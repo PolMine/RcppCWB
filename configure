@@ -1,15 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 PLATFORM=$(uname -s)
 
-if [ "$PLATFORM" == "Darwin" ]; then
+if [ "$PLATFORM" = "Darwin" ]; then
   if [ ! -e /usr/local/lib/libcl.a ]; then
     wget https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-osx-10.5-universal.tar.gz
     tar xzfv cwb-3.0.0-osx-10.5-universal.tar.gz
     rm cwb-3.0.0-osx-10.5-universal.tar.gz
     mv cwb-3.0.0-osx-10.5-universal cwb
   fi
-elif [ "$PLATFORM" == "Linux" ]; then
+elif [ "$PLATFORM" = "Linux" ]; then
   if [ ! -e /usr/local/lib/libcl.a ]; then
     # https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-linux-i386.tar.gz/download
     wget https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-linux-x86_64.tar.gz
