@@ -1,6 +1,6 @@
 Package: RcppCWB
 Type: Package
-Title: 'Rcpp' Bindings for the Corpus Workbench (CWB)
+Title: 'Rcpp' Bindings for the Corpus Workbench
 Version: 0.1.2
 Date: 2018-01-03
 Author: Andreas Blaette
@@ -8,7 +8,7 @@ Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
 Description: Bindings for the corpus library (CL) as low-level access to CWB-indexed corpora.
 License: GPL (>= 2)
 NeedsCompilation: yes
-SystemRequirements: IMS Open Corpus Workbench (CWB)
+SystemRequirements: On Linux and MacOS: pcre (>= 7), glib2 (>= 2)
 Imports:
     Rcpp (>= 0.12.6)
 Suggests:
