@@ -1,3 +1,6 @@
+[![Travis-CI Build Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=master)](https://travis-ci.org/PolMine/RcppCWB)
+[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
+
 # Rcpp backend for the polmineR backage
 
 The package offers a Rcpp implementation of performance critical operations. Precondition is the presence of the Corpus Workbench (CWB) on your system, as C++ code is compiled against the corpus library (CL), a C library that is part of the CWB.
