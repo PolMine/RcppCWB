@@ -1,0 +1,2 @@
+PKG_CPPFLAGS='-I/usr/local/include/cwb'
+PKG_LIBS='-lcl'
