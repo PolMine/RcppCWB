@@ -10,7 +10,6 @@ addons:
 
 r_packages:
   - Rcpp
-  - devtools
   - covr
 
 warnings_are_errors: false
