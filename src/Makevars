@@ -1,2 +1,9 @@
-PKG_CPPFLAGS='-I/usr/local/include/cwb'
-PKG_LIBS='-lcl'
+PKG_CPPFLAGS = \
+  -I/usr/local/include/cwb \
+  -I../inst/include/cwb \
+
+
+PKG_LIBS = \
+  -L/usr/local/lib \
+  -L../cwb/lib \
+  -lcl
