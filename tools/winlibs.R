@@ -1,4 +1,4 @@
-if( !file.exists("../windows/libcl-master/include/cl.h") ) ){
+if( !file.exists("../windows/libcl-master/include/cl.h") ){
   
   # if(getRversion() < "3.3.0") setInternet2()
   download.file(
