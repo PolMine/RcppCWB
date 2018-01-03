@@ -18,6 +18,5 @@ VignetteBuilder:
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 Collate:
-  'polmineR.Rcpp_package.R'
+  'RcppCWB_package.R'
   'RcppExports.R'
-  'zzz.R'
