@@ -1,12 +1,11 @@
-Package: polmineR.Rcpp
+Package: RcppCWB
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 0.1.1
-Date: 2017-12-14
+Title: 'Rcpp' Bindings for the Corpus Workbench (CWB)
+Version: 0.1.2
+Date: 2018-01-03
 Author: Andreas Blaette
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
-Description: One paragraph description of what the package does as one or more
-    full sentences.
+Description: Bindings for the corpus library (CL) as low-level access to CWB-indexed corpora.
 License: GPL (>= 2)
 NeedsCompilation: yes
 SystemRequirements: IMS Open Corpus Workbench (CWB)
