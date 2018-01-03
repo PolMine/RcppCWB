@@ -1,27 +1,12 @@
-# CXX_STD=CXX11
-
-
 PKG_CPPFLAGS = \
-    -I../inst/include/cwb
+    -I../windows/libcl-master/include
 
 PKG_CXXFLAGS=-D_LIB
 
 PKG_LIBS = \
-    -L../inst/libs${R_ARCH} \
+    -L../windows/libcl-master/lib/{R_ARCH} \
     -lcl -lpcre -lglib-2.0 -lintl \
     -lws2_32 -lwinmm -lole32 
-
-# \
-    
-# -dynamic -lmsvcrt
-
-# -lwinpthread-1 
-#    -L/Rtools/mingw_64/lib/gcc/x86_64-w64-mingw32/4.9.3/ \
-#    -LC:/windows/system32 \
-#    -LC:/windows/SysWOW64 \
-#    -static-libgcc -static-libstdc++ -lstdc++ \
- 
-
 
 all: clean winlibs
 
