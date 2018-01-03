@@ -4,7 +4,7 @@ PKG_CPPFLAGS = \
 PKG_CXXFLAGS=-D_LIB
 
 PKG_LIBS = \
-    -L../windows/libcl-master/lib/{R_ARCH} \
+    -L../windows/libcl-master/lib${R_ARCH} \
     -lcl -lpcre -lglib-2.0 -lintl \
     -lws2_32 -lwinmm -lole32 
 
