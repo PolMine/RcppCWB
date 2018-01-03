@@ -1,1 +1,5 @@
 rm -f src/*.{o,so}
+
+if [ -d "cwb" ]; then
+  rm -r cwb
+fi
