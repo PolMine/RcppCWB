@@ -20,3 +20,7 @@ regionsToCountMatrix(corpus, pAttribute = "word",
 \description{
 Reduces time by one third.
 }
+\examples{
+Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+regionsToCountMatrix(corpus = "REUTERS", pAttribute = "word", matrix = matrix(c(1,10), ncol = 2))
+}

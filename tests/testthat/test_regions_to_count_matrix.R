@@ -1,0 +1,16 @@
+library(RcppCWB)
+
+testthat::context("regions_to_count_matrix")
+
+test_that(
+  "regions_to_count_matrix",
+  {
+    M <- regions_to_count_matrix(
+      corpus = "REUTERS",
+      p_attribute = "word",
+      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
+      matrix = matrix(c(0, 91), nrow = 1)
+    )
+    expect_equal(M[16,2], 5L)
+  }
+)

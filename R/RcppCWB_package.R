@@ -26,6 +26,9 @@ NULL
 #' @param registry character
 #' @export decodeSAttribute
 #' @aliases decode_s_attribute
+#' @examples
+#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+#' decodeSAttribute("REUTERS", "places")
 decodeSAttribute <- function(corpus, sAttribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   decode_s_attribute(corpus, sAttribute, registry)
 }
@@ -39,6 +42,9 @@ decodeSAttribute <- function(corpus, sAttribute, registry = Sys.getenv("CORPUS_R
 #' @param registry character
 #' @export getCountVector
 #' @aliases get_count_vector
+#' @examples
+#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+#' getCountVector("REUTERS", pAttribute = "word")
 getCountVector <- function(corpus, pAttribute = "word", registry = Sys.getenv("CORPUS_REGISTRY")){
   get_count_vector(corpus, pAttribute, registry)
 }
@@ -69,6 +75,9 @@ getRegionMatrix <- function(corpus, sAttribute = "word", strucs, registry = Sys.
 #' @param window intger, window size
 #' @export getCbowMatrix
 #' @aliases get_cbow_matrix
+#' @examples
+#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+#' getCbowMatrix("REUTERS", pAttribute = "word", matrix = matrix(c(1,10), nrow = 1), window = 5L)
 getCbowMatrix <- function(corpus, pAttribute = "word", registry = Sys.getenv("CORPUS_REGISTRY"), matrix, window){
   get_cbow_matrix(corpus = corpus, p_attribute = pAttribute, registry = registry, matrix = matrix, window = window)
 }
@@ -84,6 +93,9 @@ getCbowMatrix <- function(corpus, pAttribute = "word", registry = Sys.getenv("CO
 #' @param matrix a matrix with regions
 #' @export regionsToCountMatrix
 #' @aliases regions_to_count_matrix
+#' @examples 
+#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+#' regionsToCountMatrix(corpus = "REUTERS", pAttribute = "word", matrix = matrix(c(1,10), ncol = 2))
 regionsToCountMatrix <- function(corpus, pAttribute = "word", registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
   regions_to_count_matrix(corpus = corpus, p_attribute = pAttribute, registry = registry, matrix = matrix)
 }

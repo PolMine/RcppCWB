@@ -230,8 +230,8 @@ int lexicon_size(SEXP corpus, SEXP p_attribute, SEXP registry){
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector cpos2struc(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVector cpos, SEXP registry){
-  Attribute* att = make_s_attribute(corpus, p_attribute, registry);
+Rcpp::IntegerVector cpos2struc(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry){
+  Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   int i;
   int len = cpos.length();
   Rcpp::IntegerVector strucs(len);

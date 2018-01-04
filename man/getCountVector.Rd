@@ -18,3 +18,7 @@ getCountVector(corpus, pAttribute = "word",
 \description{
 Substantially faster than cqi_cpos2str/tabulate.
 }
+\examples{
+Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+getCountVector("REUTERS", pAttribute = "word")
+}

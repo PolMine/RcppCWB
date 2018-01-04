@@ -1,6 +1,6 @@
 ---
-title: "Getting started with polmineR.Rcpp"
-author: "Andreas Blätte (andreas.blaette@uni-due.de)"
+title: "Getting started with RcppCWB"
+author: "Andreas Blaette (andreas.blaette@uni-due.de)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

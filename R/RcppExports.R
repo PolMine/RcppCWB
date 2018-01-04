@@ -33,8 +33,8 @@ lexicon_size <- function(corpus, p_attribute, registry) {
     .Call(`_RcppCWB_lexicon_size`, corpus, p_attribute, registry)
 }
 
-cpos2struc <- function(corpus, p_attribute, cpos, registry) {
-    .Call(`_RcppCWB_cpos2struc`, corpus, p_attribute, cpos, registry)
+cpos2struc <- function(corpus, s_attribute, cpos, registry) {
+    .Call(`_RcppCWB_cpos2struc`, corpus, s_attribute, cpos, registry)
 }
 
 cpos2str <- function(corpus, p_attribute, registry, cpos) {

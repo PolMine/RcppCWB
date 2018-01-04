@@ -22,3 +22,7 @@ getCbowMatrix(corpus, pAttribute = "word",
 \description{
 Substantially faster than lapply(cqi_struc2cpos).
 }
+\examples{
+Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
+getCbowMatrix("REUTERS", pAttribute = "word", matrix = matrix(c(1,10), nrow = 1), window = 5L)
+}

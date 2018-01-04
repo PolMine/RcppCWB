@@ -116,16 +116,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // cpos2struc
-Rcpp::IntegerVector cpos2struc(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVector cpos, SEXP registry);
-RcppExport SEXP _RcppCWB_cpos2struc(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
+Rcpp::IntegerVector cpos2struc(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
+RcppExport SEXP _RcppCWB_cpos2struc(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
-    rcpp_result_gen = Rcpp::wrap(cpos2struc(corpus, p_attribute, cpos, registry));
+    rcpp_result_gen = Rcpp::wrap(cpos2struc(corpus, s_attribute, cpos, registry));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -1,0 +1,16 @@
+library(RcppCWB)
+
+testthat::context("regions_to_ids")
+
+test_that(
+  "regions_to_ids",
+  {
+    ids <- regions_to_ids(
+      corpus = "REUTERS",
+      p_attribute = "word",
+      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
+      matrix = matrix(c(0, 91), nrow = 1)
+    )
+    expect_equal(tail(ids, n = 6L), c(55L, 56L, 41L, 15L, 57L, 58L))
+  }
+)
