@@ -1,29 +1,25 @@
 ---
-title: "Getting started with RcppCWB"
+title: "Introducing RcppCWB"
 author: "Andreas Blaette (andreas.blaette@uni-due.de)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with polmineR.Rcpp}
+  %\VignetteIndexEntry{Introducing RcppCWB}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-## Disclaimer
+# Introducing RcppCWB
 
-Please note: This is not a perfect instruction for reproduction,
-A few steps are reconstructed from memory. It will hopefully 
-help future efforts to cross compile the CWB.
+The corpus library (CL) is a C library offering low-level access 
+to CWB-indexed corpora. This package offers wrappers for core functions of the corpus library,
+and functions for performance critial tasks in the polmineR package.
+
   
-  
-## Cross compilation of Corpus Workbench for 64 bit Windows
+## Annex: Cross-compiling libcl and the Corpus Workbench (CWB)
 
 ### Potentially useful resources
 
-
-The dll libglib-2.0-0.dll is available at:
-http://www.dlldownloader.com/libglib2-00-dll/
-  
 A very good description:
 www.blogcompiler.com/2010/07/11/compile-for-windows-on-linux
 
@@ -46,9 +42,10 @@ MINGW_OUTPUT_TMP=`x86_64-w64-mingw32-gcc --print-search-dirs | grep ^install`; e
 
 Note: This line is from the INSTALL.WIN instructions.
 
-# 64 bit
 
-### Cross-compiling pcre
+### Cross-compilation (64bit)
+
+#### pcre
 
 ```{sh, eval = FALSE}
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz
@@ -66,7 +63,8 @@ make
 sudo make install
 ```
 
-### libiconv
+
+#### libiconv
 
 ```{sh, eval = FALSE}
 wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
@@ -83,9 +81,7 @@ sudo make install
 ```
 
 
-### expat
-
-Thought this was necessary for gettext - but I am not really sure.
+#### expat
 
 ```{sh, eval = FALSE}
 wget http://downloads.sourceforge.net/expat/expat-2.1.0.tar.gz
@@ -101,9 +97,8 @@ make
 sudo make install
 ```
 
-### gettext
 
-This cost me a lot of nerves and it was painful. At the end it simply worked, but I do not know why.
+### gettext
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnu.org/pub/gnu/gettext/gettext-latest.tar.gz
@@ -139,7 +134,7 @@ sudo make install
 ```
 
 
-### Cross-compiling glib
+### glib
 
 It never worked to do it myself. Here you can get binaries in a 
 simple and dirty way: BEST CHOICE!!
@@ -148,7 +143,7 @@ simple and dirty way: BEST CHOICE!!
 wget http://ftp.gnome.org/pub/gnome/binaries/win64/glib/2.26/
 ```
 
-Copy files to cross compiler dirs after download.
+Copy files to cross compiler dirs after download. 
 
 This is where I finally got libglib-2.0.0.dll:
 
@@ -174,7 +169,8 @@ CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc  ./configure               \
 --oldincludedir=/usr/lib/gcc/x86_64-w64-mingw32/4.8/include
 ```
 
-### Cross compiling Corpus Workbench
+
+#### CWB
 
 Basically, I followed the instructions in the INSTALL.WIN file. In addition:
 
@@ -226,9 +222,10 @@ I think for 'make release', certain dlls were still missing (libglib-2.0.0.dll),
 so I downloaded that manually from a source indicated above and put that
 into the bin dir in the cross compiler directory.
 
-# 32 bit
 
-## pcre
+### Cross-compilation (32bit)
+
+#### pcre
 
 ```{sh, eval = FALSE}
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz
@@ -245,26 +242,8 @@ make
 sudo make install
 ```
 
-# pcre 2
 
-```{sh, eval = FALSE}
-wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre2-10.21.tar.gz
-tar xzfv pcre2-10.21.tar.gz
-cd pcre2-10.21
-CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc  ./configure    \
---host=x86_64-w64-mingw32                                  \
---enable-utf8 --enable-unicode-properties --enable-jit     \
---enable-pcre16 --enable-pcre32                            \
---enable-newline-is-any --disable-cpp --enable-static      \
---prefix=/usr/lib/gcc/x86_64-w64-mingw32/4.8/              \
---exec-prefix=/usr/lib/gcc/x86_64-w64-mingw32/4.8/         \
---oldincludedir=/usr/lib/gcc/x86_64-w64-mingw32/4.8/include
-make
-sudo make install
-```
-
-
-## libiconv
+#### iconv
 
 ```{sh, eval = FALSE}
 wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
@@ -281,7 +260,7 @@ sudo make install
 ```
 
 
-### expat
+#### expat
 
 ```{sh, eval = FALSE}
 wget http://downloads.sourceforge.net/expat/expat-2.1.0.tar.gz
@@ -297,7 +276,7 @@ make
 sudo make install
 ```
 
-## liblzma
+#### liblzma
 
 liblzma von github clonen 
 
@@ -312,7 +291,8 @@ make
 sudo make install
 ```
 
-## libxml2
+
+#### libxml2
 
 ```{sh, eval = FALSE}
 wget ftp://xmlsoft.org/libxml2/libxml2-sources-2.9.7.tar.gz
@@ -329,7 +309,7 @@ sudo make install
 ```
 
 
-### gettext
+#### gettext
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnu.org/pub/gnu/gettext/gettext-latest.tar.gz
@@ -348,8 +328,7 @@ sudo make install
 ```
 
 
-
-### libffi
+#### libffi
 
 ```{sh, eval = FALSE}
 wget ftp://sourceware.org/pub/libffi/libffi-3.2.tar.gz
@@ -366,7 +345,8 @@ make
 sudo make install
 ```
 
-## glib
+
+#### glib
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnome.org/pub/gnome/sources/glib/2.50/glib-2.50.0.tar.xz
@@ -384,15 +364,21 @@ CC=i686-w64-mingw32-gcc CC_FOR_BUILD=gcc  ./configure               \
 ```
 
 
+### Create libcl.a static library
+
+The essential workflow is as follows. In the directory of the Corpus Workbench
+execute:
+
 ```{sh, eval = FALSE}
 make clean
 make depend
 make cl
 ```
 
-include line in regopt.c
+It is necessary to include the following line in cl/regopt.c:
 #include <pcre.h>
 
+Compile the file again:
 
 ```{sh, eval = FALSE}
 i686-w64-mingw32-gcc -c -o regopt.o -O2 -Wall             \
@@ -408,7 +394,8 @@ i686-w64-mingw32-gcc -c -o regopt.o -O2 -Wall             \
   regopt.c
 ```
 
-Throws one warning (if (ch >= 32 & ch < 127))
+This throws one warning (if (ch >= 32 & ch < 127)) that can be ignored.
+Combine the object files into to the static library.
 
 
 ```{sh, eval = FALSE}
@@ -423,30 +410,6 @@ i686-w64-mingw32-ranlib libcl.a
 ```
 
 
-
-how to merge static libraries:
+Helpful toturial how to merge static libraries:
 https://stackoverflow.com/questions/3821916/how-to-merge-two-ar-static-libraries-into-one
 
-```{sh, eval = FALSE}
-create libcl-1.a
-addlib libcl.a
-addlib /usr/lib/gcc/i686-w64-mingw32/4.8/lib/libintl.a
-addlib /usr/lib/gcc/i686-w64-mingw32/4.8/lib/libpcre.a
-addlib /usr/lib/gcc/i686-w64-mingw32/4.8/lib/libglib-2.0.a
-save
-end
-```
-
-```{sh, eval = FALSE}
-ar -M <foo.mri
-```
-
-
-Workflow:
-get archive libraries
-compile libcl.a (make cl)
-ar 
-
-link to 
-Ole32.dll
-winmm.lib

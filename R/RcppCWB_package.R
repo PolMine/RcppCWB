@@ -1,6 +1,7 @@
-#' Rcpp extension for polmineR.
+#' Rcpp bindings for the corpus library (CL).
 #' 
-#' Based on the functionality of the cl corpus library, this package
+#' The corpus library (CL) is a C library offering low-level access 
+#' to CWB-indexed corpora. This package
 #' offers wrappers for core functions of the corpus library, and 
 #' functions for performance critial tasks in the polmineR package.
 #' 
@@ -11,103 +12,90 @@
 #' @rdname RcppCWB
 #' @name RcppCWB
 #' @useDynLib RcppCWB, .registration = TRUE
-#' @aliases attribute_size lexicon_size cpos2struc cpos2str cpos2id struc2cpos
-#' id2str struc2str regex2id str2id id2freq id2cpos cpos2lbound cpos2rbound
 #' @importFrom Rcpp evalCpp
 #' @exportPattern "^[[:alpha:]]+"
 NULL
 
-#' Decode s-attributes
-#' 
-#' Proof of concept - not faster than rcqp::cqi_struc2str.
+
+#' Higher-level Functions.
 #' 
 #' @param corpus character
-#' @param sAttribute character
+#' @param s_attribute character
+#' @param p_attribute character
 #' @param registry character
-#' @export decodeSAttribute
-#' @aliases decode_s_attribute
-#' @examples
-#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
-#' decodeSAttribute("REUTERS", "places")
-decodeSAttribute <- function(corpus, sAttribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  decode_s_attribute(corpus, sAttribute, registry)
-}
-
-#' Count tokens in corpus.
-#' 
-#' Substantially faster than cqi_cpos2str/tabulate.
-#' 
-#' @param corpus character
-#' @param pAttribute character
-#' @param registry character
-#' @export getCountVector
-#' @aliases get_count_vector
-#' @examples
-#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
-#' getCountVector("REUTERS", pAttribute = "word")
-getCountVector <- function(corpus, pAttribute = "word", registry = Sys.getenv("CORPUS_REGISTRY")){
-  get_count_vector(corpus, pAttribute, registry)
-}
-
-
-#' Get Matrix with Regions.
-#' 
-#' Substantially faster than lapply(cqi_struc2cpos).
-#' 
-#' @param corpus character
-#' @param sAttribute character
 #' @param strucs integer
-#' @param registry character
-#' @export getRegionMatrix
-#' @aliases get_region_matrix
-getRegionMatrix <- function(corpus, sAttribute = "word", strucs, registry = Sys.getenv("CORPUS_REGISTRY")){
-  get_region_matrix(corpus = corpus, s_attribute = sAttribute, strucs = strucs, registry = registry)
-}
-
-#' Get matrix with CBOW.
-#' 
-#' Substantially faster than lapply(cqi_struc2cpos).
-#' 
-#' @param corpus character
-#' @param pAttribute character
-#' @param registry character
-#' @param matrix a matrix with regions
-#' @param window intger, window size
-#' @export getCbowMatrix
-#' @aliases get_cbow_matrix
 #' @examples
 #' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
-#' getCbowMatrix("REUTERS", pAttribute = "word", matrix = matrix(c(1,10), nrow = 1), window = 5L)
-getCbowMatrix <- function(corpus, pAttribute = "word", registry = Sys.getenv("CORPUS_REGISTRY"), matrix, window){
-  get_cbow_matrix(corpus = corpus, p_attribute = pAttribute, registry = registry, matrix = matrix, window = window)
-}
+#' 
+#' decode_s_attribute("REUTERS", "places", registry = Sys.getenv("CORPUS_REGISTRY"))
+#' get_count_vector(
+#'   "REUTERS", p_attribute = "word",
+#'   registry = Sys.getenv("CORPUS_REGISTRY")
+#'   )
+#' get_cbow_matrix(
+#'   "REUTERS", p_attribute = "word", matrix = matrix(c(1,10), nrow = 1),
+#'   window = 5L, registry = Sys.getenv("CORPUS_REGISTRY")
+#'   )
+#' regions_to_count_matrix(
+#'   "REUTERS", p_attribute = "word", matrix = matrix(c(1,10), ncol = 2),
+#'   registry = Sys.getenv("CORPUS_REGISTRY")
+#'   )
+#' @section Functions:
+#' \describe{
+#'   \item{\code{decode_s_attribute(corpus, s_attribute, registry)}}{decode s-attributes}
+#'   \item{\code{get_count_vector(corpus, p_attribute, registry)}}{count tokens in corpus}
+#'   \item{\code{get_region_matrix(corpus, s_attribute, strucs, registry)}}{get region matrix for strucs}
+#'   \item{\code{regions_to_count_matrix(corpus, p_attribute, registry, matrix)}}{get matrix with ids and counts}
+#'   \item{\code{get_cbow_matrix(corpus, p_attribute, registry = registry, matrix, window = window)}}{get matrix with CBOW}
+#'   \item{\code{regions_to_count_matrix(corpus, p_attribute, registry, matrix)}}{get counts for regions}
+#'   \item{\code{regions_to_ids(corpus, p_attribute, registry, matrix)}}{get ids for regions}
+#' }
+#' @aliases get_count_vector decode_s_attribute get_region_matrix regions_to_count_matrix
+#'   get_cbow_matrix regions_to_count_matrix regions_to_ids
+#' @export get_count_vector decode_s_attribute get_region_matrix regions_to_count_matrix
+#' @export get_cbow_matrix regions_to_count_matrix regions_to_ids
+#' @rdname cl_wrapper_functions
+#' @name cl_wrapper_functions
+NULL
 
 
-#' Get matrix with ids and counts.
+#' Functions of the Corpus Library (CL).
 #' 
-#' Reduces time by one third.
-#' 
-#' @param corpus character
-#' @param pAttribute character
-#' @param registry character
-#' @param matrix a matrix with regions
-#' @export regionsToCountMatrix
-#' @aliases regions_to_count_matrix
-#' @examples 
-#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
-#' regionsToCountMatrix(corpus = "REUTERS", pAttribute = "word", matrix = matrix(c(1,10), ncol = 2))
-regionsToCountMatrix <- function(corpus, pAttribute = "word", registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
-  regions_to_count_matrix(corpus = corpus, p_attribute = pAttribute, registry = registry, matrix = matrix)
-}
-
-#' Turn regions into ids.
-#' 
-#' @param corpus character
-#' @param pAttribute character
-#' @param registry character
-#' @param matrix matrix (2 columns) with regions
-#' @export regionsToIds
-#' @aliases regions_to_ids
-regionsToIds <- function(corpus, pAttribute, registry, matrix){
-  regions_to_ids(corpus = corpus, p_attribute = pAttribute, registry = registry, matrix = matrix)
-}
+#' @param corpus name of a CWB corpus (upper case)
+#' @param attribute name of a s- or p-attribute
+#' @param attribute_type either "p" or "s"
+#' @param registry path to the registry directory
+#' @param p_attribute a p-attribute
+#' @param s_attribute a s-attribute
+#' @param cpos corpus positions (integer vector)
+#' @param struc strucs (integer vector)
+#' @param id id of a token
+#' @param regex a regular expression
+#' @param str a character string
+#' @export attribute_size
+#' @rdname cl_functions
+#' @section Functions:
+#' \describe{
+#'   \item{\code{attribute_size(corpus, attribute, attribute_type, registry)}}{get size of an attribute}
+#'   \item{\code{lexicon_size(corpus, p_attribute, registry)}}{get lexicon size}
+#'   \item{\code{cpos2struc(corpus, s_attribute, cpos, registry)}}{turn corpus position to struc}
+#'   \item{\code{cpos2str(corpus, p_attribute, registry, cpos)}}{get string value for corpus position}
+#'   \item{\code{cpos2id(corpus, p_attribute, registry, cpos)}}{get token id for corpus position}
+#'   \item{\code{struc2cpos(corpus, s_attribute, registry, struc)}}{turn struc to cpos}
+#'   \item{\code{id2str(corpus, p_attribute, registry, id)}}{get string value for id}
+#'   \item{\code{struc2str(corpus, s_attribute, struc, registry)}}{get string value for struc}
+#'   \item{\code{regex2id(corpus, p_attribute, regex, registry)}}{get ids matching a regex}
+#'   \item{\code{str2id(corpus, p_attribute, str, registry)}}{get id for string}
+#'   \item{\code{id2freq(corpus, p_attribute, id, registry)}}{get frequency for id}
+#'   \item{\code{id2cpos(corpus, p_attribute, id, registry)}}{get corpus positions for id}
+#'   \item{\code{cpos2lbound(corpus, s_attribute, cpos, registry)}}{get left boundary of a struc for a corpus position}
+#'   \item{\code{cpos2rbound(corpus, s_attribute, cpos, registry)}}{get right boundary of a struc for a corpus position}
+#' }
+#' @aliases attribute_size lexicon_size cpos2struc cpos2str cpos2id 
+#'   struc2cpos id2str struc2str regex2id str2id id2freq id2cpos
+#'   cpos2lbound cpos2rbound
+#' @export attribute_size lexicon_size cpos2struc cpos2str cpos2id
+#' @export struc2cpos id2str struc2str regex2id str2id id2freq id2cpos 
+#' @export cpos2lbound cpos2rbound
+#' @name cl_functions
+NULL

@@ -3,24 +3,11 @@
 \docType{package}
 \name{RcppCWB}
 \alias{RcppCWB}
-\alias{attribute_size}
-\alias{lexicon_size}
-\alias{cpos2struc}
-\alias{cpos2str}
-\alias{cpos2id}
-\alias{struc2cpos}
-\alias{id2str}
-\alias{struc2str}
-\alias{regex2id}
-\alias{str2id}
-\alias{id2freq}
-\alias{id2cpos}
-\alias{cpos2lbound}
-\alias{cpos2rbound}
 \alias{RcppCWB-package}
-\title{Rcpp extension for polmineR.}
+\title{Rcpp bindings for the corpus library (CL).}
 \description{
-Based on the functionality of the cl corpus library, this package
+The corpus library (CL) is a C library offering low-level access 
+to CWB-indexed corpora. This package
 offers wrappers for core functions of the corpus library, and 
 functions for performance critial tasks in the polmineR package.
 }
