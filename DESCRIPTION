@@ -1,14 +1,18 @@
 Package: RcppCWB
 Type: Package
-Title: 'Rcpp' Bindings for the Corpus Workbench
+Title: 'Rcpp' Bindings for the Corpus Workbench (CWB)
 Version: 0.1.3
-Date: 2018-01-03
+Date: 2018-01-08
 Author: Andreas Blaette
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
-Description: Bindings for the corpus library (CL) as low-level access to CWB-indexed corpora.
-License: GPL (>= 2)
+Description: Bindings for the C code of the Corpus Workbench (CWB) to efficiently analyze
+    and query large corpora that have been indexed with the CWB. 'RcppCWB' is licensed
+    under the GNU GPL-3, in line with the GPL-3 license of the CWB. The CWB relies
+    on pcre (license: BSD) and GLib (license: LGPL).
+License: GPL-3 | file LICENSE
+Copyright: For the copyrights for the Corpus Workbench (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: On Linux and MacOS: pcre (>= 7), glib2 (>= 2)
+SystemRequirements: On Linux and MacOS GNU make, pcre (>= 7) and glib2 (>= 2).
 Imports:
     methods,
     Rcpp (>= 0.12.6)
@@ -18,9 +22,11 @@ Suggests:
 VignetteBuilder:
     knitr
 LinkingTo: Rcpp
+URL: https://www.github.com/PolMine/RcppCWB
+BugReports: https://github.com/PolMine/RcppCWB/issues
 RoxygenNote: 6.0.1
 Collate:
   'RcppCWB_package.R'
   'RcppExports.R'
-  'RegistryFile.R'
+  'utils.R'
   'zzz.R'

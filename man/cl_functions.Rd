@@ -46,20 +46,20 @@ Functions of the Corpus Library (CL).
 \section{Functions}{
 
 \describe{
-  \item{\code{attribute_size(corpus, attribute, attribute_type, registry)}}{}
-  \item{\code{lexicon_size(corpus, p_attribute, registry)}}{}
-  \item{\code{cpos2struc(corpus, s_attribute, cpos, registry)}}{}
-  \item{\code{cpos2str(corpus, p_attribute, registry, cpos)}}{}
-  \item{\code{cpos2id(corpus, p_attribute, registry, cpos)}}{}
-  \item{\code{struc2cpos(corpus, s_attribute, registry, struc)}}{}
-  \item{\code{id2str(corpus, p_attribute, registry, id)}}{}
-  \item{\code{struc2str(corpus, s_attribute, struc, registry)}}{}
-  \item{\code{regex2id(corpus, p_attribute, regex, registry)}}{}
-  \item{\code{str2id(corpus, p_attribute, str, registry)}}{}
-  \item{\code{id2freq(corpus, p_attribute, id, registry)}}{}
-  \item{\code{id2cpos(corpus, p_attribute, id, registry)}}{}
-  \item{\code{cpos2lbound(corpus, s_attribute, cpos, registry)}}{}
-  \item{\code{cpos2rbound(corpus, s_attribute, cpos, registry)}}{}
+  \item{\code{attribute_size(corpus, attribute, attribute_type, registry)}}{get size of an attribute}
+  \item{\code{lexicon_size(corpus, p_attribute, registry)}}{get lexicon size}
+  \item{\code{cpos2struc(corpus, s_attribute, cpos, registry)}}{turn corpus position to struc}
+  \item{\code{cpos2str(corpus, p_attribute, registry, cpos)}}{get string value for corpus position}
+  \item{\code{cpos2id(corpus, p_attribute, registry, cpos)}}{get token id for corpus position}
+  \item{\code{struc2cpos(corpus, s_attribute, registry, struc)}}{turn struc to cpos}
+  \item{\code{id2str(corpus, p_attribute, registry, id)}}{get string value for id}
+  \item{\code{struc2str(corpus, s_attribute, struc, registry)}}{get string value for struc}
+  \item{\code{regex2id(corpus, p_attribute, regex, registry)}}{get ids matching a regex}
+  \item{\code{str2id(corpus, p_attribute, str, registry)}}{get id for string}
+  \item{\code{id2freq(corpus, p_attribute, id, registry)}}{get frequency for id}
+  \item{\code{id2cpos(corpus, p_attribute, id, registry)}}{get corpus positions for id}
+  \item{\code{cpos2lbound(corpus, s_attribute, cpos, registry)}}{get left boundary of a struc for a corpus position}
+  \item{\code{cpos2rbound(corpus, s_attribute, cpos, registry)}}{get right boundary of a struc for a corpus position}
 }
 }
 

@@ -8,7 +8,12 @@ if [ "$PLATFORM" = "Darwin" ]; then
     tar xzfv cwb-3.0.0-osx-10.5-universal.tar.gz
     rm cwb-3.0.0-osx-10.5-universal.tar.gz
     mv cwb-3.0.0-osx-10.5-universal cwb
-  fi
+  else
+    if [ ! -e ./cwb ]; then
+      mkdir cwb
+      mkdir cwb/lib
+    fi
+  fi 
 elif [ "$PLATFORM" = "Linux" ]; then
   if [ ! -e /usr/local/lib/libcl.a ]; then
     # https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-linux-i386.tar.gz/download
@@ -16,6 +21,11 @@ elif [ "$PLATFORM" = "Linux" ]; then
     tar xzfv cwb-3.0.0-linux-x86_64.tar.gz
     rm cwb-3.0.0-linux-x86_64.tar.gz
     mv cwb-3.0.0-linux-x86_64 cwb
+  else 
+    if [ ! -e ./cwb ]; then
+      mkdir cwb
+      mkdir cwb/lib
+    fi
   fi
 fi
 
