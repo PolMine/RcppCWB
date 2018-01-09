@@ -5,8 +5,17 @@
 #' offers wrappers for core functions of the corpus library, and 
 #' functions for performance critial tasks in the polmineR package.
 #' 
+#' The work of the all contributors to the Corpus Workbench is
+#' gratefully acknowledged. There is a huge intellectual debt to 
+#' Bernard Desgraupes and Sylvain Loiseau, and the package 'rcqp'
+#' they developed as a R wrapper for the functionality of the CWB.
+#' The intention behind using Rcpp for writing the wrapper library
+#' is to make it easier to maintain the package, to provide some 
+#' extra functionality, and to make the package work on Windows
+#' systems. 
+#' 
 #' @author Andreas Blaette (andreas.blaette@@uni-due.de)
-#' @references http://polmine.sowi.uni-due.de
+#' @references CWB (http://cwb.sourceforge.net)
 #' @keywords package
 #' @docType package
 #' @rdname RcppCWB
@@ -17,7 +26,7 @@
 NULL
 
 
-#' Higher-level Functions.
+#' Higher-level functions using the corpus library (CL).
 #' 
 #' @param corpus character
 #' @param s_attribute character
@@ -59,7 +68,7 @@ NULL
 NULL
 
 
-#' Functions of the Corpus Library (CL).
+#' Exposed functions of the corpus library (CL).
 #' 
 #' @param corpus name of a CWB corpus (upper case)
 #' @param attribute name of a s- or p-attribute
@@ -72,30 +81,29 @@ NULL
 #' @param id id of a token
 #' @param regex a regular expression
 #' @param str a character string
-#' @export attribute_size
 #' @rdname cl_functions
 #' @section Functions:
 #' \describe{
-#'   \item{\code{attribute_size(corpus, attribute, attribute_type, registry)}}{get size of an attribute}
-#'   \item{\code{lexicon_size(corpus, p_attribute, registry)}}{get lexicon size}
-#'   \item{\code{cpos2struc(corpus, s_attribute, cpos, registry)}}{turn corpus position to struc}
-#'   \item{\code{cpos2str(corpus, p_attribute, registry, cpos)}}{get string value for corpus position}
-#'   \item{\code{cpos2id(corpus, p_attribute, registry, cpos)}}{get token id for corpus position}
-#'   \item{\code{struc2cpos(corpus, s_attribute, registry, struc)}}{turn struc to cpos}
-#'   \item{\code{id2str(corpus, p_attribute, registry, id)}}{get string value for id}
-#'   \item{\code{struc2str(corpus, s_attribute, struc, registry)}}{get string value for struc}
-#'   \item{\code{regex2id(corpus, p_attribute, regex, registry)}}{get ids matching a regex}
-#'   \item{\code{str2id(corpus, p_attribute, str, registry)}}{get id for string}
-#'   \item{\code{id2freq(corpus, p_attribute, id, registry)}}{get frequency for id}
-#'   \item{\code{id2cpos(corpus, p_attribute, id, registry)}}{get corpus positions for id}
-#'   \item{\code{cpos2lbound(corpus, s_attribute, cpos, registry)}}{get left boundary of a struc for a corpus position}
-#'   \item{\code{cpos2rbound(corpus, s_attribute, cpos, registry)}}{get right boundary of a struc for a corpus position}
+#'   \item{\code{cwb_attribute_size(corpus, attribute, attribute_type, registry)}}{get size of an attribute}
+#'   \item{\code{cwb_lexicon_size(corpus, p_attribute, registry)}}{get lexicon size}
+#'   \item{\code{cwb_cpos2struc(corpus, s_attribute, cpos, registry)}}{turn corpus position to struc}
+#'   \item{\code{cwb_cpos2str(corpus, p_attribute, registry, cpos)}}{get string value for corpus position}
+#'   \item{\code{cwb_cpos2id(corpus, p_attribute, registry, cpos)}}{get token id for corpus position}
+#'   \item{\code{cwb_struc2cpos(corpus, s_attribute, registry, struc)}}{turn struc to cpos}
+#'   \item{\code{cwb_id2str(corpus, p_attribute, registry, id)}}{get string value for id}
+#'   \item{\code{cwb_struc2str(corpus, s_attribute, struc, registry)}}{get string value for struc}
+#'   \item{\code{cwb_regex2id(corpus, p_attribute, regex, registry)}}{get ids matching a regex}
+#'   \item{\code{cwb_str2id(corpus, p_attribute, str, registry)}}{get id for string}
+#'   \item{\code{cwb_id2freq(corpus, p_attribute, id, registry)}}{get frequency for id}
+#'   \item{\code{cwb_id2cpos(corpus, p_attribute, id, registry)}}{get corpus positions for id}
+#'   \item{\code{cwb_cpos2lbound(corpus, s_attribute, cpos, registry)}}{get left boundary of a struc for a corpus position}
+#'   \item{\code{cwb_cpos2rbound(corpus, s_attribute, cpos, registry)}}{get right boundary of a struc for a corpus position}
 #' }
-#' @aliases attribute_size lexicon_size cpos2struc cpos2str cpos2id 
-#'   struc2cpos id2str struc2str regex2id str2id id2freq id2cpos
-#'   cpos2lbound cpos2rbound
-#' @export attribute_size lexicon_size cpos2struc cpos2str cpos2id
-#' @export struc2cpos id2str struc2str regex2id str2id id2freq id2cpos 
-#' @export cpos2lbound cpos2rbound
+#' @aliases cwb_attribute_size cwb_lexicon_size cwb_cpos2struc cwb_cpos2str cwb_cpos2id 
+#'   cwb_struc2cpos cwb_id2str cwb_struc2str cwb_regex2id cwb_str2id cwb_id2freq cwb_id2cpos
+#'   cwb_cpos2lbound cwb_cpos2rbound
+#' @export cwb_attribute_size cwb_lexicon_size cwb_cpos2struc cwb_cpos2str cwb_cpos2id
+#' @export cwb_struc2cpos cwb_id2str cwb_struc2str cwb_regex2id cwb_str2id cwb_id2freq cwb_id2cpos 
+#' @export cwb_cpos2lbound cwb_cpos2rbound
 #' @name cl_functions
 NULL

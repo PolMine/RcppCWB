@@ -1,16 +1,5 @@
-This package is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 or 3 of the License (at your option).
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.r-project.org/licenses/. 
-
-Dependencies
-============
+Licenses of the dependencies of the RcppCWB package
+===================================================
 
 The binaries of this package include the following third party components with
 the respective licenses.
@@ -30,7 +19,7 @@ BSD Licence. According to the terms of the BSD Licence this licence is reproduce
 bellow.
 
 
-GLIB2 (http://www.gtk.org/)
+GLIB2 (https://developer.gnome.org/glib/)
 ---------------------------
 
 LGPL Licence, see https://www.gnu.org/licenses/lgpl-3.0.en.html.
@@ -134,5 +123,6 @@ POSSIBILITY OF SUCH DAMAGE.
 End
 
 ============================================================================
+
 
 

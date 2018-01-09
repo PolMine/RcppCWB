@@ -11,8 +11,18 @@ to CWB-indexed corpora. This package
 offers wrappers for core functions of the corpus library, and 
 functions for performance critial tasks in the polmineR package.
 }
+\details{
+The work of the all contributors to the Corpus Workbench is
+gratefully acknowledged. There is a huge intellectual debt to 
+Bernard Desgraupes and Sylvain Loiseau, and the package 'rcqp'
+they developed as a R wrapper for the functionality of the CWB.
+The intention behind using Rcpp for writing the wrapper library
+is to make it easier to maintain the package, to provide some 
+extra functionality, and to make the package work on Windows
+systems.
+}
 \references{
-http://polmine.sowi.uni-due.de
+CWB (http://cwb.sourceforge.net)
 }
 \author{
 Andreas Blaette (andreas.blaette@uni-due.de)

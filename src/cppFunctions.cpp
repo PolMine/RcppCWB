@@ -207,7 +207,7 @@ Rcpp::IntegerVector regions_to_count_matrix(SEXP corpus, SEXP p_attribute, SEXP 
 
 
 // [[Rcpp::export]]
-int attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry) {
+int cwb_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry) {
   int size;
   std::string atype = Rcpp::as<std::string>(attribute_type);
   if (atype == "p"){
@@ -222,7 +222,7 @@ int attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP regist
 
 
 // [[Rcpp::export]]
-int lexicon_size(SEXP corpus, SEXP p_attribute, SEXP registry){
+int cwb_lexicon_size(SEXP corpus, SEXP p_attribute, SEXP registry){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   int size = cl_max_id(att);
   return( size );
@@ -230,7 +230,7 @@ int lexicon_size(SEXP corpus, SEXP p_attribute, SEXP registry){
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector cpos2struc(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry){
+Rcpp::IntegerVector cwb_cpos2struc(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   int i;
   int len = cpos.length();
@@ -243,7 +243,7 @@ Rcpp::IntegerVector cpos2struc(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVecto
 
 
 // [[Rcpp::export]]
-Rcpp::StringVector cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+Rcpp::StringVector cwb_cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   int i;
   int len;
@@ -257,7 +257,7 @@ Rcpp::StringVector cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+Rcpp::IntegerVector cwb_cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   int i;
   int len = cpos.length();
@@ -269,7 +269,7 @@ Rcpp::IntegerVector cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::
 }
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc){
+Rcpp::IntegerVector cwb_struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   Rcpp::IntegerVector cpos(2);
   int lb, rb;
@@ -281,7 +281,7 @@ Rcpp::IntegerVector struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int
 
 
 // [[Rcpp::export]]
-Rcpp::StringVector id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector id){
+Rcpp::StringVector cwb_id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector id){
   /* potentially cpos > max cpos causing a crash */
   int len = id.length();
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
@@ -295,7 +295,7 @@ Rcpp::StringVector id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::In
 
 
 // [[Rcpp::export]]
-Rcpp::StringVector struc2str(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector struc, SEXP registry){
+Rcpp::StringVector cwb_struc2str(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector struc, SEXP registry){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   int len = struc.length();
   Rcpp::StringVector result(len);
@@ -310,7 +310,7 @@ Rcpp::StringVector struc2str(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector 
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector regex2id(SEXP corpus, SEXP p_attribute, SEXP regex, SEXP registry){
+Rcpp::IntegerVector cwb_regex2id(SEXP corpus, SEXP p_attribute, SEXP regex, SEXP registry){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   char *r = strdup(Rcpp::as<std::string>(regex).c_str());
   int *idlist;
@@ -326,7 +326,7 @@ Rcpp::IntegerVector regex2id(SEXP corpus, SEXP p_attribute, SEXP regex, SEXP reg
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector str2id(SEXP corpus, SEXP p_attribute, Rcpp::StringVector str, SEXP registry){
+Rcpp::IntegerVector cwb_str2id(SEXP corpus, SEXP p_attribute, Rcpp::StringVector str, SEXP registry){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   int len = str.length();
   Rcpp::IntegerVector ids(len);
@@ -338,7 +338,7 @@ Rcpp::IntegerVector str2id(SEXP corpus, SEXP p_attribute, Rcpp::StringVector str
 }
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector id2freq(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVector id, SEXP registry){
+Rcpp::IntegerVector cwb_id2freq(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVector id, SEXP registry){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   int len = id.length();
   Rcpp::IntegerVector result(len);
@@ -351,7 +351,7 @@ Rcpp::IntegerVector id2freq(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVector i
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector id2cpos(SEXP corpus, SEXP p_attribute, SEXP id, SEXP registry){
+Rcpp::IntegerVector cwb_id2cpos(SEXP corpus, SEXP p_attribute, SEXP id, SEXP registry){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   int *cposlist;
   int len;
@@ -367,7 +367,7 @@ Rcpp::IntegerVector id2cpos(SEXP corpus, SEXP p_attribute, SEXP id, SEXP registr
 
 
 // [[Rcpp::export]]
-int cpos2lbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry){
+int cwb_cpos2lbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   int cpos_int = Rcpp::as<int>(cpos);
   int struc = cl_cpos2struc(att, cpos_int);
@@ -377,7 +377,7 @@ int cpos2lbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry){
 }
 
 // [[Rcpp::export]]
-int cpos2rbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry){
+int cwb_cpos2rbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   int cpos_int = Rcpp::as<int>(cpos);
   int struc = cl_cpos2struc(att, cpos_int);

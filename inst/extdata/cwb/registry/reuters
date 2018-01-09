@@ -7,9 +7,9 @@ NAME ""
 # corpus ID (must be lowercase in registry!)
 ID   reuters
 # path to binary data files
-HOME /Users/blaette/Lab/github/polmineR/inst/extdata/cwb/indexed_corpora/reuters
+HOME 
 # optional info file (displayed by "info;" command in CQP)
-INFO /Users/blaette/Data/cwb/indexed_corpora/reuters/.info
+INFO 
 
 # corpus properties provide additional information about the corpus:
 ##:: charset = "latin1"	# character encoding of corpus data

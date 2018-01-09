@@ -1,16 +1,29 @@
 Package: RcppCWB
 Type: Package
-Title: 'Rcpp' Bindings for the Corpus Workbench (CWB)
+Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
 Version: 0.1.3
-Date: 2018-01-08
-Author: Andreas Blaette
+Date: 2018-01-09
+Author: Andreas Blaette [aut, cre],
+  Oliver Christ [ctb],
+  Bruno Maximilian Schulze [ctb],
+  Stefan Evert [ctb],
+  Arne Fitschen [ctb]
+Authors@R: c(
+  person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
+  person("Oliver", "Christ", role = "ctb"),
+  person("Bruno Maximilian", "Schulze", role = "ctb"),
+  person("Stefan", "Evert", role = "ctb"),
+  person("Arne", "Fitschen", role = "ctb")
+  )
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
-Description: Bindings for the C code of the Corpus Workbench (CWB) to efficiently analyze
-    and query large corpora that have been indexed with the CWB. 'RcppCWB' is licensed
-    under the GNU GPL-3, in line with the GPL-3 license of the CWB. The CWB relies
-    on pcre (license: BSD) and GLib (license: LGPL).
-License: GPL-3 | file LICENSE
-Copyright: For the copyrights for the Corpus Workbench (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
+Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query
+    engine to efficiently analyze large corpora (<http://cwb.sourceforge.net>). 'RcppCWB' is licensed
+    under the GNU GPL-3, in line with the GPL-3 license of the 'CWB' (<https://www.r-project.org/Licenses/GPL-3>).
+    The 'CWB' relies on 'pcre' (BSD license, see <https://www.pcre.org/licence.txt>) and 'GLib'
+    (LGPL license, see <https://www.gnu.org/licenses/lgpl-3.0.en.html>). See the file LICENSE.note for
+    further information.
+License: GPL-3
+Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
 SystemRequirements: On Linux and MacOS GNU make, pcre (>= 7) and glib2 (>= 2).
 Imports:

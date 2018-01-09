@@ -2,21 +2,21 @@
 % Please edit documentation in R/RcppCWB_package.R
 \name{cl_functions}
 \alias{cl_functions}
-\alias{attribute_size}
-\alias{lexicon_size}
-\alias{cpos2struc}
-\alias{cpos2str}
-\alias{cpos2id}
-\alias{struc2cpos}
-\alias{id2str}
-\alias{struc2str}
-\alias{regex2id}
-\alias{str2id}
-\alias{id2freq}
-\alias{id2cpos}
-\alias{cpos2lbound}
-\alias{cpos2rbound}
-\title{Functions of the Corpus Library (CL).}
+\alias{cwb_attribute_size}
+\alias{cwb_lexicon_size}
+\alias{cwb_cpos2struc}
+\alias{cwb_cpos2str}
+\alias{cwb_cpos2id}
+\alias{cwb_struc2cpos}
+\alias{cwb_id2str}
+\alias{cwb_struc2str}
+\alias{cwb_regex2id}
+\alias{cwb_str2id}
+\alias{cwb_id2freq}
+\alias{cwb_id2cpos}
+\alias{cwb_cpos2lbound}
+\alias{cwb_cpos2rbound}
+\title{Exposed functions of the corpus library (CL).}
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}
 
@@ -41,25 +41,25 @@
 \item{str}{a character string}
 }
 \description{
-Functions of the Corpus Library (CL).
+Exposed functions of the corpus library (CL).
 }
 \section{Functions}{
 
 \describe{
-  \item{\code{attribute_size(corpus, attribute, attribute_type, registry)}}{get size of an attribute}
-  \item{\code{lexicon_size(corpus, p_attribute, registry)}}{get lexicon size}
-  \item{\code{cpos2struc(corpus, s_attribute, cpos, registry)}}{turn corpus position to struc}
-  \item{\code{cpos2str(corpus, p_attribute, registry, cpos)}}{get string value for corpus position}
-  \item{\code{cpos2id(corpus, p_attribute, registry, cpos)}}{get token id for corpus position}
-  \item{\code{struc2cpos(corpus, s_attribute, registry, struc)}}{turn struc to cpos}
-  \item{\code{id2str(corpus, p_attribute, registry, id)}}{get string value for id}
-  \item{\code{struc2str(corpus, s_attribute, struc, registry)}}{get string value for struc}
-  \item{\code{regex2id(corpus, p_attribute, regex, registry)}}{get ids matching a regex}
-  \item{\code{str2id(corpus, p_attribute, str, registry)}}{get id for string}
-  \item{\code{id2freq(corpus, p_attribute, id, registry)}}{get frequency for id}
-  \item{\code{id2cpos(corpus, p_attribute, id, registry)}}{get corpus positions for id}
-  \item{\code{cpos2lbound(corpus, s_attribute, cpos, registry)}}{get left boundary of a struc for a corpus position}
-  \item{\code{cpos2rbound(corpus, s_attribute, cpos, registry)}}{get right boundary of a struc for a corpus position}
+  \item{\code{cwb_attribute_size(corpus, attribute, attribute_type, registry)}}{get size of an attribute}
+  \item{\code{cwb_lexicon_size(corpus, p_attribute, registry)}}{get lexicon size}
+  \item{\code{cwb_cpos2struc(corpus, s_attribute, cpos, registry)}}{turn corpus position to struc}
+  \item{\code{cwb_cpos2str(corpus, p_attribute, registry, cpos)}}{get string value for corpus position}
+  \item{\code{cwb_cpos2id(corpus, p_attribute, registry, cpos)}}{get token id for corpus position}
+  \item{\code{cwb_struc2cpos(corpus, s_attribute, registry, struc)}}{turn struc to cpos}
+  \item{\code{cwb_id2str(corpus, p_attribute, registry, id)}}{get string value for id}
+  \item{\code{cwb_struc2str(corpus, s_attribute, struc, registry)}}{get string value for struc}
+  \item{\code{cwb_regex2id(corpus, p_attribute, regex, registry)}}{get ids matching a regex}
+  \item{\code{cwb_str2id(corpus, p_attribute, str, registry)}}{get id for string}
+  \item{\code{cwb_id2freq(corpus, p_attribute, id, registry)}}{get frequency for id}
+  \item{\code{cwb_id2cpos(corpus, p_attribute, id, registry)}}{get corpus positions for id}
+  \item{\code{cwb_cpos2lbound(corpus, s_attribute, cpos, registry)}}{get left boundary of a struc for a corpus position}
+  \item{\code{cwb_cpos2rbound(corpus, s_attribute, cpos, registry)}}{get right boundary of a struc for a corpus position}
 }
 }
 

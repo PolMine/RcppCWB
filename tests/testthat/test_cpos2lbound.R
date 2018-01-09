@@ -1,11 +1,11 @@
 library(RcppCWB)
 
-testthat::context("cpos2lbound")
+testthat::context("cwb_cpos2lbound")
 
 test_that(
   "id2str",
   {
-    cpos <- cpos2lbound(
+    cpos <- cwb_cpos2lbound(
       corpus = "REUTERS",
       s_attribute = "places",
       cpos = 5L,

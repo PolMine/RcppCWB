@@ -25,59 +25,59 @@ regions_to_count_matrix <- function(corpus, p_attribute, registry, matrix) {
     .Call(`_RcppCWB_regions_to_count_matrix`, corpus, p_attribute, registry, matrix)
 }
 
-attribute_size <- function(corpus, attribute, attribute_type, registry) {
-    .Call(`_RcppCWB_attribute_size`, corpus, attribute, attribute_type, registry)
+cwb_attribute_size <- function(corpus, attribute, attribute_type, registry) {
+    .Call(`_RcppCWB_cwb_attribute_size`, corpus, attribute, attribute_type, registry)
 }
 
-lexicon_size <- function(corpus, p_attribute, registry) {
-    .Call(`_RcppCWB_lexicon_size`, corpus, p_attribute, registry)
+cwb_lexicon_size <- function(corpus, p_attribute, registry) {
+    .Call(`_RcppCWB_cwb_lexicon_size`, corpus, p_attribute, registry)
 }
 
-cpos2struc <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB_cpos2struc`, corpus, s_attribute, cpos, registry)
+cwb_cpos2struc <- function(corpus, s_attribute, cpos, registry) {
+    .Call(`_RcppCWB_cwb_cpos2struc`, corpus, s_attribute, cpos, registry)
 }
 
-cpos2str <- function(corpus, p_attribute, registry, cpos) {
-    .Call(`_RcppCWB_cpos2str`, corpus, p_attribute, registry, cpos)
+cwb_cpos2str <- function(corpus, p_attribute, registry, cpos) {
+    .Call(`_RcppCWB_cwb_cpos2str`, corpus, p_attribute, registry, cpos)
 }
 
-cpos2id <- function(corpus, p_attribute, registry, cpos) {
-    .Call(`_RcppCWB_cpos2id`, corpus, p_attribute, registry, cpos)
+cwb_cpos2id <- function(corpus, p_attribute, registry, cpos) {
+    .Call(`_RcppCWB_cwb_cpos2id`, corpus, p_attribute, registry, cpos)
 }
 
-struc2cpos <- function(corpus, s_attribute, registry, struc) {
-    .Call(`_RcppCWB_struc2cpos`, corpus, s_attribute, registry, struc)
+cwb_struc2cpos <- function(corpus, s_attribute, registry, struc) {
+    .Call(`_RcppCWB_cwb_struc2cpos`, corpus, s_attribute, registry, struc)
 }
 
-id2str <- function(corpus, p_attribute, registry, id) {
-    .Call(`_RcppCWB_id2str`, corpus, p_attribute, registry, id)
+cwb_id2str <- function(corpus, p_attribute, registry, id) {
+    .Call(`_RcppCWB_cwb_id2str`, corpus, p_attribute, registry, id)
 }
 
-struc2str <- function(corpus, s_attribute, struc, registry) {
-    .Call(`_RcppCWB_struc2str`, corpus, s_attribute, struc, registry)
+cwb_struc2str <- function(corpus, s_attribute, struc, registry) {
+    .Call(`_RcppCWB_cwb_struc2str`, corpus, s_attribute, struc, registry)
 }
 
-regex2id <- function(corpus, p_attribute, regex, registry) {
-    .Call(`_RcppCWB_regex2id`, corpus, p_attribute, regex, registry)
+cwb_regex2id <- function(corpus, p_attribute, regex, registry) {
+    .Call(`_RcppCWB_cwb_regex2id`, corpus, p_attribute, regex, registry)
 }
 
-str2id <- function(corpus, p_attribute, str, registry) {
-    .Call(`_RcppCWB_str2id`, corpus, p_attribute, str, registry)
+cwb_str2id <- function(corpus, p_attribute, str, registry) {
+    .Call(`_RcppCWB_cwb_str2id`, corpus, p_attribute, str, registry)
 }
 
-id2freq <- function(corpus, p_attribute, id, registry) {
-    .Call(`_RcppCWB_id2freq`, corpus, p_attribute, id, registry)
+cwb_id2freq <- function(corpus, p_attribute, id, registry) {
+    .Call(`_RcppCWB_cwb_id2freq`, corpus, p_attribute, id, registry)
 }
 
-id2cpos <- function(corpus, p_attribute, id, registry) {
-    .Call(`_RcppCWB_id2cpos`, corpus, p_attribute, id, registry)
+cwb_id2cpos <- function(corpus, p_attribute, id, registry) {
+    .Call(`_RcppCWB_cwb_id2cpos`, corpus, p_attribute, id, registry)
 }
 
-cpos2lbound <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB_cpos2lbound`, corpus, s_attribute, cpos, registry)
+cwb_cpos2lbound <- function(corpus, s_attribute, cpos, registry) {
+    .Call(`_RcppCWB_cwb_cpos2lbound`, corpus, s_attribute, cpos, registry)
 }
 
-cpos2rbound <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB_cpos2rbound`, corpus, s_attribute, cpos, registry)
+cwb_cpos2rbound <- function(corpus, s_attribute, cpos, registry) {
+    .Call(`_RcppCWB_cwb_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 

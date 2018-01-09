@@ -8,7 +8,7 @@
 \alias{regions_to_count_matrix}
 \alias{get_cbow_matrix}
 \alias{regions_to_ids}
-\title{Higher-level Functions.}
+\title{Higher-level functions using the corpus library (CL).}
 \arguments{
 \item{corpus}{character}
 
@@ -21,7 +21,7 @@
 \item{strucs}{integer}
 }
 \description{
-Higher-level Functions.
+Higher-level functions using the corpus library (CL).
 }
 \section{Functions}{
 
