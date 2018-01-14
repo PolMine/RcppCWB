@@ -8,12 +8,7 @@ extern "C" {
 }
 
 #include <Rcpp.h>
-/* #include <stdio.h> */
-/* #include <string.h> */
 
-/* int strcmp ( const char * str1, const char * str2 ); */
-/* size_t strlen ( const char * str ); */
-/* FILE *fdopen(int fd, const char *mode); */
 
 int region_matrix_to_size(Rcpp::IntegerMatrix matrix){
   int n;
