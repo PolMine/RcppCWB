@@ -27,7 +27,6 @@ Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgeme
 NeedsCompilation: yes
 SystemRequirements: On Linux and MacOS GNU make, pcre (>= 7) and glib2 (>= 2).
 Imports:
-    methods,
     Rcpp (>= 0.12.6)
 Suggests:
     knitr,
