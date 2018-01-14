@@ -3,30 +3,30 @@
 PLATFORM=$(uname -s)
 
 if [ "$PLATFORM" = "Darwin" ]; then
-  if [ ! -e /usr/local/lib/libcl.a ]; then
-    wget https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-osx-10.5-universal.tar.gz
-    tar xzfv cwb-3.0.0-osx-10.5-universal.tar.gz
-    rm cwb-3.0.0-osx-10.5-universal.tar.gz
-    mv cwb-3.0.0-osx-10.5-universal cwb
-  else
-    if [ ! -e ./cwb ]; then
-      mkdir cwb
-      mkdir cwb/lib
-    fi
-  fi 
+  CWB_DISTRO="cwb-3.0.0-osx-10.5-universal"
 elif [ "$PLATFORM" = "Linux" ]; then
-  if [ ! -e /usr/local/lib/libcl.a ]; then
-    # https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-linux-i386.tar.gz/download
-    wget https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/cwb-3.0.0-linux-x86_64.tar.gz
-    tar xzfv cwb-3.0.0-linux-x86_64.tar.gz
-    rm cwb-3.0.0-linux-x86_64.tar.gz
-    mv cwb-3.0.0-linux-x86_64 cwb
+  ARCH=`lscpu | head -n 1 | grep -oP '\d+$'`
+  if [ "$ARCH" = "64" ]; then
+    CWB_DISTRO="cwb-3.0.0-linux-x86_64"
   else 
-    if [ ! -e ./cwb ]; then
-      mkdir cwb
-      mkdir cwb/lib
-    fi
+    CWB_DISTRO="cwb-3.0.0-linux-i386"
   fi
+elif [ "$PLATFORM" = "SunOS" ]; then
+  CWB_DISTRO="cwb-3.0.0-solaris-sparc"
 fi
 
+CWB_TARBALL=$CWB_DISTRO.tar.gz
+CWB_URL=https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/$CWB_TARBALL
+R_CMD='download.file(url = "'"$CWB_URL"'", destfile = "'"$CWB_TARBALL"'")'
 
+if [ ! -e /usr/local/lib/libcl.a ]; then
+  Rscript -e "$R_CMD"
+  tar xzfv $CWB_TARBALL
+  rm $CWB_TARBALL
+  mv $CWB_DISTRO cwb
+else
+  if [ ! -e ./cwb ]; then
+    mkdir cwb
+    mkdir cwb/lib
+  fi
+fi 
