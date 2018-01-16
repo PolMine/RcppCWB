@@ -30,3 +30,11 @@ else
     mkdir cwb/lib
   fi
 fi 
+
+
+
+REGISTRY_FILE=$(pwd)/inst/extdata/cwb/registry/reuters
+HOME_LINE="HOME $R_PACKAGE_DIR/extdata/cwb/indexed_corpora/reuters"
+
+R_CMD='r<-readLines("'"$REGISTRY_FILE"'");r[10]<-"'"$HOME_LINE"'";writeLines(text=r,con="'"$REGISTRY_FILE"'")'
+Rscript -e "$R_CMD"
