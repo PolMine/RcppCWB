@@ -68,16 +68,3 @@ Then open R. The easiest way to install RcppCWB is to install it from GitHub usi
 if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
 devtools::install_github("PolMine/RcppCWB")
 ```
-
-
-## Installation on Windows
-
-To compile RcppCWB yourself, having [Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed on your system is a precondition. Using the mechanism offered by the devtools package, you can install RcppCWB.
-
-```{r}
-if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
-devtools::install_github("PolMine/RcppCWB")
-```
-
-During the installation, cross-compiled versions of the corpus library (CL) are downloaded, to fulfill the condition that libcl.a needs to present on your system to compile the C++ code in the package against it. No further installations are necessary.
-
