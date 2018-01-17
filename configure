@@ -1,27 +1,46 @@
 #!/bin/bash
 
-PLATFORM=$(uname -s)
+# If CWB is installed, the default directory for the corpus library (libcl.a)
+# will be /usr/local/lib
+# It the library is not present, download the appropriate binary of the CWB,
+# and put it in the directory cwb/lib. In Makevars, these directories are included
+# (-I../inst/include/cwb, and -L../cwb/lib)
+#
+# Calling Rscript follows the instructions found at:
+# http://grokbase.com/t/r/r-devel/105mz9x9hx/rd-use-of-r-and-rscript-in-configure-makevars-in-packages
+# 
 
-if [ "$PLATFORM" = "Darwin" ]; then
-  CWB_DISTRO="cwb-3.0.0-osx-10.5-universal"
-elif [ "$PLATFORM" = "Linux" ]; then
-  ARCH=`lscpu | head -n 1 | grep -oP '\d+$'`
-  if [ "$ARCH" = "64" ]; then
-    CWB_DISTRO="cwb-3.0.0-linux-x86_64"
-  else 
-    CWB_DISTRO="cwb-3.0.0-linux-i386"
-  fi
-elif [ "$PLATFORM" = "SunOS" ]; then
-  CWB_DISTRO="cwb-3.0.0-solaris-sparc"
-fi
-
-CWB_TARBALL=$CWB_DISTRO.tar.gz
-CWB_URL=https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/$CWB_TARBALL
-R_CMD='download.file(url = "'"$CWB_URL"'", destfile = "'"$CWB_TARBALL"'")'
 
 if [ ! -e /usr/local/lib/libcl.a ]; then
-  Rscript -e "$R_CMD"
-  tar xzfv $CWB_TARBALL
+  
+  case $(uname -s) in
+    Darwin)
+      CWB_DISTRO="cwb-3.0.0-osx-10.5-universal";;
+    Linux)
+      ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
+      case "$ARCH" in 
+        x86_64)
+          CWB_DISTRO="cwb-3.0.0-linux-x86_64";;
+        i386) 
+          CWB_DISTRO="cwb-3.0.0-linux-i386";;
+        esac;;
+    SunOS)
+      CPU_INFO=`psrinfo -pv | sed -n '2p'`
+      case $CPU_INFO in
+        x86)
+          echo "Only Sparc architecture supported so far";
+          exit;;
+        SPARK)
+          CWB_DISTRO="cwb-3.0.0-solaris-sparc";;
+      esac;;
+  esac
+  
+  CWB_TARBALL=$CWB_DISTRO.tar.gz
+  CWB_URL=https://sourceforge.net/projects/cwb/files/cwb/cwb-3.0.0/$CWB_TARBALL
+  R_CMD='download.file(url = "'"$CWB_URL"'", destfile = "'"$CWB_TARBALL"'")'
+
+  ${R_HOME}/bin/Rscript -e "$R_CMD"
+  tar xf $CWB_TARBALL
   rm $CWB_TARBALL
   mv $CWB_DISTRO cwb
 else
@@ -32,9 +51,8 @@ else
 fi 
 
 
-
 REGISTRY_FILE=$(pwd)/inst/extdata/cwb/registry/reuters
 HOME_LINE="HOME $R_PACKAGE_DIR/extdata/cwb/indexed_corpora/reuters"
 
 R_CMD='r<-readLines("'"$REGISTRY_FILE"'");r[10]<-"'"$HOME_LINE"'";writeLines(text=r,con="'"$REGISTRY_FILE"'")'
-Rscript -e "$R_CMD"
+${R_HOME}/bin/Rscript -e "$R_CMD"
