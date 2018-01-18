@@ -1,14 +1,16 @@
 #!/bin/bash
 
-# If CWB is installed, the default directory for the corpus library (libcl.a)
-# will be /usr/local/lib
-# It the library is not present, download the appropriate binary of the CWB,
-# and put it in the directory cwb/lib. In Makevars, these directories are included
-# (-I../inst/include/cwb, and -L../cwb/lib)
+# If the CWB is installed, the default installation directory for the corpus
+# library (libcl.a) will be /usr/local/lib. This is where the configure script
+# tries to locate the library first.
+#
+# It the library is not present, we download the appropriate binary of the CWB,
+# and put it in the directory ./cwb/lib. In Makevars, these directories are included
+# (-I../inst/include/cwb, and -L../cwb/lib), to find the library, and the header
+# files.
 #
 # Calling Rscript follows the instructions found at:
 # http://grokbase.com/t/r/r-devel/105mz9x9hx/rd-use-of-r-and-rscript-in-configure-makevars-in-packages
-# 
 
 
 if [ ! -e /usr/local/lib/libcl.a ]; then
@@ -23,12 +25,20 @@ if [ ! -e /usr/local/lib/libcl.a ]; then
           CWB_DISTRO="cwb-3.0.0-linux-x86_64";;
         i386) 
           CWB_DISTRO="cwb-3.0.0-linux-i386";;
-        esac;;
+        arm)
+          echo "CWB/libcl.a not found on your system. At present, no pre-compiled binaries"
+          echo "are available for ARM architecture. Please compile the CWB yourself, and"
+          echo "place libcl.a in /usr/local/lib. "
+          exit 1;
+      esac;;
     SunOS)
       CPU_INFO=`psrinfo -pv | sed -n '2p'`
       case $CPU_INFO in
         x86)
-          echo "Only Sparc architecture supported so far";
+          echo "CWB/libcl.a not found on your system. At present, pre-compiled binaries"
+          echo "are only available for SPARK. Please compile the CWB yourself"
+          echo "(http://cwb.sourceforge.net/download.php), and place libcl.a in"
+          echo "/usr/local/lib."
           exit;;
         SPARK)
           CWB_DISTRO="cwb-3.0.0-solaris-sparc";;
