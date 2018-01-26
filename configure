@@ -13,8 +13,9 @@
 # http://grokbase.com/t/r/r-devel/105mz9x9hx/rd-use-of-r-and-rscript-in-configure-makevars-in-packages
 
 
-if [ ! -e /usr/local/lib/libcl.a ]; then
-  
+CWB_CONFIG_PATH=`command -v cwb-config`
+
+if [ -z $CWB_CONFIG_PATH ]; then
   case $(uname -s) in
     Darwin)
       CWB_DISTRO="cwb-3.0.0-osx-10.5-universal";;
@@ -53,13 +54,19 @@ if [ ! -e /usr/local/lib/libcl.a ]; then
   tar xf $CWB_TARBALL
   rm $CWB_TARBALL
   mv $CWB_DISTRO cwb
+  CWB_CFLAGS="-I../inst/include/cwb"
+  CWB_LDFLAGS="-L../cwb/lib -lcl"
 else
+  CWB_CFLAGS="`cwb-config --cflags`/cwb"
+  CWB_LDFLAGS=`cwb-config --ldflags`
   if [ ! -e ./cwb ]; then
     mkdir cwb
     mkdir cwb/lib
   fi
 fi 
 
+echo "PKG_CPPFLAGS = $CWB_CFLAGS" > ./src/Makevars
+echo "PKG_LIBS = $CWB_LDFLAGS" >> ./src/Makevars
 
 REGISTRY_FILE=$(pwd)/inst/extdata/cwb/registry/reuters
 HOME_LINE="HOME $R_PACKAGE_DIR/extdata/cwb/indexed_corpora/reuters"
