@@ -2,5 +2,5 @@
 
 HOME_LINE="HOME $R_PACKAGE_DIR/extdata/cwb/indexed_corpora/reuters"
 
-R_CMD='registryFile <- file.path(getwd(), "inst", "extdata", "cwb", "registry", "reuters"); registry <- readLines(registryFile); r[10]<-"'"$HOME_LINE"'"; writeLines(text = registry, con = registryFile)'
+R_CMD='registryFile <- file.path(getwd(), "inst", "extdata", "cwb", "registry", "reuters"); registry <- readLines(registryFile); registry[10]<-"'"$HOME_LINE"'"; writeLines(text = registry, con = registryFile)'
 ${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe -e "$R_CMD"
