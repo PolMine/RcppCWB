@@ -1,0 +1,7 @@
+#!/bin/sh
+
+REGISTRY_FILE=$(pwd)/inst/extdata/cwb/registry/reuters
+HOME_LINE="HOME $R_PACKAGE_DIR/extdata/cwb/indexed_corpora/reuters"
+
+R_CMD='r<-readLines("'"$REGISTRY_FILE"'");r[10]<-"'"$HOME_LINE"'";writeLines(text=r,con="'"$REGISTRY_FILE"'")'
+${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe -e "$R_CMD"
