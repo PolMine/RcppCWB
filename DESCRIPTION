@@ -46,3 +46,4 @@ RoxygenNote: 6.0.1
 Collate:
   'RcppCWB_package.R'
   'RcppExports.R'
+  'zzz.R'
