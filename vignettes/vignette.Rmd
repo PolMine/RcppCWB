@@ -12,16 +12,38 @@ vignette: >
 # Introducing RcppCWB
 
 The corpus library (CL) is a C library offering low-level access 
-to CWB-indexed corpora. This package offers wrappers for core functions of the corpus library,
-and functions for performance critial tasks in the polmineR package.
+to CWB-indexed corpora. This package
+offers wrappers for core functions of the corpus library, and 
+functions for performance critial tasks in the polmineR package.
+
+The work of the all contributors to the Corpus Workbench is
+gratefully acknowledged. There is a huge intellectual debt to 
+Bernard Desgraupes and Sylvain Loiseau, and the package 'rcqp'
+they developed as a R wrapper for the functionality of the CWB.
+
+The intention behind using Rcpp for writing the wrapper library
+is to make it easier to maintain the package, to provide some 
+extra functionality, and to make the package work on Windows
+systems. Indeed, portability is the major reason for the effort
+that went into the package.
+
+The essential idea of the package is that pre-compiled binaries 
+of the corpus library and further libraries are available for Windows
+via a  GitHub repository (github.com/PolMine/libcl). During the installation,
+the binaries are downloaded, and the Rcpp code is compiled against
+these binaries.
+
+For this, a pre-compiled version of the CWB is necessary. The annex explains
+the procedure that has been used.
+
+On Linux and macOS, offical binaries of the CWB (that include libcl.a)
+are downloaded, if the CWB is not yet installed. To identify of the libraries
+and header files are already present, the tool cwb-config is used.
 
   
 ## Annex: Cross-compiling libcl and the Corpus Workbench (CWB)
 
 ### Potentially useful resources
-
-A very good description:
-www.blogcompiler.com/2010/07/11/compile-for-windows-on-linux
 
 INSTALL.WIN script in the cwb directory with installation files is extremely
 helpful up to the point where it comes to cross-compiling glib.
@@ -40,16 +62,18 @@ To get the installation directory for cross-compilation:
 MINGW_OUTPUT_TMP=`x86_64-w64-mingw32-gcc --print-search-dirs | grep ^install`; echo ${MINGW_OUTPUT_TMP:9}
 ```
 
-Note: This line is from the INSTALL.WIN instructions.
+Note: This line is taken from the INSTALL.WIN instructions.
 
 
 ### Cross-compilation (64bit)
+
+First, it is necessary to compile the dependencies of the corpus library.
 
 #### pcre
 
 ```{sh, eval = FALSE}
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz
-tar xzfv pcre-8.39.tar.gz
+tar xf pcre-8.39.tar.gz
 cd pcre-8.39
 CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc  ./configure    \
 --host=x86_64-w64-mingw32                                  \
@@ -68,7 +92,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
-tar xzfv libiconv-1.15.tar.gz
+tar xf libiconv-1.15.tar.gz
 cd libiconv-1.15/
 CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc ./configure       \
 --host=x86_64-w64-mingw32                                    \
@@ -85,7 +109,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget http://downloads.sourceforge.net/expat/expat-2.1.0.tar.gz
-tar xzfv expat-2.1.0.tar.gz
+tar xf expat-2.1.0.tar.gz
 cd expat-2.1.0
 CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc                            \
 ./configure                                                           \
@@ -102,7 +126,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnu.org/pub/gnu/gettext/gettext-latest.tar.gz
-tar xzfv gettext-latest.tar.gz
+tar xf gettext-latest.tar.gz
 cd gettext-0.19.8.1/
   CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc                            \
 ./configure                                                           \
@@ -119,7 +143,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget ftp://sourceware.org/pub/libffi/libffi-3.2.tar.gz
-tar xzfv libffi-3.2.tar.gz
+tar xf libffi-3.2.tar.gz
 cd libffi-3.2
 LIBFFI_CFLAGS=/usr/lib/gcc/x86_64-w64-mingw32/4.8/include             \
 LIBFFI_LIBS=/usr/lib/gcc/x86_64-w64-mingw32/4.8/lib                   \
@@ -136,23 +160,14 @@ sudo make install
 
 ### glib
 
-It never worked to do it myself. Here you can get binaries in a 
-simple and dirty way: BEST CHOICE!!
-
-```{sh, eval = FALSE}
-wget http://ftp.gnome.org/pub/gnome/binaries/win64/glib/2.26/
-```
-
-Copy files to cross compiler dirs after download. 
-
-This is where I finally got libglib-2.0.0.dll:
+Glib is known to be difficult to cross compile. I ultimately resorted to 
+downloading binaries. This is where I finally got libglib-2.0.0.dll:
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnome.org/pub/gnome/binaries/win64/glib/2.26/glib_2.26.0-1_win64.zip
 ```
 
-This is the effort to cross compile glib myself - it always failed, which
-seems to be a typical problem
+To document efforts to cross compile glib myself:
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnome.org/pub/gnome/sources/glib/2.50/glib-2.50.0.tar.xz
@@ -172,7 +187,8 @@ CC=x86_64-w64-mingw32-gcc CC_FOR_BUILD=gcc  ./configure               \
 
 #### CWB
 
-Basically, I followed the instructions in the INSTALL.WIN file. In addition:
+Then follow the instructions in the INSTALL.WIN file included in the CWB. 
+In addition:
 
 * Got a fresh copy of CWB with svn
 * made the following changes in config.mk:
@@ -201,7 +217,7 @@ DEPEND = x86_64-w64-mingw32-gcc -MM -MG
 
 * used grep 'i586' for hunting
 
-At the end, instructions of INSTALL-WIN again:
+At the end, following instructions of INSTALL-WIN again:
   
 ```{sh, eval = FALSE}
 make clean
@@ -225,11 +241,13 @@ into the bin dir in the cross compiler directory.
 
 ### Cross-compilation (32bit)
 
+These are the same commands as for 64bit, but with a differen cross-compiler.
+
 #### pcre
 
 ```{sh, eval = FALSE}
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz
-tar xzfv pcre-8.39.tar.gz
+tar xf pcre-8.39.tar.gz
 cd pcre-8.39
 CC=i686-w64-mingw32-gcc CC_FOR_BUILD=gcc  ./configure    \
 --host=i686-w64-mingw32                                  \
@@ -247,7 +265,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
-tar xzfv libiconv-1.15.tar.gz
+tar xf libiconv-1.15.tar.gz
 cd libiconv-1.15/
 CC=i686-w64-mingw32-gcc CC_FOR_BUILD=gcc ./configure      \
 --host=i686-w64-mingw32                                   \
@@ -264,7 +282,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget http://downloads.sourceforge.net/expat/expat-2.1.0.tar.gz
-tar xzfv expat-2.1.0.tar.gz
+tar xf expat-2.1.0.tar.gz
 cd expat-2.1.0
 CC=i686-w64-mingw32-gcc CC_FOR_BUILD=gcc                            \
 ./configure                                                           \
@@ -278,7 +296,7 @@ sudo make install
 
 #### liblzma
 
-liblzma von github clonen 
+Got lzma from github.
 
 ```{sh, eval = FALSE}
 cd lzma/
@@ -296,7 +314,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget ftp://xmlsoft.org/libxml2/libxml2-sources-2.9.7.tar.gz
-tar xzfv libxml2-sources-2.9.7.tar.gz
+tar xf libxml2-sources-2.9.7.tar.gz
 cd libxml2-2.9.7/
 CC=i686-w64-mingw32-gcc CC_FOR_BUILD=gcc                            \
 ./configure                                                           \
@@ -313,7 +331,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget http://ftp.gnu.org/pub/gnu/gettext/gettext-latest.tar.gz
-tar xzfv gettext-latest.tar.gz
+tar xf gettext-latest.tar.gz
 cd gettext-0.19.8.1/
 export CFLAGS="$CFLAGS -O2"
 export CXXFLAGS="$CXXFLAGS -O2"
@@ -332,7 +350,7 @@ sudo make install
 
 ```{sh, eval = FALSE}
 wget ftp://sourceware.org/pub/libffi/libffi-3.2.tar.gz
-tar xzfv libffi-3.2.tar.gz
+tar xf libffi-3.2.tar.gz
 cd libffi-3.2
 LIBFFI_CFLAGS=/usr/lib/gcc/i686-w64-mingw32/4.8/include             \
 LIBFFI_LIBS=/usr/lib/gcc/i686-w64-mingw32/4.8/lib                   \
