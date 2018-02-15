@@ -28,13 +28,14 @@ esac
   
 
 # Augment Makevars
-echo $(R_PACKAGE_SOURCE)
+CURRENT_DIR=$(pwd)
+echo $CURRENT_DIR
 echo "cl: depend" >> ./src/Makevars
-echo -e '\tR_PACKAGE_SOURCE="$(R_PACKAGE_SOURCE)" $(MAKE) -C cwb cl\n' >> ./src/Makevars
+echo -e '\tR_PACKAGE_SOURCE="$CURRENT_DIR" $(MAKE) -C cwb cl\n' >> ./src/Makevars
 echo "depend: clean" >> ./src/Makevars
-echo -e '\tR_PACKAGE_SOURCE="$(R_PACKAGE_SOURCE)" $(MAKE) -C cwb depend\n' >> ./src/Makevars
+echo -e '\tR_PACKAGE_SOURCE=$(pwd) $(MAKE) -C cwb depend\n' >> ./src/Makevars
 echo "clean:" >> ./src/Makevars
-echo -e '\tR_PACKAGE_SOURCE="$(R_PACKAGE_SOURCE)" $(MAKE) -C cwb clean\n' >> ./src/Makevars
+echo -e '\tR_PACKAGE_SOURCE=$(pwd) $(MAKE) -C cwb clean\n' >> ./src/Makevars
 
 cat ./src/Makevars
 
