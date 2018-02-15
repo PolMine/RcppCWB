@@ -44,16 +44,11 @@
 #  doxygen      to update the HTML code documentation (requires doxygen to be installed)
 #  
 
-TOP = $(shell pwd)
+TOP = /Users/blaette/Lab/github/RcppCWB/src/cwb
 include $(TOP)/config.mk
 
-# targets for external libraries; currently not used (Glib and PCRE assumed to be on the system already)
-ifdef __MINGW__
-#EXTERNALS = 
-else
-EXTERNALS = 
-endif
-SUBDIRS = cl cqp utils man instutils	# subdirectories that have their own makefiles
+
+SUBDIRS = cl	# subdirectories that have their own makefiles
 SRCDIRS = cl cqp utils CQi	# subdirectories containing C source code
 
 
@@ -138,21 +133,14 @@ clean:
 
 realclean:	clean
 	for i in $(SUBDIRS) ; do $(MAKE) -C $$i realclean; done;
-ifdef __MINGW__
-	-$(RM) -rf mingw-libgnurx-2.5.1/config.log mingw-libgnurx-2.5.1/config.status mingw-libgnurx-2.5.1/Makefile
-endif
 
 install:
-ifdef __MINGW__
-	@$(ECHO) "ERROR: install operation is not supported for Windows binaries!"
-else
 	$(MAKE) -C cl install   # not in for loop to make sure we abort on error
 	$(MAKE) -C cqp install
 	$(MAKE) -C utils install
 	$(MAKE) -C man install
 	$(MAKE) -C instutils all
 	$(MAKE) -C instutils install
-endif
 
 release:
 	if [ -d "$(RELEASE_DIR)" ]; then $(RM) -rf "$(RELEASE_DIR)"; fi
@@ -163,10 +151,6 @@ release:
 	$(MAKE) -C man release
 	$(MAKE) -C instutils all
 	$(MAKE) -C instutils release
-ifdef __MINGW__
-# we also need DLL file(s)
-	for i in $(DLLS_TO_INSTALL); do $(INSTALL) $(INST_FLAGS_DATA) $$i "$(RELEASE_DIR)/bin"; done
-endif
 	if [ -f "$(RELEASE_COMPRESSED_FILENAME)" ]; then $(RM) "$(RELEASE_COMPRESSED_FILENAME)"; fi
 	(cd build/ && $(COMPRESS_COMMAND) "$(RELEASE_COMPRESSED_FILENAME)" "$(RELEASE_NAME)")
 	@$(ECHO) "==> CREATED BINARY RELEASE build/$(RELEASE_COMPRESSED_FILENAME)"

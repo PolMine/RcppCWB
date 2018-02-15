@@ -38,9 +38,9 @@
 #       mingw-cross   Cross-compile for Win32-on-i586 from a *nix system with MinGW installed (experimental)
 #       mingw-native  Build natively on Win32 using MinGW (new, at research stage only, does not work yet)
 #
-ifndef PLATFORM
+# ifndef PLATFORM
 PLATFORM=linux-64
-endif
+# endif
 include $(TOP)/config/platform/$(PLATFORM)
 
 #
@@ -59,9 +59,9 @@ include $(TOP)/config/platform/$(PLATFORM)
 #         windows-release ... for Windows binaries cross-compiled with MinGW; use with "mingw" platform
 #       cygwin          Win32 / Cygwin configuration (experimental)
 #       
-ifndef SITE
+# ifndef SITE
 SITE=standard
-endif
+# endif
 include $(TOP)/config/site/$(SITE)
 
 

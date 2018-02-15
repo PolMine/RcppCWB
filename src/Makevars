@@ -1,0 +1,15 @@
+PKG_CPPFLAGS=-I../inst/include/cwb
+PKG_LIBS=-L./src/cwb/cl -lcl
+
+all: cl
+
+cl: depend
+	$(MAKE) -C cwb cl
+
+depend: clean
+	$(MAKE) -C cwb depend
+
+clean:
+	$(MAKE) -C cwb clean
+
+
