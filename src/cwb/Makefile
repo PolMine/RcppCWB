@@ -44,7 +44,7 @@
 #  doxygen      to update the HTML code documentation (requires doxygen to be installed)
 #  
 
-TOP = /Users/blaette/Lab/github/RcppCWB/src/cwb
+TOP = $(R_PACKAGE_SOURCE)
 include $(TOP)/config.mk
 
 

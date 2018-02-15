@@ -27,14 +27,16 @@ case $(uname -s) in
 esac
   
 
-# Generate Makevars - very simple alternative to using a
-# full-fledged configure script 
+# Augment Makevars
+echo $(R_PACKAGE_SOURCE)
+echo "cl: depend" >> ./src/Makevars
+echo -e '\tR_PACKAGE_SOURCE="$(R_PACKAGE_SOURCE)" $(MAKE) -C cwb cl\n' >> ./src/Makevars
+echo "depend: clean" >> ./src/Makevars
+echo -e '\tR_PACKAGE_SOURCE="$(R_PACKAGE_SOURCE)" $(MAKE) -C cwb depend\n' >> ./src/Makevars
+echo "clean:" >> ./src/Makevars
+echo -e '\tR_PACKAGE_SOURCE="$(R_PACKAGE_SOURCE)" $(MAKE) -C cwb clean\n' >> ./src/Makevars
 
-
-# if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
-# echo "PKG_CPPFLAGS = $CWB_CFLAGS" > ./src/Makevars
-# echo "PKG_LIBS = $CWB_LDFLAGS" >> ./src/Makevars
-
+cat ./src/Makevars
 
 # Call the setpaths.R script to set paths
 # this is a standardized script that is part of the ctk package 
