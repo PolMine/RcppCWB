@@ -1,0 +1,113 @@
+---
+title: "Untitled"
+author: "Andreas Blaette"
+date: "2 2 2018"
+output: html_document
+---
+
+## cwb-encode
+
+# word.corpus
+
+The corpus file is a sequence of the token ids. The length of the corpus file will be the number of tokens in a corpus.
+
+```{r}
+corpusFile <- "~/Lab/tmp/encoding/indexed_corpora/word.corpus"
+corpusSize <- file.info(corpusFile)$size
+corpus <- readBin(con = corpusFile, what = integer(), size = 4L, n = lexiconSize, endian = "big")
+```
+
+
+# word.lexicon
+
+The file 'word.lexicon' includes the unique words.
+
+```{r}
+lexiconFile <- "~/Lab/tmp/encoding/indexed_corpora/word.lexicon"
+lexiconSize <- file.info(lexiconFile)$size
+lexicon <- readBin(con = lexiconFile, what = character(), n = lexiconSize)
+```
+
+# word.lexicon.idx
+
+The idx file offers the positions/beginnings of a token in the lexicon file.
+
+```{r}
+idxFile <- "~/Lab/tmp/encoding/indexed_corpora/word.lexicon.idx"
+idxSize <- file.info(idxFile)$size
+idx <- readBin(con = idxFile, what = integer(), size = 4L, n = idxSize, endian = "big")
+```
+
+To see that ...
+
+```{r}
+i <- strsplit(paste(lexicon, collapse = "|"), split = "")[[1]]
+names(i) <- 0:(length(i) - 1)
+```
+
+
+## cwb-makeall
+
+```{sh}
+cwb-makeall -r ~/Lab/tmp/encoding/registry -V FOO
+```
+
+# word.corpus.cnt
+
+The cnt file is a list of integer values, the frequency of the tokens.
+
+```{r}
+cntFile <- "~/Lab/tmp/encoding/indexed_corpora/word.corpus.cnt"
+cntSize <- file.info(cntFile)$size
+cnt <- readBin(con = cntFile, what = integer(), size = 4L, n = idxSize, endian = "big")
+```
+
+# word.corpus.rdx
+
+This points to the position in the rev file where the corpus positions for a token id begin.
+
+```{r}
+rdxFile <- "~/Lab/tmp/encoding/indexed_corpora/word.corpus.rdx"
+rdxSize <- file.info(rdxFile)$size
+rdx <- readBin(con = rdxFile, what = integer(), size = 4L, n = rexSize, endian = "big")
+```
+
+# word.corpus.rev
+
+As long as the number of tokens. Indicates the corpus positions of a token.
+
+```{r}
+revFile <- "~/Lab/tmp/encoding/indexed_corpora/word.corpus.rev"
+revSize <- file.info(revFile)$size
+rev <- readBin(con = revFile, what = integer(), size = 4L, n = revSize, endian = "big")
+```
+
+# word.lexicon.srt
+
+```{r}
+srtFile <- "~/Lab/tmp/encoding/indexed_corpora/word.lexicon.srt"
+srtSize <- file.info(srtFile)$size
+srt <- readBin(con = srtFile, what = integer(), size = 4L, n = srtSize, endian = "big")
+```
+
+
+## cwb-huffcode
+
+```{sh}
+cwb-huffcode -r ~/Lab/tmp/encoding/registry -A FOO
+```
+
+### word.hcd
+### word.huf
+### word.huf.syn
+
+## cwb-compress-rdx
+
+```{sh}
+cwb-compress-rdx -r ~/Lab/tmp/encoding/registry -A FOO
+```
+
+### word.crc (compressed index, replaces word.corpus.rev)
+
+### word.crx (compressed index offsets, replaces word.crx)
+
