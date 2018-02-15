@@ -1,4 +1,3 @@
 #!/bin/sh
 
-R_CMD='registryFile <- file.path(getwd(), "inst", "extdata", "cwb", "registry", "reuters"); registry <- readLines(registryFile); homeDir <- file.path(gsub("^[A-Za-z]?:?(.*)$", "\\1", "'"$R_PACKAGE_DIR"'"), "extdata", "cwb", "indexed_corpora", "reuters"); registry[10] <- paste("HOME", homeDir, sep = " "); writeLines(text = registry, con = registryFile)'
-${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe -e "$R_CMD"
+${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe ./tools/setpaths.R --args "$R_PACKAGE_DIR"

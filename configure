@@ -91,8 +91,9 @@ if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
 echo "PKG_CPPFLAGS = $CWB_CFLAGS" > ./src/Makevars
 echo "PKG_LIBS = $CWB_LDFLAGS" >> ./src/Makevars
 
-REGISTRY_FILE=$(pwd)/inst/extdata/cwb/registry/reuters
-HOME_LINE="HOME $R_PACKAGE_DIR/extdata/cwb/indexed_corpora/reuters"
 
-R_CMD='r<-readLines("'"$REGISTRY_FILE"'");r[10]<-"'"$HOME_LINE"'";writeLines(text=r,con="'"$REGISTRY_FILE"'")'
-${R_HOME}/bin/Rscript -e "$R_CMD"
+# Call the setpaths.R script to set paths
+# this is a standardized script that is part of the ctk package 
+
+${R_HOME}/bin/Rscript ./tools/setpaths.R --args "$R_PACKAGE_DIR"
+
