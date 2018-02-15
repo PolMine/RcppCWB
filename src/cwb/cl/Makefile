@@ -21,7 +21,7 @@
 
 
 ## Read configuration settings and standard definitions
-TOP = /Users/blaette/Lab/github/RcppCWB/src/cwb
+TOP = $(R_PACKAGE_SOURCE)
 include $(TOP)/config.mk
 
 ## The following targets are available:

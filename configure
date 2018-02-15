@@ -2,45 +2,41 @@
 
 case $(uname -s) in
   Darwin)
-    PKG_CPPFLAGS="/Users/blaette/Lab/github/RcppCWB/src/cwb/cl"
-    PKG_LIBS="/Users/blaette/Lab/github/RcppCWB/src/cwb/cl";;
+    sed -i -e "s/PLATFORM=.*/PLATFORM=darwin-64/" ./src/cwb/config.mk;;
   Linux)
     ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
     case "$ARCH" in 
       x86_64)
-        FOO="";;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=linux-64/" ./src/cwb/config.mk;;
       i386) 
-        FOO="";;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=linux/" ./src/cwb/config.mk;;
       arm)
-        echo "Did not find an installation of the Corpus Workbench (CWB) on your system."
-        exit 1;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
     esac;;
   SunOS)
     CPU_INFO=`psrinfo -pv | sed -n '2p'`
     case $CPU_INFO in
       x86)
-        echo "Did not find an installation of the Corpus Workbench (CWB) on your system."
-        exit;;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
       SPARK)
-        FOO="";;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=solaris/" ./src/cwb/config.mk;;
     esac;;
 esac
-  
+
+
 
 # Augment Makevars
-CURRENT_DIR=$(pwd)
-echo $CURRENT_DIR
+PKG_DIR=`pwd`/src/cwb
 echo "cl: depend" >> ./src/Makevars
-echo -e '\tR_PACKAGE_SOURCE="$CURRENT_DIR" $(MAKE) -C cwb cl\n' >> ./src/Makevars
+echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb cl\n" >> ./src/Makevars
 echo "depend: clean" >> ./src/Makevars
-echo -e '\tR_PACKAGE_SOURCE=$(pwd) $(MAKE) -C cwb depend\n' >> ./src/Makevars
+echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb depend\n" >> ./src/Makevars
 echo "clean:" >> ./src/Makevars
-echo -e '\tR_PACKAGE_SOURCE=$(pwd) $(MAKE) -C cwb clean\n' >> ./src/Makevars
+echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb clean\n" >> ./src/Makevars
 
 cat ./src/Makevars
 
-# Call the setpaths.R script to set paths
-# this is a standardized script that is part of the ctk package 
+# Call the setpaths.R script to set paths (template in package ctk)
 
 ${R_HOME}/bin/Rscript ./tools/setpaths.R --args "$R_PACKAGE_DIR"
 
