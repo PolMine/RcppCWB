@@ -38,17 +38,18 @@ esac
 # The Makevars file is generated here, to pass the directory where RcppCWB
 # is build (variable PKG_DIR) into the Makevars file.
 
-PKG_DIR=`pwd`/src/cwb
+BUILD_DIR=`pwd`
+CWB_DIR=`pwd`/src/cwb
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
-echo "PKG_CPPFLAGS=-I"$PKG_DIR"/inst/include/cwb" > ./src/Makevars
-echo -e "PKG_LIBS=-L"$PKG_DIR"/src/cwb/cl -lcl\n" >> ./src/Makevars
+echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/inst/include/cwb" > ./src/Makevars
+echo -e "PKG_LIBS=-L"$BUILD_DIR"/src/cwb/cl -lcl\n" >> ./src/Makevars
 echo -e "all: cl\n" >>./src/Makevars
 echo "cl: depend" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb cl\n" >> ./src/Makevars
+echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" \$(MAKE) -C cwb cl\n" >> ./src/Makevars
 echo "depend: clean" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb depend\n" >> ./src/Makevars
+echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" \$(MAKE) -C cwb depend\n" >> ./src/Makevars
 echo "clean:" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb clean\n" >> ./src/Makevars
+echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" \$(MAKE) -C cwb clean\n" >> ./src/Makevars
 
 
 # Step 3: Modify data directory in registry file
