@@ -1,0 +1,14 @@
+PKG_CPPFLAGS=-I/Users/blaette/Lab/github/RcppCWB/src/cwb/cl
+PKG_LIBS=-L/Users/blaette/Lab/github/RcppCWB/src/cwb/cl -lglib-2.0 -lpcre -lcl
+
+all: cl
+
+cl: depend
+	R_PACKAGE_SOURCE=/Users/blaette/Lab/github/RcppCWB/src/cwb $(MAKE) -C cwb cl
+
+depend: clean
+	R_PACKAGE_SOURCE=/Users/blaette/Lab/github/RcppCWB/src/cwb $(MAKE) -C cwb depend
+
+clean:
+	R_PACKAGE_SOURCE=/Users/blaette/Lab/github/RcppCWB/src/cwb $(MAKE) -C cwb clean
+
