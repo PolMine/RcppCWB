@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Step 1: Configure CWB
+# 
+# The CWB includes specialized configurations (for macOS, Linux, Solaris).
+# We check whether RcppCWB is installed on a system for which a specialized
+# configuration is available. If not, the standard unix configuration is
+# used. 
+
 case $(uname -s) in
   Darwin)
     sed -i -e "s/PLATFORM=.*/PLATFORM=darwin-64/" ./src/cwb/config.mk;;
@@ -10,7 +17,7 @@ case $(uname -s) in
         sed -i -e "s/PLATFORM=.*/PLATFORM=linux-64/" ./src/cwb/config.mk;;
       i386) 
         sed -i -e "s/PLATFORM=.*/PLATFORM=linux/" ./src/cwb/config.mk;;
-      arm)
+      *)
         sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
     esac;;
   SunOS)
@@ -21,13 +28,18 @@ case $(uname -s) in
       SPARK)
         sed -i -e "s/PLATFORM=.*/PLATFORM=solaris/" ./src/cwb/config.mk;;
     esac;;
+  *)
+    sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
 esac
 
 
-
-# create Makevars
+# Step 2: Generate Makevars file
+#
+# The Makevars file is generated here, to pass the directory where RcppCWB
+# is build (variable PKG_DIR) into the Makevars file.
 
 PKG_DIR=`pwd`/src/cwb
+if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
 echo "PKG_CPPFLAGS=-I../inst/include/cwb" > ./src/Makevars
 echo -e "PKG_LIBS=-L./src/cwb/cl -lcl\n" >> ./src/Makevars
 echo -e "all: cl\n" >>./src/Makevars
@@ -38,9 +50,12 @@ echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb depend\n" >> ./src/Makeva
 echo "clean:" >> ./src/Makevars
 echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb clean\n" >> ./src/Makevars
 
-cat ./src/Makevars
 
-# Call the setpaths.R script to set paths (template in package ctk)
+# Step 3: Modify data directory in registry file
+# 
+# The package includes a small binary sample corpus. The path to the binary
+# files needs to be set during installation. We call a standardized script
+# in the tools directory for that purpose. 
 
 ${R_HOME}/bin/Rscript ./tools/setpaths.R --args "$R_PACKAGE_DIR"
 
