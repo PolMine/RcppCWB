@@ -40,8 +40,8 @@ esac
 
 PKG_DIR=`pwd`/src/cwb
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
-echo "PKG_CPPFLAGS=-I../inst/include/cwb" > ./src/Makevars
-echo -e "PKG_LIBS=-L./src/cwb/cl -lcl\n" >> ./src/Makevars
+echo "PKG_CPPFLAGS=-I"$PKG_DIR"/inst/include/cwb" > ./src/Makevars
+echo -e "PKG_LIBS=-L"$PKG_DIR"/src/cwb/cl -lcl\n" >> ./src/Makevars
 echo -e "all: cl\n" >>./src/Makevars
 echo "cl: depend" >> ./src/Makevars
 echo -e "\tR_PACKAGE_SOURCE="$PKG_DIR" \$(MAKE) -C cwb cl\n" >> ./src/Makevars

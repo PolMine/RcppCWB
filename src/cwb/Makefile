@@ -86,6 +86,7 @@ all:  $(EXTERNALS)
 cl:
 	@$(ECHO) "--------------------------------- BUILDING CORPUS LIBRARY (CL)"
 	$(MAKE) -C cl
+	echo $(shell ls cl)
 
 cqp:
 	@$(ECHO) "--------------------------------- BUILDING CQP"
