@@ -16,15 +16,12 @@
  */
 
 
-/**
- * @file
- *
- * Provides the definition of the cl_bswap32() function, which was used as a portable implementation of the ntohl()
- * and htonl() macros in earlier CWB versions; still needed for explicit conversion to little-endian format
- */
+/* provides definition of the cl_bswap32() function, which was used as a portable implementation of the ntohl()
+   and htonl() macros in earlier CWB versions; still needed for explicit conversion to little-endian format
+*/
 
 
-#include "globals.h"
+#include "globals.h" /* globals.h checks whether endianness is well-defined */
 
 #include "endian.h"
 

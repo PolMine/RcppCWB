@@ -21,19 +21,13 @@
 #include "cqi.h"
 
 #include <sys/types.h>
-#include <sys/time.h>
-
-#ifndef __MINGW__
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#else
-#include <winsock2.h>
-#define socklen_t int
-#endif
-
 #include <signal.h>
+#include <strings.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -51,80 +45,47 @@
 #define GENERAL_ERROR_SIZE 1024
 
 #ifndef MSG_WAITALL
-/* Linux doesn't define the MSG_WAITALL flag (ditto MinGW), but under normal conditions
+/* Linux doesn't define the MSG_WAITALL flag, but under normal conditions 
    it _does_ wait for the entire amount of data requested to arrive; so we
    just set MSG_WAITALL to 0 (nothing) in this case */
 #define MSG_WAITALL 0
 #endif
 
-/*
- *
- * Global variables for CQPSERVER
- *
- */
 
-int sockfd;                       /**< Connection in:  file-descriptor integer */
-int connfd;                       /**< Connection out: file-descriptor integer */
-FILE *conn_out;                   /**< Connection out: stream for buffered output (don't forget to flush()) */
+int sockfd, connfd;
+FILE *conn_out;                 /* buffered output (don't forget to flush()) */
 struct sockaddr_in my_addr, client_addr;
 struct hostent *remote_host;
 char *remote_address;
-cqi_byte netbuf[NETBUFSIZE];      /* do we need it at all? */
-int bytes;                        /* always used for data held in netbuf[] */
+cqi_byte netbuf[NETBUFSIZE];    /* do we need it at all? */
+int bytes;                      /* always used for data held in netbuf[] */
 
 
-int cqi_errno = CQI_STATUS_OK;    /**< CQi last error */
-char cqi_error_string[GENERAL_ERROR_SIZE] = "No error.";  /**< String describing the last CQi error.
-                                                           *   This can be queried by the client. */
+int cqi_errno = CQI_STATUS_OK;  /* CQi last error */
+char cqi_error_string[GENERAL_ERROR_SIZE] = "No error.";
 
 /*
  *
  *  Error messages
  *
  */
-/* TODO: better names might be cqi_error_send, cqi_error_recv, cqi_error_internal */
 
-/**
- * Prints an error message to cqpserver's STDERR and then exits.
- *
- * This function reports an error in SENDING data to the outgoing connection.
- *
- * @param function  String containing the name of the function where the error was raised.
- */
 void 
-cqi_send_error(char *function)
-{
+cqi_send_error(char *function) {
   fprintf(stderr, "ERROR CQi data send failure in function\n");
   fprintf(stderr, "ERROR %s() <server.c>\n", function);
   exit(1);
 }
 
-/**
- * Prints an error message to cqpserver's STDERR and then exits.
- *
- * This function reports an error in READING data from the incoming connection.
- *
- * @param function  String containing the name of the function where the error was raised.
- */
 void 
-cqi_recv_error(char *function)
-{
+cqi_recv_error(char *function) {
   fprintf(stderr, "ERROR CQi data recv failure in function\n");
   fprintf(stderr, "ERROR %s() <server.c>\n", function);
   exit(1);
 }
 
-/**
- * Prints an error message to cqpserver's STDERR and then exits.
- *
- * This function reports a (miscellanrous) internal error in a cqpserver function.
- *
- * @param function  String containing the name of the function where the error was raised.
- * @param cause     String containing a description of what caused the error.
- */
 void
-cqi_internal_error(char *function, char *cause)
-{
+cqi_internal_error(char *function, char *cause) {
   fprintf(stderr, "ERROR Internal error in function\n");
   fprintf(stderr, "ERROR %s() <server.c>\n", function);
   fprintf(stderr, "ERROR ''%s''\n", cause);
@@ -132,23 +93,12 @@ cqi_internal_error(char *function, char *cause)
 }
 
 
-/**
- * General error reporting function.
+/*
  *
- * Note that unlike other CQi error functions, this function sends an error
- * message to the outgoing connection, rather than printing to the server's
- * STDERR. Also note that the program doesn't exit!
+ *  General error reporting
  *
- * The error message is placed into the global variable cqi_error_string,
- * whence it can be accessed by the client if the CQI_CTRL_LAST_GENERAL_ERROR
- * is sent to the server.
- *
- * TODO a better name would be cqi_error_general
- * @param errstring  String containing the error message.
  */
-void
-cqi_general_error(char *errstring)
-{
+void cqi_general_error(char *errstring) {
   if (strlen(errstring) >= GENERAL_ERROR_SIZE) 
     cqi_internal_error("cqi_general_error", "Error message too long.");
   strcpy(cqi_error_string, errstring);
@@ -156,43 +106,22 @@ cqi_general_error(char *errstring)
 }
 
 
-
-/**
- * Wait for, and then process, an attempt by a client to initiate a connection
- * to cqpserver via TCP/IP.
+/*
  *
- * Note that this function may or may not fork the cqpserver process.
+ *  Init TCP/IP connection
  *
- * If forking happens, then the child handles the connection, whereas the parent carries
- * on waiting for further connections.
- *
- * On Windows, forking never happens (since Windows doesn't support it).
- *
- * On *nix, forking happens UNLESS the global private_server is true. (Actually, if
- * private_server is true, then forking still happens, but the parent process immeidately
- * exits.)
- *
- * TODO: a better name would be server_accept_connection or somesuch...
- *
- * @param port  The integer identifier of the port to listen on.
- * @return      A > 0 value (actually the socket ID of the incoming connection)
- *              if all is OK; otherwise -1.
  */
+
 int 
-accept_connection(int port)
-{
+accept_connection(int port) {
   const int on = 1;
   socklen_t sin_size = sizeof(struct sockaddr_in);
-#ifndef __MINGW__
   pid_t child_pid;
-#endif
 
-#ifndef __MINGW__
   if (SIG_ERR == signal(SIGCHLD, SIG_IGN)) {
     perror("ERROR Can't ignore SIGCHLD");
     exit(1);
   }
-#endif
 
   if (port <= 0) {
     port = CQI_PORT;
@@ -200,30 +129,8 @@ accept_connection(int port)
 
   if (server_debug) 
     fprintf(stderr, "CQi: Opening socket and binding to port %d\n", port);
-
-#ifdef __MINGW__
-  /* startup the use of the Winsock DLL */
-  WORD wVersionRequested;
-  WSADATA wsaData;
-  int err;
-  wVersionRequested = MAKEWORD(2, 2); /* 2.2 is the higher version */
-  err = WSAStartup(wVersionRequested, &wsaData);
-
-  if (err != 0) {
-    char buffer[50];
-    sprintf(buffer,"ERROR WSAStartup failed with error: %d\n",err);
-    perror(buffer);
-    return -1;
-  }
-#endif
-
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-#ifndef __MINGW__
   if (sockfd < 0) {
-#else
-  if (sockfd == INVALID_SOCKET) {
-#endif
     perror("ERROR Can't create socket");
     return -1;
   }
@@ -236,7 +143,7 @@ accept_connection(int port)
     my_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); /* loopback device */
   else 
     my_addr.sin_addr.s_addr = htonl(INADDR_ANY);      /* all network devices on local machine */
-  memset(&(my_addr.sin_zero), '\0', 8);
+  bzero(&(my_addr.sin_zero), 8);
   if (0 != bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))) {
     perror("ERROR Can't bind socket to port");
     return -1;
@@ -249,7 +156,6 @@ accept_connection(int port)
     return -1;
   }
 
-#ifndef __MINGW__
   /* if called with '-q', fork() and quit before waiting for connections */
   if (server_quit) {
     pid_t pid = fork();
@@ -259,9 +165,6 @@ accept_connection(int port)
       exit(0);
     }
   }
-#else
-  /* no forking in Windows! */
-#endif
 
   while (42) {
     /* when run as a private server, we'll only wait for up to 10 seconds */
@@ -298,7 +201,6 @@ accept_connection(int port)
       printf("\n");
     }
     
-#ifndef __MINGW__
     /* spawn a server to handle the request */
     child_pid = fork();
     if (child_pid < 0) {
@@ -318,21 +220,7 @@ accept_connection(int port)
       close(sockfd);
       exit(0);                  /* SIGCHLD should be reaped by calling process */
     }
-#else
-    /* no forking in Windows!
-     * So all we can do here is break the loop, assuming we are a child.
-     *
-     * Note this means: the Windows version of cqpserver accepts only one client!
-     * (see here for some discussion:
-     *      http://www.gamedev.net/community/forums/topic.asp?topic_id=360290
-     *      http://stackoverflow.com/questions/985281/what-is-the-closest-thing-windows-has-to-fork
-     *      )
-     * We print the "private server" message automatically.
-     */
-    printf("Accepting no more connections (private server).\n");
-    break;
-#endif
-  }/* endwhile 42 */
+  }
 
   /* this is the child serving the new CQi connection */
   if (server_debug) 
@@ -347,16 +235,12 @@ accept_connection(int port)
     exit(1);
   }
 
-#ifndef __MINGW__
-  /* create a buffered stream to the outgoing connection */
   conn_out = fdopen(connfd, "w");
   if (conn_out == NULL) {
     perror("ERROR Can't switch CQi connection to buffered output");
     close(connfd);
     return -1;
   }
-#endif
-
   if (server_debug) 
     fprintf(stderr, "CQi: creating attribute hash (size = %d)\n", ATTHASHSIZE);
   make_attribute_hash(ATTHASHSIZE);
@@ -374,21 +258,8 @@ accept_connection(int port)
 
 /* communication primitives (no auto-flush; use cqi_flush()) */
 
-/**
- * Flushes the stream from the CQP server to the client program,
- * emptying its buffer.
- *
- * Note that under windows, buffered output is not possible, so
- * this function does nothing.
- *
- * @return  Boolean: true if everything OK, otherwise false.
- */
 int 
-cqi_flush(void)
-{
-#ifdef __MINGW__
-  return 1;
-#else
+cqi_flush(void) {
   if (snoop) {
     fprintf(stderr, "CQi FLUSH\n");
   }
@@ -399,71 +270,35 @@ cqi_flush(void)
   else {
     return 1;
   }
-#endif
 }
 
-/**
- * Sends a BYTE to the client.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- *
- * This is the fundamental "sending" function, and the only one that calls the underlying
- * OS-specific file stream/socket functions.
- *
- * @param n        The byte to send. NOTE that as the parameter is an int, numbers bigger than
- *                 0xff can be passed. BUT all content except the lowest-order 8-bits are discarded
- *                 (0xff is used as a mask with bitwise-and).
- * @param nosnoop  Boolean: if true, snoop functionality is overridden (to allow for non-repetition
- *                 of messages when called from a function that has already printed a message)
- */
+/* BYTE ... send byte */
 int 
-cqi_send_byte(int n, int nosnoop)
-{
-#ifdef __MINGW__
-  unsigned char prep;
-  prep = (unsigned char) 0xff & n;
-#endif
-
-  if (snoop && !nosnoop) {
+cqi_send_byte(int n) {
+  if (snoop) {
     fprintf(stderr, "CQi SEND BYTE   %02X        [= %d]\n", n, n);
   }
-
-  /* note that the actual sending is wrapped in an "if" whose content differs between OSes */
   if (
-#ifndef __MINGW__
       (EOF == putc(0xff & n, conn_out))
-#else
-      (1 != send(connfd, &prep, 1, MSG_WAITALL))
-#endif
-      )  {
-    perror("ERROR cqi_send_byte()");
-    return 0;
-  }
+      )
+    {
+      perror("ERROR cqi_send_byte()");
+      return 0;
+    }
   else {
     return 1;
   }
 }
 
-/**
- * Sends a WORD to the client.
- *
- * A word consists of two bytes in network order. Since CQi commands are
- * two bytes, this function can be used to send commands.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- */
+/* WORD ... 2 byte, network order; can be used to send commands */
 int 
-cqi_send_word(int n)
-{
+cqi_send_word(int n) {
   if (snoop) {
     fprintf(stderr, "CQi SEND WORD   %04X      [= %d]\n", n, n);
   }
   if (
-      /* exploit the fact that cqi_send_byte() only uses the lowest 8 bytes of its argument */
-      !(cqi_send_byte(n>>8, 1)) ||
-      !(cqi_send_byte(n, 1))
+      (EOF == putc(0xff & (n >> 8), conn_out)) ||
+      (EOF == putc(0xff & n, conn_out))
       )
     {
       perror("ERROR cqi_send_word()");
@@ -474,28 +309,17 @@ cqi_send_word(int n)
   }
 }
 
-/**
- * Sends an INT to the client.
- *
- * An int consists of four bytes in network order.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- *
- * @return  Boolean: true if everything OK, otherwise false.
- */
+/* INT ... 4 byte, network order */
 int 
-cqi_send_int(int n)
-{
+cqi_send_int(int n) {
   if (snoop) {
     fprintf(stderr, "CQi SEND INT    %08X  [= %d]\n", n, n);
   }
   if (
-      /* exploit the fact that cqi_send_byte() only uses the lowest 8 bytes of its argument */
-      !(cqi_send_byte(n>>24, 1)) ||
-      !(cqi_send_byte(n>>16, 1)) ||
-      !(cqi_send_byte(n>>8, 1)) ||
-      !(cqi_send_byte(n, 1))
+      (EOF == putc(0xff & (n >> 24), conn_out)) ||
+      (EOF == putc(0xff & (n >> 16), conn_out)) ||
+      (EOF == putc(0xff & (n >> 8), conn_out)) ||
+      (EOF == putc(0xff & n, conn_out))
       )
     {
       perror("ERROR cqi_send_int()");
@@ -506,22 +330,9 @@ cqi_send_int(int n)
   }
 }
 
-
-/**
- * Sends a STRING to the client.
- *
- * CQi strings are NOT null-terminated -- so while the argument to this
- * function needs to be a null-terminated string, the string that actually
- * gets sent across the network will not be.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- *
- * @return  Boolean: true if everything OK, otherwise false.
- */
+/* STRING ... send CQi string (NOT null-terminated) */ 
 int 
-cqi_send_string(char *str)
-{
+cqi_send_string(char *str) {
   int len;
 
   if (str == NULL) {
@@ -541,39 +352,25 @@ cqi_send_string(char *str)
   }
   if (snoop) {
     fprintf(stderr, "CQi SEND CHAR[] '%s'\n", str);
- }
-  /* we can afford to mangle len and str because we're at the end of the function */
-  while (--len >= 0) {
-    if (!cqi_send_byte(*str++, 1)) {
-      perror("ERROR cqi_send_string()");
-      return 0;
-    }
   }
-
-  return 1;
+  if (len != fprintf(conn_out, "%s", str)) {
+    perror("ERROR cqi_send_string()");
+    return 0;
+  }    
+  else {
+    return 1;
+  }
 }
 
-
-/**
- * Sends a BYTE[] (byte list) to the client.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- *
- * @param list  pointer to a block of bytes to send.
- * @param l     the number of bytes to send.
- *
- * @return  Boolean: true if everything OK, otherwise false.
- */
+/* BYTE[] ... byte list */
 int 
-cqi_send_byte_list(cqi_byte *list, int l)
-{
+cqi_send_byte_list(cqi_byte *list, int l) {
   if (!cqi_send_int(l)) {
     perror("ERROR cqi_send_byte_list()");
     return 0;
   }
   while (--l >= 0) {
-    if (!cqi_send_byte(*list++, 0)) {
+    if (!cqi_send_byte(*list++)) {
       perror("ERROR cqi_send_byte_list()");
       return 0;
     }
@@ -581,20 +378,9 @@ cqi_send_byte_list(cqi_byte *list, int l)
   return 1;
 }
 
-/**
- * Sends an INT[] (integer list) to the client.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- *
- * @param list  pointer to a block of integers to send.
- * @param l     the number of integers to send.
- *
- * @return  Boolean: true if everything OK, otherwise false.
- */
+/* INT[] ... integer list */
 int 
-cqi_send_int_list(int *list, int l)
-{
+cqi_send_int_list(int *list, int l) {
   if (!cqi_send_int(l)) {
     perror("ERROR cqi_send_int_list()");
     return 0;
@@ -608,19 +394,9 @@ cqi_send_int_list(int *list, int l)
   return 1;
 }
 
-
-/**
- * Sends a STRING[] (string list) to the client.
- *
- * This function should be called via one of the cqi_data_* functions
- * and not on its own.
- *
- * @param list  pointer to a block of pointers-to-strings; the strings will be sent.
- * @param l     the number of strings to send.
- */
+/* STRING[] ... string list */
 int 
-cqi_send_string_list(char **list, int l)
-{
+cqi_send_string_list(char **list, int l) {
   if (!cqi_send_int(l)) {
     perror("ERROR cqi_send_string_list()");
     return 0;
@@ -635,127 +411,74 @@ cqi_send_string_list(char **list, int l)
 }
 
 
+/* send a CQi command */
 
-/**
- * Sends a general CQi command, without any arguments.
- */
+/* general command without arguments */
 void 
-cqi_command(int command)
-{
+cqi_command(int command) {
   if (!cqi_send_word(command) || !cqi_flush()) {
     cqi_send_error("cqi_command");
   }
 }
 
-/**
- * Sends a byte of data to the client.
- */
 void 
-cqi_data_byte(int n)
-{
-  if (!cqi_send_word(CQI_DATA_BYTE) || !cqi_send_byte(n, 0) || !cqi_flush()) {
+cqi_data_byte(int n) {
+  if (!cqi_send_word(CQI_DATA_BYTE) || !cqi_send_byte(n) || !cqi_flush()) {
     cqi_send_error("cqi_data_byte");
   }
 }
 
-/**
- * Sends a boolean to the client.
- */
 void 
-cqi_data_bool(int n)
-{
-  if (!cqi_send_word(CQI_DATA_BOOL) || !cqi_send_byte(n, 0) || !cqi_flush()) {
+cqi_data_bool(int n) {
+  if (!cqi_send_word(CQI_DATA_BOOL) || !cqi_send_byte(n) || !cqi_flush()) {
     cqi_send_error("cqi_data_bool");
   }
 }
 
-/**
- * Sends an integer to the client.
- */
 void 
-cqi_data_int(int n)
-{
+cqi_data_int(int n) {
   if (!cqi_send_word(CQI_DATA_INT) || !cqi_send_int(n) || !cqi_flush()) {
     cqi_send_error("cqi_data_int");
   }
 }
 
-/**
- * Sends a string to the client.
- */
 void 
-cqi_data_string(char *str)
-{
+cqi_data_string(char *str) {
   if (!cqi_send_word(CQI_DATA_STRING) || !cqi_send_string(str) || !cqi_flush()) {
     cqi_send_error("cqi_data_string");
   }
 }
 
-/**
- * Sends a byte list to the client.
- *
- * @param list  pointer to a block of bytes to send.
- * @param l     the number of bytes to send.
- */
 void 
-cqi_data_byte_list(cqi_byte *list, int l)
-{
+cqi_data_byte_list(cqi_byte *list, int l) {
   if (!cqi_send_word(CQI_DATA_BYTE_LIST) || !cqi_send_byte_list(list, l) || !cqi_flush()) {
     cqi_send_error("cqi_data_byte_list");
   }
 }
 
-/**
- * Sends a list of booleans to the client.
- *
- * @param list  pointer to a block of booleans (each occupying one byte) to send.
- * @param l     the number of bytes to send.
- */
 void 
-cqi_data_bool_list(cqi_byte *list, int l)
-{
+cqi_data_bool_list(cqi_byte *list, int l) {
   if (!cqi_send_word(CQI_DATA_BOOL_LIST) || !cqi_send_byte_list(list, l) || !cqi_flush()) {
     cqi_send_error("cqi_data_bool_list");
   }
 }
 
-/**
- * Sends a list of integers to the client.
- *
- * @param list  pointer to a block of integers to send.
- * @param l     the number of integers to send.
- */
 void 
-cqi_data_int_list(int *list, int l)
-{
+cqi_data_int_list(int *list, int l) {
   if (!cqi_send_word(CQI_DATA_INT_LIST) || !cqi_send_int_list(list, l) || !cqi_flush()) {
     cqi_send_error("cqi_data_int_list");
   }
 }
 
-/**
- * Sends a list of strings to the client.
- *
- * @param list  pointer to a block of pointers-to-strings; the strings will be sent.
- * @param l     the number of strings to send.
- */
 void 
-cqi_data_string_list(char **list, int l)
-{
+cqi_data_string_list(char **list, int l) {
   if (!cqi_send_word(CQI_DATA_STRING_LIST) || !cqi_send_string_list(list, l) || !cqi_flush()) {
     cqi_send_error("cqi_data_string_list");
   }
 }
 
-/**
- * Sends a sequence of two integers to the client.
- *
- * @param n1  The first integer sent
- * @param n2  The second integer sent
- */
 void 
-cqi_data_int_int(int n1, int n2)
-{
+cqi_data_int_int(int n1, int n2) {
   if (
       !cqi_send_word(CQI_DATA_INT_INT) ||
       !cqi_send_int(n1) ||
@@ -767,17 +490,8 @@ cqi_data_int_int(int n1, int n2)
     }
 }
 
-/**
- * Sends a sequence of four integers to the client.
- *
- * @param n1  The first integer sent
- * @param n2  The second integer sent
- * @param n3  The third integer sent
- * @param n4  The fourth integer sent
- */
 void 
-cqi_data_int_int_int_int(int n1, int n2, int n3, int n4)
-{
+cqi_data_int_int_int_int(int n1, int n2, int n3, int n4) {
   if (
       !cqi_send_word(CQI_DATA_INT_INT_INT_INT) ||
       !cqi_send_int(n1) ||
@@ -799,8 +513,7 @@ cqi_data_int_int_int_int(int n1, int n2, int n3, int n4)
  */
 
 int 
-cqi_recv_bytes(cqi_byte *buf, int bytes)
-{
+cqi_recv_bytes(cqi_byte *buf, int bytes) {
   if (bytes <= 0) {
     return 1;
   }
@@ -817,8 +530,7 @@ cqi_recv_bytes(cqi_byte *buf, int bytes)
 }
 
 int 
-cqi_recv_byte(void)
-{
+cqi_recv_byte(void) {
   cqi_byte b;
   if (1 != recv(connfd, &b, 1, MSG_WAITALL)) {
     perror("ERROR cqi_recv_byte()");
@@ -831,8 +543,7 @@ cqi_recv_byte(void)
 }
 
 int 
-cqi_read_byte(void)
-{
+cqi_read_byte(void) {
   int b = cqi_recv_byte();
   if (b == EOF) {
     cqi_recv_error("cqi_read_byte");
@@ -841,8 +552,7 @@ cqi_read_byte(void)
 }
 
 int 
-cqi_read_bool(void)
-{
+cqi_read_bool(void) {
   int b = cqi_recv_byte();
   if (b == EOF) {
     cqi_recv_error("cqi_read_bool");
@@ -851,8 +561,7 @@ cqi_read_bool(void)
 }
 
 int 
-cqi_read_word(void)
-{
+cqi_read_word(void) {
   int n = cqi_read_byte();
   n = (n << 8) | cqi_read_byte();
   if (snoop) {
@@ -862,8 +571,7 @@ cqi_read_word(void)
 }
 
 int 
-cqi_read_int(void)
-{
+cqi_read_int(void) {
   int n = cqi_read_byte();
   int minus_bits = ((int)-1) ^ 0xFFFFFFFF; /* extra minus bits if int is > 32 bit*/
 
@@ -879,8 +587,7 @@ cqi_read_int(void)
 }
 
 char *
-cqi_read_string(void)
-{
+cqi_read_string(void) {
   int len;
   char *s;
 
@@ -895,8 +602,7 @@ cqi_read_string(void)
 }  
 
 int
-cqi_read_command(void)
-{
+cqi_read_command(void) {
   int command;
 
   if (server_debug)
@@ -909,8 +615,7 @@ cqi_read_command(void)
 }
 
 int
-cqi_read_byte_list(cqi_byte **list)
-{
+cqi_read_byte_list(cqi_byte **list) {
   int i, len;
 
   len = cqi_read_int();
@@ -929,8 +634,7 @@ cqi_read_byte_list(cqi_byte **list)
 }
 
 int
-cqi_read_bool_list(cqi_byte **list)
-{
+cqi_read_bool_list(cqi_byte **list) {
   int i, len;
 
   len = cqi_read_int();
@@ -949,8 +653,7 @@ cqi_read_bool_list(cqi_byte **list)
 }
 
 int
-cqi_read_int_list(int **list)
-{
+cqi_read_int_list(int **list) {
   int i, len;
 
   len = cqi_read_int();
@@ -969,8 +672,7 @@ cqi_read_int_list(int **list)
 }
 
 int
-cqi_read_string_list(char ***list)
-{
+cqi_read_string_list(char ***list) {
   int i, len;
   
   len = cqi_read_int();
@@ -1058,9 +760,7 @@ check_subcorpus_name(char *name) {
 /* To avoid messing with function arguments when splitting specifiers,
    I need the following strdupto() function, which creates a duplicate
    of <str> just as if there were a \0 at <end> */
-char *
-strdupto(char *str, char *end)
-{
+char *strdupto(char *str, char *end) {
   int len = end - str;
   char *ret, *p;
 
@@ -1136,32 +836,23 @@ combine_subcorpus_spec(char *corpus, char *subcorpus) {
  *
  */
 
-/** The AttBucket object is a holder for an attribute and its key string. */
 typedef struct att_bucket {
-  char *string;                 /**< the key for this attribute bucket. */
+  char *string; /* the key */
   Attribute *attribute;
-  int type;                     /**< type of the attribute in this bucket: ATT_NONE, ATT_POS, ATT_STRUC, ... */
+  int type;                     /* ATT_NONE, ATT_POS, ATT_STRUC, ... */
 } AttBucket;
 
-/** Underlying structure for the AttHashTable object.  @see AttHashTable */
 struct att_hashtable {
-  AttBucket *space;             /**< the actual array of attribute buckets. */
+  AttBucket *space;
   int    code;
   int    size;
 };
 
-/** An AttHashTable object contains space for a hash table of attribute-pointers. */
 typedef struct att_hashtable *AttHashTable;
 
-/** The CQi server's global attribute hash */
-AttHashTable AttHash = NULL;
+AttHashTable AttHash = NULL;    /* this is the global attribute hash */
 
-/**
- * This function has to be called once to initialise the global attribute hash.
- *
- * TODO better name: att_hash_make
- * @see AttHash
- */
+/* has to be called once to initialise the hash */
 void 
 make_attribute_hash(int size)
 {
@@ -1177,12 +868,6 @@ make_attribute_hash(int size)
   AttHash->code = 0;
 }
 
-/**
- * Frees the global AttHash object and the space that it points to.
- *
- * TODO better name: att_hash_free
- * @see AttHash
- */
 void 
 free_attribute_hash(void)
 {
@@ -1194,9 +879,6 @@ free_attribute_hash(void)
   }
 }
 
-/**
- * Finds an AttBucket within the global AttHash that matches the argument string.
- */
 AttBucket *
 att_hash_lookup(char *str)
 {
@@ -1233,8 +915,7 @@ att_hash_lookup(char *str)
 }
 
 Attribute *
-cqi_lookup_attribute(char *name, int type)
-{
+cqi_lookup_attribute(char *name, int type) {
   AttBucket *p = att_hash_lookup(name);
   if (p->attribute == NULL) {
     /* try to open the attribute */
@@ -1279,16 +960,6 @@ cqi_lookup_attribute(char *name, int type)
   }
 }
 
-/**
- * Drops the named attribute from memory.
- *
- * The attribute name is looked up in the global hash,
- * and then cl_delete_attribute() is called on the result.
- *
- * @see         cl_delete_attribute
- * @param name  Name of the attribute to be deleted
- * @return      Boolean: true for all OK, otherwise false
- */
 int
 cqi_drop_attribute(char *name) {
   AttBucket *p = att_hash_lookup(name);
@@ -1303,7 +974,7 @@ cqi_drop_attribute(char *name) {
     return 0;
   }
 }
-
+      
 
 
 /*
@@ -1312,12 +983,8 @@ cqi_drop_attribute(char *name) {
  *
  */
 
-/**
- * Gets a pointer to the corpus with the given name.
- */
 CorpusList *
-cqi_find_corpus(char *name)
-{
+cqi_find_corpus(char *name) {
   CorpusList *cl;
   char *corpus, *subcorpus;
 
@@ -1342,13 +1009,9 @@ cqi_find_corpus(char *name)
   cqi_errno = CQI_STATUS_OK;
   return cl;
 }
-
-/**
- * Activates the named corpus.
- */
+    
 int 
-cqi_activate_corpus(char *name)
-{
+cqi_activate_corpus(char *name) {
   CorpusList *cl;
 
   if (server_debug) 

@@ -26,7 +26,7 @@ char *progname;
  * Prints a message describing how to use the program to STDERR and then exits.
  */
 void
-sdecode_usage(void)
+usage(void)
 {
   fprintf(stderr,
           "\n"
@@ -105,7 +105,7 @@ main(int argc, char **argv)
 
     default:
     case 'h':
-      sdecode_usage();
+      usage();
       break;
 
     }
@@ -113,7 +113,7 @@ main(int argc, char **argv)
 
   /* expect three arguments: <corpus> -S <attribute> */
   if (argc <= (optind + 2))
-    sdecode_usage();
+    usage();
 
   if (!show_regions && !show_values) {
     fprintf(stderr, "Error: options -n and -v cannot be combined (would print nothing)\n");
@@ -133,7 +133,7 @@ main(int argc, char **argv)
 
   /* second argument: -S */
   if (strcmp(argv[optind++], "-S") != 0)
-    sdecode_usage();
+    usage();
 
   /* third argument: attribute name */
   attr_name = argv[optind];

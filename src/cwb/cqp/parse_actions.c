@@ -19,11 +19,7 @@
 
 #include <stdlib.h>
 #include <sys/time.h>
-#ifndef __MINGW__
 #include <sys/resource.h>
-#else
-#include <windows.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -55,48 +51,22 @@
 
 /* ======================================== GLOBAL PARSER VARIABLES */
 
-/**
- * TODO would be very useful to have a desc for this
- *
- * A boolean; seems to be some kind of error-indicator (set to true
- * if a query worked, false if it didn't, things like that).
- *
- * When it is false, many actions simply have no effect, because they are
- * set to only actually do anything "if (generate_code)".
- *
- * Some functions will set it to 0 when an action works to block later actions.
- *
- * In some cases, setting this to  0 is linked with "YYABORT" in comments.
- */
 int generate_code;
-int within_gc;                   /**< TODO would be very useful to have a desc for this ;
-                                      seems to be about whether or not we are within a global constraint */
+int within_gc;
 
-CYCtype last_cyc;                /**< type of last corpus yielding command */
+CYCtype last_cyc;                /* type of last corpus yielding command */
 
-/** The corpus (or subcorpus) which is "active" in the sense that the query will be executed within it. */
 CorpusList *query_corpus = NULL;
-/** Used for preserving former values of query_corpus (@see query_corpus), so it can be reset to a former value). */
 CorpusList *old_query_corpus = NULL;
 
 int catch_unknown_ids = 0;
 
+extern FILE *yyin;
 
-/**
- * This is used by the parser in response to CQP's "expand" operator,
- * which incorporates context around the query hit into the match itself.
- * Functions involved in carrying this out utilise info stored here by the parser.
- */
 Context expansion;
-/**
- * Buffer for storing regex strings. As it says on the tin.
- *
- * TODO Doesn't seem currently to be in use anywhere, except in one func which itself is not used.
- */
-char regex_string[CL_MAX_LINE_LENGTH];
-/** index into the regex string buffer, storing a current position. @ see regex_string_pos */
+
+char regex_string[1024];
 int regex_string_pos;
-/** length of search string: is written to by evaltree2searchstr() but then seems never to be read.  TODO . */
 int sslen;
 
 /* ======================================== predeclared functions */
@@ -107,17 +77,6 @@ char *mval_string_conversion(char *s);
 
 /* ======================================== Syntax rule: line -> command */
 
-/**
- * Add a line of CQP input to the history file.
- *
- * Supports parser rule: line -> command
- *
- * The line that is added comes from QueryBuffer; the file it is
- * written to is that named in cqp_history_file.
- *
- * @see QueryBuffer
- * @see cqp_history_file
- */
 void
 addHistoryLine(void)
 {
@@ -130,8 +89,9 @@ addHistoryLine(void)
 
       FILE *fd;
 
-      if (!(fd = open_file(cqp_history_file, "a"))) {
-        cqpmessage(Error, "Can't open history file %s\n", cqp_history_file);
+      if (!(fd = OpenFile(cqp_history_file, "a"))) {
+        cqpmessage(Error, "Can't open history file %s\n",
+                   cqp_history_file);
       }
       else {
         fputs(QueryBuffer, fd);
@@ -142,18 +102,11 @@ addHistoryLine(void)
   }
 }
 
-/**
- * Empties the query buffer and sets to 0 the pointer.
- *
- * Supports parser rule: line -> command
- *
- * @see QueryBuffer
- * @see QueryBufferP
- */
 void
 resetQueryBuffer(void)
 {
-  /*   fprintf(stderr, "+ Resetting Query Buffer\n"); */
+/*   fprintf(stderr, "+ Resetting Query Buffer\n"); */
+
   QueryBufferP = 0;
   QueryBuffer[0] = '\0';
   QueryBufferOverflow = 0;
@@ -166,8 +119,7 @@ RaiseError(void)
   resetQueryBuffer();
 }
 
-void
-prepare_parse(void)
+void prepare_parse(void)
 {
   if (old_query_corpus != NULL) {
     query_corpus = old_query_corpus;
@@ -195,20 +147,20 @@ in_CorpusCommand(char *id, CorpusList *cl)
     return NULL;
   }
   else {
-    duplicate_corpus(cl, id, True);
+    (void) duplicate_corpus(cl, id, True);
     
     last_cyc = Assignment;
     return current_corpus;
   }
 }
 
-/**
- * Set the current corpus and
- * do the output if it was a query
- */
-void
-after_CorpusCommand(CorpusList *cl)
+void after_CorpusCommand(CorpusList *cl)
 {
+  /*
+   * set the current corpus and
+   * do the output if it was a query
+   */
+
 #if defined(DEBUG_QB)
   if (QueryBufferOverflow) 
     fprintf(stderr, "+ Query Buffer overflow.\n");
@@ -230,7 +182,8 @@ after_CorpusCommand(CorpusList *cl)
       else if (!silent)
         printf("%d matches.%s\n",
                cl->size,
-               (cl->size > 0 ? " Use 'cat' to show." : ""));
+               (cl->size > 0 ? " Use 'cat' to show."
+                : ""));
     }
     query_corpus = NULL;
     
@@ -268,16 +221,7 @@ after_CorpusCommand(CorpusList *cl)
 
 /* ======================================== UnnamedCorpusCommand -> CYCommand ReStructure */
 
-/**
- * This function is called after an UnnamedCorpusCommand rule is parsed.
- *
- * Seems to be a tidying-up function.
- *
- * @param cl  The result of the corpus-yielding command (first component of this syntax rule).
- * @return    Modified valuse of cl. May be NULL.
- */
-CorpusList *
-in_UnnamedCorpusCommand(CorpusList *cl)
+CorpusList *in_UnnamedCorpusCommand(CorpusList *cl)
 {
   CorpusList *res = NULL;
   
@@ -288,9 +232,7 @@ in_UnnamedCorpusCommand(CorpusList *cl)
     switch (last_cyc) {
     case Query:
       
-      /* the last command was a query */
-
-      assert(cl->type == TEMP); /* should be true since the last command was a query! */
+      assert(cl->type == TEMP);
       
       if (generate_code) {
 
@@ -298,7 +240,6 @@ in_UnnamedCorpusCommand(CorpusList *cl)
 
         do_timing("Query result computed"); /* timer must be started by each query execution command */
 
-        /* set the "corpus" created by the query to be the default "Last" subcorpus. */
         res = assign_temp_to_sub(cl, "Last");
       }
       else
@@ -310,13 +251,16 @@ in_UnnamedCorpusCommand(CorpusList *cl)
       
     case Activation:
       
-      /* Last command was not a query, that is, it was a corpus activation.
-       * We only have to copy if we want to expand the beast.
+      /* it was no query, that is, an activation.
+       * We only have to copy if we want to
+       * expand the beast.
        */
+      
       if (expansion.size > 0) {
 
         if (cl->type == SYSTEM) {
-          cqpmessage(Warning, "System corpora can't be expanded");
+          cqpmessage(Warning,
+                     "System corpora can't be expanded");
           res = cl;
         }
         else {
@@ -326,7 +270,9 @@ in_UnnamedCorpusCommand(CorpusList *cl)
         }
       }
       else {
-        /* a simple activation without restructuring */
+        /* a simple activation without
+         * restructuring
+         */
         res = cl;
       }
       break;
@@ -397,22 +343,7 @@ after_CorpusSetExpr(CorpusList *cl)
   return cl;
 }
 
-/**
- * This function sets things up to run a query.
- *
- * It is called as an "action" before any detected Query in the parser.
- *
- * [AH 2010/8/2: I have added the code checking input character encoding.
- * Anything that is not part of a query should be plain ASCII - if not,
- * then the lexer/parser should pick it up as bad. Filenames, etc. are
- * obvious exceptions - but we can't check the encoding of those, because
- * there's no guarantee it will be the same as that of the corpus, which
- * is the only thing whose encoding we know. So it's up to the user to
- * type filenames in an encoding their OS will accept!
- * Canonicalisation is done within the CL_Regex, not here.]
- */
-void
-prepare_Query()
+void prepare_Query()
 {
   generate_code = 1;
 
@@ -425,20 +356,13 @@ prepare_Query()
     cqpmessage(Error, "Current corpus can't be accessed");
     generate_code = 0;
   }
-
+  
   if (generate_code) {
     
     assert(current_corpus->corpus != NULL);
     assert(searchstr == NULL);
     assert(eep == -1);
-
-    /* validate character encoding according to that corpus, now we know it's loaded */
-    if (!cl_string_validate_encoding(QueryBuffer, current_corpus->corpus->charset, 0)) {
-      cqpmessage(Error, "Query includes a character or character sequence that is invalid\n"
-          "in the encoding specified for this corpus");
-      generate_code = 0;
-    }
-
+    
     if (!next_environment()) {
       cqpmessage(Error, "Can't allocate another evaluation environment");
       generate_code = 0;
@@ -450,7 +374,8 @@ prepare_Query()
       assert(eep == 0);
       assert(CurEnv == &(Environment[0]));
       
-      query_corpus = make_temp_corpus(current_corpus, "RHS");
+      query_corpus = make_temp_corpus(current_corpus,
+                                      "RHS");
       CurEnv->query_corpus = query_corpus;
 
       /* subqueries don't work properly if the mother corpus has overlapping regions -> delete and warn */
@@ -458,23 +383,23 @@ prepare_Query()
       RangeSetop(query_corpus, RNonOverlapping, NULL, NULL);
       after = query_corpus->size;
       if (after < before) {
-        cqpmessage(Warning, "Overlapping matches in %s:%s deleted for subquery execution.",
-                   query_corpus->mother_name, query_corpus->name);
+        cqpmessage(Warning, "Overlapping matches in %s:%s deleted for subquery execution.", query_corpus->mother_name, query_corpus->name);
       }
     }
   }
   within_gc = 0;
 }
 
-CorpusList *
-after_Query(CorpusList *cl)
+CorpusList *after_Query(CorpusList *cl)
 {
   last_cyc = Query;
 
   within_gc = 0;
 
   if (generate_code) {
+
     if (cl) {
+
       cl_free(cl->query_text);
       cl_free(cl->query_corpus);
 
@@ -512,7 +437,7 @@ do_save(CorpusList *cl, struct Redir *r)
   if (cl) {
     if (!LOCAL_CORP_PATH)
       cqpmessage(Warning,
-                 "Can't save subcorpus ``%s'' (env. var. %s isn't set)", /* TODO: isn't this a bit misleading? Would be better to say "you must set DataDirectory".... */
+                 "Can't save subcorpus ``%s'' (env. var. %s isn't set)",
                  cl->name,
                  DEFAULT_LOCAL_PATH_ENV_VAR);
     else {
@@ -564,65 +489,6 @@ do_attribute_show(char *name, int status)
     }
   }
 }
-
-CorpusList *
-do_translate(CorpusList *source, char *target_name) {
-  CorpusList *res, *target;
-  Attribute *alignment;
-  int i, n, bead;
-  int s1, s2, t1, t2;
-  
-  if (generate_code) {
-    assert(source != NULL);
-    target = findcorpus(target_name, SYSTEM, 0);
-    if (target == NULL) {
-      cqpmessage(Warning, "System corpus ``%s'' doesn't exist", target_name);
-      generate_code = 0;
-      return NULL;
-    }
-    alignment = find_attribute(source->corpus, target->corpus->registry_name,
-                               ATT_ALIGN, NULL);
-    if (alignment == NULL) {
-      cqpmessage(Error, "Corpus ``%s'' is not aligned to corpus ``%s''",
-                 source->mother_name, target->mother_name);
-      generate_code = 0;
-      return NULL;      
-    }
-    
-    /* allocate temporary NQR for the translated ranges */
-    res = make_temp_corpus(target, "RHS");
-    res->size = n = source->size;
-    cl_free(res->range);     /* allocate ranges for mapped regions */
-    res->range = (Range *)cl_calloc(n, sizeof(Range));
-    cl_free(res->targets);   /* make sure there are no spurious target / keywords vectors */
-    cl_free(res->keywords);
-    
-    /* translate each matching range into target bead */
-    for (i = 0; i < n; i++) {
-      bead = cl_cpos2alg(alignment, source->range[i].start);
-      if (bead < 0 ||
-          !cl_alg2cpos(alignment, bead, &s1, &s2, &t1, &t2) || 
-          cderrno != CDA_OK) {
-        res->range[i].start = -1;
-      } 
-      else {
-        res->range[i].start = t1;
-        res->range[i].end = t2;
-      }
-    }
-
-    /* remove unaligned items (but not duplicates) */
-    RangeSetop(res, RReduce, NULL, NULL); 
-
-    /* make sure target ranges are sorted (preserving original order with sortidx) */
-    RangeSort(res, 1);
-    
-    return res;
-  } 
-  else
-    return NULL;
-}
-
 
 CorpusList *
 do_setop(RangeSetOp op, CorpusList *c1, CorpusList *c2)
@@ -690,7 +556,7 @@ prepare_do_subset(CorpusList *cl, FieldType field)
     progress_bar_message(1, 1, "    preparing");
   }
 
-  /* jetzt kï¿½nnen wir endlich loslegen */
+  /* jetzt können wir endlich loslegen */
   query_corpus = make_temp_corpus(cl, "RHS");
   generate_code = 1;
 }
@@ -745,7 +611,7 @@ do_set_complex_target(CorpusList *cl,
     old_query_corpus = NULL;
   }
   
-  /* aufrï¿½umen */
+  /* aufräumen */
   if (boolt)
     free_booltree(boolt);
 }
@@ -754,7 +620,7 @@ do_set_complex_target(CorpusList *cl,
 /**
  * Puts the program to sleep.
  *
- * A wrapper round the standard sleep() function (or Sleep() in Windows).
+ * A wrapper round the standard sleep() function.
  *
  * @param duration  How many seconds to sleep for.
  */
@@ -762,17 +628,11 @@ void
 do_sleep(int duration)
 {
   if (duration > 0) {
-#ifndef __MINGW__
-    sleep(duration);       /* sleep in number of seconds (normal POSIX function) */
-#else
-    Sleep(duration*1000);  /* sleep in number of milliseconds (Windows "equivalent") */
-#endif
+    sleep(duration);
   }
 }
 
-/**
- * Execute the commands contained within a specified text file.
- */
+
 void
 do_exec(char *fname)
 {
@@ -781,13 +641,15 @@ do_exec(char *fname)
   cqpmessage(Message, "exec cmd: %s\n", fname);
   
   if (1) {
-    cqpmessage(Error, "The source statement is not yet supported");
+    cqpmessage(Error,
+               "The source statement is not yet supported");
     generate_code = 0;
   }
   else {
-    if ((f = open_file(fname, "r")) != NULL) {
+    if ((f = OpenFile(fname, "r")) != NULL) {
       if (!cqp_parse_file(f, 1)) {
-        cqpmessage(Error, "Errors in exec'ed file %s\n", fname);
+        cqpmessage(Error,
+                   "Errors in exec'ed file %s\n", fname);
         generate_code = 0;
       }
     }
@@ -981,12 +843,12 @@ void
 do_group(CorpusList *cl,
          FieldType target, int target_offset, char *t_att,
          FieldType source, int source_offset, char *s_att,
-         int cut, int expand, int is_grouped, struct Redir *redir)
+         int cut, int expand, struct Redir *redir)
 {
   Group *group;
   
   do_start_timer();
-  group = compute_grouping(cl, source, source_offset, s_att, target, target_offset, t_att, cut, is_grouped);
+  group = compute_grouping(cl, source, source_offset, s_att, target, target_offset, t_att, cut);
   do_timing("Grouping computed");
   if (group) {
     print_group(group, expand, redir);
@@ -994,7 +856,6 @@ do_group(CorpusList *cl,
   }
 }
 
-/** Like do_group, but with no source */
 void 
 do_group2(CorpusList *cl,
           FieldType target, int target_offset, char *t_att,
@@ -1003,7 +864,7 @@ do_group2(CorpusList *cl,
   Group *group;
   
   do_start_timer();
-  group = compute_grouping(cl, NoField, 0, NULL, target, target_offset, t_att, cut, 0);
+  group = compute_grouping(cl, NoField, 0, NULL, target, target_offset, t_att, cut);
   do_timing("Grouping computed");
   if (group) {
     print_group(group, expand, r);
@@ -1012,27 +873,12 @@ do_group2(CorpusList *cl,
 }
 
 CorpusList *
-do_StandardQuery(int cut_value, int keep_flag, char *modifier)
+do_StandardQuery(int cut_value, int keep_flag)
 {
   CorpusList *res;
   res = NULL;
 
   cqpmessage(Message, "Query");
-
-  /* embedded modifier (?<modifier>) at start of query */
-  if (modifier != NULL) {
-    /* currently, modifiers can only be used to set the matching strategy */
-    int code = find_matching_strategy(modifier);
-    if (code < 0) {
-      cqpmessage(Error, "embedded modifier (?%s) not recognized;\n"
-          "\tuse (?longest), (?shortest), (?standard) or (?traditional) to set matching strategy temporarily",
-          modifier);
-      generate_code = 0;
-    }
-    else
-      Environment[0].matching_strategy = code;
-    cl_free(modifier); /* allocated by lexer */
-  }
   
   if (parseonly || (generate_code == 0))
     res = NULL;
@@ -1050,15 +896,15 @@ do_StandardQuery(int cut_value, int keep_flag, char *modifier)
     res = Environment[0].query_corpus;
 
     /* the new matching strategies require post-processing of the query result */
-    switch (Environment[0].matching_strategy) {
+    switch (matching_strategy) {
     case shortest_match:
-      RangeSetop(res, RMinimalMatches, NULL, NULL);         /* select shortest from several nested matches */
+      RangeSetop(res, RMinimalMatches, NULL, NULL);        /* select shortest from several nested matches */
       break;
     case standard_match:
-      RangeSetop(res, RLeftMaximalMatches, NULL, NULL);     /* reduce multiple matches created by optional query prefix */
+      RangeSetop(res, RLeftMaximalMatches, NULL, NULL);        /* reduce multiple matches created by optional query prefix */
       break;
     case longest_match:
-      RangeSetop(res, RMaximalMatches, NULL, NULL);         /* select longest from several nested matches */
+      RangeSetop(res, RMaximalMatches, NULL, NULL);      /* select longest from several nested matches */
       break;
     case traditional:
     default:
@@ -1124,13 +970,13 @@ do_MUQuery(Evaltree evalt, int keep_flag, int cut_value)
   return res;
 }
 
-void
-do_SearchPattern(Evaltree expr, /* $1 */
-                 Constrainttree constraint) /* $3 */
+void do_SearchPattern(Evaltree expr, /* $1 */
+                      Constrainttree constraint) /* $3 */
 {
   cqpmessage(Message, "SearchPattern");
 
   if (generate_code) {
+    
     CurEnv->evaltree = expr;
     CurEnv->gconstraint = constraint;
     
@@ -1148,16 +994,11 @@ do_SearchPattern(Evaltree expr, /* $1 */
         printf("Search String: ``%s''\n", searchstr);
       }
       
-      if (searchstr && (strspn(searchstr, " ") < strlen(searchstr))) { /* i.e. searchstr does not match /^\s*$/ */
+      if (searchstr && (searchstr[0] != '\0'))
         regex2dfa(searchstr, &(CurEnv->dfa));
-      }
-      else {
-        cqpmessage(Error, "Query is vacuous, not evaluated.");
-        generate_code = 0;
-      }
       cl_free(searchstr);
     }
-  } /* endif generate_code */
+  }
 }
 
 /* ======================================== Regular Expressions */
@@ -1222,13 +1063,11 @@ do_AnchorPoint(FieldType field, int is_closing)
         cqpmessage(Error, "<keyword> anchor not defined in %s", query_corpus->name);
         generate_code = 0;
       }
-      break;
     default:
-      /* should not be reachable */
       assert("Internal error in do_AnchorPoint()" && 0);
     }
 
-  }
+  }    
 
   if (generate_code) {
     CurEnv->MaxPatIndex++;
@@ -1240,8 +1079,7 @@ do_AnchorPoint(FieldType field, int is_closing)
     res = CurEnv->MaxPatIndex;
   }
   
-  if (!generate_code)
-    res = -1;
+  if (!generate_code) res = -1;
 
   return res;
 }
@@ -1332,7 +1170,7 @@ do_XMLTag(char *s_name, int is_closing, int op, char *regex, int flags)
           assert(0 && "do_mval_string(): illegal opcode (internal error)");
         }
 
-        rx = cl_new_regex(pattern, flags, query_corpus->corpus->charset);
+        rx = cl_new_regex(pattern, flags, latin1);
         if (rx == NULL) {
           cqpmessage(Error, "Illegal regular expression: %s", regex);
           generate_code = 0;
@@ -1357,7 +1195,7 @@ do_XMLTag(char *s_name, int is_closing, int op, char *regex, int flags)
     }
     else {                        /* close tag -> if label is already defined, it is 'used', i.e. activated */
       label = findlabel(CurEnv->labels, s_name, LAB_RDAT);
-      if ((label != NULL) && (label->flags & LAB_DEFINED)) {
+      if ((label != NULL) && (label->flags | LAB_DEFINED)) {
         label->flags |= LAB_USED; /* activate this label for strict regions */
         CurEnv->patternlist[CurEnv->MaxPatIndex].tag.right_boundary = label;
       }
@@ -1608,12 +1446,11 @@ OptimizeStringConstraint(Constrainttree left,
       
       assert(right->leaf.pat_type == NORMAL);
       
-      id = cl_str2id(left->pa_ref.attr, right->leaf.ctype.sconst);
+      id = get_id_of_string(left->pa_ref.attr, right->leaf.ctype.sconst);
       
       if (id < 0) {
 
         if (catch_unknown_ids) {
-          /* nb effectively if (0) since catch_unknown_ids is initialised to 0 and no code changes it -- AH*/
           cqpmessage(Error, "The string ``%s'' is not in the value space of ``%s''\n",
                      right->leaf.ctype.sconst, left->pa_ref.attr->any.name);
           generate_code = 0;
@@ -1664,7 +1501,7 @@ do_StringConstraint(char *s, int flags)
                  def_unbr_attr, query_corpus->name,
                  DEFAULT_ATT_NAME);
       
-      set_string_option_value("DefaultNonbrackAttr", DEFAULT_ATT_NAME);
+      (void) set_string_option_value("DefaultNonbrackAttr", DEFAULT_ATT_NAME);
       
       if ((attr = find_attribute(query_corpus->corpus,
                                  DEFAULT_ATT_NAME,
@@ -1765,7 +1602,7 @@ do_SimpleVariableReference(char *varName)
                  def_unbr_attr, query_corpus->name,
                  DEFAULT_ATT_NAME);
       
-      set_string_option_value("DefaultNonbrackAttr", DEFAULT_ATT_NAME);
+      (void) set_string_option_value("DefaultNonbrackAttr", DEFAULT_ATT_NAME);
       
       if ((attr = find_attribute(query_corpus->corpus,
                                  DEFAULT_ATT_NAME,
@@ -1786,18 +1623,19 @@ do_SimpleVariableReference(char *varName)
     return NULL;
 }
 
-void
-prepare_AlignmentConstraints(char *id)
+void prepare_AlignmentConstraints(char *id)
 {
   Attribute *algattr;
   CorpusList *cl;
   
   if ((cl = findcorpus(id, SYSTEM, 0)) == NULL) {
-    cqpmessage(Warning, "System corpus ``%s'' is undefined", id);
+    cqpmessage(Warning,
+               "System corpus ``%s'' is undefined", id);
     generate_code = 0;
   }
   else if (!access_corpus(cl)) {
-    cqpmessage(Warning, "Corpus ``%s'' can't be accessed", id);
+    cqpmessage(Warning,
+               "Corpus ``%s'' can't be accessed", id);
     generate_code = 0;
   }
   else if ((algattr = find_attribute(Environment[0].query_corpus->corpus,
@@ -1809,7 +1647,9 @@ prepare_AlignmentConstraints(char *id)
     generate_code = 0;
   }
   else if (!next_environment()) {
-    cqpmessage(Error, "Can't allocate another evaluation environment (too many alignments)");
+    cqpmessage(Error,
+               "Can't allocate another evaluation environment"
+               " (too many alignments)");
     generate_code = 0;
     query_corpus = NULL;
   }
@@ -2129,7 +1969,7 @@ do_LabelReference(char *label_name, int auto_delete)
     } 
     else {
       /* reference to (value of) structural attribute at label */
-      if (!cl_struc_values(attr)) {
+      if (!structure_has_values(attr)) {
         cqpmessage(Error,
                    "Need attribute with values (``%s'' has no values)",
                    hack);
@@ -2237,16 +2077,13 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
   return res;
 }
 
-/**
- * Implements expansion of a variable within the RE() operator.
- */
+
 Constrainttree
-do_flagged_re_variable(char *varname, int flags)
-{
+do_flagged_re_variable(char *varname, int flags) {
   Constrainttree tree;
   Variable var;
   char *s, *mark, **items;
-  int length, i, l, N_strings;
+  int length, i, l, N;
   
   tree = NULL;
   if (flags == IGNORE_REGEX) {
@@ -2256,37 +2093,27 @@ do_flagged_re_variable(char *varname, int flags)
 
   var = FindVariable(varname);
   if (var != NULL) {
-    items = GetVariableStrings(var, &N_strings);
-    if (items == NULL || N_strings == 0) {
+    items = GetVariableStrings(var, &N);
+    if (items == NULL || N == 0) {
       cqpmessage(Error, "Variable $%s is empty.", varname);
       generate_code = 0;
     }
     else {
       /* compute length of interpolated regular expression */
       length = 1;
-      for (i = 0; i < N_strings; i++)
+      for (i = 0; i < N; i++) 
         length += strlen(items[i]) + 1;
       s = cl_malloc(length);
       l = sprintf(s, "%s", items[0]);
       mark = s + l;        /* <mark> points to the trailing null byte */
-      for (i = 1; i < N_strings; i++) {
+      for (i = 1; i < N; i++) {
         l = sprintf(mark, "|%s", items[i]);
         mark += l;
       }
       cl_free(items);
       /* now <s> contains the disjunction over all REs stored in <var> */
-
-      /* since the var strings were loaded without charset checking,
-       * we need to now check the regex for the present corpus's encoding. */
-      if (! cl_string_validate_encoding(s, query_corpus->corpus->charset, 0)){
-        cqpmessage(Error, "Variable $%s used with RE() includes one or more strings with characters that are invalid\n"
-                "in the encoding specified for corpus [%s]", varname, query_corpus->corpus->name);
-        generate_code = 0;
-        cl_free(s);
-      }
-      else
-        tree = do_flagged_string(s, flags);
-        /* note that <s> is inserted into the constraint tree and mustn't be freed here */
+      tree = do_flagged_string(s, flags);
+      /* note that <s> is inserted into the constraint tree and mustn't be freed here */
     }
   }
   else {
@@ -2323,7 +2150,8 @@ do_flagged_string(char *s, int flags)
     
     cl_string_latex2iso(s, s, strlen(s));
     
-    if (flags == IGNORE_REGEX || (strcspn(s, "[](){}.*+|?\\") == strlen(s) && flags == 0)) {
+    if (flags == IGNORE_REGEX ||
+        (strcspn(s, "[](){}.*+|?\\") == strlen(s) && flags == 0)) {
 
       res->leaf.ctype.sconst = s;
       res->leaf.pat_type = NORMAL;
@@ -2334,7 +2162,7 @@ do_flagged_string(char *s, int flags)
       
       res->leaf.pat_type = REGEXP;
       res->leaf.ctype.sconst = s;
-      res->leaf.rx = cl_new_regex(s, flags, query_corpus->corpus->charset);
+      res->leaf.rx = cl_new_regex(s, flags, latin1);
       if (res->leaf.rx == NULL) {
         cqpmessage(Error, "Illegal regular expression: %s", s);
         res->leaf.pat_type = NORMAL;
@@ -2502,8 +2330,7 @@ FunctionCall(char *f_name, ActualParamList *apl)
 }
 
 
-void
-do_Description(Context *context, int nr, char *name)
+void do_Description(Context *context, int nr, char *name)
 {
   context->type = word;
   context->attrib = NULL;
@@ -2570,8 +2397,7 @@ Evaltree do_MeetStatement(Evaltree left, Evaltree right, Context *context)
   return ev;
 }
 
-Evaltree
-do_UnionStatement(Evaltree left, Evaltree right)
+Evaltree do_UnionStatement(Evaltree left, Evaltree right)
 {
   Evaltree ev;
 
@@ -2591,8 +2417,7 @@ do_UnionStatement(Evaltree left, Evaltree right)
   return ev;
 }
 
-void
-do_StructuralContext(Context *context, char *name)
+void do_StructuralContext(Context *context, char *name)
 {
   context->type = word;
   context->attrib = NULL;
@@ -2784,8 +2609,9 @@ do_printVariableSize(char *varName)
     }
     printf("$%s has %d entries\n", v->my_name, size);
   }
-  else
+  else {
     cqpmessage(Error, "%s: no such variable", varName);
+  }
 }
 
 void
@@ -2806,7 +2632,7 @@ do_SetVariableValue(char *varName, char operator, char *varValues)
       cqpmessage(Error, "Error in variable value definition.");
   }
   else
-    cqpmessage(Warning, "Can't create variable, probably fatal (bad variable name?)");
+    cqpmessage(Warning, "Can't find variable, probably fatal");
 }
 
 void
@@ -2817,10 +2643,12 @@ do_AddSubVariables(char *var1Name, int add, char *var2Name)
   int i, N;
   
   if ((v1 = FindVariable(var1Name)) == NULL) {
-    cqpmessage(Error, "Variable $%s not defined.", var1Name);
+    cqpmessage(Error, "Variable $%s not defined.",
+               var1Name);
   }
   else if ((v2 = FindVariable(var2Name)) == NULL) {
-    cqpmessage(Error, "Variable $%s not defined.", var2Name);
+    cqpmessage(Error, "Variable $%s not defined.",
+               var2Name);
   }
   else {
     items = GetVariableStrings(v2, &N);
@@ -2841,17 +2669,7 @@ do_AddSubVariables(char *var1Name, int add, char *var2Name)
 
 /* ======================================== PARSER UTILS */
 
-/**
- * Get ready to parse a command.
- *
- * This function is called before the processing of each parsed line that is
- * recognised as a command.
- *
- * Mostly it involves setting the global variables to their starting-state
- * values.
- */
-void
-prepare_input(void)
+void prepare_input(void)
 {
   regex_string_pos = 0;
   free_environments();
@@ -2862,28 +2680,16 @@ prepare_input(void)
   LastExpression = NoExpression;
 }
 
-/**
- * Expand the dataspace of a subcorpus.
- *
- * This is done, e.g., by the CQP-syntax "expand" command, to include context
- * into the matches found by a query.
- *
- * Each corpus interval stored in the CorpusList is extended by an amount, and in a direction,
- * dependant on the information in the global variable "expansion", a Context object
- * (information which has been put there by the parser).
- *
- * @see       expansion
- * @param cl  The subcorpus to expand.
- */
-void
-expand_dataspace(CorpusList *cl)
+void expand_dataspace(CorpusList *cl)
 {
   int i, res;
 
   if (cl == NULL)
-    cqpmessage(Warning, "The selected corpus is empty.");
+    cqpmessage(Warning,
+             "The selected corpus is empty.");
   else if (cl->type == SYSTEM)
-    cqpmessage(Warning, "You can only expand subcorpora, no system corpora (unchanged)");
+    cqpmessage(Warning,
+             "You can only expand subcorpora, no system corpora (unchanged)");
   else if (expansion.size > 0) {
 
     for (i = 0; i < cl->size; i++) {
@@ -2894,7 +2700,7 @@ expand_dataspace(CorpusList *cl)
         if (res >= 0)
           cl->range[i].start = res;
         else
-          cqpmessage(Warning, "'expand' statement failed (while expanding corpus interval leftwards).\n");
+          cqpmessage(Warning, "'expand' statement failed.\n");
       }
       if (expansion.direction == right || expansion.direction == leftright) {
         res = calculate_rightboundary(cl,
@@ -2903,7 +2709,7 @@ expand_dataspace(CorpusList *cl)
         if (res >= 0)
           cl->range[i].end = res;
         else
-          cqpmessage(Warning, "'expand' statement failed (while expanding corpus interval rightwards).\n");
+          cqpmessage(Warning, "'expand' statement failed.\n");
       }
     }
 
@@ -2914,42 +2720,32 @@ expand_dataspace(CorpusList *cl)
   }
 }
 
-/**
- * Add a character (in the sense of a byte) to the regex_string buffer.
- *
- * Doesn't seem to currently be in use.
- *
- * @see regex_string
- */
-void
-push_regchr(char c)
+void push_regchr(char c)
 {
-  if (regex_string_pos < CL_MAX_LINE_LENGTH) {
+  if (regex_string_pos < 1024) {
     regex_string[regex_string_pos] = c;
     regex_string_pos++;
     regex_string[regex_string_pos] = '\0';
   }
   else {
-    cqpmessage(Warning, "Regex string overflow");
+    cqpmessage(Warning,
+             "Regex string overflow");
     regex_string[0] = '\0';
   }
 }
 
-/**
- * Prints out all the existing EvalEnvironments in the global array.
- *
- * @see Environment
- */
-void
-debug_output(void)
+void debug_output(void)
 {
+
   int i;
-  for (i = 0; i <= eep; i++)
-    show_environment(i);
+
+  if (show_compdfa || show_evaltree || show_gconstraints || show_patlist)
+    for (i = 0; i <= eep; i++)
+      show_environment(i);
 }
 
 
-/** Global variable for timing functions; not exported. @see do_start_timer @see do_timing */
+/** local variable for timing functions */
 struct timeval timer_start_time;
 
 /**
@@ -3027,15 +2823,6 @@ do_size(CorpusList *cl, FieldType field)
   }
 }
 
-/**
- * Dump query result (or part of it) as TAB-delimited table of corpus positions.
- *
- * @param cl       The result (as a subcorpus, naturally)
- * @param first    Where in the result to begin dumping (index of cl->range)
- * @param last     Where in the result to end dumping (index of cl->range)
- * @param rd       Pointer to a Redir structure which contains information about
- *                 where to dump to.
- */
 void
 do_dump(CorpusList *cl, int first, int last, struct Redir *rd)
 {
@@ -3043,38 +2830,32 @@ do_dump(CorpusList *cl, int first, int last, struct Redir *rd)
   Range *rg;
 
   if (cl) {
-    if (! open_stream(rd, cl->corpus->charset)) {
+    if (! open_stream(rd, ascii)) {
       cqpmessage(Error, "Can't redirect output to file or pipe\n");
       return;
     }
 
     f = (first >= 0) ? first : 0;
     l = (last < cl->size) ? last : cl->size - 1;
-    for (i = f; (i <= l) && !cl_broken_pipe; i++) {
+    for (i = f; i <= l; i++) {
       j = (cl->sortidx) ? cl->sortidx[i] : i;
-      target  = (cl->targets)  ? cl->targets[j]  : -1;
+      target = (cl->targets) ? cl->targets[j] : -1;
       keyword = (cl->keywords) ? cl->keywords[j] : -1;
       rg = cl->range + j;
-      fprintf(rd->stream, "%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
+      fprintf(rd->stream, "%d\t%d\t%d\t%d\n", 
+              rg->start, rg->end, target, keyword);
     }
 
     close_stream(rd);
   }
 }
 
-/** read TAB-delimited table of corpus positions and create named query result from it.
- *
- * acceptable values for extension_fields and corresponding row formats:
- * 0 = match \t matchend
- * 1 = match \t matchend \t target
- * 2 = match \t matchend \t target \t keyword
- */
 int
 do_undump(char *corpname, int extension_fields, int sort_ranges, struct InputRedir *rd)
 {
   int i, ok, size, match, matchend, target, keyword;
   int max_cpos, mark, abort;                /* for validity checks */
-  char line[CL_MAX_LINE_LENGTH], junk[CL_MAX_LINE_LENGTH], mother[CL_MAX_LINE_LENGTH];
+  char line[MAX_LINE_LENGTH], junk[MAX_LINE_LENGTH], mother[MAX_LINE_LENGTH];
   CorpusList *cl = current_corpus, *new = NULL;
 
   assert(corpname != NULL);
@@ -3116,35 +2897,34 @@ do_undump(char *corpname, int extension_fields, int sort_ranges, struct InputRed
   assert((new != NULL) && "failed to create temporary query result for undump");
 
   if (! open_input_stream(rd)) { /* open input file, input pipe, or read from stdin */
-    /* error message should printed by open_input_stream() */
+    cqpmessage(Error, "Can't read input to file or pipe\n");
     drop_temp_corpora();
     return 0;
   }
 
   ok = 0; /* read undump table header = number of rows */
-  if (fgets(line, CL_MAX_LINE_LENGTH, rd->stream)) {
+  if (fgets(line, MAX_LINE_LENGTH, rd->stream)) {
     if (1 == sscanf(line, "%d %s", &size, junk)) {
       ok = 1;
     }
     else if (2 == sscanf(line, "%d %d", &match, &matchend)) {
       /* looks like undump file without line count => determine number of lines */
-      if (rd->stream == stdin) {
-        cqpmessage(Warning, "You must always provide an explicit line count if undump data is entered manually (i.e. read from STDIN)");
+      if (rd->is_pipe) {
+        cqpmessage(Warning, "Sorry, undump files without explict line count can only be read from regular files, not from pipes or standard input");
       }
       else {
-        /* undump file without header: count lines, then reopen stream */
         size = 1; /* first line is already in buffer */
-        while (fgets(line, CL_MAX_LINE_LENGTH, rd->stream))
+        while (fgets(line, MAX_LINE_LENGTH, rd->stream))
           size++; /* dump files should not contain any long lines, so this count is correct */
-        close_input_stream(rd);
-        if (! open_input_stream(rd))
+        /* rewind stream to start of file */
+        if (fseek(rd->stream, 0, SEEK_SET) != 0) {
           cqpmessage(Warning, "Can't rewind undump file after counting lines: line count must be given explicitly");
+        }
         else
           ok = 1;
       }
     }
   }
-
   if (!ok) {
     cqpmessage(Error, "Format error in undump file: expecting number of rows on first line");
     close_input_stream(rd);
@@ -3167,7 +2947,7 @@ do_undump(char *corpname, int extension_fields, int sort_ranges, struct InputRed
   abort = 0;
   for (i = 0; (i < size) && !abort; i++) {        /* now read one data row at a time from the undump table */
     if (feof(rd->stream)
-        || (!fgets(line, CL_MAX_LINE_LENGTH, rd->stream)) /* parse input line format */
+        || (!fgets(line, MAX_LINE_LENGTH, rd->stream)) /* parse input line format */
         || (sscanf(line, "%d %d %d %d %s", &match, &matchend, &target, &keyword, junk)
             != (2 + extension_fields))
         ) {

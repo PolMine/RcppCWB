@@ -24,11 +24,8 @@
 #include "compression.h"
 
 
-#if __STDC_VERSION__ >= 199901L
-/* C99 has log2() already, but many pre-C99 Cs don't */
-#else
+/** doesn't seem to exist outside Solaris, so we define it here */
 #define log2(x) (log(x)/log(2.0))
-#endif
 
 /**
  * {I have no idea what this does -- AH}
@@ -106,7 +103,7 @@ write_golomb_code(int x, int b, BFile *bf)
  * Reads an integer from a Golomb-coded bit-file-buffer.
  *
  * @param b   ???
- * @param bf  The bit-file to read from.
+ * @param bf  The bit-filem to read from.
  * @return    The integer that is read.
  */
 int read_golomb_code_bf(int b, BFile *bf)
@@ -211,7 +208,7 @@ read_golomb_code_bs(int b, BStream *bs)
  * ============================== OLD VERSION, BUGGY
  */
 
-/********************************************************************/
+********************************************************************
 
 int read_golomb_code_bs(int b, BStream *bs)
 {

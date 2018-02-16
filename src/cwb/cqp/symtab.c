@@ -31,9 +31,6 @@
  * some internal helper functions 
  */
 
-/**
- * Frees the whole of a linked list of labels entries.
- */
 void
 free_labellist(LabelEntry l)
 {
@@ -54,7 +51,6 @@ free_labellist(LabelEntry l)
  * The SYMBOL LOOKUP part: SymbolTable and LabelEntry 
  */
 
-/** create new symbol table */
 SymbolTable
 new_symbol_table(void)
 {
@@ -65,7 +61,6 @@ new_symbol_table(void)
   return st;
 }
 
-/** delete symbol table (free all entries) */
 void
 delete_symbol_table(SymbolTable st)
 {
@@ -76,7 +71,6 @@ delete_symbol_table(SymbolTable st)
   }
 }
 
-/** Returns label entry, or NULL if undefined (flags are used _only_ to determine namespace) */
 LabelEntry 
 findlabel(SymbolTable st, char *s, int flags)
 {
@@ -96,10 +90,6 @@ findlabel(SymbolTable st, char *s, int flags)
   return ((LabelEntry) NULL);
 }
 
-/**
- * Look up a label, add flags, and return label entry (NULL if undefined).
- * if create is set and label does not exist, it is added to the symbol table
- */
 LabelEntry 
 labellookup(SymbolTable st, char *s, int flags, int create)
 {
@@ -151,20 +141,12 @@ labellookup(SymbolTable st, char *s, int flags, int create)
   }
 }
 
-/**
- * Drops a label from the symbol table (NB: its reference index can't be re-used).
- * WARNING: this function is not implemented (doesn't seem to be useful at the moment)
- */
 void 
 droplabel(SymbolTable st, LabelEntry l)
 {
   assert(0 && "droplabel(): function not implemented");
 }
 
-/**
- * Checks whether all used labels are defined (and vice versa).
- * [only non-special labels in the user namespace will be checked]
- */
 int 
 check_labels(SymbolTable st)
 {
@@ -187,7 +169,6 @@ check_labels(SymbolTable st)
   return result;
 }
 
-/** print symbol table contents (for debugging purposes) */
 void 
 print_symbol_table(SymbolTable st)
 {
@@ -259,12 +240,6 @@ symbol_table_iterator(LabelEntry prev, int flags)
  * The DATA ARRAY part: RefTab 
  */
 
-/**
- * Create new reference table of required size for the given symbol table.
- *
- * NB If further labels are added to st, you must reallocate the reference table
- * to make room for the new reference indices
- */
 RefTab 
 new_reftab(SymbolTable st)
 {
@@ -277,18 +252,15 @@ new_reftab(SymbolTable st)
   return rt;
 }
 
-/** Deletes (and frees) a reference table. */
 void 
 delete_reftab(RefTab rt)
 {
   if (rt) {
-    if (rt->data)
-      free(rt->data);
+    if (rt->data) free(rt->data);
     free(rt);
   }
 }
 
-/** Copies rt1 to rt2; doesn't allocate new reftab for efficiency reasons. */
 void 
 dup_reftab(RefTab rt1, RefTab rt2)
 {
@@ -301,18 +273,16 @@ dup_reftab(RefTab rt1, RefTab rt2)
   (void) memcpy(rt2->data, rt1->data, rt1->size * sizeof(int));
 }
 
-/** resets all referenced corpus position to -1 -> undefine all references */
 void 
 reset_reftab(RefTab rt)
 {
   int i;
   
   assert(rt);
-  for (i = 0; i < rt->size; i++)
-    rt->data[i] = -1;
+  for (i = 0; i < rt->size; i++) rt->data[i] = -1;
 }
 
-/** set references (cpos value in get_reftab is returned for 'this' label (_), set to -1 if n/a) */
+/* set references (cpos value in get_reftab is returned for 'this' label (_), set to -1 if n/a) */
 void 
 set_reftab(RefTab rt, int index, int value)
 {
@@ -327,7 +297,7 @@ set_reftab(RefTab rt, int index, int value)
   }
 }
 
-/** read references (cpos value in get_reftab is returned for 'this' label (_), set to -1 if n/a) */
+/* read references (cpos value in get_reftab is returned for 'this' label (_), set to -1 if n/a) */
 int 
 get_reftab(RefTab rt, int index, int cpos)
 {

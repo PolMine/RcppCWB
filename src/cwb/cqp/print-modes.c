@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../cl/globals.h"
 #include "../cl/corpus.h"
 #include "../cl/attributes.h"
 #include "../cl/cdaccess.h"
@@ -143,13 +142,13 @@ ParsePrintOptions(void)
   if (printModeOptions) {
 
     char *token;
-    char s[CL_MAX_LINE_LENGTH];
+    char s[1024];
     int value;
 
     /* we must not destructively modify the global variable, as strtok
        would do */
 
-    cl_strcpy(s, printModeOptions);
+    strncpy(s, printModeOptions, 1024);
 
     token = strtok(s, " \t\n,.");
     while (token) {

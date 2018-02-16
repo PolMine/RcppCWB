@@ -17,11 +17,9 @@
 
 #include <ctype.h>
 #include <sys/types.h>
-#ifndef __MINGW__
 #include <sys/utsname.h>
 #include <pwd.h>
 #include <grp.h>
-#endif
 
 #include "globals.h"
 
@@ -33,6 +31,12 @@
 
 
 /* ---------------------------------Interface to registry parser */
+
+/**
+ * Function created in output from parsing registry.y
+ * (function only used by demo version)
+ */
+void creg_scan_string(const char *str);
 
 /**
  * File pointer for loading corpus registry.
@@ -48,8 +52,8 @@ extern FILE *cregin;
 extern Corpus *cregcorpus;
 /**
  * Function created in output from parsing registry.y
+ */
 void cregerror(char *message);
- * TODO - is the above function unused? in this file? */
 /**
  * Restarts the registry file parse
  *
@@ -82,7 +86,7 @@ char *cregin_name = "";
 /**
  * Buffer for an error message. {Used in registry parser???}
  */
-char errmsg[CL_MAX_LINE_LENGTH];
+char errmsg[MAX_LINE_LENGTH];
 
 
 
@@ -104,10 +108,7 @@ Corpus *loaded_corpora = NULL;
  *
  * It is initialised when the function that reads it is first called.
  *
- * @see cl_standard_registry
- * TODO: would this be better as a static variable WITHIN that function?
- * That way there is no change of anyone acessing the regdir variable
- * except via that function...
+ * @see central_corpus_directory
  *
  */
 static char *regdir = NULL;
@@ -115,18 +116,13 @@ static char *regdir = NULL;
 /**
  * Gets a string containing the path of the default registry directory.
  *
- * Note this is a pointer to an internal string, and therefore must not
- * be altered or freed.
- *
  * @return  The value of the corpus-module-internal variable regdir,
  *          which is initialised from the environment variable
  *          REGISTRY_ENVVAR or, failing that, the macro
  *          REGISTRY_DEFAULT_PATH.
- * @see     REGISTRY_ENVVAR
- * @see     REGISTRY_DEFAULT_PATH
  */
 char *
-cl_standard_registry()
+central_corpus_directory()
 {
   if (regdir == NULL)
     regdir = getenv(REGISTRY_ENVVAR);
@@ -161,12 +157,11 @@ find_corpus(char *registry_dir, char *registry_name)
 
   for (c = loaded_corpora; c != NULL; c = c->next) {
     int l_dir = strlen(c->registry_dir);
-    if (STREQ(registry_name, c->registry_name) &&             /* corpus ID must be the same */
-      (mark = strstr(registry_dir, c->registry_dir)) &&       /* find registry dir of <c> as substring of list <registry_dir> */
-                                                          /* now we must check that the substring corresponds
-                                                           * to a full component of the list */
-      (mark == registry_dir || mark[-1] == PATH_SEPARATOR) && /* must start at beginning of string or after ':' separator */
-      (mark[l_dir] == '\0' || mark[l_dir] == PATH_SEPARATOR)  /* must end at end of string or before ':' separator */
+    if (STREQ(registry_name, c->registry_name) && /* corpus ID must be the same */
+    (mark = strstr(registry_dir, c->registry_dir)) && /* find registry dir of <c> as substring of list <registry_dir> */
+    /* now we must check that the substring corresponds to a full component of the list */
+    (mark == registry_dir || mark[-1] == ':') && /* must start at beginning of string or after ':' separator */
+    (mark[l_dir] == '\0' || mark[l_dir] == ':') /* must end at end of string or before ':' separator */
     ) {
       break;
     }
@@ -178,8 +173,6 @@ find_corpus(char *registry_dir, char *registry_name)
 /**
  * Gets a file handle for the registry file of the corpus with the specified CWB-name and registry location.
  *
- * The registry file is opened for text-mode read.
- *
  * @param  registry_dir       The registry directory.
  * @param  registry_name      The CWB name of the corpus.
  * @param  real_registry_dir  This will be set to a pointer to the "real"
@@ -188,9 +181,10 @@ find_corpus(char *registry_dir, char *registry_name)
  * @return                    A file handle, or NULL in case of error.
  */
 FILE *
-find_corpus_registry(char *registry_dir, char *registry_name, char **real_registry_dir)
+find_corpus_registry(char *registry_dir, char *registry_name,
+    char **real_registry_dir)
 {
-  char full_name[CL_MAX_LINE_LENGTH];
+  char full_name[MAX_LINE_LENGTH];
 
   int re_p, ins_p, p, start_of_entry, end_of_entry;
 
@@ -205,7 +199,7 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
     }
     else {
       if (registry_dir[re_p] == '?' && registry_dir[re_p + 1] != '\0'
-          && registry_dir[re_p + 1] != PATH_SEPARATOR)
+          && registry_dir[re_p + 1] != ':')
         re_p++; /* this is an optional registry directory, which will not cause warnings if it is not mounted */
 
       ins_p = 0;
@@ -215,12 +209,12 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
 
         full_name[ins_p++] = registry_dir[re_p++];
 
-      } while ((registry_dir[re_p] != PATH_SEPARATOR) && (registry_dir[re_p] != '\0'));
+      } while ((registry_dir[re_p] != ':') && (registry_dir[re_p] != '\0'));
 
       end_of_entry = re_p;
 
-      if (full_name[ins_p - 1] != SUBDIR_SEPARATOR)
-        full_name[ins_p++] = SUBDIR_SEPARATOR;
+      if (full_name[ins_p - 1] != '/')
+        full_name[ins_p++] = '/';
 
       for (p = 0; registry_name[p]; p++)
         full_name[ins_p++] = registry_name[p];
@@ -235,7 +229,7 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
         (*real_registry_dir)[end_of_entry - start_of_entry] = '\0';
         return fd;
       }
-      else if (registry_dir[re_p] == PATH_SEPARATOR)
+      else if (registry_dir[re_p] == ':')
         re_p++;
     }
   }
@@ -264,13 +258,6 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
  * of allows hosts is set, this function will return true iff
  * the current host is on that list.
  *
- * Finally note: if compiled for Windows, this function returns
- * true without actually checking anything, because windows
- * does not support the POSIX user/group functionality on which
- * all of this relies. Under Windows, access policies have to
- * managed by the cqpserver rather than by the CL simply reading from
- * the registry.
- *
  * @param corpus   The corpus.
  * @param verbose  A boolean. Currently ignored.
  * @return         A boolean: true if access is OK, else false.
@@ -279,9 +266,6 @@ int
 check_access_conditions(Corpus *corpus, int verbose)
 {
   int access_ok = 1;
-
-#ifndef __MINGW__
-
   struct passwd *pwd = NULL;
 
   /* get password data only if we have user / group access restrictions */
@@ -373,14 +357,11 @@ check_access_conditions(Corpus *corpus, int verbose)
         (pwd && pwd->pw_name) ? pwd->pw_name : "(unknown)", corpus->name);
   }
 
-#endif
-
   return access_ok;
 }
 
 /**
- * Creates a Corpus object to represent a given indexed corpus, located in
- * a given directory accessible to the program.
+ * Creates a Corpus object.
  *
  * @param registry_dir   Path to the CWB registry directory from which the corpus is to be loaded.
  *                       This may be NULL, in which case the default registry directory is used.
@@ -388,40 +369,40 @@ check_access_conditions(Corpus *corpus, int verbose)
  * @return               Pointer to the resulting Corpus object.
  */
 Corpus *
-cl_new_corpus(char *registry_dir, char *registry_name)
+setup_corpus(char *registry_dir, char *registry_name)
 {
   char *real_registry_name;
   static char *canonical_name = NULL;
   Corpus *corpus;
 
-  /* corpus name must be all lowercase at this level
-   * -> canonicalise (standard) uppercase and (deprecated) mixed-case forms */
+  /* corpus name must be all lowercase at this level -> canonicalise (standard) uppercase and (deprecated) mixed-case forms */
   cl_free(canonical_name); /* if necessary, free buffer allocated in previous call to setup_corpus() */
 
   canonical_name = cl_strdup(registry_name);
-  /* cl_string_canonical(canonical_name, CHARSET_FOR_IDENTIFIERS, IGNORE_CASE); */
-  /* new function replaces call to cl_string_canonical ... */
-  cl_id_tolower(canonical_name);
-  if (!cl_id_validate(canonical_name)) {
-    fprintf(stderr, "cl_new_corpus: <%s> is not a valid corpus name\n", registry_name);
-  }
+  cl_string_canonical(canonical_name, IGNORE_CASE);
 
   /* ------------------------------------------------------------------ */
 
   if ((corpus = find_corpus(registry_dir, canonical_name)) != NULL) {
+
     /* we already have the beast loaded, so just increment the references */
+
     corpus->nr_of_loads++;
+
   }
   else {
+
     /* it's not yet in memory, so create and load it */
 
     if (registry_dir == NULL)
-      registry_dir = cl_standard_registry();
+      registry_dir = central_corpus_directory();
 
-    cregin = find_corpus_registry(registry_dir, canonical_name, &real_registry_name);
+    cregin = find_corpus_registry(registry_dir, canonical_name,
+        &real_registry_name);
 
     if (cregin == NULL) {
-      fprintf(stderr, "cl_new_corpus: can't locate <%s> in %s\n", registry_name, registry_dir);
+      fprintf(stderr, "setup_corpus: can't locate <%s> in %s\n", registry_name,
+          registry_dir);
     }
     else {
       cregrestart(cregin);
@@ -443,7 +424,7 @@ cl_new_corpus(char *registry_dir, char *registry_name)
           }
         }
         else {
-          cl_delete_corpus(cregcorpus);
+          drop_corpus(cregcorpus);
         }
       }
       cregin_path = "";
@@ -453,6 +434,7 @@ cl_new_corpus(char *registry_dir, char *registry_name)
 
       fclose(cregin);
     }
+
   }
 
   /* Check access permissions */
@@ -461,34 +443,28 @@ cl_new_corpus(char *registry_dir, char *registry_name)
 }
 
 /**
- * Deletes a Corpus object from memory.
+ * Deletes a Corpus object.
  *
- * A Corpus object keeps track of how many times it has been requested
- * via cl_new_corpus(). When cl_delete_corpus() is called, the object is only
- * actually deleted when there is just one outstanding request.
- * Otherwise, the variable tracking the number of requests is decremented.
- *
- * @param corpus  The Corpus to delete.
+ * @param corpus  The Corpus to delete
  * @return        Always 1.
  */
 int
-cl_delete_corpus(Corpus *corpus)
+drop_corpus(Corpus *corpus)
 {
   Corpus *prev;
 
   assert(corpus != NULL);
   assert(corpus->nr_of_loads > 0);
 
-  /* decrement the number of references to this corpus */
+  /* decrement the number of references to corpus */
   corpus->nr_of_loads--;
 
-  /* delete it physically iff nobody wants to have it any more */
   if (corpus->nr_of_loads == 0) {
 
-    /* remove it from the linked list */
     if (corpus == loaded_corpora)
       loaded_corpora = corpus->next;
     else {
+
       prev = loaded_corpora;
 
       while (prev && (prev->next != corpus))
@@ -504,9 +480,10 @@ cl_delete_corpus(Corpus *corpus)
       }
     }
 
-    /* now, time to actually get rid of it! */
+    /* delete it physically iff nobody wants to have it any more */
+
     while (corpus->attributes != NULL)
-      cl_delete_attribute(corpus->attributes);
+      attr_drop_attribute(corpus->attributes);
 
     corpus->attributes = NULL;
     corpus->next = NULL;
@@ -529,6 +506,10 @@ cl_delete_corpus(Corpus *corpus)
     if (corpus->hostAccessList)
       FreeIDList(&(corpus->userAccessList));
 
+    corpus->next = NULL;
+
+    corpus->nr_of_loads = 0;
+
     cl_free(corpus);
 
   }
@@ -540,11 +521,6 @@ cl_delete_corpus(Corpus *corpus)
 
 /**
  * Prints a description of the corpus to STDOUT.
- *
- * TODO might be nice to have this function offer an option of XML-style output.
- * TODO might also be nice to have it return a string, or send to a parameter stream,
- * so that the caller can decide what to do with it: direct UI formatting does not really
- * belong in the low-level CL.
  */
 void
 describe_corpus(Corpus *corpus)
@@ -571,46 +547,6 @@ describe_corpus(Corpus *corpus)
     describe_attribute(attr);
 
   printf("\n\n------------------------- END -------------------------\n\n");
-}
-
-/* ---------------------------------------------------------------------- */
-
-/**
- * Gets a list of the named attributes that this corpus posesses.
- *
- * This function creates a list of strings containing the names of all and only
- * those Attributes in this corpus whose type matches that specified in the
- * second parameter.
- *
- * @param corpus          The corpus whose attributes are to be listed.
- * @param attribute_type  The type of attributes to be listed. This must be one
- *                        of the attribute type macros: ATT_POS, ATT_STRUC etc.
- *                        For all attributes, specify ATT_ALL (natuerlich).
- * @return                String list containing names of all the corpus's
- *                        attributes that have the desired type. All the
- *                        actual character buffers have been newly
- *                        allocated, so it is safe to call cl_free_string_list
- *                        on the returned cl_string_list object once you're
- *                        done with it.
- */
-cl_string_list
-cl_corpus_list_attributes(Corpus *corpus, int attribute_type)
-{
-  cl_string_list attnames;
-  Attribute *attr;
-
-  attnames = cl_new_string_list();
-
-  for (attr = corpus->attributes;
-       attr != NULL;
-       attr= (Attribute *) (attr->any.next)) {
-    /* ie if any of the bits set on the parameter match the type bit of this att   */
-    /* (allows ATT_ANY and ATT_REAL to be passed, and we will get the right result */
-    if ((attr->any.type & attribute_type) != 0)
-      cl_string_list_append(attnames, cl_strdup(attr->any.name));
-  }
-
-  return attnames;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -679,7 +615,7 @@ cl_first_corpus_property(Corpus *corpus)
  * (The corpus properties iterator / property datatype is public.)
  *
  * @param prop      The current property.
- * @return          The next property on the list, or NULL if there isn't one.
+ * @return          The next property on the list.
  *
  */
 CorpusProperty
@@ -719,8 +655,7 @@ cl_corpus_property(Corpus *corpus, char *property)
 
 
 /**
- * Retrieves the special 'charset' property from a Corpus object.
- *
+ * Retrieves the special 'charset' property
  * @param corpus  The corpus object from which to retrieve the charset
  * @return        The character set (as a CorpusCharset object).
  */
@@ -734,17 +669,10 @@ cl_corpus_charset(Corpus *corpus)
 typedef struct _charset_spec
 {
   CorpusCharset id;
-  /* TODO should this be const char *? */
   char *name;
 } charset_spec;
 
-/** a list of charset names as strings paired with CorpusCharset ID values;
- *  where there are multiple possible names for one ID, the pair with the
- *  CWB-preferred name comes first in the array (and is the same as the
- *  identifier used for that charset in the CorpusCharset enumeration).
- *
- *  TODO should it be const charset_spec ?
- */
+/** a list of charset names as strings linked to CorpusCharset enumerations */
 charset_spec charset_names[] = {
     { ascii,    "ascii" },
     { latin1,   "latin1" },
@@ -780,7 +708,7 @@ charset_spec charset_names[] = {
 /**
  * Gets a string containing the name of the specified CorpusCharset character set object.
  *
- * Note that returned string cannot be modified. TODO It should probably be a const char.
+ * Note that returned string cannot be modified.
  */
 char *
 cl_charset_name(CorpusCharset id)
@@ -814,8 +742,6 @@ cl_charset_from_name(char *name)
  * Checks whether a string represents a valid charset, and returns a pointer to the name in
  * canonical form (ie lacking any non-standard case there may be in the input string).
  *
- * Note that the returned string cannot be modified.
- *
  * @param name_to_check  String containing the character set name to be checked
  * @return               Pointer to canonical-form string for that charset's name
  *                       or NULL if name_to_check cannot be linked to a valid charset.
@@ -836,7 +762,6 @@ cl_charset_name_canonical(char *name_to_check)
 
 /**
  * Adds a property to the list of corpus properties.
- * Use this function from registry.y only!
  *
  * If the property is already defined, ignore and warn.
  * If the property is 'charset', corpus charset is set as well.
@@ -849,8 +774,8 @@ void
 add_corpus_property(Corpus *corpus, char *property, char *value)
 {
   CorpusProperty new_prop;
-//  CorpusCharset charset;
-//  int i;
+  CorpusCharset charset;
+  int i;
 
   if (cl_corpus_property(corpus, property) != NULL) {
     fprintf(stderr,

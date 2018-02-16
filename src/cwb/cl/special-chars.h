@@ -19,12 +19,7 @@
 #define _special_chars_h_
 
 
-#include "globals.h"
+#include "globals.h"                    /* flag and function definitions now in <cl.h> */
 
-/* external flag and function definitions now in <cl.h> */
-
-unsigned char *cl_string_maptable(CorpusCharset charset, int flags);
-
-int cl_iso_char_is_alphanumeric(unsigned char c, CorpusCharset charset);
 
 #endif

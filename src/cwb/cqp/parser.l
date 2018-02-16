@@ -45,7 +45,7 @@
 #undef YY_INPUT
 
 /* replace YY_INPUT macro with call to yy_input_char() <macro.c> for
-   macro expansion  --  this version suffers from the 0xff2k-Bug anyway */
+   macro expansion  --  this version suffers from the ÿ2k-Bug anyway */
 /*
 #define YY_INPUT(buf,result,max_size) { \
      int c = (cqp_input_string ? cqp_input_string[cqp_input_string_position++] \
@@ -59,8 +59,7 @@
    }
 
 /* new_string = strip_quotes(string); */
-/* Removes single or double quotes around string as well as doubling escapes inside (e.g. 'it''s' => it's), 
-   while keeping track of backslash escapes. */
+/* Removes single or double quotes around string as well as doubling escapes inside (e.g. 'it''s' => it's), while keeping track of backslash escapes. */
 char *
 strip_quotes(char *s) {
   char *t;
@@ -96,19 +95,10 @@ strip_quotes(char *s) {
 digits          [0-9]+
 exponent        [eE][+-]?{digits}
 floatconst      [+-]?{digits}[\.]{digits}{exponent}?
-letter          [a-zA-Z_\x80-\xff]
-xletter         [a-zA-Z0-9_\-\.\x80-\xff]
-idletter        [a-zA-Z_]
-xidletter       [a-zA-Z0-9_\-\.]
+letter          [a-zA-Z_À-ÿ]
+xletter         [a-zA-Z0-9_\-\.À-ÿ]
 var             \${letter}{xletter}*
-/* old identifiers:
 id              {letter}{xletter}*(:{xletter}+)?(^{xletter}+)?
-id              {idletter}{xidletter}*(:{xidletter}+)?(^{xidletter}+)?
-*/
-/* ID (corpus name, attribute name, macro name, etc.) */
-id              {idletter}{xidletter}*
-/* specifier for named query result, with mother name and/or implicit expansion */
-nqrid           {idletter}{xidletter}*:{idletter}{xidletter}*(^{xidletter}+)?|{idletter}{xidletter}*^{xidletter}+
 flags           %[a-z]+
 
 /* -- no idea why accents should be matched explicitly here, so just remove the rule */
@@ -246,7 +236,7 @@ RE\(                    { return(RE_PAREN); }  /* for [lemma = RE($var)] */
                         }
 {floatconst}            { 
                           yylval.fval = atof(yytext);
-                          return(DOUBLEFLOAT);
+                          return(FLOAT);
                         }   
 \/{id}[\(\[]            { 
                           if (!enable_macros) { 
@@ -276,10 +266,6 @@ RE\(                    { return(RE_PAREN); }  /* for [lemma = RE($var)] */
                         }
 @:                      { /* allowing @: targets makes distinction between labels & target in macros unnecessary */
                           return('@');
-                        }
-{nqrid}                 { 
-                          yylval.strval = cl_strdup(yytext);
-                          return(NQRID);
                         }
 {id}                    { 
                           yylval.strval = cl_strdup(yytext);
@@ -328,7 +314,6 @@ RE\(                    { return(RE_PAREN); }  /* for [lemma = RE($var)] */
 \+\=                    { return PLUSEQ; }
 \-\=                    { return MINUSEQ; }
 -\>                     { return IMPLIES; }
-\(\?                    { return EXTENSION; } /* for standard query extensions of the form (?...) */
 `                       { return ESCAPE_SYM; }
 .                       { return yytext[0]; }
 

@@ -32,7 +32,7 @@
  */
 
 /**
- * Safely allocates memory malloc-style.
+ * safely allocates memory malloc-style.
  *
  * This function allocates a block of memory of the requested size,
  * and does a test for malloc() failure which aborts the program and
@@ -44,8 +44,7 @@
  * @return       Pointer to the block of allocated memory
  */
 void *
-cl_malloc(size_t bytes)
-{
+cl_malloc(size_t bytes) {
   void *block;
 
   block = malloc(bytes);
@@ -59,7 +58,7 @@ cl_malloc(size_t bytes)
 }
 
 /**
- * Safely allocates memory calloc-style.
+ * safely allocates memory calloc-style.
  *
  * @see cl_malloc
  * @param nr_of_elements  Number of elements to allocate
@@ -67,8 +66,7 @@ cl_malloc(size_t bytes)
  * @return                Pointer to the block of allocated memory
  */
 void *
-cl_calloc(size_t nr_of_elements, size_t element_size)
-{
+cl_calloc(size_t nr_of_elements, size_t element_size) {
   void *block;
 
   block = calloc(nr_of_elements, element_size);
@@ -82,16 +80,15 @@ cl_calloc(size_t nr_of_elements, size_t element_size)
 }
 
 /**
- * Safely reallocates memory.
+ * safely reallocates memory.
  *
  * @see cl_malloc
  * @param block  Pointer to the block to be reallocated
  * @param bytes  Number of bytes to allocate to the resized memory block
- * @return       Pointer to the block of reallocated memory
+ * @ return      Pointer to the block of reallocated memory
  */
 void *
-cl_realloc(void *block, size_t bytes)
-{
+cl_realloc(void *block, size_t bytes) {
   void *new_block;
 
   if (block == NULL) 
@@ -116,15 +113,14 @@ cl_realloc(void *block, size_t bytes)
 }
 
 /**
- * Safely duplicates a string.
+ * safely duplicates a string.
  *
  * @see cl_malloc
  * @param string  Pointer to the original string
  * @return        Pointer to the newly duplicated string
  */
 char *
-cl_strdup(const char *string)
-{
+cl_strdup(char *string) {
   char *new_string;
 
   new_string = strdup(string);
@@ -139,11 +135,18 @@ cl_strdup(const char *string)
 
 
 
+
+
+
+
+
 /*
  * built-in random number generator (avoid dependence on quality of system's rand() function)
  *
  * this random number generator is a version of Marsaglia-multicarry which is one of the RNGs used by R
  */
+
+
 
 static unsigned int RNG_I1=1234, RNG_I2=5678;
 
@@ -154,25 +157,23 @@ static unsigned int RNG_I1=1234, RNG_I2=5678;
  * @param i2  The value to set the second RNG integer to (if zero, resets it to 1)
  */
 void
-cl_set_rng_state(unsigned int i1, unsigned int i2)
-{
+cl_set_rng_state(unsigned int i1, unsigned int i2) {
   RNG_I1 = (i1) ? i1 : 1; 	/* avoid zero values as seeds */
   RNG_I2 = (i2) ? i2 : 1;
 }
 
-
+/* read current state of CL-internal RNG (two unsigned 32-bit integers) */
 /**
  * Reads current state of CL-internal random number generator.
  *
- * The (unsigned, 32-bit) integers currently held in RNG_I1 and RNG_I2
- * are written to the two memory locations supplied as arguments.
+ * The integers currently held in RNG_I1 and RNG_I2 are written to the
+ * two memory locations supplied as arguments.
  *
  * @param i1  Target location for the value of RNG_I1
  * @param i2  Target location for the value of RNG_I2
  */
 void 
-cl_get_rng_state(unsigned int *i1, unsigned int *i2)
-{
+cl_get_rng_state(unsigned int *i1, unsigned int *i2) {
   *i1 = RNG_I1; 
   *i2 = RNG_I2;
 }
@@ -183,8 +184,7 @@ cl_get_rng_state(unsigned int *i1, unsigned int *i2)
  * @param seed  A single 32bit number to use as the seed
  */
 void
-cl_set_seed(unsigned int seed)
-{
+cl_set_seed(unsigned int seed) {
   cl_set_rng_state(seed, 69069 * seed + 1); /* this is the way that R does it */
 }
 
@@ -192,8 +192,7 @@ cl_set_seed(unsigned int seed)
  *  Initialises the CL-internal random number generator from the current system time.
  */
 void
-cl_randomize(void)
-{
+cl_randomize(void) {
   cl_set_seed(time(NULL));
 }
 
@@ -205,8 +204,7 @@ cl_randomize(void)
  * @return  The random number, an unsigned 32-bit integer with uniform distribution
  */
 unsigned int
-cl_random(void)
-{
+cl_random(void) {
   RNG_I1 = 36969*(RNG_I1 & 0177777) + (RNG_I1 >> 16);
   RNG_I2 = 18000*(RNG_I2 & 0177777) + (RNG_I2 >> 16);
   return((RNG_I1 << 16) ^ (RNG_I2 & 0177777));
@@ -220,8 +218,7 @@ cl_random(void)
  * @return  The generated random number.
  */
 double 
-cl_runif(void)
-{
+cl_runif(void) {
   return cl_random() * 2.328306437080797e-10; /* = cl_random / (2^32 - 1) */
 }
 
@@ -248,8 +245,7 @@ int progress_bar_simple = 0;
  *                0 = pretty-printed messages with carriage returns ON STDERR
  */
 void
-progress_bar_child_mode(int on_off)
-{
+progress_bar_child_mode(int on_off) {
   progress_bar_simple = on_off;
 }
 
@@ -282,8 +278,7 @@ progress_bar_clear_line(void) {
  *
  */
 void
-progress_bar_message(int pass, int total, char *message)
-{
+progress_bar_message(int pass, int total, char *message) {
   /* [pass <pass> of <total>: <message>]   (uses pass and total values from last call if total == 0)*/
   if (total <= 0) {
     pass = progress_bar_pass;
@@ -318,8 +313,7 @@ progress_bar_message(int pass, int total, char *message)
  * and total values from the last call of this function.
  */
 void
-progress_bar_percentage(int pass, int total, int percentage)
-{
+progress_bar_percentage(int pass, int total, int percentage) {
   /* [pass <pass> of <total>: <percentage>% complete]  (uses progress_bar_message) */
   char message[20];
   sprintf(message, "%3d%c complete", percentage, '%');
@@ -339,8 +333,7 @@ int ilist_indent;         /* ... */
 
 /* internal function: print <n> blanks */
 void
-ilist_print_blanks(int n)
-{
+ilist_print_blanks(int n) {
   while (n > 0) {
     printf(" ");
     n--;
@@ -359,8 +352,7 @@ ilist_print_blanks(int n)
  * @param indent     Indentation of the list from left margin (in characters)
  */
 void
-start_indented_list(int linewidth, int tabsize, int indent)
-{
+start_indented_list(int linewidth, int tabsize, int indent) {
   /* set status variables */
   ilist_linewidth = (linewidth > 0) ? linewidth : ILIST_LINEWIDTH;
   ilist_tab = (tabsize > 0) ? tabsize : ILIST_TAB;
@@ -380,8 +372,7 @@ start_indented_list(int linewidth, int tabsize, int indent)
  *               a string, then the string appears on the far left hand side.
  */
 void
-print_indented_list_br(char *label)
-{
+print_indented_list_br(char *label) {
   int llen = (label != NULL) ? strlen(label) : 0;
   
   if (ilist_cursor != 0) {
@@ -394,7 +385,7 @@ print_indented_list_br(char *label)
     ilist_print_blanks(ilist_indent);
   }
   else {
-    printf("%s", label);
+    Rprintf(label);
     ilist_print_blanks(ilist_indent - llen);
   }
   ilist_cursor = 0;
@@ -406,8 +397,7 @@ print_indented_list_br(char *label)
  * @param string  The string to print as a list item.
  */
 void
-print_indented_list_item(char *string)
-{
+print_indented_list_item(char *string) {
   int len;
 
   if (string != NULL) {
@@ -433,8 +423,7 @@ print_indented_list_item(char *string)
  * Ends the printing of a line in an indented 'tabularised' list.
  */
 void
-end_indented_list(void)
-{
+end_indented_list(void) {
   if (ilist_cursor == 0) {
     printf("\r");        /* no output on last line (just indention) -> erase indention */
   }
@@ -443,38 +432,5 @@ end_indented_list(void)
   }
   ilist_cursor = 0;
   fflush(stdout);
-}
-
-
-/**
- * Safely add an offset to a corpus position.
- *
- * Return CDA_EPOSORNG if cpos + offset is outside the corpus (clamp = 0),
- * or clamps the return value to the valid range (clamp = 1).
- * Particular care is taken to avoid integer overflow if cpos is close to INT_MAX.
- *
- * @param cpos         corpus position (must be in valid range)
- * @param offset       positive or negative offset from corpus position
- * @param corpus_size  corpus size are returned by cl_max_cpos()
- * @param clamp        whether to clamp return value (1) or return an error (0)
- *
- * @return             cpos + offset (possibly clamped) or CDA_EPOSORNG
- */
-int
-cl_cpos_offset(int cpos, int offset, int corpus_size, int clamp) {
-  if (offset > 0) {
-    if ((corpus_size - cpos) <= offset)
-      return(clamp ? corpus_size - 1 : CDA_EPOSORNG);
-    else
-      return cpos + offset;
-  }
-  else if (offset < 0) {
-    if (corpus_size + offset < 0)
-      return(clamp ? 0 : CDA_EPOSORNG);
-    else
-      return cpos + offset;
-  }
-  else
-    return cpos;
 }
 

@@ -21,14 +21,15 @@
 
 /* byte order handling taken from Corpus Library */
 #include "../cl/endian.h"
-#include "../cl/cl.h"
+
+#define BUFSIZE 4096
 
 /* LONG and SHORT modes removed. Mon Mar 23 19:25:35 MET 1998 (evert) */
 
 
 int little_endian = 0;  /* CWB default format is 4-byte big-endian = network */
 
-int buf[CL_MAX_LINE_LENGTH];
+int buf[BUFSIZE];
 
 /**
  * Reads one integer at a time from a stream and prints a decimal representation
@@ -44,7 +45,7 @@ process_fd(FILE *fd)
   do {
     /* currently only works on systems with 32bit ints.
        should really be fixed some time */
-    N = fread(&buf[0], sizeof(int), CL_MAX_LINE_LENGTH, fd);
+    N = fread(&buf[0], sizeof(int), BUFSIZE, fd);
 
     for ( k = 0; k < N; k++) {
       i = ntohl(buf[k]);        /* convert from CWB to internal format */
@@ -52,7 +53,7 @@ process_fd(FILE *fd)
         i = cl_bswap32(i);      /* explicit conversion */
       fprintf(stdout, "%d\n", i);
     }
-  } while (N == CL_MAX_LINE_LENGTH);
+  } while (N == BUFSIZE);
 }
 
 /* *************** *\
@@ -97,7 +98,7 @@ main(int argc, char **argv)
         exit(1);
       }
     }
-    else if ((fd = fopen(argv[i], "rb")) == NULL) {
+    else if ((fd = fopen(argv[i], "r")) == NULL) {
       fprintf(stderr, "%s: Couldn't open %s\n", progname, argv[i]);
       exit(1);
     }

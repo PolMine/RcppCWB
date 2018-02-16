@@ -33,22 +33,15 @@
  * @param bf        Buffer in which to set up the opened BF
  * @return          1 on success, 0 on failure (not like fopen/fclose)
  */
-int
-BFopen(char *filename, char *type, BFile *bf)
+int BFopen(char *filename, char *type, BFile *bf)
 {
-  /* force binary-mode open */
-  char passmode[3] = { '\0', 'b', '\0' };
-
-  bf->mode = type[0];
-
-  assert((bf->mode == 'r') || (bf->mode == 'w'));
-
-  passmode[0] = bf->mode;
-
-  bf->fd = fopen(filename, passmode);
+  bf->fd = fopen(filename, type);
   bf->buf = '\0';
   bf->bits_in_buf = 0;
+  bf->mode = type[0];
   bf->position = 0;
+
+  assert((bf->mode == 'r') || (bf->mode == 'w'));
 
   return (bf->fd ? 1 : 0);
 }
@@ -63,8 +56,7 @@ BFopen(char *filename, char *type, BFile *bf)
  * @param bf    Buffer in which to set up the opened BS
  * @return      boolean: 1 on success, 0 on failure (not like fopen/fclose)
  */
-int
-BSopen(unsigned char *base, char *type, BStream *bf)
+int BSopen(unsigned char *base, char *type, BStream *bf)
 {
   bf->base = base;
   bf->buf = '\0';
@@ -83,10 +75,9 @@ BSopen(unsigned char *base, char *type, BStream *bf)
  * If this is an output buffer, it is flushed before closing.
  *
  * @param stream  The file buffer to close.
- * @return        Returns true iff the file was closed successfully.
+ * @return        Always returns true.
  */
-int
-BFclose(BFile *stream)
+int BFclose(BFile *stream)
 {
   if (stream->mode == 'w') 
     BFflush(stream);
@@ -102,8 +93,7 @@ BFclose(BFile *stream)
  * @param stream  The stream buffer to close.
  * @return        Always returns true.
  */
-int
-BSclose(BStream *stream)
+int BSclose(BStream *stream)
 {
   if (stream->mode == 'w') 
     BSflush(stream);
@@ -123,8 +113,7 @@ BSclose(BStream *stream)
  * @param stream  The file buffer to flush.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BFflush(BFile *stream)
+int BFflush(BFile *stream)
 {
   int retval;
 
@@ -171,8 +160,7 @@ BFflush(BFile *stream)
  * @param stream  The stream to flush.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BSflush(BStream *stream)
+int BSflush(BStream *stream)
 {
   int retval;
 
@@ -219,8 +207,7 @@ BSflush(BStream *stream)
  * @param stream  The buffer to write via.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BFwrite(unsigned char data, int nbits, BFile *stream)
+int BFwrite(unsigned char data, int nbits, BFile *stream)
 {
 
   unsigned char mask;
@@ -264,8 +251,7 @@ BFwrite(unsigned char data, int nbits, BFile *stream)
  * @param stream  The buffer to write via.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BSwrite(unsigned char data, int nbits, BStream *stream)
+int BSwrite(unsigned char data, int nbits, BStream *stream)
 {
   unsigned char mask;
 
@@ -307,8 +293,7 @@ BSwrite(unsigned char data, int nbits, BStream *stream)
  * @param stream  The BFile buffer to use.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BFread(unsigned char *data, int nbits, BFile *stream)
+int BFread(unsigned char *data, int nbits, BFile *stream)
 {
   *data = '\0';
 
@@ -343,8 +328,7 @@ BFread(unsigned char *data, int nbits, BFile *stream)
  * @param stream  The BStream buffer to use.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BSread(unsigned char *data, int nbits, BStream *stream)
+int BSread(unsigned char *data, int nbits, BStream *stream)
 {
   *data = '\0';
 
@@ -381,8 +365,7 @@ BSread(unsigned char *data, int nbits, BStream *stream)
  * @param stream  The BFile buffer to use.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BFwriteWord(unsigned int data, int nbits, BFile *stream)
+int BFwriteWord(unsigned int data, int nbits, BFile *stream)
 {
   int bytes, rest, i;
   unsigned char *cdata;
@@ -423,8 +406,7 @@ BFwriteWord(unsigned int data, int nbits, BFile *stream)
  * @param stream  The BFile buffer to use.
  * @return        Boolean: 1 for all OK, 0 for a problem.
  */
-int
-BFreadWord(unsigned int *data, int nbits, BFile *stream)
+int BFreadWord(unsigned int *data, int nbits, BFile *stream)
 {
   int bytes, rest, i;
   unsigned char *cdata;
@@ -462,8 +444,7 @@ BFreadWord(unsigned int *data, int nbits, BFile *stream)
 /**
  * Gets the stream position of a BFile.
  */
-int
-BFposition(BFile *stream)
+int BFposition(BFile *stream)
 {
   assert(stream);
   return stream->position;
@@ -472,8 +453,7 @@ BFposition(BFile *stream)
 /**
  * Gets the stream position of a BStream.
  */
-int
-BSposition(BStream *stream)
+int BSposition(BStream *stream)
 {
   assert(stream);
   return stream->position;
@@ -484,10 +464,9 @@ BSposition(BStream *stream)
  *
  * @param stream  The stream whose position marker is changed.
  * @param offset  The desired new offset.
- * @return        Always true.
+ * @return  Always true.
  */
-int
-BSseek(BStream *stream, off_t offset)
+int BSseek(BStream *stream, off_t offset)
 {
   stream->buf = '\0';
   stream->bits_in_buf = 0;

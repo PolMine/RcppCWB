@@ -39,11 +39,7 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
-#include <time.h>
-
-#ifndef __MINGW__
 #include <pwd.h>
-#endif
 
 /* ---------------------------------------------------------------------- */
 
@@ -237,10 +233,10 @@ html_print_field(FieldType field, int at_end)
 char *
 html_convert_string(char *s)
 {
-  static char html_s[CL_MAX_LINE_LENGTH*2];
-  int p; /* "pointer" into array */
+  static char html_s[MAX_LINE_LENGTH*2];
+  int p;
 
-  if (!s || strlen(s) >(CL_MAX_LINE_LENGTH))
+  if (!s || strlen(s) >(MAX_LINE_LENGTH))
     return NULL;
   
   for (p = 0; *s; s++) {
@@ -280,14 +276,6 @@ html_convert_string(char *s)
 
 /* ---------------------------------------------------------------------- */
 
-/**
- * Prints a line of text (which will have been previously extracted from a corpus
- * linked to the present corpus by an a-attribute) within HTML markup.
- *
- * @param stream          Destination for the output.
- * @param attribute_name  The name of the aligned corpus: printed in the leading indicator within the HTML.
- * @param line            Character data of the line of aligned-corpus data to print. This is treated as opaque.
- */
 void
 html_print_aligned_line(FILE *stream, 
                         char *attribute_name, 
@@ -304,7 +292,7 @@ html_print_aligned_line(FILE *stream,
 
   html_puts(stream, attribute_name, SUBST_ALL);
   html_puts(stream, ":</EM></B>&nbsp;&nbsp;", 0);
-  html_puts(stream, line, SUBST_NONE); /* entities have already been escaped */
+  html_puts(stream, line, SUBST_ALL);
 
   if (GlobalPrintOptions.print_tabular) 
     fprintf(stream, "</TR>\n");
@@ -360,10 +348,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
 void html_print_corpus_header(CorpusList *cl, FILE *stream)
 {
   time_t now;
-
-#ifndef __MINGW__
   struct passwd *pwd = NULL;
-#endif
 
   if (GlobalPrintOptions.print_header) {
 
@@ -380,13 +365,8 @@ void html_print_corpus_header(CorpusList *cl, FILE *stream)
             "<tr><td nowrap> </td><td nowrap>%s</td></tr>\n"
             "<tr><td nowrap><em>Subcorpus:</em></td><td nowrap>%s:%s</td></tr>\n"
             "<tr><td nowrap><em>Number of Matches:</em></td><td nowrap>%d</td></tr>\n",
-#ifndef __MINGW__
             (pwd ? pwd->pw_name : "unknown"),
             (pwd ? pwd->pw_gecos  : "unknown"),
-#else
-            "<unknown>",
-            "<unknown>",
-#endif
             ctime(&now),
             (cl->corpus && cl->corpus->registry_name ? cl->corpus->registry_name : "unknown"),
             (cl->corpus && cl->corpus->name ? cl->corpus->name : "unknown"),
@@ -442,7 +422,7 @@ void html_print_output(CorpusList *cl,
   if ((last >= cl->size) || (last < 0))
     last = cl->size - 1;
 
-  for (line = first; (line <= last) && !cl_broken_pipe; line++) {
+  for (line = first; (line <= last) && (!broken_pipe); line++) {
 
     if (cl->sortidx)
       real_line = cl->sortidx[line];
@@ -536,7 +516,7 @@ html_print_group(Group *group, int expand, FILE *fd)
 
   fprintf(fd, "<BODY>\n<TABLE>\n");
 
-  for (cell = 0; (cell < group->nr_cells) && !cl_broken_pipe; cell++) {
+  for (cell = 0; cell < group->nr_cells; cell++) {
 
     fprintf(fd, "<TR><TD>");
 

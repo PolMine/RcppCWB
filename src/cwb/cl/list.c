@@ -229,9 +229,7 @@ cl_string_list_size(cl_string_list l) {
  * @param l  The list to search.
  * @param n  The element to retrieve.
  * @return   The n'th string on the list, or NULL if there
- *           is no n'th string. Note that the returned pointer
- *           references the ACTUAL DATA in the list - not a
- *           copy, if you want a copy you must make one yourself.
+ *           is no n'th string.
  */
 char *
 cl_string_list_get(cl_string_list l, int n) {

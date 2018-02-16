@@ -21,81 +21,49 @@
 
 #include "attlist.h"
 
-/* The following constant define flags for the four different ways of measuring context-width: */
 
-/** Context width measured in characters */
-#define CHAR_CONTEXT  -1
-/** Context width measured in tokens */
-#define WORD_CONTEXT  -2
-/** Context width measured in terms of an s-attribute */
+#define CHAR_CONTEXT -1
+#define WORD_CONTEXT -2
 #define STRUC_CONTEXT -3
-/** Context width measured in terms of an a-attribute - that is, alignment blocks as the unit of context */
-#define ALIGN_CONTEXT -4
+#define ALIGN_CONTEXT -4	/* allow alignment blocks as context */
 
-/**
- * ContextDescriptor object: a bundle of CQP options
- * describing how a list of corpus positions is to be
- * displayed in a concordance: with left context,
- * with right context, with what attributes, etc.
- *
- * It is passed around between different print functions
- * so that they know what to do!
- *
- * Note that the options contained here are settable
- * by the user. This is in contrast to the "options"
- * held in the PrintDecriptionRecord, which are built-in
- * for each print style; the user can choose among modes
- * but cannot modify the settings individually.
- *
- * TODO This object is confusingly named, as it DOES NOT
- * merely specify the "Context" size; it also specifies
- * which attributes get printed, and so on.
- *
- * (It would be better called a "concordance line co-text
- * configuration object".)
- *
- * @see PrintDescriptionRecord
- *
- * TODO why is it necessary for concordance-printing
- * options to be spread across two separate objects?
- */
 typedef struct _context_description_block {
-  /* oh hurray look, yet another **different** way for the struct tag to correspond to the classname........... */
 
-  /* ==================== left context scope description variables */
+  /* ==================== left context */
 
-  int left_width;                    /**< Amount of context to show before the match, in units specified by left_type */
-  int left_type;                     /**< Unit in which context is measured;
-                                          Set to one of the constants: CHAR_CONTEXT, WORD_CONTEXT, STRUC_CONTEXT, ALIGN_CONTEXT */
-  /* TODO Is being able to have the left co-text measured in words and the right context in (say) paragraphs something we really are bovvered about? */
-
+  int left_width;
+  int left_type;
   char *left_structure_name;
   Attribute *left_structure;
 
-  /* ==================== right context scope description variables */
+  /* ==================== right context */
 
-  int right_width;                   /**< Amount of context to show after the match, in units specified by right_type */
-  int right_type;                    /**< Unit in which context is measured;
-                                          Set to one of the constants: CHAR_CONTEXT, WORD_CONTEXT, STRUC_CONTEXT, ALIGN_CONTEXT */
+  int right_width;
+  int right_type;
   char *right_structure_name;
   Attribute *right_structure;
 
-  /** Boolean flag: if true, print corpus position numbers */
+  /* ==================== flag whether to print corpus position */
   int print_cpos;
 
-  /* ==================== lists of attributes of different types to print */
+  /* ==================== positional attributes to print */
+  AttributeList *attributes;
 
-  AttributeList *attributes;         /**< positional attributes to print */
-  AttributeList *strucAttributes;    /**< structural attributes to print */
-  AttributeList *printStructureTags; /**< structure tag (values) to print */
-  AttributeList *alignedCorpora;     /**< aligned corpora from which to print parallel data */
+  /* ==================== structural attributes to print */
+  AttributeList *strucAttributes;
+
+  /* ==================== structure tag (values) to print */
+  AttributeList *printStructureTags;
+
+  /* ==================== aligned lines to print */
+  AttributeList *alignedCorpora;
 
 } ContextDescriptor;
 
-
-/* ContextDescriptor methods */
-
-/* TODO not much naming convention stability among these descriptors! */
+/* verify the current context settings against the current corpus:
+ * check whether structures are still valid, and reset them to
+ * defaults if not. returns 1 if all keeps the same, 0 otherwise. The
+ * string fields in CD are supposed to be malloced and freed. */
 
 int verify_context_descriptor(Corpus *corpus, 
                               ContextDescriptor *cd,
@@ -103,10 +71,14 @@ int verify_context_descriptor(Corpus *corpus,
 
 int initialize_context_descriptor(ContextDescriptor *cd);
 
-int update_context_descriptor(Corpus *corpus, ContextDescriptor *cd);
+int update_context_descriptor(Corpus *corpus,
+                              ContextDescriptor *cd);
 
-ContextDescriptor *NewContextDescriptor(void);
+ContextDescriptor *NewContextDescriptor();
 
-void PrintContextDescriptor(ContextDescriptor *cdp);
+void FreeContextDescriptor(ContextDescriptor **cdp);
+
+void
+PrintContextDescriptor(ContextDescriptor *cdp);
 
 #endif

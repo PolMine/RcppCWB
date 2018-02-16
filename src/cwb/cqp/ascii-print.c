@@ -23,11 +23,7 @@
 #include "../cl/cdaccess.h"
 
 #include <sys/time.h>
-#include <time.h>
-
-#ifndef __MINGW__
 #include <pwd.h>
-#endif
 
 #ifdef USE_TERMCAP
 #include <curses.h>
@@ -54,15 +50,13 @@
 
 /* ---------------------------------------------------------------------- */
 
-/** [TODO get rid?] doesn't currently appear to be used anywhere? */
+/** doesn't currently appear to be used anywhere? */
 #define USE_OLD_COMPOSE  
 
 /* ---------------------------------------------------------------------- */
 
 /**
  * Convert string function for ASCII mode.
- *
- * This is used for the "printToken" function in the relevant PDR.
  *
  * @param s  The string to convert.
  * @return   s (ie no change).
@@ -74,14 +68,16 @@ ascii_convert_string(char *s)
   return s;
 }
 
-char *ascii_print_field(FieldType field, int at_end);
+char *
+ascii_print_field(FieldType field, int at_end);
 
 /* ---------------------------------------------------------------------- */
 
 /**
  * Print description record for ASCII print mode.
  */
-PrintDescriptionRecord ASCIIPrintDescriptionRecord = {
+PrintDescriptionRecord 
+ASCIIPrintDescriptionRecord = {
   "%9d: ",                            /* CPOSPrintFormat */
   
   NULL,                               /* BeforePrintStructures */
@@ -115,7 +111,8 @@ PrintDescriptionRecord ASCIIPrintDescriptionRecord = {
 /**
  * Print description record for Highlighted-ASCII print mode.
  */
-PrintDescriptionRecord ASCIIHighlightedPrintDescriptionRecord = {
+PrintDescriptionRecord 
+ASCIIHighlightedPrintDescriptionRecord = {
   "%9d: ",                            /* CPOSPrintFormat */
   
   NULL,                               /* BeforePrintStructures */
@@ -185,8 +182,7 @@ get_colour_escape(char colour, int foreground)
  * Dummy function
  */
 char *
-get_typeface_escape(char typeface)
-{
+get_typeface_escape(char typeface) {
   return "";
 }
 
@@ -204,8 +200,8 @@ void get_screen_escapes(void)
   sc_bl_in = NULL;
   sc_bl_out = NULL;
   sc_all_out = NULL;
-
-  escapes_initialized++;
+ 
+  return;
 }
 
 #else /* USE_TERMCAP */
@@ -384,7 +380,7 @@ char *
 ascii_print_field(FieldType field, int at_end)
 {
 
-  sc_before_token[0] = '\0';                /* sets sc_before_token to "" */
+  *sc_before_token = 0;                /* sets sc_before_token to "" */
 
   /* if targets are shown, print target number at end of target/keyword fields */
   if (show_targets && at_end && (field==TargetField || field==KeywordField)) {
@@ -448,16 +444,6 @@ ascii_print_field(FieldType field, int at_end)
   return sc_before_token;
 }
 
-/**
- * Prints a line of text (which will have been previously exrtracted from a corfpus
- * linked to the present corpus by an a-attribute) with a brief character-mode
- * start-of-line flag ("-->$att_name: ").
- *
- * @param stream          Destination for the output.
- * @param highlighting    Boolean: if true, use colour/bold highlighting for the leading indicator on the line.
- * @param attribute_name  The name of the aligned corpus: printed in the leading indicator
- * @param line            Character data of the line of aligned-corpus data to print. This is treated as opaque.
- */
 void
 ascii_print_aligned_line(FILE *stream, 
                          int highlighting,
@@ -482,8 +468,7 @@ ascii_print_aligned_line(FILE *stream,
 /* print the concordance line for the target_word on the screen */
 /**
  * Prints a concordance line.
- * (documentation not complete)_
- *
+ * (documentation not compklete)_
  *
  */
 void 
@@ -583,14 +568,10 @@ ascii_print_corpus_header(CorpusList *cl,
                           FILE *stream)
 {
   time_t now;
-
-#ifndef __MINGW__
   struct passwd *pwd = NULL;
-#endif
-
   int i;
   
-  time(&now);
+  (void) time(&now);
   /*   pwd = getpwuid(geteuid()); */
   /* disabled because of incompatibilities between different Linux versions */
 
@@ -606,13 +587,8 @@ ascii_print_corpus_header(CorpusList *cl,
           "# Corpus:  %s (%s)\n"
           "# Name:    %s:%s\n"
           "# Size:    %d intervals/matches\n",
-#ifndef __MINGW__
           (pwd ? pwd->pw_name : "<unknown>"),
           (pwd ? pwd->pw_gecos  : "<unknown>"),
-#else
-          "<unknown>",
-          "<unknown>",
-#endif
           ctime(&now),
           (cl->corpus && cl->corpus->registry_name ? cl->corpus->registry_name : "<Unknown Corpus>"),
           (cl->corpus && cl->corpus->name ? cl->corpus->name : "<Unknown Corpus>"),
@@ -656,7 +632,7 @@ ascii_print_output(CorpusList *cl,
   if ((last >= cl->size) || (last < 0))
     last = cl->size - 1;
 
-  for (i = first; (i <= last) && !cl_broken_pipe; i++) {
+  for (i = first; (i <= last) && (!broken_pipe); i++) {
     
     if (cl->sortidx)
       real_line = cl->sortidx[i];
@@ -690,7 +666,7 @@ ascii_print_group(Group *group, int expand, FILE *fd)
   last_source_id = -666;
   nr_targets = 0;
 
-  for (cell = 0; (cell < group->nr_cells) && !cl_broken_pipe; cell++) {
+  for (cell = 0; cell < group->nr_cells; cell++) {
 
     source_id = group->count_cells[cell].s;
     source_s = Group_id2str(group, source_id, 0);
@@ -705,8 +681,8 @@ ascii_print_group(Group *group, int expand, FILE *fd)
         nr_targets = 0;
       }
 
-      /* separator bar between groups */
-      if (cell == 0 || (group->is_grouped && nr_targets == 0))
+      /* separator bar is meaningless when using the internal grouping algorithm */
+      if ((UseExternalGrouping) || (cell == 0))
         fprintf(fd, SEPARATOR);
       
       fprintf(fd, "%-28s  %-28s\t%6d\n",

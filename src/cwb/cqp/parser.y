@@ -18,9 +18,7 @@
 
 
 #include <sys/time.h>
-#ifndef __MINGW__
 #include <sys/resource.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -81,16 +79,12 @@ void warn_query_lock_violation(void) {
 
 /* ============================================================ */
 
-/* note: SYCHRONIZE is a windows API identifier, and it doesn't seem at all
-necessary here - it is just defined, then tested.
-So: commented out. AH 2/4/2010
 #define SYNCHRONIZE
-*/
 
 void
 synchronize(void)
 {
-/*#if defined(SYNCHRONIZE)*/
+#if defined(SYNCHRONIZE)
   int macro_status;
 
   /* delete macro buffers & disable macro expansion while sync'ing */
@@ -110,7 +104,7 @@ synchronize(void)
   }
 
   enable_macros = macro_status; /* reset enable_macros to previous value */
-/*#endif*/
+#endif
 }
 
 #define YYERROR_VERBOSE
@@ -189,9 +183,9 @@ synchronize(void)
   TabulationItem     tabulation_item;
 }
 
-%token <strval> ID QID NQRID LABEL STRING FLAG TAGSTART TAGEND VARIABLE IPAddress IPSubnet
+%token <strval> ID QID LABEL STRING FLAG TAGSTART TAGEND VARIABLE IPAddress IPSubnet
 %token <ival> INTEGER
-%token <fval> DOUBLEFLOAT
+%token <fval> FLOAT
 %token <field> FIELD FIELDLABEL ANCHORTAG ANCHORENDTAG
 %token <search_strategy> SEARCH_STRATEGY
 
@@ -265,21 +259,20 @@ synchronize(void)
 %token EOL_SYM           /* '.EOL.' */
 %token ELLIPSIS          /* '..' or '...' */
 
-%token MATCHALL          /* [] */
-%token LCSTART           /* [: */
-%token LCEND             /* :] */
-%token LCMATCHALL        /* [::] */
-%token EXTENSION         /* (? */        
+%token MATCHALL                 /* [] */
+%token LCSTART                  /* [: */
+%token LCEND                    /* :] */
+%token LCMATCHALL               /* [::] */
 
 %token PLUSEQ
 %token MINUSEQ
 
-%token UNLOCK_SYM        /* unlock 'QueryLock' mode */
+%token UNLOCK_SYM               /* unlock 'QueryLock' mode */
 
-%token USER_SYM          /* CQPserver user authentication */
+%token USER_SYM                 /* CQPserver user authentication */
 %token HOST_SYM
 
-%token UNDEFINED_MACRO   /* dummy symbol which forces parse error when an undefined macro is encountered */
+%token UNDEFINED_MACRO          /* dummy symbol which forces parse error when an undefined macro is encountered */
 %token MACRO_SYM
 
 %token RANDOMIZE_SYM
@@ -288,7 +281,7 @@ synchronize(void)
 %token INCLUSIVE_SYM
 %token EXCLUSIVE_SYM
 
-%token NULL_SYM          /* 'NULL' */
+%token NULL_SYM           /* 'NULL' */
 
 
   /* operator precedence */
@@ -306,7 +299,7 @@ synchronize(void)
 %type <boolt> GlobalConstraint ExtConstraint LookaheadConstraint BoolExpr
 %type <boolt> RelExpr RelLHS RelRHS FunctionCall
 %type <boolo> RelOp
-%type <strval> LabelReference OptRefId ID_OR_NQRID
+%type <strval> LabelReference OptRefId
 %type <context> Description MeetContext OptDistance
 %type <direction> OptDirection
 %type <redir> OptionalRedir Redir
@@ -315,10 +308,9 @@ synchronize(void)
 %type <varsetting> VariableValueSpec
 
 %type <cl> CorpusCommand UnnamedCorpusCommand CID OptionalCID 
-%type <cl> CYCommand Query AQuery CorpusSetExpr TranslateExpr SubsetExpr MUQuery 
+%type <cl> CYCommand Query AQuery CorpusSetExpr SubsetExpr MUQuery 
 %type <cl> StandardQuery TABQuery
 
-%type <strval> EmbeddedModifier
 %type <ival> OptTargetSign
 %type <apl> FunctionArgList SingleArg
 %type <varval> VarValue
@@ -329,10 +321,6 @@ synchronize(void)
 %type <tabulation_item> TabulationItem
 %type <AnchorPair> TabulationRange
 %type <AttributeSpecification> OptAttributeSpec
-
-/* -------------------- Group */
-
-%type <ival> GroupBy
 
 /* -------------------- Sort */
 
@@ -361,15 +349,13 @@ synchronize(void)
 
 /* ============================================================ RULES */
 
-/* a note for the non-Bison/Yacc savvy: "epsilon" = an empty rule alternative */ 
-
 line:                                  { prepare_parse(); }
                   command              { if (generate_code)
                                            addHistoryLine();
                                          resetQueryBuffer();
                                          YYACCEPT; }
                 | ';'                 { YYACCEPT; }  /* empty command */
-                | /* epsilon */       { YYACCEPT; }
+                | /* eps */           { YYACCEPT; }
                 ;
 
 command:                                 { prepare_input(); }
@@ -402,7 +388,6 @@ command:                                 { prepare_input(); }
 CorpusCommand:  UnnamedCorpusCommand    { $$ = $1; }
                 | ID '=' UnnamedCorpusCommand
                                         { $$ = in_CorpusCommand($1, $3); }
-                | ID '=' TranslateExpr  { $$ = in_CorpusCommand($1, after_CorpusSetExpr($3)); }
                 ;
 
 UnnamedCorpusCommand:
@@ -446,15 +431,14 @@ EOLCmd:           EOL_SYM               { printf("-::-EOL-::-\n"); fflush(stdout
                 ;
 
 Cat:              CAT_SYM OptionalCID
-                          OptionalRedir       { do_cat($2, &($3), 0, -1); cl_free($3.name); } 
+                          OptionalRedir       { do_cat($2, &($3), 0, -1); } 
                   /* cat entire subcorpus */
                 | CAT_SYM OptionalCID OptFROM INTEGER OptTO INTEGER
-                          OptionalRedir       { do_cat($2, &($7), $4, $6); cl_free($7.name); } 
+                          OptionalRedir       { do_cat($2, &($7), $4, $6); } 
                   /* cat part of subcorpus (matches #$3 .. #$4) */
                 | CAT_SYM CorpusSetExpr OptionalRedir   
                           { if (generate_code) 
                               do_cat($2, &($3), 0, -1);
-                            cl_free($3.name);
                             drop_temp_corpora();
                           }
                 ;
@@ -464,31 +448,36 @@ Saving:           SAVE_SYM OptionalCID
                 ;
 
 OptionalRedir:    Redir
-                | /* epsilon */         { $$.name = NULL; /* will open STDOUT */
-                                          $$.mode = "w";
-                                          $$.stream = NULL;
+                | /* epsilon */         { $$.name = (char *)NULL;
+                                          $$.mode = (char *)NULL;
+                                          $$.stream = stdout;
+                                          $$.is_pipe = 0;
                                         }
                 ;
 
 Redir:            '>' STRING            { $$.name = $2;
                                           $$.mode = "w";
                                           $$.stream = NULL;
+                                          $$.is_pipe = 0;
                                         }
                 | APPEND STRING         { $$.name = $2;
                                           $$.mode = "a";
                                           $$.stream = NULL;
+                                          $$.is_pipe = 0;
                                         }
                 ;
 
 
 OptionalInputRedir:    InputRedir
-                | /* epsilon */         { $$.name = NULL; /* will open STDIN */
-                                          $$.stream = NULL;
+                | /* epsilon */         { $$.name = (char *)NULL;
+                                          $$.stream = stdin;
+                                          $$.is_pipe = 0;
                                         }
                 ;
 
 InputRedir:       '<' STRING            { $$.name = $2;
                                           $$.stream = NULL;
+                                          $$.is_pipe = 0;
                                         }
                 ;
 
@@ -524,9 +513,6 @@ AttributeSelections:
 AttributeSelection:
                   '+' ID                        { do_attribute_show($2, 1); }
                 | '-' ID                        { do_attribute_show($2, 0); }
-                ;
-
-TranslateExpr:  FROM_SYM CID TO_SYM ID { if (query_lock) {warn_query_lock_violation(); YYABORT;} $$ = do_translate($2, $4); }
                 ;
 
 CorpusSetExpr:  SetOp CID CID           { if (query_lock) {warn_query_lock_violation(); YYABORT;} $$ = do_setop($1, $2, $3); }
@@ -715,10 +701,16 @@ InfoCmd:          INFO_SYM CID          { do_info($2); }
                 | INFO_SYM              { do_info(current_corpus); }
                 ;
 
-GroupCmd:       GROUP_SYM CID Anchor ID GroupBy Anchor ID 
+GroupCmd:       GROUP_SYM CID Anchor ID BY_SYM Anchor ID 
                   CutStatement OptExpansion OptionalRedir
                                 { 
-                                  do_group($2, $3.anchor, $3.offset, $4, $6.anchor, $6.offset, $7, $8, $9, $5, &($10)); 
+                                  do_group($2, $3.anchor, $3.offset, $4, $6.anchor, $6.offset, $7, $8, $9, &($10)); 
+                                  cl_free($10.name);
+                                }
+              | GROUP_SYM CID Anchor ID FOREACH_SYM Anchor ID 
+                  CutStatement OptExpansion OptionalRedir
+                                { 
+                                  do_group($2, $3.anchor, $3.offset, $4, $6.anchor, $6.offset, $7, $8, $9, &($10));
                                   cl_free($10.name);
                                 }
               | GROUP_SYM CID Anchor ID 
@@ -729,19 +721,10 @@ GroupCmd:       GROUP_SYM CID Anchor ID GroupBy Anchor ID
                                 }
               ;
 
-GroupBy:      BY_SYM                  { $$ = 0; } 
-              | FOREACH_SYM           { $$ = 0; }
-              | GROUP_SYM BY_SYM      { $$ = 1; }
-              | GROUP_SYM FOREACH_SYM { $$ = 1; }
-              ;
-
-
 /* the 'expand' flag is not implemented in the group command */
 OptExpansion:    EXPAND_SYM { $$ = 1; } 
                | /* epsilon */ { $$ = 0; }
                ;
-
-
 
 /* ================================================== Tabulate */
 
@@ -782,7 +765,7 @@ TabulationRange:   Anchor
 
 OptAttributeSpec:    ID OptionalFlag
                        { $$.name = $1; $$.flags = $2; }
-                   | /* epsilon */
+                   | /* eps */
                        { $$.name = NULL; $$.flags = 0; }
                    ;
 
@@ -828,7 +811,7 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
 
 OptionalSortClause: 
                 SortClause              { $$ = $1; }
-              | /* epsilon */           { $$ = NULL; }
+              | /* eps */               { $$ = NULL; }
               ;
 
 SortClause:     BY_SYM ID OptionalFlag SortBoundaries SortDirection OptReverse
@@ -853,18 +836,18 @@ SortBoundaries: OptON Anchor { $$.anchor1 = $$.anchor2 = $2.anchor; $$.offset1 =
               | OptON Anchor OptELLIPSIS Anchor
                             { $$.anchor1 = $2.anchor; $$.offset1 = $2.offset;
                               $$.anchor2 = $4.anchor; $$.offset2 = $4.offset; } 
-              | /* epsilon */
+              | /* eps */
                             { $$.anchor1 = MatchField;    $$.offset1 = 0;
                               $$.anchor2 = MatchEndField; $$.offset2 = 0; }
               ;
 
-SortDirection:  ASC_SYM       { $$ = 1; }
-              | DESC_SYM      { $$ = 0; }
-              | /* epsilon */ { $$ = 1; }
+SortDirection:  ASC_SYM     { $$ = 1; }
+              | DESC_SYM    { $$ = 0; }
+              | /* eps */   { $$ = 1; }
               ;
 
-OptReverse:     REVERSE_SYM   { $$ = 1; }
-              | /* epsilon */ { $$ = 0; }
+OptReverse:     REVERSE_SYM { $$ = 1; }
+              | /* eps */   { $$ = 0; }
               ;
 
 /* ================================================== Deletions */
@@ -887,8 +870,8 @@ Reduction:        REDUCE_SYM OptionalCID TO_SYM INTEGER OptPercent
                                         }                                       
                 ;
         
-OptPercent:       '%'           { $$ = 1; }
-                | /* epsilon */ { $$ = 0; }
+OptPercent:       '%'       { $$ = 1; }
+                | /* eps */ { $$ = 0; }
                 ;
 
 Delete:           DELETE_SYM OptionalCID WITH_SYM FIELD
@@ -936,12 +919,12 @@ UndumpCmd: UNDUMP_SYM ID OptWithTargetKeyword OptAscending OptionalInputRedir
             { do_undump($2, $3, !$4, &($5)); cl_free($5.name); }
         ;
 
-OptAscending:  ASC_SYM        { $$ = 1; }
-             | /* epsilon */  { $$ = 0; }
+OptAscending:  ASC_SYM    { $$ = 1; }
+             | /* eps */  { $$ = 0; }
              ;
 
 OptWithTargetKeyword:
-          /* epsilon */       { $$ = 0; }
+          /* eps */     { $$ = 0; }
         | WITH_SYM FIELD        
           { 
             if ($2 == TargetField) { $$ = 1; }
@@ -974,15 +957,10 @@ AQuery:         StandardQuery
               | TABQuery
               ;
 
-StandardQuery:  EmbeddedModifier
-                SearchPattern
+StandardQuery:  SearchPattern
                 AlignmentConstraints
-                CutStatement OptKeep    { $$ = do_StandardQuery($4, $5, $1); }
+                CutStatement OptKeep    { $$ = do_StandardQuery($3, $4); }
 ;
-
-EmbeddedModifier: EXTENSION ID ')'      { $$ = $2; }
-                | /* epsilon */         { $$ = NULL; }
-                ;
 
 MUQuery:          MU_SYM
                   MUStatement OptKeep CutStatement { $$ = do_MUQuery($2, $3, $4); }
@@ -1080,7 +1058,7 @@ XMLTag:           TAGSTART '>'          { $$ = do_XMLTag($1, 0, 0, NULL, 0); }
 RegexpOp:         MvalOp                { $$ = $1; }
                 | NEQ                   { $$ = OP_EQUAL | OP_NOT; }
                 | '='                   { $$ = OP_EQUAL; }
-                | /* epsilon */         { $$ = OP_EQUAL; }
+                | /* eps */             { $$ = OP_EQUAL; }
                 ;
 
 NamedWfPattern: OptTargetSign
@@ -1177,7 +1155,7 @@ AlignmentConstraints:
                          SearchPattern { if (generate_code)
                                            CurEnv->negated = $5;
                                        }
-                   | /* epsilon */     { };
+                   | /* epsilon */     { }
                     ;
 
 OptNot:             '!'                { $$ = 1; }
@@ -1243,7 +1221,7 @@ OptionalCID:    CID                     { $$ = $1; }
                 ;
 
 
-CID:            ID_OR_NQRID             { CorpusList *cl;
+CID:            ID                      { CorpusList *cl;
 
                                           cqpmessage(Message, "CID: %s", $1);
 
@@ -1261,10 +1239,6 @@ CID:            ID_OR_NQRID             { CorpusList *cl;
                                           else
                                             $$ = cl;
                                         }
-                ;
-
-ID_OR_NQRID:    NQRID                   { $$ = $1; }
-              | ID                      { $$ = $1; }
                 ;
 
 BoolExpr:     BoolExpr IMPLIES BoolExpr { $$ = bool_implies($1, $3); }
@@ -1292,8 +1266,8 @@ MvalOp:   OptionalNot CONTAINS_SYM  {$$ = OP_CONTAINS | $1;}
         | OptionalNot MATCHES_SYM   {$$ = OP_MATCHES  | $1;}
 ;       
 
-OptionalNot:   NOT_SYM        {$$ = OP_NOT;}
-             | /* epsilon */  {$$ = 0;}
+OptionalNot:   NOT_SYM    {$$ = OP_NOT;}
+             | /* eps */  {$$ = 0;}
 ;
 
 RelLHS:           LabelReference        { $$ = do_LabelReference($1, 0); }  /* label reference "label.att"*/
@@ -1335,7 +1309,7 @@ RelRHS:           RelLHS                { $$ = $1; }
                                           else
                                             $$ = NULL;
                                         }
-                | DOUBLEFLOAT           { if (generate_code) {
+                | FLOAT                 { if (generate_code) {
                                             NEW_BNODE($$);
                                             $$->type = float_leaf;
                                             $$->leaf.ctype.fconst = $1;
@@ -1441,14 +1415,14 @@ TabOtherPatterns: TabOtherPatterns
                   OptDistance
                   NamedWfPattern        { $$ = add_tabular_pattern($1, &($2), $3); }
                   
-                | /* epsilon */         { $$ = NULL; }
+                | /* eps */             { $$ = NULL; }
                 ;
 
 OptDistance:      '{' INTEGER '}'       { do_OptDistance(&($$), $2, $2); }
                 | '{' INTEGER ',' OptMaxNumber '}'
                                         { do_OptDistance(&($$), $2, $4); }
-                | '{' ',' INTEGER '}'   { do_OptDistance(&($$), 1, $3); }
-                | /* epsilon */         { do_OptDistance(&($$), 1, 1); }
+                | '{' ',' INTEGER '}'   { do_OptDistance(&($$), 0, $3); }
+                | /* eps */             { do_OptDistance(&($$), 0, 0); }
                 ;
 
 
@@ -1461,13 +1435,13 @@ AuthorizeCmd:     USER_SYM ID STRING    { add_user_to_list($2, $3); }
                 ;
 
 OptionalGrants:   '(' Grants ')'
-                | /* epsilon */
+                | /* eps */
                 ;
 
 /* add_grant_to_last_user() saves us the trouble of passing username from above */
 Grants:           Grants
                   ID                    { add_grant_to_last_user($2); }
-                | /* epsilon */
+                | /* eps */
                 ;
 
 /* macro definition */
@@ -1497,7 +1471,7 @@ Macro:            OptDEFINE_SYM MACRO_SYM
                 ;
 
 OptDEFINE_SYM:    DEFINE_SYM
-                | /* epsilon */
+                | /* eps */
                 ;
 
 /* displaying macros */
@@ -1535,25 +1509,25 @@ RandomizeCmd:     RANDOMIZE_SYM         { cl_randomize(); }  /* seed internal RN
                 | RANDOMIZE_SYM INTEGER { cl_set_seed($2); } /* set seed for internal RNG */
                 ;
 
-OtherCommand:   /* epsilon */
+OtherCommand:   /* eps */
                 ;
 
 
 /* optional symbols (as returned from flex) */
 OptionalFIELD:    FIELD                 { $$ = $1; }
-                | /* epsilon */         { $$ = NoField; }
+                | /* eps */             { $$ = NoField; }
                 ;
 OptON:            ON_SYM 
-                | /* epsilon */
+                | /* eps */
                 ;
 OptFROM:          FROM_SYM 
-                | /* epsilon */
+                | /* eps */
                 ;
 OptTO:            TO_SYM 
-                | /* epsilon */
+                | /* eps */
                 ;
 OptELLIPSIS:      ELLIPSIS 
-                | /* epsilon */
+                | /* eps */
                 ;
 
 /* anchor with optional offset:  e.g.  match:4  target:-1  matchend (== matchend:0) */

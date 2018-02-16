@@ -32,18 +32,17 @@
 #include "../cqp/groups.h"
 
 
-/** String containing the username sent by the currently-connect CQi client */
-char *user = "";
-/** String containing the password sent by the currently-connect CQi client */
-char *passwd = "";
+char *user = "", *passwd = "";
 
 
-/**
- *  Prints the CQi server welcome and copyright message.
+/*
+ *
+ *  CQi server welcome & copyright message
+ *
  */
+
 void 
-cqiserver_welcome(void)
-{
+cqiserver_welcome(void) {
   printf("** CQPserver v" VERSION "\n");
   printf("** implementing version %d.%d of the CQi\n", CQI_MAJOR_VERSION, CQI_MINOR_VERSION);
   printf("\n");
@@ -56,42 +55,20 @@ cqiserver_welcome(void)
  *
  */
 
-/**
- * Shuts down the server with an "unknown CQi command" error condition.
- *
- * @param cmd  The integer representing the unknown command received from the client.
- */
 void 
-cqiserver_unknown_command_error(int cmd)
-{
+unknown_command_error(int cmd) {
   fprintf(stderr, "CQPserver: unknown CQi command 0x%04X.\n", cmd);
   exit(1);
 }
 
-/**
- * Shuts down the server with an "CQi command not allowed here" error condition.
- *
- * @param cmd  The integer representing the wrong command received from the client.
- */
 void 
-cqiserver_wrong_command_error(int cmd)
-{
+wrong_command_error(int cmd) {
   fprintf(stderr, "CQPserver: command 0x%04X not allowed in this context.\n", cmd);
   exit(1);
 }
 
-/**
- * Shuts down the server with an "internal error" condition.
- *
- * Both parameters will be printed as part of the shutdown error message.
- *
- * @param function  String: should be name of the calling function, that is,
- *                  the point where the error was raised.
- * @param reason    String containing any other explanatory details about the error.
- */
 void
-cqiserver_internal_error(char *function, char *reason)
-{
+internal_error(char *function, char *reason) {
   fprintf(stderr, "CQPserver: internal error in %s()\n", function);
   fprintf(stderr, "CQPserver: ''%s''\n", reason);
   exit(1);
@@ -104,26 +81,12 @@ cqiserver_internal_error(char *function, char *reason)
  *
  */
 
-/**
- * Sends the current CL error value to the client.
- *
- * This function takes the current contents of of the CL library's global
- * cl_errno error value and sends it to the client.
- *
- * It takes the CL error consant and translates it into the corresponding
- * CQI_CL_ERROR_* constant.
- *
- * NB: This function shuts down the server with an error condition if cl_errno
- * does not actually contain an error condition.
- *
- * @see cl_errno
- */
+/* send CQI_CL_ERROR_* according to the CL cderrno variable */
 void
-send_cl_error(void)
-{
+send_cl_error(void) {
   int cmd;
   
-  switch (cl_errno) {
+  switch (cderrno) {
   case CDA_EATTTYPE:
     cmd = CQI_CL_ERROR_WRONG_ATTRIBUTE_TYPE;
     break;
@@ -162,13 +125,12 @@ send_cl_error(void)
 
 /*
  *
- *  CQi commands  (called from interpreter loop)
+ *  CQi commands  (removed from interpreter loop)
  *
  */
 
 void
-do_cqi_corpus_list_corpora(void)
-{
+do_cqi_corpus_list_corpora(void) {
   CorpusList *cl;
   int n = 0;
   
@@ -189,27 +151,19 @@ do_cqi_corpus_list_corpora(void)
 }
 
 void 
-do_cqi_corpus_charset(void)
-{
+do_cqi_corpus_charset(void) {
   char *c;
-  CorpusList *cl;
+
   c = cqi_read_string();
   if (server_debug)
     fprintf(stderr, "CQi: CQI_CORPUS_CHARSET('%s')\n", c);
-
-  cl = findcorpus(c, SYSTEM, 0);
-  if (cl == NULL || !access_corpus(cl)) {
-    cqi_command(CQI_CQP_ERROR_NO_SUCH_CORPUS);
-  }
-  else {
-    cqi_data_string(cl_charset_name(cl->corpus->charset));
-  }
+  /* this is a dummy until we've implemented the registry extensions */
+  cqi_data_string("latin1");
   free(c);
 }
 
 void 
-do_cqi_corpus_properties(void)
-{
+do_cqi_corpus_properties(void) {
   char *c;
 
   c = cqi_read_string();
@@ -222,8 +176,7 @@ do_cqi_corpus_properties(void)
 
 /* this part sends attributes of a certain type as a STRING[] to the client */
 void
-send_cqi_corpus_attributes(Corpus *c, int type)
-{
+send_cqi_corpus_attributes(Corpus *c, int type) {
   Attribute *a;
   int len;
   
@@ -241,8 +194,7 @@ send_cqi_corpus_attributes(Corpus *c, int type)
 }
 
 void
-do_cqi_corpus_attributes(int type)
-{
+do_cqi_corpus_attributes(int type) {
   char *c, *typename;
   CorpusList *cl;
 
@@ -275,8 +227,7 @@ do_cqi_corpus_attributes(int type)
 }
 
 void
-do_cqi_corpus_full_name(void)
-{
+do_cqi_corpus_full_name(void) {
   char *c;
   CorpusList *cl;
 
@@ -312,8 +263,7 @@ do_cqi_corpus_structural_attribute_has_values(void) {
 }
 
 void
-do_cqi_cl_attribute_size(void)
-{
+do_cqi_cl_attribute_size(void) {
   char *a;
   Attribute *attribute;
   int size;
@@ -364,8 +314,7 @@ do_cqi_cl_attribute_size(void)
 }
 
 void
-do_cqi_cl_lexicon_size(void)
-{
+do_cqi_cl_lexicon_size(void) {
   char *a;
   Attribute *attribute;
   int size;
@@ -390,8 +339,7 @@ do_cqi_cl_lexicon_size(void)
 }
 
 void
-do_cqi_cl_drop_attribute(void)
-{
+do_cqi_cl_drop_attribute(void) {
   if (server_debug)
     fprintf(stderr, "CQi: CQI_CL_DROP_ATTRIBUTE()  --  not implemented\n");
  cqi_general_error("CQI_CL_DROP_ATTRIBUTE not implemented."); 
@@ -400,8 +348,7 @@ do_cqi_cl_drop_attribute(void)
 /* one might wish to add extensive error checking to all the CL functions,
    but that will need a LOT of code! */
 void
-do_cqi_cl_str2id(void)
-{
+do_cqi_cl_str2id(void) {
   char **strlist;
   int len, i, id;
   char *a;
@@ -438,8 +385,7 @@ do_cqi_cl_str2id(void)
 }
 
 void
-do_cqi_cl_id2str(void)
-{
+do_cqi_cl_id2str(void) {
   int *idlist;
   int len, i;
   char *a, *str;
@@ -474,8 +420,7 @@ do_cqi_cl_id2str(void)
 }
 
 void
-do_cqi_cl_id2freq(void)
-{
+do_cqi_cl_id2freq(void) {
   int *idlist;
   int len, i, f;
   char *a;
@@ -512,8 +457,7 @@ do_cqi_cl_id2freq(void)
 }
 
 void
-do_cqi_cl_cpos2str(void)
-{
+do_cqi_cl_cpos2str(void) {
   int *cposlist;
   int len, i;
   char *a, *str;
@@ -548,8 +492,7 @@ do_cqi_cl_cpos2str(void)
 }
 
 void
-do_cqi_cl_cpos2id(void)
-{
+do_cqi_cl_cpos2id(void) {
   int *cposlist;
   int len, i, id;
   char *a;
@@ -586,8 +529,7 @@ do_cqi_cl_cpos2id(void)
 }
 
 void
-do_cqi_cl_cpos2struc(void)
-{
+do_cqi_cl_cpos2struc(void) {
   int *cposlist;
   int len, i, struc;
   char *a;
@@ -627,8 +569,7 @@ do_cqi_cl_cpos2struc(void)
    and should be improved with a caching model to avoid the frequent cpos2struc lookup;
    perhaps make them CL functions with an intelligent caching algorithm? */
 void
-do_cqi_cl_cpos2lbound(void)
-{
+do_cqi_cl_cpos2lbound(void) {
   int *cposlist;
   int len, i, struc, lb, rb;
   char *a;
@@ -670,8 +611,7 @@ do_cqi_cl_cpos2lbound(void)
 }
 
 void
-do_cqi_cl_cpos2rbound(void)
-{
+do_cqi_cl_cpos2rbound(void) {
   int *cposlist;
   int len, i, struc, lb, rb;
   char *a;
@@ -713,8 +653,7 @@ do_cqi_cl_cpos2rbound(void)
 }
 
 void
-do_cqi_cl_cpos2alg(void)
-{
+do_cqi_cl_cpos2alg(void) {
   int *cposlist;
   int len, i, alg;
   char *a;
@@ -751,8 +690,7 @@ do_cqi_cl_cpos2alg(void)
 }
 
 void
-do_cqi_cl_struc2str(void)
-{
+do_cqi_cl_struc2str(void) {
   int *struclist;
   int len, i;
   char *a, *str;
@@ -787,8 +725,7 @@ do_cqi_cl_struc2str(void)
 }
 
 void
-do_cqi_cl_id2cpos(void)
-{
+do_cqi_cl_id2cpos(void) {
   int *cposlist;
   int len, id;
   char *a;
@@ -815,8 +752,7 @@ do_cqi_cl_id2cpos(void)
 }
 
 void
-do_cqi_cl_idlist2cpos(void)
-{
+do_cqi_cl_idlist2cpos(void) {
   int *idlist, *cposlist;
   int i, len, cposlen;
   char *a;
@@ -850,8 +786,7 @@ do_cqi_cl_idlist2cpos(void)
 }
 
 void
-do_cqi_cl_regex2id(void)
-{
+do_cqi_cl_regex2id(void) {
   int *idlist;
   int len;
   char *a, *regex;
@@ -883,8 +818,7 @@ do_cqi_cl_regex2id(void)
 }
 
 void
-do_cqi_cl_struc2cpos(void)
-{
+do_cqi_cl_struc2cpos(void) {
   int struc, start, end;
   char *a;
   Attribute *attribute;
@@ -907,8 +841,7 @@ do_cqi_cl_struc2cpos(void)
 }
 
 void
-do_cqi_cl_alg2cpos(void)
-{
+do_cqi_cl_alg2cpos(void) {
   int alg, s1, s2, t1, t2;
   char *a;
   Attribute *attribute;
@@ -931,8 +864,7 @@ do_cqi_cl_alg2cpos(void)
 }
 
 void
-do_cqi_cqp_list_subcorpora(void)
-{
+do_cqi_cqp_list_subcorpora(void) {
   char *corpus;
   CorpusList *cl, *mother;
   int n = 0;
@@ -962,32 +894,23 @@ do_cqi_cqp_list_subcorpora(void)
   free(corpus);
 }
 
-/**
- * Tests whether or nto the final non-blank character in a string is a semicolon.
- *
- * CQP queries must be terminated with a single semicolon;
- * multiple semicolons will produce an error to occur -- so we
- * have to check and add a semicolon if necessary.
- *
- * @return  Boolean: true iff the final non-blank character is a semicolon.
- */
+/* CQP queries must be terminated with a single semicolon; */
+/* multiple semicolons will produce an error to occur -- so we */
+/* have to check and add a semicolon if necessary. */
 int
-query_has_semicolon(char *query)
-{
+query_has_semicolon(char *query) {
   char *p;
 
   if (query == NULL || *query == 0)
     return 0;
   p = query + strlen(query); 
   while (--p > query)           /* stop at first non-blank char or at first string character */
-    if (!(*p == ' ' || *p == '\t'))
-      break;
+    if (!(*p == ' ' || *p == '\t')) break;
   return (*p == ';') ? 1 : 0;
 }
 
 void 
-do_cqi_cqp_query(void)
-{
+do_cqi_cqp_query(void) {
   char *child, *mother, *query, *c, *sc;
   
   mother = cqi_read_string();
@@ -1045,8 +968,7 @@ do_cqi_cqp_query(void)
 }
 
 void
-do_cqi_cqp_subcorpus_size(void)
-{
+do_cqi_cqp_subcorpus_size(void) {
   char *subcorpus;
   CorpusList *cl;
 
@@ -1062,13 +984,7 @@ do_cqi_cqp_subcorpus_size(void)
   free(subcorpus);
 }
 
-/**
- * Returns string representations of CQI_CONST_FIELD_ values.
- *
- * Utility function, used for debugging output & to check valid fields in subroutines below.
- *
- * TODO as a utiltiy, shouldn't this be in the cqi library (server.c?)
- */
+/* used for debugging output & to check valid fields in subroutines below */
 char *
 cqi_field_name(cqi_byte field) {
   switch (field) {
@@ -1086,8 +1002,7 @@ cqi_field_name(cqi_byte field) {
 }
 
 void
-do_cqi_cqp_subcorpus_has_field(void)
-{
+do_cqi_cqp_subcorpus_has_field(void) {
   char *subcorpus;
   CorpusList *cl;
   cqi_byte field;
@@ -1132,7 +1047,7 @@ do_cqi_cqp_subcorpus_has_field(void)
         cqi_data_bool(CQI_CONST_YES);
       break;
     default:
-      cqiserver_internal_error("do_cqi_cqp_subcorpus_has_field", "Can't identify requested field.");
+      internal_error("do_cqi_cqp_subcorpus_has_field", "Can't identify requested field.");
     }
     cqi_flush();
   }
@@ -1140,28 +1055,15 @@ do_cqi_cqp_subcorpus_has_field(void)
   free(subcorpus);
 }
 
-/**
- * Sends n instances of integer -1 to the client.
- *
- * Utility function for do_cqi_cqp_dump_subcorpus().
- *
- * This is the error condition of the CQI_CQP_DUMP_SUBCORPUS command:
- * it returns a list of (-1) values if requested field is not set.
- *
- * It is assumed that the length of the lsit has already been sent.
- *
- * @param n  Length of list to send.
- */
+/* CQI_CQP_DUMP_SUBCORPUS returns list of (-1) values if requested field is not set */
 void
-do_cqi_send_minus_one_list(int n)
-{
+cqi_send_minus_one_list(int n) {
   while (n--) 
     cqi_send_int(-1);
 }
 
 void
-do_cqi_cqp_dump_subcorpus(void)
-{
+do_cqi_cqp_dump_subcorpus(void) {
   char *subcorpus;
   CorpusList *cl;
   cqi_byte field;
@@ -1205,20 +1107,20 @@ do_cqi_cqp_dump_subcorpus(void)
         break;
       case CQI_CONST_FIELD_TARGET:
         if (cl->targets == NULL) 
-          do_cqi_send_minus_one_list(size);
+          cqi_send_minus_one_list(size);
         else 
           for (i=first; i<=last; i++)
             cqi_send_int(cl->targets[i]);
         break;
       case CQI_CONST_FIELD_KEYWORD:
         if (cl->keywords == NULL) 
-          do_cqi_send_minus_one_list(size);
+          cqi_send_minus_one_list(size);
         else 
           for (i=first; i<=last; i++)
             cqi_send_int(cl->keywords[i]);
         break;
       default:
-        cqiserver_internal_error("do_cqi_cqp_dump_subcorpus", "No handler for requested field.");
+        internal_error("do_cqi_cqp_dump_subcorpus", "No handler for requested field.");
       }
       cqi_flush();
   }
@@ -1227,8 +1129,7 @@ do_cqi_cqp_dump_subcorpus(void)
 }
 
 void
-do_cqi_cqp_drop_subcorpus(void)
-{
+do_cqi_cqp_drop_subcorpus(void) {
   char *subcorpus;
   CorpusList *cl;
   char *c, *sc;
@@ -1260,8 +1161,7 @@ do_cqi_cqp_drop_subcorpus(void)
 
 /* temporary functions for CQI_CQP_FDIST_1() and CQI_CQP_FDIST_2() */
 void
-do_cqi_cqp_fdist_1(void)
-{
+do_cqi_cqp_fdist_1(void) {
   char *subcorpus;
   CorpusList *cl;
   int cutoff;
@@ -1299,7 +1199,7 @@ do_cqi_cqp_fdist_1(void)
   else {
     /* compute_grouping() returns tokens with f > cutoff, but CQi specifies f >= cutoff */
     cutoff = (cutoff > 0) ? cutoff - 1 : 0;
-    table = compute_grouping(cl, NoField, 0, NULL, fieldtype, 0, att, cutoff, 0);
+    table = compute_grouping(cl, NoField, 0, NULL, fieldtype, 0, att, cutoff);
     if (table == NULL) {
       cqi_command(CQI_CQP_ERROR_GENERAL);
     }
@@ -1323,8 +1223,7 @@ do_cqi_cqp_fdist_1(void)
 
 
 void
-do_cqi_cqp_fdist_2(void)
-{
+do_cqi_cqp_fdist_2(void) {
   char *subcorpus;
   CorpusList *cl;
   int cutoff;
@@ -1372,7 +1271,7 @@ do_cqi_cqp_fdist_2(void)
   else {
     /* compute_grouping() returns tokens with f > cutoff, but CQi specifies f >= cutoff */
     cutoff = (cutoff > 0) ? cutoff - 1 : 0;
-    table = compute_grouping(cl, fieldtype1, 0, att1, fieldtype2, 0, att2, cutoff, 0);
+    table = compute_grouping(cl, fieldtype1, 0, att1, fieldtype2, 0, att2, cutoff);
     if (table == NULL) {
       cqi_command(CQI_CQP_ERROR_GENERAL);
     }
@@ -1397,18 +1296,14 @@ do_cqi_cqp_fdist_2(void)
 }
 
 
-/**
+/*
  *
- *  The CQP server's command interpreter loop.
- *
- *  The loops starts running when this function is called, and when the
- *  exit command is reveived (CQI_CTRL_BYE)
- *  (returns on exit)
+ *  The command interpreter loop (returns on exit)
  *
  */
+
 void 
-interpreter(void)
-{
+interpreter(void) {
   int cmd;
   int cmd_group;
 
@@ -1422,8 +1317,7 @@ interpreter(void)
     case CQI_CTRL:
       switch (cmd) {
       case CQI_CTRL_CONNECT:
-        cqiserver_wrong_command_error(cmd);
-        break;
+        wrong_command_error(cmd);
       case CQI_CTRL_BYE:
         if (server_debug) 
           fprintf(stderr, "CQi: CQI_CTRL_BYE()\n");
@@ -1444,7 +1338,7 @@ interpreter(void)
         cqi_data_string(cqi_error_string);
         break;
       default:
-        cqiserver_unknown_command_error(cmd);
+        unknown_command_error(cmd);
       }
       break;
       
@@ -1501,7 +1395,7 @@ interpreter(void)
         do_cqi_corpus_full_name();
         break;
       default:
-        cqiserver_unknown_command_error(cmd);
+        unknown_command_error(cmd);
       }
       break;
       
@@ -1563,7 +1457,7 @@ interpreter(void)
         do_cqi_cl_alg2cpos();
         break;
       default:
-        cqiserver_unknown_command_error(cmd);
+        unknown_command_error(cmd);
       }
       break;
 
@@ -1595,60 +1489,33 @@ interpreter(void)
         do_cqi_cqp_fdist_2();
         break;
       default:
-        cqiserver_unknown_command_error(cmd);
+        unknown_command_error(cmd);
       }
       break;
       
     default:
-      cqiserver_unknown_command_error(cmd);
-
-    } /* end outer switch */
+      unknown_command_error(cmd);
+    }
     
-  } /* end while 42 */
+  }
 
 }
 
 
 
-/**
- * Main function for the cqpserver app.
- */
-int
-main(int argc, char *argv[])
-{
+
+int main(int argc, char *argv[]) {
   int cmd;
 
   which_app = cqpserver;
 
-  /* TODO: shouldn't these come AFTER initialize_cqp(), as that function may overwrite these values with defaults?
-   * or maybe I've missed some subtlety here....*/
   silent = 1; 
   paging = autoshow = auto_save = 0;
 
   if (!initialize_cqp(argc, argv)) {
-    fprintf(stderr, "CQPserver: ERROR Couldn't initialise CQP engine.\n");
+    fprintf(stderr, "ERROR Couldn't initialise CQP engine.\n");
     exit(1);
   }
-  while (optind < argc) {
-    /* remaining command-line arguments are <user>:<password> specifications */
-    char *sep = strchr(argv[optind], ':');
-    if (sep != NULL) {
-      if (sep == argv[optind]) {
-        fprintf(stderr, "CQPserver: Invalid account specification '%s' (username must not be empty)\n", argv[optind]);
-        exit(1);
-      }
-      else {
-        *sep = '\0';
-        add_user_to_list(argv[optind], sep + 1);
-      }
-    }
-    else {
-      fprintf(stderr, "CQPserver: Invalid account specification '%s' (password missing)\n", argv[optind]);
-      exit(1);
-    }
-    optind++;
-  }
-  
   cqiserver_welcome();
 
   if (localhost) {
@@ -1657,10 +1524,10 @@ main(int argc, char *argv[])
 
   if (0 < accept_connection(server_port)) {
     if (server_log)
-      printf("CQPserver: Connected. Waiting for CONNECT request.\n");
+      printf("Connected. Waiting for CONNECT request.\n");
   }
   else {
-    fprintf(stderr, "CQPserver: ERROR Connection failed.\n");
+    fprintf(stderr, "ERROR Connection failed.\n");
     exit(1);
   }
 
@@ -1668,17 +1535,17 @@ main(int argc, char *argv[])
   cmd = cqi_read_command();
   if (cmd != CQI_CTRL_CONNECT) {
     if (server_log)
-      printf("CQPserver: Connection refused.\n");
-    cqiserver_wrong_command_error(cmd);
+      printf("Connection refused.\n");
+    wrong_command_error(cmd);
   }
   user = cqi_read_string();
   passwd = cqi_read_string();
   if (server_log)
-    printf("CQPserver: CONNECT  user = '%s'  passwd = '%s'  pid = %d\n", user, passwd, (int)getpid());
+    printf("CONNECT  user = '%s'  passwd = '%s'  pid = %d\n", user, passwd, (int)getpid());
 
   /* check password here (always required !!) */
   if (!authenticate_user(user, passwd)) {
-    printf("CQPserver: Wrong username or password. Connection refused.\n"); /* TODO shouldn't this be to stderr as it is not conditional on server_log? */
+    printf("Wrong password. Connection refused.\n");
     cqi_command(CQI_ERROR_CONNECT_REFUSED);
   }
   else {
@@ -1689,25 +1556,24 @@ main(int argc, char *argv[])
 
     /* check which corpora the user is granted access to */
     {
-      CorpusList *cl = FirstCorpusFromList();
-      while (cl != NULL) {
-        if (!check_grant(user, cl->name))
-          dropcorpus(cl);
-        cl = NextCorpusFromList(cl);
-      }
+    CorpusList *cl = FirstCorpusFromList();
+    while (cl != NULL) {
+      if (!check_grant(user, cl->name))
+        dropcorpus(cl);
+      cl = NextCorpusFromList(cl);
+    }
     }
 
     /* start command interpreter loop */
     interpreter();
 
     if (server_log)
-      printf("CQPserver: User '%s' has logged off.\n", user);
+      printf("User '%s' has logged off from the CQPserver.\n", user);
   }
 
   /* connection terminated; clean up and exit */
-  printf("CQPserver: Exit. (pid = %d)\n", (int)getpid());
+  printf("Exit. (pid = %d)\n", (int)getpid());
 
-  /* TODO should we check cqp_error_status as in the main cqp app? */
   return 0;
 }
 
