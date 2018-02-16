@@ -41,7 +41,7 @@ esac
 BUILD_DIR=`pwd`
 CWB_DIR=`pwd`/src/cwb
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
-echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/src/cwb/cl" > ./src/Makevars
+echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/inst/include/cwb" > ./src/Makevars
 echo -e "PKG_LIBS=-L"$BUILD_DIR"/src/cwb/cl -lglib-2.0 -lpcre -lcl\n" >> ./src/Makevars
 echo -e "all: cl\n" >>./src/Makevars
 echo "cl: depend" >> ./src/Makevars
