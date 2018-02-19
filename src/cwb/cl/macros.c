@@ -18,6 +18,7 @@
 
 #include "globals.h"
 #include "macros.h"
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 #include <time.h>
 
