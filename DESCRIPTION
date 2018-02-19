@@ -26,12 +26,10 @@ License: GPL-3
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
 SystemRequirements: On Unix-like operating systems, pcre (>= 7) and glib2 (>= 2) need to be present to 
-    compile 'RcppCWB'. See README.md for instructions how to install these dependencies.
-    In addition, the 'corpus library' (CL) included in the 'CWB' is required. If not yet present, a binary
-    distribution of the 'CWB' that includes the CL is downloaded (see <http://cwb.sourceforge.net/download.php>)
-    during installation. On Windows, no prior installations are necessary, as pre-built (i.e. cross-compiled)
-    binaries of all required libraries are downloaded from a GitHub repository (<https://github.com/PolMine/libcl>)
-    during installation.
+    compile 'RcppCWB'. See README.md for instructions how to install these dependencies. On Windows, no 
+    prior installations are necessary, as pre-built (i.e. cross-compiled) binaries of all required 
+    libraries are downloaded from a GitHub repository (<https://github.com/PolMine/libcl>) during 
+    installation.
 Imports:
     Rcpp (>= 0.12.6)
 Suggests:
