@@ -3,7 +3,7 @@
 #' The corpus library (CL) is a C library offering low-level access 
 #' to CWB-indexed corpora. This package
 #' offers wrappers for core functions of the corpus library, and 
-#' functions for performance critial tasks in the polmineR package.
+#' functions for performance critical tasks in the polmineR package.
 #' 
 #' The work of the all contributors to the Corpus Workbench is
 #' gratefully acknowledged. There is a huge intellectual debt to 
