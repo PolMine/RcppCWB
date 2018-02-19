@@ -35,8 +35,6 @@ Imports:
 Suggests:
     knitr,
     testthat
-VignetteBuilder:
-    knitr
 LinkingTo: Rcpp
 Biarch: true
 URL: https://www.github.com/PolMine/RcppCWB
