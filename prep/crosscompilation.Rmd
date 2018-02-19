@@ -9,43 +9,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Introducing RcppCWB
-
-The corpus library (CL) is a C library offering low-level access 
-to CWB-indexed corpora. This package
-offers wrappers for core functions of the corpus library, and 
-functions for performance critial tasks in the polmineR package.
-
-The work of the all contributors to the Corpus Workbench is
-gratefully acknowledged. There is a huge intellectual debt to 
-Bernard Desgraupes and Sylvain Loiseau, and the package 'rcqp'
-they developed as a R wrapper for the functionality of the CWB.
-
-The intention behind using Rcpp for writing the wrapper library
-is to make it easier to maintain the package, to provide some 
-extra functionality, and to make the package work on Windows
-systems. Indeed, portability is the major reason for the effort
-that went into the package.
-
-The essential idea of the package is that pre-compiled binaries 
-of the corpus library and further libraries are available for Windows
-via a  GitHub repository (github.com/PolMine/libcl). During the installation,
-the binaries are downloaded, and the Rcpp code is compiled against
-these binaries.
-
-For this, a pre-compiled version of the CWB is necessary. The annex explains
-the procedure that has been used.
-
-On Linux and macOS, offical binaries of the CWB (that include libcl.a)
-are downloaded, if the CWB is not yet installed. To identify of the libraries
-and header files are already present, the tool cwb-config is used.
-
   
-## Annex: Cross-compiling libcl and the Corpus Workbench (CWB)
+## Cross-compiling libcl and the Corpus Workbench (CWB)
+
+This is a documentation of the cross-compilation of the corpus library (CL) of 
+the Corpus Workbench on a Ubuntu machine for Windows.
 
 ### Potentially useful resources
 
-INSTALL.WIN script in the cwb directory with installation files is extremely
+The INSTALL.WIN script in the cwb directory with installation files is extremely
 helpful up to the point where it comes to cross-compiling glib.
 
 ### Preparations
