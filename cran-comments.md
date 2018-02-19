@@ -33,7 +33,7 @@ wrappers.
 
 ## Test environments
 
-* local OS X install, R 3.4.1
+* local OS X install, R 3.4.3
 * Ubuntu 14.04 (on travis-ci), R 3.4.2
 * Ubuntu 14.04 (project server), R 3.4.3
 * Debian 9.1 (virtual machine), R 3.4.3
