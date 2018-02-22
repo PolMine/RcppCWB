@@ -48,7 +48,7 @@ TOP = $(R_PACKAGE_SOURCE)
 include $(TOP)/config.mk
 
 
-SUBDIRS = cl	# subdirectories that have their own makefiles
+SUBDIRS = cl cqp	# subdirectories that have their own makefiles
 SRCDIRS = cl cqp utils CQi	# subdirectories containing C source code
 
 

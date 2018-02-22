@@ -89,7 +89,7 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
 
 ## ----------------------------------------------------------------------
 
-all: $(PROGRAMS)
+all: libcqp.a
 
 parser.tab.c parser.tab.h: parser.y
 	$(RM) parser.tab.* parser.output
