@@ -17,35 +17,6 @@ extern "C" {
 #include <string.h>
 
 
-/* from globals.h */
-
-#ifndef _globals_h_
-#define _globals_h_
-#include "cl.h"
-extern int cl_debug;
-extern int cl_optimize;
-extern size_t cl_memory_limit;
-#if (!defined(REGISTRY_DEFAULT_PATH))
-#define REGISTRY_DEFAULT_PATH  "/corpora/c1/registry"
-#endif
-
-#if (!defined(REGISTRY_ENVVAR))
-#define REGISTRY_ENVVAR        "CORPUS_REGISTRY"
-#endif
-#define MAX_LINE_LENGTH        4096
-
-#define MAX_IDENTIFIER_LENGTH  1024
-
-#define TODO {(void)fprintf(stderr,"TODO point reached: file \"%s\", line %d\n", \
-			    __FILE__, \
-			    __LINE__); \
-			    exit(1);}
-
-
-#endif
-
-
-
 /* from options.h */
 
 #ifndef _cqp_options_h_
