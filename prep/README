@@ -1,3 +1,13 @@
+cwb/cqp/hash.c
+--------------
+
+The following symbols/functions are defined exactly the same way in cl/lexhash.c and cqp/hash.c:
+hash_string
+is_prime
+find_prime
+To avoid linker errors, the functions are commented out in cqp/hash.c
+
+
 cwb/cqp/Makefile
 ----------------
 

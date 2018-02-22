@@ -15,7 +15,11 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+/* the following functions - is_prime, find_prime, hash_string - are exactly 
+identical with functions in cl/lexhash.c. To avoid errors with the linker
+when adding everything up, they are commented out here  */
 
+/* 
 int 
 is_prime(int n) {
   int i;
@@ -24,15 +28,19 @@ is_prime(int n) {
       return 0;
   return 1;
 }
+*/
 
+/*
 int 
 find_prime(int n) {
-  for( ; n > 0 ; n++)		/* will exit on int overflow */
+  for( ; n > 0 ; n++)
     if (is_prime(n)) 
       return n;
   return 0;
 }
+*/
 
+/*
 unsigned int 
 hash_string(char *string) {
   unsigned char *s = (unsigned char *)string;
@@ -41,6 +49,7 @@ hash_string(char *string) {
     result = (result * 33 ) ^ (result >> 27) ^ *s;
   return result;
 }
+*/
 
 unsigned int 
 hash_macro(char *macro_name, unsigned int args) {
