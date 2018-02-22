@@ -99,6 +99,11 @@ lex.yy.c: parser.l parser.y
 	$(RM) lex.yy.*
 	$(LEX) $<
 
+libcqp.a: $(OBJS) $(CQI_OBJS)
+        $(RM) $@
+        $(AR) $@ $^
+        $(RANLIB) $@
+
 cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 	$(RM) $@
 	$(CC) $(CFLAGS_ALL) -o $@ llquery.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
