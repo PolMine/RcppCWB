@@ -1,0 +1,10 @@
+cwb/cqp/Makefile
+----------------
+
+# new target added - to generate libcqp.a
+
+libcqp.a: $(OBJS) $(CQI_OBJS)
+        $(RM) $@
+        $(AR) $@ $^
+        $(RANLIB) $@
+
