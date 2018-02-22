@@ -1,3 +1,10 @@
+cwb/cqp/options.h
+-----------------
+The file is copied to _options.h, and include "concordance.h" is commented out in _options.h
+The cpp file with the cqp functions calls _options.h. This omits that a series of includes is
+performed that causes an error.
+
+
 cwb/cqp/hash.c
 --------------
 
