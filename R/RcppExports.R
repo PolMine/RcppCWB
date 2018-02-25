@@ -81,3 +81,43 @@ cwb_cpos2rbound <- function(corpus, s_attribute, cpos, registry) {
     .Call(`_RcppCWB_cwb_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 
+get_registry <- function() {
+    .Call(`_RcppCWB_get_registry`)
+}
+
+initialize_cwb <- function() {
+    invisible(.Call(`_RcppCWB_initialize_cwb`))
+}
+
+#' Get the name of the programme running
+#' 
+#' @export
+get_progname <- function() {
+    .Call(`_RcppCWB_get_progname`)
+}
+
+cqp_list_corpora <- function() {
+    .Call(`_RcppCWB_cqp_list_corpora`)
+}
+
+#' Run a CQP query.
+#' @param inMother the corpus
+#' @param inChild the temporary corpus
+#' @param inQuery the query
+#' @export
+cqp_query <- function(inMother, inChild, inQuery) {
+    .Call(`_RcppCWB_cqp_query`, inMother, inChild, inQuery)
+}
+
+cqp_subcorpus_size <- function(inSubcorpus) {
+    .Call(`_RcppCWB_cqp_subcorpus_size`, inSubcorpus)
+}
+
+cqp_list_subcorpora <- function(inCorpus) {
+    .Call(`_RcppCWB_cqp_list_subcorpora`, inCorpus)
+}
+
+cqp_dump_subcorpus <- function(inSubcorpus) {
+    .Call(`_RcppCWB_cqp_dump_subcorpus`, inSubcorpus)
+}
+

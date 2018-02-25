@@ -47,6 +47,9 @@ void initialize_cwb()
 	make_attribute_hash(16384);
 }
 
+//' Get the name of the programme running
+//' 
+//' @export
 // [[Rcpp::export]]
 Rcpp::StringVector get_progname(){
   Rcpp::StringVector result(1);
@@ -78,6 +81,11 @@ Rcpp::StringVector cqp_list_corpora(){
   
 }
 
+//' Run a CQP query.
+//' @param inMother the corpus
+//' @param inChild the temporary corpus
+//' @param inQuery the query
+//' @export
 // [[Rcpp::export]]
 SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery){
   

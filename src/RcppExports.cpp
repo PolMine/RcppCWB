@@ -283,6 +283,91 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_registry
+Rcpp::StringVector get_registry();
+RcppExport SEXP _RcppCWB_get_registry() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_registry());
+    return rcpp_result_gen;
+END_RCPP
+}
+// initialize_cwb
+void initialize_cwb();
+RcppExport SEXP _RcppCWB_initialize_cwb() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    initialize_cwb();
+    return R_NilValue;
+END_RCPP
+}
+// get_progname
+Rcpp::StringVector get_progname();
+RcppExport SEXP _RcppCWB_get_progname() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_progname());
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_list_corpora
+Rcpp::StringVector cqp_list_corpora();
+RcppExport SEXP _RcppCWB_cqp_list_corpora() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(cqp_list_corpora());
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_query
+SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery);
+RcppExport SEXP _RcppCWB_cqp_query(SEXP inMotherSEXP, SEXP inChildSEXP, SEXP inQuerySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type inMother(inMotherSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type inChild(inChildSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type inQuery(inQuerySEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_query(inMother, inChild, inQuery));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_subcorpus_size
+int cqp_subcorpus_size(SEXP inSubcorpus);
+RcppExport SEXP _RcppCWB_cqp_subcorpus_size(SEXP inSubcorpusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type inSubcorpus(inSubcorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_subcorpus_size(inSubcorpus));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_list_subcorpora
+Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus);
+RcppExport SEXP _RcppCWB_cqp_list_subcorpora(SEXP inCorpusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type inCorpus(inCorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_list_subcorpora(inCorpus));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_dump_subcorpus
+Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus);
+RcppExport SEXP _RcppCWB_cqp_dump_subcorpus(SEXP inSubcorpusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type inSubcorpus(inSubcorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_dump_subcorpus(inSubcorpus));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},
@@ -305,6 +390,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_id2cpos", (DL_FUNC) &_RcppCWB_cwb_id2cpos, 4},
     {"_RcppCWB_cwb_cpos2lbound", (DL_FUNC) &_RcppCWB_cwb_cpos2lbound, 4},
     {"_RcppCWB_cwb_cpos2rbound", (DL_FUNC) &_RcppCWB_cwb_cpos2rbound, 4},
+    {"_RcppCWB_get_registry", (DL_FUNC) &_RcppCWB_get_registry, 0},
+    {"_RcppCWB_initialize_cwb", (DL_FUNC) &_RcppCWB_initialize_cwb, 0},
+    {"_RcppCWB_get_progname", (DL_FUNC) &_RcppCWB_get_progname, 0},
+    {"_RcppCWB_cqp_list_corpora", (DL_FUNC) &_RcppCWB_cqp_list_corpora, 0},
+    {"_RcppCWB_cqp_query", (DL_FUNC) &_RcppCWB_cqp_query, 3},
+    {"_RcppCWB_cqp_subcorpus_size", (DL_FUNC) &_RcppCWB_cqp_subcorpus_size, 1},
+    {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},
+    {"_RcppCWB_cqp_dump_subcorpus", (DL_FUNC) &_RcppCWB_cqp_dump_subcorpus, 1},
     {NULL, NULL, 0}
 };
 
