@@ -2,12 +2,6 @@
 % Please edit documentation in R/RcppCWB_package.R
 \name{cl_wrapper_functions}
 \alias{cl_wrapper_functions}
-\alias{get_count_vector}
-\alias{decode_s_attribute}
-\alias{get_region_matrix}
-\alias{regions_to_count_matrix}
-\alias{get_cbow_matrix}
-\alias{regions_to_ids}
 \title{Higher-level functions using the corpus library (CL).}
 \arguments{
 \item{corpus}{character}
@@ -23,19 +17,6 @@
 \description{
 Higher-level functions using the corpus library (CL).
 }
-\section{Functions}{
-
-\describe{
-  \item{\code{decode_s_attribute(corpus, s_attribute, registry)}}{decode s-attributes}
-  \item{\code{get_count_vector(corpus, p_attribute, registry)}}{count tokens in corpus}
-  \item{\code{get_region_matrix(corpus, s_attribute, strucs, registry)}}{get region matrix for strucs}
-  \item{\code{regions_to_count_matrix(corpus, p_attribute, registry, matrix)}}{get matrix with ids and counts}
-  \item{\code{get_cbow_matrix(corpus, p_attribute, registry = registry, matrix, window = window)}}{get matrix with CBOW}
-  \item{\code{regions_to_count_matrix(corpus, p_attribute, registry, matrix)}}{get counts for regions}
-  \item{\code{regions_to_ids(corpus, p_attribute, registry, matrix)}}{get ids for regions}
-}
-}
-
 \examples{
 Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
 

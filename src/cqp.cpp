@@ -21,20 +21,21 @@ extern "C" {
 using namespace Rcpp;
 
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name=".get_registry")]]
 Rcpp::StringVector get_registry(){
   Rcpp::StringVector result(1);
   result(0) = cl_standard_registry();
   return result;
 }
 
-// [[Rcpp::export]]
+
+// [[Rcpp::export(name=".initialize_cwb")]]
 void initialize_cwb()
 {
 	int		ac = 1;
 	char *		av[1];
 
-	av[0] = "rcqp";
+	av[0] = "RcppCWB";
 	which_app = cqp;
 	silent = 1; 
 	paging = 0;
@@ -47,18 +48,9 @@ void initialize_cwb()
 	make_attribute_hash(16384);
 }
 
-//' Get the name of the programme running
-//' 
-//' @export
-// [[Rcpp::export]]
-Rcpp::StringVector get_progname(){
-  Rcpp::StringVector result(1);
-  result(0) = progname;
-  return result;
-}
 
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name=".cqp_list_corpora")]]
 Rcpp::StringVector cqp_list_corpora(){
   
   CorpusList *	cl;
@@ -81,12 +73,8 @@ Rcpp::StringVector cqp_list_corpora(){
   
 }
 
-//' Run a CQP query.
-//' @param inMother the corpus
-//' @param inChild the temporary corpus
-//' @param inQuery the query
-//' @export
-// [[Rcpp::export]]
+
+// [[Rcpp::export(name=".cqp_query")]]
 SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery){
   
   char * mother = (char*)CHAR(STRING_ELT(inMother,0));
@@ -134,7 +122,7 @@ SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery){
 }
 
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name=".cqp_subcorpus_size")]]
 int cqp_subcorpus_size(SEXP inSubcorpus)
 {
   int result;
@@ -152,7 +140,7 @@ int cqp_subcorpus_size(SEXP inSubcorpus)
   return result;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name=".cqp_list_subcorpora")]]
 Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus)
 {
   char * corpus;
@@ -184,7 +172,7 @@ Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus)
   return result;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(name=".cqp_dump_subcorpus")]]
 Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus)
 {
   char * subcorpus;
