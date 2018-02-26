@@ -42,3 +42,9 @@ Replaced with:
 #ifndef _cqp_table_h_
 #define _cqp_table_h_
 
+cwb/cqp/*
+---------
+
+printf needs to be replaced by Rprintf:
+LC_CTYPE=C && LANG=C sed -i -e 's/\sprintf/ Rprintf/g' *
+afterwards, run git clean -f to remove backup files
