@@ -17,6 +17,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
+int setenv(const char *var_name, const char *new_value, int change_flag);
 
 using namespace Rcpp;
 
