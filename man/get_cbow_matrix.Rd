@@ -24,8 +24,14 @@ token at the respective position.
 }
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-m <- get_region_matrix(corpus = "REUTERS", s_attribute = "places", strucs = 0L:5L, registry = registry)
+m <- get_region_matrix(
+  corpus = "REUTERS", s_attribute = "places",
+  strucs = 0L:5L, registry = registry
+  )
 windowsize <- 3L
-m2 <- get_cbow_matrix(corpus = "REUTERS", p_attribute = "word", registry = registry, matrix = m, window = windowsize)
+m2 <- get_cbow_matrix(
+  corpus = "REUTERS", p_attribute = "word",
+  registry = registry, matrix = m, window = windowsize
+  )
 colnames(m2) <- c(-windowsize:-1, "node", 1:windowsize)
 }

@@ -24,9 +24,15 @@ corresponds to the number of ids.
 }
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-y <- get_count_vector(corpus = "REUTERS", p_attribute = "word", registry = registry)
+y <- get_count_vector(
+  corpus = "REUTERS", p_attribute = "word",
+  registry = registry
+  )
 df <- data.frame(token_id = 0:(length(y) - 1), count = y)
-df[["token"]] <- cwb_id2str("REUTERS", p_attribute = "word", id = df[["token_id"]], registry = registry)
+df[["token"]] <- cwb_id2str(
+  "REUTERS", p_attribute = "word",
+  id = df[["token_id"]], registry = registry
+  )
 df <- df[,c("token", "token_id", "count")] # reorder columns
 df <- df[order(df[["count"]], decreasing = TRUE),]
 head(df)

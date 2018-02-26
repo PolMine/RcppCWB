@@ -21,9 +21,18 @@ Get token IDs for Region Matrix.
 }
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-m <- get_region_matrix(corpus = "REUTERS", s_attribute = "places", strucs = 4L:5L, registry = registry)
-ids <- regions_to_ids(corpus = "REUTERS", p_attribute = "word", registry = registry, matrix = m)
-tokenstream <- cwb_id2str(corpus = "REUTERS", p_attribute = "word", registry = registry, id = ids)
+m <- get_region_matrix(
+  corpus = "REUTERS", s_attribute = "places",
+  strucs = 4L:5L, registry = registry
+  )
+ids <- regions_to_ids(
+  corpus = "REUTERS", p_attribute = "word",
+  registry = registry, matrix = m
+  )
+tokenstream <- cwb_id2str(
+  corpus = "REUTERS", p_attribute = "word",
+  registry = registry, id = ids
+  )
 txt <- paste(tokenstream, collapse = " ")
 txt
 }

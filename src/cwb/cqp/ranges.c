@@ -516,7 +516,7 @@ int RangeSetop(CorpusList *corpus1,
              => the ranges are identical and we'll copy target/keyword from corpus1
            */
           
-          if ((corpus1->range[i].end == corpus2->range[j].end)) {
+          if (corpus1->range[i].end == corpus2->range[j].end) {
             
             /* real duplicate, copy once from corpus1 */
             rs_cp_range(tmp, tmp_target, tmp_keyword, ins, corpus1, i);

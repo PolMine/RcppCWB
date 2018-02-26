@@ -24,5 +24,8 @@ Return values for all strucs of a structural attribute.
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 decode_s_attribute(corpus = "REUTERS", s_attribute = "id", registry = registry)
 Sys.setenv(CORPUS_REGISTRY = registry)
-decode_s_attribute(corpus = "REUTERS", s_attribute = "places", registry = registry)
+decode_s_attribute(
+  corpus = "REUTERS", s_attribute = "places",
+  registry = registry
+  )
 }

@@ -23,11 +23,20 @@ of occurrencs / counts (column 2).
 }
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-m <- get_region_matrix(corpus = "REUTERS", s_attribute = "places", strucs = 5L:5L, registry = registry)
-y <- regions_to_count_matrix(corpus = "REUTERS", p_attribute = "word", registry = registry, matrix = m)
+m <- get_region_matrix(
+  corpus = "REUTERS", s_attribute = "places",
+  strucs = 5L:5L, registry = registry
+  )
+y <- regions_to_count_matrix(
+  corpus = "REUTERS", p_attribute = "word",
+  registry = registry, matrix = m
+  )
 df <- as.data.frame(y)
 colnames(df) <- c("token_id", "count")
-df[["token"]] <- cwb_id2str("REUTERS", p_attribute = "word", registry = registry, id = df[["token_id"]])
+df[["token"]] <- cwb_id2str(
+  "REUTERS", p_attribute = "word",
+  registry = registry, id = df[["token_id"]]
+  )
 df[order(df[["count"]], decreasing = TRUE),]
 head(df)
 }

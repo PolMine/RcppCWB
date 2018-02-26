@@ -774,8 +774,8 @@ void
 add_corpus_property(Corpus *corpus, char *property, char *value)
 {
   CorpusProperty new_prop;
-  CorpusCharset charset;
-  int i;
+  /* CorpusCharset charset; */
+  /* int i; */
 
   if (cl_corpus_property(corpus, property) != NULL) {
     fprintf(stderr,
