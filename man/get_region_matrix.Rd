@@ -26,5 +26,5 @@ of the strucs in columns one and two, respectively.
 }
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-y <- get_region_matrix("REUTERS", "id", 0L:5L, registry = registry)
+y <- get_region_matrix(corpus = "REUTERS", s_attribute = "id", strucs = 0L:5L, registry = registry)
 }

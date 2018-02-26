@@ -200,56 +200,67 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// get_registry
-Rcpp::StringVector get_registry();
-RcppExport SEXP _RcppCWB_get_registry() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(get_registry());
-    return rcpp_result_gen;
-END_RCPP
-}
-// initialize_cwb
-void initialize_cwb();
-RcppExport SEXP _RcppCWB_initialize_cwb() {
+// init_cqp
+void init_cqp();
+RcppExport SEXP _RcppCWB_init_cqp() {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    initialize_cwb();
+    init_cqp();
     return R_NilValue;
 END_RCPP
 }
-// cqp_list_corpora
-Rcpp::StringVector cqp_list_corpora();
-RcppExport SEXP _RcppCWB_cqp_list_corpora() {
+// get_cqp_registry
+Rcpp::StringVector get_cqp_registry();
+RcppExport SEXP _RcppCWB_get_cqp_registry() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(cqp_list_corpora());
+    rcpp_result_gen = Rcpp::wrap(get_cqp_registry());
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_cqp_registry
+SEXP set_cqp_registry(SEXP registry_dir);
+RcppExport SEXP _RcppCWB_set_cqp_registry(SEXP registry_dirSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_cqp_registry(registry_dir));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cwb_list_corpora
+Rcpp::StringVector cwb_list_corpora();
+RcppExport SEXP _RcppCWB_cwb_list_corpora() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(cwb_list_corpora());
     return rcpp_result_gen;
 END_RCPP
 }
 // cqp_query
-SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery);
-RcppExport SEXP _RcppCWB_cqp_query(SEXP inMotherSEXP, SEXP inChildSEXP, SEXP inQuerySEXP) {
+SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query);
+RcppExport SEXP _RcppCWB_cqp_query(SEXP corpusSEXP, SEXP subcorpusSEXP, SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type inMother(inMotherSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type inChild(inChildSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type inQuery(inQuerySEXP);
-    rcpp_result_gen = Rcpp::wrap(cqp_query(inMother, inChild, inQuery));
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type subcorpus(subcorpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_query(corpus, subcorpus, query));
     return rcpp_result_gen;
 END_RCPP
 }
 // cqp_subcorpus_size
-int cqp_subcorpus_size(SEXP inSubcorpus);
-RcppExport SEXP _RcppCWB_cqp_subcorpus_size(SEXP inSubcorpusSEXP) {
+int cqp_subcorpus_size(SEXP scorpus);
+RcppExport SEXP _RcppCWB_cqp_subcorpus_size(SEXP scorpusSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type inSubcorpus(inSubcorpusSEXP);
-    rcpp_result_gen = Rcpp::wrap(cqp_subcorpus_size(inSubcorpus));
+    Rcpp::traits::input_parameter< SEXP >::type scorpus(scorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_subcorpus_size(scorpus));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -385,9 +396,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_id2cpos", (DL_FUNC) &_RcppCWB_cwb_id2cpos, 4},
     {"_RcppCWB_cwb_cpos2lbound", (DL_FUNC) &_RcppCWB_cwb_cpos2lbound, 4},
     {"_RcppCWB_cwb_cpos2rbound", (DL_FUNC) &_RcppCWB_cwb_cpos2rbound, 4},
-    {"_RcppCWB_get_registry", (DL_FUNC) &_RcppCWB_get_registry, 0},
-    {"_RcppCWB_initialize_cwb", (DL_FUNC) &_RcppCWB_initialize_cwb, 0},
-    {"_RcppCWB_cqp_list_corpora", (DL_FUNC) &_RcppCWB_cqp_list_corpora, 0},
+    {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
+    {"_RcppCWB_get_cqp_registry", (DL_FUNC) &_RcppCWB_get_cqp_registry, 0},
+    {"_RcppCWB_set_cqp_registry", (DL_FUNC) &_RcppCWB_set_cqp_registry, 1},
+    {"_RcppCWB_cwb_list_corpora", (DL_FUNC) &_RcppCWB_cwb_list_corpora, 0},
     {"_RcppCWB_cqp_query", (DL_FUNC) &_RcppCWB_cqp_query, 3},
     {"_RcppCWB_cqp_subcorpus_size", (DL_FUNC) &_RcppCWB_cqp_subcorpus_size, 1},
     {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},

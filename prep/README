@@ -29,3 +29,16 @@ libcqp.a: $(OBJS) $(CQI_OBJS)
         $(AR) $@ $^
         $(RANLIB) $@
 
+
+cwb/cqp/table.h
+---------------
+
+These lines provoke a warning from header guard:
+#ifndef _cqp_table_h
+#define _cqp_table_h_
+
+Replaced with:
+
+#ifndef _cqp_table_h_
+#define _cqp_table_h_
+

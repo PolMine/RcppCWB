@@ -21,21 +21,13 @@ extern "C" {
 using namespace Rcpp;
 
 
-// [[Rcpp::export(name=".get_registry")]]
-Rcpp::StringVector get_registry(){
-  Rcpp::StringVector result(1);
-  result(0) = cl_standard_registry();
-  return result;
-}
 
 
-// [[Rcpp::export(name=".initialize_cwb")]]
-void initialize_cwb()
-{
+// [[Rcpp::export(name=".init_cqp")]]
+void init_cqp() {
 	int		ac = 1;
 	char *		av[1];
-
-	av[0] = "RcppCWB";
+	av[0] = (char *)"RcppCWB";
 	which_app = cqp;
 	silent = 1; 
 	paging = 0;
@@ -49,9 +41,27 @@ void initialize_cwb()
 }
 
 
+// [[Rcpp::export(name=".get_cqp_registry")]]
+Rcpp::StringVector get_cqp_registry(){
+  Rcpp::StringVector result(1);
+  result(0) = cl_standard_registry();
+  return result;
+}
 
-// [[Rcpp::export(name=".cqp_list_corpora")]]
-Rcpp::StringVector cqp_list_corpora(){
+
+// [[Rcpp::export(name=".set_cqp_registry")]]
+SEXP set_cqp_registry(SEXP registry_dir){
+  char * registry_new;
+  registry_new = (char*)CHAR(STRING_ELT(registry_dir,0));
+  SEXP result = R_NilValue;
+  setenv("CORPUS_REGISTRY", registry_new, 1);		
+  init_cqp();
+  return result;
+}
+
+
+// [[Rcpp::export(name=".cwb_list_corpora")]]
+Rcpp::StringVector cwb_list_corpora(){
   
   CorpusList *	cl;
   int	i = 0, n = 0;
@@ -75,47 +85,40 @@ Rcpp::StringVector cqp_list_corpora(){
 
 
 // [[Rcpp::export(name=".cqp_query")]]
-SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery){
+SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   
-  char * mother = (char*)CHAR(STRING_ELT(inMother,0));
-  char * child = (char*)CHAR(STRING_ELT(inChild,0));
-  char * query = (char*)CHAR(STRING_ELT(inQuery,0));
+  char * mother = (char*)CHAR(STRING_ELT(corpus,0));
+  char * child = (char*)CHAR(STRING_ELT(subcorpus,0));
+  char * q = (char*)CHAR(STRING_ELT(query,0));
   char * cqp_query;
   CorpusList *cl;
   
   
   cl = cqi_find_corpus(mother);
-  printf("corpus name: %s\n", cl->name);
   set_current_corpus(cl, 0);
-  printf("corpus is: %s\n", current_corpus->name);
 
-  int len = strlen(child) + strlen(query) + 10;
+  int len = strlen(child) + strlen(q) + 10;
   
   cqp_query = (char *) cl_malloc(len);
-  sprintf(cqp_query, "%s = %s", child, query);
-  
-  printf("query: %s", cqp_query);
+  sprintf(cqp_query, "%s = %s", child, q);
   
   if (!cqi_activate_corpus(mother)){
     printf("activation failed");
   }
-  
   if (!check_subcorpus_name(child)){
     printf("checking subcorpus name failed \n");
   }
   
-  int x = cqp_parse_string(cqp_query);
-  printf("cqp_parse_string - result: %d\n", x);
-  
+  cqp_parse_string(cqp_query);
+
   char *			full_child;
   CorpusList *	childcl;
   
   full_child = combine_subcorpus_spec(mother, child); /* c is the 'physical' part of the mother corpus */
-  printf("subcorpus_spec: %s\n", full_child);
   childcl = cqi_find_corpus(full_child);
-  if ((childcl) == NULL) {
+  /* if ((childcl) == NULL) {
     printf("subcorpus not found\n");
-  } 
+  } */
   
   SEXP result = R_NilValue;
   return result;
@@ -123,13 +126,13 @@ SEXP cqp_query(SEXP inMother, SEXP inChild, SEXP inQuery){
 
 
 // [[Rcpp::export(name=".cqp_subcorpus_size")]]
-int cqp_subcorpus_size(SEXP inSubcorpus)
+int cqp_subcorpus_size(SEXP scorpus)
 {
   int result;
-  char *			subcorpus;
-  CorpusList *	cl;
+  char * subcorpus;
+  CorpusList * cl;
   
-  subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
+  subcorpus = (char*)CHAR(STRING_ELT(scorpus,0));
   cl = cqi_find_corpus(subcorpus);
   
   if (cl == NULL) {

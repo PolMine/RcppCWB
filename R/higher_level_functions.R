@@ -14,9 +14,9 @@
 #' Sys.setenv(CORPUS_REGISTRY = registry)
 #' decode_s_attribute(corpus = "REUTERS", s_attribute = "places", registry = registry)
 decode_s_attribute <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_s_attribute(s_attribute)
+  .check_registry(registry = registry)
+  .check_corpus(corpus = corpus, registry = registry)
+  .check_s_attribute(s_attribute = s_attribute)
   .decode_s_attribute(corpus = corpus, s_attribute = s_attribute, registry = registry)
 }
 
@@ -43,7 +43,7 @@ decode_s_attribute <- function(corpus, s_attribute, registry = Sys.getenv("CORPU
 #' head(df)
 get_count_vector <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .check_registry(registry)
-  .check_corpus(corpus)
+  .check_corpus(corpus, registry)
   .check_p_attribute(p_attribute)
   .get_count_vector(corpus = corpus, p_attribute = p_attribute, registry = registry)
 }
@@ -63,12 +63,12 @@ get_count_vector <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' (columns 1 and 2, respectively)
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' y <- get_region_matrix("REUTERS", "id", 0L:5L, registry = registry)
+#' y <- get_region_matrix(corpus = "REUTERS", s_attribute = "id", strucs = 0L:5L, registry = registry)
 get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv("CORPUS_REGISTRY")){
   .check_registry(registry)
-  .check_corpus(corpus)
-  .check_strucs(s_attribute)
-  .get_region_matrix(corpus, s_attribute, strucs, registry)
+  .check_corpus(corpus, registry)
+  .check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = strucs, registry = registry)
+  .get_region_matrix(corpus = corpus, s_attribute = s_attribute, strucs = strucs, registry = registry)
 }
 
 #' Get CBOW Matrix.
@@ -91,11 +91,11 @@ get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv
 #' colnames(m2) <- c(-windowsize:-1, "node", 1:windowsize)
 get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix, window){
   .check_registry(registry)
-  .check_corpus(corpus)
+  .check_corpus(corpus, registry)
   .check_p_attribute(p_attribute)
   .check_region_matrix(matrix)
   stopifnot(window >= 1L)
-  .get_cbow_matrix(corpus, p_attribute, registry, matrix, window)
+  .get_cbow_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix, window = window)
 }
 
 
@@ -116,10 +116,10 @@ get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' txt
 regions_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
   .check_registry(registry)
-  .check_corpuc(corpus)
+  .check_corpus(corpus, registry)
   .check_p_attribute(p_attribute)
   .check_region_matrix(matrix)
-  .regions_to_ids(corpus, p_attribute, registry, matrix)
+  .regions_to_ids(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }
 
 #' Perform Count for Vector of IDs.
@@ -136,7 +136,7 @@ regions_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_RE
 #' table(ids) # alternative to get a similar result
 ids_to_count_matrix <- function(ids){
   stopifnot(is.integer(ids))
-  .ids_to_count_matrix(ids)
+  .ids_to_count_matrix(ids = ids)
 }
 
 #' Count for Region Matrix.
@@ -161,9 +161,9 @@ ids_to_count_matrix <- function(ids){
 #' head(df)
 regions_to_count_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
   .check_registry(registry)
-  .check_corpus(corpus)
+  .check_corpus(corpus, registry)
   .check_p_attribute(p_attribute)
-  stopifnot(is.matrix(matrix) == FALSE)
-  .regions_to_count_matrix(corpus, p_attribute, registry, matrix)
+  stopifnot(is.matrix(matrix))
+  .regions_to_count_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }
 

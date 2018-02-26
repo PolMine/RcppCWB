@@ -47,3 +47,4 @@ Collate:
   'utils.R'
   'higher_level_functions.R'
   'RcppExports.R'
+  'zzz.R'

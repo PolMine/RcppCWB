@@ -44,7 +44,7 @@ cwb_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 
 #' @rdname cl
 cwb_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
-  .cwb_cpos2idfunction(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  .cwb_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 
 #' @rdname cl

@@ -36,10 +36,10 @@ NULL
 #' @examples
 #' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
 #' 
-#' decode_s_attribute("REUTERS", "places", registry = Sys.getenv("CORPUS_REGISTRY"))
+#' decode_s_attribute(corpus = "REUTERS", s_attribute = "places", registry = Sys.getenv("CORPUS_REGISTRY"))
 #' 
 #' get_count_vector(
-#'   "REUTERS", p_attribute = "word",
+#'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = Sys.getenv("CORPUS_REGISTRY")
 #'   )
 #' get_cbow_matrix(

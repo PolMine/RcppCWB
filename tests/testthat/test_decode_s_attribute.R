@@ -3,7 +3,7 @@ library(RcppCWB)
 testthat::context("decode_s_attribute")
 
 test_that(
-  "lexicon size",
+  "decode_s_attribute",
   {
     sAttr <- decode_s_attribute(
       corpus = "REUTERS",

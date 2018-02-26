@@ -57,24 +57,28 @@
     .Call(`_RcppCWB_cwb_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 
-.get_registry <- function() {
-    .Call(`_RcppCWB_get_registry`)
+.init_cqp <- function() {
+    invisible(.Call(`_RcppCWB_init_cqp`))
 }
 
-.initialize_cwb <- function() {
-    invisible(.Call(`_RcppCWB_initialize_cwb`))
+.get_cqp_registry <- function() {
+    .Call(`_RcppCWB_get_cqp_registry`)
 }
 
-.cqp_list_corpora <- function() {
-    .Call(`_RcppCWB_cqp_list_corpora`)
+.set_cqp_registry <- function(registry_dir) {
+    .Call(`_RcppCWB_set_cqp_registry`, registry_dir)
 }
 
-.cqp_query <- function(inMother, inChild, inQuery) {
-    .Call(`_RcppCWB_cqp_query`, inMother, inChild, inQuery)
+.cwb_list_corpora <- function() {
+    .Call(`_RcppCWB_cwb_list_corpora`)
 }
 
-.cqp_subcorpus_size <- function(inSubcorpus) {
-    .Call(`_RcppCWB_cqp_subcorpus_size`, inSubcorpus)
+.cqp_query <- function(corpus, subcorpus, query) {
+    .Call(`_RcppCWB_cqp_query`, corpus, subcorpus, query)
+}
+
+.cqp_subcorpus_size <- function(scorpus) {
+    .Call(`_RcppCWB_cqp_subcorpus_size`, scorpus)
 }
 
 .cqp_list_subcorpora <- function(inCorpus) {
