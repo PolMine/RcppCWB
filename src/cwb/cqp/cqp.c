@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -318,14 +320,14 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
       if (!quiet) {
         if (current_corpus != NULL)
           if (STREQ(current_corpus->name, current_corpus->mother_name))
-            printf("%s> ", current_corpus->name);
+            Rprintf("%s> ", current_corpus->name);
           else
-            printf("%s:%s[%d]> ",
+            Rprintf("%s:%s[%d]> ",
                    current_corpus->mother_name,
                    current_corpus->name,
                    current_corpus->size);
         else
-          printf("[no corpus]> ");
+          Rprintf("[no corpus]> ");
       }
 
       cqp_status = yyparse();
@@ -338,7 +340,7 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
       if (child_process && !reading_cqprc) {
 #if 0
         /* empty lines after commands in child mode have been disabled as of version 2.2.b94 */
-        printf("\n");                /* print empty line as separator in child mode */
+        Rprintf("\n");                /* print empty line as separator in child mode */
 #endif
         fflush(stdout);
         fflush(stderr);
