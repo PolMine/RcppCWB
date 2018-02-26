@@ -12,7 +12,10 @@
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' decode_s_attribute(corpus = "REUTERS", s_attribute = "id", registry = registry)
 #' Sys.setenv(CORPUS_REGISTRY = registry)
-#' decode_s_attribute(corpus = "REUTERS", s_attribute = "places", registry = registry)
+#' decode_s_attribute(
+#'   corpus = "REUTERS", s_attribute = "places",
+#'   registry = registry
+#'   )
 decode_s_attribute <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .check_registry(registry = registry)
   .check_corpus(corpus = corpus, registry = registry)
@@ -35,9 +38,15 @@ decode_s_attribute <- function(corpus, s_attribute, registry = Sys.getenv("CORPU
 #' @export get_count_vector
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' y <- get_count_vector(corpus = "REUTERS", p_attribute = "word", registry = registry)
+#' y <- get_count_vector(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry
+#'   )
 #' df <- data.frame(token_id = 0:(length(y) - 1), count = y)
-#' df[["token"]] <- cwb_id2str("REUTERS", p_attribute = "word", id = df[["token_id"]], registry = registry)
+#' df[["token"]] <- cwb_id2str(
+#'   "REUTERS", p_attribute = "word",
+#'   id = df[["token_id"]], registry = registry
+#'   )
 #' df <- df[,c("token", "token_id", "count")] # reorder columns
 #' df <- df[order(df[["count"]], decreasing = TRUE),]
 #' head(df)
@@ -63,7 +72,10 @@ get_count_vector <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' (columns 1 and 2, respectively)
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' y <- get_region_matrix(corpus = "REUTERS", s_attribute = "id", strucs = 0L:5L, registry = registry)
+#' y <- get_region_matrix(
+#'   corpus = "REUTERS", s_attribute = "id",
+#'   strucs = 0L:5L, registry = registry
+#'   )
 get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv("CORPUS_REGISTRY")){
   .check_registry(registry)
   .check_corpus(corpus, registry)
@@ -85,9 +97,15 @@ get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv
 #' @export get_cbow_matrix
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' m <- get_region_matrix(corpus = "REUTERS", s_attribute = "places", strucs = 0L:5L, registry = registry)
+#' m <- get_region_matrix(
+#'   corpus = "REUTERS", s_attribute = "places",
+#'   strucs = 0L:5L, registry = registry
+#'   )
 #' windowsize <- 3L
-#' m2 <- get_cbow_matrix(corpus = "REUTERS", p_attribute = "word", registry = registry, matrix = m, window = windowsize)
+#' m2 <- get_cbow_matrix(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry, matrix = m, window = windowsize
+#'   )
 #' colnames(m2) <- c(-windowsize:-1, "node", 1:windowsize)
 get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix, window){
   .check_registry(registry)
@@ -109,9 +127,18 @@ get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' @export regions_to_ids
 #' @examples
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' m <- get_region_matrix(corpus = "REUTERS", s_attribute = "places", strucs = 4L:5L, registry = registry)
-#' ids <- regions_to_ids(corpus = "REUTERS", p_attribute = "word", registry = registry, matrix = m)
-#' tokenstream <- cwb_id2str(corpus = "REUTERS", p_attribute = "word", registry = registry, id = ids)
+#' m <- get_region_matrix(
+#'   corpus = "REUTERS", s_attribute = "places",
+#'   strucs = 4L:5L, registry = registry
+#'   )
+#' ids <- regions_to_ids(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry, matrix = m
+#'   )
+#' tokenstream <- cwb_id2str(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry, id = ids
+#'   )
 #' txt <- paste(tokenstream, collapse = " ")
 #' txt
 regions_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
@@ -152,11 +179,20 @@ ids_to_count_matrix <- function(ids){
 #' @rdname regions_to_count_matrix
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' m <- get_region_matrix(corpus = "REUTERS", s_attribute = "places", strucs = 5L:5L, registry = registry)
-#' y <- regions_to_count_matrix(corpus = "REUTERS", p_attribute = "word", registry = registry, matrix = m)
+#' m <- get_region_matrix(
+#'   corpus = "REUTERS", s_attribute = "places",
+#'   strucs = 5L:5L, registry = registry
+#'   )
+#' y <- regions_to_count_matrix(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry, matrix = m
+#'   )
 #' df <- as.data.frame(y)
 #' colnames(df) <- c("token_id", "count")
-#' df[["token"]] <- cwb_id2str("REUTERS", p_attribute = "word", registry = registry, id = df[["token_id"]])
+#' df[["token"]] <- cwb_id2str(
+#'   "REUTERS", p_attribute = "word",
+#'   registry = registry, id = df[["token_id"]]
+#'   )
 #' df[order(df[["count"]], decreasing = TRUE),]
 #' head(df)
 regions_to_count_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){

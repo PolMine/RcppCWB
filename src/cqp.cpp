@@ -103,10 +103,10 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   sprintf(cqp_query, "%s = %s", child, q);
   
   if (!cqi_activate_corpus(mother)){
-    printf("activation failed");
+    Rprintf("activation failed");
   }
   if (!check_subcorpus_name(child)){
-    printf("checking subcorpus name failed \n");
+    Rprintf("checking subcorpus name failed \n");
   }
   
   cqp_parse_string(cqp_query);
@@ -186,7 +186,7 @@ Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus)
   subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
   cl = cqi_find_corpus(subcorpus);
   if (cl == NULL) {
-    printf("subcorpus not found\n");
+    Rprintf("subcorpus not found\n");
   }
   
   Rcpp::IntegerMatrix result(nrows,2);

@@ -26,32 +26,3 @@
 NULL
 
 
-#' Higher-level functions using the corpus library (CL).
-#' 
-#' @param corpus character
-#' @param s_attribute character
-#' @param p_attribute character
-#' @param registry character
-#' @param strucs integer
-#' @examples
-#' Sys.setenv(CORPUS_REGISTRY = system.file(package = "RcppCWB", "extdata", "cwb", "registry"))
-#' 
-#' decode_s_attribute(corpus = "REUTERS", s_attribute = "places", registry = Sys.getenv("CORPUS_REGISTRY"))
-#' 
-#' get_count_vector(
-#'   corpus = "REUTERS", p_attribute = "word",
-#'   registry = Sys.getenv("CORPUS_REGISTRY")
-#'   )
-#' get_cbow_matrix(
-#'   "REUTERS", p_attribute = "word", matrix = matrix(c(1,10), nrow = 1),
-#'   window = 5L, registry = Sys.getenv("CORPUS_REGISTRY")
-#'   )
-#' regions_to_count_matrix(
-#'   "REUTERS", p_attribute = "word", matrix = matrix(c(1,10), ncol = 2),
-#'   registry = Sys.getenv("CORPUS_REGISTRY")
-#'   )
-#' @rdname cl_wrapper_functions
-#' @name cl_wrapper_functions
-NULL
-
-
