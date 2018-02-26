@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include "parse_actions.h"
 
 #include <stdlib.h>
@@ -180,7 +182,7 @@ void after_CorpusCommand(CorpusList *cl)
         catalog_corpus(cl, NULL, 0, -1, GlobalPrintMode);
       }
       else if (!silent)
-        printf("%d matches.%s\n",
+         Rprintf("%d matches.%s\n",
                cl->size,
                (cl->size > 0 ? " Use 'cat' to show."
                 : ""));
@@ -201,7 +203,7 @@ void after_CorpusCommand(CorpusList *cl)
       if (autoshow && (cl->size > 0))
         catalog_corpus(cl, NULL, 0, -1, GlobalPrintMode);
       else if (!silent)
-        printf("%d matches.%s\n",
+         Rprintf("%d matches.%s\n",
                cl->size,
                (cl->size > 0 ? " Use 'cat' to show."
                 : ""));
@@ -556,7 +558,7 @@ prepare_do_subset(CorpusList *cl, FieldType field)
     progress_bar_message(1, 1, "    preparing");
   }
 
-  /* jetzt können wir endlich loslegen */
+  /* jetzt k?nnen wir endlich loslegen */
   query_corpus = make_temp_corpus(cl, "RHS");
   generate_code = 1;
 }
@@ -611,7 +613,7 @@ do_set_complex_target(CorpusList *cl,
     old_query_corpus = NULL;
   }
   
-  /* aufräumen */
+  /* aufr?umen */
   if (boolt)
     free_booltree(boolt);
 }
@@ -989,9 +991,9 @@ void do_SearchPattern(Evaltree expr, /* $1 */
       searchstr = (char *)evaltree2searchstr(CurEnv->evaltree,
                                              &sslen);
       if (search_debug) {
-        printf("Evaltree: \n");
+         Rprintf("Evaltree: \n");
         print_evaltree(eep, CurEnv->evaltree, 0);
-        printf("Search String: ``%s''\n", searchstr);
+         Rprintf("Search String: ``%s''\n", searchstr);
       }
       
       if (searchstr && (searchstr[0] != '\0'))
@@ -2553,7 +2555,7 @@ printSingleVariableValue(Variable v, int max_items)
   int i;
 
   if (v) {
-    printf("$%s = \n", v->my_name);
+    Rprintf("$%s = \n", v->my_name);
     if (max_items <= 0)
       max_items = v->nr_items;
 
@@ -2607,7 +2609,7 @@ do_printVariableSize(char *varName)
       if (!v->items[i].free)
         size++;
     }
-    printf("$%s has %d entries\n", v->my_name, size);
+    Rprintf("$%s has %d entries\n", v->my_name, size);
   }
   else {
     cqpmessage(Error, "%s: no such variable", varName);
@@ -2798,7 +2800,7 @@ do_size(CorpusList *cl, FieldType field)
               count++;
           }
         }
-        printf("%d\n", count);
+        Rprintf("%d\n", count);
       }
       else if (field == KeywordField) {
         int count = 0, i;
@@ -2808,18 +2810,18 @@ do_size(CorpusList *cl, FieldType field)
               count++;
           }
         }
-        printf("%d\n", count);
+        Rprintf("%d\n", count);
       }
       else {                        /* must be Match or MatchEnd then */
-        printf("%d\n", cl->size);
+        Rprintf("%d\n", cl->size);
       }
     }
     else {
-      printf("%d\n", cl->size);
+      Rprintf("%d\n", cl->size);
     }
   }
   else {
-    printf("0\n");                /* undefined corpus */
+    Rprintf("0\n");                /* undefined corpus */
   }
 }
 
