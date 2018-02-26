@@ -45,6 +45,4 @@ Replaced with:
 cwb/cqp/*
 ---------
 
-printf needs to be replaced by Rprintf:
-LC_CTYPE=C && LANG=C sed -i -e 's/\sprintf/ Rprintf/g' *
-afterwards, run git clean -f to remove backup files
+printf needs to be replaced by Rprintf - ultimately did that manually

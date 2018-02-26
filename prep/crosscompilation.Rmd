@@ -399,3 +399,18 @@ i686-w64-mingw32-ar cq libcl.a globals.o macros.o list.o  \
 i686-w64-mingw32-ranlib libcl.a
 ```
 
+
+## Crosscompiling libcqp.a
+
+added to the Makefile in the cqp subdirectory
+
+all: libcqp.a
+
+libcqp.a: $(OBJS) $(CQI_OBJS)
+        $(RM) $@
+        $(AR) $@ $^
+        $(RANLIB) $@
+
+make clean
+make depend
+make libcqp.a
