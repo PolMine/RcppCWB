@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -2903,7 +2905,7 @@ cqp_run_tab_query(int implode)
   memset((char *)positions, '\0', nr_columns * sizeof(int));
 
   /* zur Bequemlichkeit, damit wir die Constraints als Array
-   * adressieren können */
+   * adressieren k?nnen */
 
   constraints = (Evaltree *)cl_malloc(nr_columns * sizeof(Evaltree));
   memset((char *)constraints, '\0', nr_columns * sizeof(Evaltree));
@@ -3330,29 +3332,29 @@ show_environment(int thisenv)
             thisenv);
   else {
     
-    printf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
+   Rprintf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
     
-    printf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
+   Rprintf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
 
     if (show_compdfa) {
-      printf("\n==================== DFA:\n\n");
+      Rprintf("\n==================== DFA:\n\n");
       show_complete_dfa(Environment[thisenv].dfa);
     }
     
     if (show_evaltree) {
-      printf("\n==================== Evaluation Tree:\n\n");
+      Rprintf("\n==================== Evaluation Tree:\n\n");
       print_evaltree(thisenv, Environment[thisenv].evaltree, 0);
     }
 
     if (show_gconstraints) {
-      printf("\n==================== Global Constraints:\n\n");
+      Rprintf("\n==================== Global Constraints:\n\n");
       print_booltree(Environment[thisenv].gconstraint, 0);
     }
     
     if (show_patlist)
       show_patternlist(thisenv);
 
-    printf(" ================= END ENVIRONMENT #%d =============\n", thisenv);
+    Rprintf(" ================= END ENVIRONMENT #%d =============\n", thisenv);
     fflush(stdout);
   }
 }

@@ -17,6 +17,8 @@
 
 /* This is the interactive CQP main function (interactive loop) */
 
+void Rprintf(const char *, ...);
+
 #include <stdio.h>
 #include <signal.h>
 
@@ -322,7 +324,7 @@ void readline_main(void)
       }
 
     if (highlighting) {
-      printf(get_typeface_escape('n')); /* work around 'bug' in less which may not switch off display attributes when user exits */
+      Rprintf(get_typeface_escape('n')); /* work around 'bug' in less which may not switch off display attributes when user exits */
       fflush(stdout);
     }
 
@@ -363,7 +365,7 @@ void readline_main(void)
     save_unsaved_subcorpora();
 
   if (!silent) {
-    printf("\nDone. Share and enjoy!\n");
+    Rprintf("\nDone. Share and enjoy!\n");
   }
 
 }
@@ -407,14 +409,14 @@ main(int argc, char *argv[])
     char sc_colour[256];
     int i, j;
 
-    printf("%s%sWelcome%s to %s%sC%s%sQ%s%sP%s -- ", green, bold, normal, red, bold, pink, bold, blue, bold, normal);
-    printf("the %s Colourful %s Query %s Processor %s.\n", yellowBack, greenBack, cyanBack, normal);
+    Rprintf("%s%sWelcome%s to %s%sC%s%sQ%s%sP%s -- ", green, bold, normal, red, bold, pink, bold, blue, bold, normal);
+    Rprintf("the %s Colourful %s Query %s Processor %s.\n", yellowBack, greenBack, cyanBack, normal);
 
     for (i = 3; i <= 4; i++) {
-      printf("[");
+      Rprintf("[");
       for (j = 0; j < 8; j++) {
         sprintf(sc_colour, "\x1B[0;%d%dm", i,j);
-        printf("%d%d: %sN%s%sB%s%sU%s%sS%s  ",
+        Rprintf("%d%d: %sN%s%sB%s%sU%s%sS%s  ",
                i, j,
                sc_colour,
                sc_colour, bold,
@@ -422,14 +424,14 @@ main(int argc, char *argv[])
                sc_colour, standout,
                normal);
       }
-      printf("]\n");
+      Rprintf("]\n");
     }
   } /* endif use_colour */
 
   install_signal_handler();
 
   if (child_process) {
-    printf("CQP version " VERSION "\n");
+    Rprintf("CQP version " VERSION "\n");
     fflush(stdout);
   }
 
