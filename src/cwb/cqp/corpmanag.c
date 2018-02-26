@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <stddef.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -1877,7 +1879,7 @@ show_corpora_files1(enum corpus_type ct)
   char label[4];
 
   if (ct == SYSTEM) {
-    if (pretty_print) printf("System corpora:\n");
+    if (pretty_print) Rprintf("System corpora:\n");
     /* make list of corpus names, then qsort() and print */
     N = 0;                      /* count nr of system corpora before allocating list */
     for (cl = corpuslist; cl; cl = cl->next) 
@@ -1899,7 +1901,7 @@ show_corpora_files1(enum corpus_type ct)
         print_indented_list_item(list[i]);
       }
       else {
-        printf("%s\n", list[i]);
+        Rprintf("%s\n", list[i]);
       }
     }
     if (pretty_print)
@@ -1908,11 +1910,11 @@ show_corpora_files1(enum corpus_type ct)
     free(list);
   }
   else if (ct == SUB) {
-    if (pretty_print) printf("Named Query Results:\n");
+    if (pretty_print) Rprintf("Named Query Results:\n");
     for (cl = corpuslist; cl; cl = cl->next)
       if (cl->type == SUB) {
         if (pretty_print) {
-          printf("   %c%c%c  %s:%s [%d]\n", 
+          Rprintf("   %c%c%c  %s:%s [%d]\n", 
                  cl->loaded ? 'm' : '-',
                  cl->saved ? 'd' : '-',
                  cl->needs_update ? '*' : '-',
@@ -1920,7 +1922,7 @@ show_corpora_files1(enum corpus_type ct)
                  cl->name, cl->size);
         }
         else {
-          printf("%c%c%c\t%s:%s\t%d\n", 
+          Rprintf("%c%c%c\t%s:%s\t%d\n", 
                  cl->loaded ? 'm' : '-',
                  cl->saved ? 'd' : '-',
                  cl->needs_update ? '*' : '-',
