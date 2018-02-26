@@ -53,7 +53,7 @@ HDRS = globals.h macros.h \
 	  $(PARSEH) \
           cdaccess.h \
 	  bitio.h \
-	  endian.h \
+	  endian2.h \
 	  compression.h \
 	  binsert.h \
 	  class-mapping.h   # used by lexdecode

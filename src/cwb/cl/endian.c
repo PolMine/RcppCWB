@@ -23,7 +23,7 @@
 
 #include "globals.h" /* globals.h checks whether endianness is well-defined */
 
-#include "endian.h"
+#include "endian2.h"
 
 
 /**

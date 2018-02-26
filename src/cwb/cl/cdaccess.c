@@ -22,7 +22,7 @@
 
 #include "globals.h"
 
-#include "endian.h"
+#include "endian2.h"
 #include <regex.h>
 #include "macros.h"
 #include "attributes.h"
