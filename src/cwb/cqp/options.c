@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -267,18 +269,18 @@ print_option_value(int opt) {
   int show_lc_rc = 0;                /* "set context;" should also display left and right context settings */
 
   if (cqpoptions[opt].opt_abbrev != NULL)
-    printf("[%s]\t", cqpoptions[opt].opt_abbrev);
+   Rprintf("[%s]\t", cqpoptions[opt].opt_abbrev);
   else 
-    printf("\t");
-  printf("%-22s", cqpoptions[opt].opt_name);
+   Rprintf("\t");
+ Rprintf("%-22s", cqpoptions[opt].opt_name);
 
   if (cqpoptions[opt].address != NULL) {
 
-    printf("=  ");
+   Rprintf("=  ");
     switch (cqpoptions[opt].type) {
     case OptString:
       if (strcasecmp(cqpoptions[opt].opt_name, "PrintOptions") == 0) {
-        printf("%ctbl %chdr %cwrap %cbdr %cnum",
+       Rprintf("%ctbl %chdr %cwrap %cbdr %cnum",
                GlobalPrintOptions.print_tabular ? '+' : '-',
                GlobalPrintOptions.print_header ? '+' : '-',
                GlobalPrintOptions.print_wrap ? '+' : '-',
@@ -286,66 +288,66 @@ print_option_value(int opt) {
                GlobalPrintOptions.number_lines ? '+' : '-');
       }
       else if (*((char **)cqpoptions[opt].address))
-        printf("%s", *((char **)cqpoptions[opt].address));
+       Rprintf("%s", *((char **)cqpoptions[opt].address));
       else
-        printf("<no value>");
+       Rprintf("<no value>");
       break;
 
     case OptBoolean: 
-      printf((*((int *)cqpoptions[opt].address)) ? "yes" : "no");
+      Rprintf((*((int *)cqpoptions[opt].address)) ? "yes" : "no");
       break;
 
     case OptInteger:
-      printf("%d", *((int *)cqpoptions[opt].address));
+      Rprintf("%d", *((int *)cqpoptions[opt].address));
       break;
 
     case OptContext:
       if (strcasecmp(cqpoptions[opt].opt_name, "Context") == 0) {
-        printf("(see below)");
+        Rprintf("(see below)");
         show_lc_rc = 1;
       }
       else if (strcasecmp(cqpoptions[opt].opt_name, "LeftContext") == 0) {
-        printf("%d ",
+        Rprintf("%d ",
              ((ContextDescriptor *)cqpoptions[opt].address)->left_width);
 
         switch (((ContextDescriptor *)cqpoptions[opt].address)->left_type) {
         case STRUC_CONTEXT:
         case ALIGN_CONTEXT:
-          printf("%s",
+          Rprintf("%s",
                  ((ContextDescriptor *)cqpoptions[opt].address)->left_structure_name ?
                  ((ContextDescriptor *)cqpoptions[opt].address)->left_structure_name :
                  "(empty?)");
 
           break;
         case CHAR_CONTEXT:
-          printf("characters");
+          Rprintf("characters");
           break;
 
         case WORD_CONTEXT:
-          printf("words");
+          Rprintf("words");
           break;
         default:
           assert(0 && "Can't be");
         }
       }
       else if (strcasecmp(cqpoptions[opt].opt_name, "RightContext") == 0) {
-        printf("%d ",
+        Rprintf("%d ",
                ((ContextDescriptor *)cqpoptions[opt].address)->right_width);
 
         switch (((ContextDescriptor *)cqpoptions[opt].address)->right_type) {
         case STRUC_CONTEXT:
         case ALIGN_CONTEXT:
-          printf("%s",
+          Rprintf("%s",
                  ((ContextDescriptor *)cqpoptions[opt].address)->right_structure_name ?
                  ((ContextDescriptor *)cqpoptions[opt].address)->right_structure_name :
                  "(empty?)");
           break;
 
         case CHAR_CONTEXT:
-          printf("characters");
+          Rprintf("characters");
           break;
         case WORD_CONTEXT:
-          printf("words");
+          Rprintf("words");
           break;
         default:
           assert(0 && "Can't be");
@@ -357,7 +359,7 @@ print_option_value(int opt) {
       break;
 
     default:
-      printf("WARNING: Illegal Option Type!");
+      Rprintf("WARNING: Illegal Option Type!");
       break;
     }
 
@@ -365,9 +367,9 @@ print_option_value(int opt) {
   else {
     /* no address given for option -> this is only LeftContext and RightContext in
        normal mode, so refer people to the Context option */
-    printf("<not bound to variable>");
+    Rprintf("<not bound to variable>");
   }
-  printf("\n");
+  Rprintf("\n");
 
   if (show_lc_rc) {
     print_option_value(find_option("LeftContext"));
@@ -382,7 +384,7 @@ void print_option_values()
   int rc_opt = find_option("RightContext");
 
   if (!silent)
-    printf("Variable settings:\n");
+    Rprintf("Variable settings:\n");
   
   opt = 0;
   for (opt = 0; cqpoptions[opt].opt_name; opt++)
@@ -967,7 +969,7 @@ parse_options(int ac, char *av[])
       syntax();
       break;
     case 'v':
-      printf("%s\n", licensee);
+      Rprintf("%s\n", licensee);
       exit(0);
       break;
     case 's':
