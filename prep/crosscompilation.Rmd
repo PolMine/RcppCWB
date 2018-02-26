@@ -370,33 +370,63 @@ It is necessary to include the following line in cl/regopt.c:
 
 Compile the file again:
 
+# 32bit
+
 ```{sh, eval = FALSE}
 i686-w64-mingw32-gcc -c -o regopt.o -O2 -Wall             \
-  -static                                                 \
-  -D__MINGW__ -DEMULATE_SETENV -DG_OS_WIN32               \
-  -DREGISTRY_DEFAULT_PATH=\""C:\\\\CWB\\\\Registry"\"     \
-  -DCOMPILE_DATE=\""So 24. Dez 22:14:00 CET 2017"\"       \
-  -DPCRE_STATIC=-1                                        \
-  -DVERSION=\"3.4.12\"                                    \
-  -I/usr/include/glib-2.0                                 \
-  -I/usr/lib/x86_64-linux-gnu/glib-2.0/include            \
-  -I/usr/lib/gcc/i686-w64-mingw32/4.8/include             \
-  regopt.c
-```
-
-This throws one warning (if (ch >= 32 & ch < 127)) that can be ignored.
-Combine the object files into to the static library.
+-static                                                 \
+-D__MINGW__ -DEMULATE_SETENV -DG_OS_WIN32               \
+-DREGISTRY_DEFAULT_PATH=\""C:\\\\CWB\\\\Registry"\"     \
+-DCOMPILE_DATE=\""So 24. Dez 22:14:00 CET 2017"\"       \
+-DPCRE_STATIC=-1                                        \
+-DVERSION=\"3.4.12\"                                    \
+-I/usr/include/glib-2.0                                 \
+-I/usr/lib/x86_64-linux-gnu/glib-2.0/include        \
+-I/usr/lib/gcc/i686-w64-mingw32/4.8/include             \
+regopt.c
 
 
-```{sh, eval = FALSE}
+# This throws one warning (if (ch >= 32 & ch < 127)) that can be ignored.
+# Combine the object files into to the static library.
+
 i686-w64-mingw32-ar cq libcl.a globals.o macros.o list.o  \
-  lexhash.o ngram-hash.o bitfields.o storage.o            \
-  fileutils.o special-chars.o regopt.o corpus.o           \
-  attributes.o registry.tab.o lex.creg.o makecomps.o      \
-  cdaccess.o bitio.o endian.o compression.o binsert.o     \
-  class-mapping.o windows-mmap.o
+lexhash.o ngram-hash.o bitfields.o storage.o            \
+fileutils.o special-chars.o regopt.o corpus.o           \
+attributes.o registry.tab.o lex.creg.o makecomps.o      \
+cdaccess.o bitio.o endian.o compression.o binsert.o     \
+class-mapping.o windows-mmap.o
 
 i686-w64-mingw32-ranlib libcl.a
+```
+
+# 64bit
+
+```{sh, eval = FALSE}
+x86_64-w64-mingw32-gcc -c -o regopt.o -O2 -Wall             \
+  -static                                                 \
+-D__MINGW__ -DEMULATE_SETENV -DG_OS_WIN32               \
+-DREGISTRY_DEFAULT_PATH=\""C:\\\\CWB\\\\Registry"\"     \
+-DCOMPILE_DATE=\""So 24. Dez 22:14:00 CET 2017"\"       \
+-DPCRE_STATIC=-1                                        \
+-DVERSION=\"3.4.12\"                                    \
+-I/usr/include/glib-2.0                                 \
+-I/usr/lib/x86_64-linux-gnu/glib-2.0/include            \
+-I/usr/lib/gcc/x86_64-linux-gnu/4.8/include             \
+regopt.c
+
+
+
+# This throws one warning (if (ch >= 32 & ch < 127)) that can be ignored.
+# Combine the object files into to the static library.
+
+x86_64-w64-mingw32-ar cq libcl.a globals.o macros.o list.o  \
+lexhash.o ngram-hash.o bitfields.o storage.o            \
+fileutils.o special-chars.o regopt.o corpus.o           \
+attributes.o registry.tab.o lex.creg.o makecomps.o      \
+cdaccess.o bitio.o endian.o compression.o binsert.o     \
+class-mapping.o windows-mmap.o
+
+x86_64-w64-mingw32-ranlib libcl.a
 ```
 
 

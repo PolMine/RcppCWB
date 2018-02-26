@@ -46,3 +46,13 @@ cwb/cqp/*
 ---------
 
 printf needs to be replaced by Rprintf - ultimately did that manually
+
+cwb/cl/endian.h
+---------------
+
+The file causes issues with the endian.h system file. The best solution 
+I could come up with is to rename endian.h into endian2.h.  Then
+- also turn endian.h into endian2.h in the Makefile
+- change include statements to 'include "endian2.h"'
+
+
