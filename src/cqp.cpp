@@ -17,7 +17,6 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
-int setenv(const char *var_name, const char *new_value, int change_flag);
 
 using namespace Rcpp;
 
@@ -55,7 +54,7 @@ SEXP set_cqp_registry(SEXP registry_dir){
   char * registry_new;
   registry_new = (char*)CHAR(STRING_ELT(registry_dir,0));
   SEXP result = R_NilValue;
-  setenv("CORPUS_REGISTRY", registry_new, 1);		
+  /* setenv("CORPUS_REGISTRY", registry_new, 1); */
   init_cqp();
   return result;
 }
