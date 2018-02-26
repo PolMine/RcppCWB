@@ -1,4 +1,5 @@
 PKG_CPPFLAGS = \
+    -I../windows/libcl-master/include \
     -I../windows/libcl-master/include/cwb/cl \
     -I../windows/libcl-master/include/cwb/cqp
 
