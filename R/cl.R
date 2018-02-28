@@ -12,15 +12,15 @@
 #' @param regex a regular expression
 #' @param str a character string
 #' @rdname cl
-#' @export cwb_attribute_size cwb_lexicon_size cwb_cpos2struc cwb_cpos2str cwb_cpos2id
+#' @export cl_attribute_size cwb_lexicon_size cwb_cpos2struc cwb_cpos2str cwb_cpos2id
 #' @export cwb_struc2cpos cwb_id2str cwb_struc2str cwb_regex2id cwb_str2id cwb_id2freq cwb_id2cpos 
 #' @export cwb_cpos2lbound cwb_cpos2rbound
 #' @name cl_functions
 NULL
 
 #' @rdname cl
-cwb_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cwb_attribute_size(corpus = corpus, attribute = attribute, attribute_type = attribute_type, registry = registry)
+cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .cl_attribute_size(corpus = corpus, attribute = attribute, attribute_type = attribute_type, registry = registry)
 }
 
 

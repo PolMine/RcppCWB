@@ -2,43 +2,43 @@
 #' 
 #' CQP will need to know where to look for CWB indexed corpora. Upon
 #' initialization of CQP, the registry directory is set, by calling the function
-#' \code{initialize_cqp} during the startup procedure. To reset the registry,
+#' \code{cqp_initialize} during the startup procedure. To reset the registry,
 #' use the function \code{set_cqp_registry}. To get the registry used by CQP,
-#' use \code{get_cqp_registry}.
+#' use \code{cqp_get_registry}.
 #' 
 #' 
 #' @param registry the registry directory
-#' @export initialize_cqp
-#' @rdname initialize_cqp
+#' @export cqp_initialize
+#' @rdname cqp_initialize
 #' @examples
-#' # initialize_cqp()
-#' get_cqp_registry()
+#' # cqp_initialize()
+#' cqp_get_registry()
 #' registry_new <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' # set_cqp_registry(registry = registry_new)
-initialize_cqp <- function() .init_cqp()
+cqp_initialize <- function() .init_cqp()
 
 
-#' @export get_cqp_registry
-#' @rdname initialize_cqp
-get_cqp_registry <- function() .get_cqp_registry()
+#' @export cqp_get_registry
+#' @rdname cqp_initialize
+cqp_get_registry <- function() .get_registry()
 
-#' @export set_cqp_registry
-#' @rdname initialize_cqp
-set_cqp_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
+#' @export cqp_set_registry
+#' @rdname cqp_initialize
+cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
   .set_cqp_registry(registry_dir = registry)
 }
 
 
 #' List Available CWB Corpora.
-#' @export cwb_list_corpora
+#' @export list_corpora
 #' @examples
 #' \donttest{
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' Sys.setenv("CORPUS_REGISTRY" = registry)
-#' # initialize_cqp()
-#' cwb_list_corpora()
+#' # cqp_initialize()
+#' cqp_list_corpora()
 #' }
-cwb_list_corpora <- function() .cwb_list_corpora()
+cqp_list_corpora <- function() .cqp_list_corpora()
 
 
 #' Execute CQP Query and Retrieve Results.
@@ -59,7 +59,7 @@ cwb_list_corpora <- function() .cwb_list_corpora()
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' Sys.setenv("CORPUS_REGISTRY" = registry)
-#' # initialize_cqp()
+#' # cqp_initialize()
 #' cqp_query(corpus = "REUTERS", query = '"oil";')
 #' cqp_subcorpus_size("REUTERS")
 #' cqp_dump_subcorpus("REUTERS")

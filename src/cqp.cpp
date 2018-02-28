@@ -41,16 +41,16 @@ void init_cqp() {
 }
 
 
-// [[Rcpp::export(name=".get_cqp_registry")]]
-Rcpp::StringVector get_cqp_registry(){
+// [[Rcpp::export(name=".get_registry")]]
+Rcpp::StringVector get_registry(){
   Rcpp::StringVector result(1);
   result(0) = cl_standard_registry();
   return result;
 }
 
 
-// [[Rcpp::export(name=".set_cqp_registry")]]
-SEXP set_cqp_registry(SEXP registry_dir){
+// [[Rcpp::export(name=".set_registry")]]
+SEXP set_registry(SEXP registry_dir){
   char * registry_new;
   registry_new = (char*)CHAR(STRING_ELT(registry_dir,0));
   SEXP result = R_NilValue;
@@ -60,8 +60,8 @@ SEXP set_cqp_registry(SEXP registry_dir){
 }
 
 
-// [[Rcpp::export(name=".cwb_list_corpora")]]
-Rcpp::StringVector cwb_list_corpora(){
+// [[Rcpp::export(name=".cqp_list_corpora")]]
+Rcpp::StringVector list_corpora(){
   
   CorpusList *	cl;
   int	i = 0, n = 0;

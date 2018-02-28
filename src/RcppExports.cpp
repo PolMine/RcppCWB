@@ -5,9 +5,9 @@
 
 using namespace Rcpp;
 
-// cwb_attribute_size
-int cwb_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry);
-RcppExport SEXP _RcppCWB_cwb_attribute_size(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
+// _cl_attribute_size
+int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry);
+RcppExport SEXP _RcppCWB__cl_attribute_size(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -15,7 +15,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type attribute(attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type attribute_type(attribute_typeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_attribute_size(corpus, attribute, attribute_type, registry));
+    rcpp_result_gen = Rcpp::wrap(_cl_attribute_size(corpus, attribute, attribute_type, registry));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -209,34 +209,34 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// get_cqp_registry
-Rcpp::StringVector get_cqp_registry();
-RcppExport SEXP _RcppCWB_get_cqp_registry() {
+// get_registry
+Rcpp::StringVector get_registry();
+RcppExport SEXP _RcppCWB_get_registry() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(get_cqp_registry());
+    rcpp_result_gen = Rcpp::wrap(get_registry());
     return rcpp_result_gen;
 END_RCPP
 }
-// set_cqp_registry
-SEXP set_cqp_registry(SEXP registry_dir);
-RcppExport SEXP _RcppCWB_set_cqp_registry(SEXP registry_dirSEXP) {
+// set_registry
+SEXP set_registry(SEXP registry_dir);
+RcppExport SEXP _RcppCWB_set_registry(SEXP registry_dirSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
-    rcpp_result_gen = Rcpp::wrap(set_cqp_registry(registry_dir));
+    rcpp_result_gen = Rcpp::wrap(set_registry(registry_dir));
     return rcpp_result_gen;
 END_RCPP
 }
-// cwb_list_corpora
-Rcpp::StringVector cwb_list_corpora();
-RcppExport SEXP _RcppCWB_cwb_list_corpora() {
+// list_corpora
+Rcpp::StringVector list_corpora();
+RcppExport SEXP _RcppCWB_list_corpora() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(cwb_list_corpora());
+    rcpp_result_gen = Rcpp::wrap(list_corpora());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -381,8 +381,13 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP _RcppCWB_cwb_attribute_size(SEXP, SEXP, SEXP, SEXP);
+RcppExport SEXP _RcppCWB_cwb_list_corpora();
+RcppExport SEXP _RcppCWB_get_cqp_registry();
+RcppExport SEXP _RcppCWB_set_cqp_registry(SEXP);
+
 static const R_CallMethodDef CallEntries[] = {
-    {"_RcppCWB_cwb_attribute_size", (DL_FUNC) &_RcppCWB_cwb_attribute_size, 4},
+    {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},
     {"_RcppCWB_cwb_lexicon_size", (DL_FUNC) &_RcppCWB_cwb_lexicon_size, 3},
     {"_RcppCWB_cwb_cpos2struc", (DL_FUNC) &_RcppCWB_cwb_cpos2struc, 4},
     {"_RcppCWB_cwb_cpos2str", (DL_FUNC) &_RcppCWB_cwb_cpos2str, 4},
@@ -397,9 +402,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_cpos2lbound", (DL_FUNC) &_RcppCWB_cwb_cpos2lbound, 4},
     {"_RcppCWB_cwb_cpos2rbound", (DL_FUNC) &_RcppCWB_cwb_cpos2rbound, 4},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
-    {"_RcppCWB_get_cqp_registry", (DL_FUNC) &_RcppCWB_get_cqp_registry, 0},
-    {"_RcppCWB_set_cqp_registry", (DL_FUNC) &_RcppCWB_set_cqp_registry, 1},
-    {"_RcppCWB_cwb_list_corpora", (DL_FUNC) &_RcppCWB_cwb_list_corpora, 0},
+    {"_RcppCWB_get_registry", (DL_FUNC) &_RcppCWB_get_registry, 0},
+    {"_RcppCWB_set_registry", (DL_FUNC) &_RcppCWB_set_registry, 1},
+    {"_RcppCWB_list_corpora", (DL_FUNC) &_RcppCWB_list_corpora, 0},
     {"_RcppCWB_cqp_query", (DL_FUNC) &_RcppCWB_cqp_query, 3},
     {"_RcppCWB_cqp_subcorpus_size", (DL_FUNC) &_RcppCWB_cqp_subcorpus_size, 1},
     {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},
@@ -411,6 +416,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_regions_to_ids", (DL_FUNC) &_RcppCWB_regions_to_ids, 4},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_regions_to_count_matrix", (DL_FUNC) &_RcppCWB_regions_to_count_matrix, 4},
+    {"_RcppCWB_cwb_attribute_size",      (DL_FUNC) &_RcppCWB_cwb_attribute_size,      4},
+    {"_RcppCWB_cwb_list_corpora",        (DL_FUNC) &_RcppCWB_cwb_list_corpora,        0},
+    {"_RcppCWB_get_cqp_registry",        (DL_FUNC) &_RcppCWB_get_cqp_registry,        0},
+    {"_RcppCWB_set_cqp_registry",        (DL_FUNC) &_RcppCWB_set_cqp_registry,        1},
     {NULL, NULL, 0}
 };
 

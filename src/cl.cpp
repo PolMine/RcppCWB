@@ -38,8 +38,8 @@ Attribute* make_p_attribute(SEXP corpus, SEXP p_attribute, SEXP registry){
 /* these are the wrappers for the functions of the corpus library (CL) */
 
 
-// [[Rcpp::export(name=".cwb_attribute_size")]]
-int cwb_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry) {
+// [[Rcpp::export(name=".cl_attribute_size")]]
+int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry) {
   int size;
   std::string atype = Rcpp::as<std::string>(attribute_type);
   if (atype == "p"){
