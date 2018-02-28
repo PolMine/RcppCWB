@@ -2,7 +2,7 @@
 % Please edit documentation in R/cl.R
 \name{cl_functions}
 \alias{cl_functions}
-\alias{cwb_attribute_size}
+\alias{cl_attribute_size}
 \alias{cwb_lexicon_size}
 \alias{cwb_cpos2struc}
 \alias{cwb_cpos2str}
@@ -18,7 +18,7 @@
 \alias{cwb_cpos2rbound}
 \title{Exposed functions of the corpus library (CL).}
 \usage{
-cwb_attribute_size(corpus, attribute, attribute_type,
+cl_attribute_size(corpus, attribute, attribute_type,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cwb_lexicon_size(corpus, p_attribute,

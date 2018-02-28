@@ -30,7 +30,7 @@ cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
 
 
 #' List Available CWB Corpora.
-#' @export list_corpora
+#' @export cqp_list_corpora
 #' @examples
 #' \donttest{
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")

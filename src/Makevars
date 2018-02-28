@@ -1,5 +1,5 @@
 PKG_CPPFLAGS=-I/Users/blaette/Lab/github/RcppCWB/inst/include/cwb -I/Users/blaette/Lab/github/RcppCWB/src/cwb/cqp -I/Users/blaette/Lab/github/RcppCWB/src/cwb/cl -I/Users/blaette/Lab/github/RcppCWB/src/cwb/CQi
-PKG_LIBS=-L/Users/blaette/Lab/github/RcppCWB/src/cwb/cl -L/Users/blaette/Lab/github/RcppCWB/src/cwb/cqp -lglib-2.0 -lpcre -lcl -lcqp
+PKG_LIBS=-L/Users/blaette/Lab/github/RcppCWB/src/cwb/cl -L/Users/blaette/Lab/github/RcppCWB/src/cwb/cqp -lglib-2.0 -lpcre -lcqp -lcl
 
 $(SHLIB): libcl.a libcqp.a
 

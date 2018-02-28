@@ -6,5 +6,5 @@
       )
       )
   }
-  initialize_cqp()
+  cqp_initialize()
 }

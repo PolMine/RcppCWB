@@ -381,11 +381,6 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP _RcppCWB_cwb_attribute_size(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_list_corpora();
-RcppExport SEXP _RcppCWB_get_cqp_registry();
-RcppExport SEXP _RcppCWB_set_cqp_registry(SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},
     {"_RcppCWB_cwb_lexicon_size", (DL_FUNC) &_RcppCWB_cwb_lexicon_size, 3},
@@ -416,10 +411,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_regions_to_ids", (DL_FUNC) &_RcppCWB_regions_to_ids, 4},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_regions_to_count_matrix", (DL_FUNC) &_RcppCWB_regions_to_count_matrix, 4},
-    {"_RcppCWB_cwb_attribute_size",      (DL_FUNC) &_RcppCWB_cwb_attribute_size,      4},
-    {"_RcppCWB_cwb_list_corpora",        (DL_FUNC) &_RcppCWB_cwb_list_corpora,        0},
-    {"_RcppCWB_get_cqp_registry",        (DL_FUNC) &_RcppCWB_get_cqp_registry,        0},
-    {"_RcppCWB_set_cqp_registry",        (DL_FUNC) &_RcppCWB_set_cqp_registry,        1},
     {NULL, NULL, 0}
 };
 

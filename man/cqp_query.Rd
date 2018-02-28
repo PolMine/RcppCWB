@@ -34,7 +34,7 @@ CQP query.
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 Sys.setenv("CORPUS_REGISTRY" = registry)
-# initialize_cqp()
+# cqp_initialize()
 cqp_query(corpus = "REUTERS", query = '"oil";')
 cqp_subcorpus_size("REUTERS")
 cqp_dump_subcorpus("REUTERS")
