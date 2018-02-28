@@ -381,20 +381,6 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP _RcppCWB_cwb_cpos2id(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_cpos2lbound(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_cpos2rbound(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_cpos2str(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_cpos2struc(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_id2cpos(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_id2freq(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_id2str(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_lexicon_size(SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_regex2id(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_str2id(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_struc2cpos(SEXP, SEXP, SEXP, SEXP);
-RcppExport SEXP _RcppCWB_cwb_struc2str(SEXP, SEXP, SEXP, SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},
     {"_RcppCWB__cl_lexicon_size", (DL_FUNC) &_RcppCWB__cl_lexicon_size, 3},
@@ -425,19 +411,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_regions_to_ids", (DL_FUNC) &_RcppCWB_regions_to_ids, 4},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_regions_to_count_matrix", (DL_FUNC) &_RcppCWB_regions_to_count_matrix, 4},
-    {"_RcppCWB_cwb_cpos2id",             (DL_FUNC) &_RcppCWB_cwb_cpos2id,             4},
-    {"_RcppCWB_cwb_cpos2lbound",         (DL_FUNC) &_RcppCWB_cwb_cpos2lbound,         4},
-    {"_RcppCWB_cwb_cpos2rbound",         (DL_FUNC) &_RcppCWB_cwb_cpos2rbound,         4},
-    {"_RcppCWB_cwb_cpos2str",            (DL_FUNC) &_RcppCWB_cwb_cpos2str,            4},
-    {"_RcppCWB_cwb_cpos2struc",          (DL_FUNC) &_RcppCWB_cwb_cpos2struc,          4},
-    {"_RcppCWB_cwb_id2cpos",             (DL_FUNC) &_RcppCWB_cwb_id2cpos,             4},
-    {"_RcppCWB_cwb_id2freq",             (DL_FUNC) &_RcppCWB_cwb_id2freq,             4},
-    {"_RcppCWB_cwb_id2str",              (DL_FUNC) &_RcppCWB_cwb_id2str,              4},
-    {"_RcppCWB_cwb_lexicon_size",        (DL_FUNC) &_RcppCWB_cwb_lexicon_size,        3},
-    {"_RcppCWB_cwb_regex2id",            (DL_FUNC) &_RcppCWB_cwb_regex2id,            4},
-    {"_RcppCWB_cwb_str2id",              (DL_FUNC) &_RcppCWB_cwb_str2id,              4},
-    {"_RcppCWB_cwb_struc2cpos",          (DL_FUNC) &_RcppCWB_cwb_struc2cpos,          4},
-    {"_RcppCWB_cwb_struc2str",           (DL_FUNC) &_RcppCWB_cwb_struc2str,           4},
     {NULL, NULL, 0}
 };
 

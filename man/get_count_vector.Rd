@@ -29,7 +29,7 @@ y <- get_count_vector(
   registry = registry
   )
 df <- data.frame(token_id = 0:(length(y) - 1), count = y)
-df[["token"]] <- cwb_id2str(
+df[["token"]] <- cl_id2str(
   "REUTERS", p_attribute = "word",
   id = df[["token_id"]], registry = registry
   )

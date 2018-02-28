@@ -43,7 +43,7 @@ decode_s_attribute <- function(corpus, s_attribute, registry = Sys.getenv("CORPU
 #'   registry = registry
 #'   )
 #' df <- data.frame(token_id = 0:(length(y) - 1), count = y)
-#' df[["token"]] <- cwb_id2str(
+#' df[["token"]] <- cl_id2str(
 #'   "REUTERS", p_attribute = "word",
 #'   id = df[["token_id"]], registry = registry
 #'   )
@@ -135,7 +135,7 @@ get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = registry, matrix = m
 #'   )
-#' tokenstream <- cwb_id2str(
+#' tokenstream <- cl_id2str(
 #'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = registry, id = ids
 #'   )
@@ -189,7 +189,7 @@ ids_to_count_matrix <- function(ids){
 #'   )
 #' df <- as.data.frame(y)
 #' colnames(df) <- c("token_id", "count")
-#' df[["token"]] <- cwb_id2str(
+#' df[["token"]] <- cl_id2str(
 #'   "REUTERS", p_attribute = "word",
 #'   registry = registry, id = df[["token_id"]]
 #'   )

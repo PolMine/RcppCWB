@@ -33,7 +33,7 @@ y <- regions_to_count_matrix(
   )
 df <- as.data.frame(y)
 colnames(df) <- c("token_id", "count")
-df[["token"]] <- cwb_id2str(
+df[["token"]] <- cl_id2str(
   "REUTERS", p_attribute = "word",
   registry = registry, id = df[["token_id"]]
   )

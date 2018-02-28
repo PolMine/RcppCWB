@@ -29,7 +29,7 @@ ids <- regions_to_ids(
   corpus = "REUTERS", p_attribute = "word",
   registry = registry, matrix = m
   )
-tokenstream <- cwb_id2str(
+tokenstream <- cl_id2str(
   corpus = "REUTERS", p_attribute = "word",
   registry = registry, id = ids
   )

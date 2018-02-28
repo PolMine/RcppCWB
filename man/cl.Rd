@@ -3,57 +3,56 @@
 \name{cl_functions}
 \alias{cl_functions}
 \alias{cl_attribute_size}
-\alias{cwb_lexicon_size}
-\alias{cwb_cpos2struc}
-\alias{cwb_cpos2str}
-\alias{cwb_cpos2id}
-\alias{cwb_struc2cpos}
-\alias{cwb_id2str}
-\alias{cwb_struc2str}
-\alias{cwb_regex2id}
-\alias{cwb_str2id}
-\alias{cwb_id2freq}
-\alias{cwb_id2cpos}
-\alias{cwb_cpos2lbound}
-\alias{cwb_cpos2rbound}
+\alias{cl_lexicon_size}
+\alias{cl_cpos2struc}
+\alias{cl_cpos2str}
+\alias{cl_cpos2id}
+\alias{cl_struc2cpos}
+\alias{cl_id2str}
+\alias{cl_struc2str}
+\alias{cl_regex2id}
+\alias{cl_str2id}
+\alias{cl_id2freq}
+\alias{cl_id2cpos}
+\alias{cl_cpos2lbound}
+\alias{cl_cpos2rbound}
 \title{Exposed functions of the corpus library (CL).}
 \usage{
 cl_attribute_size(corpus, attribute, attribute_type,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_lexicon_size(corpus, p_attribute,
+cl_lexicon_size(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+cl_cpos2struc(corpus, s_attribute, cpos,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_cpos2struc(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
-
-cwb_cpos2str(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
+cl_cpos2str(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
   cpos)
 
-cwb_cpos2id(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
+cl_cpos2id(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
   cpos)
 
-cwb_struc2cpos(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
+cl_struc2cpos(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
   struc)
 
-cwb_id2str(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), id)
+cl_id2str(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), id)
 
-cwb_struc2str(corpus, s_attribute, struc,
+cl_struc2str(corpus, s_attribute, struc,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_regex2id(corpus, p_attribute, regex,
+cl_regex2id(corpus, p_attribute, regex,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_str2id(corpus, p_attribute, str, registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_str2id(corpus, p_attribute, str, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_id2freq(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_id2freq(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_id2cpos(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_id2cpos(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_cpos2lbound(corpus, s_attribute, cpos,
+cl_cpos2lbound(corpus, s_attribute, cpos,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_cpos2rbound(corpus, s_attribute, cpos,
+cl_cpos2rbound(corpus, s_attribute, cpos,
   registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
