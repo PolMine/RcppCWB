@@ -28,3 +28,10 @@ cqp_get_registry()
 registry_new <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 # set_cqp_registry(registry = registry_new)
 }
+\author{
+Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
+
+Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
+
+Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
+}

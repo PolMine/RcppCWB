@@ -17,3 +17,6 @@ Sys.setenv("CORPUS_REGISTRY" = registry)
 cqp_list_corpora()
 }
 }
+\author{
+Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
+}

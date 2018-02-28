@@ -10,6 +10,7 @@
 #' @param registry the registry directory
 #' @export cqp_initialize
 #' @rdname cqp_initialize
+#' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 #' @examples
 #' # cqp_initialize()
 #' cqp_get_registry()
@@ -20,10 +21,12 @@ cqp_initialize <- function() .init_cqp()
 
 #' @export cqp_get_registry
 #' @rdname cqp_initialize
+#' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_get_registry <- function() .cqp_get_registry()
 
 #' @export cqp_set_registry
 #' @rdname cqp_initialize
+#' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
   .cqp_set_registry(registry_dir = registry)
 }
@@ -38,6 +41,7 @@ cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
 #' # cqp_initialize()
 #' cqp_list_corpora()
 #' }
+#' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_list_corpora <- function() .cqp_list_corpora()
 
 
@@ -67,12 +71,14 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' cqp_query(corpus = "REUTERS", query = '"crude" "oil";')
 #' cqp_subcorpus_size("REUTERS", child = "QUERY")
 #' cqp_dump_subcorpus("REUTERS")
+#' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_query <- function(corpus, query){
   .cqp_query(corpus = corpus, subcorpus = "QUERY", query = query)
 }
 
 #' @export cqp_dump_subcorpus
 #' @rdname cqp_query
+#' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_dump_subcorpus <- function(corpus, child = "QUERY"){
   .cqp_dump_subcorpus(paste(corpus, child, sep = ":"))
 }

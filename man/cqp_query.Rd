@@ -43,3 +43,8 @@ cqp_query(corpus = "REUTERS", query = '"crude" "oil";')
 cqp_subcorpus_size("REUTERS", child = "QUERY")
 cqp_dump_subcorpus("REUTERS")
 }
+\author{
+Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
+
+Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
+}

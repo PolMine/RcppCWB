@@ -4,12 +4,16 @@ Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
 Version: 0.1.7.9003
 Date: 2018-02-28
 Author: Andreas Blaette [aut, cre],
+  Bernard Desgraupes [aut],
+  Sylvain Loiseau [aut]
   Oliver Christ [ctb],
   Bruno Maximilian Schulze [ctb],
   Stefan Evert [ctb],
-  Arne Fitschen [ctb]
+  Arne Fitschen [ctb],
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
+  person("Bernard", "Desgraupes", role = ("aut"), email = "bernard.desgraupes@u-paris10.fr"),
+  person("Sylvain", "Loiseau", role = "aut", email = "sylvain.loiseau@univ-paris13.fr"),
   person("Oliver", "Christ", role = "ctb"),
   person("Bruno Maximilian", "Schulze", role = "ctb"),
   person("Stefan", "Evert", role = "ctb"),
@@ -21,7 +25,8 @@ Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), a
     under the GNU GPL-3, in line with the GPL-3 license of the 'CWB' (<https://www.r-project.org/Licenses/GPL-3>).
     The 'CWB' relies on 'pcre' (BSD license, see <https://www.pcre.org/licence.txt>) and 'GLib'
     (LGPL license, see <https://www.gnu.org/licenses/lgpl-3.0.en.html>). See the file LICENSE.note for
-    further information.
+    further information. The package builds on the 'rcqp' package authored by Bernard Desgraupes and Sylvain
+    Loiseau. The implementation using 'Rcpp' is the approach used here to achieve cross-platform portability.
 License: GPL-3
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
