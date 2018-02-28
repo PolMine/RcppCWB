@@ -105,15 +105,15 @@
     .Call(`_RcppCWB_get_cbow_matrix`, corpus, p_attribute, registry, matrix, window)
 }
 
-.regions_to_ids <- function(corpus, p_attribute, registry, matrix) {
-    .Call(`_RcppCWB_regions_to_ids`, corpus, p_attribute, registry, matrix)
+.region_matrix_to_ids <- function(corpus, p_attribute, registry, matrix) {
+    .Call(`_RcppCWB_region_matrix_to_ids`, corpus, p_attribute, registry, matrix)
 }
 
 .ids_to_count_matrix <- function(ids) {
     .Call(`_RcppCWB_ids_to_count_matrix`, ids)
 }
 
-.regions_to_count_matrix <- function(corpus, p_attribute, registry, matrix) {
-    .Call(`_RcppCWB_regions_to_count_matrix`, corpus, p_attribute, registry, matrix)
+.region_matrix_to_count_matrix <- function(corpus, p_attribute, registry, matrix) {
+    .Call(`_RcppCWB_region_matrix_to_count_matrix`, corpus, p_attribute, registry, matrix)
 }
 

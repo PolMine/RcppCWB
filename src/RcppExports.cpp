@@ -341,9 +341,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// regions_to_ids
-Rcpp::IntegerVector regions_to_ids(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix);
-RcppExport SEXP _RcppCWB_regions_to_ids(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP matrixSEXP) {
+// region_matrix_to_ids
+Rcpp::IntegerVector region_matrix_to_ids(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix);
+RcppExport SEXP _RcppCWB_region_matrix_to_ids(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP matrixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -351,7 +351,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< SEXP >::type matrix(matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(regions_to_ids(corpus, p_attribute, registry, matrix));
+    rcpp_result_gen = Rcpp::wrap(region_matrix_to_ids(corpus, p_attribute, registry, matrix));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -366,9 +366,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// regions_to_count_matrix
-Rcpp::IntegerVector regions_to_count_matrix(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix);
-RcppExport SEXP _RcppCWB_regions_to_count_matrix(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP matrixSEXP) {
+// region_matrix_to_count_matrix
+Rcpp::IntegerVector region_matrix_to_count_matrix(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix);
+RcppExport SEXP _RcppCWB_region_matrix_to_count_matrix(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP matrixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -376,7 +376,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< SEXP >::type matrix(matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(regions_to_count_matrix(corpus, p_attribute, registry, matrix));
+    rcpp_result_gen = Rcpp::wrap(region_matrix_to_count_matrix(corpus, p_attribute, registry, matrix));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -408,9 +408,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_get_count_vector", (DL_FUNC) &_RcppCWB_get_count_vector, 3},
     {"_RcppCWB_get_region_matrix", (DL_FUNC) &_RcppCWB_get_region_matrix, 4},
     {"_RcppCWB_get_cbow_matrix", (DL_FUNC) &_RcppCWB_get_cbow_matrix, 5},
-    {"_RcppCWB_regions_to_ids", (DL_FUNC) &_RcppCWB_regions_to_ids, 4},
+    {"_RcppCWB_region_matrix_to_ids", (DL_FUNC) &_RcppCWB_region_matrix_to_ids, 4},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
-    {"_RcppCWB_regions_to_count_matrix", (DL_FUNC) &_RcppCWB_regions_to_count_matrix, 4},
+    {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {NULL, NULL, 0}
 };
 
