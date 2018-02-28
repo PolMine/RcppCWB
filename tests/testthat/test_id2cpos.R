@@ -1,11 +1,11 @@
 library(RcppCWB)
 
-testthat::context("cwb_id2cpos")
+testthat::context("cl_id2cpos")
 
 test_that(
   "id2cpos",
   {
-    cpos <- cwb_id2cpos(
+    cpos <- cl_id2cpos(
       corpus = "REUTERS",
       p_attribute = "word",
       id = 15,

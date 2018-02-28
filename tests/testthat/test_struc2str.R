@@ -5,7 +5,7 @@ testthat::context("struc2str")
 test_that(
   "struc2str",
   {
-    sAttr <- cwb_struc2str(
+    sAttr <- cl_struc2str(
       corpus = "REUTERS",
       s_attribute = "places",
       struc = 2L,

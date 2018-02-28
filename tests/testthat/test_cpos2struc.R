@@ -5,7 +5,7 @@ testthat::context("cpos2struc")
 test_that(
   "cpos2struc",
   {
-    N <- cwb_cpos2struc(
+    N <- cl_cpos2struc(
       corpus = "REUTERS",
       s_attribute = "places",
       cpos = 100L,

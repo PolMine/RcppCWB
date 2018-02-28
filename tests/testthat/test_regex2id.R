@@ -1,11 +1,11 @@
 library(RcppCWB)
 
-testthat::context("cwb_regex2id")
+testthat::context("cl_regex2id")
 
 test_that(
   "regex2id",
   {
-    id <- cwb_regex2id(
+    id <- cl_regex2id(
       corpus = "REUTERS",
       p_attribute = "word",
       regex = "[oO]il",

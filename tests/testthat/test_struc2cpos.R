@@ -5,7 +5,7 @@ testthat::context("struc2cpos")
 test_that(
   "struc2cpos",
   {
-    cpos <- cwb_struc2cpos(
+    cpos <- cl_struc2cpos(
       corpus = "REUTERS",
       s_attribute = "places",
       registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),

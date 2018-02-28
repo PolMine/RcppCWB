@@ -1,11 +1,11 @@
 library(RcppCWB)
 
-testthat::context("cwb_str2id")
+testthat::context("cl_str2id")
 
 test_that(
   "str2id",
   {
-    id <- cwb_str2id(
+    id <- cl_str2id(
       corpus = "REUTERS",
       p_attribute = "word",
       str = "oil",
