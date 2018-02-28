@@ -112,8 +112,8 @@ Rcpp::IntegerMatrix get_cbow_matrix(SEXP corpus, SEXP p_attribute, SEXP registry
 }
 
 
-// [[Rcpp::export(name=".regions_to_ids")]]
-Rcpp::IntegerVector regions_to_ids(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix){
+// [[Rcpp::export(name=".region_matrix_to_ids")]]
+Rcpp::IntegerVector region_matrix_to_ids(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix){
   
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   
@@ -167,10 +167,10 @@ Rcpp::IntegerMatrix ids_to_count_matrix(Rcpp::IntegerVector ids){
 }
 
 
-// [[Rcpp::export(name=".regions_to_count_matrix")]]
-Rcpp::IntegerVector regions_to_count_matrix(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix){
+// [[Rcpp::export(name=".region_matrix_to_count_matrix")]]
+Rcpp::IntegerVector region_matrix_to_count_matrix(SEXP corpus, SEXP p_attribute, SEXP registry, SEXP matrix){
   
-  Rcpp::IntegerVector ids = regions_to_ids(corpus, p_attribute, registry, matrix);
+  Rcpp::IntegerVector ids = region_matrix_to_ids(corpus, p_attribute, registry, matrix);
   Rcpp::IntegerMatrix count_matrix = ids_to_count_matrix(ids);
 
   return count_matrix;

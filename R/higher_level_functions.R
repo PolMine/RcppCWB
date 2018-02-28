@@ -123,15 +123,15 @@ get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' @param p_attribute a positional attribute
 #' @param registry registry directory
 #' @param matrix a regions matrix
-#' @rdname regions_to_ids
-#' @export regions_to_ids
+#' @rdname region_matrix_to_ids
+#' @export region_matrix_to_ids
 #' @examples
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' m <- get_region_matrix(
 #'   corpus = "REUTERS", s_attribute = "places",
 #'   strucs = 4L:5L, registry = registry
 #'   )
-#' ids <- regions_to_ids(
+#' ids <- region_matrix_to_ids(
 #'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = registry, matrix = m
 #'   )
@@ -141,12 +141,12 @@ get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #'   )
 #' txt <- paste(tokenstream, collapse = " ")
 #' txt
-regions_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
+region_matrix_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
   .check_registry(registry)
   .check_corpus(corpus, registry)
   .check_p_attribute(p_attribute)
   .check_region_matrix(matrix)
-  .regions_to_ids(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
+  .region_matrix_to_ids(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }
 
 #' Perform Count for Vector of IDs.
@@ -176,14 +176,14 @@ ids_to_count_matrix <- function(ids){
 #' @param p_attribute a positional attribute
 #' @param registry registry directory
 #' @param matrix a region matrix
-#' @rdname regions_to_count_matrix
+#' @rdname region_matrix_to_count_matrix
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' m <- get_region_matrix(
 #'   corpus = "REUTERS", s_attribute = "places",
 #'   strucs = 5L:5L, registry = registry
 #'   )
-#' y <- regions_to_count_matrix(
+#' y <- region_matrix_to_count_matrix(
 #'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = registry, matrix = m
 #'   )
@@ -195,11 +195,11 @@ ids_to_count_matrix <- function(ids){
 #'   )
 #' df[order(df[["count"]], decreasing = TRUE),]
 #' head(df)
-regions_to_count_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
+region_matrix_to_count_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
   .check_registry(registry)
   .check_corpus(corpus, registry)
   .check_p_attribute(p_attribute)
   stopifnot(is.matrix(matrix))
-  .regions_to_count_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
+  .region_matrix_to_count_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }
 

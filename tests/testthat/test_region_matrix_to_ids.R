@@ -1,11 +1,11 @@
 library(RcppCWB)
 
-testthat::context("regions_to_ids")
+testthat::context("region_matrix_to_ids")
 
 test_that(
   "regions_to_ids",
   {
-    ids <- regions_to_ids(
+    ids <- region_matrix_to_ids(
       corpus = "REUTERS",
       p_attribute = "word",
       registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
