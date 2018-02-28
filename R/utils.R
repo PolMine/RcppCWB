@@ -59,7 +59,7 @@
     stop("strucs needs to be a integer vector")
   if (min(strucs) < 0)
     stop("all values of vector strucs need to be >= 0")
-  if (max(strucs) > (cwb_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1))
+  if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1))
     stop("highest value of strucs may not be larger than size of structural attribute")
   return( TRUE )
 }

@@ -209,24 +209,24 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// get_registry
-Rcpp::StringVector get_registry();
-RcppExport SEXP _RcppCWB_get_registry() {
+// cqp_get_registry
+Rcpp::StringVector cqp_get_registry();
+RcppExport SEXP _RcppCWB_cqp_get_registry() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(get_registry());
+    rcpp_result_gen = Rcpp::wrap(cqp_get_registry());
     return rcpp_result_gen;
 END_RCPP
 }
-// set_registry
-SEXP set_registry(SEXP registry_dir);
-RcppExport SEXP _RcppCWB_set_registry(SEXP registry_dirSEXP) {
+// cqp_set_registry
+SEXP cqp_set_registry(SEXP registry_dir);
+RcppExport SEXP _RcppCWB_cqp_set_registry(SEXP registry_dirSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
-    rcpp_result_gen = Rcpp::wrap(set_registry(registry_dir));
+    rcpp_result_gen = Rcpp::wrap(cqp_set_registry(registry_dir));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -397,8 +397,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_cpos2lbound", (DL_FUNC) &_RcppCWB_cwb_cpos2lbound, 4},
     {"_RcppCWB_cwb_cpos2rbound", (DL_FUNC) &_RcppCWB_cwb_cpos2rbound, 4},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
-    {"_RcppCWB_get_registry", (DL_FUNC) &_RcppCWB_get_registry, 0},
-    {"_RcppCWB_set_registry", (DL_FUNC) &_RcppCWB_set_registry, 1},
+    {"_RcppCWB_cqp_get_registry", (DL_FUNC) &_RcppCWB_cqp_get_registry, 0},
+    {"_RcppCWB_cqp_set_registry", (DL_FUNC) &_RcppCWB_cqp_set_registry, 1},
     {"_RcppCWB_list_corpora", (DL_FUNC) &_RcppCWB_list_corpora, 0},
     {"_RcppCWB_cqp_query", (DL_FUNC) &_RcppCWB_cqp_query, 3},
     {"_RcppCWB_cqp_subcorpus_size", (DL_FUNC) &_RcppCWB_cqp_subcorpus_size, 1},

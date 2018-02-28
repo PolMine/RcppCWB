@@ -61,12 +61,12 @@
     invisible(.Call(`_RcppCWB_init_cqp`))
 }
 
-.get_registry <- function() {
-    .Call(`_RcppCWB_get_registry`)
+.cqp_get_registry <- function() {
+    .Call(`_RcppCWB_cqp_get_registry`)
 }
 
-.set_registry <- function(registry_dir) {
-    .Call(`_RcppCWB_set_registry`, registry_dir)
+.cqp_set_registry <- function(registry_dir) {
+    .Call(`_RcppCWB_cqp_set_registry`, registry_dir)
 }
 
 .cqp_list_corpora <- function() {

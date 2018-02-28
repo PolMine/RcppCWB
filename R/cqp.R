@@ -20,12 +20,12 @@ cqp_initialize <- function() .init_cqp()
 
 #' @export cqp_get_registry
 #' @rdname cqp_initialize
-cqp_get_registry <- function() .get_registry()
+cqp_get_registry <- function() .cqp_get_registry()
 
 #' @export cqp_set_registry
 #' @rdname cqp_initialize
 cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
-  .set_cqp_registry(registry_dir = registry)
+  .cqp_set_registry(registry_dir = registry)
 }
 
 
