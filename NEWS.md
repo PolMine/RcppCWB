@@ -1,3 +1,17 @@
+# v0.1.8
+* In addition to low-level functionality of the corpus library (CL), functions
+of the Corpus Query Processor (CQP) are exposed, building  on C wrappers in the
+rcqp package;
+* The authors of the rcqp package (Bernard Desgraupes and Sylvain Loiseau) are
+mentioned as package authors and as authors of functions using CQP, as the code
+used to expose CQP functionality is a modified version of rcqp code;
+* Extended package description explaining the rationale for developing the 
+RcppCWB package;
+* Documentation of functions has been rearranged, many examples have been 
+included;
+* Renaming of exposed functions of corpus library from cwb_... to cl_...;
+* sanity checks in R wrappers for Rcpp functions.
+
 # v0.1.7
 * CWB source code included in package to be GPL compliant
 * template to adjust HOME and INFO in registry file used (tools/setpaths.R)

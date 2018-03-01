@@ -7,15 +7,11 @@
 cqp_list_corpora()
 }
 \description{
-List Available CWB Corpora.
+List the corpora described by the registry files in the registry directory
+that is currently set.
 }
 \examples{
-\donttest{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-Sys.setenv("CORPUS_REGISTRY" = registry)
-# cqp_initialize()
 cqp_list_corpora()
-}
 }
 \author{
 Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau

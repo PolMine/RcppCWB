@@ -68,8 +68,8 @@ get_count_vector <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' @param registry the registry directory
 #' @rdname get_region_matrix
 #' @export get_region_matrix
-#' @return a matrix with integer values indicating left and right corpus positions
-#' (columns 1 and 2, respectively)
+#' @return A matrix with integer values indicating left and right corpus positions
+#' (columns 1 and 2, respectively).
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' y <- get_region_matrix(

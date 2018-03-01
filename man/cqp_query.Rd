@@ -28,13 +28,12 @@ query using \code{cqp_query}. Then, \code{cqp_dump_subcorpus} will return a
 matrix with the regions of the matches for the query.
 }
 \details{
-The \code{cqp_subcorpus_size} function returns the number of matches for the
-CQP query.
+The \code{cqp_query} function executes a CQP query. The
+\code{cqp_subcorpus_size} function returns the number of matches for the CQP
+query. The \code{cqp_dump_subcorpus} function will return a two-column matrix
+with the left and right corpus positions of the matches for the CQP query.
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-Sys.setenv("CORPUS_REGISTRY" = registry)
-# cqp_initialize()
 cqp_query(corpus = "REUTERS", query = '"oil";')
 cqp_subcorpus_size("REUTERS")
 cqp_dump_subcorpus("REUTERS")
@@ -43,8 +42,10 @@ cqp_query(corpus = "REUTERS", query = '"crude" "oil";')
 cqp_subcorpus_size("REUTERS", child = "QUERY")
 cqp_dump_subcorpus("REUTERS")
 }
+\references{
+Evert, S. 2005. The CQP Query Language Tutorial. Available online at
+\url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
+}
 \author{
-Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
-
 Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 }

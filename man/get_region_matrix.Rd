@@ -17,8 +17,8 @@ get_region_matrix(corpus, s_attribute, strucs,
 \item{registry}{the registry directory}
 }
 \value{
-a matrix with integer values indicating left and right corpus positions
-(columns 1 and 2, respectively)
+A matrix with integer values indicating left and right corpus positions
+(columns 1 and 2, respectively).
 }
 \description{
 The return value is an integer matrix with the left and right corpus positions

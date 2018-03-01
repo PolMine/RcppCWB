@@ -19,19 +19,12 @@ cqp_set_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
 CQP will need to know where to look for CWB indexed corpora. Upon
 initialization of CQP, the registry directory is set, by calling the function
 \code{cqp_initialize} during the startup procedure. To reset the registry,
-use the function \code{set_cqp_registry}. To get the registry used by CQP,
+use the function \code{cqp_set_registry}. To get the registry used by CQP,
 use \code{cqp_get_registry}.
 }
 \examples{
-# cqp_initialize()
 cqp_get_registry()
-registry_new <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-# set_cqp_registry(registry = registry_new)
 }
 \author{
-Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
-
-Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
-
 Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 }

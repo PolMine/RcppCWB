@@ -69,3 +69,11 @@
     stop("check region matrix - all values of column 2 need to be equal or higher than values of column one. ",
          "This is not TRUE.")
 }
+
+.check_cqp_query <- function(query){
+  if (!substr(query, start = length(query), stop = length(query)) == ";"){
+    return( paste0(query, ";", sep = "") )
+  } else {
+    return( query )
+  }
+}

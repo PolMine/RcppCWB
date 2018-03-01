@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.1.7.9003
-Date: 2018-02-28
+Version: 0.1.7.9004
+Date: 2018-03-01
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut]
@@ -20,21 +20,22 @@ Authors@R: c(
   person("Arne", "Fitschen", role = "ctb")
   )
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
-Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query
-    engine to efficiently analyze large corpora (<http://cwb.sourceforge.net>). 'RcppCWB' is licensed
-    under the GNU GPL-3, in line with the GPL-3 license of the 'CWB' (<https://www.r-project.org/Licenses/GPL-3>).
-    The 'CWB' relies on 'pcre' (BSD license, see <https://www.pcre.org/licence.txt>) and 'GLib'
-    (LGPL license, see <https://www.gnu.org/licenses/lgpl-3.0.en.html>). See the file LICENSE.note for
-    further information. The package builds on the 'rcqp' package authored by Bernard Desgraupes and Sylvain
-    Loiseau. The implementation using 'Rcpp' is the approach used here to achieve cross-platform portability.
+Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query 
+  engine to efficiently analyze large corpora (<http://cwb.sourceforge.net>). 'RcppCWB' is licensed
+  under the GNU GPL-3, in line with the GPL-3 license of the 'CWB' (<https://www.r-project.org/
+  Licenses/GPL-3>). The 'CWB' relies on 'pcre' (BSD license, see <https://www.pcre.org/
+  licence.txt>) and 'GLib' (LGPL license, see <https://www.gnu.org/licenses/lgpl-3.0.en.
+  html>). See the file LICENSE.note for further information. The package builds on the 'rcqp' 
+  package authored by Bernard Desgraupes and Sylvain Loiseau. The implementation using 'Rcpp'
+  is the approach used here to achieve cross-platform portability.
 License: GPL-3
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: On Unix-like operating systems, pcre (>= 7) and glib2 (>= 2) need to be present to 
-    compile 'RcppCWB'. See README.md for instructions how to install these dependencies. On Windows, no 
-    prior installations are necessary, as pre-built (i.e. cross-compiled) binaries of all required 
-    libraries are downloaded from a GitHub repository (<https://github.com/PolMine/libcl>) during 
-    installation.
+SystemRequirements: On Unix-like operating systems, pcre (>= 7) and glib2 (>= 2) need to be present to compile
+  'RcppCWB'. See README.md for instructions how to install these dependencies. On 
+  Windows, no prior installations are necessary, as pre-built (i.e. cross-compiled)
+  binaries of all required libraries are downloaded from a GitHub repository
+  (<https://github.com/PolMine/libcl>) during installation.
 Imports:
     Rcpp (>= 0.12.6)
 Suggests:
