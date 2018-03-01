@@ -1,4 +1,4 @@
-# v0.1.8
+# v0.2.0
 * In addition to low-level functionality of the corpus library (CL), functions
 of the Corpus Query Processor (CQP) are exposed, building  on C wrappers in the
 rcqp package;
