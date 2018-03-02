@@ -9,7 +9,7 @@ Author: Andreas Blaette [aut, cre],
   Oliver Christ [ctb],
   Bruno Maximilian Schulze [ctb],
   Stefan Evert [ctb],
-  Arne Fitschen [ctb],
+  Arne Fitschen [ctb]
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = ("aut"), email = "bernard.desgraupes@u-paris10.fr"),

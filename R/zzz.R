@@ -4,7 +4,7 @@
       package = pkg, "extdata", "cwb", "registry",
       lib.loc = lib
       )
-      )
+    )
   }
   cqp_initialize()
 }
