@@ -21,7 +21,7 @@ extern "C" {
 using namespace Rcpp;
 
 
-
+int cqp_initialization_status = 0;
 
 // [[Rcpp::export(name=".init_cqp")]]
 void init_cqp() {
@@ -37,6 +37,7 @@ void init_cqp() {
 	enable_macros = 0;
 
 	initialize_cqp(ac, av);
+	cqp_initialization_status = 1;
 	make_attribute_hash(16384);
 }
 
@@ -46,6 +47,11 @@ Rcpp::StringVector cqp_get_registry(){
   Rcpp::StringVector result(1);
   result(0) = cl_standard_registry();
   return result;
+}
+
+// [[Rcpp::export(name=".cqp_get_status")]]
+int cqp_get_status(){
+  return cqp_initialization_status;
 }
 
 
@@ -61,7 +67,7 @@ SEXP cqp_set_registry(SEXP registry_dir){
 
 
 // [[Rcpp::export(name=".cqp_list_corpora")]]
-Rcpp::StringVector list_corpora(){
+Rcpp::StringVector cqp_list_corpora(){
   
   CorpusList *	cl;
   int	i = 0, n = 0;

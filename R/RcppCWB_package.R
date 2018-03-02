@@ -84,7 +84,7 @@
 #'   wrapper to expose the functionality of the CWB.
 #' 
 #' @references 
-#' #' Christ, O. 1994. "A modular and flexible architecture for an integrated
+#' Christ, O. 1994. "A modular and flexible architecture for an integrated
 #' corpus query system", in: Proceedings of COMPLEX '94, pp. 23-32. Budapest.
 #' Available online at \url{http://cwb.sourceforge.net/files/Christ1994.pdf}
 #' 

@@ -65,12 +65,16 @@
     .Call(`_RcppCWB_cqp_get_registry`)
 }
 
+.cqp_get_status <- function() {
+    .Call(`_RcppCWB_cqp_get_status`)
+}
+
 .cqp_set_registry <- function(registry_dir) {
     .Call(`_RcppCWB_cqp_set_registry`, registry_dir)
 }
 
 .cqp_list_corpora <- function() {
-    .Call(`_RcppCWB_list_corpora`)
+    .Call(`_RcppCWB_cqp_list_corpora`)
 }
 
 .cqp_query <- function(corpus, subcorpus, query) {

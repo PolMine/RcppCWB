@@ -34,6 +34,10 @@ query. The \code{cqp_dump_subcorpus} function will return a two-column matrix
 with the left and right corpus positions of the matches for the CQP query.
 }
 \examples{
+if (!cqp_is_initialized()){
+  registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+  cqp_initialize(registry = registry)
+}
 cqp_query(corpus = "REUTERS", query = '"oil";')
 cqp_subcorpus_size("REUTERS")
 cqp_dump_subcorpus("REUTERS")

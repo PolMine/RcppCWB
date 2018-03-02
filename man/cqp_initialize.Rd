@@ -2,11 +2,14 @@
 % Please edit documentation in R/cqp.R
 \name{cqp_initialize}
 \alias{cqp_initialize}
+\alias{cqp_is_initialized}
 \alias{cqp_get_registry}
 \alias{cqp_set_registry}
 \title{Initialize Corpus Query Processor (CQP).}
 \usage{
-cqp_initialize()
+cqp_initialize(registry = NULL)
+
+cqp_is_initialized()
 
 cqp_get_registry()
 
@@ -16,14 +19,21 @@ cqp_set_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
 \item{registry}{the registry directory}
 }
 \description{
-CQP will need to know where to look for CWB indexed corpora. Upon
-initialization of CQP, the registry directory is set, by calling the function
-\code{cqp_initialize} during the startup procedure. To reset the registry,
-use the function \code{cqp_set_registry}. To get the registry used by CQP,
-use \code{cqp_get_registry}.
+CQP needs to know where to look for CWB indexed corpora. To initialize CQP,
+call \code{cqp_initialize}. To reset the registry, use the function
+\code{cqp_set_registry}. To get the registry used by CQP, use
+\code{cqp_get_registry}. To get the initialization status, use
+\code{cqp_is_initialized}
 }
 \examples{
-cqp_get_registry()
+cqp_is_initialized() # check initialization status
+if (!cqp_is_initialized()){
+  registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+  cqp_initialize(registry)
+}
+cqp_is_initialized() # check initialization status (TRUE now?)
+cqp_get_registry() # get registry dir used by CQP
+cqp_list_corpora() # get list of corpora
 }
 \author{
 Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau

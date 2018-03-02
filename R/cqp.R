@@ -1,10 +1,10 @@
 #' Initialize Corpus Query Processor (CQP).
 #' 
-#' CQP will need to know where to look for CWB indexed corpora. Upon
-#' initialization of CQP, the registry directory is set, by calling the function
-#' \code{cqp_initialize} during the startup procedure. To reset the registry,
-#' use the function \code{cqp_set_registry}. To get the registry used by CQP,
-#' use \code{cqp_get_registry}.
+#' CQP needs to know where to look for CWB indexed corpora. To initialize CQP,
+#' call \code{cqp_initialize}. To reset the registry, use the function
+#' \code{cqp_set_registry}. To get the registry used by CQP, use
+#' \code{cqp_get_registry}. To get the initialization status, use
+#' \code{cqp_is_initialized}
 #' 
 #' 
 #' @param registry the registry directory
@@ -12,9 +12,34 @@
 #' @rdname cqp_initialize
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 #' @examples
-#' cqp_get_registry()
-cqp_initialize <- function() .init_cqp()
+#' cqp_is_initialized() # check initialization status
+#' if (!cqp_is_initialized()){
+#'   registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#'   cqp_initialize(registry)
+#' }
+#' cqp_is_initialized() # check initialization status (TRUE now?)
+#' cqp_get_registry() # get registry dir used by CQP
+#' cqp_list_corpora() # get list of corpora
+cqp_initialize <- function(registry = NULL){
+  if (cqp_is_initialized()){
+    warning("CQP has already been initialized. At present, it is not possible ",
+            "to re-initialize CQP. The registry is set as: ", registry)
+  } else {
+    if (!is.null(registry)){
+      .check_registry(registry)
+      Sys.setenv(CORPUS_REGISTRY = registry)
+    }
+    .init_cqp()
+  }
+  return( cqp_is_initialized() )
+}
 
+
+#' @export cqp_is_initialized
+#' @rdname cqp_initialize
+cqp_is_initialized <- function(){
+  if (.cqp_get_status() == 0) return(FALSE) else return(TRUE)
+}
 
 #' @export cqp_get_registry
 #' @rdname cqp_initialize
@@ -34,6 +59,10 @@ cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
 #' 
 #' @export cqp_list_corpora
 #' @examples
+#' if (!cqp_is_initialized()){
+#'   registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#'   cqp_initialize(registry)
+#' }
 #' cqp_list_corpora()
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_list_corpora <- function() .cqp_list_corpora()
@@ -59,6 +88,10 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' Evert, S. 2005. The CQP Query Language Tutorial. Available online at
 #' \url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
 #' @examples 
+#' if (!cqp_is_initialized()){
+#'   registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#'   cqp_initialize(registry = registry)
+#' }
 #' cqp_query(corpus = "REUTERS", query = '"oil";')
 #' cqp_subcorpus_size("REUTERS")
 #' cqp_dump_subcorpus("REUTERS")

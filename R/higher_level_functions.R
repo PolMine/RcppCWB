@@ -117,38 +117,6 @@ get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 }
 
 
-#' Get token IDs for Region Matrix.
-#' 
-#' @param corpus a CWB corpus
-#' @param p_attribute a positional attribute
-#' @param registry registry directory
-#' @param matrix a regions matrix
-#' @rdname region_matrix_to_ids
-#' @export region_matrix_to_ids
-#' @examples
-#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' m <- get_region_matrix(
-#'   corpus = "REUTERS", s_attribute = "places",
-#'   strucs = 4L:5L, registry = registry
-#'   )
-#' ids <- region_matrix_to_ids(
-#'   corpus = "REUTERS", p_attribute = "word",
-#'   registry = registry, matrix = m
-#'   )
-#' tokenstream <- cl_id2str(
-#'   corpus = "REUTERS", p_attribute = "word",
-#'   registry = registry, id = ids
-#'   )
-#' txt <- paste(tokenstream, collapse = " ")
-#' txt
-region_matrix_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_p_attribute(p_attribute)
-  .check_region_matrix(matrix)
-  .region_matrix_to_ids(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
-}
-
 #' Perform Count for Vector of IDs.
 #' 
 #' The return value is a two-column integer matrix. Column one represents the
@@ -166,23 +134,37 @@ ids_to_count_matrix <- function(ids){
   .ids_to_count_matrix(ids = ids)
 }
 
-#' Count for Region Matrix.
-#' 
-#' Count tokens in a two-column region matrix with left and right corpus positions.
-#' The function returns a two-column matrix with the token ids (column 1) and the number
-#' of occurrencs / counts (column 2).
+
+
+#' Get IDs and Counts for Region Matrices.
 #' 
 #' @param corpus a CWB corpus
 #' @param p_attribute a positional attribute
 #' @param registry registry directory
-#' @param matrix a region matrix
-#' @rdname region_matrix_to_count_matrix
-#' @examples 
+#' @param matrix a regions matrix
+#' @rdname region_matrix_ops
+#' @name region_matrix_ops
+#' @export region_matrix_to_ids
+#' @examples
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' 
+#' # Scenario 1: Get full text for a subcorpus defined by regions
 #' m <- get_region_matrix(
 #'   corpus = "REUTERS", s_attribute = "places",
-#'   strucs = 5L:5L, registry = registry
+#'   strucs = 4L:5L, registry = registry
 #'   )
+#' ids <- region_matrix_to_ids(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry, matrix = m
+#'   )
+#' tokenstream <- cl_id2str(
+#'   corpus = "REUTERS", p_attribute = "word",
+#'   registry = registry, id = ids
+#'   )
+#' txt <- paste(tokenstream, collapse = " ")
+#' txt
+#' 
+#' # Scenario 2: Get data.frame with counts for region matrix
 #' y <- region_matrix_to_count_matrix(
 #'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = registry, matrix = m
@@ -195,6 +177,17 @@ ids_to_count_matrix <- function(ids){
 #'   )
 #' df[order(df[["count"]], decreasing = TRUE),]
 #' head(df)
+region_matrix_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
+  .check_registry(registry)
+  .check_corpus(corpus, registry)
+  .check_p_attribute(p_attribute)
+  .check_region_matrix(matrix)
+  .region_matrix_to_ids(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
+}
+
+
+#' @rdname region_matrix_ops
+#' @export region_matrix_to_count_matrix
 region_matrix_to_count_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
   .check_registry(registry)
   .check_corpus(corpus, registry)
