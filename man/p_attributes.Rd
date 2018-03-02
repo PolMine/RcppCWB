@@ -54,6 +54,7 @@ between corpus positions, token ids, and the character string of tokens.
 \examples{
 # registry directory and cpos_total will be needed in examples
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+Sys.setenv(CORPUS_REGISTRY = registry)
 cpos_total <- cl_attribute_size(
   corpus = "REUTERS", attribute = "word",
   attribute_type = "p", registry = registry

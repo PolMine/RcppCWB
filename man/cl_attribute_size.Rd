@@ -25,6 +25,8 @@ zero-based, i.e. the maximum position of a positional / structural
 attribute is attribute size minus 1 (see examples).
 }
 \examples{
+registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+Sys.setenv(CORPUS_REGISTRY = registry)
 token_no <- cl_attribute_size("REUTERS", attribute = "word", attribute_type = "p")
 corpus_positions <- seq.int(from = 0, to = token_no - 1)
 cl_cpos2id("REUTERS", "word", cpos = corpus_positions)

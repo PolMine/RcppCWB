@@ -12,6 +12,8 @@
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
 #' @examples 
+#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' Sys.setenv(CORPUS_REGISTRY = registry)
 #' token_no <- cl_attribute_size("REUTERS", attribute = "word", attribute_type = "p")
 #' corpus_positions <- seq.int(from = 0, to = token_no - 1)
 #' cl_cpos2id("REUTERS", "word", cpos = corpus_positions)
@@ -35,6 +37,8 @@ cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.
 #'   environment variable CORPUS_REGISTRY
 #' @rdname cl_lexicon_size
 #' @examples 
+#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' Sys.setenv(CORPUS_REGISTRY = registry)
 #' lexicon_size <- cl_lexicon_size("REUTERS", p_attribute = "word")
 #' token_ids <- seq.int(from = 0, to = lexicon_size - 1)
 #' cl_id2str("REUTERS", p_attribute = "word", id = token_ids)
@@ -134,6 +138,7 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 #' @examples 
 #' # registry directory and cpos_total will be needed in examples
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' Sys.setenv(CORPUS_REGISTRY = registry)
 #' cpos_total <- cl_attribute_size(
 #'   corpus = "REUTERS", attribute = "word",
 #'   attribute_type = "p", registry = registry
