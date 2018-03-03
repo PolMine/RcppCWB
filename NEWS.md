@@ -12,6 +12,7 @@ included;
 * Renaming of exposed functions of corpus library from cwb_... to cl_...;
 * sanity checks in R wrappers for Rcpp functions.
 
+
 # v0.1.7
 * CWB source code included in package to be GPL compliant
 * template to adjust HOME and INFO in registry file used (tools/setpaths.R)

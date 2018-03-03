@@ -114,4 +114,28 @@
 #' @importFrom Rcpp evalCpp
 #' @exportPattern "^[[:alpha:]]+"
 #' @author Andreas Blaette (andreas.blaette@@uni-due.de)
+#' @examples 
+#' # functions of the corpus library (starting with cl) expose the low-level
+#' # access to the CWB corpus library (CL)
+#' 
+#' regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' ids <- cl_cpos2id("REUTERS", cpos = 1:20, p_attribute = "word", registry = regdir)
+#' tokens <- cl_id2str("REUTERS", id = ids, p_attribute = "word", registry = regdir)
+#' print(paste(tokens, collapse = " "))
+#' 
+#' # To use the corpus query processor (CQP) and its syntax, it is necessary first
+#' # to initialize CQP (example: get concordances of 'oil')
+#' 
+#' cqp_initialize(regdir)
+#' cqp_query("REUTERS", query = '[]{5} "oil" []{5}')
+#' cpos_matrix <- cqp_dump_subcorpus("REUTERS")
+#' concordances_oil <- apply(
+#'   cpos_matrix, 1,
+#'   function(row){
+#'     ids <- cl_cpos2id("REUTERS", p_attribute = "word", cpos = row[1]:row[2])
+#'     tokens <- cl_id2str("REUTERS", p_attribute = "word", id = ids)
+#'     paste(tokens, collapse = " ")
+#'   }
+#'  )
+#' 
 NULL

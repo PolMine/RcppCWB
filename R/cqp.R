@@ -19,18 +19,33 @@
 #' }
 #' cqp_is_initialized() # check initialization status (TRUE now?)
 #' cqp_get_registry() # get registry dir used by CQP
+#' cqp_set_registry(registry = registry)
 #' cqp_list_corpora() # get list of corpora
-cqp_initialize <- function(registry = NULL){
+cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY"), verbose = TRUE){
+  registry # necessary to capture Sys.getenv() assignment
   if (cqp_is_initialized()){
-    warning("CQP has already been initialized. At present, it is not possible ",
-            "to re-initialize CQP. The registry is set as: ", registry)
+    warning("CQP has already been initialized. Re-initialization is not possible. ",
+            "Only resetting registry.")
   } else {
-    if (!is.null(registry)){
-      .check_registry(registry)
-      Sys.setenv(CORPUS_REGISTRY = registry)
-    }
+    # very hacky workaround to ensure that global registry variable in dynamic
+    # library will have 255 characters. Without starting with a very long (fake)
+    # initial registry, there is a bug when resetting the registry dir to a dir
+    # that is longer than the initial dir
+    dummy_registry_superdir <- tempdir()
+    dummy_regdir <- file.path(
+      dummy_registry_superdir, 
+      paste0(
+        rep("x", times = 254 - nchar(dummy_registry_superdir)),
+        collapse = ""
+      )
+    )
+    dir.create(dummy_regdir, showWarnings = FALSE)
+    Sys.setenv(CORPUS_REGISTRY = dummy_regdir)
     .init_cqp()
   }
+  .check_registry(registry)
+  Sys.setenv(CORPUS_REGISTRY = registry)
+  cqp_set_registry(registry = registry)
   return( cqp_is_initialized() )
 }
 
@@ -48,7 +63,19 @@ cqp_get_registry <- function() .cqp_get_registry()
 #' @export cqp_set_registry
 #' @rdname cqp_initialize
 cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cqp_set_registry(registry_dir = registry)
+  if (!cqp_is_initialized()){
+    warning("cqp has not yet been initialized!")
+    return( FALSE )
+  } else {
+    .check_registry(registry)
+    Sys.setenv(CORPUS_REGISTRY = registry)
+    if (nchar(registry ) > 255){
+      stop("cannot assign new registry: maximum nchar(registry) is 255")
+    } else {
+      .cqp_set_registry(registry_dir = registry)
+      return( TRUE )
+    }
+  }
 }
 
 
@@ -88,9 +115,11 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' Evert, S. 2005. The CQP Query Language Tutorial. Available online at
 #' \url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
 #' @examples 
+#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' if (!cqp_is_initialized()){
-#'   registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #'   cqp_initialize(registry = registry)
+#' } else {
+#'   if (cqp_get_registry() != registry) cqp_set_registry(registry)
 #' }
 #' cqp_query(corpus = "REUTERS", query = '"oil";')
 #' cqp_subcorpus_size("REUTERS")

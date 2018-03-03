@@ -1,34 +1,22 @@
 ## General remarks
 
-Previous versions of RcppCWB downloaded pre-compiled binaries of the corpus library,
-including unix-alikes. Uwe Ligges alerted me that this would not be in line with GPL,
-and potentially illegal. So this new version of RcppCWB includes the entire (GPL-licensed) 
-source code of the  CWB.
+This version (0.2.0) exposes further CWB functionality than the previous version
+(0.1.7). A second part of the Corpus Workbench, the Corpus Query Processor (CQP)
+is compiled as a static library, and Rcpp wrappers expose the functionality.
 
-The configure script generates the Makevars file; The Makevars file calls minimally
-modified Makefiles in the subdirectories of the CWB (i.e. in src/cwb/cl) to generate
-a static library of the corpus library first. Then the dynamic library is generated.
-I followed section 1.2.1.3 Compiling in sub-directories of 'Writing R extensions'.
-In addition, the configure script adjusts the information in the CWB configuration file
-(config.mk) concerning the platform. As far as I can see on my test environments, this
-works fine.
+For doing this, I rely on - modified - code and approaches of the rcqp package
+authored by Bernard Desgraupes and Sylvain Loiseau (GPL license). To acknowledge the
+original work of Bernard Desgraupes and Sylvain Loiseau, both are mentioned as authores
+in the DESCRIPTION file.
 
-For Windows, the mechanism is slightly different: configure.win will call the R script 
-tools/winlibs.R which will download libcl.a from my GitHub repository 
-(https://github.com/PolMine/libcl). I tried to follow the approach of packages that rely
-on the repositories at https://github.com/rwinlib.
+The previous version of the package did not pass tests on macOS. The reason
+appears to be that glib (apparantly installed on Ubuntu, Fedora and Debian)
+is missing on your machine. If glib was installed in macOS (e.g. "brew install glib""),
+I am fairly sure RcppCWB would pass macOS tests, too. It is not a major problem
+that macOS binaries are not available, but it would be nice.
 
-The library has been cross-compiled for Windows on a Ubuntu machine. A documentation of 
-the cross-compilation is explained in the file prep/crosscompilation.Rmd of the git 
-repository, see: https://github.com/PolMine/RcppCWB/blob/master/prep/crosscompilation.Rmd
-
-In earlier versions of the package, my documentation of cross-compilation was a vignette,
-causing issues with cross-platrom portability. So no vignette any more. 
-
-The primary purpose of developing the package at this stage is to have a backend for the
-package 'polmineR' that works on Windows. Once the fundamental design is acceptable for
-CRAN, I would improve the documentation, and expose more CWB functionality using Rcpp 
-wrappers.
+I am working to establish a test environment for Solaris. I will attempt to get 
+RcppCWB work on Solaris in the next upcoming version.
 
 
 ## Test environments
@@ -39,24 +27,10 @@ wrappers.
 * Debian 9.1 (virtual machine), R 3.4.3
 * win-builder (devel and release)
 
+
 ## R CMD check results
 
-There were no ERRORs or WARNINGs. 
-
-There was 1 NOTE:
-
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: ‘Andreas Blaette <andreas.blaette@uni-due.de>’
-
-New submission
-
-Package was archived on CRAN
-
-CRAN repository db overrides:
-  X-CRAN-Comment: Archived on 2018-01-19 as was very far from
-    cross-platform code.
-
-This new version is intended to make progress towards cross-platform portability.
+There were no ERRORs, WARNINGs of NOTEs. 
 
 
 ## Downstream dependencies

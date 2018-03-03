@@ -59,9 +59,15 @@ int cqp_get_status(){
 SEXP cqp_set_registry(SEXP registry_dir){
   char * registry_new;
   registry_new = (char*)CHAR(STRING_ELT(registry_dir,0));
+  registry = cl_strdup(registry_new);
+  
+  int		ac = 1;
+  char *		av[1];
+  av[0] = (char *)"RcppCWB";
+  initialize_cqp(ac, av);
+  make_attribute_hash(16384);
+  
   SEXP result = R_NilValue;
-  /* setenv("CORPUS_REGISTRY", registry_new, 1); */
-  init_cqp();
   return result;
 }
 
