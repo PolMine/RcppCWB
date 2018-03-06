@@ -28,12 +28,12 @@ call \code{cqp_initialize}. To reset the registry, use the function
 \code{cqp_is_initialized}
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 cqp_is_initialized() # check initialization status
-if (!cqp_is_initialized()) cqp_initialize(registry)
+if (!cqp_is_initialized()) cqp_initialize()
 cqp_is_initialized() # check initialization status (TRUE now?)
 cqp_get_registry() # get registry dir used by CQP
-cqp_set_registry(registry = registry)
+regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+if (cqp_get_registry() != regdir) cqp_set_registry(registry = regdir)
 cqp_list_corpora() # get list of corpora
 }
 \author{

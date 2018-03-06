@@ -200,6 +200,46 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// foo_return
+int foo_return();
+RcppExport SEXP _RcppCWB_foo_return() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(foo_return());
+    return rcpp_result_gen;
+END_RCPP
+}
+// foo_init
+int foo_init();
+RcppExport SEXP _RcppCWB_foo_init() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(foo_init());
+    return rcpp_result_gen;
+END_RCPP
+}
+// foo_add
+int foo_add();
+RcppExport SEXP _RcppCWB_foo_add() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(foo_add());
+    return rcpp_result_gen;
+END_RCPP
+}
+// foo_unset
+int foo_unset();
+RcppExport SEXP _RcppCWB_foo_unset() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(foo_unset());
+    return rcpp_result_gen;
+END_RCPP
+}
 // init_cqp
 void init_cqp();
 RcppExport SEXP _RcppCWB_init_cqp() {
@@ -293,6 +333,17 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type inSubcorpus(inSubcorpusSEXP);
     rcpp_result_gen = Rcpp::wrap(cqp_dump_subcorpus(inSubcorpus));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_drop_subcorpus
+SEXP cqp_drop_subcorpus(SEXP inSubcorpus);
+RcppExport SEXP _RcppCWB_cqp_drop_subcorpus(SEXP inSubcorpusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type inSubcorpus(inSubcorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_drop_subcorpus(inSubcorpus));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -406,6 +457,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_id2cpos", (DL_FUNC) &_RcppCWB__cl_id2cpos, 4},
     {"_RcppCWB__cl_cpos2lbound", (DL_FUNC) &_RcppCWB__cl_cpos2lbound, 4},
     {"_RcppCWB__cl_cpos2rbound", (DL_FUNC) &_RcppCWB__cl_cpos2rbound, 4},
+    {"_RcppCWB_foo_return", (DL_FUNC) &_RcppCWB_foo_return, 0},
+    {"_RcppCWB_foo_init", (DL_FUNC) &_RcppCWB_foo_init, 0},
+    {"_RcppCWB_foo_add", (DL_FUNC) &_RcppCWB_foo_add, 0},
+    {"_RcppCWB_foo_unset", (DL_FUNC) &_RcppCWB_foo_unset, 0},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
     {"_RcppCWB_cqp_get_registry", (DL_FUNC) &_RcppCWB_cqp_get_registry, 0},
     {"_RcppCWB_cqp_get_status", (DL_FUNC) &_RcppCWB_cqp_get_status, 0},
@@ -415,6 +470,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cqp_subcorpus_size", (DL_FUNC) &_RcppCWB_cqp_subcorpus_size, 1},
     {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},
     {"_RcppCWB_cqp_dump_subcorpus", (DL_FUNC) &_RcppCWB_cqp_dump_subcorpus, 1},
+    {"_RcppCWB_cqp_drop_subcorpus", (DL_FUNC) &_RcppCWB_cqp_drop_subcorpus, 1},
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},
     {"_RcppCWB_get_count_vector", (DL_FUNC) &_RcppCWB_get_count_vector, 3},
     {"_RcppCWB_get_region_matrix", (DL_FUNC) &_RcppCWB_get_region_matrix, 4},

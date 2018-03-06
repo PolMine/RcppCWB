@@ -13,12 +13,12 @@
 #' @rdname cqp_initialize
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 #' @examples
-#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' cqp_is_initialized() # check initialization status
-#' if (!cqp_is_initialized()) cqp_initialize(registry)
+#' if (!cqp_is_initialized()) cqp_initialize()
 #' cqp_is_initialized() # check initialization status (TRUE now?)
 #' cqp_get_registry() # get registry dir used by CQP
-#' cqp_set_registry(registry = registry)
+#' regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' if (cqp_get_registry() != regdir) cqp_set_registry(registry = regdir)
 #' cqp_list_corpora() # get list of corpora
 cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY"), verbose = TRUE){
   registry # necessary to capture Sys.getenv() assignment
@@ -128,10 +128,10 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' cqp_subcorpus_size("REUTERS", child = "QUERY")
 #' cqp_dump_subcorpus("REUTERS")
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
-cqp_query <- function(corpus, query){
+cqp_query <- function(corpus, query, subcorpus = "QUERY"){
   stopifnot(corpus %in% cqp_list_corpora())
   query <- .check_cqp_query(query)
-  .cqp_query(corpus = corpus, subcorpus = "QUERY", query = query)
+  .cqp_query(corpus = corpus, subcorpus = subcorpus, query = query)
 }
 
 #' @export cqp_dump_subcorpus
@@ -152,6 +152,8 @@ cqp_subcorpus_size <- function(corpus, child = "QUERY"){
 #' @rdname cqp_query
 cqp_list_subcorpora <- function(corpus){
   stopifnot(corpus %in% cqp_list_corpora())
-  .cqp_list_subcorpora(inCorpus = corpus)
+  y <- .cqp_list_subcorpora(inCorpus = corpus)
+  print(y)
+  y
 }
 

@@ -20,7 +20,6 @@ extern "C" {
 
 using namespace Rcpp;
 
-
 int cqp_initialization_status = 0;
 
 // [[Rcpp::export(name=".init_cqp")]]
@@ -163,24 +162,28 @@ Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus)
   CorpusList *cl, *mother;
   int i = 0, n = 0;
   Rcpp::StringVector result;
-  
+
   corpus = (char*)CHAR(STRING_ELT(inCorpus,0));
   
   mother = cqi_find_corpus(corpus);
   if (!check_corpus_name(corpus) || mother == NULL) {
-    Rcpp::StringVector result(1);
+    /* Rcpp::StringVector result(1); */
   } else {
     /* First count subcorpora */
     for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
-      if (cl->type == SUB && cl->corpus == mother->corpus) n++;
+      if (cl->type == SUB && cl->corpus == mother->corpus){
+        n++;
+      }
     }
-    
+    printf("number of subcorpora: %d\n", n);
     Rcpp::StringVector result(n);
-
+    
     /* Then build list of names */
     for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
       if (cl->type == SUB && cl->corpus == mother->corpus) {
         result(i) = cl->name;
+        printf("subcorpus name: %s\n", cl->name);
+        /* printf("added to result: %s", result(i)); */
         i++;
       }
     }
@@ -212,5 +215,40 @@ Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus)
   return result;
 }
 
+// [[Rcpp::export(name=".cqp_drop_subcorpus")]]
+SEXP cqp_drop_subcorpus(SEXP inSubcorpus)
+{
+  SEXP			result = R_NilValue;
+  char *			subcorpus;
+  char 			*c, *sc;
+  CorpusList *	cl;
+  
+  PROTECT(inSubcorpus);
+  
+  subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
+  
+  /* Make sure it is a subcorpus, not a root corpus */
+  if (!split_subcorpus_spec(subcorpus, &c, &sc)) {
+    UNPROTECT(1);
+    /* rcqp_error_code(cqi_errno); */
+  } else if (sc == NULL) {
+    free(c);
+    UNPROTECT(1);
+    /* error("can't drop a root corpus."); */
+  } else {
+    free(c); free(sc);
+    cl = cqi_find_corpus(subcorpus);
+    if (cl == NULL) {
+      UNPROTECT(1);
+      /* rcqp_error_code(cqi_errno); */
+    } else {
+      dropcorpus(cl);
+    }
+  }
+  
+  UNPROTECT(1);
+  
+  return result;
+}
 
 

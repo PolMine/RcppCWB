@@ -57,6 +57,22 @@
     .Call(`_RcppCWB__cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 
+foo_return <- function() {
+    .Call(`_RcppCWB_foo_return`)
+}
+
+foo_init <- function() {
+    .Call(`_RcppCWB_foo_init`)
+}
+
+foo_add <- function() {
+    .Call(`_RcppCWB_foo_add`)
+}
+
+foo_unset <- function() {
+    .Call(`_RcppCWB_foo_unset`)
+}
+
 .init_cqp <- function() {
     invisible(.Call(`_RcppCWB_init_cqp`))
 }
@@ -91,6 +107,10 @@
 
 .cqp_dump_subcorpus <- function(inSubcorpus) {
     .Call(`_RcppCWB_cqp_dump_subcorpus`, inSubcorpus)
+}
+
+.cqp_drop_subcorpus <- function(inSubcorpus) {
+    .Call(`_RcppCWB_cqp_drop_subcorpus`, inSubcorpus)
 }
 
 .decode_s_attribute <- function(corpus, s_attribute, registry) {
