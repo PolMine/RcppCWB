@@ -11,7 +11,7 @@ test_that(
       registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
       method = "Rcpp"
     )
-    expect_equal(sAttrDF[["values"]][1:4], c("usa", "usa", "canada", "usa"))
-    expect_equal(dim(sAttrDF), 20L)
+    expect_equal(sAttrDF[["value"]][1:4], c("usa", "usa", "canada", "usa"))
+    expect_equal(nrow(sAttrDF), 20L)
   }
 )

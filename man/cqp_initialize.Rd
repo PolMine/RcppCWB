@@ -17,8 +17,6 @@ cqp_reset_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{registry}{the registry directory}
-
-\item{verbose}{logical, whether to output status information}
 }
 \description{
 CQP needs to know where to look for CWB indexed corpora. To initialize CQP,

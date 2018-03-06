@@ -7,7 +7,6 @@
 #' \code{cqp_is_initialized}
 #' 
 #' @param registry the registry directory
-#' @param verbose logical, whether to output status information
 #' @export cqp_initialize
 #' @rdname cqp_initialize
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau

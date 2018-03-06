@@ -55,6 +55,12 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
     
     values <- avs[match(avx_matrix[,2], unique(avx_matrix[,2]))]
     
+    df <- data.frame(
+      cpos_left = region_matrix[,1],
+      cpos_right = region_matrix[,2],
+      value = values,
+      stringsAsFactors = FALSE
+    )
   } else if (method == "Rcpp"){
     
     if (missing(corpus)) stop("corpus needs to be specified to use 'Rcpp' method")
@@ -65,14 +71,15 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
     warning("region matrix can not yet be generated with Rcpp method")
     region_matrix <- NULL
     
+    df <- data.frame(
+      cpos_left = NA,
+      cpos_right = NA,
+      value = values,
+      stringsAsFactors = FALSE
+    )
+    
   } else {
-    
     stop("method needs to be either 'R' or 'Rcpp'")
-    
   }
-  data.frame(
-    cpos_left = region_matrix[,1],
-    cpos_right = region_matrix[,2],
-    value = values
-  )
+  df
 }

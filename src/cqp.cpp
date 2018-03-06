@@ -175,14 +175,14 @@ Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus)
         n++;
       }
     }
-    printf("number of subcorpora: %d\n", n);
+    Rprintf("number of subcorpora: %d\n", n);
     Rcpp::StringVector result(n);
     
     /* Then build list of names */
     for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
       if (cl->type == SUB && cl->corpus == mother->corpus) {
         result(i) = cl->name;
-        printf("subcorpus name: %s\n", cl->name);
+        Rprintf("subcorpus name: %s\n", cl->name);
         /* printf("added to result: %s", result(i)); */
         i++;
       }
