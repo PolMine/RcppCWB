@@ -4,7 +4,7 @@
 \alias{cqp_initialize}
 \alias{cqp_is_initialized}
 \alias{cqp_get_registry}
-\alias{cqp_set_registry}
+\alias{cqp_reset_registry}
 \title{Initialize Corpus Query Processor (CQP).}
 \usage{
 cqp_initialize(registry = Sys.getenv("CORPUS_REGISTRY"), verbose = TRUE)
@@ -13,7 +13,7 @@ cqp_is_initialized()
 
 cqp_get_registry()
 
-cqp_set_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
+cqp_reset_registry(registry)
 }
 \arguments{
 \item{registry}{the registry directory}

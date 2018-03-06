@@ -2,7 +2,7 @@
 #' 
 #' CQP needs to know where to look for CWB indexed corpora. To initialize CQP,
 #' call \code{cqp_initialize}. To reset the registry, use the function
-#' \code{cqp_set_registry}. To get the registry used by CQP, use
+#' \code{cqp_reset_registry}. To get the registry used by CQP, use
 #' \code{cqp_get_registry}. To get the initialization status, use
 #' \code{cqp_is_initialized}
 #' 
@@ -18,10 +18,11 @@
 #' cqp_is_initialized() # check initialization status (TRUE now?)
 #' cqp_get_registry() # get registry dir used by CQP
 #' regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' if (cqp_get_registry() != regdir) cqp_set_registry(registry = regdir)
+#' if (cqp_get_registry() != regdir) cqp_reset_registry(registry = regdir)
 #' cqp_list_corpora() # get list of corpora
-cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY"), verbose = TRUE){
-  registry # necessary to capture Sys.getenv() assignment
+cqp_initialize <- function(){
+  registry_new <- Sys.getenv("CORPUS_REGISTRY")
+  # registry # necessary to capture Sys.getenv() assignment
   if (cqp_is_initialized()){
     warning("CQP has already been initialized. Re-initialization is not possible. ",
             "Only resetting registry.")
@@ -42,9 +43,9 @@ cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY"), verbose = T
     Sys.setenv(CORPUS_REGISTRY = dummy_regdir)
     .init_cqp()
   }
-  .check_registry(registry)
-  Sys.setenv(CORPUS_REGISTRY = registry)
-  cqp_set_registry(registry = registry)
+  .check_registry(registry_new)
+  Sys.setenv(CORPUS_REGISTRY = registry_new)
+  cqp_reset_registry()
   return( cqp_is_initialized() )
 }
 
@@ -59,19 +60,20 @@ cqp_is_initialized <- function(){
 #' @rdname cqp_initialize
 cqp_get_registry <- function() .cqp_get_registry()
 
-#' @export cqp_set_registry
+#' @export cqp_reset_registry
 #' @rdname cqp_initialize
-cqp_set_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
+cqp_reset_registry <- function(){
+  registry_dir <- Sys.getenv("CORPUS_REGISTRY")
   if (!cqp_is_initialized()){
     warning("cqp has not yet been initialized!")
     return( FALSE )
   } else {
-    .check_registry(registry)
-    Sys.setenv(CORPUS_REGISTRY = registry)
-    if (nchar(registry ) > 255){
+    .check_registry(registry_dir)
+    Sys.setenv(CORPUS_REGISTRY = registry_dir)
+    if (nchar(registry_dir) > 255){
       stop("cannot assign new registry: maximum nchar(registry) is 255")
     } else {
-      .cqp_set_registry(registry_dir = registry)
+      .cqp_set_registry(registry_dir = registry_dir)
       return( TRUE )
     }
   }
@@ -118,7 +120,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' if (!cqp_is_initialized()){
 #'   cqp_initialize(registry = registry)
 #' } else {
-#'   if (cqp_get_registry() != registry) cqp_set_registry(registry)
+#'   if (cqp_get_registry() != registry) cqp_reset_registry(registry)
 #' }
 #' cqp_query(corpus = "REUTERS", query = '"oil";')
 #' cqp_subcorpus_size("REUTERS")

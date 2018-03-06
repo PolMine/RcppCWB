@@ -7,7 +7,7 @@
 \alias{cqp_list_subcorpora}
 \title{Execute CQP Query and Retrieve Results.}
 \usage{
-cqp_query(corpus, query)
+cqp_query(corpus, query, subcorpus = "QUERY")
 
 cqp_dump_subcorpus(corpus, child = "QUERY")
 

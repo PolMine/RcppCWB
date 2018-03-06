@@ -59,12 +59,12 @@ SEXP cqp_set_registry(SEXP registry_dir){
   char * registry_new;
   registry_new = (char*)CHAR(STRING_ELT(registry_dir,0));
   registry = cl_strdup(registry_new);
-  
   int		ac = 1;
   char *		av[1];
   av[0] = (char *)"RcppCWB";
-  initialize_cqp(ac, av);
+  set_current_corpus(NULL, 0); /* required to avoid crash! */ 
   
+  initialize_cqp(ac, av);
   make_attribute_hash(16384);
   
   SEXP result = R_NilValue;
