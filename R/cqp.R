@@ -8,15 +8,14 @@
 #' 
 #' 
 #' @param registry the registry directory
+#' @param verbose logical, whether to output status information
 #' @export cqp_initialize
 #' @rdname cqp_initialize
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 #' @examples
+#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' cqp_is_initialized() # check initialization status
-#' if (!cqp_is_initialized()){
-#'   registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#'   cqp_initialize(registry)
-#' }
+#' if (!cqp_is_initialized()) cqp_initialize(registry)
 #' cqp_is_initialized() # check initialization status (TRUE now?)
 #' cqp_get_registry() # get registry dir used by CQP
 #' cqp_set_registry(registry = registry)
@@ -27,7 +26,7 @@ cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY"), verbose = T
     warning("CQP has already been initialized. Re-initialization is not possible. ",
             "Only resetting registry.")
   } else {
-    # very hacky workaround to ensure that global registry variable in dynamic
+    # workaround to ensure that global registry variable in dynamic
     # library will have 255 characters. Without starting with a very long (fake)
     # initial registry, there is a bug when resetting the registry dir to a dir
     # that is longer than the initial dir
