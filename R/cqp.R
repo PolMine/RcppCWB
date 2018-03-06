@@ -6,7 +6,6 @@
 #' \code{cqp_get_registry}. To get the initialization status, use
 #' \code{cqp_is_initialized}
 #' 
-#' 
 #' @param registry the registry directory
 #' @param verbose logical, whether to output status information
 #' @export cqp_initialize
@@ -20,8 +19,8 @@
 #' regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 #' if (cqp_get_registry() != regdir) cqp_reset_registry(registry = regdir)
 #' cqp_list_corpora() # get list of corpora
-cqp_initialize <- function(){
-  registry_new <- Sys.getenv("CORPUS_REGISTRY")
+cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
+  registry_new <- registry
   # registry # necessary to capture Sys.getenv() assignment
   if (cqp_is_initialized()){
     warning("CQP has already been initialized. Re-initialization is not possible. ",
@@ -62,10 +61,10 @@ cqp_get_registry <- function() .cqp_get_registry()
 
 #' @export cqp_reset_registry
 #' @rdname cqp_initialize
-cqp_reset_registry <- function(){
-  registry_dir <- Sys.getenv("CORPUS_REGISTRY")
+cqp_reset_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
+  registry_dir <- registry
   if (!cqp_is_initialized()){
-    warning("cqp has not yet been initialized!")
+    warning("cannot reset registry, cqp has not yet been initialized!")
     return( FALSE )
   } else {
     .check_registry(registry_dir)
@@ -109,7 +108,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' 
 #' @param corpus a CWB corpus
 #' @param query a CQP query
-#' @param child a subcorpus
+#' @param subcorpus subcorpus name
 #' @export cqp_query
 #' @rdname cqp_query
 #' @references 
@@ -127,7 +126,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' cqp_dump_subcorpus("REUTERS")
 #' 
 #' cqp_query(corpus = "REUTERS", query = '"crude" "oil";')
-#' cqp_subcorpus_size("REUTERS", child = "QUERY")
+#' cqp_subcorpus_size("REUTERS", subcorpus = "QUERY")
 #' cqp_dump_subcorpus("REUTERS")
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_query <- function(corpus, query, subcorpus = "QUERY"){
@@ -138,24 +137,22 @@ cqp_query <- function(corpus, query, subcorpus = "QUERY"){
 
 #' @export cqp_dump_subcorpus
 #' @rdname cqp_query
-cqp_dump_subcorpus <- function(corpus, child = "QUERY"){
+cqp_dump_subcorpus <- function(corpus, subcorpus = "QUERY"){
   stopifnot(corpus %in% cqp_list_corpora())
-  .cqp_dump_subcorpus(paste(corpus, child, sep = ":"))
+  .cqp_dump_subcorpus(paste(corpus, subcorpus, sep = ":"))
 }
 
 #' @export cqp_subcorpus_size
 #' @rdname cqp_query
-cqp_subcorpus_size <- function(corpus, child = "QUERY"){
+cqp_subcorpus_size <- function(corpus, subcorpus = "QUERY"){
   stopifnot(corpus %in% cqp_list_corpora())
-  .cqp_subcorpus_size(scorpus = paste(corpus, child, sep = ":"))
+  .cqp_subcorpus_size(scorpus = paste(corpus, subcorpus, sep = ":"))
 }
 
 #' @export cqp_list_subcorpora
 #' @rdname cqp_query
 cqp_list_subcorpora <- function(corpus){
   stopifnot(corpus %in% cqp_list_corpora())
-  y <- .cqp_list_subcorpora(inCorpus = corpus)
-  print(y)
-  y
+  .cqp_list_subcorpora(inCorpus = corpus)
 }
 

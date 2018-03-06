@@ -9,9 +9,9 @@
 \usage{
 cqp_query(corpus, query, subcorpus = "QUERY")
 
-cqp_dump_subcorpus(corpus, child = "QUERY")
+cqp_dump_subcorpus(corpus, subcorpus = "QUERY")
 
-cqp_subcorpus_size(corpus, child = "QUERY")
+cqp_subcorpus_size(corpus, subcorpus = "QUERY")
 
 cqp_list_subcorpora(corpus)
 }
@@ -20,7 +20,7 @@ cqp_list_subcorpora(corpus)
 
 \item{query}{a CQP query}
 
-\item{child}{a subcorpus}
+\item{subcorpus}{subcorpus name}
 }
 \description{
 Using CQP queries requires a two-step procedure: At first, you execute a
@@ -38,14 +38,14 @@ registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 if (!cqp_is_initialized()){
   cqp_initialize(registry = registry)
 } else {
-  if (cqp_get_registry() != registry) cqp_set_registry(registry)
+  if (cqp_get_registry() != registry) cqp_reset_registry(registry)
 }
 cqp_query(corpus = "REUTERS", query = '"oil";')
 cqp_subcorpus_size("REUTERS")
 cqp_dump_subcorpus("REUTERS")
 
 cqp_query(corpus = "REUTERS", query = '"crude" "oil";')
-cqp_subcorpus_size("REUTERS", child = "QUERY")
+cqp_subcorpus_size("REUTERS", subcorpus = "QUERY")
 cqp_dump_subcorpus("REUTERS")
 }
 \references{
