@@ -54,7 +54,7 @@ registry_file_make <- function(
   if (is.null(info_file)) info_file <- file.path(dirname(data_dir), ".info.md")
   corpus_properties <- c(corpus_properties, drive_letter = path_get_drive_letter(data_dir))
   if (.Platform$OS.type == "windows")
-    data_dir <- path_remove_drive_letter(normalizePath(data_dir))
+    data_dir <- path_remove_drive_letter(normalizePath(data_dir, winslash = "/"))
   c(
     "##",                                                                                                   
     sprintf("## registry entry for corpus %s", toupper(corpus)),                                                                                
