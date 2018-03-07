@@ -66,6 +66,8 @@ CWB/Perl'').
 tokens <- readLines(system.file(package = "RcppCWB", "extdata", "examples", "reuters.txt"))
 
 tmpdir <- tempdir()
+if (.Platform$OS.type == "windows")
+   tmpdir <- normalizePath(tmpdir, winslash = "/")
 registry_tmp <- file.path(tmpdir, "registry")
 data_dir_tmp <- file.path(tmpdir, "data_dir")
 dir.create (registry_tmp)
