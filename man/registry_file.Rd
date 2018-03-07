@@ -54,6 +54,8 @@ directory.
 \examples{
 dir.create(temp_regdir <- tempfile())
 temp_data_dir <- tempfile()
+if (.Platform$OS.type == "windows")
+   temp_data_dir <- normalizePath(temp_data_dir, winslash = "/")
 reuters_regfile <- registry_file_make(
   corpus = "REUTERS", description = "Reuters Example Corpus",
   data_dir = temp_data_dir, info_file = NULL,

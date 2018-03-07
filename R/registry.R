@@ -30,6 +30,8 @@
 #' @examples 
 #' dir.create(temp_regdir <- tempfile())
 #' temp_data_dir <- tempfile()
+#' if (.Platform$OS.type == "windows")
+#'    temp_data_dir <- normalizePath(temp_data_dir, winslash = "/")
 #' reuters_regfile <- registry_file_make(
 #'   corpus = "REUTERS", description = "Reuters Example Corpus",
 #'   data_dir = temp_data_dir, info_file = NULL,
@@ -54,7 +56,8 @@ registry_file_make <- function(
   if (is.null(info_file)) info_file <- file.path(dirname(data_dir), ".info.md")
   corpus_properties <- c(corpus_properties, drive_letter = path_get_drive_letter(data_dir))
   if (.Platform$OS.type == "windows")
-    data_dir <- path_remove_drive_letter(normalizePath(data_dir, winslash = "/"))
+    data_dir <- normalizePath(data_dir, winslash = "/")
+    data_dir <- path_remove_drive_letter(data_dir)
   c(
     "##",                                                                                                   
     sprintf("## registry entry for corpus %s", toupper(corpus)),                                                                                
