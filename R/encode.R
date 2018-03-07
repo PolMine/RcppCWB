@@ -51,9 +51,9 @@
 #'   data_dir = data_dir_tmp 
 #' )
 #' 
-#' registry_write(
+#' registry_file_write(
 #'   registry_dir = registry_tmp, corpus = "REUTERS", data_dir = data_dir_tmp,
-#'   encoding = "utf-8", language = "en", p_attributes = "word"
+#'   corpus_properties = c(encoding = "utf-8", language = "en"), p_attributes = "word"
 #'   )
 #' cqp_initialize(registry = registry_tmp)
 #' cqp_query(corpus = "REUTERS", query = '[]{3} "oil" []{3};')
