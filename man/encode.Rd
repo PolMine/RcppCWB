@@ -86,7 +86,7 @@ registry_file_write(
   registry_dir = registry_tmp, corpus = "REUTERS", data_dir = data_dir_tmp,
   corpus_properties = c(encoding = "utf-8", language = "en"), p_attributes = "word"
   )
-cqp_initialize(registry = registry_tmp)
+cqp_initialize(registry = path_remove_drive_letter(registry_tmp))
 cqp_query(corpus = "REUTERS", query = '[]{3} "oil" []{3};')
 regions <- cqp_dump_subcorpus(corpus = "REUTERS")
 kwic <- apply(regions, 1, function(region){
