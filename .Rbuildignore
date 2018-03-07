@@ -1,5 +1,6 @@
-windows
-prep
+^windows$
+^prep$
 .travis.yml$
 ^cran-comments.md$
 ^paper.md$
+^data-raw$
