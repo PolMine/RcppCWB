@@ -89,8 +89,8 @@
 #' Available online at \url{http://cwb.sourceforge.net/files/Christ1994.pdf}
 #' 
 #' Desgraupes, B.; Loiseau, S. 2012. Introduction to the rcqp package.
-#' Vignette of the rcqp package. Available online at
-#' \url{https://CRAN.R-project.org/package=rcqp/vignettes/rcqp.pdf}
+#' Vignette of the rcqp package. Available at the CRAN archive at
+#' \url{https://cran.r-project.org/src/contrib/Archive/rcqp/}
 #' 
 #' Evert, S. 2005. The CQP Query Language Tutorial. Available online at
 #' \url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
