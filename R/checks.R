@@ -79,7 +79,7 @@
 }
 
 .check_drive <- function(registry){
-  if (.Platform$OS.type != windows){
+  if (.Platform$OS.type != "windows"){
     warning("Auxiliary function .check_drive has been called. Not necessary nor ",
             "appropriate if not on Windows.")
     return(TRUE)

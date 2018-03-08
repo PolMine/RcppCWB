@@ -1,7 +1,7 @@
 ^windows$
 ^prep$
-.travis.yml$
-^cran-comments.md$
+.travis\.yml$
+^cran-comments\.md$
 ^paper.md$
 ^data-raw$
-^appveyor.yml$
+^appveyor\.yml$
