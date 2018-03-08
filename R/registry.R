@@ -71,7 +71,7 @@ registry_file_make <- function(
     info_file <- normalizePath(info_file, winslash = "/")
     info_file <- path_remove_drive_letter(info_file)
   }
-  if (grepl("\\s", info_dir)) data_dir <- sprintf("\"%s\"", info_dir)
+  if (grepl("\\s", info_file)) info_file <- sprintf("\"%s\"", info_file)
   
   corpus_properties <- c(corpus_properties, drive_letter = path_get_drive_letter(data_dir))
   c(
