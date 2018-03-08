@@ -68,8 +68,8 @@ registry_file_make <- function(
     info_file <- file.path(dirname(data_dir), ".info.md")
   }
   if (.Platform$OS.type == "windows"){
-    info_dir <- normalizePath(info_dir, winslash = "/")
-    info_dir <- path_remove_drive_letter(info_dir)
+    info_file <- normalizePath(info_file, winslash = "/")
+    info_file <- path_remove_drive_letter(info_file)
   }
   if (grepl("\\s", info_dir)) data_dir <- sprintf("\"%s\"", info_dir)
   

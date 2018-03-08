@@ -30,13 +30,15 @@ cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
     # initial registry, there is a bug when resetting the registry dir to a dir
     # that is longer than the initial dir
     dummy_superdir <- tempdir()
+    dir.create(dummy_superdir, showWarnings = FALSE)
     if (.Platform$OS.type == "windows"){
       dummy_superdir <- normalizePath(dummy_superdir, winslash = "/")
     }
+    # the times argument is 247 for Windows compatibility 
     dummy_regdir <- file.path(
       dummy_superdir, 
       paste0(
-        rep("x", times = 254 - nchar(dummy_superdir)),
+        rep("x", times = 247 - nchar(dummy_superdir)),
         collapse = ""
       )
     )
