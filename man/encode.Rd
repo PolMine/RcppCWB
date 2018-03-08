@@ -66,27 +66,27 @@ CWB/Perl'').
 tokens <- readLines(system.file(package = "RcppCWB", "extdata", "examples", "reuters.txt"))
 
 tmpdir <- tempdir()
-if (.Platform$OS.type == "windows")
-   tmpdir <- normalizePath(tmpdir, winslash = "/")
+if (.Platform$OS.type == "windows") tmpdir <- normalizePath(tmpdir, winslash = "/")
 registry_tmp <- file.path(tmpdir, "registry")
 data_dir_tmp <- file.path(tmpdir, "data_dir")
 dir.create (registry_tmp)
 dir.create(data_dir_tmp)
-
+#' 
 p_attribute_encode(
   token_stream = tokens, p_attribute = "word",
   data_dir = data_dir_tmp
   )
 p_attribute_makeall(
   token_stream = tokens, p_attribute = "word",
-  data_dir = data_dir_tmp 
+  data_dir = data_dir_tmp
 )
 
 registry_file_write(
   registry_dir = registry_tmp, corpus = "REUTERS", data_dir = data_dir_tmp,
   corpus_properties = c(encoding = "utf-8", language = "en"), p_attributes = "word"
   )
-cqp_initialize(registry = path_remove_drive_letter(registry_tmp))
+if (cqp_is_initialized()) cqp_reset_registry(registry_tmp) else cqp_initialize(registry_tmp)
+
 cqp_query(corpus = "REUTERS", query = '[]{3} "oil" []{3};')
 regions <- cqp_dump_subcorpus(corpus = "REUTERS")
 kwic <- apply(regions, 1, function(region){
