@@ -33,9 +33,9 @@
 #' if (.Platform$OS.type == "windows"){
 #'   temp_data_dir <- normalizePath(temp_data_dir, winslash = "/")
 #'   drive_letter <- path_get_drive_letter(temp_data_dir)
-#'   
+#' 
 #' }
-#'
+#' 
 #' reuters_regfile <- registry_file_make(
 #'   corpus = "REUTERS", description = "Reuters Example Corpus",
 #'   data_dir = temp_data_dir, info_file = NULL,
@@ -57,11 +57,23 @@ registry_file_make <- function(
   registry_dir, corpus, description = "", data_dir, info_file = NULL,
   corpus_properties = c(language = "en", charset = "latin-1"),
   p_attributes = "word", s_attributes = NULL){
-  if (is.null(info_file)) info_file <- file.path(dirname(data_dir), ".info.md")
-  corpus_properties <- c(corpus_properties, drive_letter = path_get_drive_letter(data_dir))
-  if (.Platform$OS.type == "windows")
+  
+  if (.Platform$OS.type == "windows"){
     data_dir <- normalizePath(data_dir, winslash = "/")
     data_dir <- path_remove_drive_letter(data_dir)
+  }
+  if (grepl("\\s", data_dir)) data_dir <- sprintf("\"%s\"", data_dir)
+  
+  if (is.null(info_file)){
+    info_file <- file.path(dirname(data_dir), ".info.md")
+  }
+  if (.Platform$OS.type == "windows"){
+    info_dir <- normalizePath(info_dir, winslash = "/")
+    info_dir <- path_remove_drive_letter(info_dir)
+  }
+  if (grepl("\\s", info_dir)) data_dir <- sprintf("\"%s\"", info_dir)
+  
+  corpus_properties <- c(corpus_properties, drive_letter = path_get_drive_letter(data_dir))
   c(
     "##",                                                                                                   
     sprintf("## registry entry for corpus %s", toupper(corpus)),                                                                                

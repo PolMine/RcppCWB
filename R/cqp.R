@@ -29,11 +29,14 @@ cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
     # library will have 255 characters. Without starting with a very long (fake)
     # initial registry, there is a bug when resetting the registry dir to a dir
     # that is longer than the initial dir
-    dummy_registry_superdir <- tempdir()
+    dummy_superdir <- tempdir()
+    if (.Platform$OS.type == "windows"){
+      dummy_superdir <- normalizePath(dummy_superdir, winslash = "/")
+    }
     dummy_regdir <- file.path(
-      dummy_registry_superdir, 
+      dummy_superdir, 
       paste0(
-        rep("x", times = 254 - nchar(dummy_registry_superdir)),
+        rep("x", times = 254 - nchar(dummy_superdir)),
         collapse = ""
       )
     )

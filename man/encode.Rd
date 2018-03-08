@@ -71,7 +71,8 @@ registry_tmp <- file.path(tmpdir, "registry")
 data_dir_tmp <- file.path(tmpdir, "data_dir")
 dir.create (registry_tmp)
 dir.create(data_dir_tmp)
-#' 
+setwd(tmpdir)
+
 p_attribute_encode(
   token_stream = tokens, p_attribute = "word",
   data_dir = data_dir_tmp
@@ -81,7 +82,7 @@ p_attribute_makeall(
   data_dir = data_dir_tmp
 )
 
-registry_file_write(
+regfile <- registry_file_write(
   registry_dir = registry_tmp, corpus = "REUTERS", data_dir = data_dir_tmp,
   corpus_properties = c(encoding = "utf-8", language = "en"), p_attributes = "word"
   )
