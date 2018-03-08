@@ -90,7 +90,7 @@
     if (interactive()){
       msg <- c("The drive of your current working directory differs from the drive of",
                "the registry directory. The corpus data cannot be processed by CWB tools",
-               "unless the drive is set to", regsitry_drive, "- please confirm that you",
+               "unless the drive is set to", registry_drive, "- please confirm that you",
                "agree to resetting the working directory [Y/n]:"
       )
       user_feedback <- readline(prompt = paste0(msg, collapse = " "))
