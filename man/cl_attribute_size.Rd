@@ -19,7 +19,7 @@ environment variable CORPUS_REGISTRY}
 }
 \description{
 Use \code{cl_attribute_size} to get the total number of values of a
-positional attribute (param \code{attribute_type} = "p"), or strucutral
+positional attribute (param \code{attribute_type} = "p"), or structural
 attribute (param \code{attribute_type} = "s"). Note that indices are
 zero-based, i.e. the maximum position of a positional / structural
 attribute is attribute size minus 1 (see examples).

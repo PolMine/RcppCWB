@@ -13,7 +13,7 @@
 #' @param encoding encoding of the values ("latin-1" or "utf-8")
 #' @param registry registry directory
 #' @param method character vector, whether to use "R" or "Rcpp" implementation
-#' @return A \code{data.frame} with three columms. Column \code{cpos_left} are the start
+#' @return A \code{data.frame} with three columns. Column \code{cpos_left} are the start
 #' corpus positions of a structural annotation, \code{cpos_right} the end corpus positions.
 #' Column \code{value} is the value of the annotation.
 #' @export s_attribute_decode

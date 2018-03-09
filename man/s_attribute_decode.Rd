@@ -21,7 +21,7 @@ s_attribute_decode(corpus, data_dir, s_attribute, encoding = NULL,
 \item{method}{character vector, whether to use "R" or "Rcpp" implementation}
 }
 \value{
-A \code{data.frame} with three columms. Column \code{cpos_left} are the start
+A \code{data.frame} with three columns. Column \code{cpos_left} are the start
 corpus positions of a structural annotation, \code{cpos_right} the end corpus positions.
 Column \code{value} is the value of the annotation.
 

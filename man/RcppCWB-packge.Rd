@@ -60,7 +60,7 @@ the query syntax of the \code{Corpus Query Processor} (CQP).
   compiled and make the relevant functions of the Corpus Library and CQP
   accessible. In addition to genuine CWB functions, \code{RcppCWB} offers a
   set of higher level functions implemented using \code{Rcpp} for common
-  performance criticial tasks.
+  performance critical tasks.
 }
 
 \section{Getting Started with RcppCWB}{
