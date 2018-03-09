@@ -88,25 +88,8 @@
   wd_drive <- path_get_drive_letter(getwd())
   if (registry_drive != wd_drive){
     default_working_dir <- getwd()
-    if (interactive()){
-      msg <- c("The drive of your current working directory differs from the drive of",
-               "the registry directory. The corpus data cannot be processed by CWB tools",
-               "unless the drive is set to", registry_drive, "- please confirm that you",
-               "agree to resetting the working directory [Y/n]:"
-      )
-      user_feedback <- readline(prompt = paste0(msg, collapse = " "))
-      if (user_feedback == "Y"){
-        setwd(registry_drive)
-        return(default_working_dir)
-      } else {
-        warning("Drive not reset. Drive of working directory differs from drive of",
-                "registry directory. CWB may fail to find data directory.")
-        return(NA)
-      }
-    } else {
-      setwd(registry_drive)
-      return(default_working_dir)
-    }
+    setwd(registry_drive)
+    return(default_working_dir)
   } else {
     return(NA)
   }
