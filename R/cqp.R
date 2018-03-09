@@ -38,7 +38,7 @@ cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
     dummy_regdir <- file.path(
       dummy_superdir, 
       paste0(
-        rep("x", times = 247 - nchar(dummy_superdir)),
+        rep("x", times = 246 - nchar(dummy_superdir)),
         collapse = ""
       )
     )
