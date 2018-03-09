@@ -1,5 +1,7 @@
 rm -f src/*.{o,so}
+rm -f src/cwb/cl/*.{a,o}
+rm -f src/cwb/cl/depend.mk
+rm -f src/cwb/cqp/*.{a,o}
+rm -f src/cwb/cqp/depend.mk
+rm -f src/CQi/*.{o}
 
-if [ -d "cwb" ]; then
-  rm -r cwb
-fi
