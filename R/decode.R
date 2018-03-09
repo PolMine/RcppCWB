@@ -69,7 +69,7 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
     .check_corpus(corpus = corpus, registry = registry)
     .check_s_attribute(s_attribute = s_attribute)
     values <- .decode_s_attribute(corpus = corpus, s_attribute = s_attribute, registry = registry)
-    if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+    # if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
     warning("region matrix can not yet be generated with Rcpp method")
     region_matrix <- NULL
     
