@@ -22,8 +22,10 @@
 #' strucs <- seq.int(from = 0, to = places_no - 1)
 #' cl_struc2str("REUTERS", "places", struc = strucs)
 cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
-  .cl_attribute_size(corpus = corpus, attribute = attribute, attribute_type = attribute_type, registry = registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_attribute_size(corpus = corpus, attribute = attribute, attribute_type = attribute_type, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' Get Lexicon Size.
@@ -44,8 +46,10 @@ cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.
 #' token_ids <- seq.int(from = 0, to = lexicon_size - 1)
 #' cl_id2str("REUTERS", p_attribute = "word", id = token_ids)
 cl_lexicon_size <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
-  .cl_lexicon_size(corpus = corpus, p_attribute = p_attribute, registry = registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_lexicon_size(corpus = corpus, p_attribute = p_attribute, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 
@@ -65,7 +69,7 @@ cl_lexicon_size <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
 #' @rdname s_attributes
-#' @name s_attributes
+#' @name CL: s_attributes
 #' @examples
 #' # get registry directory
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
@@ -91,31 +95,42 @@ cl_lexicon_size <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' txt <- cl_cpos2str("REUTERS", p_attribute = "word", cpos = cpos_struc[1]:cpos_struc[2])
 #' fulltext <- paste(txt, collapse = " ")
 cl_cpos2struc <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
-  .cl_cpos2struc(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_cpos2struc(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname s_attributes
 cl_struc2cpos <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), struc){
-  .cl_struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname s_attributes
 cl_struc2str <- function(corpus, s_attribute, struc, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
-  .cl_struc2str(corpus = corpus, s_attribute = s_attribute, struc = struc, registry = registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_struc2str(corpus = corpus, s_attribute = s_attribute, struc = struc, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname s_attributes
 cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
-  .cl_cpos2lbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_cpos2lbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname s_attributes
 cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
-  .cl_cpos2rbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
+  retval <- .cl_cpos2rbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 
@@ -140,7 +155,7 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 #' @param regex a regular expression
 #' @param str a character string
 #' @rdname p_attributes
-#' @name p_attributes
+#' @name CL: p_attributes
 #' @examples 
 #' # registry directory and cpos_total will be needed in examples
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
@@ -196,58 +211,72 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 #' )
 #' 
 cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  retval <- .cl_cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname p_attributes
 cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  retval <- .cl_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname p_attributes
 cl_id2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), id){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
+  retval <- .cl_id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname p_attributes
 cl_regex2id <- function(corpus, p_attribute, regex, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_regex2id(corpus = corpus, p_attribute = p_attribute, regex = regex, registry = registry)
+  retval <- .cl_regex2id(corpus = corpus, p_attribute = p_attribute, regex = regex, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname p_attributes
 cl_str2id <- function(corpus, p_attribute, str, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_str2id(corpus = corpus, p_attribute = p_attribute, str = str, registry = registry)
+  retval <- .cl_str2id(corpus = corpus, p_attribute = p_attribute, str = str, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 #' @rdname p_attributes
 cl_id2freq <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_id2freq(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
+  retval <- .cl_id2freq(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 
 
 #' @rdname p_attributes
 cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (.Platform$OS.type == "windows") .check_drive(registry)
+  if (.Platform$OS.type == "windows") default_wd <- .check_drive(registry)
   .check_registry(registry)
   .check_corpus(corpus, registry)
-  .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
+  retval <- .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
+  if (.Platform$OS.type == "windows") if (!is.na(default_wd)) setwd(default_wd)
+  retval
 }
 

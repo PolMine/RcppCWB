@@ -82,11 +82,12 @@
   if (.Platform$OS.type != "windows"){
     warning("Auxiliary function .check_drive has been called. Not necessary nor ",
             "appropriate if not on Windows.")
-    return(TRUE)
+    return(NA)
   }
   registry_drive <- path_get_drive_letter(registry)
   wd_drive <- path_get_drive_letter(getwd())
   if (registry_drive != wd_drive){
+    default_working_dir <- getwd()
     if (interactive()){
       msg <- c("The drive of your current working directory differs from the drive of",
                "the registry directory. The corpus data cannot be processed by CWB tools",
@@ -96,17 +97,17 @@
       user_feedback <- readline(prompt = paste0(msg, collapse = " "))
       if (user_feedback == "Y"){
         setwd(registry_drive)
-        return(TRUE)
+        return(default_working_dir)
       } else {
-        warning("Drive of working directory differs from drive of registry directory. ",
-                "CWB may fail to find data directory.")
-        warning(FALSE)
+        warning("Drive not reset. Drive of working directory differs from drive of",
+                "registry directory. CWB may fail to find data directory.")
+        return(NA)
       }
     } else {
       setwd(registry_drive)
-      return(TRUE)
+      return(default_working_dir)
     }
   } else {
-    return(TRUE)
+    return(NA)
   }
 }
