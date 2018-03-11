@@ -40,10 +40,7 @@ registry file for \code{corpus} to find the data directory.
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
 Sys.setenv(CORPUS_REGISTRY = registry)
 
-# use Rcpp implementation first
-a <- s_attribute_decode(corpus = "REUTERS", s_attribute = "id", method = "Rcpp")
-
-# use pure R implementation
+# pure R implementation (Rcpp implementation fails on Windows in vanilla mode)
 b <- s_attribute_decode(
   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
   s_attribute = "places", method = "R"
