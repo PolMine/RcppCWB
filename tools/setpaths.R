@@ -1,4 +1,4 @@
-# setpaths.R - last modification: 2018-02-06
+# setpaths.R - last modification: 2018-04-09
 # author: Andreas Blaette (andreas.blaette@uni-due.de)
 # 
 #
@@ -40,27 +40,25 @@ for (corpus in list.files(registryDir)){
   registry <- readLines(registryFile)
   
   homeDir <- file.path(packageDir, "extdata", "cwb", "indexed_corpora", corpus)
-  # The CWB tools do not digest the volume declaration that will be part of the 
-  # working directory path. It needs to be removed. When the corpus is used, CWB
-  # tools will assume the path to point to a directory on the volume of the current
-  # working directory.
-  if (.Platform$OS.type == "windows") homeDir <- gsub("^[A-Za-z]?:?(.*)$", "\\1", homeDir)
-  
-  # It causes errors, if the path to the data directory contains whitespace (a
-  # typical problem on Windows). Wrapping the path declaration with quotation marks 
-  # solves the problem
-  if (grepl(" ", homeDir)){
-    registry[grep("^HOME", registry)] <- paste("HOME", sprintf("\"%s\"", homeDir), sep = " ")
-  } else {
-    registry[grep("^HOME", registry)] <- paste("HOME", homeDir , sep = " ")
-  }
-  
-  # adjust statement of info file
   infoFileLine <- grep("^INFO", registry)
   infoFileBasename <- basename(gsub("^INFO\\s+(.*?)$", "\\1", registry[infoFileLine]))
   infoFileNew <- file.path(homeDir, infoFileBasename)
-  if (grepl(" ", infoFileNew)) infoFileNew <- sprintf("\"%s\"", infoFileNew)
-  registry[infoFileLine] <- paste("INFO", infoFileNew, sep = " ")
-
+  
+  # On Windows, the CWB tools will digest the path including the volume
+  # declaration only if the path declaration is quoted; on macOS, wrapping the
+  # path is only necessary, if there is a whitespace in the path
+  if (.Platform$OS.type == "windows"){
+    registry[grep("^HOME", registry)] <- paste("HOME", sprintf('"%s"', homeDir), sep = " ")
+    registry[infoFileLine] <- paste("INFO", sprintf('"%s"', infoFileNew, sep = " "))
+  } else {
+    if (grepl(" ", homeDir)){
+      registry[grep("^HOME", registry)] <- paste("HOME", sprintf('"%s"', homeDir), sep = " ")
+      registry[infoFileLine] <- paste("INFO", sprintf('"%s"', infoFileNew, sep = " "))
+    } else {
+      registry[grep("^HOME", registry)] <- paste("HOME", homeDir , sep = " ")
+      registry[infoFileLine] <- paste("INFO", infoFileNew, sep = " ")
+    }
+  }
+  
   writeLines(text = registry, con = registryFile, sep = "\n")
 }

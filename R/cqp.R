@@ -120,10 +120,6 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' \url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
 #' @examples 
 #' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#' if (.Platform$OS.type == "windwos"){
-#'   registry_drive <- path_get_drive_letter(registry)
-#'   if (registry_drive != path_get_drive_letter(getwd())) setwd(registry_drive)
-#' }
 #' 
 #' if (!cqp_is_initialized()){
 #'   cqp_initialize(registry = registry)

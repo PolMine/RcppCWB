@@ -1,3 +1,11 @@
+# v0.2.1
+* In previous versions the drive of the working directory and of the 
+registry/data directory had to be identical on Windows; this limitation 
+does not persist;
+* Some utility functions could be removed that were necessary to check the
+identity of the drives of the working directory and the data.
+
+
 # v0.2.0
 * In addition to low-level functionality of the corpus library (CL), functions
 of the Corpus Query Processor (CQP) are exposed, building  on C wrappers in the

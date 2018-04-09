@@ -35,10 +35,6 @@ with the left and right corpus positions of the matches for the CQP query.
 }
 \examples{
 registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-if (.Platform$OS.type == "windwos"){
-  registry_drive <- path_get_drive_letter(registry)
-  if (registry_drive != path_get_drive_letter(getwd())) setwd(registry_drive)
-}
 
 if (!cqp_is_initialized()){
   cqp_initialize(registry = registry)

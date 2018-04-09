@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.2.0
-Date: 2018-03-01
+Version: 0.2.1
+Date: 2018-04-09
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -12,8 +12,8 @@ Author: Andreas Blaette [aut, cre],
   Arne Fitschen [ctb]
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
-  person("Bernard", "Desgraupes", role = ("aut"), email = "bernard.desgraupes@u-paris10.fr"),
-  person("Sylvain", "Loiseau", role = "aut", email = "sylvain.loiseau@univ-paris13.fr"),
+  person("Bernard", "Desgraupes", role = "aut"),
+  person("Sylvain", "Loiseau", role = "aut"),
   person("Oliver", "Christ", role = "ctb"),
   person("Bruno Maximilian", "Schulze", role = "ctb"),
   person("Stefan", "Evert", role = "ctb"),
@@ -58,5 +58,4 @@ Collate:
   'registry.R'
   'cbow.R'
   'region_matrix.R'
-  'path.R'
-  
+
