@@ -56,20 +56,21 @@ registry_file_make <- function(
   corpus_properties = c(language = "en", charset = "latin-1"),
   p_attributes = "word", s_attributes = NULL){
   
+  data_dir_in <- data_dir
   if (.Platform$OS.type == "windows"){
     data_dir <- sprintf('"%s"', normalizePath(data_dir, winslash = "/"))
   } else {
-    if (grepl("\\s", data_dir)) data_dir <- sprintf("\"%s\"", data_dir)
+    if (grepl("\\s", data_dir)) data_dir <- sprintf('"%s"', data_dir)
   }
   
   
   if (is.null(info_file)){
-    info_file <- file.path(dirname(data_dir), ".info.md")
+    info_file <- file.path(dirname(data_dir_in), ".info.md")
   }
   if (.Platform$OS.type == "windows"){
     info_file <- sprintf('"%s"', normalizePath(info_file, winslash = "/"))
   } else {
-    if (grepl("\\s", info_file)) info_file <- sprintf("\"%s\"", info_file)
+    if (grepl("\\s", info_file)) info_file <- sprintf('"%s"', info_file)
   }
 
   c(
