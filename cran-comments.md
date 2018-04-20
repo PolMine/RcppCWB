@@ -5,9 +5,9 @@ on CRAN (0.1.7). For doing this, I have used and modified code included in the '
 authored by Bernard Desgraupes and Sylvain Loiseau (GPL license). To acknowledge the 
 work of both colleagues, both are mentioned as authors in the DESCRIPTION file.
 
-Please note: They have not written code actively for RcppCWB. The 'Writing R Extensions'-guide did not
-give me guidance whether I should mention Bernard Desgraupes and Sylvain Loiseau as contributors
-or authors, so I opt for the option that is going further.
+Please note: They have not written code actively for RcppCWB. The 'Writing R Extensions'-guide
+did not give me guidance whether I should mention Bernard Desgraupes and Sylvain Loiseau
+as contributors or authors, so I opt for the option that is going further.
 
 The previous version of the package did not pass tests on macOS. The reason
 appears to be that glib (available on CRAN Ubuntu, Fedora and Debian systems)

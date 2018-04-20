@@ -42,7 +42,6 @@
 #' data_dir_tmp <- file.path(tmpdir, "data_dir")
 #' dir.create (registry_tmp)
 #' dir.create(data_dir_tmp)
-#' setwd(tmpdir)
 #' 
 #' p_attribute_encode(
 #'   token_stream = tokens, p_attribute = "word",

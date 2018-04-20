@@ -3,13 +3,6 @@ Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
 Version: 0.2.1
 Date: 2018-04-09
-Author: Andreas Blaette [aut, cre],
-  Bernard Desgraupes [aut],
-  Sylvain Loiseau [aut],
-  Oliver Christ [ctb],
-  Bruno Maximilian Schulze [ctb],
-  Stefan Evert [ctb],
-  Arne Fitschen [ctb]
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),
