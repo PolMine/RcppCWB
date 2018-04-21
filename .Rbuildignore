@@ -5,3 +5,6 @@
 ^paper.md$
 ^data-raw$
 ^appveyor\.yml$
+^src/cwb/doc$
+^src/cwb/man$
+^src/cwb/instutils$

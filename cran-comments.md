@@ -15,6 +15,12 @@ is not installed on your macOS machine. If glib was installed  (e.g. "brew insta
 RcppCWB should pass macOS tests, too. May I kindly ask if you could make glib available on
 your macOS machines, so package tests are passed on macOS.
 
+On Debian, you may see a warning that an implicit declaration of the functions time()
+and ctime() occurrs in 'ascii-print.c', 'sgml-print.c', 'html-print.c' and 'latex-print.c'.
+It might be necessary to include the header file 'time.h' in a different manner, 
+but I would refrain from mingling with the CWB C code here, because the print functions 
+are not used.
+
 Compilation does not yet work on Solaris. I am working to establish a test environment 
 for Solaris. I will attempt to get RcppCWB work on Solaris in the next upcoming version.
 

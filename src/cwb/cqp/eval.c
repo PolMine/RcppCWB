@@ -2888,7 +2888,7 @@ cqp_run_tab_query(int implode)
 
   nr_columns = 0;
   for (col = evalenv->evaltree; col; col = col->tab_el.next) {
-    assert(col->type = tabular);
+    assert((col->type = tabular));
     nr_columns++;
   }
 
