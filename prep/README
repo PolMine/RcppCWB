@@ -56,3 +56,9 @@ I could come up with is to rename endian.h into endian2.h.  Then
 - change include statements to 'include "endian2.h"'
 
 
+cwb/cqp/sgml-print.c ; latex-print.c ; ascii-print.c ; html-print.c
+-------------------------------------------------------------------
+file 'sgml-print.c', 'latex-print.c', 'ascii-print.c' and 'html-print.c' in ./src/cwb/cqp:
+include for header file time.h added (in addition to sys/time.h):
+#include <time.h>
+to avoid warning of implicit function declaration 

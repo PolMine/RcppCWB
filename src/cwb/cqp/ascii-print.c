@@ -23,6 +23,7 @@
 #include "../cl/cdaccess.h"
 
 #include <sys/time.h>
+#include <time.h>
 #include <pwd.h>
 
 #ifdef USE_TERMCAP

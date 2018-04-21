@@ -37,6 +37,7 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
+#include <time.h>
 #include <pwd.h>
 #include <unistd.h>
 
