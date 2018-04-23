@@ -7,12 +7,11 @@ matrix:
       dist: trusty
     - os: osx
       osx_image: xcode9.1
-      brew_packages: pkg-config glib pcre readline
+      brew_packages: pkg-config pcre readline
 
 addons:
   apt:
     packages:
-    - libglib2.0-dev
     - libssl-dev
     - libcurl4-openssl-dev
 
