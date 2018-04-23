@@ -7,7 +7,6 @@ matrix:
       dist: trusty
     - os: osx
       osx_image: xcode9.1
-      brew_packages: pkg-config pcre readline
 
 addons:
   apt:
