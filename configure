@@ -42,7 +42,7 @@ BUILD_DIR=`pwd`
 CWB_DIR=`pwd`/src/cwb
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
 echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/inst/include/cwb -I"$BUILD_DIR"/src/cwb/cqp -I"$BUILD_DIR"/src/cwb/cl -I"$BUILD_DIR"/src/cwb/CQi" > ./src/Makevars
-echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -lglib-2.0 -lpcre -lcqp -lcl\n" >> ./src/Makevars
+echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -lpcre -lcqp -lcl\n" >> ./src/Makevars
 echo -e "\$(SHLIB): libcl.a libcqp.a\n" >>./src/Makevars
 echo "libcl.a: depend" >> ./src/Makevars
 echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" \$(MAKE) -C cwb cl\n" >> ./src/Makevars
