@@ -69,3 +69,11 @@ line 2891 changed:
 assert(col->type = tabular); turned into
 assert((col->type = tabular));
 to avoid -Wparentheses error (on Debian CRAN machine)
+
+flex/bison
+-----------
+The flex and bison parsers may be missing on CRAN build machines. To avoid 
+errors, parsed files files are generated and included:
+registry.tab.c
+registry.tab.h
+registry.y
