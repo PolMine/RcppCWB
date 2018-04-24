@@ -11,8 +11,7 @@ matrix:
 addons:
   apt:
     packages:
-    - libssl-dev
-    - libcurl4-openssl-dev
+    - libpcre3-dev
 
 r_packages:
   - Rcpp
