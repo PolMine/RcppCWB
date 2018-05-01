@@ -1714,7 +1714,8 @@ valid_subcorpus_id(char *corpusname) {
 
 Boolean
 valid_subcorpus_name(char *corpusname) {
-  return ((split_subcorpus_name == NULL) ? False : True);
+  char mother[MAX_LINE_LENGTH];
+  return ((split_subcorpus_name(corpusname, mother) == NULL) ? False : True);
 }
 
 Boolean

@@ -77,3 +77,18 @@ errors, parsed files files are generated and included:
 registry.tab.c
 registry.tab.h
 registry.y
+
+
+Datei corpmanag.c
+-----------------
+Funktion 'valid_subcorpus_name' neu:
+Boolean
+valid_subcorpus_name(char *corpusname) {
+  char mother[MAX_LINE_LENGTH];
+  return ((split_subcorpus_name(corpusname, mother) == NULL) ? False : True);
+}
+--> vorher nur split_subcorpus_name ohne parameter
+
+Behebt folgenden Fehler:
+Found the following significant warnings:
+  corpmanag.c:1717:12: warning: comparison of function 'split_subcorpus_name' equal to a null pointer is always false [-Wtautological-pointer-compare]

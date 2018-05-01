@@ -1,8 +1,8 @@
 ## General remarks
 
-This (v0.2.2) is a submission following the previous version (v0.2.1) less than two weeks to solve remaining issues that restrict cross-platform portability.
+This (v0.2.2) is a submission following the previous version (v0.2.1) quickly (less than two weeks) to solve remaining issues that restrict cross-platform portability.
 
-I assume this version will now pass tests on your macOS build machine. Version 0.2.1 of the package did not pass tests, the cause being that glib is not available on the CRAN macOS build machine. I realized that the glib dependency can be circumvented on unlix-like systems. 
+I assume this version may now pass tests on your macOS build machine. The previous version (v0.2.1) did not pass tests, because glib2.0 is not available on the CRAN macOS build machine. I realized that the glib dependency can be circumvented on unlix-like systems.
 
 Initially, package tests for v0.2.1 failed on the CRAN Linux build machine, because the bison parser was not found. After a few days, the package did pass tests, so my interpretation is that you might have installed bison. 
 
@@ -14,7 +14,7 @@ for Solaris. Solving issues to pass tests on macOS has been my priority this tim
 
 ## Test environments
 
-* local OS X install, R 3.4.3
+* local OS X install, R 3.5.0
 * Ubuntu 14.04 (on travis-ci), R 3.5.0
 * Ubuntu 14.04 (project server), R 3.4.3
 * Debian 9.1 (virtual machine), R 3.4.3
