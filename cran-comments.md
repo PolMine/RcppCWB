@@ -1,13 +1,15 @@
 ## General remarks
 
-This RcppCWB version (v0.2.1) exposes more CWB functionality than the previous version on CRAN (0.1.7). For doing this, I have used and modified code included in the 'rcqp' package authored by Bernard Desgraupes and Sylvain Loiseau (GPL license). To acknowledge the work of both colleagues, both are mentioned as authors in the DESCRIPTION file.
+This (v0.2.2) is a submission following the previous version (v0.2.1) less than two weeks to solve remaining issues that restrict cross-platform portability.
 
-Note that Bernard Desgraupes and Sylvain Loiseau have not written code actively for RcppCWB. However, 'Writing R Extensions' did not give me guidance whether I should mention Bernard Desgraupes and Sylvain Loiseau as contributors or authors, so I opt for the option that is going further.
+I assume this version will now pass tests on your macOS build machine. Version 0.2.1 of the package did not pass tests, the cause being that glib is not available on the CRAN macOS build machine. I realized that the glib dependency can be circumvented on unlix-like systems. 
 
-The previous version of the package did not pass tests on macOS. The cause is that glib (available on CRAN Ubuntu, Fedora and Debian systems) is not installed on your macOS machine. If glib was installed  (e.g. using homebrew, "brew install glib"), RcppCWB should pass macOS tests, too. I would be very grateful, if you could make glib available on CRAN macOS machines. 
+Initially, package tests for v0.2.1 failed on the CRAN Linux build machine, because the bison parser was not found. After a few days, the package did pass tests, so my interpretation is that you might have installed bison. 
 
-Compilation does not yet work on Solaris. I am working to establish a test environment 
-for Solaris. I will attempt to get RcppCWB work on Solaris in the next upcoming version.
+To omit difficulties for users, I added the files parsed by bison to the package, while keeping the original input files. Distributing the input source and the resulting C code is the recommendation I found here (section 'Distribution of packages using Bison'):  https://en.wikipedia.org/wiki/GNU_bison#Distribution_of_packages_using_Bison
+
+Compilation does not yet work on Solaris. I am (still) working to establish a test environment 
+for Solaris. Solving issues to pass tests on macOS has been my priority this time.
 
 
 ## Test environments

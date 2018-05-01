@@ -2,7 +2,7 @@ Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
 Version: 0.2.2
-Date: 2018-04-23
+Date: 2018-05-01
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),
@@ -26,8 +26,8 @@ Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), a
 License: GPL-3
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: On Unix-like operating systems, pcre (>= 7) and glib2 (>= 2) need to be present to compile
-  'RcppCWB'. See README.md for instructions how to install these dependencies. On 
+SystemRequirements: On Unix-like operating systems, pcre (>= 7) needs to be present to compile
+  'RcppCWB'. See README.md for instructions how to install dependencies. On 
   Windows, no prior installations are necessary, as pre-built (i.e. cross-compiled)
   binaries of all required libraries are downloaded from a GitHub repository
   (<https://github.com/PolMine/libcl>) during installation.
@@ -48,9 +48,7 @@ Collate:
   'checks.R'
   'count.R'
   'RcppExports.R'
-  'encode.R'
   'decode.R'
-  'registry.R'
   'cbow.R'
   'region_matrix.R'
 
