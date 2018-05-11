@@ -1,12 +1,20 @@
-#' Check registry directory
+#' Check Input to Rcpp Functions.
 #' 
-#' This utility functions checks whether registry is a character vector length
-#' 1, exists and is a directory. The function offers a robustness checks for all
-#' C functions called.
-#' 
+#' A set of functions to check whether the input values to the Rcpp
+#' wrappers for the C functions of the Corpus Workbench potentially causing
+#' crashes are valid. These auxiliary functions are called by the cl_ and cqp_
+#' functions.
+#' @param corpus name of a CWB corpus
+#' @param s_attribute a structural attribute
+#' @param p_attribute a positional attribute
+#' @param strucs strucs (indices of structural attributes)
+#' @param query a CQP query
+#' @param region_matrix a region matrix
 #' @param registry path to registry directory
-#' @noRd
-.check_registry <- function(registry){
+#' @rdname checks
+#' @name check
+#' @export check_registry
+check_registry <- function(registry){
   if (length(registry) != 1)
     stop("registry needs to be a character vector length 1")
   if (!is.character(registry))
@@ -18,15 +26,9 @@
   return( TRUE )
 }
 
-#' Check corpus
-#' 
-#' This utility functions checks whether corpus is a character vector length 1,
-#' exists and that a file with the respective name exists. The function offers a
-#' robustness checks for all C functions called.
-#' 
-#' @param registry path to registry directory
-#' @noRd
-.check_corpus <- function(corpus, registry){
+#' @rdname checks
+#' @export check_corpus
+check_corpus <- function(corpus, registry){
   if (length(corpus) != 1)
     stop("corpus needs to be a vector of length 1")
   if (!is.character(corpus))
@@ -36,25 +38,39 @@
   return( TRUE )
 }
 
-.check_s_attribute <- function(s_attribute){
+#' @export check_s_attribute
+#' @rdname checks
+check_s_attribute <- function(s_attribute, corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   if (length(s_attribute) != 1)
     stop("s_attribute needs to be a length 1 vector")
   if (!is.character(s_attribute))
     stop("s_attribute needs to be a character vector")
-  # missing test! whether s_attribute is available
+  registry_file <- readLines(file.path(registry, tolower(corpus)))
+  sattr_lines <- registry_file[grep("^STRUCTURE", registry_file)]
+  sattrs_declared <- gsub("^STRUCTURE\\s+(.*?)\\s*.*?", "\\1", sattr_lines)
+  if (!s_attribute %in% sattrs_declared)
+    stop(sprintf("s_attribute '%s' is not declared in registry file of corpus '%s'", s_attribute, corpus))
   return( TRUE )
 }
 
-.check_p_attribute <- function(p_attribute){
+#' @export check_p_attribute
+#' @rdname checks
+check_p_attribute <- function(p_attribute, corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   if (length(p_attribute) != 1)
     stop("p_attribute needs to be a length 1 vector")
   if (!is.character(p_attribute))
     stop("p_attribute needs to be a character vector")
-  return( FALSE )
-  # missing test! whether s_attribute is available
+  registry_file <- readLines(file.path(registry, tolower(corpus)))
+  pattr_lines <- registry_file[grep("^ATTRIBUTE", registry_file)]
+  pattrs_declared <- gsub("^ATTRIBUTE\\s+(.*?)\\s*.*?", "\\1", pattr_lines)
+  if (!p_attribute %in% pattrs_declared)
+    stop(sprintf("p_attribute '%s' is not declared in registry file of corpus '%s'", p_attribute, corpus))
+  return( TRUE )
 }
 
-.check_strucs <- function(corpus, s_attribute, strucs, registry){
+#' @export check_strucs
+#' @rdname checks
+check_strucs <- function(corpus, s_attribute, strucs, registry){
   if (!is.integer(strucs))
     stop("strucs needs to be a integer vector")
   if (min(strucs) < 0)
@@ -64,13 +80,18 @@
   return( TRUE )
 }
 
-.check_region_matrix <- function(matrix){
-  if (!all(matrix[,2] - matrix[,1] >= 0))
+#' @export check_region_matrix
+#' @rdname checks
+check_region_matrix <- function(region_matrix){
+  if (!all(region_matrix[,2] - region_matrix[,1] >= 0))
     stop("check region matrix - all values of column 2 need to be equal or higher than values of column one. ",
          "This is not TRUE.")
+  return( TRUE )
 }
 
-.check_cqp_query <- function(query){
+#' @export check_cqp_query
+#' @rdname checks
+check_cqp_query <- function(query){
   if (!substr(query, start = length(query), stop = length(query)) == ";"){
     return( paste0(query, ";", sep = "") )
   } else {

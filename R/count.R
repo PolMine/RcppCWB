@@ -25,9 +25,9 @@
 #' df <- df[order(df[["count"]], decreasing = TRUE),]
 #' head(df)
 get_count_vector <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_p_attribute(p_attribute)
+  check_registry(registry)
+  check_corpus(corpus, registry)
+  check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
   .get_count_vector(corpus = corpus, p_attribute = p_attribute, registry = registry)
 }
 

@@ -1,15 +1,9 @@
 ## General remarks
 
-This (v0.2.2) is a submission following the previous version (v0.2.1) quickly (less than two weeks) to solve remaining issues that restrict cross-platform portability.
+This (v0.2.3) is a submission following the previous version (v0.2.2) quickly to solve a potential issue when installing package binaries from CRAN.
 
-I assume this version may now pass tests on your macOS build machine. The previous version (v0.2.1) did not pass tests, because glib2.0 is not available on the CRAN macOS build machine. I realized that the glib dependency can be circumvented on unlix-like systems.
+The package includes sample data in the package subdirectory ./inst/extdata/cwb/. Upon installation, the configuration files 'configure' and 'configure.win' ensure that paths in the so-called registry files are reset to point to data files within the package. However, the configure stripts are not used when a binary package is installed (from CRAN), and paths are not set correctly. To make sure that users who install a binary package have access to the sample data, .onLoad() checks whether paths are set correctly, and adjusts paths, if necessary.
 
-Initially, package tests for v0.2.1 failed on the CRAN Linux build machine, because the bison parser was not found. After a few days, the package did pass tests, so my interpretation is that you might have installed bison. 
-
-To omit difficulties for users, I added the files parsed by bison to the package, while keeping the original input files. Distributing the input source and the resulting C code is the recommendation I found here (section 'Distribution of packages using Bison'):  https://en.wikipedia.org/wiki/GNU_bison#Distribution_of_packages_using_Bison
-
-Compilation does not yet work on Solaris. I am (still) working to establish a test environment 
-for Solaris. Solving issues to pass tests on macOS has been my priority this time.
 
 
 ## Test environments

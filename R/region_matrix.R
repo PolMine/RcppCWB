@@ -18,9 +18,9 @@
 #'   strucs = 0L:5L, registry = registry
 #'   )
 get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = strucs, registry = registry)
+  check_registry(registry)
+  check_corpus(corpus, registry)
+  check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = strucs, registry = registry)
   .get_region_matrix(corpus = corpus, s_attribute = s_attribute, strucs = strucs, registry = registry)
 }
 
@@ -67,10 +67,10 @@ get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv
 #' df[order(df[["count"]], decreasing = TRUE),]
 #' head(df)
 region_matrix_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_p_attribute(p_attribute)
-  .check_region_matrix(matrix)
+  check_registry(registry)
+  check_corpus(corpus, registry)
+  check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
+  check_region_matrix(region_matrix = matrix)
   .region_matrix_to_ids(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }
 
@@ -78,9 +78,9 @@ region_matrix_to_ids <- function(corpus, p_attribute, registry = Sys.getenv("COR
 #' @rdname region_matrix_ops
 #' @export region_matrix_to_count_matrix
 region_matrix_to_count_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_p_attribute(p_attribute)
+  check_registry(registry)
+  check_corpus(corpus, registry)
+  check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
   stopifnot(is.matrix(matrix))
   .region_matrix_to_count_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }

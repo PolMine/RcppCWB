@@ -23,10 +23,10 @@
 #'   )
 #' colnames(m2) <- c(-windowsize:-1, "node", 1:windowsize)
 get_cbow_matrix <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), matrix, window){
-  .check_registry(registry)
-  .check_corpus(corpus, registry)
-  .check_p_attribute(p_attribute)
-  .check_region_matrix(matrix)
+  check_registry(registry)
+  check_corpus(corpus, registry)
+  check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
+  check_region_matrix(region_matrix = matrix)
   stopifnot(window >= 1L)
   .get_cbow_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix, window = window)
 }

@@ -46,7 +46,7 @@ cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
     Sys.setenv(CORPUS_REGISTRY = dummy_regdir)
     .init_cqp()
   }
-  .check_registry(registry_new)
+  check_registry(registry_new)
   Sys.setenv(CORPUS_REGISTRY = registry_new)
   cqp_reset_registry()
   return( cqp_is_initialized() )
@@ -71,7 +71,7 @@ cqp_reset_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
     warning("cannot reset registry, cqp has not yet been initialized!")
     return( FALSE )
   } else {
-    .check_registry(registry_dir)
+    check_registry(registry_dir)
     Sys.setenv(CORPUS_REGISTRY = registry_dir)
     if (nchar(registry_dir) > 255){
       stop("cannot assign new registry: maximum nchar(registry) is 255")
@@ -136,7 +136,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_query <- function(corpus, query, subcorpus = "QUERY"){
   stopifnot(corpus %in% cqp_list_corpora())
-  query <- .check_cqp_query(query)
+  query <- check_cqp_query(query)
   .cqp_query(corpus = corpus, subcorpus = subcorpus, query = query)
 }
 

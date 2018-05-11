@@ -61,9 +61,9 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
   } else if (method == "Rcpp"){
     
     if (missing(corpus)) stop("corpus needs to be specified to use 'Rcpp' method")
-    .check_registry(registry = registry)
-    .check_corpus(corpus = corpus, registry = registry)
-    .check_s_attribute(s_attribute = s_attribute)
+    check_registry(registry = registry)
+    check_corpus(corpus = corpus, registry = registry)
+    check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
     values <- .decode_s_attribute(corpus = corpus, s_attribute = s_attribute, registry = registry)
     warning("region matrix can not yet be generated with Rcpp method")
     region_matrix <- NULL

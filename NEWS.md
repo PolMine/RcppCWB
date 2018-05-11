@@ -1,3 +1,11 @@
+# v0.2.2.9001
+* when loading the package, a check is performed to make sure that paths in the 
+registry files point to the data files of the sample data (issues may occur when
+installing binaries)
+* auxiliary functions to check whether input to Rcpp-wrappers/C functions is valid
+are now exported and documented
+* more consistent validity checks of input to functions for structural attributes
+
 # v0.2.2
 * Compiling RcppCWB on unix-like systems (macOS, Linux) will work now without
 the presence of glib (on Windows, the dependency persists).
