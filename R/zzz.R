@@ -29,7 +29,7 @@
           registry[info_line_no] <- sprintf("INFO %s", info_file_new)
         }
       }
-      if (file.access(registry_file, mode == 2) == -1){
+      if (file.access(registry_file, mode = 2) == -1){
         warning(sprintf("Not sufficient permissions to modify registry file %s", registry_file),
                 " which would be necessary to have access to sample corpora in package. ",
                 "Consider loading package with admin rights one."
