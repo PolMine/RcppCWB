@@ -8,6 +8,8 @@
 #' @param s_attribute a structural attribute
 #' @param p_attribute a positional attribute
 #' @param strucs strucs (indices of structural attributes)
+#' @param cpos vector of corpus positions
+#' @param id id (encoded p-attribute), integer value
 #' @param query a CQP query
 #' @param region_matrix a region matrix
 #' @param registry path to registry directory
@@ -21,7 +23,7 @@ check_registry <- function(registry){
     stop("registry needs to be a character vector (is.character not TRUE)")
   if(!file.exists(registry))
     stop("the registry directory provided does not exist")
-  if(!file.info(registry)$isdir)
+  if (!file.info(registry)$isdir)
     stop("registry exists, but is not a directory")
   return( TRUE )
 }
@@ -97,4 +99,30 @@ check_cqp_query <- function(query){
   } else {
     return( query )
   }
+}
+
+#' @export check_cpos
+#' @rdname checks
+check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
+  attr_max <- cl_attribute_size(corpus = corpus, attribute = p_attribute, attribute_type = "p", registry = registry)
+  if (min(cpos) < 0){
+    stop("all corpus positions (cpos) need to be >= 0, not TRUE")
+  }
+  if (max(cpos) > attr_max){
+    stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
+  }
+  return( TRUE )
+}
+
+#' @export check_id
+#' @rdname checks
+check_id <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
+  lexicon_size <- cl_lexicon_size(corpus = corpus, p_attribute = p_attribute, registry = registry)
+  if (min(id) < 0){
+    stop("all corpus positions (cpos) need to be >= 0, not TRUE")
+  }
+  if (max(id) > lexicon_size){
+    stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
+  }
+  return( TRUE )
 }

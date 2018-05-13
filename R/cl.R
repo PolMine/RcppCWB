@@ -92,6 +92,7 @@ cl_cpos2struc <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORP
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
   .cl_cpos2struc(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
 }
 
@@ -100,6 +101,7 @@ cl_struc2cpos <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REG
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = struc, registry = registry)
   .cl_struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
 }
 
@@ -108,6 +110,7 @@ cl_struc2str <- function(corpus, s_attribute, struc, registry = Sys.getenv("CORP
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = struc, registry = registry)
   .cl_struc2str(corpus = corpus, s_attribute = s_attribute, struc = struc, registry = registry)
 }
 
@@ -116,6 +119,7 @@ cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
   .cl_cpos2lbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
 }
 
@@ -124,6 +128,7 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
   .cl_cpos2rbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
 }
 
@@ -221,6 +226,7 @@ cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIST
 cl_id2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), id){
   check_registry(registry)
   check_corpus(corpus, registry)
+  check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
   .cl_id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
 }
 
@@ -243,6 +249,7 @@ cl_id2freq <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
   check_registry(registry)
   check_corpus(corpus, registry)
   check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
+  check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
   .cl_id2freq(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
 }
 
@@ -252,6 +259,7 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
   check_registry(registry)
   check_corpus(corpus, registry)
   check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
+  check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
   .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
 }
 
