@@ -18,13 +18,11 @@
       if (.Platform$OS.type == "windows") {
         registry[home_line_no] <- sprintf("HOME \"%s\"", pkg_home_dir)
         registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
-      }
-      else {
+      } else {
         if (grepl("\\s+", pkg_home_dir)) {
           registry[grep("^HOME", registry)] <- sprintf("HOME \"%s\"",  pkg_home_dir)
           registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
-        }
-        else {
+        } else {
           registry[grep("^HOME", registry)] <- sprintf("HOME %s", pkg_home_dir)
           registry[info_line_no] <- sprintf("INFO %s", info_file_new)
         }

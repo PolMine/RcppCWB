@@ -16,6 +16,7 @@ addons:
 r_packages:
   - Rcpp
   - covr
+  - digest
 
 warnings_are_errors: false
 
