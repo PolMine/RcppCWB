@@ -4,6 +4,7 @@ This (v0.2.3) is a submission following the previous version (v0.2.2) quickly to
 
 The package includes sample data in the package subdirectory ./inst/extdata/cwb/. Upon installation, the configuration files 'configure' and 'configure.win' ensure that paths in the so-called registry files are reset to point to data files within the package. However, the configure stripts are not used when a binary package is installed (from CRAN), and paths are not set correctly. To make sure that users who install a binary package have access to the sample data, .onLoad() checks whether paths are set correctly, and adjusts paths, if necessary.
 
+The new version introduces some checks to avoid crashes. As a consequence, three tests included in the polmineR package (maintained by myself) will fail. I have already prepared a release of the polmineR package that fixes the issue, and will submit it as soon as RcppCWB is admitted.
 
 
 ## Test environments
@@ -28,3 +29,4 @@ On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb |
 I have also checked downstream dependencies using devtools::revdep(),
 without seeing ERRORs, WARNINGs, or NOTEs.
 
+On the issue with polmineR, see the explanation in the general remarks.

@@ -73,7 +73,7 @@ check_p_attribute <- function(p_attribute, corpus, registry = Sys.getenv("CORPUS
 #' @export check_strucs
 #' @rdname checks
 check_strucs <- function(corpus, s_attribute, strucs, registry){
-  if (!is.integer(strucs))
+  if (!is.numeric(strucs))
     stop("strucs needs to be a integer vector")
   if (min(strucs) < 0)
     stop("all values of vector strucs need to be >= 0")
