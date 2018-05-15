@@ -1,4 +1,4 @@
-# v0.2.2.9001
+# v0.2.3
 * when loading the package, a check is performed to make sure that paths in the 
 registry files point to the data files of the sample data (issues may occur when
 installing binaries)
