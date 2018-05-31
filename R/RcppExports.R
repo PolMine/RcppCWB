@@ -97,6 +97,10 @@
     .Call(`_RcppCWB_cqp_drop_subcorpus`, inSubcorpus)
 }
 
+.cwb_makeall <- function(x, registry_dir, p_attribute) {
+    .Call(`_RcppCWB_cwb_makeall`, x, registry_dir, p_attribute)
+}
+
 .decode_s_attribute <- function(corpus, s_attribute, registry) {
     .Call(`_RcppCWB_decode_s_attribute`, corpus, s_attribute, registry)
 }

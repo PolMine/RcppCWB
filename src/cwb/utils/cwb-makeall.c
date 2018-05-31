@@ -24,8 +24,6 @@
 
 /** The corpus we are working on */
 Corpus *corpus;
-/** Name of this program */
-char *progname = NULL;
 
 
 /**
