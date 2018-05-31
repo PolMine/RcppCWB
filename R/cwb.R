@@ -1,15 +1,26 @@
-#' CWB Utility Functions
+#' CWB Tools for Creating Corpora
 #' 
-#' Wrappers for CWB utilities (cwb-makeall, cwb-huffcode, cwb-compress-rdx).
+#' Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
+#' \code{cwb-compress-rdx}). Unlike the 'original' command line tools, these
+#' wrappers will always perform a specific indexing/compression step on one
+#' positional attribute, and produce all components.
 #' 
 #' @rdname cwb_utils
 #' @param corpus name of a CWB corpus (upper case)
 #' @param p_attribute name p-attribute
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
-#' @export cwb_makeall
 #' @examples
+#' # The package includes and 'unfinished' corpus of debates in the UN General 
+#' # Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is
+#' # not compressed.
+#' #
+#' # The first step in the following example is to copy the raw
+#' # corpus to a temporary place.
+#' 
 #' regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
+#' 
 #' tmpdir <- tempdir()
 #' tmp_regdir <- file.path(tmpdir, "registry")
 #' tmp_data_dir <- file.path(tmpdir, "indexed_corpora")
@@ -18,11 +29,14 @@
 #' if (!file.exists(tmp_data_dir)) dir.create(tmp_data_dir)
 #' if (!file.exists(tmp_unga_dir)) dir.create(tmp_unga_dir)
 #' file.copy(from = file.path(regdir, "unga"), to = file.path(tmp_regdir, "unga"))
-#' home_dir <- registry_file_parse(corpus = "unga", registry_dir = regdir)[["home"]]
 #' for (x in list.files(home_dir, full.names = TRUE)){
 #'   file.copy(from = x, to = tmp_unga_dir)
 #' }
+#' 
+#' # perform cwb_makeall (equivalent to cwb-makeall command line utility)
 #' cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+#' 
+#' # see whether it works
 #' ids_sentence_1 <- cl_cpos2id(
 #'   corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
 #'   cpos = 0:83
@@ -31,7 +45,11 @@
 #'   corpus = "UNGA", p_attribute = "word",
 #'   registry = tmp_regdir, id = ids_sentence_1
 #'   )
-#' sentence <- gsub("\\s+([\\.,])", "\\1", paste(token, collapse = " "))
+#' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
+NULL
+
+#' @rdname cwb_utils
+#' @export cwb_makeall
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
