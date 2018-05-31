@@ -1,0 +1,28 @@
+##
+## registry entry for corpus UNGA
+##
+
+# long descriptive name for the corpus
+NAME "UNGA"
+# corpus ID (must be lowercase in registry!)
+ID   unga
+# path to binary data files
+HOME /Users/blaette/Lab/github/RcppCWB/inst/extdata/cwb/indexed_corpora/unga
+# optional info file (displayed by ",info;" command in CQP)
+INFO /Users/blaette/Lab/github/RcppCWB/inst/extdata/cwb/indexed_corpora/unga/.info
+
+# corpus properties provide additional information about the corpus:
+##:: charset = "utf8"
+#========================================================================#
+
+
+##
+## p-attributes (token annotations)
+##
+
+ATTRIBUTE word
+
+##
+## s-attributes
+##
+

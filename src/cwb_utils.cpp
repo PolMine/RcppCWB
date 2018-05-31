@@ -14,7 +14,14 @@ using namespace Rcpp;
 Corpus *corpus;
 
 
-/* COPIED FROM utils-makeall.c */
+/* COPIED AND SLIGHTLY MODIFIED FROM utils-makeall.c 
+ * Modifications:
+ * - printf -> Rprintf;
+ * - fprintf -> Rprintf (without stderr)
+ * - exit -> return
+ * - fflush(stdout); commented out (twice)
+ * - do_attribute and make_component return integer value;
+ */
 
 /**
  * Checks whether a component has already been created.
@@ -34,8 +41,8 @@ int
     }
     else {
       if (state != ComponentDefined) {
-        fprintf(stderr, "Internal Error: Illegal state %d/component ID %d ???\n", state, cid);
-        exit(1);
+        Rprintf("Internal Error: Illegal state %d/component ID %d ???\n", state, cid);
+        return 1;
       }
       return 0;
     }
@@ -53,27 +60,27 @@ int
 * @param attr  The attribute of the component to create.
 * @param cid   The component ID of the component to create.
 */
-void
+int
   make_component(Attribute *attr, ComponentID cid)
   {
     int state;
     
     if (! component_ok(attr, cid)) {
       
-      printf(" + creating %s ... ", cid_name(cid));
-      fflush(stdout);
+      Rprintf(" + creating %s ... ", cid_name(cid));
+      /* fflush(stdout); */
       (void) create_component(attr, cid);
       
       state = component_state(attr, cid);
       if (!(state == ComponentLoaded || state == ComponentUnloaded)) {
-        printf("FAILED\n");
-        fprintf(stderr, "ERROR. Aborted.\n");
-        exit(1);
+        Rprintf("FAILED\n");
+        Rprintf("ERROR. Aborted.\n");
+        return 1;
       }
       
-      printf("OK\n");
+      Rprintf("OK\n");
     }
-    
+    return 0;
   }
 
 
@@ -98,21 +105,21 @@ int
 int lexsize, corpsize;
 int i, offset, cpos, id;
 
-printf(" ? validating %s ... ", cid_name(CompRevCorpus));
-fflush(stdout);
+Rprintf(" ? validating %s ... ", cid_name(CompRevCorpus));
+/* fflush(stdout); */
 
 if (revcorp == NULL) {
-  printf("FAILED (no data)\n");
+  Rprintf("FAILED (no data)\n");
   return 0;
 }
 lexsize = cl_max_id(attr);
 corpsize = cl_max_cpos(attr);
 if ((lexsize <= 0) || (corpsize <= 0)) {
-  printf("FAILED (corpus access error)\n");
+  Rprintf("FAILED (corpus access error)\n");
   return 0;
 }
 if (revcorp->size != corpsize) {
-  printf("FAILED (wrong size)\n");
+  Rprintf("FAILED (wrong size)\n");
   return 0;
 }
 
@@ -128,12 +135,12 @@ for (i = 0; i < lexsize; i++) {
 for (cpos = 0; cpos < corpsize; cpos++) {
   id = cl_cpos2id(attr, cpos);
   if ((id < 0) || (id >= lexsize)) {
-    printf("FAILED (inconsistency in token stream)\n");
+    Rprintf("FAILED (inconsistency in token stream)\n");
     cl_free(ptab);
     return 0;
   }
   if (ntohl(revcorp->data.data[ptab[id]]) != cpos) {
-    printf("FAILED\n");
+    Rprintf("FAILED\n");
     cl_free(ptab);
     return 0;
   }
@@ -145,7 +152,7 @@ offset = 0;
 for (i = 0; i < lexsize; i++) {
   offset += cl_id2freq(attr, i);
   if (ptab[i] != offset) {
-    printf("FAILED (token frequencies incorrect)\n");
+    Rprintf("FAILED (token frequencies incorrect)\n");
     cl_free(ptab);
     return 0;
   }
@@ -153,7 +160,7 @@ for (i = 0; i < lexsize; i++) {
 
 cl_free(ptab);
 
-printf("OK\n");
+Rprintf("OK\n");
 return 1;
   }
 
@@ -167,21 +174,21 @@ return 1;
 * @param validate  boolean - if true, validate_revcorp is called to check
 *                  the resulting revcorp.
 */
-void
+int
   do_attribute(Attribute *attr, ComponentID cid, int validate)
   {
     assert(attr);
     
     if (cid == CompLast) {
-      printf("ATTRIBUTE %s\n", attr->any.name);
+      Rprintf("ATTRIBUTE %s\n", attr->any.name);
       /* automatically create all necessary components */
       
       /* check whether directory for data files exists (may be misspelt in registry) */
       if (! is_directory(attr->any.path)) {
-        fprintf(stderr, "WARNING. I cannot find the data directory of the '%s' attribute.\n",
+        Rprintf("WARNING. I cannot find the data directory of the '%s' attribute.\n",
                 attr->any.name);
-        fprintf(stderr, "WARNING  Directory: %s/ \n", attr->any.path);
-        fprintf(stderr, "WARNING  Perhaps you misspelt the directory name in the registry file?\n");
+        Rprintf("WARNING  Directory: %s/ \n", attr->any.path);
+        Rprintf("WARNING  Perhaps you misspelt the directory name in the registry file?\n");
       }
       
       /* lexicon and lexicon offsets must have been created by encode */
@@ -196,39 +203,39 @@ void
         !component_ok(attr, CompCompRF) && !component_ok(attr, CompCompRFX))
         {
           /* issue a warning message & return */
-          printf(" ! attribute not created yet (skipped)\n");
+          Rprintf(" ! attribute not created yet (skipped)\n");
           if (strcmp(attr->any.name, "word") == 0) {
-            fprintf(stderr, "WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
+            Rprintf("WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
           }
-          return;
+          return 0;
         }
         else {
-          fprintf(stderr, "ERROR. Lexicon is missing. You must use the 'encode' tool first!\n");
-          exit(1);
+          Rprintf("ERROR. Lexicon is missing. You must use the 'encode' tool first!\n");
+          return 1;
         }
       }
       else {
         /* may need to create "alphabetically" sorted lexicon */
         make_component(attr, CompLexiconSrt);
-        printf(" - lexicon      OK\n");
+        Rprintf(" - lexicon      OK\n");
       }
       
       /* create token frequencies if necessary (must be able to do so if they aren't already there) */
       make_component(attr, CompCorpusFreqs);
-      printf(" - frequencies  OK\n");
+      Rprintf(" - frequencies  OK\n");
       
       /* check if token sequence has been compressed, otherwise create CompCorpus (if necessary) */
       if (component_ok(attr, CompHuffSeq) && component_ok(attr, CompHuffCodes) && component_ok(attr, CompHuffSync)) {
-        printf(" - token stream OK (COMPRESSED)\n");
+        Rprintf(" - token stream OK (COMPRESSED)\n");
       }
       else {
         make_component(attr, CompCorpus);
-        printf(" - token stream OK\n");
+        Rprintf(" - token stream OK\n");
       }
       
       /* same for index (check if compressed, otherwise create if not already there) */
       if (component_ok(attr, CompCompRF) && component_ok(attr, CompCompRFX)) {
-        printf(" - index        OK (COMPRESSED)\n");
+        Rprintf(" - index        OK (COMPRESSED)\n");
       }
       else {
         make_component(attr, CompRevCorpusIdx);
@@ -237,26 +244,27 @@ void
           if (validate) {
             /* validate the index, i.e. the REVCORP component we just created */
             if (! validate_revcorp(attr)) {
-              fprintf(stderr, "ERROR. Validation failed.\n");
-              exit(1);
+              Rprintf("ERROR. Validation failed.\n");
+              return 1;
             }
           }
         }
-        printf(" - index        OK\n");
+        Rprintf(" - index        OK\n");
       }
     }
     else {
       /* create requested component only */
-      printf("Processing component %s of ATTRIBUTE %s\n",
+      Rprintf("Processing component %s of ATTRIBUTE %s\n",
              cid_name(cid), attr->any.name);
       make_component(attr, cid);
       if (validate && (cid == CompRevCorpus)) { /* validates even if REVCORP already existed -> useful trick for validating later */
       if (! validate_revcorp(attr)) {
-        fprintf(stderr, "ERROR. Validation failed.\n");
-        exit(1);
+        Rprintf("ERROR. Validation failed.\n");
+        return 1;
       }
       }
     }
+    return 0;
     
   }
 
@@ -285,5 +293,5 @@ int cwb_makeall(SEXP x, SEXP registry_dir, SEXP p_attribute){
   do_attribute(attribute, cid, validate);
 
   Rprintf("========================================\n");
-  exit(0);
+  return 0;
 }

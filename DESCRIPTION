@@ -45,6 +45,7 @@ Collate:
   'RcppCWB_package.R'
   'cl.R'
   'cqp.R'
+  'cwb.R'
   'checks.R'
   'count.R'
   'RcppExports.R'
