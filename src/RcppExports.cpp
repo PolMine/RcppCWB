@@ -307,6 +307,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cwb_compress_rdx
+int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute);
+RcppExport SEXP _RcppCWB_cwb_compress_rdx(SEXP xSEXP, SEXP registry_dirSEXP, SEXP p_attributeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_compress_rdx(x, registry_dir, p_attribute));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cwb_huffcode
 int cwb_huffcode(SEXP x, SEXP registry_dir, SEXP p_attribute);
 RcppExport SEXP _RcppCWB_cwb_huffcode(SEXP xSEXP, SEXP registry_dirSEXP, SEXP p_attributeSEXP) {
@@ -453,6 +466,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},
     {"_RcppCWB_cqp_dump_subcorpus", (DL_FUNC) &_RcppCWB_cqp_dump_subcorpus, 1},
     {"_RcppCWB_cqp_drop_subcorpus", (DL_FUNC) &_RcppCWB_cqp_drop_subcorpus, 1},
+    {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},

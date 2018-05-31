@@ -1,5 +1,6 @@
 # v0.2.3.9001
-* exposing cwb-makeall
+* cwb command line tools cwb-makeall, cwb-huffcode and cwb-compress-rdx exposed
+  as cwb_makeall, cwb_huffcode and cwb_compress_rdx
 
 
 # v0.2.3

@@ -3,11 +3,15 @@
 \name{cwb_makeall}
 \alias{cwb_makeall}
 \alias{cwb_huffcode}
+\alias{cwb_compress_rdx}
 \title{CWB Tools for Creating Corpora}
 \usage{
 cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+cwb_compress_rdx(corpus, p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}
@@ -59,4 +63,6 @@ tokens_sentence_1 <- cl_id2str(
   registry = tmp_regdir, id = ids_sentence_1
   )
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
+cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
