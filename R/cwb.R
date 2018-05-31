@@ -46,10 +46,17 @@
 #'   registry = tmp_regdir, id = ids_sentence_1
 #'   )
 #' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
-NULL
-
 #' @rdname cwb_utils
 #' @export cwb_makeall
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+}
+
+
+#' @rdname cwb_utils
+#' @export cwb_huffcode
+#' @examples 
+#' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
