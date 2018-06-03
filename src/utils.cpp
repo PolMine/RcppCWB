@@ -1,17 +1,8 @@
 extern "C" {
   #include <cl.h>
-  #include "attributes.h"
+  #include "cwb/cl/attributes.h"
+  #include "utils.h"
 }
-
-/* this is a pseudo header */
-Corpus *corpus; 
-int cleanup(int error_code);
-void compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug);
-void decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug);
-int decode_check_huff(Attribute *attr, char *fname);
-int compute_code_lengths(Attribute *attr, HCD *hc, char *fname);
-int do_attribute(Attribute *attr, ComponentID cid, int validate);
-/* end of pseudo header */  
 
 
   
