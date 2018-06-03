@@ -27,19 +27,16 @@
  * - return value of decode_check_huff turned into 'int'
  */
 
-#include <Rcpp.h>
-using namespace Rcpp;
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
-extern "C" {
-  #include "../cl/globals.h"
-  #include "../cl/cl.h"
-  #include "../cl/corpus.h"
-  #include "../cl/attributes.h"
-  #include "../cl/storage.h"
-  #include "../cl/bitio.h"
-  #include "../cl/macros.h"
-}
-  
+#include "../cl/globals.h"
+#include "../cl/cl.h"
+#include "../cl/corpus.h"
+#include "../cl/attributes.h"
+#include "../cl/storage.h"
+#include "../cl/bitio.h"
+#include "../cl/macros.h"
+
 /** Level of progress-info (inc compression protocol) message output: 0 = none. */
 int do_protocol = 1;
 /** File handle for this program's progress-info output: always stdout */
@@ -911,42 +908,3 @@ decode_check_huff(Attribute *attr, char *fname)
   return 0;                        /* exits on error, so there's no return value */
 }
 
-
-// [[Rcpp::export(name=".cwb_huffcode")]]
-int cwb_huffcode(SEXP x, SEXP registry_dir, SEXP p_attribute) {
-  
-  char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
-  char *attr_name = strdup(Rcpp::as<std::string>(p_attribute).c_str());
-  char * corpus_id = strdup(Rcpp::as<std::string>(x).c_str());
-
-  char *output_fn = NULL;
-  Attribute *attr;
-
-  HCD hc;
-
-  int i_want_to_believe = 0;        /* skip error checks? */
-  int all_attributes = 0;
-
-  /* protocol = stdout;   */             /* 'delayed' init (see top of file) */
-
-
-  if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
-    Rprintf("Corpus %s not found in registry %s . Aborted.\n", 
-            corpus_id,
-            (registry_directory ? registry_directory
-               : central_corpus_directory()));
-    return 1;
-  }
-
-  if ((attr = cl_new_attribute(corpus, attr_name, ATT_POS)) == NULL) {
-    Rprintf("Attribute %s.%s doesn't exist. Aborted.\n",  corpus_id, attr_name);
-    return 1;
-  }
-  
-  compute_code_lengths(attr, &hc, output_fn);
-  if (! i_want_to_believe) decode_check_huff(attr, output_fn);
-  
-  cl_delete_corpus(corpus);
-  
-  return 0;
-}

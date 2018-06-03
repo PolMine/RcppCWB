@@ -25,22 +25,18 @@
  * - global variable 'debug' replaced by local variable that is passed around
  */
 
-#include <Rcpp.h>
-using namespace Rcpp;
-
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 #include <math.h>
 
-extern "C" {
-  #include "../cl/cl.h"
-  #include "../cl/globals.h"
-  #include "../cl/corpus.h"
-  #include "../cl/attributes.h"
-  #include "../cl/storage.h"
-  #include "../cl/bitio.h"
-  #include "../cl/compression.h"
-}
-  
+#include "../cl/cl.h"
+#include "../cl/globals.h"
+#include "../cl/corpus.h"
+#include "../cl/attributes.h"
+#include "../cl/storage.h"
+#include "../cl/bitio.h"
+#include "../cl/compression.h"
+
 /* doesn't seem to exist outside Solaris, so we define it here */
 #define log2(x) (log(x)/log(2.0))
 
@@ -474,40 +470,3 @@ cleanup(int error_code) {
   return error_code;
 }
 
-
-
-// [[Rcpp::export(name=".cwb_compress_rdx")]]
-int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute) {
-  
-  char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
-  char *attr_name = strdup(Rcpp::as<std::string>(p_attribute).c_str());
-  char *corpus_id = strdup(Rcpp::as<std::string>(x).c_str());
-  
-  Attribute *attr;
-
-  char *output_fn = NULL;
-
-  int i_want_to_believe = 0;        /* skip error checks? */
-
-  /* debug_output = stderr; */        /* 'delayed' init (see top of file) */
-  int debug = 0;
-
-  if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
-    Rprintf("Corpus %s not found in registry %s . Aborted.\n", 
-            corpus_id,
-            (registry_directory ? registry_directory
-             : central_corpus_directory()));
-    cleanup(1);
-  }
-
-  if ((attr = find_attribute(corpus, attr_name, ATT_POS, NULL)) == NULL) {
-    Rprintf("Attribute %s.%s doesn't exist. Aborted.\n", corpus_id, attr_name);
-    cleanup(1);
-  }
-  
-  compress_reversed_index(attr, output_fn, corpus_id, debug);
-  if (! i_want_to_believe) decompress_check_reversed_index(attr, output_fn, corpus_id, debug);
-  
-  cleanup(0);
-  return 0;                        /* to keep gcc from complaining */
-}

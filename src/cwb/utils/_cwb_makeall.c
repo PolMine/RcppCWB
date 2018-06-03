@@ -1,15 +1,12 @@
-extern "C" {
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
-  #include <cl.h>
-  #include "globals.h"
-  #include "attributes.h"
-  #include "fileutils.h"
-}
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
-#include <Rcpp.h>
-using namespace Rcpp;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../cl/cl.h"
+#include "../cl/globals.h"
+#include "../cl/attributes.h"
+#include "../cl/fileutils.h"
 
 Corpus *corpus;
 
@@ -269,29 +266,3 @@ int
   }
 
 
-/* MODIFIED from cwb-makeall.c */
-
-
-// [[Rcpp::export(name=".cwb_makeall")]]
-int cwb_makeall(SEXP x, SEXP registry_dir, SEXP p_attribute){
-  
-  char *progname = "RcppCWB";
-  
-  char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
-  char *attr_name = strdup(Rcpp::as<std::string>(p_attribute).c_str());
-  char * corpus_id = strdup(Rcpp::as<std::string>(x).c_str());
-  int validate = 1;
-
-  ComponentID cid = CompLast;
-
-  corpus = cl_new_corpus(registry_directory, corpus_id);
-  
-  Rprintf("=== Makeall: processing corpus %s ===\n", corpus_id);
-  Rprintf("Registry directory: %s\n", corpus->registry_dir);
-  
-  Attribute *attribute = cl_new_attribute(corpus, attr_name, ATT_POS);
-  do_attribute(attribute, cid, validate);
-
-  Rprintf("========================================\n");
-  return 0;
-}
