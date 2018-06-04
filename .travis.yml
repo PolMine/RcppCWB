@@ -13,12 +13,15 @@ addons:
     packages:
     - libpcre3-dev
 
+before_install:
+  - tlmgr install inconsolata
+
 r_packages:
   - Rcpp
   - covr
   - digest
 
-warnings_are_errors: false
+warnings_are_errors: true
 
 notifications:
   email:
