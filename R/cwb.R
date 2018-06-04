@@ -23,7 +23,7 @@
 #' 
 #' tmpdir <- tempdir()
 #' win <- if (Sys.info()[["sysname"]] == "Windows") TRUE else FALSE
-#' if (win) tmpdir <- normalizePath(tmpdir, winslash = "/")
+#' if (win) tmpdir <- normalizePath(tmpdir)
 #' tmp_regdir <- file.path(tmpdir, "registry", fsep = if (win) "\\" else "/")
 #' tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = if (win) "\\" else "/")
 #' tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = if (win) "\\" else "/")
