@@ -70,7 +70,7 @@ int cwb_huffcode(SEXP x, SEXP registry_dir, SEXP p_attribute) {
   }
   
   compute_code_lengths(attr, &hc, output_fn);
-  if (! i_want_to_believe) decode_check_huff(attr, output_fn);
+  if (! i_want_to_believe) decode_check_huff(attr, corpus_id, output_fn);
   
   cl_delete_corpus(corpus);
   
@@ -89,7 +89,14 @@ int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute) {
   
   char *output_fn = NULL;
   
-  int i_want_to_believe = 0;        /* skip error checks? */
+  #ifdef _WIN32
+    int i_want_to_believe = 1;        /* skip error on Windows, for the time being */
+  #else
+    int i_want_to_believe = 0;        /* do not skip error checks on macOS and Linux */
+  #endif
+  
+  
+  
   
   /* debug_output = stderr; */        /* 'delayed' init (see top of file) */
   int debug = 0;

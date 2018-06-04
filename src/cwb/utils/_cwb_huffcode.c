@@ -25,6 +25,7 @@
  * - all uses of 'protocol' commented out
  * - exit(1); replaced by return 1;
  * - return value of decode_check_huff turned into 'int'
+ * - corpus_id is passed explicitly into decode_check_huff
  */
 
 void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
@@ -787,7 +788,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
  *              Can be NULL, in which case the filenames in the attribute are used.
  */
 int 
-decode_check_huff(Attribute *attr, char *fname)
+decode_check_huff(Attribute *attr, char *corpus_id, char *fname)
 {
   BFile bfd;
   FILE *sync;

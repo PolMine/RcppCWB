@@ -485,8 +485,8 @@ i686-w64-mingw32-gcc -c -o _cwb_compress_rdx.o -O2 -Wall -static  \
 
 
 ```{sh}
-x86_64-w64-mingw32-ar cq libcwb.a _cwb_makeall.o _cwb_huffcode.o _cwb_compress_rdx.o
-x86_64-w64-mingw32-ranlib libcwb.a
+i686-w64-mingw32-ar cq libcwb.a _cwb_makeall.o _cwb_huffcode.o _cwb_compress_rdx.o
+i686-w64-mingw32-ranlib libcwb.a
 ```
 
 
