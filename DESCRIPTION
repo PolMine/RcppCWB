@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.2.3.9001
-Date: 2018-05-31
+Version: 0.2.3.9002
+Date: 2018-06-04
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),

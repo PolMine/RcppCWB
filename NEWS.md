@@ -1,3 +1,6 @@
+# v0.2.3.9002
+* cwb command line tools for creating corpora available for windows
+
 # v0.2.3.9001
 * cwb command line tools cwb-makeall, cwb-huffcode and cwb-compress-rdx exposed
   as cwb_makeall, cwb_huffcode and cwb_compress_rdx
