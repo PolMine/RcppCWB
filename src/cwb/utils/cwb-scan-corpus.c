@@ -17,10 +17,10 @@
 
 
 #include "../cl/globals.h"
+#include "../cl/corpus.h"
 #include "../cl/cl.h"
+#include "../cl/special-chars.h"
 
-/** use 1 million buckets by default */
-#define DEFAULT_BUCKETS 1000000
 
 /** maximum value of N (makes life a little easier) */
 #define MAX_N 32
@@ -30,19 +30,7 @@
    for each structure and access tuple as entry->tuple[i] or in a similar way */
 
 /**
- * Structure representing hash entries.
- *
- * @see Hash
- */
-typedef struct _hash_entry {
-  int *tuple;               /**< K-tuple of lexicon IDs (with K == Hash.K) */
-  int freq;                 /**< frequency of this K-tuple (so far) */
-  struct _hash_entry *next;
-} *HashEntry;
-
-
-/**
- * A specialised hash for computing frequency distributions over tuples of lexicon IDs
+ * A specialised hashtable for computing frequency distributions over tuples of lexicon IDs.
  */
 struct _Hash {
   int N;                    /**< number of keys, including constraint-only keys */
@@ -51,6 +39,7 @@ struct _Hash {
   int max_offset;           /**< largest offset of all keys (to avoid scanning past end of corpus */
   int is_structural[MAX_N]; /**< list of flags identifying s-attributes (all others are p-attributes) */
   CL_Regex regex[MAX_N];    /**< optional regex constraint (compiled regular expression) */
+  int is_negated[MAX_N];    /**< whether regex constraint is negated (!=) */
 
   /* optional frequency values for corpus rows */
   Attribute *frequency_values;
@@ -70,8 +59,8 @@ struct _Hash {
 
   int is_constraint[MAX_N]; /**< list of flags marking constraint keys ("?...") */
   int K;                    /**< number of non-constraint keys, i.e. the actual hash table stores K-tuples */
-  int buckets;              /**< no. of buckets in hash table */
-  HashEntry *table;         /**< array of HashEntry pointers == buckets (initialised to NULL, i.e. empty buckets) */
+
+  cl_ngram_hash table;      /**< the actual hash table, a cl_ngram_hash object */
 } Hash;
 
 /* other global variables */
@@ -79,8 +68,10 @@ Corpus *C;                   /**< corpus we're working on */
 char *reg_dir = NULL;        /**< registry directory (NULL -> use default) */
 char *corpname = NULL;       /**< corpus name (command-line) */
 int check_words = 0;         /**< if set, accept only 'regular' words in frequency counts */
+CL_Regex regular_rx = NULL;  /**< regex object for use when check_words is true. @see scancorpus_word_is_regular */
 char *progname = NULL;       /**< name of this program (from shell command) */
 char *output_file = NULL;    /**< output file name (-o option) */
+int sort_output = 0;         /**< sort output in canonical order (-S option) */
 int frequency_threshold = 0; /**< frequency threshold for result table (-f option) */
 char *frequency_att = NULL;  /**< p-attribute with frequency entries for corpus rows (when abusing corpus as frequency database) */
 int global_start = 0;        /**< start scanning at this cpos (defaults to start of corpus) */
@@ -88,41 +79,44 @@ int global_end = -1;         /**< will be set up in main() unless changed with -
 char *ranges_file = NULL;    /**< file with ranges to scan (pairs of corpus positions) */
 FILE *ranges_fh = NULL;      /**< corresponding filehandle */
 int quiet = 0;               /**< if set, don't show progress information on stderr */
-
-
+int n_buckets = 0;           /**< if set, use fixed number of buckets; otherwise, revert to cl_ngram_hash defaults */
+int debug_level = 0;         /**< CL debug level */
 
 /**
  * Prints a usage message and exits the program.
  */
 void
-usage(void)
+scancorpus_usage(void)
 {
   fprintf(stderr, "\n");
-  fprintf(stderr, "Usage: %s [options] <corpus> <key1> <key2> ... \n\n", progname);
+  fprintf(stderr, "Usage: cwb-scan-corpus [options] <corpus> <key1> <key2> ... \n\n");
   fprintf(stderr, "Computes the joint frequency distribution over <key1>, <key2>, ... .\n");
   fprintf(stderr, "Each key specifier takes the form:\n\n");
-  fprintf(stderr, "    [?]<att>[+<n>][=/<regex>/[cd]]\n\n");
+  fprintf(stderr, "    [?]<att>[+<n>][[!]=/<regex>/[cd]]\n\n");
   fprintf(stderr, "where <att> is a positional or structural attribute, <n> an optional\n");
   fprintf(stderr, "non-negative offset (number of tokens to the right), and <regex> an optional\n");
-  fprintf(stderr, "regular expression against which the key is matched (instances where the value\n");
-  fprintf(stderr, "of <att> does not match <regex> are discarded before counting). The regex\n");
-  fprintf(stderr, "may be followed by 'c' (ignore case) and/or 'd' (ignore diacritics).\n");
+  fprintf(stderr, "regular expression that the key must match ('=') or not match ('!='). The\n");
+  fprintf(stderr, "regex may be followed by 'c' (ignore case) and/or 'd' (ignore diacritics).\n");
   fprintf(stderr, "The optional '?' sign marks a \"constraint\" key which will not be included\n");
-  fprintf(stderr, "in the resulting frequency distribution.\n\n");
+  fprintf(stderr, "in the resulting frequency distribution. Up to %d keys may be specified in total.\n\n", MAX_N);
   fprintf(stderr, "The output is a table of the form:\n");
   fprintf(stderr, "  <f>  TAB  <key1-value>  TAB  <key2-value>  TAB  ... \n\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr, "  -r <dir>  use registry directory <dir>\n");
-  fprintf(stderr, "  -b <n>    use <n> hash buckets [default: 1,000,000]\n");
-  fprintf(stderr, "  -o <file> write frequency table to <file> [default"": standard output]\n"); /* 'default:' confuses Emacs C-mode */
-  fprintf(stderr, "            (compressed with gzip if <file> ends in '.gz')\n");
+  fprintf(stderr, "  -b <n>    use <n> hash buckets [default: adjust dynamically]\n");
+  fprintf(stderr, "  -o <file> write frequency table to <file> [default"": standard output]\n");
+                                                            /* 'default:' confuses Emacs C-mode */
+  fprintf(stderr, "            (compressed if <file> ends in '.gz' or '.bz2')\n");
+  fprintf(stderr, "  -S        sort n-grams in canonical order (so they can be merged)\n");
   fprintf(stderr, "  -f <n>    include only items with frequency >= <n> in result table\n");
   fprintf(stderr, "  -F <att>  add up frequency values from p-attribute <att>\n");
-  fprintf(stderr, "  -C        clean up data, i.e. accept only 'regular' words\n");
+  fprintf(stderr, "  -C        clean up data, i.e. accept only \"regular\" words\n");
+  fprintf(stderr, "            (does not apply to constraint keys marked with '?')\n");
   fprintf(stderr, "  -s <n>    start scanning at corpus position <n>\n");
   fprintf(stderr, "  -e <n>    stop scanning at corpus position <n>\n");
   fprintf(stderr, "  -R <file> read list of corpus ranges to scan from <file>\n");
   fprintf(stderr, "  -q        quiet mode (no progress information on stderr)\n");
+  fprintf(stderr, "  -D        activate CL debugging (use repeatedly for more output)\n");
   fprintf(stderr, "  -h        this help page\n\n");
   fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
   exit(1);
@@ -136,13 +130,13 @@ usage(void)
  * @return      The value of global optind after the function has run.
  */
 int
-parse_options(int argc, char *argv[])
+scancorpus_parse_options(int argc, char *argv[])
 {
   extern int optind;
   extern char *optarg;
   int c;
 
-  while ((c = getopt(argc, argv, "+r:b:o:f:F:Cs:e:R:qh")) != EOF)
+  while ((c = getopt(argc, argv, "+r:b:o:Sf:F:Cs:e:R:qDh")) != EOF) {
     switch (c) {
     case 'r':                        /* -r <dir> */
       if (reg_dir == NULL)
@@ -153,7 +147,7 @@ parse_options(int argc, char *argv[])
       }
       break;
     case 'b':                        /* -b <n> */
-      Hash.buckets = atoi(optarg);
+      n_buckets = atoi(optarg);
       break;
     case 'o':                        /* -o <file> */
       if (output_file == NULL)
@@ -162,6 +156,9 @@ parse_options(int argc, char *argv[])
         fprintf(stderr, "Error: -o option used twice.\n");
         exit(1);
       }
+      break;
+    case 'S':                        /* -S */
+      sort_output = 1;
       break;
     case 'f':                        /* -f <n> */
       frequency_threshold = atoi(optarg);
@@ -194,168 +191,16 @@ parse_options(int argc, char *argv[])
     case 'q':
       quiet = 1;
       break;
+    case 'D':
+      debug_level++;
+      break;
     case 'h':                       /* -h */
     default:                        /* unknown option: print usage info */
-      usage();
+      scancorpus_usage();
     }
+  }
 
   return(optind);
-}
-
-
-/* hash utility functions */
-
-/**
- * Checks whether a number is prime.
- *
- * @param n  number to check
- * @return   Boolean
- */
-int
-is_prime(int n)
-{
-  int i;
-  for(i = 2; i*i <= n; i++)
-    if ((n % i) == 0)
-      return 0;
-  return 1;
-}
-
-/**
- * Finds a prime number.
- *
- * @param n  lower bound for the generated prime.
- * @return   The first prime number greater than n,
- *           or 0 if no prime number was found within
- *           the sizeof a signed int.
- */
-int
-find_prime(int n)
-{
-  for( ; n > 0 ; n++)                /* will exit on int overflow */
-    if (is_prime(n))
-      return n;
-  return 0;
-}
-
-
-/**
- * Computes a hash index for an N-tuple of ints.
- *
- * @param N      Size of the tuple.
- * @param tuple  The tuple itself: an array of ints.
- * @return       The hash index calculated.
- */
-unsigned int
-hash_index(int N, int *tuple)
-{
-  unsigned int result = 0;
-  int i;
-
-  for(i = 0 ; i < N; i++)
-    result = (result * 33 ) ^ (result >> 27) ^ tuple[i];
-  return result;
-}
-
-
-/**
- * Compares two N-tuples for equality.
- *
- * @param N    Size of the tuple.
- * @param t1   First tuple (array of ints of size N).
- * @param t2   Second tuple (array of ints of size N).
- * @return     Boolean: true if all ints are identical,
- *             otherwise false.
- */
-int
-tuples_eq(int N, int *t1, int *t2)
-{
-  int i;
-  for (i = 0; i < N; i++) {
-    if (t1[i] != t2[i]) return 0;
-  }
-  return 1;
-}
-
-
-/**
- * Finds an N-tuple in the global hash.
- *
- * @param tuple    The tuple to search for.
- * @param R_index  The index of the bucket containing the
- *                 located HashEntry.
- * @return         The located HashEntry.
- */
-HashEntry
-hash_find(int *tuple, int *R_index)
-{
-  unsigned int index;
-  HashEntry entry;
-
-  index = hash_index(Hash.K, tuple) % Hash.buckets;
-  if (R_index != NULL) *R_index = index;
-  entry = Hash.table[index];
-  while (entry != NULL && !tuples_eq(Hash.K, tuple, entry->tuple)) {
-    entry = entry->next;
-  }
-  return entry;
-}
-
-/* insert N-tuple into hash (if it's already in there, just increment its count) */
-/**
- * Inserts an N-tuple into the global hash.
- *
- * If the N-tuple is already in the hash, its count
- * is incremented by f, but nothing is inserted.
- *
- * @param tuple  The tuple to add (array of ints).
- * @param f      The frequency of the tuple.
- */
-void
-hash_add(int *tuple, int f)
-{
-  HashEntry entry;
-  int index;
-
-  entry = hash_find(tuple, &index);
-  if (entry != NULL) {          /* tuple already in hash -> increment count */
-    entry->freq += f;
-  }
-  else {                        /* add new tuple (to bucket <index> */
-    entry = (HashEntry) cl_malloc(sizeof(struct _hash_entry));
-    entry->tuple = (int *) cl_malloc(Hash.K * sizeof(int));
-    bcopy(tuple, entry->tuple, Hash.K * sizeof(int)); /* we can just copy it verbatim */
-    entry->freq = f;
-    entry->next = Hash.table[index];
-    Hash.table[index] = entry;
-  }
-}
-
-/**
- * Checks whether a character is a letter.
- *
- * @param c The character to check.
- * @return  Boolean.
- */
-int
-is_letter(unsigned char c)
-{
-  return
-    ( (c >= 'A' && c <= 'Z') ||
-      (c >= 'a' && c <= 'z') ||
-      (c >= 0xC0 && c <= 0xFF ));
-/*      (c >= '\xfffd' && c <= '\xfffd') );
- * this line became corrupt when imported into the SVN due to non-ASCII characters (see above)
- * I replaced it with the hex values for capital-a-grave to little-y-diaresis,
- * having looked them up in earlier version of the code... -- AH 1/7/09
- * Which means that the condition could never be satisfied on a platform where char is signed
- * (because the non-ASCII characters have negative codes in this case); I've explicitly made the
- * function argument an "unsigned char" now, which should fix the problem. -- SE 18/08/09
- * (NB: there's still a harmless warning that "comparison is always true" for "c <= 0xFF")
- */
-/*
- * TODO This may or may not presents a challenge for UTF-8 depending on how the function is used.
- */
 }
 
 
@@ -363,19 +208,56 @@ is_letter(unsigned char c)
  * Check regularity of a token.
  *
  * A token is "regular" if it contains only letters, numbers and dashes
- * (with no dash at the end).
+ * (with no dash at the start or end).
  *
  * "Regularity" is used as a filter on the corpus iff the -C option
  * is specified.
- *
- * Character encoding: Latin-1.
  *
  * @param s  String containing the token to check.
  * @return   True if the token is regular, otherwise false.
  */
 int
-is_regular(char *s)
+scancorpus_word_is_regular(char *s)
 {
+  /* bad pointer or empty string or first char is hyphen? not regular */
+  if (s == NULL || *s == '\0' || *s == '-')
+    return 0;
+
+  /* otherwise, different approach of utf8 versus iso8859 */
+  if (C->charset == utf8)
+    return cl_regex_match(regular_rx, s, 0);
+  else {
+    char *p = s;
+    while (*p) {
+      /* each component of the string may be... */
+      /* a sequence of digits: if so scroll through */
+      if (*p >= '0' && *p <= '9')
+        while (*p >= '0' && *p <= '9')
+          p++;
+      /* or a sequence fo letters: if so scroll through */
+      else if (cl_iso_char_is_alphanumeric(*p, C->charset))
+        while (cl_iso_char_is_alphanumeric(*p, C->charset))
+          p++;
+      /* otherwise this isn't the start of a valid component */
+      else
+        return 0;
+      /* we are at the end of a component: if it is also the end of
+       * the string this is regular; otherwise there must be a hyphen,
+       * followed by another component */
+      if (*p == '\0')
+        return 1;
+      if (*p++ != '-')
+        return 0;
+      /* else: there IS a hyphen, so we need to loop again */
+    }
+    /* we are at the end of the string: was the last character a hyphen? */
+    if (*(p-1) == '-')
+      return 0;
+  }
+  /* when we get here, the word ended in a '-' => not regular */
+  return 0;
+
+#if 0  /* the old version of this function. */
   char *p = s;
   while (*p) {                          /* each component of the word may be ... */
     if (*p >= '0' && *p <= '9') { /* ... a number */
@@ -396,6 +278,7 @@ is_regular(char *s)
   }
   /* when we get here, the word was either empty or ended in a '-' => not regular */
   return 0;
+#endif
 }
 
 
@@ -407,13 +290,14 @@ is_regular(char *s)
  *             main() from a command-line argument)
  */
 void
-add_key(char *key)
+scancorpus_add_key(char *key)
 {
-  char buf[MAX_LINE_LENGTH];        /* stores copy of <key> if we have to mess around with it */
+  char buf[CL_MAX_LINE_LENGTH]; /* stores copy of <key> if we have to mess around with it */
   Attribute *att = NULL;        /* p-attribute object for attribute <att> */
-  int offset = 0;                /* offset obtained from [+<n>] part of key specifier */
-  char *regex = NULL;                /* <regex> from optional [=/<regex>/[cd]] part */
+  int offset = 0;               /* offset obtained from [+<n>] part of key specifier */
+  char *regex = NULL;           /* <regex> from optional [=/<regex>/[cd]] part */
   int flags = 0;                /* optional ignore case and/or diacritics flags ([cd]) */
+  int is_negated = 0;           /* regex constraint negated? */
   int is_constraint = 0;        /* just a constraint key? */
   int is_structural = 0;        /* positional or structural attribute? */
   char *p;
@@ -426,8 +310,14 @@ add_key(char *key)
   else
     strcpy(buf, key);
 
-  regex = strchr(buf, '=');        /* check for "=/<regex>/" */
+  regex = strchr(buf, '=');        /* check for "=/<regex>/" or "!=/<regex>/" */
   if (regex != NULL) {
+    if (regex > buf) {
+      if (regex[-1] == '!') {
+        regex[-1] = '\0';
+        is_negated = 1;
+      }
+    }
     *(regex++) = '\0';                /* terminate part of key before regex */
     if (*regex != '/') {
       fprintf(stderr, "Syntax error in regex part of key '%s'.\n", key);
@@ -462,15 +352,11 @@ add_key(char *key)
 
   /* now <buf> points to the attribute name, <regex> is NULL or points to a regular expression,
      the optional <flags> are set up, and <offset> is 0 or set to <n> */
-  att = cl_new_attribute(C, buf, ATT_POS);
-  if (att != NULL) {
+  if ((att = cl_new_attribute(C, buf, ATT_POS)) != NULL)
     is_structural = 0;
-  }
-  else {
-    att = cl_new_attribute(C, buf, ATT_STRUC);
+  else if ((att = cl_new_attribute(C, buf, ATT_STRUC)) != NULL)
     is_structural = 1;
-  }
-  if (att == NULL) {
+  else {
     fprintf(stderr, "Error: can't open attribute %s.%s\n", corpname, buf);
     fprintf(stderr, "      (possibly a syntax error in key '%s')\n", key);
     exit(1);
@@ -481,6 +367,7 @@ add_key(char *key)
   if (offset > Hash.max_offset)
     Hash.max_offset = offset;
   Hash.is_constraint[Hash.N] = is_constraint;
+  Hash.is_negated[Hash.N] = is_negated;
 
   if (regex != NULL) {                /* optional regex constraint */
     Hash.regex[Hash.N] = cl_new_regex(regex, flags, cl_corpus_charset(C)); /* compile regular expression */
@@ -495,13 +382,13 @@ add_key(char *key)
       if (check_words && !is_constraint) { /* reduce ID list to regular words with -C option (but not for constraint keys) */
         point = mark = 0;
         while (point < list_size) {
-          if (is_regular(cl_id2str(att, Hash.id_list[Hash.N][point])))
+          if (scancorpus_word_is_regular(cl_id2str(att, Hash.id_list[Hash.N][point])))
             Hash.id_list[Hash.N][mark++] = Hash.id_list[Hash.N][point];
           point++;
         }
         Hash.id_list_size[Hash.N] = mark;
       }
-      if (Hash.id_list_size == 0) {
+      if (Hash.id_list_size[Hash.N] == 0) {
         fprintf(stderr, "Warning: no matches for key '%s' -- scan results will be empty\n", key);
       }
     }
@@ -548,11 +435,11 @@ add_key(char *key)
 int
 get_next_range(int *start, int *end)
 {
-  char buffer[1024];
+  char buffer[CL_MAX_LINE_LENGTH];
 
   *start = *end = -1;                /* these values are returned on error or at end-of-input */
   if (ranges_fh) {
-    if ((fgets(buffer, 1024, ranges_fh) != NULL) &&
+    if ((fgets(buffer, CL_MAX_LINE_LENGTH, ranges_fh) != NULL) &&
         (sscanf(buffer, "%d %d", start, end) == 2))
       return 1;
     else
@@ -571,6 +458,88 @@ get_next_range(int *start, int *end)
   }
 }
 
+
+/**
+ * Format n-gram hash entry.
+ *
+ * The formatted n-gram entry is written to the specified stream in format
+ *   <freq> TAB <w1> TAB <w2> TAB ...
+ *
+ * @param fh    output stream (use stdout to display in terminal)
+ * @param entry n-gram hash entry to be printed
+ */
+void
+print_ngram_entry(FILE *fh, cl_ngram_hash_entry entry) {
+  int i, k;
+  char *str;
+
+  fprintf(fh, "%d", entry->freq);
+  k = 0;
+  for (i = 0; i < Hash.N; i++) {
+    if (! Hash.is_constraint[i]) {
+      if (! Hash.is_structural[i]) {
+        str = cl_id2str(Hash.att[i], entry->ngram[k]);
+      }
+      else {
+        if (entry->ngram[k] < 0) {
+          str = "";
+        }
+        else {
+          str = Hash.source_base[i] + entry->ngram[k];
+        }
+      }
+      fprintf(fh, "\t%s", str);
+      k++;
+    }
+  }
+  fprintf(fh, "\n");
+}
+
+/**
+ * Collate two n-gram hash entries in canonical sort order (callback for qsort())
+ *
+ * Canonical sort order iteratively compares the elements of the two n-grams as unsigned byte sequences,
+ * i.e. using strcmp() according to the C99 standard. Since CWB annotation strings must not contain control
+ * characters, this is equivalent to a strcmp() on the full n-grams with TAB separators.
+ *
+ * @param a   pointer to first n-gram entry (i.e. a cl_ngram_hash_entry *)
+ * @param b   pointer to second n-gram entry (i.e. a cl_ngram_hash_entry *)
+ * @return    -1 if a < b, 0 if a == b, +1 if a > b
+ */
+int
+collate_ngram_entries(const void *a, const void *b) {
+  cl_ngram_hash_entry A = *((cl_ngram_hash_entry *) a);
+  cl_ngram_hash_entry B = *((cl_ngram_hash_entry *) b);
+  int i, k, res;
+  char *strA, *strB;
+
+  k = 0;
+  for (i = 0; i < Hash.N; i++) {
+    if (! Hash.is_constraint[i]) {
+      if (! Hash.is_structural[i]) {
+        strA = cl_id2str(Hash.att[i], A->ngram[k]);
+        strB = cl_id2str(Hash.att[i], B->ngram[k]);
+      }
+      else {
+        if (A->ngram[k] < 0)
+          strA = "";
+        else
+          strA = Hash.source_base[i] + A->ngram[k];
+        if (B->ngram[k] < 0)
+          strB = "";
+        else
+          strB = Hash.source_base[i] + B->ngram[k];
+      }
+      res = strcmp(strA, strB);
+      if (res != 0) return(res);
+      k++;
+    }
+  }
+
+  return 0;
+}
+
+
 /* *************** *\
  *      MAIN()     *
 \* *************** */
@@ -584,25 +553,24 @@ get_next_range(int *start, int *end)
 int
 main (int argc, char *argv[])
 {
-  int argind;                        /* index of first (non-option) argument in argv[] */
-  int Csize = 0;                /* corpus size (= number of tokens) */
-  Attribute *word;                /* need default p-attribute to compute corpus size */
+  int argind;                      /* will be set to the index of first (non-option) argument in argv[] */
+  int Csize = 0;                   /* corpus size (= number of tokens) */
+  Attribute *word;                 /* need default p-attribute to compute corpus size */
   int cpos, next_cpos, start_cpos, end_cpos, previous_end;
 
   /* parse command line options */
-  Hash.buckets = DEFAULT_BUCKETS;  /* must pre-initialise Hash.buckets */
   progname = argv[0];
-  argind = parse_options(argc, argv);
+  argind = scancorpus_parse_options(argc, argv);
   if ((argc - argind) < 2) {
-    usage();                     /* not enough arguments -> print usage info */
+    scancorpus_usage();                       /* not enough arguments -> print usage info */
   }
+  if (debug_level > 0)
+    cl_set_debug_level(debug_level);
 
   /* initialise hash */
-  Hash.N = 0;                        /* will be incremented when we process the arguments */
+  Hash.N = 0;                      /* will be incremented when we process the arguments */
   Hash.K = 0;
   Hash.max_offset = 0;
-  Hash.buckets = find_prime(Hash.buckets); /* make sure number of buckets is a prime */
-  Hash.table = cl_calloc(Hash.buckets, sizeof(HashEntry));
   Hash.frequency_values = NULL;
   Hash.frequency = NULL;
 
@@ -614,11 +582,28 @@ main (int argc, char *argv[])
     exit(1);
   }
 
+  /* now we know the corpus (and its character set) we can initialise the global regular expression object, if needed */
+  if (check_words) {
+    if (C->charset == utf8) {
+      /* utf8: don't fold diacritics, but use Unicode character properties */
+      if (NULL == (regular_rx = cl_new_regex("([\\pL\\pM]+|\\pN+)(-([\\pL\\pM]+|\\pN+))*", 0, C->charset)) ) {
+        fprintf(stderr, "Error: can't initialise regex\n");
+        exit(1);
+      }
+    }
+    /* other character sets don't use regex engine: see scancorpus_word_is_regular */
+  }
+
   /* remaining arguments are specifiers for keys forming N-tuple */
   while (argind < argc) {
-    add_key(argv[argind]);
+    scancorpus_add_key(argv[argind]);
     argind++;
   }
+
+  /* now initalise the n-gram hash table */
+  Hash.table = cl_new_ngram_hash(Hash.K, n_buckets);
+  if (n_buckets > 0)
+    cl_ngram_hash_auto_grow(Hash.table, 0);
 
   /* determine size of corpus */
   word = cl_new_attribute(C, "word", ATT_POS);
@@ -636,14 +621,10 @@ main (int argc, char *argv[])
 
   /* if -R option was used, open file with ranges of corpus positions ("-" for stdin) */
   if (ranges_file) {
-    if (strcmp(ranges_file, "-") == 0)
-      ranges_fh = stdin;
-    else {
-      ranges_fh = fopen(ranges_file, "r");
-      if (! ranges_fh) {
-        perror(ranges_file);
-        exit(1);
-      }
+    ranges_fh = cl_open_stream(ranges_file, CL_STREAM_READ, CL_STREAM_MAGIC);
+    if (! ranges_fh) {
+      cl_error("Can't load -R file");
+      exit(1);
     }
   }
 
@@ -706,7 +687,8 @@ main (int argc, char *argv[])
       if ((! quiet) && ((cpos & 0xffff) == 0)) {
         int cpK = cpos >> 10;
         int csK = Csize >> 10;
-        fprintf(stderr, "Progress: %6dK / %dK   \r", cpK, csK);
+        int entriesK = cl_ngram_hash_size(Hash.table) >> 10;
+        fprintf(stderr, "Progress: %7dK / %dK  | %7dK n-grams \r", cpK, csK, entriesK);
         fflush(stderr);
       }
 
@@ -736,16 +718,28 @@ main (int argc, char *argv[])
               else
                 bot = mid + 1;
             }
-            if (id != idlist[bot])     /* now id==idlist[bot==top], or id is not in list */
-              accept = 0;
+            if (id == idlist[bot]) {   /* now id==idlist[bot==top], or id is not in list */
+              if (Hash.is_negated[i])  /* a) id found -> reject if constraint is negated */
+                accept = 0;            
+            } 
+            else {
+              if (Hash.is_negated[i]) {/* b) id not found -> reject unless negated, otherwise must check -C flag */
+                if (check_words && !Hash.is_constraint[i]) {
+                   /* id matching negative constraint may not have been found in idlist[] filtered with -C flag,
+                      so we need to check explicitly that the corresponding string is regular in this case */
+                  str = cl_id2str(Hash.att[i], id);
+                  if (!scancorpus_word_is_regular(str)) accept = 0;
+                }
+              }
+              else accept = 0;
+            }
           }
           else if (size == 0) {        /* empty list: constraint cannot be satisfied */
             accept = 0;
           }
-          else if (check_words) {      /* no regex, but -C option specified: check now whether word is regular
-                                          (otherwise implicit in ID list) */
+          else if (check_words) {      /* no regex, but -C option specified: check now whether word is regular */
             str = cl_id2str(Hash.att[i], id);
-            accept = accept && is_regular(str);
+            if (!scancorpus_word_is_regular(str)) accept = 0;
           }
         }
         else {                             /* s-attribute -> id = offset of annotation string in lexicon data */
@@ -767,9 +761,15 @@ main (int argc, char *argv[])
                 Hash.virtual_id[i] = -1;
               }
               Hash.constraint_ok[i] = 1;
-              if ((Hash.regex[i] != NULL) && (! cl_regex_match(Hash.regex[i], str)))
-                Hash.constraint_ok[i] = 0;
-              if (check_words && !is_regular(str))
+              if (Hash.regex[i] != NULL) {
+                if (cl_regex_match(Hash.regex[i], str, 0)) {
+                  if (Hash.is_negated[i]) Hash.constraint_ok[i] = 0;  /* negated regex matches -> reject */
+                }
+                else {
+                  if (!Hash.is_negated[i]) Hash.constraint_ok[i] = 0; /* plain regex matches -> reject */
+                }
+              }
+              if (check_words && !Hash.is_constraint[i] && !scancorpus_word_is_regular(str))   /* -C flag (ignored for constraint keys) */
                 Hash.constraint_ok[i] = 0;
               /* may jump directly to next region when regex constraint is present (or for ``?head'' constraints) */ 
               if (Hash.regex[i] != NULL || Hash.source_base[i] == NULL) { 
@@ -787,7 +787,7 @@ main (int argc, char *argv[])
           if (effective_cpos >= Hash.start_cpos[i]) { /* when in region, use relevant information in Hash data structure */
             id = Hash.virtual_id[i];
             if (Hash.regex[i] != NULL || check_words) /* apply stored constraint flag if regex or -C is in effect */
-              if (! Hash.constraint_ok[i])
+              if (! Hash.constraint_ok[i])            /* (should always be TRUE otherwise, so the condition may be redundant) */
                 accept = 0;
           }
           else {                        /* outside region, ID is undef (-1) and any regex constraint fails */
@@ -805,102 +805,89 @@ main (int argc, char *argv[])
 
       if (accept) {
         if (Hash.frequency_values) /* note that the frequency attribute is always used with offset 0 */
-          hash_add(tuple, Hash.frequency[cl_cpos2id(Hash.frequency_values, cpos)]);
+          cl_ngram_hash_add(Hash.table, tuple, Hash.frequency[cl_cpos2id(Hash.frequency_values, cpos)]);
         else
-          hash_add(tuple, 1);
+          cl_ngram_hash_add(Hash.table, tuple, 1);
       }
     } /* end of scan loop for current range */
 
   } /* end of loop over ranges */
 
   if (! quiet)
-    fprintf(stderr, "Scan complete.                          \n");
+    fprintf(stderr, "Scan complete.                                         \n");
 
   /* close ranges file (if -R option had been used) */
-  if (ranges_fh && ranges_fh != stdin)
-    fclose(ranges_fh);
+  if (ranges_fh)
+    cl_close_stream(ranges_fh);
 
   /* print hash contents to stdout or file (in hash-internal order) */
   {
-    HashEntry entry;
+    cl_ngram_hash_entry entry;
+    cl_ngram_hash_entry *entry_vec;
+    int i, k, n_items = 0;
     FILE *of;
-    char pipe_cmd[MAX_LINE_LENGTH];
-    int bucket, i, k, l, is_pipe;
-    char *str;
 
-    is_pipe = 0;
-    if (output_file != NULL) {
-      l = strlen(output_file);
-      if ((l > 3) && (strncasecmp(output_file + l - 3, ".gz", 3) == 0)) {
-        sprintf(pipe_cmd, "gzip > %s", output_file); /* write .gz file through gzip pipe */
-        of = popen(pipe_cmd, "w");
-        if (of == NULL) {
-          perror(pipe_cmd);
-          fprintf(stderr, "Can't write compressed file %s. Aborted.\n", output_file);
-          exit(1);
-        }
-        is_pipe = 1;
-        if (! quiet)
-          fprintf(stderr, "Writing frequency table to compressed file %s ... ", output_file);
-      }
-      else {
-        of = fopen(output_file, "w");
-        if (of == NULL) {
-          perror(output_file);
-          fprintf(stderr, "Can't create file %s. Aborted.\n", output_file);
-          exit(1);
-        }
-        if (! quiet)
-          fprintf(stderr, "Writing frequency table to %s ... ", output_file);
-      }
+    of = cl_open_stream((output_file) ? output_file : "-", CL_STREAM_WRITE, CL_STREAM_MAGIC); /* if NULL, default to STDOUT */
+    if (of == NULL) {
+      cl_error("Can't write output file");
+      fprintf(stderr, "Error: operation aborted\n");
+      exit(1);
     }
     else {
-      of = stdout;
-      if (! quiet)
-        fprintf(stderr, "Printing frequency table on stdout ... ");
+      if (!quiet)
+        fprintf(stderr, "Writing frequency table to %s ... ", (output_file) ? output_file : "STDOUT");
     }
     fflush(stderr);
 
-    for (bucket = 0; bucket < Hash.buckets; bucket++) {
-      entry = Hash.table[bucket];
-      while (entry != NULL) {
-        if (entry->freq >= frequency_threshold) {
-          fprintf(of, "%d", entry->freq);
-          k = 0;
-          for (i = 0; i < Hash.N; i++) {
-            if (! Hash.is_constraint[i]) {
-              if (! Hash.is_structural[i]) {
-                str = cl_id2str(Hash.att[i], entry->tuple[k]);
-              }
-              else {
-                if (entry->tuple[k] < 0) {
-                  str = "";
-                }
-                else {
-                  str = Hash.source_base[i] + entry->tuple[k];
-                }
-              }
-              fprintf(of, "\t%s", str);
-              k++;
-            }
+    if (sort_output) {
+      entry_vec = cl_ngram_hash_get_entries(Hash.table, &n_items);
+      if (frequency_threshold > 1) {
+        /* pre-filter list of items to speed up qsort */
+        k = 0; /* insert point */
+        for (i = 0; i < n_items; i++) {
+          if (entry_vec[i]->freq >= frequency_threshold) {
+            entry_vec[k] = entry_vec[i];
+            k++;
           }
-          fprintf(of, "\n");
         }
-        entry = entry->next;
+        n_items = k;
+      }
+      if (!quiet) {
+        fprintf(stderr, "sorting ... ");
+        fflush(stderr);
+      }
+      if (n_items > 0)
+        qsort(entry_vec, n_items, sizeof(cl_ngram_hash_entry), collate_ngram_entries);
+      if (!quiet) {
+        fprintf(stderr, "saving ... ");
+        fflush(stderr);
+      }
+      for (i = 0; i < n_items; i++)
+        print_ngram_entry(of, entry_vec[i]);
+      cl_free(entry_vec);
+    }
+    else {
+      cl_ngram_hash_iterator_reset(Hash.table);
+      while ((entry = cl_ngram_hash_iterator_next(Hash.table)) != NULL) {
+        if (entry->freq >= frequency_threshold) {
+          print_ngram_entry(of, entry);
+          n_items++;
+        }
       }
     }
 
-    if (output_file != NULL) {
-      if (is_pipe)
-        pclose(of);
-      else
-        fclose(of);
-    }
+    cl_close_stream(of);
     if (! quiet)
-      fprintf(stderr, "ok.\n");
-  }
+      fprintf(stderr, "%d items.\n", n_items);
+  } /* endblock print hash contents to stdout */
+
+  /* display hash table usage statistics at higher debug levels (-D -D and above) */
+  if (debug_level >= 2)
+    cl_ngram_hash_print_stats(Hash.table, 20);
+
+  /* final act of cleanup */
+  if (regular_rx)
+    cl_delete_regex(regular_rx);
 
   exit(0);                        /* that was easy, wasn't it? */
 }
-
-

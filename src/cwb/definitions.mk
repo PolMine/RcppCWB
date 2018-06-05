@@ -23,7 +23,8 @@
 #
 # CWB version
 #
-VERSION = 3.0.0
+VERSION = 3.4.14
+# 3.4.x = beta versions leading up to new stable 3.5.0
 
 #
 # Check that required configuration variables are set
@@ -116,7 +117,11 @@ endif
 ifndef TAR
 TAR = tar
 endif
-
+## note the above assume cross-compilation for Win; different solutions will be needed for native compilation. 
+## only needed by "make release" for Windows
+ifndef ZIP
+ZIP = zip -r
+endif
 
 #
 # Command-line flags for (GNU-compatible) install program
@@ -168,6 +173,15 @@ endif
 RELEASE_NAME = cwb-$(VERSION)-$(RELEASE_OS)-$(RELEASE_ARCH)
 RELEASE_DIR = $(TOP)/build/$(RELEASE_NAME)
 
+## commands / filenames used by make release
+ifndef __MINGW__
+RELEASE_COMPRESSED_FILENAME = "$(RELEASE_NAME).tar.gz"
+COMPRESS_COMMAND = $(TAR) cfz
+else
+RELEASE_COMPRESSED_FILENAME = "$(RELEASE_NAME).zip"
+COMPRESS_COMMAND = $(ZIP) 
+endif
+
 #
 # Set up compiler and linker flags
 #
@@ -175,14 +189,42 @@ RELEASE_DIR = $(TOP)/build/$(RELEASE_NAME)
 CFLAGS += $(DEBUG_FLAGS) $(SITE_CFLAGS)
 LDFLAGS += $(DEBUG_FLAGS) $(SITE_LDFLAGS)
 
+# termcap/curses/readline DISALLOWED under MinGW, even if set elsewhere
+# (because cmd.exe gives us commandline editing anyway).
+ifdef __MINGW__
+READLINE_LIBS = 
+TERMCAP_LIBS =
+READLINE_DEFINES =
+TERMCAP_DEFINES =
+endif
+
 # termcap/curses support is activated by setting TERMCAP_LIBS
 ifdef TERMCAP_LIBS
 CFLAGS += -DUSE_TERMCAP
 endif
 
-# same for readline library support (defaults to included editline)
+# same for GNU Readline library support
 ifdef READLINE_LIBS
 CFLAGS += -DUSE_READLINE
+endif
+
+# Glib and PCRE header file info (added to CFLAGS_ALL below)
+ifndef __MINGW__
+ifndef PCRE_DEFINES
+PCRE_DEFINES := $(shell pcre-config --cflags)
+endif
+ifndef GLIB_DEFINES
+GLIB_DEFINES := $(shell pkg-config  --cflags glib-2.0)
+endif
+else
+# Library/Include/DLL/PKG-config files for the cross compiler are to be found beneath this folder
+ifndef MINGW_CROSS_HOME
+MINGW_CROSS_HOME := $(subst install: ,,$(shell $(CC) --print-search-dirs | grep ^install))
+# The above will usually produce the correct result - usually something like
+# /usr/lib/gcc/i586-mingw32msvc/4.2.1-sjlj.  If necessary, override in config.mk
+endif
+PCRE_DEFINES := $(shell $(MINGW_CROSS_HOME)/bin/pcre-config --cflags)
+GLIB_DEFINES := $(shell export PKG_CONFIG_PATH=$(MINGW_CROSS_HOME)/lib/pkgconfig ; pkg-config --cflags glib-2.0) $(shell pkg-config  --cflags glib-2.0)
 endif
 
 # define macro variables for some global settings
@@ -192,10 +234,49 @@ INTERNAL_DEFINES = -DREGISTRY_DEFAULT_PATH=\""$(DEFAULT_REGISTRY)"\" -DCOMPILE_D
 LIBCL_PATH = $(TOP)/cl/libcl.a
 CL_LIBS = $(LIBCL_PATH) 
 
+# paths to DLL files that need to be installed along with CWB binaries (win only)
+ifdef __MINGW__
+ifdef  LIB_DLL_PATH
+# This general variable, if set (should only be set by user!), overrrides (and makes unnecessary) both the specific variables.
+LIBGLIB_DLL_PATH = $(LIB_DLL_PATH)
+LIBPCRE_DLL_PATH = $(LIB_DLL_PATH)
+endif
+ifndef LIBGLIB_DLL_PATH
+#$(error Configuration variable LIBGLIB_DLL_PATH is not set (directory containing MinGW-compiled libglib-2.0-0.dll))
+LIBGLIB_DLL_PATH = $(MINGW_CROSS_HOME)/bin
+endif
+ifndef LIBPCRE_DLL_PATH
+LIBPCRE_DLL_PATH = $(MINGW_CROSS_HOME)/bin
+#$(error Configuration variable LIBPCRE_DLL_PATH is not set (directory containing MinGW-compiled libpcre-0.dll))
+endif
+DLLS_TO_INSTALL =                            \
+    $(LIBPCRE_DLL_PATH)/libpcre-1.dll        \
+    $(LIBPCRE_DLL_PATH)/libpcreposix-0.dll   \
+    $(LIBGLIB_DLL_PATH)/libglib-2.0-0.dll    
+else # i.e. if ! def __MINGW__
+DLLS_TO_INSTALL = 
+endif 
+
+# Linker flags for libraries used by the CL (to be added to linking commands for all programs)
+ifndef __MINGW__
+ifndef PCRE_LIBS
+PCRE_LIBS := $(shell pcre-config --libs)
+endif
+ifndef GLIB_LIBS
+GLIB_LIBS := $(shell pkg-config --libs glib-2.0)
+endif
+LDFLAGS_LIBS = $(PCRE_LIBS) $(GLIB_LIBS)  
+else
+#LDFLAGS_LIBS = -lpcre -lpcre.dll -lglib-2.0
+LDFLAGS_LIBS := -L$(MINGW_CROSS_HOME)/lib  -lpcre -lpcre.dll -lglib-2.0               \
+    $(shell $(MINGW_CROSS_HOME)/bin/pcre-config --libs)   \
+    $(shell export PKG_CONFIG_PATH=$(MINGW_CROSS_HOME)/lib/pkgconfig ; pkg-config --libs glib-2.0)
+endif 
+
 # complete sets of compiler and linker flags (allows easy specification of specific build rules)
-CFLAGS_ALL = $(CFLAGS) $(INTERNAL_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
-DEPEND_CFLAGS_ALL = $(DEPEND_CLAGS) $(INTERNAL_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
-LDFLAGS_ALL = $(LDFLAGS)
+CFLAGS_ALL = $(CFLAGS) $(INTERNAL_DEFINES) $(GLIB_DEFINES) $(PCRE_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
+DEPEND_CFLAGS_ALL = $(DEPEND_CLAGS) $(INTERNAL_DEFINES) $(GLIB_DEFINES) $(PCRE_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
+LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_LIBS)
 
 # readline and termcap libraries are only needed for building CQP
 LDFLAGS_CQP =  $(READLINE_LIBS) $(TERMCAP_LIBS)

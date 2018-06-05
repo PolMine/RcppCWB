@@ -15,6 +15,11 @@
 ##  Public License for more details (in the file "COPYING", or available via
 ##  WWW at http://www.gnu.org/copyleft/gpl.html).
 
+
+##  This is the Makefile for the CWB Corpus Query Processor programs. 
+
+
+
 ## Read configuration settings and standard definitions
 TOP = $(R_PACKAGE_SOURCE)
 include $(TOP)/config.mk
@@ -44,7 +49,7 @@ PARSEO = parser.tab.o lex.yy.o
 
 SRCS =  llquery.c cqp.c cqpcl.c symtab.c eval.c tree.c options.c corpmanag.c \
 	regex2dfa.c output.c ranges.c builtins.c groups.c targets.c \
-	matchlist.c paths.c \
+	matchlist.c \
 	concordance.c \
 	parse_actions.c attlist.c context_descriptor.c \
 	print-modes.c ascii-print.c sgml-print.c html-print.c latex-print.c \
@@ -56,7 +61,7 @@ SRCS =  llquery.c cqp.c cqpcl.c symtab.c eval.c tree.c options.c corpmanag.c \
 
 OBJS =  cqp.o symtab.o eval.o tree.o options.o \
 	corpmanag.o regex2dfa.o output.o ranges.o builtins.o \
-	groups.o targets.o matchlist.o paths.o \
+	groups.o targets.o matchlist.o \
 	concordance.o \
 	parse_actions.o attlist.o context_descriptor.o \
 	print-modes.o ascii-print.o sgml-print.o html-print.o latex-print.o \
@@ -73,9 +78,9 @@ CQI_OBJS = ../CQi/server.o ../CQi/auth.o
 CQP_OBJS = dummy_auth.o
 
 HDRS =  cqp.h options.h symtab.h tree.h eval.h corpmanag.h \
-	regex2dfa.h output.h translate.h \
+	regex2dfa.h output.h \
 	ranges.h builtins.h treemacros.h \
-	groups.h targets.h matchlist.h paths.h \
+	groups.h targets.h matchlist.h \
 	concordance.h \
 	parse_actions.h attlist.h context_descriptor.h \
 	print-modes.h ascii-print.h sgml-print.h html-print.h latex-print.h \
@@ -91,6 +96,12 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
 
 all: libcqp.a
 
+libcqp.a: $(OBJS) $(CQI_OBJS)
+	$(RM) $@
+	$(AR) $@ $^
+	$(RANLIB) $@
+
+
 parser.tab.c parser.tab.h: parser.y
 	$(RM) parser.tab.* parser.output
 	$(YACC) $<
@@ -99,22 +110,17 @@ lex.yy.c: parser.l parser.y
 	$(RM) lex.yy.*
 	$(LEX) $<
 
-libcqp.a: $(OBJS) $(CQI_OBJS)
-	$(RM) $@
-	$(AR) $@ $^
-	$(RANLIB) $@
-
 cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 	$(RM) $@
-	$(CC) $(CFLAGS_ALL) -o $@ llquery.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
+	$(CC) $(CFLAGS_ALL) -o $@ llquery.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
 
 cqpcl$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) cqpcl.o $(LIBCL_PATH)
 	$(RM) $@
-	$(CC) $(CFLAGS_ALL) -o $@ cqpcl.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
+	$(CC) $(CFLAGS_ALL) -o $@ cqpcl.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
 
 cqpserver$(EXEC_SUFFIX): $(OBJS) $(CQI_OBJS) ../CQi/cqpserver.o $(LIBCL_PATH)
 	$(RM) $@
-	$(CC) $(CFLAGS_ALL) -o $@ ../CQi/cqpserver.o $(OBJS) $(CQI_OBJS) $(CL_LIBS) $(LDFLAGS_ALL) $(LDFLAGS_CQP) $(NETWORK_LIBS)
+	$(CC) $(CFLAGS_ALL) -o $@ ../CQi/cqpserver.o $(OBJS) $(CQI_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP) $(NETWORK_LIBS)
 
 depend:
 	-$(RM) depend.mk

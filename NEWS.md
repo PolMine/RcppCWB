@@ -1,3 +1,10 @@
+# v0.2.3.9003
+* for linux and macOS, CWB 3.4.14 included, so that UTF-8 support is realized
+* Umlaute can be used in queries
+* bug removed in check_cqp_query that would prevent special characters from working
+in CQP queries
+
+
 # v0.2.3.9002
 * cwb command line tools for creating corpora available for windows
 

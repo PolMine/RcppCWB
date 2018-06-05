@@ -20,7 +20,7 @@
 
 #define CQPRC_NAME ".cqprc"
 #define CQPMACRORC_NAME ".cqpmacros"
-/** The number of file handles CQP can store in its file-array (ie max number of nested files) @see cqp_parse_file ) */
+/** The number of file handles CQP can store in its file-array (ie max number of nested files) @see cqp_parse_file */
 #define MAXCQPFILES 20
 
 /** Size of the CQP query buffer. */
@@ -28,21 +28,35 @@
 
 #include <stdio.h>
 
-#define True 1
-#define False 0
-/**
- * DEPRACATED means of storing a Boolean value
- */
-typedef char Boolean;
-/* typedef enum bool { False, True } Boolean; */
+/** DEPRACATED means of storing a Boolean value  */
+typedef int Boolean;
 
+/** DEPRACATED macros for Boolean true and false */
+#define True 1
+/** DEPRACATED macros for Boolean true and false */
+#define False 0
+/* TODO In CWB 4 we should change both the above, and the more recent "int/1/0" convention, to C11-style bool/true/false */
+
+/**
+ * The "corpus yielding command type" type.
+ *
+ * Each possible value of the enumeration represents a particular "type"
+ * of command that may potentially yield a (sub)corpus.
+ */
 typedef enum _cyctype {
-  NoExpression, Query, Activation, SetOperation, Assignment
+  NoExpression,
+  Query,                  /**< A query (yielding a query-result subcorpus) */
+  Activation,             /**< A corpus-activation command. */
+  SetOperation,
+  Assignment
 } CYCtype;
 
+/** Global variable indicating type (CYC) of last expression */
 CYCtype LastExpression;
 
 extern int reading_cqprc;
+
+extern int cqp_error_status;
 
 /* ======================================== Query Buffer Interface */
 
@@ -55,16 +69,13 @@ extern int QueryBufferOverflow;
 
 /* ======================================== Other global variables */
 
-char *searchstr;                /**< needs to be global, unfortunately */
+extern char *searchstr;         /* needs to be global, unfortunately */
 int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
 
 char *cqp_input_string;
 int cqp_input_string_position;
 
-void cqp_randomize(void);
-
 int initialize_cqp(int argc, char **argv);
-
 
 int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
 
@@ -77,15 +88,23 @@ int cqp_parse_string(char *s);
  */
 typedef void (*InterruptCheckProc)(void);
 
+/**
+ * Boolean indicating that an interruptible process is currently running.
+ *
+ * The process in question is one that may be expected to be non-instantaneous.
+ * This variable is turned off by the Ctrl+C interrupt handler.
+ *
+ * @see sigINT_signal_handler
+ */
 int EvaluationIsRunning;
 
 int setInterruptCallback(InterruptCheckProc f);
 
-void CheckForInterrupts();
+void CheckForInterrupts(void);
 
 int signal_handler_is_installed;
 
-void install_signal_handler(void); /* install Ctrl-C interrupt handler (clears EvaluationIsRunning flag) */
+void install_signal_handler(void);
 
 
 /* ====================================================================== */

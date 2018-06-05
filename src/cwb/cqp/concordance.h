@@ -24,100 +24,48 @@
 #include "context_descriptor.h"
 #include "print-modes.h"
 
-/* ============================== Affix lists */
-
+/** ConcLineLayout enum represents the possible layout modes (horizontal/vertical) */
 typedef enum _conclinelayout {
-  ConcLineHorizontal, ConcLineVertical
+  ConcLineHorizontal,
+  ConcLineVertical
 } ConcLineLayout;
 
+/**
+ * ConcLineField :  a concordance line "field" is one of the four "anchors":
+ * that is, match, matchend, target, keyword. This object contains a record
+ * of the location of one such anchor point and its type. This can be passed to
+ * a "field-printing" function to perform special rendering of tokens in the
+ * "anchor" within a concordance line.
+ */
 typedef struct _ConcLineField {
   int start_position;
   int end_position;
   int type;
 } ConcLineField;
 
-/* ========================================== */
 
-typedef union _concordanceLineElement {
 
-  int type;			/* simple string or subtree */
-
-  struct {
-    int type;			/* leaf */
-    int ElementType;		/* type of this element */
-
-    int length;			/* length of s */
-    char *s;			/* s itself */
-  } simpleString;
-
-  struct {
-    int type;
-    int ElementType;		/* type of the captured elements */
-
-    int nr_subelements;
-    union _concordanceLineElement **subElements;
-  } nestedString;
-
-} ConcordanceLineElement;
-
-typedef ConcordanceLineElement * ConcordanceLine;
-
-/* ========================================== */
-
-int
-append(char *s, char *suffix, int *sp, int max_sp);
-
-void 
-add_to_string(char **s, int *spos, int *ssize, char *suffix);
-
-/* ======================================== */
-
-int
-get_print_attribute_values(ContextDescriptor *cd,
-			   int corpus_position,
-			   char *s,    /* array, not malloced */
-			   int *sp,    /* returns used length(s) */
-			   int max_sp, /* length of s */
-			   int add_position_number, /* number lines? */
-			   PrintDescriptionRecord *pdr);
-
-int
-get_position_values(ContextDescriptor *cd,
-		    int position,
-		    char *s,
-		    int *sp,
-		    int max_sp,
-		    int add_position_number,
-		    ConcLineLayout orientation,
-		    PrintDescriptionRecord *pdr,
-		    int nr_mappings, /* unused */
-		    Mapping *mappings);	/* unused */
-
-/*
- * Wed Mar  1 16:41:09 1995 (oli):
- * 'position_list' is a list of (corpus) positions. The string
- * start and beginning positions for these corpus positions 
- * are written into returned_positions, which must be exactly
- * two times as large as the position list. The number of 
- * positions must be in nr_positions.
- */
 
 char *compose_kwic_line(Corpus *corpus,
-			int start, int end, /* corpus positions */
-			ContextDescriptor *context,
-			int *length,
-			int *string_match_begin,
-			int *string_match_end,
-			char *left_marker,
-			char *right_marker,
-			int *position_list,
-			int nr_positions,
-			int *returned_positions,
-			ConcLineField *fields,
-			int nr_fields,
-			ConcLineLayout orientation,
-			PrintDescriptionRecord *pdr,
-			int nr_mappings,
-			Mapping *mappings);
+                        int match_start,
+                        int match_end,
+                        ContextDescriptor *context,
+                        int *length,
+                        int *string_match_begin,
+                        int *string_match_end,
+                        char *left_marker,
+                        char *right_marker,
+                        int *position_list,
+                        int nr_positions,
+                        int *returned_positions,
+                        ConcLineField *fields,
+                        int nr_fields,
+                        ConcLineLayout orientation,
+                        PrintDescriptionRecord *pdr,
+                        int nr_mappings,
+                        Mapping *mappings);
+
+
+void cleanup_kwic_line_memory(void);
 
 #endif

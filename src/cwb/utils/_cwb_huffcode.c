@@ -119,7 +119,7 @@ bprintf(unsigned int i, int width, FILE *stream)
 void 
 dump_heap(int *heap, int heap_size, int node, int indent)
 {
-  int i;
+  /* int i; */
 
   if (node <= heap_size) {
 

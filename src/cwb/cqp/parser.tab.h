@@ -41,206 +41,210 @@
    enum yytokentype {
      ID = 258,
      QID = 259,
-     LABEL = 260,
-     STRING = 261,
-     FLAG = 262,
-     TAGSTART = 263,
-     TAGEND = 264,
-     VARIABLE = 265,
-     IPAddress = 266,
-     IPSubnet = 267,
-     INTEGER = 268,
-     FLOAT = 269,
-     FIELD = 270,
-     FIELDLABEL = 271,
-     ANCHORTAG = 272,
-     ANCHORENDTAG = 273,
-     SEARCH_STRATEGY = 274,
-     TAB_SYM = 275,
-     CAT_SYM = 276,
-     DEFINE_SYM = 277,
-     DIFF_SYM = 278,
-     DISCARD_SYM = 279,
-     EXPAND_SYM = 280,
-     EXIT_SYM = 281,
-     FLAT_SYM = 282,
-     INTER_SYM = 283,
-     JOIN_SYM = 284,
-     SUBSET_SYM = 285,
-     LEFT_SYM = 286,
-     RIGHT_SYM = 287,
-     SAVE_SYM = 288,
-     SCATTER_SYM = 289,
-     SHOW_SYM = 290,
-     CD_SYM = 291,
-     TO_SYM = 292,
-     WITHIN_SYM = 293,
-     SET_SYM = 294,
-     EXEC_SYM = 295,
-     CUT_SYM = 296,
-     OCCURS_SYM = 297,
-     INFO_SYM = 298,
-     GROUP_SYM = 299,
-     WHERE_SYM = 300,
-     ESCAPE_SYM = 301,
-     MEET_SYM = 302,
-     UNION_SYM = 303,
-     MU_SYM = 304,
-     SORT_SYM = 305,
-     COUNT_SYM = 306,
-     ASC_SYM = 307,
-     DESC_SYM = 308,
-     REVERSE_SYM = 309,
-     BY_SYM = 310,
-     FOREACH_SYM = 311,
-     ON_SYM = 312,
-     YES_SYM = 313,
-     OFF_SYM = 314,
-     NO_SYM = 315,
-     SLEEP_SYM = 316,
-     REDUCE_SYM = 317,
-     MAXIMAL_SYM = 318,
-     WITH_SYM = 319,
-     WITHOUT_SYM = 320,
-     DELETE_SYM = 321,
-     SIZE_SYM = 322,
-     DUMP_SYM = 323,
-     UNDUMP_SYM = 324,
-     TABULATE_SYM = 325,
-     NOT_SYM = 326,
-     CONTAINS_SYM = 327,
-     MATCHES_SYM = 328,
-     GCDEL = 329,
-     APPEND = 330,
-     LET = 331,
-     GET = 332,
-     NEQ = 333,
-     IMPLIES = 334,
-     RE_PAREN = 335,
-     EOL_SYM = 336,
-     ELLIPSIS = 337,
-     MATCHALL = 338,
-     LCSTART = 339,
-     LCEND = 340,
-     LCMATCHALL = 341,
-     PLUSEQ = 342,
-     MINUSEQ = 343,
-     UNLOCK_SYM = 344,
-     USER_SYM = 345,
-     HOST_SYM = 346,
-     UNDEFINED_MACRO = 347,
-     MACRO_SYM = 348,
-     RANDOMIZE_SYM = 349,
-     FROM_SYM = 350,
-     INCLUSIVE_SYM = 351,
-     EXCLUSIVE_SYM = 352,
-     NULL_SYM = 353
+     NQRID = 260,
+     LABEL = 261,
+     STRING = 262,
+     FLAG = 263,
+     TAGSTART = 264,
+     TAGEND = 265,
+     VARIABLE = 266,
+     IPAddress = 267,
+     IPSubnet = 268,
+     INTEGER = 269,
+     DOUBLEFLOAT = 270,
+     FIELD = 271,
+     FIELDLABEL = 272,
+     ANCHORTAG = 273,
+     ANCHORENDTAG = 274,
+     SEARCH_STRATEGY = 275,
+     TAB_SYM = 276,
+     CAT_SYM = 277,
+     DEFINE_SYM = 278,
+     DIFF_SYM = 279,
+     DISCARD_SYM = 280,
+     EXPAND_SYM = 281,
+     EXIT_SYM = 282,
+     FLAT_SYM = 283,
+     INTER_SYM = 284,
+     JOIN_SYM = 285,
+     SUBSET_SYM = 286,
+     LEFT_SYM = 287,
+     RIGHT_SYM = 288,
+     SAVE_SYM = 289,
+     SCATTER_SYM = 290,
+     SHOW_SYM = 291,
+     CD_SYM = 292,
+     TO_SYM = 293,
+     WITHIN_SYM = 294,
+     SET_SYM = 295,
+     EXEC_SYM = 296,
+     CUT_SYM = 297,
+     OCCURS_SYM = 298,
+     INFO_SYM = 299,
+     GROUP_SYM = 300,
+     WHERE_SYM = 301,
+     ESCAPE_SYM = 302,
+     MEET_SYM = 303,
+     UNION_SYM = 304,
+     MU_SYM = 305,
+     SORT_SYM = 306,
+     COUNT_SYM = 307,
+     ASC_SYM = 308,
+     DESC_SYM = 309,
+     REVERSE_SYM = 310,
+     BY_SYM = 311,
+     FOREACH_SYM = 312,
+     ON_SYM = 313,
+     YES_SYM = 314,
+     OFF_SYM = 315,
+     NO_SYM = 316,
+     SLEEP_SYM = 317,
+     REDUCE_SYM = 318,
+     MAXIMAL_SYM = 319,
+     WITH_SYM = 320,
+     WITHOUT_SYM = 321,
+     DELETE_SYM = 322,
+     SIZE_SYM = 323,
+     DUMP_SYM = 324,
+     UNDUMP_SYM = 325,
+     TABULATE_SYM = 326,
+     NOT_SYM = 327,
+     CONTAINS_SYM = 328,
+     MATCHES_SYM = 329,
+     GCDEL = 330,
+     APPEND = 331,
+     LET = 332,
+     GET = 333,
+     NEQ = 334,
+     IMPLIES = 335,
+     RE_PAREN = 336,
+     EOL_SYM = 337,
+     ELLIPSIS = 338,
+     MATCHALL = 339,
+     LCSTART = 340,
+     LCEND = 341,
+     LCMATCHALL = 342,
+     EXTENSION = 343,
+     PLUSEQ = 344,
+     MINUSEQ = 345,
+     UNLOCK_SYM = 346,
+     USER_SYM = 347,
+     HOST_SYM = 348,
+     UNDEFINED_MACRO = 349,
+     MACRO_SYM = 350,
+     RANDOMIZE_SYM = 351,
+     FROM_SYM = 352,
+     INCLUSIVE_SYM = 353,
+     EXCLUSIVE_SYM = 354,
+     NULL_SYM = 355
    };
 #endif
 /* Tokens.  */
 #define ID 258
 #define QID 259
-#define LABEL 260
-#define STRING 261
-#define FLAG 262
-#define TAGSTART 263
-#define TAGEND 264
-#define VARIABLE 265
-#define IPAddress 266
-#define IPSubnet 267
-#define INTEGER 268
-#define FLOAT 269
-#define FIELD 270
-#define FIELDLABEL 271
-#define ANCHORTAG 272
-#define ANCHORENDTAG 273
-#define SEARCH_STRATEGY 274
-#define TAB_SYM 275
-#define CAT_SYM 276
-#define DEFINE_SYM 277
-#define DIFF_SYM 278
-#define DISCARD_SYM 279
-#define EXPAND_SYM 280
-#define EXIT_SYM 281
-#define FLAT_SYM 282
-#define INTER_SYM 283
-#define JOIN_SYM 284
-#define SUBSET_SYM 285
-#define LEFT_SYM 286
-#define RIGHT_SYM 287
-#define SAVE_SYM 288
-#define SCATTER_SYM 289
-#define SHOW_SYM 290
-#define CD_SYM 291
-#define TO_SYM 292
-#define WITHIN_SYM 293
-#define SET_SYM 294
-#define EXEC_SYM 295
-#define CUT_SYM 296
-#define OCCURS_SYM 297
-#define INFO_SYM 298
-#define GROUP_SYM 299
-#define WHERE_SYM 300
-#define ESCAPE_SYM 301
-#define MEET_SYM 302
-#define UNION_SYM 303
-#define MU_SYM 304
-#define SORT_SYM 305
-#define COUNT_SYM 306
-#define ASC_SYM 307
-#define DESC_SYM 308
-#define REVERSE_SYM 309
-#define BY_SYM 310
-#define FOREACH_SYM 311
-#define ON_SYM 312
-#define YES_SYM 313
-#define OFF_SYM 314
-#define NO_SYM 315
-#define SLEEP_SYM 316
-#define REDUCE_SYM 317
-#define MAXIMAL_SYM 318
-#define WITH_SYM 319
-#define WITHOUT_SYM 320
-#define DELETE_SYM 321
-#define SIZE_SYM 322
-#define DUMP_SYM 323
-#define UNDUMP_SYM 324
-#define TABULATE_SYM 325
-#define NOT_SYM 326
-#define CONTAINS_SYM 327
-#define MATCHES_SYM 328
-#define GCDEL 329
-#define APPEND 330
-#define LET 331
-#define GET 332
-#define NEQ 333
-#define IMPLIES 334
-#define RE_PAREN 335
-#define EOL_SYM 336
-#define ELLIPSIS 337
-#define MATCHALL 338
-#define LCSTART 339
-#define LCEND 340
-#define LCMATCHALL 341
-#define PLUSEQ 342
-#define MINUSEQ 343
-#define UNLOCK_SYM 344
-#define USER_SYM 345
-#define HOST_SYM 346
-#define UNDEFINED_MACRO 347
-#define MACRO_SYM 348
-#define RANDOMIZE_SYM 349
-#define FROM_SYM 350
-#define INCLUSIVE_SYM 351
-#define EXCLUSIVE_SYM 352
-#define NULL_SYM 353
+#define NQRID 260
+#define LABEL 261
+#define STRING 262
+#define FLAG 263
+#define TAGSTART 264
+#define TAGEND 265
+#define VARIABLE 266
+#define IPAddress 267
+#define IPSubnet 268
+#define INTEGER 269
+#define DOUBLEFLOAT 270
+#define FIELD 271
+#define FIELDLABEL 272
+#define ANCHORTAG 273
+#define ANCHORENDTAG 274
+#define SEARCH_STRATEGY 275
+#define TAB_SYM 276
+#define CAT_SYM 277
+#define DEFINE_SYM 278
+#define DIFF_SYM 279
+#define DISCARD_SYM 280
+#define EXPAND_SYM 281
+#define EXIT_SYM 282
+#define FLAT_SYM 283
+#define INTER_SYM 284
+#define JOIN_SYM 285
+#define SUBSET_SYM 286
+#define LEFT_SYM 287
+#define RIGHT_SYM 288
+#define SAVE_SYM 289
+#define SCATTER_SYM 290
+#define SHOW_SYM 291
+#define CD_SYM 292
+#define TO_SYM 293
+#define WITHIN_SYM 294
+#define SET_SYM 295
+#define EXEC_SYM 296
+#define CUT_SYM 297
+#define OCCURS_SYM 298
+#define INFO_SYM 299
+#define GROUP_SYM 300
+#define WHERE_SYM 301
+#define ESCAPE_SYM 302
+#define MEET_SYM 303
+#define UNION_SYM 304
+#define MU_SYM 305
+#define SORT_SYM 306
+#define COUNT_SYM 307
+#define ASC_SYM 308
+#define DESC_SYM 309
+#define REVERSE_SYM 310
+#define BY_SYM 311
+#define FOREACH_SYM 312
+#define ON_SYM 313
+#define YES_SYM 314
+#define OFF_SYM 315
+#define NO_SYM 316
+#define SLEEP_SYM 317
+#define REDUCE_SYM 318
+#define MAXIMAL_SYM 319
+#define WITH_SYM 320
+#define WITHOUT_SYM 321
+#define DELETE_SYM 322
+#define SIZE_SYM 323
+#define DUMP_SYM 324
+#define UNDUMP_SYM 325
+#define TABULATE_SYM 326
+#define NOT_SYM 327
+#define CONTAINS_SYM 328
+#define MATCHES_SYM 329
+#define GCDEL 330
+#define APPEND 331
+#define LET 332
+#define GET 333
+#define NEQ 334
+#define IMPLIES 335
+#define RE_PAREN 336
+#define EOL_SYM 337
+#define ELLIPSIS 338
+#define MATCHALL 339
+#define LCSTART 340
+#define LCEND 341
+#define LCMATCHALL 342
+#define EXTENSION 343
+#define PLUSEQ 344
+#define MINUSEQ 345
+#define UNLOCK_SYM 346
+#define USER_SYM 347
+#define HOST_SYM 348
+#define UNDEFINED_MACRO 349
+#define MACRO_SYM 350
+#define RANDOMIZE_SYM 351
+#define FROM_SYM 352
+#define INCLUSIVE_SYM 353
+#define EXCLUSIVE_SYM 354
+#define NULL_SYM 355
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 114 "parser.y"
+#line 118 "parser.y"
 {
   Evaltree           evalt;
   Constrainttree     boolt;
@@ -313,7 +317,7 @@ typedef union YYSTYPE
   TabulationItem     tabulation_item;
 }
 /* Line 1529 of yacc.c.  */
-#line 317 "parser.tab.h"
+#line 321 "parser.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -1,10 +1,6 @@
 extern "C" {
-  #include <cl.h>
-  #ifdef _WIN32
-    #include "cwb_3.5/include/attributes.h"
-  #else
-    #include "cwb/cl/attributes.h"
-  #endif
+  #include "cl_min.h"
+  #include <attributes.h>
   #include "utils.h"
 }
 
@@ -16,7 +12,7 @@ using namespace Rcpp;
 // [[Rcpp::export(name=".cwb_makeall")]]
 int cwb_makeall(SEXP x, SEXP registry_dir, SEXP p_attribute){
   
-  char *progname = "RcppCWB";
+  /* char *progname = "RcppCWB"; */
   
   char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
   char *attr_name = strdup(Rcpp::as<std::string>(p_attribute).c_str());
@@ -51,7 +47,7 @@ int cwb_huffcode(SEXP x, SEXP registry_dir, SEXP p_attribute) {
   HCD hc;
   
   int i_want_to_believe = 0;        /* skip error checks? */
-  int all_attributes = 0;
+  /* int all_attributes = 0; */
   
   /* protocol = stdout;   */             /* 'delayed' init (see top of file) */
   

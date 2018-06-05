@@ -29,22 +29,27 @@ Corpus *corpus = NULL;
 
 /* ---------------------------------------- */
 
-/**
- * Maximum number of attributes that can be printed.
- */
+/** Maximum number of attributes that can be printed. */
 #define MAX_ATTRS 1024
 
-typedef Attribute * ATPtr;
-ATPtr print_list[MAX_ATTRS];    /**< list of attributes selected by user for printing */
-int print_list_index = 0;       /**< denotes the last attribute to be printed */
+/* typedef Attribute * ATPtr;    // No real need for a type used three times! */
+Attribute *print_list[MAX_ATTRS];    /**< array of attributes selected by user for printing */
+int print_list_index = 0;            /**< Number of atts added to print_list (so far);
+                                      *   used with less-than, = top limit for scrolling that array */
 
-/* before a token is printed, all regions of s-attributes from print_list[] which contain that token are copied to s_att_regions[],
-   bubble-sorted (to enforce proper nesting while retaining the specified order as far as possible), and printed from s_att_regions[] */
+/**
+ * Represents a single s-attribuite region and its annotation.
+ *
+ * Before a token is printed, all regions of s-attributes from print_list[]
+ * which contain that token are copied to s_att_regions[],
+ * bubble-sorted (to enforce proper nesting while retaining
+ * the specified order as far as possible), and printed from s_att_regions[] .
+ */
 typedef struct {
   char *name;                   /**< name of the s-attribute */
   int start;
   int end;
-  char *annot;                  /**< NULL if there is no annotation */
+  char *annot;                  /**< NULL if there is no annotation; otherwise the content of the annotation */
 } SAttRegion;
 SAttRegion s_att_regions[MAX_ATTRS];
 int sar_sort_index[MAX_ATTRS];  /**< index used for bubble-sorting list of regions */
@@ -52,25 +57,29 @@ int N_sar = 0;                  /**< number of regions currently in list (may ch
 
 /* ---------------------------------------- */
 
+/* the following are used only in matchlist mode: */
+
+/** Maximum number of attributes whose "surrounding values" can be printed in matchlist mode. */
 #define MAX_PRINT_VALUES 1024
 
-ATPtr printValues[MAX_PRINT_VALUES];
-int printValuesIndex = 0;
+Attribute *printValues[MAX_PRINT_VALUES];   /**< List of s-attributes whose values are to be printed */
+int printValuesIndex = 0;                   /**< Number of atts added to printValues (so far);
+                                             *   used with less-than, = top limit for scrolling that array */
 
 /* ---------------------------------------- */
 
-int first_token = 0;
-int last = 0;
-int maxlast = -1;
-int printnum = 0;
+int first_token;            /**< cpos of token to begin output at */
+int last;                   /**< cpos of token to end output at (inclusive; ie this one gets printed!) */
+int maxlast;                /**< maximum ending cpos (deduced from size of p-attribute);  */
+int printnum = 0;           /**< whether or not token numbers are to be printed (-n option) */
 
 
 typedef enum _output_modes {
   StandardMode, LispMode, EncodeMode, ConclineMode, XMLMode
 } OutputMode;
 
-int mode = StandardMode;
-int xml_compatible = 0;         /* EncodeMode only, selected by option -Cx */
+OutputMode mode = StandardMode;  /**< global variable for overall output mode */
+int xml_compatible = 0;          /**< xml-style, for (cwb-encode -x ...); EncodeMode only, selected by -Cx */
 
 
 /* not really necessary, but we'll keep it for now -- it's cleaner anyway :o) */
@@ -80,10 +89,10 @@ int xml_compatible = 0;         /* EncodeMode only, selected by option -Cx */
  * @param error_code  Value to be returned by the program when it exits.
  */
 void
-cleanup(int error_code)
+decode_cleanup(int error_code)
 {
   if (corpus != NULL)
-    drop_corpus(corpus);
+    cl_delete_corpus(corpus);
   exit(error_code);
 }
 
@@ -93,22 +102,23 @@ cleanup(int error_code)
  * @param exit_code  Value to be returned by the program when it exits.
  */
 void
-usage(int exit_code) {
+decode_usage(int exit_code)
+{
   fprintf(stderr, "\n");
-  fprintf(stderr, "Usage:  %s [options] <corpus> [flags]\n\n", progname);
+  fprintf(stderr, "Usage:  %s [options] <corpus> [declarations]\n\n", progname);
   fprintf(stderr, "Decodes CWB corpus as plain text (or in various other text formats).\n");
   fprintf(stderr, "In normal mode, the entire corpus (or a segment specified with the\n");
   fprintf(stderr, "-s and -e options) is printed on stdout. In matchlist mode (-p or -f),\n");
   fprintf(stderr, "(pairs of) corpus positions are read from stdin (or a file specified\n");
   fprintf(stderr, "with -f), and the corresponding tokens or ranges are displayed. The\n");
-  fprintf(stderr, "[flags] determine which attributes to display (-ALL for all attributes).\n");
+  fprintf(stderr, "[declarations] determine which attributes to display (-ALL for all attributes).\n\n");
   fprintf(stderr, "See list of options for available output modes.\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr, "  -L        Lisp output mode\n");
   fprintf(stderr, "  -H        concordance line ('horizontal') output mode\n");
-  fprintf(stderr, "  -C        compact output mode (suitable for encode)\n");
-  fprintf(stderr, "  -Cx       XML-compatible compact output (for \"encode -x ...\")\n");
+  fprintf(stderr, "  -C        compact output mode (suitable for cwb-encode)\n");
+  fprintf(stderr, "  -Cx       XML-compatible compact output (for \"cwb-encode -x ...\")\n");
   fprintf(stderr, "  -X        XML output mode\n");
   fprintf(stderr, "  -n        show corpus position ('numbers')\n");
   fprintf(stderr, "  -s <n>    first token to print (at corpus position <n>)\n");
@@ -117,7 +127,7 @@ usage(int exit_code) {
   fprintf(stderr, "  -p        matchlist mode (input from stdin)\n");
   fprintf(stderr, "  -f <file> matchlist mode (input from <file>)\n");
   fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Flags:\n");
+  fprintf(stderr, "Attribute declarations:\n");
   fprintf(stderr, "  -P <att>  print p-attribute <att>\n");
   fprintf(stderr, "  -S <att>  print s-attribute <att> (possibly including annotations)\n");
   fprintf(stderr, "  -V <att>  show s-attribute annotation for each range in matchlist mode\n");
@@ -126,7 +136,7 @@ usage(int exit_code) {
   fprintf(stderr, "  -c <att>  expand ranges to full <att> region (matchlist mode)\n\n");
   fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
 
-  cleanup(exit_code);
+  decode_cleanup(exit_code);
 }
 
 /**
@@ -136,7 +146,8 @@ usage(int exit_code) {
  * @return   Boolean: true iff s contains only digits.
  */
 int
-is_num(char *s) {
+is_num(char *s)
+{
   int i;
 
   for (i = 0; s[i]; i++)
@@ -146,87 +157,104 @@ is_num(char *s) {
   return 1;
 }
 
-/* Convert string to Lisp string with required escapes (probably)
-   warning: returns pointer to static internal buffer of fixed size
-   */
-char *
-lisp_string(char *s) {
-  int i, t;
-  static char ls[MAX_LINE_LENGTH];
 
-  if (mode == LispMode) {
+/**
+ * Escapes a string according to the currently active global mode.
+ *
+ * In XMLMode, this function converts the string to an encoded XML string;
+ * all 'critical' characters are replaced by entity references,
+ * and C0 control characters are replaced with blanks. (This also happens
+ * in other modes - i.e. compact - if the global xml_compatible variable
+ * is true.)
+ *
+ * In LispMode, it converts the string to a Lisp string with the required
+ * escapes (probably!)
+ *
+ * In any other mode, it does nothing, and just returns the argument pointer.
+ *
+ * It is safe to use this function without checking for a NULL argument,
+ * as NULLs will just be returned as NULLs.
+ *
+ * Warning: returns pointer to static internal buffer of fixed size;
+ * in particular, don't use it twice in a single argument list!
+ *
+ * @see      EncodeMode
+ * @param s  String to encode.
+ * @return   Pointer to encoded string in static internal buffer; or,
+ *           the argument s iff the mode is not one that requires any
+ *           encoding. If the argument is NULL, NULL is returned.
+ */
+const char *
+decode_string_escape(const char *s)
+{
+  int i, t = 0;
+  static char coded_s[CL_MAX_LINE_LENGTH];
 
-    t = 0;
-
-    for (i = 0; s[i]; i++) {
-      if ((s[i] == '"') || (s[i] == '\\')) {
-        ls[t++] = '\\';
-        ls[t++] = '\\';
-        ls[t++] = '\\';
-      }
-      ls[t++] = s[i];
-    }
-    ls[t] = '\0';
-    return ls;
-  }
-  else
-    return s;
-}
-
-/* Convert string to ISO-8859-* encoded XML string; all 'critical' characters are replaced by entity references;
-   warning: returns pointer to static internal buffer of fixed size; in particular, don't use it twice in a single argument list!
-   */
-char *
-xml_string(char *s) {
-  int i, t;
-  static char ls[MAX_LINE_LENGTH];
+  if (s == NULL)
+    return NULL;
 
   if ((mode == XMLMode) || xml_compatible) {
-    t = 0;
-
     for (i = 0; s[i]; i++) {
       if (s[i] == '"') {
-        sprintf(ls+t, "&quot;");
-        t += strlen(ls+t);
+        sprintf(coded_s+t, "&quot;");
+        t += strlen(coded_s+t);
       }
       else if (s[i] == '\'') {
-        sprintf(ls+t, "&apos;");
-        t += strlen(ls+t);
+        sprintf(coded_s+t, "&apos;");
+        t += strlen(coded_s+t);
       }
       else if (s[i] == '<') {
-        sprintf(ls+t, "&lt;");
-        t += strlen(ls+t);
+        sprintf(coded_s+t, "&lt;");
+        t += strlen(coded_s+t);
       }
       else if (s[i] == '>') {
-        sprintf(ls+t, "&gt;");
-        t += strlen(ls+t);
+        sprintf(coded_s+t, "&gt;");
+        t += strlen(coded_s+t);
       }
       else if (s[i] == '&') {
-        sprintf(ls+t, "&amp;");
-        t += strlen(ls+t);
+        sprintf(coded_s+t, "&amp;");
+        t += strlen(coded_s+t);
       }
       else if ((s[i] > 0) && (s[i] < 32)) {
         /* C0 controls are invalid -> substitute blanks */
-        ls[t++] = ' ';
+        coded_s[t++] = ' ';
       }
       else {
-        ls[t++] = s[i];
+        coded_s[t++] = s[i];
       }
     }
-    ls[t] = '\0';               /* terminate converted string and return it */
-    return ls;
+    /* terminate converted string and return it */
+    coded_s[t] = '\0';
+    return coded_s;
+  }
+  else if (mode == LispMode) {
+    for (i = 0; s[i]; i++) {
+      if ((s[i] == '"') || (s[i] == '\\')) {
+        coded_s[t++] = '\\';
+        coded_s[t++] = '\\';
+        coded_s[t++] = '\\';
+      }
+      coded_s[t++] = s[i];
+    }
+    coded_s[t] = '\0';
+    /* terminate converted string and return it */
+    return coded_s;
   }
   else
+    /* all other modes : do nothing */
     return s;
 }
 
-/* prints XML declaration, using character set specification obtained from <corpus> */
+/**
+ * Prints an XML declaration, using character set specification
+ * obtained from the global corpus variable.
+ */
 void
-print_xml_declaration(void) {
+decode_print_xml_declaration(void)
+{
   CorpusCharset charset = unknown_charset;
-  if (corpus) {
+  if (corpus)
     charset = cl_corpus_charset(corpus);
-  }
 
   printf("<?xml version=\"1.0\" encoding=\"");
   switch (charset) {
@@ -242,20 +270,32 @@ print_xml_declaration(void) {
   case latin4:
     printf("ISO-8859-4");
     break;
-  case latin5:
+  case cyrillic:
     printf("ISO-8859-5");
     break;
-  case latin6:
+  case arabic:
     printf("ISO-8859-6");
     break;
-  case latin7:
+  case greek:
     printf("ISO-8859-7");
     break;
-  case latin8:
+  case hebrew:
     printf("ISO-8859-8");
     break;
-  case latin9:
+  case latin5:
     printf("ISO-8859-9");
+    break;
+  case latin6:
+    printf("ISO-8859-10");
+    break;
+  case latin7:
+    printf("ISO-8859-13");
+    break;
+  case latin8:
+    printf("ISO-8859-14");
+    break;
+  case latin9:
+    printf("ISO-8859-15");
     break;
   case utf8:
     printf("UTF-8");
@@ -269,14 +309,25 @@ print_xml_declaration(void) {
 }
 
 
-/* sort s_att_regions[MAX_ATTRS] in ascending 'nested' order, using sar_sort_index[] (which is automatically initialised);
-   since only regions which begin or end at the current token are considered, such an ordering is always possible;
-   without knowing the current token, we sort by end position descending, then by start position ascending, which gives us:
-    - first the regions corresponding to start tags, beginning with the 'largest' region
-    - then the regions corresponding to end tags, again beginning with the 'largest' region
-   uses bubble sort in order to retaining the existing order of identical regions; */
+/**
+ * Sorts s_att_regions[MAX_ATTRS] in ascending 'nested' order,
+ * using sar_sort_index[] (which is automatically initialised).
+ *
+ * Since only regions which begin or end at the current token are
+ * considered, such an ordering is always possible;
+ * without knowing the current token, we sort by end position descending,
+ * then by start position ascending, which gives us:
+ *
+ *  - first the regions corresponding to start tags, beginning with the 'largest' region
+ *
+ *  - then the regions corresponding to end tags, again beginning with the 'largest' region
+ *
+ * The function uses bubble sort in order to retain the existing order of identical regions.
+ *
+ */
 void
-sort_s_att_regions(void) {
+decode_sort_s_att_regions(void)
+{
   int i, temp, modified;
 
   for (i = 0; i < N_sar; i++)   /* initialise sort index */
@@ -302,8 +353,16 @@ sort_s_att_regions(void) {
   return;
 }
 
+/**
+ * Determines whether or not a given Attribute is in an array of Attributes.
+ *
+ * @param attr           The attribute to look for.
+ * @param att_list       Pointer to the first member of the array (i.e. array name).
+ * @param att_list_size  Upper bound of the array (the last member the function checks is attlist[attlist_size-1]).
+ * @return               Boolean.
+ */
 int
-attr_member(Attribute *attr, ATPtr *att_list, int att_list_size)
+decode_attribute_is_in_list(Attribute *attr, Attribute **att_list, int att_list_size)
 {
   int i;
   for (i = 0; i < att_list_size; i++)
@@ -312,11 +371,17 @@ attr_member(Attribute *attr, ATPtr *att_list, int att_list_size)
   return 0;
 }
 
+/**
+ * Adds a specified Attribute to the global print_list array. Aborts the program
+ * if that array is already full.
+ *
+ * @return Boolean.
+ */
 int
-add_attribute(Attribute *attr)
+decode_add_attribute(Attribute *attr)
 {
   if (print_list_index < MAX_ATTRS) {
-    if (attr_member(attr, print_list, print_list_index)) {
+    if (decode_attribute_is_in_list(attr, print_list, print_list_index)) {
       fprintf(stderr, "Attribute %s.%s added twice to print list (ignored)\n",
               corpus_id, attr->any.name);
       return 0;
@@ -326,28 +391,37 @@ add_attribute(Attribute *attr)
     return 1;
   }
   else {
-    fprintf(stderr, "Too many attributes (maximum is %d). Aborted.\n",
-            MAX_ATTRS);
-    cleanup(2);
+    fprintf(stderr, "Too many attributes (maximum is %d). Aborted.\n", MAX_ATTRS);
+    decode_cleanup(2);
     return 0;
   }
 }
 
-int
-verify_print_value_list() {
+/**
+ * Check the context of the global printValues array, to check that no s-attribute in
+ * it is declared more in the main print_list_index as well.
+ *
+ * If an attribute is found to be declared in nboth, a warning is printed.
+ */
+void
+decode_verify_print_value_list(void)
+{
   int i;
 
   for (i = 0; i < printValuesIndex; i++) {
-    if (attr_member(printValues[i], print_list, print_list_index)) {
+    if (decode_attribute_is_in_list(printValues[i], print_list, print_list_index)) {
       fprintf(stderr, "Warning: s-attribute %s.%s used with both -S and -V !\n",
               corpus_id, printValues[i]->any.name);
     }
   }
-  return 1;
 }
 
+/**
+ * Prints a starting tag for each s-attribute.
+ */
 void
-showSurroundingStructureValues(int position) {
+decode_print_surrounding_s_att_values(int position)
+{
   int i;
   char *tagname;
 
@@ -355,12 +429,13 @@ showSurroundingStructureValues(int position) {
 
     if (printValues[i]) {
 
-      char *sval;
+      const char *sval;
       int snum;
 
       snum = cl_cpos2struc(printValues[i], position);
       if (snum >= 0) {
-        sval = cl_struc2str(printValues[i], snum);
+        /* if it is a p- or a- attribute, snum is a CL error (less than 0) */
+        sval = decode_string_escape(cl_struc2str(printValues[i], snum));
         tagname = printValues[i]->any.name;
 
         switch (mode) {
@@ -369,15 +444,16 @@ showSurroundingStructureValues(int position) {
           break;
 
         case LispMode:
-          printf("(VALUE %s \"%s\")\n", tagname, lisp_string(sval));
+          printf("(VALUE %s \"%s\")\n", tagname, sval);
           break;
 
         case XMLMode:
-          printf("<element name=\"%s\" value=\"%s\"/>\n", tagname, xml_string(sval));
+          printf("<element name=\"%s\" value=\"%s\"/>\n", tagname, sval);
           break;
 
         case EncodeMode:
-          printf("# %s=%s\n", tagname, sval); /* pretends to be a comment, but has to be stripped before feeding output to encode */
+          /* pretends to be a comment, but has to be stripped before feeding output to encode */
+          printf("# %s=%s\n", tagname, sval);
           break;
 
         case StandardMode:
@@ -394,31 +470,41 @@ showSurroundingStructureValues(int position) {
   }
 }
 
-
-/* show the requested attributes for a sequence of tokens (or a single token if end_position == -1);
-   if -c flag was used, sequence is extended to entire s-attribute region (for matchlist mode) */
+/* TODO should the parameters be const int ? */
+/**
+ * Prints out the requested attributes for a sequence of tokens
+ * (or a single token if end_position == -1).
+ *
+ * If the -c flag was used (and, thus, the context parameter is not NULL),
+ * then the sequence is extended to the entire s-attribute region (in matchlist mode).
+ */
 void
-show_position_values(int start_position, int end_position, Attribute *context) {
-
+decode_print_token_sequence(int start_position, int end_position, Attribute *context)
+{
   int alg, aligned_start, aligned_end, aligned_start2, aligned_end2,
     rng_start, rng_end, snum;
   int start_context, end_context, dummy;
   int lastposa, i, w;
-  char *wrd;
+
+  /* pointer used for values of p-attributes */
+  const char *wrd;
 
 
   start_context = start_position;
   end_context = (end_position >= 0) ? end_position : start_position;
+  /* above ensures that in non-matchlist mode (where ep == -1), we only print one token */
 
   if (context != NULL) {
 
+    /* expand the start_context end_context numbers to the start
+     * and end points of the containing region of the context s-attribute */
     if (!cl_cpos2struc2cpos(context, start_position,
                             &start_context, &end_context)) {
       start_context = start_position;
       end_context = (end_position >= 0) ? end_position : start_position;
     }
     else if (end_position >= 0) {
-      if (!get_struc_attribute(context, end_position,
+      if (!cl_cpos2struc2cpos(context, end_position,
                                &dummy, &end_context)) {
         end_context = (end_position >= 0) ? end_position : start_position;
       }
@@ -449,10 +535,10 @@ show_position_values(int start_position, int end_position, Attribute *context) {
       break;
     }
 
-  }
+  } /* endif context != NULL */
 
   /* some extra information in -L and -H modes */
-  if ((mode == LispMode) && (end_position != -1))
+  if (mode == LispMode && end_position != -1)
     printf("(CONTEXT %d %d)\n", start_context, end_context);
   else if (mode == ConclineMode) {
     if (printnum)
@@ -481,7 +567,7 @@ show_position_values(int start_position, int end_position, Attribute *context) {
         }
       }
     }
-    sort_s_att_regions();       /* sort regions to ensure proper nesting of start and end tags */
+    decode_sort_s_att_regions();       /* sort regions to ensure proper nesting of start and end tags */
 
     /* show corpus positions with -n option */
     if (printnum)
@@ -554,7 +640,7 @@ show_position_values(int start_position, int end_position, Attribute *context) {
             if (printnum)
               printf(" cpos=\"%d\"", w);
             if (region->annot)
-              printf(" value=\"%s\"", xml_string(region->annot));
+              printf(" value=\"%s\"", decode_string_escape(region->annot));
             printf("/>\n");
           }
           else {
@@ -578,20 +664,19 @@ show_position_values(int start_position, int end_position, Attribute *context) {
     }
 
     beg_of_line = 1;
+    /* Loop printing each attribute for this cpos (w) */
     for (i = 0; i < print_list_index; i++) {
 
       switch (print_list[i]->any.type) {
       case ATT_POS:
         lastposa = i;
-        if ((wrd = cl_cpos2str(print_list[i], w)) != NULL)
+        if ((wrd = decode_string_escape(cl_cpos2str(print_list[i], w))) != NULL) {
           switch (mode) {
           case LispMode:
-            printf("(%s \"%s\")", print_list[i]->any.name, lisp_string(wrd));
+            printf("(%s \"%s\")", print_list[i]->any.name, wrd);
             break;
 
           case EncodeMode:
-            if (xml_compatible)
-              wrd = xml_string(wrd);
             if (beg_of_line) {
               printf("%s", wrd);
               beg_of_line = 0;
@@ -610,8 +695,7 @@ show_position_values(int start_position, int end_position, Attribute *context) {
             break;
 
           case XMLMode:
-            printf(" <attr name=\"%s\">%s</attr>",
-                   print_list[i]->any.name, xml_string(wrd));
+            printf(" <attr name=\"%s\">%s</attr>", print_list[i]->any.name, wrd);
             break;
 
           case StandardMode:
@@ -619,13 +703,15 @@ show_position_values(int start_position, int end_position, Attribute *context) {
             printf("%s=%s\t", print_list[i]->any.name, wrd);
             break;
           }
+        }
         else {
-          cdperror("(aborting) cl_cpos2str() failed");
-          cleanup(1);
+          cl_error("(aborting) cl_cpos2str() failed");
+          decode_cleanup(1);
         }
         break;
 
       case ATT_ALIGN:
+        /* do not print in encode, concline or xml modes because already done (above) */
         if ((mode != EncodeMode) && (mode != ConclineMode) && (mode != XMLMode)) {
           if (
               ((alg = cl_cpos2alg(print_list[i], w)) >= 0)
@@ -642,14 +728,15 @@ show_position_values(int start_position, int end_position, Attribute *context) {
                      aligned_start, aligned_end, print_list[i]->any.name, aligned_start2, aligned_end2);
             }
           }
-          else if (cderrno != CDA_OK) {
-            cdperror("(aborting) alignment error");
-            cleanup(1);
+          else if (cl_errno != CDA_OK) {
+            cl_error("(aborting) alignment error");
+            decode_cleanup(1);
           }
         }
         break;
 
       case ATT_STRUC:
+        /* do not print in encode, concline or xml modes because already done (above) */
         if ((mode != EncodeMode) && (mode != ConclineMode) && (mode != XMLMode)) {
           if (cl_cpos2struc2cpos(print_list[i], w, &rng_start, &rng_end)) {
             /* standard and -L mode don't show tag annotations */
@@ -657,13 +744,13 @@ show_position_values(int start_position, int end_position, Attribute *context) {
                    print_list[i]->any.name,
                    rng_start, rng_end);
           }
-          else if (cderrno != CDA_OK)
-            cdperror("(aborting) cl_cpos2struc2cpos() failed");
+          else if (cl_errno != CDA_OK)
+            cl_error("(aborting) cl_cpos2struc2cpos() failed");
         }
         break;
 
       case ATT_DYN:
-        /* dynamical attributes aren't implemented */
+        /* dynamic attributes aren't implemented */
       default:
         break;
       }
@@ -688,7 +775,7 @@ show_position_values(int start_position, int end_position, Attribute *context) {
     }
 
     /* now, after printing all the positional attributes, print end tags with -H,-C,-X */
-    if ((mode == EncodeMode)  || (mode == ConclineMode) || (mode == XMLMode)) {
+    if (mode == EncodeMode  || mode == ConclineMode || mode == XMLMode) {
 
       /* print s-attributes from s_att_regions[] (using sar_sort_index[] in reverse order) */
       for (i = N_sar - 1; i >= 0; i--) {
@@ -702,13 +789,12 @@ show_position_values(int start_position, int end_position, Attribute *context) {
             printf("/>\n");
           }
           else {
-            printf("</%s>%c", region->name,
-                   (mode == ConclineMode ? ' ' : '\n'));
+            printf("</%s>%c", region->name, (mode == ConclineMode ? ' ' : '\n'));
           }
         }
       }
 
-      /* print a-attributes form print_list[] */
+      /* print a-attributes from print_list[] */
       for (i = 0; i < print_list_index; i++) {
         switch (print_list[i]->any.type) {
         case ATT_ALIGN:
@@ -734,14 +820,15 @@ show_position_values(int start_position, int end_position, Attribute *context) {
           }
           break;
 
-        default:                /* ignore all other attribute types */
+        default:
+          /* ignore all other attribute types */
           break;
         }
       }
 
-    }
+    } /* end of print end tags */
 
-  }  /* end of match range loop */
+  }  /* end of match range loop: for w from start_context to end_context */
 
   /* end of match (for matchlist mode in particular) */
   if ((context != NULL) && (mode == LispMode))
@@ -769,11 +856,13 @@ main(int argc, char **argv)
   Attribute *attr;
   Attribute *context = NULL;
 
-  int sp, ep;
+  int sp;  /* start position of a match */
+  int ep;  /* end position of a match */
 
-  int w, cnt, read_pos_frm_stdin;
+  int w, cnt;
+  int read_pos_from_file;
 
-  char s[1024];
+  char s[CL_MAX_LINE_LENGTH];      /* buffer for strings read from file */
   char *token;
 
   char *input_filename = NULL;
@@ -791,7 +880,7 @@ main(int argc, char **argv)
   last = -1;
   maxlast = -1;
 
-  read_pos_frm_stdin = 0;
+  read_pos_from_file = 0;
 
   /* use getopt() to parse command-line options */
   while((c = getopt(argc, argv, "+s:e:r:nLHCxXf:ph")) != EOF)
@@ -844,22 +933,23 @@ main(int argc, char **argv)
       /* f: matchlist mode / read corpus positions from file */
     case 'f':
       input_filename = optarg;
+      read_pos_from_file++;
       break;
 
       /* p: matchlist mode / read corpus positions from stdin */
     case 'p':
-      read_pos_frm_stdin++;
+      read_pos_from_file++; /* defaults to STDIN if input_filename is NULL */
       break;
 
       /* h: help page */
     case 'h':
-      usage(2);
+      decode_usage(2);
       break;
 
     default:
       fprintf(stderr, "Illegal option. Try \"%s -h\" for more information.\n", progname);
-      fprintf(stderr, "[remember that options go before the corpus name, and flags after it!]\n");
-      cleanup(2);
+      fprintf(stderr, "[remember that options go before the corpus name, and attribute declarations after it!]\n");
+      decode_cleanup(2);
     }
 
   /* required argument: corpus id */
@@ -869,14 +959,13 @@ main(int argc, char **argv)
     if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
       fprintf(stderr, "Corpus %s not found in registry %s . Aborted.\n",
               corpus_id,
-              (registry_directory ? registry_directory
-               : central_corpus_directory()));
-      cleanup(1);
+              (registry_directory ? registry_directory : cl_standard_registry() ) );
+      decode_cleanup(1);
     }
   }
   else {
     fprintf(stderr, "Missing argument. Try \"%s -h\" for more information.\n", progname);
-    cleanup(2);
+    decode_cleanup(2);
   }
 
 
@@ -884,31 +973,29 @@ main(int argc, char **argv)
   for (cnt = optind; cnt < argc; cnt++) {
     if (strcmp(argv[cnt], "-c") == 0) {         /* -c: context */
 
-      if ((context =
-           cl_new_attribute(corpus, argv[++cnt], ATT_STRUC)) == NULL) {
+      if ((context = cl_new_attribute(corpus, argv[++cnt], ATT_STRUC)) == NULL) {
         fprintf(stderr, "Can't open s-attribute %s.%s . Aborted.\n",
                 corpus_id, argv[cnt]);
-        cleanup(1);
+        decode_cleanup(1);
       }
 
     }
     else if (strcmp(argv[cnt], "-P") == 0) {    /* -P: positional attribute */
 
       if ((attr = cl_new_attribute(corpus, argv[++cnt], ATT_POS)) == NULL) {
-        fprintf(stderr, "Can't open p-attribute %s.%s . Aborted.\n",
-                corpus_id, argv[cnt]);
-        cleanup(1);
+        fprintf(stderr, "Can't open p-attribute %s.%s . Aborted.\n", corpus_id, argv[cnt]);
+        decode_cleanup(1);
       }
       else {
         if (cl_max_cpos(attr) > 0) {
-          add_attribute(attr);
+          decode_add_attribute(attr);
           if (maxlast < 0)
             maxlast = cl_max_cpos(attr); /* determines corpus size */
         }
         else {
           fprintf(stderr, "Attribute %s.%s is declared, but not accessible (missing data?). Aborted.\n",
                   corpus_id, argv[cnt]);
-          cleanup(1);
+          decode_cleanup(1);
         }
       }
 
@@ -917,130 +1004,129 @@ main(int argc, char **argv)
 
       for (attr = corpus->attributes; attr; attr = attr->any.next)
         if (attr->any.type == ATT_POS) {
-          add_attribute(attr);
+          decode_add_attribute(attr);
           if (maxlast < 0)
             maxlast = cl_max_cpos(attr);
         }
         else if (attr->any.type == ATT_STRUC) {
-          add_attribute(attr);
+          decode_add_attribute(attr);
         }
 
     }
     else if (strcmp(argv[cnt], "-D") == 0) {    /* -D: dynamic attribute (not implemented) */
 
       fprintf(stderr, "Sorry, dynamic attributes are not implemented. Aborting.\n");
-      cleanup(2);
+      decode_cleanup(2);
 
     }
     else if (strcmp(argv[cnt], "-A") == 0) {    /* -A: alignment attribute */
 
       if ((attr = cl_new_attribute(corpus, argv[++cnt], ATT_ALIGN)) == NULL) {
-        fprintf(stderr, "Can't open a-attribute %s.%s . Aborted.\n",
-                corpus_id, argv[cnt]);
-        cleanup(1);
+        fprintf(stderr, "Can't open a-attribute %s.%s . Aborted.\n", corpus_id, argv[cnt]);
+        decode_cleanup(1);
       }
       else
-        add_attribute(attr);
+        decode_add_attribute(attr);
     }
     else if (strcmp(argv[cnt], "-S") == 0) {    /* -S: structural attribute (as tags) */
 
       if ((attr = cl_new_attribute(corpus, argv[++cnt], ATT_STRUC)) == NULL) {
         fprintf(stderr, "Can't open s-attribute %s.%s . Aborted.\n",
                 corpus_id, argv[cnt]);
-        cleanup(1);
+        decode_cleanup(1);
       }
       else
-        add_attribute(attr);
-
+        decode_add_attribute(attr);
     }
     else if (strcmp(argv[cnt], "-V") == 0) {    /* -V: show structural attribute values (with -p or -f) */
 
       if ((attr = cl_new_attribute(corpus, argv[++cnt], ATT_STRUC)) == NULL) {
         fprintf(stderr, "Can't open s-attribute %s.%s . Aborted.\n",
                 corpus_id, argv[cnt]);
-        cleanup(1);
+        decode_cleanup(1);
       }
       else if (!cl_struc_values(attr)) {
         fprintf(stderr, "S-attribute %s.%s does not have annotations. Aborted.\n",
                 corpus_id, argv[cnt]);
-        cleanup(1);
+        decode_cleanup(1);
       }
       else if (printValuesIndex >= MAX_PRINT_VALUES) {
         fprintf(stderr, "Too many -V attributes, sorry. Aborted.\n");
-        cleanup(1);
+        decode_cleanup(1);
       }
       else
         printValues[printValuesIndex++] = attr;
-
     }
     else {
 
       fprintf(stderr, "Unknown flag: %s\n", argv[cnt]);
-      cleanup(2);
+      decode_cleanup(2);
 
     }
   }
+  /* ---- end of parse attribute declarations ---- */
 
-  if (input_filename != NULL) {
-    if (strcmp(input_filename, "-") == 0)
-      input_file = stdin;
-    else if ((input_file = fopen(input_filename, "r")) == NULL) {
-      perror(input_filename);
+  if (read_pos_from_file) {
+    if (input_filename == NULL) input_filename = "-"; /* -p: use STDIN */
+    input_file = cl_open_stream(input_filename, CL_STREAM_READ, CL_STREAM_MAGIC);
+    if (input_file == NULL) {
+      cl_error("Can't read matchlist file (-f)");
       exit(1);
     }
-    read_pos_frm_stdin++;
   }
 
-  (void) verify_print_value_list(); /* always returns TRUE anyway */
+  decode_verify_print_value_list();
 
   /* ------------------------------------------------------------ DECODE CORPUS */
 
-  if (read_pos_frm_stdin == 0) { /* normal mode: decode entire corpus or specified range */
+  if (! read_pos_from_file) {
+    /*
+     * normal mode: decode entire corpus or specified range
+     */
 
     if (maxlast < 0) {
       fprintf(stderr, "Need at least one p-attribute (-P flag). Aborted.\n");
-      cleanup(2);
+      decode_cleanup(2);
     }
 
-    if ((first_token < 0) || (first_token >= maxlast))
+    if (first_token < 0 || first_token >= maxlast)
       first_token = 0;
 
-    if ((last < 0) || (last >= maxlast))
+    if (last < 0 || last >= maxlast)
       last = maxlast - 1;
 
     if (last < first_token) {
       fprintf(stderr, "Warning: output range #%d..#%d is empty. No output.\n", first_token, last);
-      cleanup(2);
+      decode_cleanup(2);
     }
 
-    if ( (mode == XMLMode) ||
-         ((mode == EncodeMode) && xml_compatible) ) {
-      print_xml_declaration();
+    if ( (mode == XMLMode) ||  ((mode == EncodeMode) && xml_compatible) ) {
+      decode_print_xml_declaration();
       printf("<corpus name=\"%s\" start=\"%d\" end=\"%d\">\n",
              corpus_id, first_token, last);
     }
 
-
-    /* showSurroundingStructureValues(first_token); */ /* don't do that in "normal" mode, coz it doesn't make sense */
+    /* decode_print_surrounding_s_att_values(first_token); */ /* don't do that in "normal" mode, coz it doesn't make sense */
 
     for (w = first_token; w <= last; w++)
-      show_position_values(w, -1, context);
+      decode_print_token_sequence(w, -1, context);
 
-    if ( (mode == XMLMode) ||
-         ((mode == EncodeMode) && xml_compatible) ) {
+    if ( (mode == XMLMode) || ((mode == EncodeMode) && xml_compatible) ) {
       printf("</corpus>\n");
     }
   }
-  else {                        /* matchlist mode: read (pairs of) corpus positions from stdin or file */
+  else {
+    /*
+     * matchlist mode: read (pairs of) corpus positions from stdin or file
+     */
 
-    if ( (mode == XMLMode) ||
-         ((mode == EncodeMode) && xml_compatible) ) {
-      print_xml_declaration();
+    if ( (mode == XMLMode) || ((mode == EncodeMode) && xml_compatible) ) {
+      decode_print_xml_declaration();
       printf("<matchlist corpus=\"%s\">\n", corpus_id);
     }
 
     cnt = 0;
-    while (fgets(s, 1024, input_file) != NULL) {
+    while (fgets(s, CL_MAX_LINE_LENGTH, input_file) != NULL) {
 
       token = strtok(s, " \t\n");
 
@@ -1051,7 +1137,7 @@ main(int argc, char **argv)
         if ((token = strtok(NULL, " \t\n")) != NULL) {
           if (!is_num(token)) {
             fprintf(stderr, "Invalid corpus position #%s . Aborted.\n", token);
-            cleanup(1);
+            decode_cleanup(1);
           }
           else
             ep = atoi(token);
@@ -1068,9 +1154,9 @@ main(int argc, char **argv)
           /* nothing shown before range */
         }
 
-        showSurroundingStructureValues(sp);
+        decode_print_surrounding_s_att_values(sp);
 
-        show_position_values(sp, ep, context);
+        decode_print_token_sequence(sp, ep, context);
 
         if (mode == XMLMode) {
           printf("</match>\n");
@@ -1081,19 +1167,17 @@ main(int argc, char **argv)
       }
       else {
         fprintf(stderr, "Invalid corpus position #%s . Aborted.\n", s);
-        cleanup(1);
+        decode_cleanup(1);
       }
     }
 
-    if (input_file != stdin)
-      fclose(input_file);
+    cl_close_stream(input_file);
 
-    if ( (mode == XMLMode) ||
-         ((mode == EncodeMode) && xml_compatible) ) {
+    if ( (mode == XMLMode) || ((mode == EncodeMode) && xml_compatible) ) {
       printf("</matchlist>\n");
     }
   }
 
-  cleanup(0);
+  decode_cleanup(0);
   return 0;                     /* just to keep gcc from complaining */
 }

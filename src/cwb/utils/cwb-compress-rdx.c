@@ -27,6 +27,7 @@
 
 /* doesn't seem to exist outside Solaris, so we define it here */
 #define log2(x) (log(x)/log(2.0))
+/* TODO actually log2 is now a math.h function in C99 and in POSIX... */
 
 /* ---------------------------------------------------------------------- */
 
@@ -38,8 +39,8 @@ char *corpus_id = NULL;
 /** Record for the corpus we are working on */
 Corpus *corpus; 
 
-void usage(char *msg, int error_code);
-void cleanup(int error_code);
+void compressrdx_usage(char *msg, int error_code);
+void compressrdx_cleanup(int error_code);
 
 /** debug level */
 int debug = 0;
@@ -49,7 +50,7 @@ FILE *debug_output; /* " = stderr;" init moved to main() for Gnuwin32 compatibil
 /** stores current position in a bit-write-file */
 int codepos = 0;
 
-#ifdef __NEVER__
+#if 0
 
 /* ------------- THIS VARIANT OF THE COMPRESSION CODE NOT USED !! ------- */
 
@@ -175,8 +176,8 @@ void
 compress_reversed_index(Attribute *attr, char *output_fn)
 {
   char *s;
-  char data_fname[1024];
-  char index_fname[1024];
+  char data_fname[CL_MAX_FILENAME_LENGTH];
+  char index_fname[CL_MAX_FILENAME_LENGTH];
   
   int nr_elements;
   int element_freq;
@@ -201,32 +202,30 @@ compress_reversed_index(Attribute *attr, char *output_fn)
    * .corpus.rev and .corpus.rdx components in order to force
    * subsequent CL calls to use the uncompressed data.
    */
-
   {
     Component *comp;
 
     if ((comp = ensure_component(attr, CompRevCorpus, 0)) == NULL) {
       fprintf(stderr, "Index compression requires the REVCORP component\n");
-      cleanup(1);
+      compressrdx_cleanup(1);
     }
 
     if ((comp = ensure_component(attr, CompRevCorpusIdx, 0)) == NULL) {
       fprintf(stderr, "Index compression requires the REVCIDX component\n");
-      cleanup(1);
+      compressrdx_cleanup(1);
     }
-
   }
 
   nr_elements = cl_max_id(attr);
-  if ((nr_elements <= 0) || (cderrno != CDA_OK)) {
-    cdperror("(aborting) cl_max_id() failed");
-    cleanup(1);
+  if ((nr_elements <= 0) || (cl_errno != CDA_OK)) {
+    cl_error("(aborting) cl_max_id() failed");
+    compressrdx_cleanup(1);
   }
 
   corpus_size = cl_max_cpos(attr);
-  if ((corpus_size <= 0) || (cderrno != CDA_OK)) {
-    cdperror("(aborting) cl_max_cpos() failed");
-    cleanup(1);
+  if ((corpus_size <= 0) || (cl_errno != CDA_OK)) {
+    cl_error("(aborting) cl_max_cpos() failed");
+    compressrdx_cleanup(1);
   }
 
   if (output_fn) {
@@ -235,40 +234,40 @@ compress_reversed_index(Attribute *attr, char *output_fn)
   }
   else {
     s = component_full_name(attr, CompCompRF, NULL);
-    assert(s && (cderrno == CDA_OK));
+    assert(s && (cl_errno == CDA_OK));
     strcpy(data_fname, s);
 
     s = component_full_name(attr, CompCompRFX, NULL);
-    assert(s && (cderrno == CDA_OK));
+    assert(s && (cl_errno == CDA_OK));
     strcpy(index_fname, s);
   }
   
   if (! BFopen(data_fname, "w", &data_file)) {
     fprintf(stderr, "ERROR: can't create file %s\n", data_fname);
     perror(data_fname);
-    cleanup(1);
+    compressrdx_cleanup(1);
   }
   printf("- writing compressed index to %s\n", data_fname);
   
-  if ((index_file = fopen(index_fname, "w")) == NULL) {
+  if ((index_file = fopen(index_fname, "wb")) == NULL) {
     fprintf(stderr, "ERROR: can't create file %s\n", index_fname);
     perror(index_fname);
-    cleanup(1);
+    compressrdx_cleanup(1);
   }
   printf("- writing compressed index offsets to %s\n", index_fname);
 
   for (i = 0; i < nr_elements; i++) {
     
     element_freq = cl_id2freq(attr, i);
-    if ((element_freq == 0) || (cderrno != CDA_OK)) {
-      cdperror("(aborting) token frequency == 0\n");
-      cleanup(1);
+    if ((element_freq == 0) || (cl_errno != CDA_OK)) {
+      cl_error("(aborting) token frequency == 0\n");
+      compressrdx_cleanup(1);
     }
 
-    PStream = OpenPositionStream(attr, i);
-    if ((PStream == NULL) || (cderrno != CDA_OK)) {
-      cdperror("(aborting) index read error");
-      cleanup(1);
+    PStream = cl_new_stream(attr, i);
+    if ((PStream == NULL) || (cl_errno != CDA_OK)) {
+      cl_error("(aborting) index read error");
+      compressrdx_cleanup(1);
     }
     
     b = compute_ba(element_freq, corpus_size);
@@ -282,9 +281,9 @@ compress_reversed_index(Attribute *attr, char *output_fn)
     
     last_pos = 0;
     for (k = 0; k < element_freq; k++) {
-      if (1 != ReadPositionStream(PStream, &new_pos, 1)) {
-        cdperror("(aborting) index read error\n");
-        cleanup(1);
+      if (1 != cl_read_stream(PStream, &new_pos, 1)) {
+        cl_error("(aborting) index read error\n");
+        compressrdx_cleanup(1);
       }
       
       gap = new_pos - last_pos;
@@ -297,7 +296,7 @@ compress_reversed_index(Attribute *attr, char *output_fn)
       codepos++;
     }
     
-    ClosePositionStream(&PStream);
+    cl_delete_stream(&PStream);
     BFflush(&data_file);
   }
     
@@ -310,26 +309,25 @@ compress_reversed_index(Attribute *attr, char *output_fn)
 
 /* ================================================== DECOMPRESSION & ERROR CHECKING */
 
-/*
-    */
+
 /**
  * Checks a compressed reversed index for errors by decompressing it.
  *
  * This function this assumes that compress_reversed_index() has been called
- * beforehand and made sure that the _uncompressed_ index is used by CL
+ * beforehand and made sure that the _uncompressed_ index is usable by CL
  * access functions.
  *
  * @param attr      The attribute to check the index of.
  * @param output_fn Base name for the compressed RDX files to be read
- *                  (if this is null, filename swill be taken from the
+ *                  (if this is null, filenames will be taken from the
  *                  attribute).
  */
 void 
 decompress_check_reversed_index(Attribute *attr, char *output_fn)
 {
   char *s;
-  char data_fname[1024];
-  char index_fname[1024];
+  char data_fname[CL_MAX_FILENAME_LENGTH];
+  char index_fname[CL_MAX_FILENAME_LENGTH];
   
   int nr_elements;
   int element_freq;
@@ -349,15 +347,15 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   printf("VALIDATING %s.%s\n", corpus_id, attr->any.name);
 
   nr_elements = cl_max_id(attr);
-  if ((nr_elements <= 0) || (cderrno != CDA_OK)) {
-    cdperror("(aborting) cl_max_id() failed");
-    cleanup(1);
+  if ((nr_elements <= 0) || (cl_errno != CDA_OK)) {
+    cl_error("(aborting) cl_max_id() failed");
+    compressrdx_cleanup(1);
   }
 
   corpus_size = cl_max_cpos(attr);
-  if ((corpus_size <= 0) || (cderrno != CDA_OK)) {
-    cdperror("(aborting) cl_max_cpos() failed");
-    cleanup(1);
+  if ((corpus_size <= 0) || (cl_errno != CDA_OK)) {
+    cl_error("(aborting) cl_max_cpos() failed");
+    compressrdx_cleanup(1);
   }
 
   if (output_fn) {
@@ -366,25 +364,25 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   }
   else {
     s = component_full_name(attr, CompCompRF, NULL);
-    assert(s && (cderrno == CDA_OK));
+    assert(s && (cl_errno == CDA_OK));
     strcpy(data_fname, s);
 
     s = component_full_name(attr, CompCompRFX, NULL);
-    assert(s && (cderrno == CDA_OK));
+    assert(s && (cl_errno == CDA_OK));
     strcpy(index_fname, s);
   }
   
   if (! BFopen(data_fname, "r", &data_file)) {
     fprintf(stderr, "ERROR: can't open file %s\n", data_fname);
     perror(data_fname);
-    cleanup(1);
+    compressrdx_cleanup(1);
   }
   printf("- reading compressed index from %s\n", data_fname);
   
   if ((index_file = fopen(index_fname, "r")) == NULL) {
     fprintf(stderr, "ERROR: can't open file %s\n", index_fname);
     perror(index_fname);
-    cleanup(1);
+    compressrdx_cleanup(1);
   }
   printf("- reading compressed index offsets from %s\n", index_fname);
 
@@ -392,15 +390,15 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   for (i = 0; i < nr_elements; i++) {
 
     element_freq = cl_id2freq(attr, i);
-    if ((element_freq == 0) || (cderrno != CDA_OK)) {
-      cdperror("(aborting) token frequency == 0\n");
-      cleanup(1);
+    if ((element_freq == 0) || (cl_errno != CDA_OK)) {
+      cl_error("(aborting) token frequency == 0\n");
+      compressrdx_cleanup(1);
     }
 
-    PStream = OpenPositionStream(attr, i);
-    if ((PStream == NULL) || (cderrno != CDA_OK)) {
-      cdperror("(aborting) index read error");
-      cleanup(1);
+    PStream = cl_new_stream(attr, i);
+    if ((PStream == NULL) || (cl_errno != CDA_OK)) {
+      cl_error("(aborting) index read error");
+      compressrdx_cleanup(1);
     }
 
     b = compute_ba(element_freq, corpus_size);
@@ -415,19 +413,19 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
       gap = read_golomb_code_bf(b, &data_file);
       pos += gap;
 
-      if (1 != ReadPositionStream(PStream, &true_pos, 1)) {
-        cdperror("(aborting) index read error\n");
-        cleanup(1);
+      if (1 != cl_read_stream(PStream, &true_pos, 1)) {
+        cl_error("(aborting) index read error\n");
+        compressrdx_cleanup(1);
       }
       if (pos != true_pos) {
-        fprintf(stderr, "ERROR: wrong occurrence of token #%d at cpos %d (correct cpos: %d). Aborted.\n",
-              i, pos, true_pos);
-        cleanup(1);
+        fprintf(stderr, "ERROR: wrong occurrence of type #%d at cpos %d (correct cpos: %d) (on attribute: %s). Aborted.\n",
+                i, pos, true_pos, attr->any.name);
+        compressrdx_cleanup(1);
       }
 
     }
     
-    ClosePositionStream(&PStream);
+    cl_delete_stream(&PStream);
     BFflush(&data_file);
   }
 
@@ -453,7 +451,7 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
  * @param error_code  Value to be returned by the program when it exits.
  */
 void 
-usage(char *msg, int error_code)
+compressrdx_usage(char *msg, int error_code)
 {
   if (msg)
     fprintf(stderr, "Usage error: %s\n", msg);
@@ -474,18 +472,19 @@ usage(char *msg, int error_code)
   fprintf(stderr, "  -h        this help page\n\n");
   fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
 
-  cleanup(error_code);
+  compressrdx_cleanup(error_code);
 }
 
 /**
- * Cleans up memory prior to an error-prompted exit.
+ * Cleans up memory prior to an (error-prompted or normal) exit.
  *
  * @param error_code  Value to be returned by the program when it exits.
  */
 void
-cleanup(int error_code) {
+compressrdx_cleanup(int error_code)
+{
   if (corpus)
-    drop_corpus(corpus);
+    cl_delete_corpus(corpus);
 
   if (debug_output != stderr)
     fclose(debug_output);
@@ -506,7 +505,8 @@ cleanup(int error_code) {
  * @param argv   Command-line arguments.
  */
 int
-main(int argc, char **argv) {
+main(int argc, char **argv)
+{
   char *registry_directory = NULL;
   char *attr_name = DEFAULT_ATT_NAME;
   Attribute *attr;
@@ -529,7 +529,7 @@ main(int argc, char **argv) {
 
 
   /* parse arguments */
-  while ((c = getopt(argc, argv, "+TP:r:f:dDAh")) != EOF) {
+  while ((c = getopt(argc, argv, "+TP:r:f:dD:Ah")) != EOF) {
 
     switch (c) {
       /* T: skip decompression / error checking pass ("I trust you")  */
@@ -548,7 +548,7 @@ main(int argc, char **argv) {
         registry_directory = optarg;
       else {
         fprintf(stderr, "%s: -r option used twice\n", progname);
-        cleanup(2);
+        compressrdx_cleanup(2);
       }
       break;
       
@@ -575,14 +575,13 @@ main(int argc, char **argv) {
 
       /* h: help page */
     case 'h':
-      usage(NULL, 2);
+      compressrdx_usage(NULL, 2);
       break;
 
     default: 
-      usage("illegal option.", 2);
+      compressrdx_usage("illegal option.", 2);
       break;
     }
-
   }
 
   if (debug_fn)  {
@@ -591,7 +590,7 @@ main(int argc, char **argv) {
     else if ((debug_output = fopen(debug_fn, "w")) == NULL) {
       fprintf(stderr, "Can't write debug output to file %s. Aborted.", debug_fn);
       perror(debug_fn);
-      cleanup(1);
+      compressrdx_cleanup(1);
     }
   }
 
@@ -600,19 +599,18 @@ main(int argc, char **argv) {
     corpus_id = argv[optind++];
   }
   else {
-    usage("corpus not specified (missing argument)", 1);
+    compressrdx_usage("corpus not specified (missing argument)", 1);
   }
 
   if (optind < argc) {
-    usage("Too many arguments", 1);
+    compressrdx_usage("Too many arguments", 1);
   }
 
   if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
     fprintf(stderr, "Corpus %s not found in registry %s . Aborted.\n", 
             corpus_id,
-            (registry_directory ? registry_directory
-             : central_corpus_directory()));
-    cleanup(1);
+            (registry_directory ? registry_directory : cl_standard_registry()));
+    compressrdx_cleanup(1);
   }
 
   if (all_attributes) {
@@ -624,16 +622,15 @@ main(int argc, char **argv) {
       }
   }
   else {
-    if ((attr = find_attribute(corpus, attr_name, ATT_POS, NULL)) == NULL) {
-      fprintf(stderr, "Attribute %s.%s doesn't exist. Aborted.\n", 
-              corpus_id, attr_name);
-      cleanup(1);
+    if ((attr = cl_new_attribute_oldstyle(corpus, attr_name, ATT_POS, NULL)) == NULL) {
+      fprintf(stderr, "Attribute %s.%s doesn't exist. Aborted.\n", corpus_id, attr_name);
+      compressrdx_cleanup(1);
     }
     compress_reversed_index(attr, output_fn);
     if (! i_want_to_believe) 
       decompress_check_reversed_index(attr, output_fn);
   }
   
-  cleanup(0);
-  return 0;                        /* to keep gcc from complaining */
+  compressrdx_cleanup(0);
+  return 0;                        /* never reached; to keep gcc from complaining */
 }

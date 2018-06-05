@@ -1559,7 +1559,7 @@ yyreduce:
 
   case 4:
 #line 162 "registry.y"
-    { cregerror_cleanup("Parse Error."); YYABORT; ;}
+    { cregerror_cleanup("Error parsing the main Registry structure."); YYABORT; ;}
     break;
 
   case 5:

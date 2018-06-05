@@ -15,23 +15,27 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#include <sys/types.h>		/* required on Darwin */
-#include <sys/socket.h>		/* required on Darwin */
+#ifndef __MINGW__
+#include <sys/types.h>     /* required on Darwin */
+#include <sys/socket.h>    /* required on Darwin */
 #include <netinet/in.h>
+#else
+#include <winsock2.h>
+#endif
 
 void add_user_to_list(char *user, char *passwd);
 void add_host_to_list(char *ipaddr);               /* e.g. "141.58.127.243"; NULL to accept connections from all hosts */
 void add_hosts_in_subnet_to_list(char *ipsubnet);  /* e.g. "141.58.127." */
 void add_grant_to_last_user(char *corpus);
 
-/* returns true if host is in list of allowed hosts */
+/** returns true if host is in list of allowed hosts */
 int check_host(struct in_addr host);
 
-/* returns true if (user, passwd) pair is in list */
+/** returns true if (user, passwd) pair is in list of allowed users */
 int authenticate_user(char *user, char *passwd);
 
-/* returns true if user may access corpus */
+/** returns true if user may access corpus */
 int check_grant(char *user, char *corpus);
 
-/* debugging only */
+/** for debugging only */
 void show_grants(void);

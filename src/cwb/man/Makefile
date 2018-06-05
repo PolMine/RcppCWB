@@ -16,23 +16,23 @@
 ##  WWW at http://www.gnu.org/copyleft/gpl.html).
 
 ## Read configuration settings and standard definitions
-TOP = $(R_PACKAGE_SOURCE)
+TOP = $(shell pwd)/..
 include $(TOP)/config.mk
 
 ## The following targets are available:
 #
 #  all          create man pages from POD documentation
-#  install	install man pages
-#  uninstall	uninstall man pages from chosen location (currently not supported)
+#  install      install man pages
+#  uninstall    uninstall man pages from chosen location (currently not supported)
 #  relase       install to binary release dir
-#  pdf		create PDF files from man pages
+#  pdf          create PDF files from man pages
 #  clean        delete PostScript files and other temporary files
-#  realclean	also delete generated man pages
-#  depend	<dummy target>
-#  size	        <dummy target>
+#  realclean    also delete generated man pages
+#  depend       <dummy target>
+#  size         <dummy target>
 
 MANS = 	cqp.man cqpcl.man cqpserver.man \
-	cwb-align.man cwb-align-show.man cwb-align-encode.man \
+	cwb-align.man cwb-align-show.man cwb-align-encode.man cwb-align-decode.man \
 	cwb-atoi.man cwb-itoa.man \
 	cwb-config.man \
 	cwb-encode.man cwb-decode.man cwb-lexdecode.man cwb-decode-nqrfile.man \
@@ -59,9 +59,15 @@ install: $(MANS)
 	if [ ! -d $(MANINSTDIR)/man$(MANEXT) ];	then  $(INSTALL) $(INST_FLAGS_DIR) $(MANINSTDIR)/man$(MANEXT); fi
 	for i in $(BASENAMES); do $(INSTALL) $(INST_FLAGS_DATA) $$i.man $(MANINSTDIR)/man$(MANEXT)/$$i.$(MANEXT) ; done
 
+ifdef __MINGW__
+release: $(PDFMANS)
+	if [ ! -d "$(RELEASE_DIR)/man" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/man"; fi;
+	for i in $(PDFMANS); do $(INSTALL) $(INST_FLAGS_DATA) $$i "$(RELEASE_DIR)/man/$$i"; done
+else
 release: $(MANS)
 	if [ ! -d "$(RELEASE_DIR)/man/man$(MANEXT)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/man/man$(MANEXT)"; fi;
 	for i in $(BASENAMES); do $(INSTALL) $(INST_FLAGS_DATA) $$i.man "$(RELEASE_DIR)/man/man$(MANEXT)/$$i.$(MANEXT)"; done
+endif
 
 uninstall:
 	@$(ECHO) "ERROR: uninstall operation is currently not supported!"

@@ -40,7 +40,10 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <time.h>
+
+#ifndef __MINGW__
 #include <pwd.h>
+#endif
 
 /* ---------------------------------------------------------------------- */
 
@@ -95,6 +98,7 @@ SGMLPrintDescriptionRecord = {
 
 /* ---------------------------------------------------------------------- */
 
+#define SUBST_NONE 0
 #define SUBST_LT   1
 #define SUBST_GT   2
 #define SUBST_AMP  4
@@ -143,10 +147,10 @@ sgml_print_field(FieldType field, int at_end)
 char *
 sgml_convert_string(char *s)
 {
-  static char sgml_s[MAX_LINE_LENGTH*2];
+  static char sgml_s[CL_MAX_LINE_LENGTH*2];
   int p;
 
-  if (!s || strlen(s) >(MAX_LINE_LENGTH))
+  if (!s || strlen(s) >(CL_MAX_LINE_LENGTH))
     return NULL;
   
   for (p = 0; *s; s++) {
@@ -206,13 +210,24 @@ sgml_puts(FILE *fd, char *s, int flags)
     fputs(s, fd);
 }
 
+/**
+ * Prints a line of text (which will have been previously exrtracted from a corfpus
+ * linked to the present corpus by an a-attribute) following an SGML open-tag.
+ *
+ * The structure is <align name="$att_name">$line_data
+ * And the whole thing is terminated by EOL (note, no close tag as we;'d have in XML!)
+ *
+ * @param stream          Destination for the output.
+ * @param attribute_name  The name of the aligned corpus: printed in the "align" tag as an SGML attribute.
+ * @param line            Character data of the line of aligned-corpus data to print. This is treated as opaque.
+ */
 void
 sgml_print_aligned_line(FILE *stream, char *attribute_name, char *line)
 {
   sgml_puts(stream, "<align name=\"", 0);
   sgml_puts(stream, attribute_name, 0);
   sgml_puts(stream, "\">", 0);
-  sgml_puts(stream, line, SUBST_ALL);
+  sgml_puts(stream, line, SUBST_NONE); /* entities have already been escaped */
 
   fputc('\n', stream);
 }
@@ -258,12 +273,17 @@ void sgml_print_context(ContextDescriptor *cd, FILE *stream)
 
 }
 
-void sgml_print_corpus_header(CorpusList *cl, FILE *stream)
+void
+sgml_print_corpus_header(CorpusList *cl, FILE *stream)
 {
   time_t now;
-  struct passwd *pwd = NULL;
 
-  (void) time(&now);
+#ifndef __MINGW__
+  struct passwd *pwd = NULL;
+#endif
+
+  time(&now);
+
   /*   pwd = getpwuid(geteuid()); */
   /* disabled because of incompatibilities between different Linux versions */
 
@@ -275,11 +295,16 @@ void sgml_print_corpus_header(CorpusList *cl, FILE *stream)
           "<subcorpusInfo size=%d>\n"
           "<name>%s:%s</name>\n"
           "</subcorpusInfo>\n",
+#ifndef __MINGW__
           (pwd ? pwd->pw_name : "unknown"),
           (pwd ? pwd->pw_gecos  : "unknown"),
+#else
+          "unknown",
+          "unknown",
+#endif
           ctime(&now),
-          (cl->corpus && cl->corpus->registry_name ? cl->corpus->registry_name : "unknown"),
-          (cl->corpus && cl->corpus->name ? cl->corpus->name : "unknown"),
+          ( (cl->corpus && cl->corpus->registry_name) ? cl->corpus->registry_name : "unknown"),
+          ( (cl->corpus && cl->corpus->name) ? cl->corpus->name : "unknown"),
           cl->size,
           cl->mother_name, cl->name);
   
@@ -288,11 +313,12 @@ void sgml_print_corpus_header(CorpusList *cl, FILE *stream)
   fputs("</concordanceInfo>\n", stream);
 }
 
-void sgml_print_output(CorpusList *cl, 
-                       FILE *stream,
-                       int interactive,
-                       ContextDescriptor *cd,
-                       int first, int last)
+void
+sgml_print_output(CorpusList *cl,
+                  FILE *stream,
+                  int interactive,
+                  ContextDescriptor *cd,
+                  int first, int last)
 {
   int line, real_line;
   ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
@@ -323,7 +349,7 @@ void sgml_print_output(CorpusList *cl,
   if ((last >= cl->size) || (last < 0))
     last = cl->size - 1;
 
-  for (line = first; (line <= last) && (!broken_pipe); line++) {
+  for (line = first; (line <= last) && !cl_broken_pipe; line++) {
 
     if (cl->sortidx)
       real_line = cl->sortidx[line];
@@ -416,7 +442,7 @@ sgml_print_group(Group *group, int expand, FILE *fd)
 
   fprintf(fd, "<TABLE>\n");
 
-  for (cell = 0; cell < group->nr_cells; cell++) {
+  for (cell = 0; (cell < group->nr_cells) && !cl_broken_pipe; cell++) {
 
     fprintf(fd, "<TR><TD>");
 

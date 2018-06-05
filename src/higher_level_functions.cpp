@@ -3,7 +3,7 @@ extern "C" {
   #include <stdlib.h>
   #include <unistd.h>
   #include <string.h>
-  #include <cl.h>
+  #include "cl_min.h"
   #include <pcre.h>
 }
 

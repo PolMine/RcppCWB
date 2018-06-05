@@ -24,6 +24,8 @@
 
 /** The corpus we are working on */
 Corpus *corpus;
+/** Name of this program */
+char *progname = NULL;
 
 
 /**
@@ -64,7 +66,7 @@ component_ok(Attribute *attr, ComponentID cid)
  * @param cid   The component ID of the component to create.
  */
 void
-make_component(Attribute *attr, ComponentID cid)
+makeall_make_component(Attribute *attr, ComponentID cid)
 {
   int state;
 
@@ -102,7 +104,6 @@ make_component(Attribute *attr, ComponentID cid)
 int
 validate_revcorp(Attribute *attr)
 {
-
   Component *revcorp = ensure_component(attr, CompRevCorpus, 0);
   int *ptab;                        /* table of index offsets for each lexicon entry */
   int lexsize, corpsize;
@@ -178,7 +179,7 @@ validate_revcorp(Attribute *attr)
  *                  the resulting revcorp.
  */
 void
-do_attribute(Attribute *attr, ComponentID cid, int validate)
+makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
 {
   assert(attr);
 
@@ -196,22 +197,22 @@ do_attribute(Attribute *attr, ComponentID cid, int validate)
 
     /* lexicon and lexicon offsets must have been created by encode */
     if (! (component_ok(attr, CompLexicon) && component_ok(attr, CompLexiconIdx))) {
-      /* if none of the components exits, we assume that the attribute will be created later & skip it */
+      /* if none of the components exists, we assume that the attribute will be created later & skip it */
       if (!component_ok(attr, CompLexicon) && !component_ok(attr, CompLexiconIdx) &&
           !component_ok(attr, CompLexiconSrt) &&
           !component_ok(attr, CompCorpus) && !component_ok(attr, CompCorpusFreqs) &&
           !component_ok(attr, CompHuffSeq) && !component_ok(attr, CompHuffCodes) &&
           !component_ok(attr, CompHuffSync) &&
           !component_ok(attr, CompRevCorpus) && !component_ok(attr, CompRevCorpusIdx) &&
-          !component_ok(attr, CompCompRF) && !component_ok(attr, CompCompRFX))
-        {
-          /* issue a warning message & return */
-          printf(" ! attribute not created yet (skipped)\n");
-          if (strcmp(attr->any.name, "word") == 0) {
-            fprintf(stderr, "WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
-          }
-          return;
+          !component_ok(attr, CompCompRF) && !component_ok(attr, CompCompRFX
+          ))  {
+        /* issue a warning message & return */
+        printf(" ! attribute not created yet (skipped)\n");
+        if (strcmp(attr->any.name, "word") == 0) {
+          fprintf(stderr, "WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
         }
+        return;
+      }
       else {
         fprintf(stderr, "ERROR. Lexicon is missing. You must use the 'encode' tool first!\n");
         exit(1);
@@ -219,12 +220,12 @@ do_attribute(Attribute *attr, ComponentID cid, int validate)
     }
     else {
       /* may need to create "alphabetically" sorted lexicon */
-      make_component(attr, CompLexiconSrt);
+      makeall_make_component(attr, CompLexiconSrt);
       printf(" - lexicon      OK\n");
     }
 
     /* create token frequencies if necessary (must be able to do so if they aren't already there) */
-    make_component(attr, CompCorpusFreqs);
+    makeall_make_component(attr, CompCorpusFreqs);
     printf(" - frequencies  OK\n");
 
     /* check if token sequence has been compressed, otherwise create CompCorpus (if necessary) */
@@ -232,7 +233,7 @@ do_attribute(Attribute *attr, ComponentID cid, int validate)
       printf(" - token stream OK (COMPRESSED)\n");
     }
     else {
-      make_component(attr, CompCorpus);
+      makeall_make_component(attr, CompCorpus);
       printf(" - token stream OK\n");
     }
 
@@ -241,9 +242,9 @@ do_attribute(Attribute *attr, ComponentID cid, int validate)
       printf(" - index        OK (COMPRESSED)\n");
     }
     else {
-      make_component(attr, CompRevCorpusIdx);
+      makeall_make_component(attr, CompRevCorpusIdx);
       if (! component_ok(attr, CompRevCorpus)) { /* need this check to avoid validation of existing revcorp  */
-        make_component(attr, CompRevCorpus);
+        makeall_make_component(attr, CompRevCorpus);
         if (validate) {
           /* validate the index, i.e. the REVCORP component we just created */
           if (! validate_revcorp(attr)) {
@@ -256,10 +257,10 @@ do_attribute(Attribute *attr, ComponentID cid, int validate)
     }
   }
   else {
-    /* create requested component only */
+    /* cid != CompLast; so, create requested component only */
     printf("Processing component %s of ATTRIBUTE %s\n",
            cid_name(cid), attr->any.name);
-    make_component(attr, cid);
+    makeall_make_component(attr, cid);
     if (validate && (cid == CompRevCorpus)) { /* validates even if REVCORP already existed -> useful trick for validating later */
       if (! validate_revcorp(attr)) {
         fprintf(stderr, "ERROR. Validation failed.\n");
@@ -274,7 +275,7 @@ do_attribute(Attribute *attr, ComponentID cid, int validate)
  * Prints a usage message and exits the program.
  */
 void
-usage(void)
+makeall_usage(void)
 {
   fprintf(stderr, "\n");
   fprintf(stderr, "Usage:  %s [options] <corpus> [<attribute> ...] \n", progname);
@@ -285,13 +286,17 @@ usage(void)
   fprintf(stderr, "  -D        debug mode\n");
   fprintf(stderr, "  -r <dir>  use registry directory <dir>\n");
   fprintf(stderr, "  -c <comp> create component <comp> only\n");
-  fprintf(stderr, "  -P <att>  work on attribute <att> [default: word]\n");
+  fprintf(stderr, "  -P <att>  work on attribute <att> [default: ALL attributes]\n");
   fprintf(stderr, "  -M <size> limit memory usage to approx. <size> MBytes\n");
   fprintf(stderr, "  -V        validate index after creating it\n");
   fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
   exit(2);
 }
-
+/* TODO  it is a but confusing that there is both a -P option for attributes, AND you can list attributes
+ * after the corpus name. (Or is there a difference between these two ways of specifying attributes? Either
+ * way, it needs to be documented in the usage message, and in the manfile too.
+ * NB the normally parallel huffcode does not have attributes after the corpus!
+ */
 
 
 /* *************** *\
@@ -307,7 +312,7 @@ usage(void)
 int
 main(int argc, char **argv)
 {
-  char *attr_name;
+  char *attr_name = NULL;
   Attribute *attribute;
 
   char *registry_directory = NULL;
@@ -317,7 +322,7 @@ main(int argc, char **argv)
   extern char *optarg;
   int c;
 
-  int validate;
+  int validate = 0;
 
   char *component = NULL;
 
@@ -327,16 +332,15 @@ main(int argc, char **argv)
   /* ------------------------------------------------- PARSE ARGUMENTS */
 
   progname = argv[0];
-  attr_name = NULL;
-  validate = 0;
 
   /* parse arguments */
-  while ((c = getopt(argc, argv, "+r:c:P:hDM:V")) != EOF)
+  while ((c = getopt(argc, argv, "+r:c:P:hDM:V")) != EOF) {
     switch (c) {
 
     /* r: registry directory */
     case 'r':
-      if (registry_directory == NULL) registry_directory = optarg;
+      if (registry_directory == NULL)
+        registry_directory = optarg;
       else {
         fprintf(stderr, "%s: -r option used twice\n", progname);
         exit(2);
@@ -344,11 +348,21 @@ main(int argc, char **argv)
       break;
 
     case 'P':
-      attr_name = optarg;
+      if (attr_name == NULL)
+        attr_name = optarg;
+      else {
+        fprintf(stderr, "%s: -P option used twice\n", progname);
+        exit(2);
+      }
       break;
 
     case 'c':
-      component = optarg;
+      if (component == NULL)
+        component = optarg;
+      else {
+        fprintf(stderr, "%s: -c option used twice\n", progname);
+        exit(2);
+      }
       break;
 
     case 'D':
@@ -366,8 +380,9 @@ main(int argc, char **argv)
 
     case 'h':
     default:
-      usage();
+      makeall_usage();
     }
+  }
 
   if (optind >= argc) {
     fprintf(stderr, "Missing argument, try \"%s -h\" for more information.\n", progname);
@@ -401,24 +416,25 @@ main(int argc, char **argv)
   printf("Registry directory: %s\n", corpus->registry_dir);
 
   if (optind < argc) {
+    /* process each specified atttribute (at the end of the invocation) */
     for (i = optind; i < argc; i++) {
       if ((attribute = cl_new_attribute(corpus, argv[i], ATT_POS)) != NULL) {
-        do_attribute(attribute, cid, validate);
+        makeall_do_attribute(attribute, cid, validate);
+        /* TODO why do we not need to drop components here, when the for-loop below needs to?? */
       }
       else {
-        fprintf(stderr, "p-attribute %s.%s not defined. Aborted.\n",
-                corpus_id, attr_name);
+        fprintf(stderr, "p-attribute %s.%s not defined. Aborted.\n", corpus_id, argv[i]);
         exit(1);
       }
     }
   }
   else if (attr_name != NULL) {
+    /* process a specified attribute (via the -P option) */
     if ((attribute = cl_new_attribute(corpus, attr_name, ATT_POS)) != NULL) {
-      do_attribute(attribute, cid, validate);
+      makeall_do_attribute(attribute, cid, validate);
     }
     else {
-      fprintf(stderr, "p-attribute %s.%s not defined. Aborted.\n",
-              corpus_id, attr_name);
+      fprintf(stderr, "p-attribute %s.%s not defined. Aborted.\n", corpus_id, attr_name);
       exit(1);
     }
   }
@@ -428,7 +444,7 @@ main(int argc, char **argv)
       if (attribute->type == ATT_POS) {
         ComponentID my_cid;
 
-        do_attribute(attribute, cid, validate);
+        makeall_do_attribute(attribute, cid, validate);
         /* now destoy all components; this makes the attribute unusable,
            but it is currently the only way to free allocated and memory-mapped data */
         for (my_cid = CompDirectory; my_cid < CompLast; my_cid++) { /* ordering gleaned from attributes.h */

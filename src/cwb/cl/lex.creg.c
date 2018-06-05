@@ -433,14 +433,14 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    7,    7,    7,    7,    7,    7,    7,    7,    7,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1
     } ;
 
 static yyconst flex_int32_t yy_meta[35] =
@@ -598,7 +598,9 @@ char *cregtext;
 #define cregwrap() 1
 */
 
-/* remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place */
+/**
+ * remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place
+ */
 void
 unescape_string (char *string) {
   char *p, *q;
@@ -615,7 +617,7 @@ unescape_string (char *string) {
   *q = '\0';  
 }
 
-#line 619 "lex.creg.c"
+#line 621 "lex.creg.c"
 
 #define INITIAL 0
 
@@ -797,10 +799,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 62 "registry.l"
+#line 64 "registry.l"
 
 
-#line 804 "lex.creg.c"
+#line 806 "lex.creg.c"
 
 	if ( !(yy_init) )
 		{
@@ -885,173 +887,173 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 64 "registry.l"
+#line 66 "registry.l"
 { return(NAME_SYM); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 65 "registry.l"
+#line 67 "registry.l"
 { return(ID_SYM);   }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 66 "registry.l"
+#line 68 "registry.l"
 { return(INFO_SYM); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 67 "registry.l"
+#line 69 "registry.l"
 { return(HOME_SYM); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 69 "registry.l"
+#line 71 "registry.l"
 { return(ATTRIBUTE_SYM); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 71 "registry.l"
+#line 73 "registry.l"
 { return(IGNORE_SYM); }   /* *** ignore MAPTABLEs and NGRAMs *** */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 72 "registry.l"
+#line 74 "registry.l"
 { return(IGNORE_SYM); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "registry.l"
+#line 76 "registry.l"
 { return(DIR_SYM); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 75 "registry.l"
+#line 77 "registry.l"
 { return(CORPUS_SYM); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 76 "registry.l"
+#line 78 "registry.l"
 { return(REVCORP_SYM); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 77 "registry.l"
+#line 79 "registry.l"
 { return(REVCIDX_SYM); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 78 "registry.l"
+#line 80 "registry.l"
 { return(FREQS_SYM); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 79 "registry.l"
+#line 81 "registry.l"
 { return(LEXICON_SYM); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 80 "registry.l"
+#line 82 "registry.l"
 { return(LEXIDX_SYM); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 81 "registry.l"
+#line 83 "registry.l"
 { return(LEXSRT_SYM); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 83 "registry.l"
+#line 85 "registry.l"
 { return(STRUCTURE_SYM); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 84 "registry.l"
+#line 86 "registry.l"
 { return(ALIGNED_SYM); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 85 "registry.l"
+#line 87 "registry.l"
 { return(DYNAMIC_SYM); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 88 "registry.l"
+#line 90 "registry.l"
 { return(ADMIN_SYM); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 89 "registry.l"
+#line 91 "registry.l"
 { return(ACCESS_SYM); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 90 "registry.l"
+#line 92 "registry.l"
 { return(USER_SYM); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 91 "registry.l"
+#line 93 "registry.l"
 { return(GROUP_SYM); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 92 "registry.l"
+#line 94 "registry.l"
 { return(ASSERT_SYM); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 93 "registry.l"
+#line 95 "registry.l"
 { return(HOST_SYM); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 96 "registry.l"
+#line 98 "registry.l"
 { return(DOTS_SYM); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 98 "registry.l"
+#line 100 "registry.l"
 { return(PROPERTY_SYM); }
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 99 "registry.l"
+#line 101 "registry.l"
 ; /* single line comment, skip; unless the comment begins with '##::' */
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 100 "registry.l"
+#line 102 "registry.l"
 ;
 	YY_BREAK
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 101 "registry.l"
+#line 103 "registry.l"
 ;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 102 "registry.l"
+#line 104 "registry.l"
 ;
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 104 "registry.l"
+#line 106 "registry.l"
 ;  /* skip */
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 107 "registry.l"
+#line 109 "registry.l"
 { creglval.ival = atoi(cregtext);
                   return(NUMBER); 
                 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 110 "registry.l"
+#line 112 "registry.l"
 { creglval.strval = cl_strdup(cregtext);
                   return(IDENTIFIER); 
                 }
@@ -1059,7 +1061,7 @@ YY_RULE_SETUP
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 113 "registry.l"
+#line 115 "registry.l"
 { creglval.strval = cl_strdup(cregtext+1);
                   creglval.strval[cregleng - 2] = '\0';
                   unescape_string(creglval.strval);
@@ -1068,15 +1070,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 119 "registry.l"
+#line 121 "registry.l"
 return cregtext[0];
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 121 "registry.l"
+#line 123 "registry.l"
 ECHO;
 	YY_BREAK
-#line 1080 "lex.creg.c"
+#line 1082 "lex.creg.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2073,7 +2075,7 @@ void cregfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 121 "registry.l"
+#line 123 "registry.l"
 
 
 
