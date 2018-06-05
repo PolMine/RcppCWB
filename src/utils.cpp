@@ -1,10 +1,6 @@
 extern "C" {
-  #include <cl.h>
-  #ifdef _WIN32
-    #include "cwb_3.5/include/attributes.h"
-  #else
-    #include "cwb/cl/attributes.h"
-  #endif
+  #include "cl_min.h"
+  #include <attributes.h>
   #include "utils.h"
 }
 
