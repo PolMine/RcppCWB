@@ -44,16 +44,6 @@ PARSES  = registry.tab.c lex.creg.c
 PARSEG  = registry.l registry.y
 PARSEO  = registry.tab.o lex.creg.o
 
-## Compile and link-in windows-mmap functions only if we are in MinGW
-ifdef __MINGW__
-MMAPH = windows-mmap.h
-MMAPS = windows-mmap.c
-MMAPO = windows-mmap.o
-else
-MMAPH =
-MMAPS =
-MMAPO =
-endif 
 
 ## cl.h header file will be installed in subdirectory cwb/
 REALINCINSTDIR = $(INCINSTDIR)/cwb
@@ -122,28 +112,6 @@ libcl.a: $(OBJS)
 	$(RM) $@
 	$(AR) $@ $^
 	$(RANLIB) $@
-
-install: libcl.a
-ifndef __MINGW__
-	if [ ! -d "$(LIBINSTDIR)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(LIBINSTDIR)" ; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) libcl.a "$(LIBINSTDIR)"
-	if [ ! -d "$(REALINCINSTDIR)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(REALINCINSTDIR)" ; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) cl.h "$(REALINCINSTDIR)"
-else
-	@$(ECHO) "ERROR: install operation is not supported for Windows binaries!"
-endif
-
-release: libcl.a
-	if [ ! -d "$(RELEASE_DIR)/lib" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/lib"; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) libcl.a "$(RELEASE_DIR)/lib"
-	if [ ! -d "$(RELEASE_DIR)/include/cwb" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/include/cwb"; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) cl.h "$(RELEASE_DIR)/include/cwb"
-
-
-uninstall:
-	@$(ECHO) "ERROR: uninstall operation is currently not supported!"
-#	$(RM) $(LIBINSTDIR)/libcl.a
-#	(cd $(REALINCINSTDIR); $(RM) cl.h)
 
 depend:
 	-$(RM) depend.mk
