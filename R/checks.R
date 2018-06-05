@@ -94,8 +94,12 @@ check_region_matrix <- function(region_matrix){
 #' @export check_cqp_query
 #' @rdname checks
 check_cqp_query <- function(query){
-  if (!substr(query, start = length(query), stop = length(query)) == ";"){
-    return( paste0(query, ";", sep = "") )
+  if (!substr(query, start = nchar(query), stop = nchar(query)) == ";"){
+    encoding_query <- Encoding(query)
+    retval <- paste0(query, ";", sep = "")
+    if (Encoding(retval) != encoding_query)
+      retval <- iconv(retval, from = Encoding(retval), to = encoding_query)
+    return( retval )
   } else {
     return( query )
   }
