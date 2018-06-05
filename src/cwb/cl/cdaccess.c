@@ -1350,11 +1350,11 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
   unsigned char bitmap_mask;    /* current bitmap offset (within-byte part, as bit mask) */
   /* TODO might move bitmap to static variable and re-allocate only when necessary ... */
   
-  int regex_result, idx, i, len, lexsize;
-  int optimised, grain_match;
+  int idx, i, lexsize;
+  int optimised;
 
   CL_Regex rx;
-  char *word, *preprocessed_string;
+  char *word;
 
   check_arg(attribute, ATT_POS, NULL);
 
@@ -1390,8 +1390,8 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
   /* for each index in the lexicon... */
   for (idx = 0; idx < lexsize; idx++) {
     int off_start, off_end;     /* start and end offset of current lexicon entry */
-    char *p;
-    int i;
+    /* char *p; */
+    /* int i; */
 
     /* compute start offset and length of current lexicon entry from lexidx, if possible)
      *  -- no longer necessary because we can't pass len to cl_regex_match

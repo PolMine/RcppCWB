@@ -2924,7 +2924,7 @@ cqp_run_tab_query()
 
   nr_columns = 0;
   for (col = evalenv->evaltree; col; col = col->tab_el.next) {
-    assert(col->type = tabular);
+    assert((col->type = tabular));
     if (evalenv->patternlist[col->tab_el.patindex].type != Pattern) {
       cqpmessage(Error, "matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n", nr_columns + 1);
       init_matchlist(&result);
