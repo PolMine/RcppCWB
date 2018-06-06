@@ -13,9 +13,6 @@ addons:
     packages:
     - libpcre3-dev
 
-before_install:
-  - tlmgr install inconsolata
-
 r_packages:
   - Rcpp
   - covr
