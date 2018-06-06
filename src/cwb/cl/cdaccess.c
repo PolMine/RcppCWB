@@ -23,7 +23,7 @@
 
 #include "globals.h"
 
-#include "endian.h"
+#include "endian2.h"
 #include "macros.h"
 #include "attributes.h"
 #include "special-chars.h"

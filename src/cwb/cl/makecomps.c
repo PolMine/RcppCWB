@@ -31,7 +31,7 @@
 
 #include "globals.h"
 
-#include "endian.h"
+#include "endian2.h"
 #include "macros.h"
 #include "storage.h"
 #include "fileutils.h"
