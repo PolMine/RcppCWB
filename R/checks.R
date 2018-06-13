@@ -79,6 +79,8 @@ check_strucs <- function(corpus, s_attribute, strucs, registry){
     stop("all values of vector strucs need to be >= 0")
   if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1))
     stop("highest value of strucs may not be larger than size of structural attribute")
+  if (any(is.na(strucs)))
+    stop("there is an NA value among strucs")
   return( TRUE )
 }
 
@@ -109,12 +111,12 @@ check_cqp_query <- function(query){
 #' @rdname checks
 check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
   attr_max <- cl_attribute_size(corpus = corpus, attribute = p_attribute, attribute_type = "p", registry = registry)
-  if (min(cpos) < 0){
+  if (min(cpos) < 0)
     stop("all corpus positions (cpos) need to be >= 0, not TRUE")
-  }
-  if (max(cpos) > attr_max){
+  if (max(cpos) > attr_max)
     stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
-  }
+  if (any(is.na(cpos)))
+    stop("there are NA values among the corpus positions")
   return( TRUE )
 }
 
@@ -122,11 +124,11 @@ check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv
 #' @rdname checks
 check_id <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
   lexicon_size <- cl_lexicon_size(corpus = corpus, p_attribute = p_attribute, registry = registry)
-  if (min(id) < 0){
+  if (min(id) < 0)
     stop("all corpus positions (cpos) need to be >= 0, not TRUE")
-  }
-  if (max(id) > lexicon_size){
+  if (max(id) > lexicon_size)
     stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
-  }
+  if (any(is.na(id)))
+    stop("there are NA values among the corpus positions")
   return( TRUE )
 }
