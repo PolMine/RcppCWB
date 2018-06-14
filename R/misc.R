@@ -1,0 +1,34 @@
+#' Use Temporary Registry
+#' 
+#' Use a temporary registry directory to describe and access the corpora in 
+#' a package
+#' @param pkg full path to a package
+#' @export use_tmp_registry
+use_tmp_registry <- function(pkg){
+  
+  tmp_registry_dir <- file.path(tempdir(), "registry_tmp")
+  if (!file.exists(tmp_registry_dir)) dir.create(tmp_registry_dir)
+  
+  pkg_registry_dir <- file.path(pkg, "extdata", "cwb", "registry")
+  pkg_indexed_corpora_dir <- file.path(pkg, "extdata", "cwb", "indexed_corpora")
+  
+  for (corpus in list.files(pkg_registry_dir)){
+    
+    registry <- readLines(file.path(pkg_registry_dir, corpus))
+    
+    home_line_no <- grep("^HOME", registry)
+    registry[home_line_no] <- sprintf("HOME \"%s\"", file.path(pkg_indexed_corpora_dir, corpus))
+    
+    info_line_no <- grep("^INFO", registry)
+    info_file_new <- file.path(pkg_indexed_corpora_dir, corpus, basename(registry_info_file), fsep = "/")
+    registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
+    
+    writeLines(text = text, con = file.path(tmp_registry_dir, corpus), sep = "\n")
+  }
+  
+  Sys.setenv(tmp_registry_dir)
+  if (cqp_is_initialized()) cqp_reset_registry(tmp_registry_dir)
+  tmp_registry_dir
+}
+
+get_pkg_registry <- function(pkgname) system.file(package = "RcppCWB", "extdata", "cwb", "registry")

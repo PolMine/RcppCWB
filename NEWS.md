@@ -3,6 +3,7 @@
 * Umlaute can be used in queries
 * bug removed in check_cqp_query that would prevent special characters from working
 in CQP queries
+* check_strucs, check_cpos and check_id are checking for NAs now
 
 
 # v0.2.3.9002

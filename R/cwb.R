@@ -18,7 +18,7 @@
 #' # The first step in the following example is to copy the raw
 #' # corpus to a temporary place.
 #' 
-#' regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' registry <- if (!check_pkg_registry_files) use_tmp_registry() else get_pkg_registry()
 #' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 #' 
 #' tmpdir <- tempdir()
