@@ -52,5 +52,6 @@ Collate:
   'decode.R'
   'cbow.R'
   'region_matrix.R'
+  'misc.R'
   'zzz.R'
 

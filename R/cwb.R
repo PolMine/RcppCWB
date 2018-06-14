@@ -18,7 +18,7 @@
 #' # The first step in the following example is to copy the raw
 #' # corpus to a temporary place.
 #' 
-#' registry <- if (!check_pkg_registry_files) use_tmp_registry() else get_pkg_registry()
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 #' 
 #' tmpdir <- tempdir()
@@ -34,7 +34,7 @@
 #' } else {
 #'   file.remove(list.files(tmp_unga_dir, full.names = TRUE))
 #' }
-#' regfile <- readLines(file.path(regdir, "unga"))
+#' regfile <- readLines(file.path(registry, "unga"))
 #' homedir_line <- grep("^HOME", regfile)
 #' regfile[homedir_line] <- sprintf('HOME "%s"', tmp_unga_dir)
 #' writeLines(text = regfile, con = file.path(tmp_regdir, "unga"))

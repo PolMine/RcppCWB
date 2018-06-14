@@ -25,7 +25,7 @@ The return value is an integer matrix with the left and right corpus positions
 of the strucs in columns one and two, respectively.
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 y <- get_region_matrix(
   corpus = "REUTERS", s_attribute = "id",
   strucs = 0L:5L, registry = registry

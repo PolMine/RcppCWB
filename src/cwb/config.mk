@@ -39,7 +39,7 @@
 #       mingw-native  Build natively on Win32 using MinGW (new, at research stage only, does not work yet)
 #
 ifndef PLATFORM
-PLATFORM=darwin-brew
+PLATFORM=darwin-64
 endif
 include $(TOP)/config/platform/$(PLATFORM)
 

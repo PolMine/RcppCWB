@@ -45,8 +45,7 @@ Structural attributes store the metadata of texts in a CWB
   (struc).
 }
 \examples{
-# get registry directory
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 
 # get metadata for matches of token
 # scenario: id of the texts with occurrence of 'oil'

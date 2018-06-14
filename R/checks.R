@@ -135,11 +135,11 @@ check_id <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGI
 
 #' Check Paths in Registry Files
 #' 
-#' @param pkgdir Full path to package directory
+#' @param pkg Full path to package directory
 #' @param set Logical, whether 
 #' @return Logical value, whether home directories are set correctly.
 #' @export check_pkg_registry_files
-check_pkg_registry_files <- function(pkg, set = FALSE){
+check_pkg_registry_files <- function(pkg = system.file(package = "RcppCWB"), set = FALSE){
   pkg_cwb_dir <- file.path(pkg, "extdata", "cwb")
   pkg_registry_dir <- file.path(pkg_cwb_dir, "registry")
   pkg_indexed_corpora_dir <- file.path(pkg_cwb_dir, "indexed_corpora")
@@ -155,7 +155,7 @@ check_pkg_registry_files <- function(pkg, set = FALSE){
       pkg_home_dir <- file.path(pkg_indexed_corpora_dir, corpus)
       if (!identical(x = registry_home_dir, y = pkg_home_dir)) {
         if (set){
-          message(sprintf("... adjusting data directory in registry for corpus '%s' in package '%s'", corpus, pkgname))
+          message(sprintf("... adjusting data directory in registry for corpus '%s' in package '%s'", corpus, pkg))
           info_file_new <- file.path(pkg_home_dir, basename(registry_info_file), fsep = "/")
           if (.Platform$OS.type == "windows") {
             registry[home_line_no] <- sprintf("HOME \"%s\"", pkg_home_dir)
@@ -175,7 +175,7 @@ check_pkg_registry_files <- function(pkg, set = FALSE){
                     "Consider loading package with admin rights one."
             )
           }
-          writeLines(text = text, con = registry_file, sep = "\n")
+          writeLines(text = registry, con = registry_file, sep = "\n")
           return(TRUE)
         } else {
           return(FALSE)
@@ -183,5 +183,5 @@ check_pkg_registry_files <- function(pkg, set = FALSE){
       }
     }
   )
-  all(is_set)
+  all(unlist(is_set))
 }

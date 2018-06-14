@@ -20,10 +20,11 @@ use_tmp_registry <- function(pkg){
     registry[home_line_no] <- sprintf("HOME \"%s\"", file.path(pkg_indexed_corpora_dir, corpus))
     
     info_line_no <- grep("^INFO", registry)
+    registry_info_file <- gsub("^INFO\\s+\"*(.*?)\"*\\s*$", "\\1", registry[info_line_no])
     info_file_new <- file.path(pkg_indexed_corpora_dir, corpus, basename(registry_info_file), fsep = "/")
     registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
     
-    writeLines(text = text, con = file.path(tmp_registry_dir, corpus), sep = "\n")
+    writeLines(text = registry, con = file.path(tmp_registry_dir, corpus), sep = "\n")
   }
   
   Sys.setenv(tmp_registry_dir)
@@ -31,4 +32,7 @@ use_tmp_registry <- function(pkg){
   tmp_registry_dir
 }
 
-get_pkg_registry <- function(pkgname) system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' Get Registry Directory Within Package
+#' @param pkgname Name of package (character vector)
+#' @export get_pkg_registry
+get_pkg_registry <- function(pkgname = "RcppCWB") system.file(package = pkgname, "extdata", "cwb", "registry")

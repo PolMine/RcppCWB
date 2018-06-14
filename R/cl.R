@@ -12,7 +12,7 @@
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
 #' @examples 
-#' registry <- if (!check_pkg_registry_files) use_tmp_registry() else get_pkg_registry()
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' 
 #' Sys.setenv(CORPUS_REGISTRY = registry)
 #' token_no <- cl_attribute_size("REUTERS", attribute = "word", attribute_type = "p")
@@ -38,7 +38,7 @@ cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.
 #'   environment variable CORPUS_REGISTRY
 #' @rdname cl_lexicon_size
 #' @examples 
-#' registry <- if (!check_pkg_registry_files) use_tmp_registry() else get_pkg_registry()
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' Sys.setenv(CORPUS_REGISTRY = registry)
 #' lexicon_size <- cl_lexicon_size("REUTERS", p_attribute = "word")
 #' token_ids <- seq.int(from = 0, to = lexicon_size - 1)
@@ -66,7 +66,7 @@ cl_lexicon_size <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' @rdname s_attributes
 #' @name CL: s_attributes
 #' @examples
-#' registry <- if (!check_pkg_registry_files) use_tmp_registry() else get_pkg_registry()
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' 
 #' # get metadata for matches of token
 #' # scenario: id of the texts with occurrence of 'oil'
@@ -157,7 +157,7 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 #' @name CL: p_attributes
 #' @examples 
 #' # registry directory and cpos_total will be needed in examples
-#' registry <- if (!check_pkg_registry_files) use_tmp_registry() else get_pkg_registry()
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' Sys.setenv(CORPUS_REGISTRY = registry)
 #' cpos_total <- cl_attribute_size(
 #'   corpus = "REUTERS", attribute = "word",
