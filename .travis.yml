@@ -12,6 +12,7 @@ addons:
   apt:
     packages:
     - libpcre3-dev
+    - libglib2.0-dev
 
 r_packages:
   - Rcpp
