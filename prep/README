@@ -92,3 +92,28 @@ valid_subcorpus_name(char *corpusname) {
 Behebt folgenden Fehler:
 Found the following significant warnings:
   corpmanag.c:1717:12: warning: comparison of function 'split_subcorpus_name' equal to a null pointer is always false [-Wtautological-pointer-compare]
+
+
+Datei cl/lex.reg.c
+------------------
+Funktion 'static void yyunput (int c, register char * yy_bp )' auskommentiert, zur Vermeidung Nachricht:
+lex.creg.c:1410:17: warning: unused function 'yyunput' [-Wunused-function]
+
+
+Funktion open_temporary_file
+----------------------------
+open_temporary_file(char *tmp_name_buffer) auskommentiert in cqp/output.c
+Platzhalter auskommentiert in cqp/output.h
+Funktionen auskommentiert, die open_temporary_file aufrufen:
+- ComputeGroupExternally (cqp/groups.c)
+- SortExternally (cqp/ranges.c)
+Wiederum Aufrufe dieser Funktionen auskommentiert
+Dadurch Vermeidung der Warnmeldung:
+
+Datei cl/lex.yy.c
+-----------------
+Funktion yyunput auskommentiert, zur Vermeidung von FEhler:
+lex.yy.c:2459:17: warning: unused function 'yyunput' [-Wunused-function]
+auskommentiert: static int input  (void)
+um zu vermeiden:
+lex.yy.c:2500:16: warning: function 'input' is not needed and will not be emitted [-Wunneeded-internal-declaration]

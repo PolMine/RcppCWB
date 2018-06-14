@@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**< alias to newly created sortidx, so it can b
  * No parameters - the assumption is that everything is set up
  * already by the SortSubCorpus function which calls this one.
  */
+/*
 int
 SortExternally(void)
 {
-  /* uses settings from static srt_* variables */
   char temporary_name[TEMP_FILENAME_BUFSIZE];
   FILE *fd;
   FILE *pipe;
@@ -1051,14 +1051,13 @@ SortExternally(void)
   if ((fd = open_temporary_file(temporary_name)) != NULL) {
     int line, p1start, p1end, plen, step, token, l;
 
-    line = -1;                  /* will indicate sort failure below if text_size == 0 */
+    line = -1;                 
     if (text_size > 0) {
 
       for (line = 0; line < srt_cl->size; line++) {
         
         fprintf(fd, "%d ", line); 
         
-        /* determine start and end position of sort interval for this match */
         switch (srt_anchor1) {
         case MatchField:
             p1start = srt_cl->range[line].start + srt_offset1;
@@ -1095,7 +1094,6 @@ SortExternally(void)
           break;
         }
         
-        /* adjust sort boundaries at start and end of corpus */
         if (p1start < 0)
           p1start = 0;
         else if (p1start >= text_size)
@@ -1106,20 +1104,16 @@ SortExternally(void)
         else if (p1end >= text_size)
           p1end = text_size - 1;
         
-        /* swap start and end of interval for reverse sorting */
         if (srt_reverse) {
           int temp;
           temp = p1start; p1start = p1end; p1end = temp;
         }
         
-        /* determine sort direction */
         step = (p1end >= p1start) ? 1 : -1;
         
-        /* how many tokens to print */
         plen = abs(p1end - p1start) + 1;
 
         
-        /* when using flags, print normalised token sequence first (after applying cl_string_canonical) */
         if (srt_flags) {
           token = p1start;
           for (l=1 ; l <= plen ; l++) {
@@ -1129,13 +1123,6 @@ SortExternally(void)
             if (value) {
               int i, p = strlen((char *) value);
               if (srt_flags) {
-                // DELETE WHEN  NEW FORM OF CL_STRING_CANONICAL CONFIRMED FUNCTIONAL
-//                /* allocate extra mem in case of UTF8 folding */
-//                char *newvalue = cl_malloc( (p + 1) * (srt_cl->corpus->charset == utf8 ? 2 : 1) );
-//                strcpy(newvalue, value);
-//                cl_string_canonical(newvalue, srt_cl->corpus->charset, srt_flags);
-//                del_value = 1;
-//                value = newvalue;
                 value = cl_string_canonical(value, srt_cl->corpus->charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
                 del_value = 1;
               }
@@ -1147,11 +1134,6 @@ SortExternally(void)
                 del_value = 1;
               }
 
-              /* old
-              if (srt_reverse) {
-                for (i = p-1 ; i >= 0; i--)
-                  fputc(srt_maptable[value[i]], fd);
-              }*/
               for (i = 0; i < p; i++)
                 fputc((unsigned char) value[i], fd);
 
@@ -1164,7 +1146,6 @@ SortExternally(void)
           fprintf(fd, "\t");
         }
 
-        /* print sequence of tokens in sort interval */
         token = p1start;
         for (l = 1 ; l <= plen ; l++) {
           char *value = cl_cpos2str(srt_attribute, token);
@@ -1177,11 +1158,6 @@ SortExternally(void)
               del_value = 1;
               value = cl_string_reverse(value, srt_cl->corpus->charset);
             }
-            /*old version
-             if (srt_reverse) {
-              for (i = p-1 ; i >= 0; i--)
-                fputc(value[i], fd);
-            } */
             for (i = 0; i < p; i++)
               fputc((unsigned char) value[i], fd);
             fputc(' ', fd);
@@ -1189,19 +1165,17 @@ SortExternally(void)
               cl_free(value);
           }
           token += step;
-        } /* end for each token */
+        } 
         fprintf(fd, "\n");
       }
     
       fclose(fd);
 
-      /* now, execute the external sort command on the temporary file */
       sprintf(sort_call, "%s %s %s | gawk '{print $1}'", ExternalSortingCommand, (srt_ascending ? "" : "-r"), temporary_name);
       if (SORT_DEBUG)
         fprintf(stderr, "Running sort: \n\t%s\n", sort_call);
       
-      /* run sort cmd and read from pipe */
-      line = -1;                /* will indicate failure of external sort command  */
+      line = -1;                
       if ((pipe = popen(sort_call, "r")) == NULL) {
         perror("Failure opening sort pipe");
         cqpmessage(Error, "Can't execute external sort:\n\t%s\n"
@@ -1220,7 +1194,7 @@ SortExternally(void)
             int num = atoi(sort_call);
             if (num < 0 || num >= srt_cl->size) {
               fprintf(stderr, "Error in externally sorted file - line number #%d out of range\n", num);
-              break;            /* abort */
+              break;          
             }
             srt_cl->sortidx[line] = num;
             line++;
@@ -1238,7 +1212,6 @@ SortExternally(void)
                  "\tPlease remove the file manually.", temporary_name);
     }      
     
-    /* now we should have read exactly cl->size lines; otherwise something went wrong */
     if (line == srt_cl->size) 
       return 1;
     else {
@@ -1253,6 +1226,8 @@ SortExternally(void)
       return 0;
   }
 }
+*/
+ 
   
 /**
  * Defined if a sort cache is to be used in sorting concordance lines.
@@ -1673,7 +1648,7 @@ SortSubcorpus(CorpusList *cl, SortClause sc, int count_mode, struct Redir *redir
 
   ok = 1;
   if (UseExternalSorting && !insecure && !count_mode) {
-    ok = SortExternally();
+    /* ok = SortExternally(); */
   }
   else {
     /* precompute tables for start and end position of sort interval */

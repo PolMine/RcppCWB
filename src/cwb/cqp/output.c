@@ -123,24 +123,17 @@ print_corpus_info_header(CorpusList *cl,
  * @return                A stream (FILE *) to the opened temporary file, or NULL
  *                        if unsuccessful.
  */
+/*
 FILE *
 open_temporary_file(char *tmp_name_buffer)
 {
   char *tempfile_name;
-  char prefix[64]; /* holds "cqpt.$$", so 64 chars is plenty of headroom */
+  char prefix[64];
   FILE *fd = NULL;
 
   assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
-
-  /* note there is a potential problem using tempnam rather than tmpfile () or mkstemp () if there
-   * is more than one copy of cqp running and they both call this function at the same time.
-   * A race condition could result where copy#2 gets the same name as copy#1 by calling tempnam()
-   * after copy#1 calls it but before copy#1 opens the file.
-   *
-   * For this reason, the process ID is used to make the filename unique to this process.
-   */
-  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); /* "cqpt.$$" */
-  tempfile_name = tempnam(TEMPDIR_PATH, prefix); /* string is allocated by tempnam(), needs to be free'd below */
+  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); 
+  tempfile_name = tempnam(TEMPDIR_PATH, prefix);
   if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
     perror("open_temporary_file(): filename too long for buffer");
     *tmp_name_buffer = '\0';
@@ -162,7 +155,7 @@ open_temporary_file(char *tmp_name_buffer)
     return NULL;
   }
 }
-
+*/
 
 /**
  * This function is a wrapper round fopen() which provides checks for

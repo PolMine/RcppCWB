@@ -253,7 +253,7 @@ ComputeGroupInternally(Group *group)
   return group;
 }
 
-
+/*
 Group *
 ComputeGroupExternally(Group *group)
 {
@@ -266,8 +266,6 @@ ComputeGroupExternally(Group *group)
   FILE *pipe;
   char sort_call[CL_MAX_LINE_LENGTH];
 
-  /* ---------------------------------------------------------------------- */
-
   if ((fd = open_temporary_file(temporary_name)) == NULL) {
     perror("Error while opening temporary file");
     cqpmessage(Warning, "Can't open temporary file");
@@ -275,11 +273,10 @@ ComputeGroupExternally(Group *group)
   }
 
   for (i = 0; i < size; i++) {
-    fprintf(fd, "%d %d\n", get_group_id(group, i, 0), get_group_id(group, i, 1)); /* (source ID, target ID) */
+    fprintf(fd, "%d %d\n", get_group_id(group, i, 0), get_group_id(group, i, 1));
   }
   fclose(fd);
 
-  /* construct sort call */
   sprintf(sort_call, ExternalGroupingCommand, temporary_name);
   if (GROUP_DEBUG)
     fprintf(stderr, "Running grouping sort: \n\t%s\n",
@@ -340,7 +337,7 @@ ComputeGroupExternally(Group *group)
   
   return group;
 }
-
+*/
 
 Group *compute_grouping(CorpusList *cl,
                         FieldType source_field,
@@ -489,11 +486,13 @@ Group *compute_grouping(CorpusList *cl,
   group->cutoff_frequency = cutoff_freq;
   group->is_grouped = is_grouped;
 
-  if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
-    /* external grouping doesn't support s-attributes and grouped counts */
-    return ComputeGroupExternally(group); /* modifies Group object in place and returns pointer */
+
+  /* if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
+    return ComputeGroupExternally(group);
   else
     return ComputeGroupInternally(group);
+   */
+  return group;
 }
 
 void

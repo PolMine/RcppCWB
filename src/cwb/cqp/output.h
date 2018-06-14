@@ -76,7 +76,7 @@ extern TabulationItem TabulationList;
 
 /* ---------------------------------------------------------------------- */
 
-FILE *open_temporary_file(char *tmp_name_buffer);
+/* FILE *open_temporary_file(char *tmp_name_buffer); */
 
 FILE *open_file(char *name, char *mode);
 
