@@ -27,7 +27,7 @@ use_tmp_registry <- function(pkg){
     writeLines(text = registry, con = file.path(tmp_registry_dir, corpus), sep = "\n")
   }
   
-  Sys.setenv(tmp_registry_dir)
+  Sys.setenv("CORPUS_REGISTRY" = tmp_registry_dir)
   if (cqp_is_initialized()) cqp_reset_registry(tmp_registry_dir)
   tmp_registry_dir
 }
