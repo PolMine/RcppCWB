@@ -19,6 +19,7 @@ r_packages:
   - Rcpp
   - covr
   - digest
+  - testthat
 
 warnings_are_errors: true
 
