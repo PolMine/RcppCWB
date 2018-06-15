@@ -8,6 +8,8 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 #include "../cl/attributes.h"
 #include "../cl/fileutils.h"
 
+#include <netinet/in.h>
+
 Corpus *corpus;
 
 

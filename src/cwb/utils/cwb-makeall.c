@@ -22,6 +22,8 @@
 #include "../cl/endian.h"
 #include "../cl/fileutils.h"
 
+#include <netinet/in.h>
+
 /** The corpus we are working on */
 Corpus *corpus;
 /** Name of this program */
