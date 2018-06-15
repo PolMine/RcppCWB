@@ -20,7 +20,7 @@ r_packages:
   - covr
   - digest
 
-warnings_are_errors: false
+warnings_are_errors: true
 
 notifications:
   email:
