@@ -817,9 +817,9 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
                 }
               | COUNT_SYM OptionalCID SortClause CutStatement OptionalRedir
                 { 
-                  int ok;
+                  /* int ok; */
                   if ($2 && generate_code) {
-                    ok = SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
+                    SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
                     FreeSortClause($3);
                     cl_free($5.name);
                   }
