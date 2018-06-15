@@ -4,7 +4,7 @@
 #' a package
 #' @param pkg full path to a package
 #' @export use_tmp_registry
-use_tmp_registry <- function(pkg){
+use_tmp_registry <- function(pkg = system.file(package = "RcppCWB")){
   
   tmp_registry_dir <- file.path(tempdir(), "registry_tmp")
   if (!file.exists(tmp_registry_dir)) dir.create(tmp_registry_dir)
