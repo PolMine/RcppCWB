@@ -349,7 +349,7 @@ get_position_values(ContextDescriptor *cd,
 
 
 #if 0
-  fprintf(stderr, "get_position_values() at pos %d: ``%s''\n", position, s->data);
+  Rprintf("get_position_values() at pos %d: ``%s''\n", position, s->data);
 #endif
 }
 
@@ -601,7 +601,7 @@ compose_kwic_line(Corpus *corpus,
       nr_selected_attributes++;
     }
     else {
-      fprintf(stderr, "ERROR: Can't select default attribute in attribute list\n");
+      Rprintf("ERROR: Can't select default attribute in attribute list\n");
       return NULL;
     }
   }
@@ -760,13 +760,13 @@ compose_kwic_line(Corpus *corpus,
      * but we DON'T flip any printStructures */
 
 #if 0
-    fprintf(stderr, "line before srev(): >>%s<<\n", line + index);
+    Rprintf("line before srev(): >>%s<<\n", line + index);
 #endif
 
     srev(line->data + index);
 
 #if 0
-    fprintf(stderr, "line after srev(): >>%s<<\n", line + index);
+    Rprintf("line after srev(): >>%s<<\n", line + index);
 #endif
 
     /* now the fun bit: because of the srev() call abnove, we now need to align the list of returned_positions ... */
@@ -784,7 +784,7 @@ compose_kwic_line(Corpus *corpus,
           new_end   = line->len - 1 - old_start;
 
 #if 0
-          fprintf(stderr, "Patching [%d,%d] to [%d,%d]\n", old_start, old_end, new_start, new_end);
+          Rprintf("Patching [%d,%d] to [%d,%d]\n", old_start, old_end, new_start, new_end);
 #endif
 
           returned_positions[el_c * 2]     = new_start + 1;
@@ -842,7 +842,7 @@ compose_kwic_line(Corpus *corpus,
   case ALIGN_CONTEXT:
     
     if (!cd->left_structure) {
-      fprintf(stderr, "concordance.o/compose_kwic_line: lcontext attribute pointer is NULL\n");
+      Rprintf("concordance.o/compose_kwic_line: lcontext attribute pointer is NULL\n");
       start = match_start - 20;
     }
     else {
@@ -1112,7 +1112,7 @@ compose_kwic_line(Corpus *corpus,
   case ALIGN_CONTEXT:
 
     if (!cd->right_structure) {
-      fprintf(stderr, "concordance.o/compose_kwic_line: rcontext attribute pointer is NULL\n");
+      Rprintf("concordance.o/compose_kwic_line: rcontext attribute pointer is NULL\n");
       end = match_end + 20;
     }
     else {

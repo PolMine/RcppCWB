@@ -233,7 +233,7 @@ get_corpus_positions(Attribute *attribute,
   if (initial_matchlist_debug &&
       (matchlist->start != NULL) &&
       (matchlist->tabsize > 0) && !silent)
-    fprintf(stderr, "matched initial wordform for non-regex %s, "
+    Rprintf("matched initial wordform for non-regex %s, "
             "%d matches\n", wordform, matchlist->tabsize);
 
   return(matchlist->tabsize);
@@ -287,7 +287,7 @@ get_matched_corpus_positions(Attribute *attribute,
   /* AH notes Aug 2011: the above comment about 4.0 has nothing to do with the TODO-4.0 plan I sketched out! */
   if (STREQ(regstr, ".*")) {
     if (eval_debug) 
-      fprintf(stderr, "get_matched_corpus_positions: .* optimization\n");
+      Rprintf("get_matched_corpus_positions: .* optimization\n");
     
     matchlist->start = (int *)cl_malloc(sizeof(int) * size);
 
@@ -345,7 +345,7 @@ get_matched_corpus_positions(Attribute *attribute,
   if (initial_matchlist_debug && 
       (matchlist->start != NULL) &&
       (matchlist->tabsize > 0) && !silent)
-    fprintf(stderr, "matched initial pattern for regex %s, %d matches\n",
+    Rprintf("matched initial pattern for regex %s, %d matches\n",
             regstr,
             matchlist->tabsize);
 
@@ -510,7 +510,7 @@ get_label_referenced_position(LabelEntry label, RefTab rt, int corppos)
   if (label) {
     referenced_position = get_reftab(rt, label->ref, corppos);
     if (eval_debug) 
-      fprintf(stderr, "Evaluating label %s = %d\n", label->name, referenced_position);
+      Rprintf("Evaluating label %s = %d\n", label->name, referenced_position);
   }
 
   return referenced_position;
@@ -606,7 +606,7 @@ get_leaf_value(Constrainttree ctptr,
       dcr->value.intres = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
       if (ctptr->pa_ref.delete) {
         if (eval_debug)
-          fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+          Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->pa_ref.label->name, dcr->value.intres);
         set_reftab(rt, ctptr->pa_ref.label->ref, -1);
       }
@@ -623,7 +623,7 @@ get_leaf_value(Constrainttree ctptr,
         referenced_position = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
         if (ctptr->pa_ref.delete) {
           if (eval_debug)
-            fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+            Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                    ctptr->pa_ref.label->name, referenced_position);
           set_reftab(rt, ctptr->pa_ref.label->ref, -1);
         }
@@ -686,7 +686,7 @@ get_leaf_value(Constrainttree ctptr,
       
       if (ctptr->sa_ref.delete) {
         if (eval_debug)
-          fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+          Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->sa_ref.label->name, referenced_position);
         set_reftab(rt, ctptr->sa_ref.label->ref, -1);
       }
@@ -779,7 +779,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical and */
       case b_and: 
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean and\n");
+          Rprintf("eval_bool: evaluate boolean and\n");
         assert((ctptr->node.left != NULL) && (ctptr->node.right != NULL));
         return(eval_bool(ctptr->node.left, rt, corppos) &&
                eval_bool(ctptr->node.right, rt, corppos));
@@ -788,7 +788,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical or */
       case b_or:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean or\n");
+          Rprintf("eval_bool: evaluate boolean or\n");
         assert((ctptr->node.left != NULL) && (ctptr->node.right != NULL));
 
         return(eval_bool(ctptr->node.left, rt, corppos) ||
@@ -798,7 +798,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical implication */
       case b_implies:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean implication\n");
+          Rprintf("eval_bool: evaluate boolean implication\n");
         assert((ctptr->node.left != NULL) && (ctptr->node.right != NULL));
 
         return((eval_bool(ctptr->node.left, rt, corppos)) ? eval_bool(ctptr->node.right, rt, corppos) : True);
@@ -807,7 +807,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical not */
       case b_not:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean not\n");
+          Rprintf("eval_bool: evaluate boolean not\n");
 
         if (!ctptr->node.left)
           return(True);
@@ -826,7 +826,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
       case cmp_ex:
 
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate comparisons\n");
+          Rprintf("eval_bool: evaluate comparisons\n");
 
         /* check presence of arguments */
         assert((ctptr->node.left != NULL) &&
@@ -1164,7 +1164,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
       int res;
 
       if (eval_debug)
-        fprintf(stderr, "eval_bool: evaluate id_list membership\n");
+        Rprintf("eval_bool: evaluate id_list membership\n");
 
       assert(ctptr->idlist.attr);
 
@@ -1172,7 +1172,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         referenced_corppos = get_label_referenced_position(ctptr->idlist.label, rt, corppos);
         if (ctptr->idlist.delete) {
           if (eval_debug)
-            fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+            Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                    ctptr->idlist.label->name, referenced_corppos);
           set_reftab(rt, ctptr->idlist.label->ref, -1);
         }
@@ -1374,7 +1374,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr,
       case b_or:                /* logical or */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean or\n");
+          Rprintf("calc_initial_ml: boolean or\n");
 
         assert(ctptr->node.left && ctptr->node.right);
 
@@ -1438,7 +1438,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr,
       case b_not:                /* logical negation */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean not\n");
+          Rprintf("calc_initial_ml: boolean not\n");
 
         assert(ctptr->node.left);
 
@@ -1471,7 +1471,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr,
       case cmp_ex:
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: evaluate comparisons\n");
+          Rprintf("calc_initial_ml: evaluate comparisons\n");
 
         /* check argument types */
 
@@ -1937,7 +1937,7 @@ matchfirstpattern(AVS pattern,
        */
 
       if (!silent)
-        fprintf(stderr, "QOpt: %f (pos %d)\n", red, nr_pos);
+        Rprintf("QOpt: %f (pos %d)\n", red, nr_pos);
 
       matchlist->start = (int *)cl_malloc(sizeof(int) * nr_pos);
       matchlist->end = NULL;
@@ -1959,7 +1959,7 @@ matchfirstpattern(AVS pattern,
       assert(k == nr_pos);
 
       if (!silent)
-        fprintf(stderr, "QOpt: copied ranges\n");
+        Rprintf("QOpt: copied ranges\n");
 
       return (k == nr_pos);
     }
@@ -2075,7 +2075,7 @@ simulate(Matchlist *matchlist,
       my_target = -1;
 
       if (debug_simulation)
-        fprintf(stderr, "Looking at matchlist element %d (cpos %d)\n"
+        Rprintf("Looking at matchlist element %d (cpos %d)\n"
                 "  range[rp=%d]=[%d,%d]\n",
                 i, matchlist->start[i],
                 rp,
@@ -2116,7 +2116,7 @@ simulate(Matchlist *matchlist,
         boundary = MIN(b1, b2);
 
         if (debug_simulation)
-          fprintf(stderr, "Starting NFA simulation. Max bound is %d\n", boundary);
+          Rprintf("Starting NFA simulation. Max bound is %d\n", boundary);
 
         if (boundary == -1) {
           /*
@@ -2124,7 +2124,7 @@ simulate(Matchlist *matchlist,
            */
           matchlist->start[i] = -1;
           if (debug_simulation)
-            fprintf(stderr, "  ... not within selected boundary\n");
+            Rprintf("  ... not within selected boundary\n");
         }
         else {
 
@@ -2189,7 +2189,7 @@ simulate(Matchlist *matchlist,
                */
 
               if (debug_simulation) {
-                fprintf(stderr, "  state %d, cpos %d...\n", state, cpos);
+                Rprintf("  state %d, cpos %d...\n", state, cpos);
                 if (symtab_debug)
                   print_label_values(evalenv->labels, reftab_vector[state], cpos);
               }
@@ -2340,7 +2340,7 @@ simulate(Matchlist *matchlist,
                         }
 
                         if (debug_simulation) {
-                          fprintf(stderr, "Transition %d --%d-> %d  (pattern %d TRUE at cpos=%d)\n",
+                          Rprintf("Transition %d --%d-> %d  (pattern %d TRUE at cpos=%d)\n",
                                   state, p, target_state, p, effective_cpos);
                           if (symtab_debug)
                             print_label_values(evalenv->labels, reftab_target_vector[target_state], effective_cpos);
@@ -2368,7 +2368,7 @@ simulate(Matchlist *matchlist,
                         if (this_is_a_winner) {
 
                           if (debug_simulation)
-                            fprintf(stderr, "Winning cpos found at %d\n", cpos);
+                            Rprintf("Winning cpos found at %d\n", cpos);
 
                           /* remember the last token (cpos) of this winner & its target position (if set) */
                           winner = (zero_width_pattern) ?  cpos - 1 : cpos;
@@ -2460,7 +2460,7 @@ simulate(Matchlist *matchlist,
            */
 
           if (debug_simulation)
-            fprintf(stderr, "NFA sim terminated. Winner %d, running states %d\n",
+            Rprintf("NFA sim terminated. Winner %d, running states %d\n",
                     winner, running_states);
 
           /* queries like "</s>" will return empty matches -> ignore those (set to no match)
@@ -2722,7 +2722,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
                               evalenv->query_corpus) == True) {
 
           if (initial_matchlist_debug) {
-            fprintf(stderr, "After initial matching for transition %d: ", p);
+            Rprintf("After initial matching for transition %d: ", p);
             show_matchlist_firstelements(matchlist);
             print_symbol_table(evalenv->labels);
           }
@@ -2755,7 +2755,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
                      p);
 
             if (initial_matchlist_debug) {
-              fprintf(stderr, "After simulation for transition %d:\n ", p);
+              Rprintf("After simulation for transition %d:\n ", p);
               show_matchlist(matchlist);
             }
 
@@ -2771,7 +2771,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
             }
 
             if (initial_matchlist_debug && (!FirstTransitionIsDeterministic)) {
-              fprintf(stderr, "Complete Matchlist after simulating transition %d: \n", p);
+              Rprintf("Complete Matchlist after simulating transition %d: \n", p);
               show_matchlist(total_matchlist);
             }
           }
@@ -2797,7 +2797,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
       total_matchlist = matchlist;
 
     if (initial_matchlist_debug) {
-      fprintf(stderr, "After total simulation:\n");
+      Rprintf("After total simulation:\n");
       show_matchlist(total_matchlist);
     }
 
@@ -2814,7 +2814,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
     Setop(&total_matchlist, Reduce, NULL);
     
     if (initial_matchlist_debug) {
-      fprintf(stderr, "after final reducing\n");
+      Rprintf("after final reducing\n");
       show_matchlist(total_matchlist);
     }
     
@@ -3276,7 +3276,7 @@ int
 next_environment(void)
 {
   if (eep >= MAXENVIRONMENT) {
-    fprintf(stderr, "No more environments for evaluation (max %d exceeded)\n",
+    Rprintf("No more environments for evaluation (max %d exceeded)\n",
             MAXENVIRONMENT);
     return 0;
   }
@@ -3332,7 +3332,7 @@ free_environment(int thisenv)
   int i;
 
   if ((thisenv < 0) || (thisenv > eep)) {
-    fprintf(stderr, "Environment %d not occupied\n", thisenv);
+    Rprintf("Environment %d not occupied\n", thisenv);
     return 0;
   }
   else {
@@ -3418,33 +3418,33 @@ void
 show_environment(int thisenv)
 {
   if ((thisenv < 0) || (thisenv > eep))
-    fprintf(stderr, "Environment %d not used\n", thisenv);
+    Rprintf("Environment %d not used\n", thisenv);
   else if (show_compdfa || show_evaltree || show_gconstraints || show_patlist) {
     /* Note, at least one of the above debugging-variables must be true, or there is nothing to print! */
 
-    printf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
+    Rprintf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
 
-    printf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
+    Rprintf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
 
     if (show_compdfa) {
-      printf("\n==================== DFA:\n\n");
+      Rprintf("\n==================== DFA:\n\n");
       show_complete_dfa(Environment[thisenv].dfa);
     }
 
     if (show_evaltree) {
-      printf("\n==================== Evaluation Tree:\n\n");
+      Rprintf("\n==================== Evaluation Tree:\n\n");
       print_evaltree(thisenv, Environment[thisenv].evaltree, 0);
     }
 
     if (show_gconstraints) {
-      printf("\n==================== Global Constraints:\n\n");
+      Rprintf("\n==================== Global Constraints:\n\n");
       print_booltree(Environment[thisenv].gconstraint, 0);
     }
 
     if (show_patlist)
       show_patternlist(thisenv);
 
-    printf(" ================= END ENVIRONMENT #%d =============\n", thisenv);
+    Rprintf(" ================= END ENVIRONMENT #%d =============\n", thisenv);
     fflush(stdout);
   }
 }
@@ -3459,7 +3459,7 @@ free_environments(void)
 
   for (i = 0; i <= eep; i++)
     if (!free_environment(i)) {
-      fprintf(stderr, "Problems while free'ing environment %d\n", i);
+      Rprintf("Problems while free'ing environment %d\n", i);
       break;
     }
   eep = -1;

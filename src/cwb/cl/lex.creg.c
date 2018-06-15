@@ -40,6 +40,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
+void Rprintf(const char *, ...);
+
 /* end standard C headers. */
 
 /* flex integer type definitions */
@@ -1861,7 +1863,7 @@ YY_BUFFER_STATE creg_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_le
 
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
+    	(void) Rprintf("%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 

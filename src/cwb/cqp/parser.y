@@ -73,7 +73,7 @@ void yyerror (char *s)
 
 void warn_query_lock_violation(void) {
   if (which_app != cqpserver)
-    fprintf(stderr, "WARNING: query lock violation attempted\n");
+    Rprintf("WARNING: query lock violation attempted\n");
   query_lock_violation++;       /* this is for the CQPserver */
 }
 
@@ -97,12 +97,12 @@ synchronize(void)
   enable_macros = 0;
 
   if (cqp_input_string != NULL) {
-    fprintf(stderr, "Synchronizing to end of line ... \n");
+    Rprintf("Synchronizing to end of line ... \n");
     while (!(yychar <= 0))
       yychar = yylex();
   }
   else {
-    fprintf(stderr, "Synchronizing until next ';'...\n");
+    Rprintf("Synchronizing until next ';'...\n");
     while (!(yychar <= 0 || yychar == ';'))
       yychar = yylex();
   }
@@ -378,8 +378,8 @@ command:                                 { prepare_input(); }
                         query_lock = 0;
                       }
                       else {
-                        fprintf(stderr, "ALERT! Query lock violation.\n");
-                        printf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
+                        Rprintf("ALERT! Query lock violation.\n");
+                        Rprintf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
                         exit(1);
                       }
                     } ';'

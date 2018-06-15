@@ -177,7 +177,7 @@ ParsePrintOptions(void)
         GlobalPrintOptions.number_lines = value;
       }
       else if (!silent)
-        fprintf(stderr, "Warning: %s: unknown print option\n",
+        Rprintf("Warning: %s: unknown print option\n",
                 token);
 
       token = strtok(NULL, " \t\n,.");

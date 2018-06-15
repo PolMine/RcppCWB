@@ -16,6 +16,7 @@
  */
 %{
 
+void Rprintf(const char *, ...);
 #include <ctype.h>
 
 #include "globals.h"
@@ -48,7 +49,7 @@ DynArg *makearg(char *type_id);
 
 void cregerror_cleanup(char *message)
 {
-  fprintf(stderr, "REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
+  Rprintf("REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
 
   if (cregattrib != NULL)
     attr_drop_attribute(cregattrib);

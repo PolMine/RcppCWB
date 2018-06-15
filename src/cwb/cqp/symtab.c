@@ -195,7 +195,7 @@ print_symbol_table(SymbolTable st)
   char *namespace;
   int i;
 
-  fprintf(stderr, "Contents of SYMBOL TABLE:\n");
+  Rprintf("Contents of SYMBOL TABLE:\n");
   
   for (i = 1; i <= 2; i++) {
     switch (i) {
@@ -212,7 +212,7 @@ print_symbol_table(SymbolTable st)
       namespace = "???";
     }
     while (l != NULL) {
-      fprintf(stderr, "\t%s\t%s(flags: %d)  ->  RefTab[%d]\n",
+      Rprintf("\t%s\t%s(flags: %d)  ->  RefTab[%d]\n",
               namespace, l->name, l->flags, l->ref);
       l = l->next;
     }
@@ -295,7 +295,7 @@ dup_reftab(RefTab rt1, RefTab rt2)
   assert(rt1);
   assert(rt2);
   if (rt1->size != rt2->size) {
-    fprintf(stderr, "dup_reftab()<symtab.c>: Tried to dup() RefTab (%d entries) to RefTab of different size (%d entries)\n", rt1->size, rt2->size);
+    Rprintf("dup_reftab()<symtab.c>: Tried to dup() RefTab (%d entries) to RefTab of different size (%d entries)\n", rt1->size, rt2->size);
     exit(1);
   }
   (void) memcpy(rt2->data, rt1->data, rt1->size * sizeof(int));
@@ -336,7 +336,7 @@ get_reftab(RefTab rt, int index, int cpos)
   else if (rt == NULL)          /* NULL is used for dummy reftabs */
     return -1;
   else if ((index < 0) || (index >= rt->size)) {
-    fprintf(stderr, "get_reftab()<symtab.c>: RefTab index #%d not in range 0 .. %d", index, rt->size - 1);
+    Rprintf("get_reftab()<symtab.c>: RefTab index #%d not in range 0 .. %d", index, rt->size - 1);
     return -1;
   }
   else
@@ -356,9 +356,9 @@ print_label_values(SymbolTable st, RefTab rt, int cpos)
   LabelEntry l;
   int i;
 
-  fprintf(stderr, "Label values:\n");
+  Rprintf("Label values:\n");
   if ((st == NULL) || (rt == NULL) || (st->next_index != rt->size)) {
-    fprintf(stderr, "ERROR\n");
+    Rprintf("ERROR\n");
     return;
   }
 
@@ -366,21 +366,21 @@ print_label_values(SymbolTable st, RefTab rt, int cpos)
     switch (i) {
     case 1:
       l = st->user;
-      fprintf(stderr, "USER:\t");
+      Rprintf("USER:\t");
       break;
     case 2:
       l = st->rdat;
-      fprintf(stderr, "RDAT:\t");
+      Rprintf("RDAT:\t");
       break;
     default:
       l = NULL;
-      fprintf(stderr, "???");
+      Rprintf("???");
     }
     while (l != NULL) {
-      fprintf(stderr, "%s=%d  ", l->name, get_reftab(rt, l->ref, cpos));
+      Rprintf("%s=%d  ", l->name, get_reftab(rt, l->ref, cpos));
       l = l->next;
     }
-    fprintf(stderr, "\n");
+    Rprintf("\n");
   }
 }
 

@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -183,7 +184,7 @@ static void
 cl_handle_sigpipe(int signum) {
 #ifndef __MINGW__
   cl_broken_pipe = 1;
-  /* fprintf(stderr, "Handle broken pipe signal\n"); */
+  /* Rprintf("Handle broken pipe signal\n"); */
 
   if (signal(SIGPIPE, cl_handle_sigpipe) == SIG_ERR)
     perror("CL: Can't reinstall SIGPIPE handler (ignored)"); /* Is this still necessary on modern platforms? */
@@ -214,7 +215,7 @@ cl_open_stream(const char *filename, int mode, int type) {
   char expanded_filename[2 * CL_MAX_FILENAME_LENGTH];
 
   if (l > CL_MAX_FILENAME_LENGTH) {
-    fprintf(stderr, "CL: filename '%s' too long (limit: %d bytes)\n", filename, CL_MAX_FILENAME_LENGTH);
+    Rprintf("CL: filename '%s' too long (limit: %d bytes)\n", filename, CL_MAX_FILENAME_LENGTH);
     cl_errno = CDA_EBUFFER;
     return NULL;
   }
@@ -231,7 +232,7 @@ cl_open_stream(const char *filename, int mode, int type) {
     mode_spec = "a";
     break;
   default:
-    fprintf(stderr, "CL: invalid I/O stream mode = %d\n", mode);
+    Rprintf("CL: invalid I/O stream mode = %d\n", mode);
     cl_errno = CDA_EARGS;
     return NULL;
   }
@@ -328,7 +329,7 @@ cl_open_stream(const char *filename, int mode, int type) {
     handle = (mode == CL_STREAM_READ) ? stdin : stdout;
     break;
   default:
-    fprintf(stderr, "CL: invalid I/O stream type = %d\n", type);
+    Rprintf("CL: invalid I/O stream type = %d\n", type);
     cl_errno = CDA_EARGS;
     return NULL;
   }
@@ -378,7 +379,7 @@ cl_close_stream(FILE *handle) {
     stream = stream->next;
   }
   if (!stream) {
-    fprintf(stderr, "CL: attempt to close non-managed I/O stream with cl_close_stream() [ignored]\n");
+    Rprintf("CL: attempt to close non-managed I/O stream with cl_close_stream() [ignored]\n");
     return CDA_EATTTYPE;
   }
 
@@ -396,7 +397,7 @@ cl_close_stream(FILE *handle) {
     was_pipe = 1;
     break;
   default:
-    fprintf(stderr, "CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);
+    Rprintf("CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);
     exit(1);
   }
 

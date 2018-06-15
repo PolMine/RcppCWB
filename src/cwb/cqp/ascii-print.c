@@ -320,7 +320,7 @@ get_typeface_escape(char typeface)
   case 's': return sc_s_in;
   case 'n': return sc_all_out;        /* also switches off colour */
   default:
-    fprintf(stderr, "Internal error: unknown typeface '%c'.\n", typeface);
+    Rprintf("Internal error: unknown typeface '%c'.\n", typeface);
     return "";
   }
 }
@@ -342,7 +342,7 @@ get_colour_escape(char colour, int foreground) {
       case 'p': return "\x1B[0;35m";
       case 'c': return "\x1B[0;36m";
       default:
-        fprintf(stderr, "Internal error: unknown colour '%c'.\n", colour);
+        Rprintf("Internal error: unknown colour '%c'.\n", colour);
         return "\x1B[0m";
       }
     }
@@ -355,7 +355,7 @@ get_colour_escape(char colour, int foreground) {
       case 'p': return "\x1B[0;45m";
       case 'c': return "\x1B[0;46m";
       default:
-        fprintf(stderr, "Internal error: unknown colour '%c'.\n", colour);
+        Rprintf("Internal error: unknown colour '%c'.\n", colour);
         return "\x1B[0m";
       }
     }
@@ -468,14 +468,14 @@ ascii_print_aligned_line(FILE *stream,
     char *red = get_colour_escape('r', 1);
     char *bold = get_typeface_escape('b');
     char *normal = get_typeface_escape('n');
-    fprintf(stream, "%s%s-->%s:%s %s\n", 
+    Rprintf("%s%s-->%s:%s %s\n", 
             red, bold,
             attribute_name,
             normal,
             line);
   }
   else
-    fprintf(stream, "-->%s: %s\n", attribute_name, line);
+    Rprintf("-->%s: %s\n", attribute_name, line);
 }
 
 
@@ -599,7 +599,7 @@ ascii_print_corpus_header(CorpusList *cl,
     fputc('-', stream);
   fputc('\n', stream);
   
-  fprintf(stream,
+  Rprintf(
           "#\n"
           "# User:    %s (%s)\n"
           "# Date:    %s"
@@ -618,7 +618,7 @@ ascii_print_corpus_header(CorpusList *cl,
           (cl->corpus && cl->corpus->name ? cl->corpus->name : "<Unknown Corpus>"),
           cl->mother_name, cl->name,
           cl->size);
-  fprintf(stream,
+  Rprintf(
           "# Context: %d %s left, %d %s right\n"
           "#\n",
           CD.left_width,
@@ -631,7 +631,7 @@ ascii_print_corpus_header(CorpusList *cl,
            (CD.right_structure_name) ? CD.right_structure_name : "???"));
   
   if (cl->query_corpus && cl->query_text) {
-    fprintf(stream, "# Query: %s; %s\n", cl->query_corpus, cl->query_text);
+    Rprintf("# Query: %s; %s\n", cl->query_corpus, cl->query_text);
   }
   
   
@@ -664,7 +664,7 @@ ascii_print_output(CorpusList *cl,
       real_line = i;
 
     if (GlobalPrintOptions.number_lines) {
-      fprintf(outfd, "%6d.\t", output_line);
+      Rprintf("%6d.\t", output_line);
       output_line++;
     }
 
@@ -707,18 +707,18 @@ ascii_print_group(Group *group, int expand, FILE *fd)
 
       /* separator bar between groups */
       if (cell == 0 || (group->is_grouped && nr_targets == 0))
-        fprintf(fd, SEPARATOR);
+        Rprintf(SEPARATOR);
       
-      fprintf(fd, "%-28s  %-28s\t%6d\n",
+      Rprintf("%-28s  %-28s\t%6d\n",
               (nr_targets == 0) ? source_s : " ", target_s, count);
     }
     else {
       if (source_id < 0) source_s = "";        /* don't print "(none)" or "(all)" in plain mode (just empty string) */
       if (target_id < 0) target_s = "";
       if (has_source) 
-        fprintf(fd, "%s\t%s\t%d\n", source_s, target_s, count);
+        Rprintf("%s\t%s\t%d\n", source_s, target_s, count);
       else 
-        fprintf(fd, "%s\t%d\n", target_s, count);
+        Rprintf("%s\t%d\n", target_s, count);
     }
     
     if (expand) {

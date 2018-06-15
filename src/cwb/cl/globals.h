@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 
 #ifndef _globals_h_
 #define _globals_h_
@@ -144,7 +145,7 @@ extern size_t cl_memory_limit;
 /**
  * Macro which exits the program when a "to do" point is hit.
  */
-#define TODO {(void)fprintf(stderr,"TODO point reached: file \"%s\", line %d\n", \
+#define TODO {(void) Rprintf("TODO point reached: file \"%s\", line %d\n", \
 			    __FILE__,  \
 			    __LINE__); \
 			    exit(1);}

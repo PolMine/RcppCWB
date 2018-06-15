@@ -97,7 +97,7 @@ sigINT_signal_handler(int signum)
     exit(1); /* make sure we abort if Ctrl-C is pressed a second time (even on platforms where signal handlers don't need to be reinstalled) */
 
   if (EvaluationIsRunning) {
-    fprintf(stderr, "** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
+    Rprintf("** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
     EvaluationIsRunning = 0;
   }
   signal_handler_is_installed = 0;
@@ -224,7 +224,7 @@ initialize_cqp(int argc, char **argv)
 
         reading_cqprc = 1;        /* not good for very much, really */
         if (!cqp_parse_file(cqprc, 1)) {
-          fprintf(stderr, "Parse errors while reading %s, exiting.\n",
+          Rprintf("Parse errors while reading %s, exiting.\n",
                   init_file_fullname);
           exit(1);
         }
@@ -233,7 +233,7 @@ initialize_cqp(int argc, char **argv)
         /* fclose(cqprc);  was already closed by cqp_parse_file!! */
       }
       else if (cqp_init_file) {
-        fprintf(stderr, "Can't read initialization file %s\n",
+        Rprintf("Can't read initialization file %s\n",
                 init_file_fullname);
         exit(1);
       }
@@ -262,7 +262,7 @@ initialize_cqp(int argc, char **argv)
 
         reading_cqprc = 1;        /* not good for very much, really */
         if (!cqp_parse_file(cqprc, 1)) {
-          fprintf(stderr, "Parse errors while reading %s, exiting.\n",
+          Rprintf("Parse errors while reading %s, exiting.\n",
                   init_file_fullname);
           exit(1);
         }
@@ -271,7 +271,7 @@ initialize_cqp(int argc, char **argv)
         /* fclose(cqprc);  was already closed by cqp_parse_file!! */
       }
       else if (macro_init_file) {
-        fprintf(stderr, "Can't read macro initialization file %s\n",
+        Rprintf("Can't read macro initialization file %s\n",
                 init_file_fullname);
         exit(1);
       }
@@ -282,14 +282,14 @@ initialize_cqp(int argc, char **argv)
 
   /* load the default corpus. */
   if ((default_corpus) && !set_current_corpus_name(default_corpus, 0)) {
-    fprintf(stderr, "Can't set current corpus to default corpus %s, exiting.\n",
+    Rprintf("Can't set current corpus to default corpus %s, exiting.\n",
             default_corpus);
     exit(1);
   }
 
 #ifndef __MINGW__
   if (signal(SIGPIPE, SIG_IGN) == SIG_IGN) {
-    /* fprintf(stderr, "Couldn't install SIG_IGN for SIGPIPE signal\n"); */
+    /* Rprintf("Couldn't install SIG_IGN for SIGPIPE signal\n"); */
     /* -- be silent about not being able to ignore the SIGPIPE signal, which often happens in slave mode */
     /* note that SIGPIPE does not seem to exist in signal.h under MinGW */
     signal(SIGPIPE, SIG_DFL);
@@ -335,21 +335,21 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
     while (ok && !feof(fd) && !exit_cqp) {
       if (child_process && ferror(fd)) {
         /* in child mode, abort on read errors (to avoid hang-up when parent has died etc.) */
-        fprintf(stderr, "READ ERROR -- aborting CQP session\n");
+        Rprintf("READ ERROR -- aborting CQP session\n");
         break;
       }
 
       if (!quiet) {
         if (current_corpus != NULL)
           if (STREQ(current_corpus->name, current_corpus->mother_name))
-            printf("%s> ", current_corpus->name);
+            Rprintf("%s> ", current_corpus->name);
           else
-            printf("%s:%s[%d]> ",
+            Rprintf("%s:%s[%d]> ",
                    current_corpus->mother_name,
                    current_corpus->name,
                    current_corpus->size);
         else
-          printf("[no corpus]> ");
+          Rprintf("[no corpus]> ");
       }
 
       cqp_status = yyparse();
@@ -357,12 +357,12 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
         ok = 0;
 
       if (child_process && (cqp_status != 0) && !reading_cqprc) {
-        fprintf(stderr, "PARSE ERROR\n"); /*  */
+        Rprintf("PARSE ERROR\n"); /*  */
       }
       if (child_process && !reading_cqprc) {
 #if 0
         /* empty lines after commands in child mode have been disabled as of version 2.2.b94 */
-        printf("\n");                /* print empty line as separator in child mode */
+        Rprintf("\n");                /* print empty line as separator in child mode */
 #endif
         fflush(stdout);
         fflush(stderr);
@@ -382,7 +382,7 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
     return ok;
   } /* endif (cqp_file_p < MAXCQPFILES) */
   else {
-    fprintf(stderr, "CQP: too many nested files (%d)\n", cqp_file_p);
+    Rprintf("CQP: too many nested files (%d)\n", cqp_file_p);
     return 0;
   }
 }

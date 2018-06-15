@@ -403,7 +403,7 @@ int evaluate_target(CorpusList *corp,          /* the corpus */
                              corp->range[line].start, context,
                              &lbound, &rbound) == False) {
 
-          fprintf(stderr, "Can't compute boundaries for range #%d", line);
+          Rprintf("Can't compute boundaries for range #%d", line);
           lbound = rbound = -1;
         }
       }
@@ -415,14 +415,14 @@ int evaluate_target(CorpusList *corp,          /* the corpus */
                              corp->range[line].start, context,
                              &lbound, &dummy) == False) {
 
-          fprintf(stderr, "Can't compute left search space boundary match #%d", line);
+          Rprintf("Can't compute left search space boundary match #%d", line);
           lbound = rbound = -1;
         }
         else if (calculate_ranges(corp,
                                   corp->range[line].end, context,
                                   &dummy, &rbound) == False) {
 
-          fprintf(stderr, "Can't compute right search space boundary match #%d", line);
+          Rprintf("Can't compute right search space boundary match #%d", line);
           lbound = rbound = -1;
         }
       }
@@ -436,7 +436,7 @@ int evaluate_target(CorpusList *corp,          /* the corpus */
                              corp->range[line].end, context,
                              &lbound, &rbound) == False) {
 
-          fprintf(stderr, "Can't compute search space boundaries for match #%d", line);
+          Rprintf("Can't compute search space boundaries for match #%d", line);
           lbound = rbound = -1;
         }
       }
@@ -453,7 +453,7 @@ int evaluate_target(CorpusList *corp,          /* the corpus */
                              corp->targets[line], context,
                                   &lbound, &rbound) == False) {
 
-          fprintf(stderr, "Can't compute search space boundaries for match #%d", line);
+          Rprintf("Can't compute search space boundaries for match #%d", line);
           lbound = rbound = -1;
         }
       }
@@ -470,7 +470,7 @@ int evaluate_target(CorpusList *corp,          /* the corpus */
                              corp->keywords[line], context,
                              &lbound, &rbound) == False) {
 
-          fprintf(stderr, "Can't compute search space boundaries for match #%d", line);
+          Rprintf("Can't compute search space boundaries for match #%d", line);
           lbound = rbound = -1;
         }
       }

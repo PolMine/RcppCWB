@@ -57,6 +57,8 @@
 #define MSG_WAITALL 0
 #endif
 
+void Rprintf(const char *, ...);
+
 /*
  *
  * Global variables for CQPSERVER
@@ -94,8 +96,8 @@ char cqi_error_string[GENERAL_ERROR_SIZE] = "No error.";  /**< String describing
 void 
 cqi_send_error(char *function)
 {
-  fprintf(stderr, "ERROR CQi data send failure in function\n");
-  fprintf(stderr, "ERROR %s() <server.c>\n", function);
+  Rprintf("ERROR CQi data send failure in function\n");
+  Rprintf("ERROR %s() <server.c>\n", function);
   exit(1);
 }
 
@@ -109,8 +111,8 @@ cqi_send_error(char *function)
 void 
 cqi_recv_error(char *function)
 {
-  fprintf(stderr, "ERROR CQi data recv failure in function\n");
-  fprintf(stderr, "ERROR %s() <server.c>\n", function);
+  Rprintf("ERROR CQi data recv failure in function\n");
+  Rprintf("ERROR %s() <server.c>\n", function);
   exit(1);
 }
 
@@ -125,9 +127,9 @@ cqi_recv_error(char *function)
 void
 cqi_internal_error(char *function, char *cause)
 {
-  fprintf(stderr, "ERROR Internal error in function\n");
-  fprintf(stderr, "ERROR %s() <server.c>\n", function);
-  fprintf(stderr, "ERROR ''%s''\n", cause);
+  Rprintf("ERROR Internal error in function\n");
+  Rprintf("ERROR %s() <server.c>\n", function);
+  Rprintf("ERROR ''%s''\n", cause);
   exit(1);
 }
 
@@ -199,7 +201,7 @@ accept_connection(int port)
   }
 
   if (server_debug) 
-    fprintf(stderr, "CQi: Opening socket and binding to port %d\n", port);
+    Rprintf("CQi: Opening socket and binding to port %d\n", port);
 
 #ifdef __MINGW__
   /* startup the use of the Winsock DLL */
@@ -243,7 +245,7 @@ accept_connection(int port)
   }
 
   if (server_log)
-    printf("Waiting for client on port #%d.\n", port);
+    Rprintf("Waiting for client on port #%d.\n", port);
   if (0 != listen(sockfd, 5)) {
     perror("ERROR listen() failed");
     return -1;
@@ -255,7 +257,7 @@ accept_connection(int port)
     pid_t pid = fork();
     if (pid != 0) {
       close(sockfd);            /* parent returns to caller */
-      printf("[CQPserver running in background now]\n");
+      Rprintf("[CQPserver running in background now]\n");
       exit(0);
     }
   }
@@ -276,7 +278,7 @@ accept_connection(int port)
       
       if ((select(sockfd+1, &read_fd, NULL, NULL, &tv) <= 0)
           || (!FD_ISSET(sockfd, &read_fd))) {
-        printf("Port #%d timed out in private server mode. Aborting.\n", port);
+        Rprintf("Port #%d timed out in private server mode. Aborting.\n", port);
         exit(1);
       }
     }
@@ -288,14 +290,14 @@ accept_connection(int port)
     }
     
     if (server_debug) 
-      fprintf(stderr, "CQi: Connection established. Looking up client's name.\n");
+      Rprintf("CQi: Connection established. Looking up client's name.\n");
     remote_address = inet_ntoa(client_addr.sin_addr);
     remote_host = gethostbyaddr((void *)&(client_addr.sin_addr), 4, AF_INET);
     if (server_log) {
-      printf("Connection established with %s ", remote_address);
+      Rprintf("Connection established with %s ", remote_address);
       if (remote_host != NULL) 
-        printf("(%s)", remote_host->h_name);
-      printf("\n");
+        Rprintf("(%s)", remote_host->h_name);
+      Rprintf("\n");
     }
     
 #ifndef __MINGW__
@@ -310,11 +312,11 @@ accept_connection(int port)
       break;                    /* the child exits the listen() loop */
 
     /* this is the listening 'parent', which exits immediately */
-    printf("Spawned CQPserver, pid = %d.\n", (int)child_pid);
+    Rprintf("Spawned CQPserver, pid = %d.\n", (int)child_pid);
     close(connfd);              /* this is the child's connection */
 
     if (private_server) {
-      printf("Accepting no more connections (private server).\n");
+      Rprintf("Accepting no more connections (private server).\n");
       close(sockfd);
       exit(0);                  /* SIGCHLD should be reaped by calling process */
     }
@@ -329,20 +331,20 @@ accept_connection(int port)
      *      )
      * We print the "private server" message automatically.
      */
-    printf("Accepting no more connections (private server).\n");
+    Rprintf("Accepting no more connections (private server).\n");
     break;
 #endif
   }/* endwhile 42 */
 
   /* this is the child serving the new CQi connection */
   if (server_debug) 
-    fprintf(stderr, "CQi: ** new CQPserver created, initiating CQi session\n");
+    Rprintf("CQi: ** new CQPserver created, initiating CQi session\n");
   close(sockfd);
 
   /* check if remote host is in validation list */
   if (!check_host(client_addr.sin_addr)) {
-    printf("WARNING %s not in list, connection refused!\n", remote_address);
-    printf("Exit. (pid = %d)\n", (int)getpid());
+    Rprintf("WARNING %s not in list, connection refused!\n", remote_address);
+    Rprintf("Exit. (pid = %d)\n", (int)getpid());
     close(connfd);
     exit(1);
   }
@@ -358,7 +360,7 @@ accept_connection(int port)
 #endif
 
   if (server_debug) 
-    fprintf(stderr, "CQi: creating attribute hash (size = %d)\n", ATTHASHSIZE);
+    Rprintf("CQi: creating attribute hash (size = %d)\n", ATTHASHSIZE);
   make_attribute_hash(ATTHASHSIZE);
 
   return connfd;
@@ -390,7 +392,7 @@ cqi_flush(void)
   return 1;
 #else
   if (snoop) {
-    fprintf(stderr, "CQi FLUSH\n");
+    Rprintf("CQi FLUSH\n");
   }
   if (EOF == fflush(conn_out)) {
     perror("ERROR cqi_flush()");
@@ -426,7 +428,7 @@ cqi_send_byte(int n, int nosnoop)
 #endif
 
   if (snoop && !nosnoop) {
-    fprintf(stderr, "CQi SEND BYTE   %02X        [= %d]\n", n, n);
+    Rprintf("CQi SEND BYTE   %02X        [= %d]\n", n, n);
   }
 
   /* note that the actual sending is wrapped in an "if" whose content differs between OSes */
@@ -458,7 +460,7 @@ int
 cqi_send_word(int n)
 {
   if (snoop) {
-    fprintf(stderr, "CQi SEND WORD   %04X      [= %d]\n", n, n);
+    Rprintf("CQi SEND WORD   %04X      [= %d]\n", n, n);
   }
   if (
       /* exploit the fact that cqi_send_byte() only uses the lowest 8 bytes of its argument */
@@ -488,7 +490,7 @@ int
 cqi_send_int(int n)
 {
   if (snoop) {
-    fprintf(stderr, "CQi SEND INT    %08X  [= %d]\n", n, n);
+    Rprintf("CQi SEND INT    %08X  [= %d]\n", n, n);
   }
   if (
       /* exploit the fact that cqi_send_byte() only uses the lowest 8 bytes of its argument */
@@ -540,7 +542,7 @@ cqi_send_string(char *str)
      return 0;
   }
   if (snoop) {
-    fprintf(stderr, "CQi SEND CHAR[] '%s'\n", str);
+    Rprintf("CQi SEND CHAR[] '%s'\n", str);
  }
   /* we can afford to mangle len and str because we're at the end of the function */
   while (--len >= 0) {
@@ -806,7 +808,7 @@ cqi_recv_bytes(cqi_byte *buf, int bytes)
   }
   else {
     if (snoop) {
-      fprintf(stderr, "CQi RECV BYTE[%d]\n", bytes);
+      Rprintf("CQi RECV BYTE[%d]\n", bytes);
     }
     if (bytes != recv(connfd, buf, bytes, MSG_WAITALL)) {
       perror("ERROR cqi_recv_bytes()");
@@ -825,7 +827,7 @@ cqi_recv_byte(void)
     return EOF;
   }
   if (snoop) {
-    fprintf(stderr, "CQi RECV BYTE 0x%02X\n", b);
+    Rprintf("CQi RECV BYTE 0x%02X\n", b);
   }
   return b;
 }
@@ -856,7 +858,7 @@ cqi_read_word(void)
   int n = cqi_read_byte();
   n = (n << 8) | cqi_read_byte();
   if (snoop) {
-    fprintf(stderr, "CQi READ WORD   %04X      [= %d]\n", n, n);
+    Rprintf("CQi READ WORD   %04X      [= %d]\n", n, n);
   }
   return n;
 }
@@ -873,7 +875,7 @@ cqi_read_int(void)
   if (n & 0x80000000)           /* negative 32bit quantity */
     n |= minus_bits;            /* expand to full size of int type */
   if (snoop) {
-    fprintf(stderr, "CQi READ INT    %08X  [= %d]\n", n, n);
+    Rprintf("CQi READ INT    %08X  [= %d]\n", n, n);
   }
   return n;
 }
@@ -890,7 +892,7 @@ cqi_read_string(void)
     cqi_recv_error("cqi_read_string");
   s[len] = '\0';
   if (snoop)
-    fprintf(stderr, "CQi READ CHAR[] '%s'\n", s);
+    Rprintf("CQi READ CHAR[] '%s'\n", s);
   return s;
 }  
 
@@ -900,7 +902,7 @@ cqi_read_command(void)
   int command;
 
   if (server_debug)
-    fprintf(stderr, "CQi: waiting for command\n");
+    Rprintf("CQi: waiting for command\n");
   command = cqi_read_byte();
   while (command == CQI_PAD) 
     command = cqi_read_byte();
@@ -923,7 +925,7 @@ cqi_read_byte_list(cqi_byte **list)
     for (i=0; i<len; i++)
       (*list)[i] = cqi_read_byte();
     if (snoop)
-      fprintf(stderr, "CQi READ BYTE[%d]\n", len);
+      Rprintf("CQi READ BYTE[%d]\n", len);
     return len;
   }
 }
@@ -943,7 +945,7 @@ cqi_read_bool_list(cqi_byte **list)
     for (i=0; i<len; i++)
       (*list)[i] = cqi_read_byte();
     if (snoop)
-      fprintf(stderr, "CQi READ BOOL[%d]\n", len);
+      Rprintf("CQi READ BOOL[%d]\n", len);
     return len;
   }
 }
@@ -963,7 +965,7 @@ cqi_read_int_list(int **list)
     for (i=0; i<len; i++)
       (*list)[i] = cqi_read_int();
     if (snoop)
-      fprintf(stderr, "CQi READ INT[%d]\n", len);
+      Rprintf("CQi READ INT[%d]\n", len);
     return len;
   }
 }
@@ -983,7 +985,7 @@ cqi_read_string_list(char ***list)
     for (i=0; i<len; i++)
       (*list)[i] = cqi_read_string();
     if (snoop)
-      fprintf(stderr, "CQi READ STRING[%d]\n", len);
+      Rprintf("CQi READ STRING[%d]\n", len);
     return len;
   }
 }
@@ -1243,7 +1245,7 @@ cqi_lookup_attribute(char *name, int type)
     Attribute *attribute;
 
     if (server_debug) {
-      fprintf(stderr, "CQi: AttHash: attribute '%s' not found, trying to open ...\n", name);
+      Rprintf("CQi: AttHash: attribute '%s' not found, trying to open ...\n", name);
     }
 
     if (!split_attribute_spec(name, &corpus_name, &attribute_name))
@@ -1265,14 +1267,14 @@ cqi_lookup_attribute(char *name, int type)
   }
   else if (p->type != type) {
     if (server_debug) {
-      fprintf(stderr, "CQi: AttHash: attribute '%s' found, wrong attribute type.\n", name);
+      Rprintf("CQi: AttHash: attribute '%s' found, wrong attribute type.\n", name);
     }
     cqi_errno = CQI_CL_ERROR_WRONG_ATTRIBUTE_TYPE;
     return NULL;
   }
   else {
     if (server_debug) {
-      fprintf(stderr, "CQi: AttHash: attribute '%s' found in hash.\n", name);
+      Rprintf("CQi: AttHash: attribute '%s' found in hash.\n", name);
     }
     cqi_errno = CQI_STATUS_OK;
     return p->attribute;
@@ -1352,7 +1354,7 @@ cqi_activate_corpus(char *name)
   CorpusList *cl;
 
   if (server_debug) 
-    fprintf(stderr, "CQi: cqi_activate_corpus('%s');\n", name);
+    Rprintf("CQi: cqi_activate_corpus('%s');\n", name);
   cl = cqi_find_corpus(name);
   if (cl == NULL) 
     return 0;

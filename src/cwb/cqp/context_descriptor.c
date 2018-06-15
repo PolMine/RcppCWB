@@ -88,11 +88,11 @@ verify_context_descriptor(Corpus *corpus,
   int result = 1;
 
   if (cd == NULL) {
-    fprintf(stderr, "verify_context_descriptor(): WARNING: Context Descriptor empty!\n");
+    Rprintf("verify_context_descriptor(): WARNING: Context Descriptor empty!\n");
     result = 0;
   }
   else if (corpus == NULL) {
-    fprintf(stderr, "verify_context_descriptor(): WARNING: Corpus Descriptor empty!\n");
+    Rprintf("verify_context_descriptor(): WARNING: Corpus Descriptor empty!\n");
     RESET_LEFT_CONTEXT;
     RESET_RIGHT_CONTEXT;
     cd->attributes = NULL;
@@ -137,7 +137,7 @@ verify_context_descriptor(Corpus *corpus,
       }
     }
     if (cd->left_width < 0) {
-      fprintf(stderr, "concordance.o/verify_context_descriptor: WARNING: lwidth < 0\n");
+      Rprintf("concordance.o/verify_context_descriptor: WARNING: lwidth < 0\n");
       cd->left_width = -cd->left_width;
       result = 0;
     }
@@ -179,7 +179,7 @@ verify_context_descriptor(Corpus *corpus,
       }
     }
     if (cd->right_width < 0) {
-      fprintf(stderr, "concordance.o/verify_context_descriptor: WARNING: lwidth < 0\n");
+      Rprintf("concordance.o/verify_context_descriptor: WARNING: lwidth < 0\n");
       cd->right_width = -cd->right_width;
       result = 0;
     }
@@ -320,25 +320,25 @@ PrintAttributes(FILE *fd, char *header, AttributeList *al, int show_if_annot)
   if (al && al->list) {
     for (current = al->list; current; current = current->next) {
       if (line++ == 0) 
-        fprintf(fd, "%s", header);
+        Rprintf("%s", header);
       else 
         for (i = strlen(header); i; i--)
-          fprintf(fd, " ");
+          Rprintf(" ");
       if (current->status)
-        fprintf(fd, "  * ");
+        Rprintf("  * ");
       else
-        fprintf(fd, "    ");
+        Rprintf("    ");
       /* structural attributes only;
        * note we DEPEND on show_if_annot only being true iff al is a list of struc attributes,
        * otherwise calling cl_struc_values will cause a cl_error */
       if (!show_if_annot || !cl_struc_values(current->attribute))
-        fprintf(fd, "%s\n", current->attribute->any.name);
+        Rprintf("%s\n", current->attribute->any.name);
       else
-        fprintf(fd, "%-20s [A]\n", current->attribute->any.name);
+        Rprintf("%-20s [A]\n", current->attribute->any.name);
     }
   }
   else
-    fprintf(fd, "%s    <none>\n", header);
+    Rprintf("%s    <none>\n", header);
 }
 
 /** attribute print helper routine (non pretty-printing mode)
@@ -350,11 +350,11 @@ PrintAttributesSimple(FILE *fd, char *type, AttributeList *al, int show_if_annot
 
   if (al && al->list) {
     for (ai = al->list; ai; ai = ai->next) {
-      fprintf(fd, "%s\t%s", type, ai->attribute->any.name);
+      Rprintf("%s\t%s", type, ai->attribute->any.name);
       if (show_if_annot) {
-        fprintf(fd, "\t%s", (cl_struc_values(ai->attribute)) ? "-V" : "");
+        Rprintf("\t%s", (cl_struc_values(ai->attribute)) ? "-V" : "");
       }
-      fprintf(fd, "\n");
+      Rprintf("\n");
     }
   }
 }
@@ -375,42 +375,42 @@ PrintContextDescriptor(ContextDescriptor *cdp)
     fd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
 
     if (pretty_print) {
-      fprintf(fd, "===Context Descriptor=======================================\n");
-      fprintf(fd, "\n");
-      fprintf(fd, "left context:     %d ", cdp->left_width);
+      Rprintf("===Context Descriptor=======================================\n");
+      Rprintf("\n");
+      Rprintf("left context:     %d ", cdp->left_width);
       switch (cdp->left_type) {
       case CHAR_CONTEXT: 
-        fprintf(fd, "characters\n"); break;
+        Rprintf("characters\n"); break;
       case WORD_CONTEXT: 
-        fprintf(fd, "tokens\n"); break;
+        Rprintf("tokens\n"); break;
       case STRUC_CONTEXT: 
       case ALIGN_CONTEXT:
-        fprintf(fd, "%s\n",
+        Rprintf("%s\n",
                 cdp->left_structure_name ? cdp->left_structure_name : "???");
       }
-      fprintf(fd, "right context:    %d ", cdp->right_width);
+      Rprintf("right context:    %d ", cdp->right_width);
       switch (cdp->right_type) {
       case CHAR_CONTEXT: 
-        fprintf(fd, "characters\n"); break;
+        Rprintf("characters\n"); break;
       case WORD_CONTEXT: 
-        fprintf(fd, "tokens\n"); break;
+        Rprintf("tokens\n"); break;
       case STRUC_CONTEXT: 
       case ALIGN_CONTEXT:
-        fprintf(fd, "%s\n",
+        Rprintf("%s\n",
                 cdp->right_structure_name ? cdp->right_structure_name : "???");
       }
-      fprintf(fd, "corpus position:  %s\n", cdp->print_cpos ? "shown" : "not shown");
-      fprintf(fd, "target anchors:   %s\n", show_targets ? "shown" : "not shown");
-      fprintf(fd, "\n");
+      Rprintf("corpus position:  %s\n", cdp->print_cpos ? "shown" : "not shown");
+      Rprintf("target anchors:   %s\n", show_targets ? "shown" : "not shown");
+      Rprintf("\n");
       PrintAttributes(fd, "Positional Attributes:", cdp->attributes, 0);
-      fprintf(fd, "\n");
+      Rprintf("\n");
       PrintAttributes(fd, "Structural Attributes:", cdp->strucAttributes, 1);
-      fprintf(fd, "\n");
+      Rprintf("\n");
       /*     PrintAttributes(fd, "Structure Values:     ", cdp->printStructureTags); */
-      /*     fprintf(fd, "\n"); */
+      /*     Rprintf("\n"); */
       PrintAttributes(fd, "Aligned Corpora:      ", cdp->alignedCorpora, 0);
-      fprintf(fd, "\n");
-      fprintf(fd, "============================================================\n");
+      Rprintf("\n");
+      Rprintf("============================================================\n");
     }
     else {
       PrintAttributesSimple(fd, "p-Att", cdp->attributes, 0);

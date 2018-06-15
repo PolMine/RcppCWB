@@ -32,6 +32,7 @@ static int BaseTypeSize = sizeof(BFBaseType);
  */
 static int BaseTypeBits = sizeof(BFBaseType) * CHAR_BIT;
 
+void Rprintf(const char *, ...);
 
 /**
  * Create a new Bitfield object.
@@ -138,7 +139,7 @@ int set_bit(Bitfield bitfield, int element)
     return 1;
   }
   else {
-    fprintf(stderr, "Illegal offset %d in set_bit\n", element);
+    Rprintf("Illegal offset %d in set_bit\n", element);
     return 0;
   }
 }
@@ -173,7 +174,7 @@ clear_bit(Bitfield bitfield, int element)
     return 1;
   }
   else {
-    fprintf(stderr, "Illegal offset %d in clear_bit\n", element);
+    Rprintf("Illegal offset %d in clear_bit\n", element);
     return 0;
   }
 }
@@ -230,7 +231,7 @@ get_bit(Bitfield bitfield, int element)
          (1<<(element % BaseTypeBits))) == 0)
        ? 0 : 1);
   else {
-    fprintf(stderr, "Illegal offset %d in get_bit\n", element);
+    Rprintf("Illegal offset %d in get_bit\n", element);
     return -1;
   }
 }
@@ -264,7 +265,7 @@ toggle_bit(Bitfield bitfield, int element)
     return 1;
   }
   else {
-    fprintf(stderr, "Illegal offset %d in toggle_bit\n", element);
+    Rprintf("Illegal offset %d in toggle_bit\n", element);
     return 0;
   }
 }

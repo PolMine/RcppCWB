@@ -106,7 +106,7 @@ cc_compl_list_sort_uniq(void) {
     rl_attempted_completion_over = 1; /* so readline doesn't fall back to filename completion */
     cl_free(cc_compl_list);
 #if RL_DEBUG
-    printf("\nRETURNING 0 COMPLETIONS.\n");
+    Rprintf("\nRETURNING 0 COMPLETIONS.\n");
 #endif
     return NULL;
   }
@@ -135,9 +135,9 @@ cc_compl_list_sort_uniq(void) {
   cc_compl_list_size = mark + 1;
   cc_compl_list[cc_compl_list_size] = NULL;
 #if RL_DEBUG
-  printf("\nRETURNING %d COMPLETIONS:\n", cc_compl_list_size);
+  Rprintf("\nRETURNING %d COMPLETIONS:\n", cc_compl_list_size);
   for (mark=0; cc_compl_list[mark]; mark++) {
-    printf(" - %s\n", cc_compl_list[mark]);
+    Rprintf(" - %s\n", cc_compl_list[mark]);
   }
 #endif
   return cc_compl_list;
@@ -158,7 +158,7 @@ cqp_custom_completion(const char *text, int start, int end) {
   char *completion;
 
 #if RL_DEBUG
-  printf("\n>> COMPLETING TEXT '%s'\n", text);
+  Rprintf("\n>> COMPLETING TEXT '%s'\n", text);
 #endif
 
   /*
@@ -191,7 +191,7 @@ cqp_custom_completion(const char *text, int start, int end) {
     var = variables_iterator_next();
     while (var != NULL) {
 #if RL_DEBUG
-      printf("Comparing variable $%s with prefix $%s\n", var->my_name, prefix);
+      Rprintf("Comparing variable $%s with prefix $%s\n", var->my_name, prefix);
 #endif
       if (strncmp(prefix, var->my_name, prefix_len) == 0) { /* found variable matching prefix -> format and add */
         completion = cl_malloc(strlen(var->my_name) + 2);
@@ -367,7 +367,7 @@ readline_main(void)
       }
 
     if (highlighting) {
-      printf("%s", get_typeface_escape('n')); /* work around 'bug' in less which may not switch off display attributes when user exits */
+      Rprintf("%s", get_typeface_escape('n')); /* work around 'bug' in less which may not switch off display attributes when user exits */
       fflush(stdout);
     }
 
@@ -408,7 +408,7 @@ readline_main(void)
     save_unsaved_subcorpora();
 
   if (!silent) {
-    printf("\nDone. Share and enjoy!\n");
+    Rprintf("\nDone. Share and enjoy!\n");
   }
 
 }
@@ -432,7 +432,7 @@ main(int argc, char *argv[])
   which_app = cqp;
 
   if (!initialize_cqp(argc, argv)) {
-    fprintf(stderr, "Can't initialize CQP\n");
+    Rprintf("Can't initialize CQP\n");
     exit(1);
   }
 
@@ -453,14 +453,14 @@ main(int argc, char *argv[])
     char sc_colour[256];
     int i, j;
 
-    printf("%s%sWelcome%s to %s%sC%s%sQ%s%sP%s -- ", green, bold, normal, red, bold, pink, bold, blue, bold, normal);
-    printf("the %s Colourful %s Query %s Processor %s.\n", yellowBack, greenBack, cyanBack, normal);
+    Rprintf("%s%sWelcome%s to %s%sC%s%sQ%s%sP%s -- ", green, bold, normal, red, bold, pink, bold, blue, bold, normal);
+    Rprintf("the %s Colourful %s Query %s Processor %s.\n", yellowBack, greenBack, cyanBack, normal);
 
     for (i = 3; i <= 4; i++) {
-      printf("[");
+      Rprintf("[");
       for (j = 0; j < 8; j++) {
         sprintf(sc_colour, "\x1B[0;%d%dm", i,j);
-        printf("%d%d: %sN%s%sB%s%sU%s%sS%s  ",
+        Rprintf("%d%d: %sN%s%sB%s%sU%s%sS%s  ",
                i, j,
                sc_colour,
                sc_colour, bold,
@@ -468,11 +468,11 @@ main(int argc, char *argv[])
                sc_colour, standout,
                normal);
       }
-      printf("]\n");
+      Rprintf("]\n");
     }
 #else
-    fprintf(stderr, "We're sorry, CQP's Colourful Mode is not available under Windows.\n");
-    fprintf(stderr, "CQP will continue as normal without it...\n");
+    Rprintf("We're sorry, CQP's Colourful Mode is not available under Windows.\n");
+    Rprintf("CQP will continue as normal without it...\n");
     use_colour = 0;
 #endif
   } /* endif use_colour */
@@ -480,13 +480,13 @@ main(int argc, char *argv[])
   install_signal_handler();
 
   if (child_process) {
-    printf("CQP version " VERSION "\n");
+    Rprintf("CQP version " VERSION "\n");
     fflush(stdout);
   }
 
   if (batchmode) {
     if (batchfd == NULL)
-      fprintf(stderr, "Can't open batch file\n");
+      Rprintf("Can't open batch file\n");
     else
       cqp_parse_file(batchfd, 1);
   }

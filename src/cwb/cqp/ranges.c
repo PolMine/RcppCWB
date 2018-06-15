@@ -333,7 +333,7 @@ calculate_ranges(CorpusList *cl, int cpos, Context spc, int *left, int *right)
     break;
     
   default: 
-    fprintf(stderr, "calculate_ranges: undefined space type %d detected\n", spc.type);
+    Rprintf("calculate_ranges: undefined space type %d detected\n", spc.type);
     exit(1);
     break;
   }
@@ -995,7 +995,7 @@ RangeSetop(CorpusList *corpus1,
     break;
 
   default:
-    fprintf(stderr, "Operation was %d, ranges from %d to %d\n", operation, RUnion, RReduce);
+    Rprintf("Operation was %d, ranges from %d to %d\n", operation, RUnion, RReduce);
     assert("Illegal operator in RangeSetOp" && 0);
     return 0;
     break;
@@ -1056,7 +1056,7 @@ SortExternally(void)
 
       for (line = 0; line < srt_cl->size; line++) {
         
-        fprintf(fd, "%d ", line); 
+        Rprintf("%d ", line); 
         
         switch (srt_anchor1) {
         case MatchField:
@@ -1143,7 +1143,7 @@ SortExternally(void)
             }
             token += step;
           }
-          fprintf(fd, "\t");
+          Rprintf("\t");
         }
 
         token = p1start;
@@ -1166,14 +1166,14 @@ SortExternally(void)
           }
           token += step;
         } 
-        fprintf(fd, "\n");
+        Rprintf("\n");
       }
     
       fclose(fd);
 
       sprintf(sort_call, "%s %s %s | gawk '{print $1}'", ExternalSortingCommand, (srt_ascending ? "" : "-r"), temporary_name);
       if (SORT_DEBUG)
-        fprintf(stderr, "Running sort: \n\t%s\n", sort_call);
+        Rprintf("Running sort: \n\t%s\n", sort_call);
       
       line = -1;                
       if ((pipe = popen(sort_call, "r")) == NULL) {
@@ -1193,14 +1193,14 @@ SortExternally(void)
           if (line < srt_cl->size) {
             int num = atoi(sort_call);
             if (num < 0 || num >= srt_cl->size) {
-              fprintf(stderr, "Error in externally sorted file - line number #%d out of range\n", num);
+              Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
               break;          
             }
             srt_cl->sortidx[line] = num;
             line++;
           }
           else
-            fprintf(stderr, "Warning: too many lines from external sort command (ignored).\n");
+            Rprintf("Warning: too many lines from external sort command (ignored).\n");
         }
         pclose(pipe);
       }
@@ -1357,7 +1357,7 @@ i2compare(const void *vidx1, const void *vidx2)
    * (similar to the standard comparison algorithm in cl_string_qsort_compare() above)
    */
   if (SORT_DEBUG)
-    fprintf(stderr, "Comparing [%d,%d](%+d) with [%d,%d](%+d)\n",
+    Rprintf("Comparing [%d,%d](%+d) with [%d,%d](%+d)\n",
             p1start, p1end, step1, p2start, p2end, step2);
 
   len1 = abs(p1end - p1start) + 1;
@@ -1801,9 +1801,9 @@ SortSubcorpus(CorpusList *cl, SortClause sc, int count_mode, struct Redir *redir
             int len = abs(end - start) + 1;
             int step = (end >= start) ? 1 : -1;
 
-            fprintf(redir->stream, "%d\t", size);
+            Rprintf("%d\t", size);
             if (! pretty_print) /* without pretty-printing: show first match in second column, for automatic processing */
-              fprintf(redir->stream, "%d\t", first);
+              Rprintf("%d\t", first);
             for (k = 0; k < len; k++) {
               int cpos = start + step * k;
               char *token_readonly = cl_cpos2str(srt_attribute, cpos);
@@ -1816,17 +1816,17 @@ SortSubcorpus(CorpusList *cl, SortClause sc, int count_mode, struct Redir *redir
                 token = temp;
               }
               if (k > 0)
-                fprintf(redir->stream, " ");
-              fprintf(redir->stream, "%s", token);
+                Rprintf(" ");
+              Rprintf("%s", token);
               cl_free(token);
             }
             if (pretty_print) { /* with pretty-printing: append range of matches belonging to group (in sorted corpus) */
               if (size > 1) 
-                fprintf(redir->stream, "  [#%d-#%d]",  first, first + size - 1);
+                Rprintf("  [#%d-#%d]",  first, first + size - 1);
               else
-                fprintf(redir->stream, "  [#%d]",  first);
+                Rprintf("  [#%d]",  first);
             }
-            fprintf(redir->stream, "\n");
+            Rprintf("\n");
             fflush(redir->stream);
           }
         }

@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 
 #include "globals.h"
 
@@ -337,27 +338,27 @@ print_mapping(Mapping map)
 {
   int cp, tp;
 
-  fprintf(stderr, "---------------------------------------- Mapping: \n");
+  Rprintf("---------------------------------------- Mapping: \n");
 
-  fprintf(stderr, "Name:  %s\n", map->mapping_name);
-  fprintf(stderr, "Valid: %s/%s\n", 
+  Rprintf("Name:  %s\n", map->mapping_name);
+  Rprintf("Valid: %s/%s\n", 
           map->corpus->registry_name,
           map->attribute->any.name);
-  fprintf(stderr, "NrCls: %d\n", 
+  Rprintf("NrCls: %d\n", 
           map->nr_classes);
 
   for (cp = 0; cp < map->nr_classes; cp++) {
-    fprintf(stderr, "%5d/%s with %d members: \n", 
+    Rprintf("%5d/%s with %d members: \n", 
             cp, map->classes[cp].class_name, map->classes[cp].nr_tokens);
     for (tp = 0; tp < map->classes[cp].nr_tokens; tp++) {
-      fprintf(stderr, "\t%d/%s", 
+      Rprintf("\t%d/%s", 
               map->classes[cp].tokens[tp],
               get_string_of_id(map->attribute, map->classes[cp].tokens[tp]));
     }
-    fprintf(stderr, "\n");
+    Rprintf("\n");
   }
 
-  fprintf(stderr, "------------------------------------------------- \n");
+  Rprintf("------------------------------------------------- \n");
 
 }
 

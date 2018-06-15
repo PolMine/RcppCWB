@@ -25,6 +25,8 @@
  * (CompCorpus, CompLExicon, etc.)
  */
 
+void Rprintf(const char *, ...);
+
 #include <ctype.h>
 #include <sys/types.h>
 
@@ -111,7 +113,7 @@ creat_sort_lexicon(Component *lexsrt)
   /* read the contents of the lexidx component into the blob of the lexsrt component
    * (note use of MALLOCED to duplicate the content). */
   if (!read_file_into_blob(lexidx->path, MALLOCED, sizeof(int), &(lexsrt->data))) {
-    fprintf(stderr, "Can't open %s, can't create lexsrt component\n", lexidx->path);
+    Rprintf("Can't open %s, can't create lexsrt component\n", lexidx->path);
     perror(lexidx->path);
     return 0;
   }
@@ -181,7 +183,7 @@ creat_freqs(Component *freqs)
   /* load a copy of the CompLexiconIdx file into the CompCorpusFreqs data block.
    * (NB note the use of MALLOCED to enforce operation on a *copy*, not the original... */
   if (!read_file_into_blob(lexidx->path, MALLOCED, sizeof(int), &(freqs->data))) {
-    fprintf(stderr, "Can't open %s, can't create freqs component\n", lexidx->path);
+    Rprintf("Can't open %s, can't create freqs component\n", lexidx->path);
     perror(lexidx->path);
     return 0;
   }
@@ -194,7 +196,7 @@ creat_freqs(Component *freqs)
   assert(corpus_fn != NULL);
 
   if ((fd = fopen(corpus_fn, "rb")) == NULL) {
-    fprintf(stderr, "CL makecomps:creat_freqs(): Couldn't open corpus %s\n", corpus_fn);
+    Rprintf("CL makecomps:creat_freqs(): Couldn't open corpus %s\n", corpus_fn);
     perror(corpus_fn);
     exit(2);
   }
@@ -207,7 +209,7 @@ creat_freqs(Component *freqs)
       if ((ptr >= 0) && (ptr < freqs->size))
         freqs->data.data[ptr]++;
       else
-        fprintf(stderr, "CL makecomps:creat_freqs(): WARNING: index %d out of range\n", ptr);
+        Rprintf("CL makecomps:creat_freqs(): WARNING: index %d out of range\n", ptr);
     }
   } while (i == BUFSIZE);
   fclose(fd);
@@ -293,8 +295,8 @@ creat_rev_corpus(Component *revcorp)
   */
 
   if (cl_debug) {
-    fprintf(stderr, "\nCreating REVCORP component as '%s' ... \n", revcorp->path);
-    fprintf(stderr, "Size = %d INTs,  Buffer Size = %ld INTs\n", datasize, bufsize);
+    Rprintf("\nCreating REVCORP component as '%s' ... \n", revcorp->path);
+    Rprintf("Size = %d INTs,  Buffer Size = %ld INTs\n", datasize, bufsize);
   }
 
   primus = 0;
@@ -320,7 +322,7 @@ creat_rev_corpus(Component *revcorp)
     pass++;
     if (cl_debug) {
       double perc = (100.0 * secundus) / lexsize;
-      fprintf(stderr, "CL makecomps: Pass #%-3d (%6.2f%c complete)\n", pass, perc, '%');
+      Rprintf("CL makecomps: Pass #%-3d (%6.2f%c complete)\n", pass, perc, '%');
     }
 
     for (cpos = 0; cpos < datasize; cpos++) {
@@ -340,7 +342,7 @@ creat_rev_corpus(Component *revcorp)
     for (id = primus + 1; id <= secundus; id++) {
       ptr += cl_id2freq(attr, id);
       if (ptr != ptab[id]) {
-        fprintf(stderr, "CL makecomps: Pointer inconsistency for id=%d. Aborting.\n", id);
+        Rprintf("CL makecomps: Pointer inconsistency for id=%d. Aborting.\n", id);
         exit(1);
       }
     }
@@ -359,7 +361,7 @@ creat_rev_corpus(Component *revcorp)
 
   /* finally, check amount of data read/written vs. expected */
   if ((ints_written != cpos) || (ints_written != datasize)) {
-    fprintf(stderr, "CL makecomps: Data size inconsistency: expected=%d, read=%d, written=%d.\n", datasize, cpos, ints_written);
+    Rprintf("CL makecomps: Data size inconsistency: expected=%d, read=%d, written=%d.\n", datasize, cpos, ints_written);
     exit(1);
   }
 
@@ -428,7 +430,7 @@ creat_rev_corpus_idx(Component *revcidx)
   /* WE DO NOT CONVERT the table from host to network order while
    * writing it, since it's already been created in network order!!! */
   if (write_file_from_blob(revcidx->path, &(revcidx->data), 0) == 0) {
-    fprintf(stderr, "CL makecomps: Can't open %s for writing", revcidx->path);
+    Rprintf("CL makecomps: Can't open %s for writing", revcidx->path);
     perror(revcidx->path);
     exit(2);
   }

@@ -124,7 +124,7 @@ VariableAddItem(Variable v, char *item)
         v->items = (VariableItem *)cl_realloc(v->items, sizeof(VariableItem) * v->nr_items);
       
       if (v->items == NULL) {
-        fprintf(stderr, "Fatal Error #6: no memory left.");
+        Rprintf("Fatal Error #6: no memory left.");
         perror("Memory fault");
         assert(0 && "Big Problem here!");
       }
@@ -230,7 +230,7 @@ DropVariable(Variable *vp)
 
   /* triggered if the variable object supplied is NOT in VariableSpace, which all Variables should be. */
   if (i >= nr_variables)
-    fprintf(stderr, "Error #5 in variable logic. Please contact developer.\n");
+    Rprintf("Error #5 in variable logic. Please contact developer.\n");
 
   
   *vp = NULL;
@@ -282,7 +282,7 @@ NewVariable(char *varname)
                                           nr_variables * sizeof(Variable));
     /* no longer necessary: cl_malloc/_realloc checks for this.
     if (VariableSpace == NULL) {
-      fprintf(stderr, "Fatal Error: Variable space out of memory.\n");
+      RprintF("Fatal Error: Variable space out of memory.\n");
       assert(0 && "Sorry, big problem here!");
     } */
     
@@ -462,7 +462,7 @@ VerifyVariable(Variable v, Corpus *corpus, Attribute *attribute)
       if (!v->items[i].free) {
         if (v->items[i].sval == NULL) {
           /* string shouldn't be NULL if free has been set to True */
-          fprintf(stderr, "Error #1 in variable logic. Contact developer.\n");
+          Rprintf("Error #1 in variable logic. Contact developer.\n");
           v->items[i].ival = -1;
         }
         else {
@@ -538,7 +538,7 @@ GetVariableItems(Variable v,
       for (i = 0; i < v->nr_items; i++)
         if (!v->items[i].free && v->items[i].ival >= 0) {
           if (ip >= v->nr_valid_items)
-            fprintf(stderr, "Error #2 in variable logic. Please contact developer.\n");
+            Rprintf("Error #2 in variable logic. Please contact developer.\n");
           else {
             items[ip] = v->items[i].ival;
             ip++;
@@ -546,7 +546,7 @@ GetVariableItems(Variable v,
         }
 
       if (ip != v->nr_valid_items) 
-        fprintf(stderr, "Error #3 in variable logic. Please contact developer.\n");
+        Rprintf("Error #3 in variable logic. Please contact developer.\n");
 
       /* eval_bool() expects a sorted list of IDs (for binary search) */
       qsort(items, *nr_items, sizeof(int), intcompare);

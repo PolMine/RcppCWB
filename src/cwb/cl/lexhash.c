@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 
 #include "globals.h"
 #include "macros.h"
@@ -349,7 +350,7 @@ cl_lexhash_check_grow(cl_lexhash hash)
     target_size = floor(((double) hash->entries) / hash->fillrate_target);
     if (target_size > MAX_BUCKETS) {
       if (cl_debug) {
-        fprintf(stderr, "[lexhash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n",
+        Rprintf("[lexhash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n",
                 (double) MAX_BUCKETS, target_size);
       }
       hash->auto_grow = 0; /* disable auto-grow to avoid further unnecessary attempts */
@@ -365,7 +366,7 @@ cl_lexhash_check_grow(cl_lexhash hash)
     new_buckets = (int) target_size;
     old_buckets = hash->buckets;
     if (cl_debug) {
-      fprintf(stderr, "[lexhash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n",
+      Rprintf("[lexhash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n",
               fill_rate, hash->entries, old_buckets);
     }
     temp = cl_new_lexhash(new_buckets); /* create new hash with target fill rate */
@@ -389,7 +390,7 @@ cl_lexhash_check_grow(cl_lexhash hash)
     cl_free(temp);                      /* we can simply deallocate temp now, having stolen its hash table */
     if (cl_debug) {
       fill_rate = ((double) hash->entries) / hash->buckets;
-      fprintf(stderr, "[lexhash autogrow: new fill rate = %3.1f (%d/%d)]\n",
+      Rprintf("[lexhash autogrow: new fill rate = %3.1f (%d/%d)]\n",
               fill_rate, hash->entries, hash->buckets);
     }
     return 1;

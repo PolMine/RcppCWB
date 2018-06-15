@@ -55,11 +55,11 @@ show_matchlist(Matchlist matchlist)
 {
   int i;
   
-  fprintf(stderr, "Matchlist (size: %d, %sinverted):\n",
+  Rprintf("Matchlist (size: %d, %sinverted):\n",
           matchlist.tabsize, matchlist.is_inverted ? "" : "not ");
 
   for (i = 0; i < matchlist.tabsize; i++) {
-    fprintf(stderr, "ml[%d] = [%d, %d]@%d\n",
+    Rprintf("ml[%d] = [%d, %d]@%d\n",
             i,
             matchlist.start[i],
             matchlist.end[i],
@@ -81,10 +81,10 @@ show_matchlist_firstelements(Matchlist matchlist)
   int i;
   int n = (matchlist.tabsize >= 1000 ? 1000 : matchlist.tabsize % 1000);
 
-  fprintf(stderr, "the first (max 1000) elements of the matchlist (size: %d) are:\n",
+  Rprintf("the first (max 1000) elements of the matchlist (size: %d) are:\n",
           matchlist.tabsize);
   for (i = 0; i < n; i++)
-    fprintf(stderr, "ml[%d] = [%d,...]\n",
+    Rprintf("ml[%d] = [%d,...]\n",
             i, matchlist.start[i]);
 }
 
@@ -479,7 +479,7 @@ Setop(Matchlist *list1, MLSetOp operation, Matchlist *list2)
      */
     
     if (list1->end) {
-      fprintf(stderr, "Can't calculate complement for non-initial matchlist.\n");
+      Rprintf("Can't calculate complement for non-initial matchlist.\n");
       return 0;
     }
 
@@ -494,17 +494,17 @@ Setop(Matchlist *list1, MLSetOp operation, Matchlist *list2)
     }
 
     if (!evalenv) {
-      fprintf(stderr, "Can't calculate complement with NULL eval env\n");
+      Rprintf("Can't calculate complement with NULL eval env\n");
       return 0;
     }
 
     if (!evalenv->query_corpus) {
-      fprintf(stderr, "Can't calculate complement with NULL query_corpus.\n");
+      Rprintf("Can't calculate complement with NULL query_corpus.\n");
       return 0;
     }
 
     if (!access_corpus(evalenv->query_corpus)) {
-      fprintf(stderr, "Complement: can't access current corpus.\n");
+      Rprintf("Complement: can't access current corpus.\n");
       return 0;
     }
 
@@ -515,14 +515,14 @@ Setop(Matchlist *list1, MLSetOp operation, Matchlist *list2)
 
     if ((attr = find_attribute(evalenv->query_corpus->corpus,
                                DEFAULT_ATT_NAME, ATT_POS, NULL)) == NULL) {
-      fprintf(stderr, "Complement: can't find %s attribute of current corpus\n",
+      Rprintf("Complement: can't find %s attribute of current corpus\n",
               DEFAULT_ATT_NAME);
       return 0;
     }
 
     i = cl_max_cpos(attr);
     if (cl_errno != CDA_OK) {
-      fprintf(stderr, "Complement: can't get attribute size\n");
+      Rprintf("Complement: can't get attribute size\n");
       return 0;
     }
 

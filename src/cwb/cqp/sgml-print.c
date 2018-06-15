@@ -250,7 +250,7 @@ void sgml_print_context(ContextDescriptor *cd, FILE *stream)
     s = "error";
     break;
   }
-  fprintf(stream, "<leftContext size=%d base=\"%s\">\n",
+  Rprintf("<leftContext size=%d base=\"%s\">\n",
           cd->left_width, s);
 
 
@@ -268,7 +268,7 @@ void sgml_print_context(ContextDescriptor *cd, FILE *stream)
     s = "error";
     break;
   }
-  fprintf(stream, "<rightContext size=%d base=\"%s\">\n",
+  Rprintf("<rightContext size=%d base=\"%s\">\n",
           cd->right_width, s);
 
 }
@@ -287,7 +287,7 @@ sgml_print_corpus_header(CorpusList *cl, FILE *stream)
   /*   pwd = getpwuid(geteuid()); */
   /* disabled because of incompatibilities between different Linux versions */
 
-  fprintf(stream,
+  Rprintf(
           "<concordanceInfo>\n"
           "<user><userID>%s</userID><userName>%s</userName></user>\n"
           "<date>%s</date>\n"
@@ -337,7 +337,7 @@ sgml_print_output(CorpusList *cl,
     
     for (ai = cd->attributes->list; ai; ai = ai->next) {
       if (ai->attribute && ai->status > 0) {
-        fprintf(stream, "<attribute type=positional name=\"%s\" anr=%d>\n",
+        Rprintf("<attribute type=positional name=\"%s\" anr=%d>\n",
                 ai->attribute->any.name, anr);
         anr++;
       }
@@ -440,11 +440,11 @@ sgml_print_group(Group *group, int expand, FILE *fd)
   last_source_id = -999;
   nr_targets = 0;
 
-  fprintf(fd, "<TABLE>\n");
+  Rprintf("<TABLE>\n");
 
   for (cell = 0; (cell < group->nr_cells) && !cl_broken_pipe; cell++) {
 
-    fprintf(fd, "<TR><TD>");
+    Rprintf("<TR><TD>");
 
     source_id = group->count_cells[cell].s;
     
@@ -454,21 +454,21 @@ sgml_print_group(Group *group, int expand, FILE *fd)
       nr_targets = 0;
     }
     else {
-      fprintf(fd, "&nbsp;");
+      Rprintf("&nbsp;");
     }
     
     target_id = group->count_cells[cell].t;
     target_s = Group_id2str(group, target_id, 1);
     count     = group->count_cells[cell].freq;
     
-    fprintf(fd, "<TD>");
+    Rprintf("<TD>");
     sgml_puts(fd, target_s, SUBST_ALL);
 
-    fprintf(fd, "<TD>%d</TR>\n", count);
+    Rprintf("<TD>%d</TR>\n", count);
     
     nr_targets++;
   }
 
-  fprintf(fd, "</TABLE>\n");
+  Rprintf("</TABLE>\n");
 }
 

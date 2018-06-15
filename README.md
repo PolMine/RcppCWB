@@ -7,7 +7,7 @@
 
 # Rcpp bindings for the Corpus Workbench (CWB)
 
-The package exposes core functions of the Corpus Worbench (CWB) by way of Rcpp wrappers. Furthermore, the packages includes Rcpp versions of performance critical operations. The main purpose of the package at this stage is to serve as an interface to the CWB for the package [polmineR](https://CRAN.R-project.org/package=RcppCWB).
+The package exposes functions of the Corpus Worbench (CWB) by way of Rcpp wrappers. Furthermore, the packages includes Rcpp code for performance critical operations. The main purpose of the package is to serve as an interface to the CWB for the package [polmineR](https://CRAN.R-project.org/package=RcppCWB).
 
 There is a huge intellectual debt to the developers of the R-package 'rcqp', Bernard Desgraupes and Sylvain Loiseau. The main impetus for developing RcppCWB is that using Rcpp decreases the pains to maintain the package, to expand the CWB functionality exposed, and -- most importantly -- to make it portable to Windows systems.
 
@@ -54,9 +54,9 @@ devtools::install_github("PolMine/RcppCWB")
 
 ## Installation on MacOS
 
-On macOS, the pcre and [Glib](https://developer.gnome.org/glib/) libraries need to be present. We recommend to use 'Homebrew' as a package manager for macOS. To install Homebrew, follow the instructions on the [Homebrew Website](https://brew.sh/index_de.html). It may be necessary to also install [Xcode](https://developer.apple.com/xcode/) and [XQuartz](https://www.xquartz.org).
+On macOS, the [pcre](https://www.pcre.org/) and [Glib](https://developer.gnome.org/glib/) libraries need to be present. We recommend to use 'Homebrew' as a package manager for macOS. To install Homebrew, follow the instructions on the [Homebrew Website](https://brew.sh/index_de.html). It may also be necessary to also install [Xcode](https://developer.apple.com/xcode/) and [XQuartz](https://www.xquartz.org).
 
-The following commands then need to be executed from a terminal window. They will install the C libraries that the rcqp package relies on:
+The following commands then need to be executed from a terminal window. They will install the C libraries the CWB relies on:
 
 ```{sh, eval = FALSE}
 brew -v install pkg-config
@@ -81,7 +81,9 @@ devtools::install_github("PolMine/RcppCWB")
 
 ## Usage
 
-The package includes a small corpus called ('REUTERS'). To start with, we get the number of tokens of the corpus.
+The package offers low-level access to CWB-indexed corpora. Using RcppCWB may not intuitive at the outset: It is designed to serve as a an efficient backend for packages offering higher-level functionality, such as polmineR. the 
+
+RcppCWB includes a small sample corpus called ('REUTERS'). To start with, we get the number of tokens of the corpus.
 
 ```{r}
 registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()

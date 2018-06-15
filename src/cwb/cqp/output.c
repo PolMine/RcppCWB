@@ -571,7 +571,7 @@ catalog_corpus(CorpusList *cl,
       print_corpus_info_header(cl, rd->stream, mode, 1);
     }
     else if (printNrMatches && mode == PrintASCII)
-      fprintf(rd->stream, "%d matches.\n", cl->size);
+      Rprintf("%d matches.\n", cl->size);
     
     print_output(cl, rd->stream, 
                  isatty(fileno(rd->stream)) || rd->is_paging, 
@@ -620,9 +620,9 @@ cqpmessage(MessageType type, char *format, ...)
     }
 
     if (!silent || type == Error) {
-      fprintf(stderr, "%s:\n\t", msg);
-      vfprintf(stderr, format, ap);
-      fprintf(stderr, "\n");
+      Rprintf("%s:\n\t", msg);
+      Rprintf(format, ap);
+      Rprintf("\n");
     }
 
   }
@@ -650,29 +650,29 @@ corpus_info(CorpusList *cl)
     stream_ok = open_stream(&rd, ascii);
     outfd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
     /* print size (should be the mother_size entry) */
-    fprintf(outfd, "Size:    %d\n", cl->mother_size);
+    Rprintf("Size:    %d\n", cl->mother_size);
     /* print charset */
-    fprintf(outfd, "Charset: ");
+    Rprintf("Charset: ");
 
     if (cl->corpus->charset == unknown_charset) {
-      fprintf(outfd, "<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
+      Rprintf("<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
     }
     else {
-      fprintf(outfd, "%s\n", cl_charset_name(cl->corpus->charset));
+      Rprintf("%s\n", cl_charset_name(cl->corpus->charset));
     }
     /* print properties */
-    fprintf(outfd, "Properties:\n");
+    Rprintf("Properties:\n");
     p = cl_first_corpus_property(cl->corpus);
     if (p == NULL)
-      fprintf(outfd, "\t<none>\n");
+      Rprintf("\t<none>\n");
     else 
       for ( ; p != NULL; p = cl_next_corpus_property(p))
-        fprintf(outfd, "\t%s = '%s'\n", p->property, p->value);
-    fprintf(outfd, "\n");
+        Rprintf("\t%s = '%s'\n", p->property, p->value);
+    Rprintf("\n");
     
 
     if (cl->corpus->info_file == NULL)
-      fprintf(outfd, "No further information available about %s\n", cl->name);
+      Rprintf("No further information available about %s\n", cl->name);
     else if ((fd = open_file(cl->corpus->info_file, "rb")) == NULL)
       cqpmessage(Warning,
                  "Can't open info file %s for reading",
@@ -687,7 +687,7 @@ corpus_info(CorpusList *cl)
       /* makes sure that .info file always ends in a newline,
        * thus ensuring that output from the "info;" command always does too.*/
       if (buf[strlen(buf)-1] != '\n')
-        fprintf(outfd, "\n");
+        Rprintf("\n");
       fclose(fd);
     }
 
@@ -894,7 +894,7 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
         if (cpos >= 0 && cpos <= cl->mother_size) {
           /* valid cpos: print cpos or requested attribute */
           if (item->attribute_type == ATT_NONE) {
-            fprintf(rd->stream, "%d", cpos);
+            Rprintf("%d", cpos);
           }
           else {
             char *string = NULL;
@@ -906,11 +906,11 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
               if (item->flags) {
                 /* get canonical string as newly alloc'ed duplicate, then print */
                 char *copy = cl_string_canonical(string, cl->corpus->charset, item->flags, CL_STRING_CANONICAL_STRDUP);
-                fprintf(rd->stream, "%s", copy);
+                Rprintf("%s", copy);
                 cl_free(copy);
               }
               else {
-                fprintf(rd->stream, "%s", string);
+                Rprintf("%s", string);
               }
             }
           }
@@ -918,16 +918,16 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
         else {
           /* cpos out of bounds: print -1 or empty string */
           if (item->attribute_type == ATT_NONE)
-            fprintf(rd->stream, "-1");
+            Rprintf("-1");
         }
         if (cpos < end)         /* tokens in a range item are separated by blanks */
-          fprintf(rd->stream, " "); 
+          Rprintf(" "); 
       }
       if (item->next)           /* multiple tabulation items are separated by TABs */
-        fprintf(rd->stream, "\t");
+        Rprintf("\t");
       item = item->next;
     }
-    fprintf(rd->stream, "\n");
+    Rprintf("\n");
   }
   
   close_stream(rd);
