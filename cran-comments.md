@@ -18,6 +18,7 @@ Fedora: yum install glib2-devel
 * Ubuntu 14.04 (on travis-ci), R 3.5.0
 * Ubuntu 14.04 (project server), R 3.4.3
 * win-builder (devel and release), R 3.5.0
+* Windows AppVeyorR, 3.5.0 Patched
 * Windows on Amazon WorkSpaces, R 3.4.3
 
 
