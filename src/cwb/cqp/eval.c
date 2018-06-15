@@ -2908,7 +2908,7 @@ cqp_run_tab_query()
   int nr_columns, i, this_col;
   Evaltree col;
 
-  int smallest_col, corpus_size;
+  int smallest_col;
   int n_res, max_res;
 
   Matchlist *lists, result;
@@ -2920,7 +2920,7 @@ cqp_run_tab_query()
   evalenv = &Environment[0];
 
   assert(evalenv->query_corpus);
-  corpus_size = evalenv->query_corpus->mother_size;
+  /* corpus_size = evalenv->query_corpus->mother_size; */
 
   nr_columns = 0;
   for (col = evalenv->evaltree; col; col = col->tab_el.next) {

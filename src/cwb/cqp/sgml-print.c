@@ -322,10 +322,10 @@ sgml_print_output(CorpusList *cl,
 {
   int line, real_line;
   ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
-  AttributeList *strucs;
+  /* AttributeList *strucs; */
   PrintDescriptionRecord *pdr = &SGMLPrintDescriptionRecord;
 
-  strucs = cd->printStructureTags;
+  /* strucs = cd->printStructureTags; */
   
   fputs(pdr->BeforeConcordance, stream);
 

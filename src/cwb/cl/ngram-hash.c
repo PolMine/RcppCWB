@@ -143,13 +143,13 @@ void
 cl_delete_ngram_hash(cl_ngram_hash hash)
 {
   int i;
-  cl_ngram_hash_entry entry, temp;
+  cl_ngram_hash_entry entry;
   
   if (hash != NULL && hash->table != NULL) {
     for (i = 0; i < hash->buckets; i++) {
       entry = hash->table[i];
       while (entry != NULL) {
-        temp = entry;
+        /* temp = entry; */
         entry = entry->next;
         cl_free(entry);
       }

@@ -233,7 +233,7 @@ latex_print_aligned_line(FILE *stream, char *attribute_name, char *line)
 
 void latex_print_context(ContextDescriptor *cd, FILE *stream)
 {
-  char *s;
+  /* char *s; */
 
   fputs("{\\em Left display context:\\/}  & ", stream);
 
@@ -249,7 +249,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
             cd->left_structure_name ? cd->left_structure_name : "???");
     break;
   default:
-    s = "error";
+    /* s = "error"; */
     break;
   }
 
@@ -269,7 +269,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
             cd->right_structure_name ? cd->right_structure_name : "???");
     break;
   default:
-    s = "error";
+    /* s = "error"; */
     break;
   }
 

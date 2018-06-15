@@ -314,7 +314,7 @@ html_print_aligned_line(FILE *stream,
 
 void html_print_context(ContextDescriptor *cd, FILE *stream)
 {
-  char *s;
+  /* char *s; */
 
   fputs("<tr><td nowrap><em>Left display context:</em></td><td nowrap>", stream);
 
@@ -330,7 +330,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
             cd->left_structure_name ? cd->left_structure_name : "???");
     break;
   default:
-    s = "error";
+    /* s = "error"; */
     break;
   }
 
@@ -350,7 +350,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
             cd->right_structure_name ? cd->right_structure_name : "???");
     break;
   default:
-    s = "error";
+    /* s = "error"; */
     break;
   }
 
@@ -415,12 +415,12 @@ void html_print_output(CorpusList *cl,
 {
   int line, real_line;
   ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
-  AttributeList *strucs;
+  /* AttributeList *strucs; */
   PrintDescriptionRecord *pdr;
 
   ParsePrintOptions();
 
-  strucs = cd->printStructureTags;
+  /* strucs = cd->printStructureTags; */
 
   if (GlobalPrintOptions.print_tabular) {
 

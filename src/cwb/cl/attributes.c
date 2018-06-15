@@ -752,7 +752,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
   char *reference;
   char c;
 
-  int ppos, bpos, dollar, rpos;
+  int ppos, bpos, rpos;
 
 
   /*  did we do the job before? */
@@ -778,7 +778,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
   ppos = 0;
   /* index in string "buf" */
   bpos = 0;
-  dollar = 0;
+  /* dollar = 0; */
   rpos = 0;
   buf[bpos] = '\0';
 
@@ -788,7 +788,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 
       /*  reference to the name of another component. */
 
-      dollar = ppos;            /* memorize the position of the $ */
+      /* dollar = ppos; */           /* memorize the position of the $ */
 
       rpos = 0;
       c = path[++ppos];         /* first skip the '$' */

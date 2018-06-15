@@ -1145,7 +1145,7 @@ make_jump_table(CL_Regex rx)
         fprintf(stderr, "CL: ");
         for (j = 0; j < 15; j++) {
           ch = k + j;
-          if (ch >= 32 & ch < 127)
+          if ((ch >= 32) & (ch < 127))
             fprintf(stderr, "|%2d %c  ", rx->jumptable[ch], ch);
           else
             fprintf(stderr, "|%2d %02X ", rx->jumptable[ch], ch);

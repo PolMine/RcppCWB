@@ -143,10 +143,10 @@ dump_heap(int *heap, int heap_size, int node, int indent)
 void 
 print_heap(int *heap, int heap_size, char *title)
 {
-  int node, depth;
+  /* int node, depth; */
 
-  node = 1;
-  depth = 0;
+  /* node = 1; */
+  /* depth = 0; */
 
   Rprintf("\nDump of %s (size %d)\n\n", title, heap_size);
   
@@ -301,7 +301,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 {
   int id, i, h;
 
-  int nr_codes = 0;
+  /* int nr_codes = 0; */
 
   int *heap = NULL;
   unsigned *codelength = NULL;        /* was char[], probably to save space; but that's unnecessary and makes gcc complain */
@@ -575,7 +575,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   if ((hc->max_codelen == 0) && (hc->min_codelen == 100)) {
 
     Rprintf("Problem: No output generated -- no items?\n");
-    nr_codes = 0;
+    /* nr_codes = 0; */
 
   }
   else {

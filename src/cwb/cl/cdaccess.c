@@ -1389,7 +1389,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
 
   /* for each index in the lexicon... */
   for (idx = 0; idx < lexsize; idx++) {
-    int off_start, off_end;     /* start and end offset of current lexicon entry */
+    int off_start;     /* start and end offset of current lexicon entry */
     /* char *p; */
     /* int i; */
 
@@ -1400,7 +1400,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
     off_start = ntohl(lexidx_data[idx]);
     word = lex_data + off_start;
     if (idx < lexsize-1) {
-      off_end = ntohl(lexidx_data[idx + 1]) - 1;
+      /* off_end = ntohl(lexidx_data[idx + 1]) - 1; */
       /* len = off_end - off_start; */
     }
     else {
@@ -2530,7 +2530,7 @@ cl_dynamic_call(Attribute *attribute,
   int i, k, ap, ins;
 
   FILE *pipe;
-  DynCallResult arg;
+  /* DynCallResult arg; */
   int argnum, val;
   DynArg *p;
   char c;
@@ -2545,7 +2545,7 @@ cl_dynamic_call(Attribute *attribute,
   
   while ((p != NULL) && (argnum < nr_args)) {
     
-    arg = args[argnum];
+    /* arg = args[argnum]; */
     
     if ((p->type == args->type) ||
           ((p->type == ATTAT_POS) && (args->type == ATTAT_INT))) {
