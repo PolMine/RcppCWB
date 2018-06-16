@@ -12,7 +12,7 @@
 #' @return A matrix with integer values indicating left and right corpus positions
 #' (columns 1 and 2, respectively).
 #' @examples 
-#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' y <- get_region_matrix(
 #'   corpus = "REUTERS", s_attribute = "id",
 #'   strucs = 0L:5L, registry = registry
@@ -35,7 +35,7 @@ get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv
 #' @name region_matrix_ops
 #' @export region_matrix_to_ids
 #' @examples
-#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' 
 #' # Scenario 1: Get full text for a subcorpus defined by regions
 #' m <- get_region_matrix(

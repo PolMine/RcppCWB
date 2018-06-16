@@ -16,7 +16,9 @@
 ##  WWW at http://www.gnu.org/copyleft/gpl.html).
 
 ##
-##  PLATFORM CONFIGURATION FILE: Universal build (ppc, i386, x06_64) for Mac OS X (Darwin)
+##  PLATFORM CONFIGURATION FILE:
+##  Universal binaries for Mac OS X 10.6 (Snow Leopard) and newer
+##  with prerequisite libraries installed by user or package manager in standard locations
 ##
 
 ## Inherits from basic Darwin configuration
@@ -25,10 +27,12 @@ include $(TOP)/config/platform/darwin
 ## Make sure that Apple's gcc is used (not e.g. a fink-installed version)
 CC = /usr/bin/gcc
 
-## Good optimisation flags for Intel Core2 architecture haven't been determined yet
-CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -arch ppc
+## needs universal versions of glib and pcre (see installation notes)
+CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -march=core2 -mtune=core2
 
 DEPEND_CFLAGS = -Wall -O3
 
 ## CPU architecture and operating system used to name binary releases
 RELEASE_ARCH = universal
+RELEASE_OS = osx-10.7
+

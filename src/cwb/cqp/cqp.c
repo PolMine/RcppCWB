@@ -15,8 +15,6 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...);
-
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -50,9 +48,9 @@ extern int yyparse (void);
 extern void yyrestart(FILE *input_file);
 
 
-/** Array of file handles. */
+/** Array of file handles. Allows nested execution of "included" text files full of commands. */
 FILE *cqp_files[MAXCQPFILES];
-/** index-pointer into cqp_files. @see cqp_files */
+/** index into cqp_files. @see cqp_files */
 int cqp_file_p;
 
 /**
@@ -64,10 +62,23 @@ int cqp_file_p;
  */
 int reading_cqprc = 0;
 
+/**
+ * Global error status for CQP (will be returned to the caller when CQP exits).
+ *
+ * For the moment, it's simply boolean (0 = all OK, anything else = error).
+ * Later, we might want to define some error macros (maybe have the CDA_
+ * macros as a subset for errors bubbling up from CL, plus *also* extra
+ * macros for other errors).
+ *
+ * TODO actually get this variable set in various error conditions.
+ * TODO work out whether cqpserver should exit with this error.
+ */
+int cqp_error_status = 0;
+
 /* ======================================== Query Buffer Interface */
 
 char QueryBuffer[QUERY_BUFFER_SIZE];        /**< buffer for queries */
-int QueryBufferP = 0;                       /**< pointer into this buffer, for appending */
+int QueryBufferP = 0;                       /**< index into this buffer, for appending */
 int QueryBufferOverflow = 0;                /**< flag which signals buffer overflows */
 
 
@@ -82,8 +93,11 @@ int QueryBufferOverflow = 0;                /**< flag which signals buffer overf
 static void
 sigINT_signal_handler(int signum)
 {
+  if (!signal_handler_is_installed)
+    exit(1); /* make sure we abort if Ctrl-C is pressed a second time (even on platforms where signal handlers don't need to be reinstalled) */
+
   if (EvaluationIsRunning) {
-    fprintf(stderr, "** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
+    Rprintf("** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
     EvaluationIsRunning = 0;
   }
   signal_handler_is_installed = 0;
@@ -91,6 +105,12 @@ sigINT_signal_handler(int signum)
 
 /**
  * Installs the interrupt signal handler function with the OS.
+ *
+ * This function installs a Ctrl-C interrupt handler (clears
+ * EvaluationIsRunning flag). The function installed is
+ * sigINT_signal_handler.
+ *
+ * @see sigINT_signal_handler
  */
 void
 install_signal_handler(void)
@@ -105,19 +125,7 @@ install_signal_handler(void)
 
 
 /**
- * Wrapper function: randomises the internal random number generator.
- *
- * @see cl_randomize
- */
-void
-cqp_randomize(void)
-{
-  cl_randomize();
-}
-
-
-/**
- * Initialises the CQP program.
+ * Initialises the CQP program (or cqpserver or cqpcl).
  *
  * This function:
  * - initialises the global variables;
@@ -136,15 +144,18 @@ int
 initialize_cqp(int argc, char **argv)
 {
   char *home = NULL;
-  char init_file_fullname[256];
+  char init_file_fullname[CL_MAX_FILENAME_LENGTH];
+#ifdef __MINGW__
+  char *homedrive = NULL;
+  char *homepath = NULL;
+#endif
 
+  /* file handle for initialisation files, if any */
   FILE *cqprc;
 
   extern int yydebug;
 
-  /*
-   * initialize global variables
-   */
+  /* initialize global variables */
 
   exit_cqp = 0;
   cqp_file_p = 0;
@@ -153,22 +164,13 @@ initialize_cqp(int argc, char **argv)
 
   eep = -1;
 
-  /*
-   * intialise built-in random number generator
-   */
-
+  /* intialise built-in random number generator */
   cl_randomize();
 
-  /*
-   * initialise macro database
-   */
-
+  /* initialise macro database */
   init_macros();
 
-  /*
-   * parse program options
-   */
-
+  /* parse program options */
   parse_options(argc, argv);
 
   /* let's always run stdout unbuffered */
@@ -178,12 +180,23 @@ initialize_cqp(int argc, char **argv)
 
   yydebug = parser_debug;
 
-  /*
-   * read initialization file
-   */
+  /* before we start looking for files, let's get the home directory, if we can,
+   * so we don't have to detect it in more than one place. */
+#ifndef __MINGW__
+  home = (char *)getenv("HOME");
+#else
+  /* under Windows it is %HOMEDRIVE%%HOMEPATH% */
+  if ((homepath = (char *)getenv("HOMEPATH")) != NULL && (homedrive = (char *)getenv("HOMEDRIVE")) != NULL )  {
+    home = (char *)cl_malloc(256);
+    sprintf(home, "%s%s", homedrive, homepath);
+  }
+#endif
+  /* note that either way above, home is NULL if the needed env var(s) were not found. */
 
+
+  /* read initialization file if specified via -I, or if we are in interactive mode */
   if (cqp_init_file ||
-      (!child_process && (!batchmode || (batchfd == NULL)) && !(which_app == cqpserver))
+      (!child_process && (!batchmode || batchfd == NULL) && which_app != cqpserver)
       ) {
 
     /*
@@ -200,18 +213,18 @@ initialize_cqp(int argc, char **argv)
 
     init_file_fullname[0] = '\0';
 
-    /* read init file specified with -I , otherwise look for ~/.cqprc */
+    /* read init file specified with -I , otherwise look for $HOME/.cqprc */
     if (cqp_init_file)
       sprintf(init_file_fullname, "%s", cqp_init_file);
-    else if ((home = (char *)getenv("HOME")) != NULL)
-      sprintf(init_file_fullname, "%s/%s", home, CQPRC_NAME);
+    else if (home)
+      sprintf(init_file_fullname, "%s%c%s", home, SUBDIR_SEPARATOR, CQPRC_NAME);
 
     if (init_file_fullname[0] != '\0') {
       if ((cqprc = fopen(init_file_fullname, "r")) != NULL) {
 
         reading_cqprc = 1;        /* not good for very much, really */
         if (!cqp_parse_file(cqprc, 1)) {
-          fprintf(stderr, "Parse errors while reading %s, exiting.\n",
+          Rprintf("Parse errors while reading %s, exiting.\n",
                   init_file_fullname);
           exit(1);
         }
@@ -220,7 +233,7 @@ initialize_cqp(int argc, char **argv)
         /* fclose(cqprc);  was already closed by cqp_parse_file!! */
       }
       else if (cqp_init_file) {
-        fprintf(stderr, "Can't read initialization file %s\n",
+        Rprintf("Can't read initialization file %s\n",
                 init_file_fullname);
         exit(1);
       }
@@ -241,15 +254,15 @@ initialize_cqp(int argc, char **argv)
     /* read macro init file specified with -M , otherwise look for ~/.cqpmacros */
     if (macro_init_file)
       sprintf(init_file_fullname, "%s", macro_init_file);
-    else if ((home = (char *)getenv("HOME")) != NULL)
-      sprintf(init_file_fullname, "%s/%s", home, CQPMACRORC_NAME);
+    else if (home)
+      sprintf(init_file_fullname, "%s%c%s", home, SUBDIR_SEPARATOR, CQPMACRORC_NAME);
 
     if (init_file_fullname[0] != '\0') {
       if ((cqprc = fopen(init_file_fullname, "r")) != NULL) {
 
         reading_cqprc = 1;        /* not good for very much, really */
         if (!cqp_parse_file(cqprc, 1)) {
-          fprintf(stderr, "Parse errors while reading %s, exiting.\n",
+          Rprintf("Parse errors while reading %s, exiting.\n",
                   init_file_fullname);
           exit(1);
         }
@@ -258,7 +271,7 @@ initialize_cqp(int argc, char **argv)
         /* fclose(cqprc);  was already closed by cqp_parse_file!! */
       }
       else if (macro_init_file) {
-        fprintf(stderr, "Can't read macro initialization file %s\n",
+        Rprintf("Can't read macro initialization file %s\n",
                 init_file_fullname);
         exit(1);
       }
@@ -269,16 +282,24 @@ initialize_cqp(int argc, char **argv)
 
   /* load the default corpus. */
   if ((default_corpus) && !set_current_corpus_name(default_corpus, 0)) {
-    fprintf(stderr, "Can't set current corpus to default corpus %s, exiting.\n",
+    Rprintf("Can't set current corpus to default corpus %s, exiting.\n",
             default_corpus);
     exit(1);
   }
 
+#ifndef __MINGW__
   if (signal(SIGPIPE, SIG_IGN) == SIG_IGN) {
-    /* fprintf(stderr, "Couldn't install SIG_IGN for SIGPIPE signal\n"); */
+    /* Rprintf("Couldn't install SIG_IGN for SIGPIPE signal\n"); */
     /* -- be silent about not being able to ignore the SIGPIPE signal, which often happens in slave mode */
+    /* note that SIGPIPE does not seem to exist in signal.h under MinGW */
     signal(SIGPIPE, SIG_DFL);
   }
+#endif
+
+#ifdef __MINGW__
+  /* due to how the home path was calculated, home contains a malloc'ed string */
+  cl_free(home);
+#endif
 
   return 1;
 }
@@ -310,10 +331,11 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
     yyin = fd;
     yyrestart(yyin);
 
+    /* main read-from-parser loop */
     while (ok && !feof(fd) && !exit_cqp) {
       if (child_process && ferror(fd)) {
         /* in child mode, abort on read errors (to avoid hang-up when parent has died etc.) */
-        fprintf(stderr, "READ ERROR -- aborting CQP session\n");
+        Rprintf("READ ERROR -- aborting CQP session\n");
         break;
       }
 
@@ -335,7 +357,7 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
         ok = 0;
 
       if (child_process && (cqp_status != 0) && !reading_cqprc) {
-        fprintf(stderr, "PARSE ERROR\n"); /*  */
+        Rprintf("PARSE ERROR\n"); /*  */
       }
       if (child_process && !reading_cqprc) {
 #if 0
@@ -360,13 +382,13 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
     return ok;
   } /* endif (cqp_file_p < MAXCQPFILES) */
   else {
-    fprintf(stderr, "CQP: too many nested files (%d)\n", cqp_file_p);
+    Rprintf("CQP: too many nested files (%d)\n", cqp_file_p);
     return 0;
   }
 }
 
 /**
- * Parses a stirng for CQP query syntax.
+ * Parses a string for CQP query syntax.
  *
  * @param s  The string to parse.
  * @return   Boolean: true = all ok, false = a problem.

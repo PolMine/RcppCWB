@@ -22,6 +22,7 @@
 
 /* byte order handling taken from Corpus Library */
 #include "../cl/endian.h"
+#include "../cl/globals.h"
 
 /**
  * boolean: is the byte-order little-endian?
@@ -30,8 +31,6 @@
  */
 int little_endian = 0;
 
-
-#define MAX_LINE_LENGTH 1024
 
 /**
  * Reads from a stream one integer-representing string per line,
@@ -42,14 +41,14 @@ int little_endian = 0;
 void
 process_fd(FILE *fd)
 {
-  char buf[MAX_LINE_LENGTH];
+  char buf[CL_MAX_LINE_LENGTH];
   int i;
 
-  while(fgets(buf, MAX_LINE_LENGTH, fd)) {
+  while(fgets(buf, CL_MAX_LINE_LENGTH, fd)) {
     i = htonl(atoi(buf));
     if (little_endian) 
-      i = cl_bswap32(i);	/* explicit conversion */
-    fwrite(&i, 4, 1, stdout);	/* always write 4 bytes ! */
+      i = cl_bswap32(i);        /* explicit conversion */
+    fwrite(&i, 4, 1, stdout);   /* always write 4 bytes ! */
   }
 }
 
@@ -66,32 +65,33 @@ main(int argc, char **argv)
   int i;
   char *progname = argv[0];
 
-  fd = stdin;  /* initialisation removed from declaration for Gnuwin32 compatibility */
+  /* default case: we are reading from stdin */
+  fd = stdin;
 
   for (i = 1; i < argc; i++) {
     if (argv[i][0] == '-') {
       switch (argv[i][1]) {
       case 'n':
-	little_endian = 0;
-	break;
+        little_endian = 0;
+        break;
       case 'l':
-	little_endian = 1;
-	break;
+        little_endian = 1;
+        break;
       case 'h':
       default:
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage:  %s [options] [file]\n", argv[0]);
-	fprintf(stderr, "Reads one integer per line from ASCII file <file> or from standard input\n");
-	fprintf(stderr, "and writes values to standard output as 32bit integers in network format\n");
-	fprintf(stderr, "(the format used by CWB binary data files).\n");
-	fprintf(stderr, "Options:\n");
-	fprintf(stderr, "  -n  convert to network format [default]\n");
-	fprintf(stderr, "  -l  convert to little endian format\n");
-	fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-	exit(1);
+        fprintf(stderr, "\n");
+        fprintf(stderr, "Usage:  %s [options] [file]\n", argv[0]);
+        fprintf(stderr, "Reads one integer per line from ASCII file <file> or from standard input\n");
+        fprintf(stderr, "and writes values to standard output as 32-bit integers in network format\n");
+        fprintf(stderr, "(the format used by CWB binary data files).\n");
+        fprintf(stderr, "Options:\n");
+        fprintf(stderr, "  -n  convert to network format [default]\n");
+        fprintf(stderr, "  -l  convert to little endian format\n");
+        fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+        exit(1);
       }
     }
-    else if ((fd = fopen(argv[i], "r")) == NULL) {
+    else if ((fd = fopen(argv[i], "rb")) == NULL) {
       fprintf(stderr, "%s: Couldn't open %s\n", progname, argv[i]);
       exit(1);
     }
@@ -100,6 +100,3 @@ main(int argc, char **argv)
   process_fd(fd);
   return 0;
 }
-
-
-

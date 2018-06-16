@@ -16,6 +16,7 @@
  */
 
 #include <stdio.h>
+#include <glib.h>
 
 #include "../cl/globals.h"
 #include "../cl/macros.h"
@@ -28,154 +29,119 @@
 #include "attlist.h"
 #include "options.h"
 
-#define MAXKWICLINELEN 32768
+/** maximum length of a KWIC line (bytes). */
+#define MAXKWICLINELEN 65535
 
-#define SRESIZE 1024
 
 
-/* ---------------------------------------------------------------------- */
-
-/* ---------------------------------------------------------------------- */
-
-void add_to_string(char **s, int *spos, int *ssize, char *suffix)
-{
-  int len, i;
-
-  len = strlen(suffix);
-
-  if (*s == NULL) {
-    *s = cl_malloc(SRESIZE);
-    *ssize = SRESIZE;
-    *spos = 0;
-  }
-
-  while ((*spos + len) >= *ssize) {
-    *ssize += SRESIZE;
-    *s = cl_realloc(*s, *ssize);
-  }
-  
-  for (i = 0; suffix[i]; i++) {
-    ((*s)[*spos]) = suffix[i];
-    *spos += 1;
-  }
-  ((*s)[*spos]) = '\0';
-}
-
-/* ============================== srev(): reverse string, destructively */
-
-char *
+/**
+ * Reverses the argument string (destructively, that is, in situ).
+ *
+ * Cf. the non-standard (microsoft) function strrev.
+ *
+ * This does not respect UTF-8, so anything reversed *must* be re-reversed
+ * before output or there will be invalid byte sequences.
+ *
+ * @param s  The string to modify.
+ * @return   A pointer to the modified string (same memory area as
+ *           the argument string).
+ */
+static char *
 srev(char *s)
 {
-  register char b;
+  register char buf;
   register int i, l;
 
   l = strlen(s);
 
   for (i = 0; i < l/2; i++) {
-
-    b = s[l-i-1];
+    buf = s[l-i-1];
     s[l-i-1] = s[i];
-    s[i] = b;
-
+    s[i] = buf;
   }
 
   return s;
 }
 
-/* ---------------------------------------------------------------------- */
-
-/* inline */
-int
-append(char *s, char *suffix, int *sp, int max_sp)
-{
-  char *k = suffix;
-  int acc = 0;
-
-  if (s && k && *k && *sp < max_sp) {
-    acc = *sp;
-
-    for ( ; *k && (*sp < max_sp); k++) {
-      s[(*sp)++] = *k;
-    }
-    acc = *sp - acc;
-  }
-  return acc;
-}
 
 
 
 /* ============================== get_print_attribute_values() */
 
-int
+/**
+ * Prints s-attribute values into a ClAutoString, for use in a printed concordance line.
+ *
+ * (Note, the function is called "attribute values" but it very specifically means s-attribvutes.)
+ *
+ * The s-attributes that will be printed are determined by the contents of the ContextDescriptor
+ * object; the PrintDescriptionRecord determines what they look like.
+ *
+ * @param cd                   Print settings (context size/type; atts to print)
+ * @param position             The CPOS to be used in the position at the start
+ * @param s                    Results will be concatenated onto this string.
+ * @param sp                   Depracated argument: not used by func
+ * @param max_sp               Depracated argument: not used by func
+ * @param add_position_number  Boolean: whether or not to make  a position number (start of concordance line)
+ * @param pdr                  Print settings (of main mode) to use
+ */
+void
 get_print_attribute_values(ContextDescriptor *cd,
                            int position,
-                           char *s,
-                           int *sp,
-                           int max_sp,
+                           ClAutoString s,
+                           int *sp,  /* not used TODO remove */
+                           int max_sp, /* not used TODO remove */
                            int add_position_number,
                            PrintDescriptionRecord *pdr)
 {
   if (add_position_number && pdr->CPOSPrintFormat) {
-    static char num[MAX_LINE_LENGTH];  /* another 'Oli': this was num[16], definitely not enough for HTML output */
+    static char rendered_cpos[CL_MAX_LINE_LENGTH];  /* another 'Oli': this was num[16], definitely not enough for HTML output */
     
-    sprintf(num, pdr->CPOSPrintFormat, position);
-    append(s, num, sp, max_sp);
+    sprintf(rendered_cpos, pdr->CPOSPrintFormat, position);
+    cl_autostring_concat(s, rendered_cpos);
   }
 
   if (cd->printStructureTags) {
-    
     AttributeInfo *ai;
-    int pref_printed = 0;
+    int pref_printed = 0; /* boolean: has the prefix been printed? */
 
     for (ai = cd->printStructureTags->list; ai; ai = ai->next) {
-      
       char *v;
       
       if (ai->status) {
-        
         assert(ai->attribute);
         
         if (!pref_printed) {
-          append(s, pdr->BeforePrintStructures, sp, max_sp);
+          cl_autostring_concat(s, pdr->BeforePrintStructures);
           pref_printed++;
         }
         
-        append(s, pdr->StructureBeginPrefix, sp, max_sp);
-        append(s, 
-               pdr->printToken 
-               ? pdr->printToken(ai->attribute->any.name) 
-               : ai->attribute->any.name, 
-               sp, max_sp);
+        cl_autostring_concat(s, pdr->StructureBeginPrefix);
+        cl_autostring_concat(s,  pdr->printToken  ?  pdr->printToken(ai->attribute->any.name)  :  ai->attribute->any.name);
         
         /* print value */
-
-        v = structure_value_at_position(ai->attribute, position);
+        v = cl_cpos2struc2str(ai->attribute, position);
         if (v && pdr->printToken)
           v = pdr->printToken(v);
 
         if (v) {
-          append(s, pdr->PrintStructureSeparator, sp, max_sp);
-          append(s, v, sp, max_sp);
+          cl_autostring_concat(s, pdr->PrintStructureSeparator);
+          cl_autostring_concat(s, v);
         }
 
-        append(s, pdr->StructureBeginSuffix, sp, max_sp);
+        cl_autostring_concat(s, pdr->StructureBeginSuffix);
       }
     }
     
     if (pref_printed)
-      append(s, pdr->AfterPrintStructures, sp, max_sp);
-    
-    s[*sp] = '\0';
-    
+      cl_autostring_concat(s, pdr->AfterPrintStructures);
   }
-  
-  return 1;
 }
 
 
 
 /* ============================== helpers for: get_position_values() */
 /* the following code is borrowed from <utils/decode.c> and ensures that XML tags in the kwic output always nest properly */
+/* TODO avoid duplication of code!! */
 
 #define MAX_S_ATTRS 1024        /* max. number of s-attribute; same as MAX_ATTRS in <utils/decode.c> and MAXRANGES in <utils/encode.c>  */
 typedef struct {                
@@ -216,13 +182,13 @@ sort_s_att_regions(void) {
 }
 
 
-/* ============================== get_position_values(): get values at given corpus position
+/**
+ * Get values at the given corpus position.
  */
-
-int
+void
 get_position_values(ContextDescriptor *cd,
                     int position,
-                    char *s,
+                    ClAutoString s,
                     int *sp,
                     int max_sp,
                     int add_position_number, 
@@ -236,6 +202,7 @@ get_position_values(ContextDescriptor *cd,
   int nr_attrs = 0;
   char *word;
 
+  cl_autostring_truncate(s, 0);
 
   /* insert all s-attribute regions which start or end at the current token into s_att_regions[],
      then sort them to ensure proper nesting, and print from the list */
@@ -268,10 +235,10 @@ get_position_values(ContextDescriptor *cd,
 
   if (add_position_number && orientation == ConcLineHorizontal) {
 
-    char num[16];
+    char num[CL_MAX_LINE_LENGTH];
 
     sprintf(num, pdr->CPOSPrintFormat, position);
-    append(s, num, sp, max_sp);
+    cl_autostring_concat(s, num);
   }
 
   /* print open tags from s_att_regions[] (ascending) */
@@ -283,7 +250,7 @@ get_position_values(ContextDescriptor *cd,
       region = &(s_att_regions[sar_sort_index[i]]);
       if (region->start == position) {
         /* add start tag to s */
-        static char body[MAX_LINE_LENGTH]; /* 'body' of the start tag, may include annotation  */
+        static char body[CL_MAX_LINE_LENGTH]; /* 'body' of the start tag, may include annotation  */
         if (show_tag_attributes && (region->annot != NULL)) {
           sprintf(body, "%s %s", region->name, region->annot);
         }
@@ -291,42 +258,38 @@ get_position_values(ContextDescriptor *cd,
           strcpy(body, region->name);
         }
         
-        append(s, pdr->StructureBeginPrefix, sp, max_sp);
-        append(s, (pdr->printToken) ? pdr->printToken(body) : body, sp, max_sp);
-        append(s, pdr->StructureBeginSuffix, sp, max_sp);
+        cl_autostring_concat(s, pdr->StructureBeginPrefix);
+        cl_autostring_concat(s, (pdr->printToken) ? pdr->printToken(body) : body);
+        cl_autostring_concat(s, pdr->StructureBeginSuffix);
         do_lb++;
       }
     }
     
     if (do_lb && (orientation == ConcLineVertical))
-      append(s, pdr->AfterLine, sp, max_sp);
+      cl_autostring_concat(s, pdr->AfterLine);
   }
 
   if (add_position_number && orientation == ConcLineVertical) {
-    char num[16];
+    char num[CL_MAX_LINE_LENGTH];
     
     sprintf(num, pdr->CPOSPrintFormat, position);
-    append(s, num, sp, max_sp);
+    cl_autostring_concat(s, num);
   }
 
 
   /* ==================== then, add positional attribute values */
 
-  /* TODO: apply mappings -- or rather FORGET ABOUT IT! */
+  /* TODO: apply mappings -- ????? */
   
   for (ai = cd->attributes->list; ai; ai = ai->next) {
-    
     if (ai->attribute && ai->status > 0) {
-      
       if (nr_attrs > 0)
-        append(s, pdr->AttributeSeparator, sp, max_sp);
+        cl_autostring_concat(s, pdr->AttributeSeparator);
       
       word = NULL;
       
       if (nr_mappings > 0) {
-
         /* unused */
-
         int mp = 0;
         int class = 0;
 
@@ -350,12 +313,10 @@ get_position_values(ContextDescriptor *cd,
       }
       
       if (!word)
-        word = get_string_at_position(ai->attribute, position);
+        word = cl_cpos2str(ai->attribute, position);
 
       if (word != NULL)
-        append(s, 
-               pdr->printToken ? pdr->printToken(word) : word, 
-               sp, max_sp);
+        cl_autostring_concat(s,  pdr->printToken ? pdr->printToken(word) : word);
 
       nr_attrs++;
     }
@@ -372,30 +333,30 @@ get_position_values(ContextDescriptor *cd,
       region = &(s_att_regions[sar_sort_index[i]]);
       if (region->end == position) {
         if (orientation == ConcLineVertical && !lb) {
-          append(s, pdr->AfterLine, sp, max_sp);
+          cl_autostring_concat(s, pdr->AfterLine);
           lb++;
         }
 
         /* add end tag to s */
-        append(s, pdr->StructureEndPrefix, sp, max_sp);
-        append(s, (pdr->printToken) ? pdr->printToken(region->name) : region->name, sp, max_sp);
-        append(s, pdr->StructureEndSuffix, sp, max_sp);
+        cl_autostring_concat(s, pdr->StructureEndPrefix);
+        cl_autostring_concat(s, (pdr->printToken) ? pdr->printToken(region->name) : region->name);
+        cl_autostring_concat(s, pdr->StructureEndSuffix);
       }
     }
   }
 
   /* ==================== finish and exit */
 
-  s[*sp] = '\0';
 
 #if 0
-  fprintf(stderr, "get_position_values() at pos %d: ``%s''\n", 
-          position, s);
+  Rprintf("get_position_values() at pos %d: ``%s''\n", position, s->data);
 #endif
-
-  return 1;
 }
 
+/**
+ * Adds the asserted number of positions (nr_positions) specified by this_token_start and this_token_end
+ * to an array of integers in returned_positions
+ */
 void
 remember_this_position(int position,
                        int this_token_start, int this_token_end,
@@ -417,6 +378,29 @@ remember_this_position(int position,
   }
 }
 
+/**
+ * Scratch string used by get_field_separators only.
+ */
+static ClAutoString scratch = NULL;
+/*TODO why is the above file-scope-static ratrher than func-scope-static? I did it, and ca't remember... */
+/**
+ * This oddly-named function prints a series of separators for "fields"
+ * to an internal buffer.
+ *
+ * "Field" in this poition means one of the 4 anchor points (begin, end, target, keyword).
+ *
+ * @param position   The corpus position (cpos) whose field-sepaators we want.
+ * @param fields     Pointer to array of ConcLineFields object (each of which specifies one of the 4 anchors).
+ * @param nr_fields  Number of items in the "fields" array.
+ * @param at_end     Boolean: if true, we get the end-separators for the fields at this cpos;
+ *                   if false, we get the beginning-separators for the fields at this cpos.
+ * @param pdr        The PDR for the current concordance printout.
+ * @return           A pointer to a module-internal static string buffer containing
+ *                   the requested string. Do not free it or alter it.
+ *                   The buffer's content will change when this function is called again.
+ *                   The function will return NULL if the requested string would have
+ *                   been zero-length.
+ */
 char *
 get_field_separators(int position, 
                      ConcLineField *fields,
@@ -424,33 +408,35 @@ get_field_separators(int position,
                      int at_end,
                      PrintDescriptionRecord *pdr)
 {
-  static char s[1024];
-  int i, spos;
+  int i;
 
-  spos = 0;
+  /* start with an empty string ... */
+  if (NULL == scratch)
+    scratch = cl_autostring_new(NULL, 0);
+  else
+    cl_autostring_truncate(scratch, 0);
 
-  if (fields && nr_fields > 0 && 
-      position >= 0 && pdr && pdr->printField) {
-    
+  if (fields && nr_fields > 0 && position >= 0 && pdr && pdr->printField) {
     if (at_end) {
       for (i = nr_fields; i > 0; i--) {
         if (position == fields[i-1].end_position) {
-          append(s, pdr->printField(fields[i-1].type, at_end), &spos, 1024);
+          /* note call to the "business end" which is the func pointer in the PDR */
+          cl_autostring_concat(scratch, pdr->printField(fields[i-1].type, at_end));
         }
       }
     }
     else {
+      /* if not at_end then... */
       for (i = 0; i < nr_fields; i++) {
         if (position == fields[i].start_position) {
-          append(s, pdr->printField(fields[i].type, at_end), &spos, 1024);
+          /* note call to the "business end" which is the func pointer in the PDR */
+          cl_autostring_concat(scratch, pdr->printField(fields[i].type, at_end));
         }
       }
     }
     
-    s[spos] = '\0';
-
-    if (spos > 0)
-      return s;
+    if (scratch->len > 0)
+      return scratch->data;
     else
       return NULL;
   }
@@ -458,9 +444,72 @@ get_field_separators(int position,
     return NULL;
 }
 
+
+
+/*
+ * TWO GLOBAL VARIABLES for concordance line construction, used only within compose_kwic_line();
+ * they are global so that, once their buffers auto-expand, they will stay expanded for the
+ * remainder of the CQP session -- no sense freeing memory when a user has already shown they
+ * are inclined to make use of it and will probably request an equally long string soon after !
+ */
+
+/** Used to build the concordance line (main line buffer); @see compose_kwic_line */
+static ClAutoString line  = NULL;
+/** Used to build the concordance line (token buffer);     @see compose_kwic_line */
+static ClAutoString token = NULL;
+
+/**
+ * Initialises the two empty auto-growing strings used for concordance line concstruction.
+ */
+void
+setup_kwic_line_memory(void)
+{
+  if (NULL == line)
+    line  = cl_autostring_new(NULL, 0);
+  else
+    cl_autostring_truncate(line, 0);
+
+  if (NULL == token)
+    token = cl_autostring_new(NULL, 0);
+  else
+    cl_autostring_truncate(line, 0);
+}
+
+/**
+ * Frees the memory used for building a KWIC line for display.
+ *
+ * Best used when CQP shuts down.
+ */
+void
+cleanup_kwic_line_memory(void)
+{
+  cl_autostring_delete(line);
+  cl_autostring_delete(token);
+  cl_autostring_delete(scratch);
+}
+
+/**
+ * Builds a string for a concordance output line.
+ *
+ * 'position_list' is a list of (corpus) positions. The string
+ * start and beginning positions for these corpus positions
+ * are written into returned_positions, which must be exactly
+ * two times as large as the position list. The number of
+ * positions must be in nr_positions.
+ *
+ * @param match_start  A corpus position
+ * @param match_end    A corpus position
+ *
+ * @param fields       Array of ConcLineFields object (each of which specifies one of the 4 anchors).
+ * @param nr_fields    Number of items in the "fields" array.
+ *
+ * roughnotes: I THINK returned_positions is just a blob of memory that the func is being allowd to use.
+ * @return             String containing the output line.
+ */
 char *
 compose_kwic_line(Corpus *corpus,
-                  int match_start, int match_end,
+                  int match_start,
+                  int match_end,
                   ContextDescriptor *cd,
                   int *length,
                   int *s_mb,
@@ -477,52 +526,64 @@ compose_kwic_line(Corpus *corpus,
                   int nr_mappings,
                   Mapping *mappings)
 {
-  int acc_len;
+  // int acc_len;  /* Accurate length - for counting context in characters */
+  /* TODO replace the single variable above with the following pair of variables */
+
+  /* length of the string assembled, in bytes */
+  unsigned length_bytes;
+  /* length of the string assembled, in characters; == length_bytes in all cases other than charset==utf8 */
+  unsigned length_characters;
+
+  int old_len;  /* Old length - for tracking the n bytes added by a concatenate operation */
+
+  /* total N of tokens on the attribute (first on the list of attributes-to-print);
+   * used as a maximum for sanity-check */
   int text_size;
+
   int start, end, index;
 
-  char line[MAXKWICLINELEN];
+  /* dummies: because the arguments of some other functions require an int to be passed... */
   int line_p;
-
-  char token[MAXKWICLINELEN];
   int token_p;
 
   char *word;
+  char *separator;
 
-  char separator;
   int number_lines;
 
   int rng_s, rng_e, rng_n, nr_ranges;
 
   int this_token_start, this_token_end;
+  int token_length_characters;
 
   int el_c = 0;
 
-  int enough_context = 0;       /* ob wir noch appenden sollen oder nicht */
+  int enough_context = 0;       /* Boolean: should we keep adding or not? */
 
   int nr_selected_attributes = 0;
 
   AttributeList *default_list = NULL;
   AttributeInfo *ai;
 
+  /* set up our two buffers as empty strings ... */
+  setup_kwic_line_memory();
 
   /* set the separator */
-
   if (orientation == ConcLineHorizontal) {
-    separator = ' ';
+    separator = " ";
     number_lines = 0;
   }
   else {
-    separator = '\n';
+    separator = "\n";
     number_lines = cd->print_cpos;
   }
 
-  /* make a dummy attribute list in case we don't yet have one. */
+  /* make a dummy attribute list (with default p-attribute as its only member) in case we don't yet have one. */
 
   if (cd->attributes == NULL ||
       cd->attributes->list == NULL) {
     default_list = NewAttributeList(ATT_POS);
-    (void) AddNameToAL(default_list, DEFAULT_ATT_NAME, 1, 0);
+    AddNameToAL(default_list, DEFAULT_ATT_NAME, 1, 0);
     cd->attributes = default_list;
   }
   
@@ -540,24 +601,23 @@ compose_kwic_line(Corpus *corpus,
       nr_selected_attributes++;
     }
     else {
-      fprintf(stderr, "ERROR: Can't select default attribute in attribute list\n");
+      Rprintf("ERROR: Can't select default attribute in attribute list\n");
       return NULL;
     }
   }
 
   assert(cd->attributes->list->attribute);
 
-  line_p = 0;
-  line[line_p] = '\0';
+  text_size = cl_max_cpos(cd->attributes->list->attribute);
 
-  text_size = get_attribute_size(cd->attributes->list->attribute);
+  /* assert sane values for match_start and match_end */
+  assert(match_start >= 0 && match_start < text_size);
+  assert(match_end >= 0 && match_end < text_size && match_end >= match_start);
 
-  assert((match_start >= 0) && 
-         (match_start < text_size));
 
-  assert((match_end >= 0) && 
-         (match_end < text_size) && 
-         (match_end >= match_start));
+  /*
+   * WE ARE NOW READY TO START BUILDING US A KWIC LINE !!! Hurray!
+   */
 
   get_print_attribute_values(cd, match_start, 
                              line, &line_p, 
@@ -565,7 +625,7 @@ compose_kwic_line(Corpus *corpus,
                              cd->print_cpos && (orientation == ConcLineHorizontal),
                              pdr);
 
-  append(line, pdr->BeforeField, &line_p, MAXKWICLINELEN);
+  cl_autostring_concat(line, pdr->BeforeField);
 
   /* ============================== clear array of returned positions */
 
@@ -577,134 +637,163 @@ compose_kwic_line(Corpus *corpus,
   }
 
 
+  /*
+   * ==========================================================================
+   * first big job: use designated method to put together the left-hand co-text
+   * ==========================================================================
+   */
+
+
   switch(cd->left_type) {
   case CHAR_CONTEXT:
     
-    acc_len = 0;                /* we have 0 characters so far */
+//    acc_len = 0;
+    /* we have 0 characters so far */
+    length_bytes = 0;
+    length_characters = 0;
     enough_context = 0;
 
-    /* wir merken uns den alten Anfang, wg. srev() */
-    index = line_p;
+    /* make a note of the old starting point, for purposes of srev() */
+    index = line->len;
 
     /* NUR linken Kontext ohne MatchToken berechnen */
     
-    for (start = match_start-1; 
-         (start >= 0 && !enough_context); 
-         start--) {
-
-      token_p = 0;
-      
-      if (acc_len >= cd->left_width) {
+    for (start = match_start - 1; (start >= 0 && !enough_context); start--) {
+//      if (acc_len >= cd->left_width)
+      if (length_characters >= cd->left_width)
         enough_context++;
+      else {
+        /* we do not yet have enough context, so get position values into (blank) string object token */
+        get_position_values(cd,
+                            start,
+                            token, &token_p,
+                            MAXKWICLINELEN,
+                            number_lines,
+                            orientation,
+                            pdr,
+                            nr_mappings,
+                            mappings);
+        token_length_characters = cl_charset_strlen(corpus->charset, token->data);
+        if (token_length_characters > 0) {
+
+          if (line->len > index) {   /* no blank before first token to the left of match */
+            old_len = line->len;
+            cl_autostring_concat(line, pdr->TokenSeparator);
+//            acc_len += line->len - old_len;
+            length_bytes += line->len - old_len;
+            length_characters += cl_charset_strlen(corpus->charset, pdr->TokenSeparator);
+          }
+
+          this_token_start = line->len;
+
+          /* wir fÃ¼gen erstmal ganz normal ein und drehen nachher um */
+
+          if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
+            cl_autostring_concat(line, word);
+
+          cl_autostring_concat(line, pdr->BeforeToken);
+
+          if (token_length_characters + length_characters < cd->left_width) {
+//          if (token->len + acc_len < cd->left_width) {
+            cl_autostring_concat(line, token->data);
+  //          acc_len += token->len;
+            length_bytes += token->len;
+            length_characters += token_length_characters;
+          }
+          else {
+            /* not enough space for the whole token */
+            char *mark;
+            if (corpus->charset != utf8) {
+              /* ... so only copy its last several bytes */
+              mark = token->data + (token->len - (cd->left_width - length_characters));
+            }
+            else {
+              /* ... so only copy its last several characters */
+              mark = token->data;
+              while (token_length_characters + length_characters > cd->left_width) {
+//                do {
+//                  --mark;
+//                } while (cl_string_utf8_continuation_byte(*mark));
+                mark = g_utf8_next_char(mark);
+                --token_length_characters;
+              }
+            }
+            old_len = line->len;
+            cl_autostring_concat(line, mark);
+//            acc_len += line->len - old_len;
+            length_bytes += line->len - old_len;
+            length_characters += cl_charset_strlen(corpus->charset, mark);
+          }
+
+          cl_autostring_concat(line, pdr->AfterToken);
+
+          if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
+            cl_autostring_concat(line, word);
+
+          srev(line->data + this_token_start);
+
+          this_token_end = line->len;
+
+          if (this_token_start != this_token_end)
+            remember_this_position(start,
+                                   this_token_start, this_token_end,
+                                   position_list, nr_positions,
+                                   returned_positions);
+        }
+        else
+          enough_context = 1;
+        /* that is, if calling get_position_values() did not generate any more context,
+         * then simply declare that we have enough context!
+         */
       }
-      else if (get_position_values(cd, 
-                                   start, 
-                                   token, &token_p, 
-                                   MAXKWICLINELEN, 
-                                   number_lines, 
-                                   orientation, 
-                                   pdr,
-                                   nr_mappings, 
-                                   mappings) &&
-               token_p > 0) {
+    } /* endfor */
 
-        if (line_p > index) {   /* no blank before first token to the left of match */
-          acc_len += append(line, pdr->TokenSeparator, &line_p, MAXKWICLINELEN);
-        }
-
-        this_token_start = line_p;
-        
-        /* wir fügen erstmal ganz normal ein und drehen nachher um */
-
-        if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
-
-        if (token_p + acc_len < cd->left_width) {
-          acc_len += append(line, token, &line_p, MAXKWICLINELEN);
-        }
-        else {
-          acc_len += append(line, 
-                            token + (token_p - (cd->left_width - acc_len)), 
-                            &line_p, MAXKWICLINELEN);
-        }
-          
-        append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
-
-        if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        this_token_end = line_p;
-        
-        line[line_p] = '\0';
-        srev(line + this_token_start);
-
-        this_token_end = line_p;
-
-        if (this_token_start != this_token_end)
-          remember_this_position(start,
-                                 this_token_start, this_token_end,
-                                 position_list, nr_positions,
-                                 returned_positions);
-
-      }
-      else
-        enough_context = 1;
+    /* pad with blanks until we reach the designated width for left co-text */
+//    while (acc_len < cd->left_width) {
+    while (length_characters < cd->left_width) {
+      cl_autostring_concat(line, " ");
+      ++length_bytes, ++length_characters;
+      //acc_len++; /* pretend to fill in necessary number of blanks, even if buffer is already full */
     }
 
-    /* auffüllen (padding) mit Blanks, bis linker Kontext erreicht */
-    while (acc_len < cd->left_width) {
-      line[line_p++] = ' ';
-      acc_len++;
-    }
-
-    /* die bisherige Zeile (Linkskontext des Match-Tokens) umdrehen,
-     * aber nicht evtl. printStructures
-     */
+    /* Now we need to reverse order of characters of the left co-text assembled in the preceding code;
+     * but we DON'T flip any printStructures */
 
 #if 0
-    fprintf(stderr, "line bef srev(): >>%s<<\n", line + index);
+    Rprintf("line before srev(): >>%s<<\n", line + index);
 #endif
 
-    line[line_p] = '\0';
-    srev(line+index);
+    srev(line->data + index);
 
 #if 0
-    fprintf(stderr, "line aft srev(): >>%s<<\n", line + index);
+    Rprintf("line after srev(): >>%s<<\n", line + index);
 #endif
 
-    /* der spannende Teil: wir müssen wg srev() die Liste der
-     * returned_positions angleichen... */
+    /* now the fun bit: because of the srev() call abnove, we now need to align the list of returned_positions ... */
 
     if (position_list && (nr_positions > 0)) {
 
       int old_start, new_start, old_end, new_end;
 
       for (el_c = 0; el_c < nr_positions; el_c++) {
-        
         if (returned_positions[el_c * 2] >= 0) {
-
           old_start = returned_positions[el_c * 2] - index;
           old_end   = returned_positions[(el_c * 2)+1] - index;
 
-          new_start = line_p - 1 - old_end;
-          new_end   = line_p - 1 - old_start;
+          new_start = line->len - 1 - old_end;
+          new_end   = line->len - 1 - old_start;
 
 #if 0
-          fprintf(stderr, "Patching [%d,%d] to [%d,%d]\n",
-                  old_start, old_end, new_start, new_end);
+          Rprintf("Patching [%d,%d] to [%d,%d]\n", old_start, old_end, new_start, new_end);
 #endif
 
-          returned_positions[el_c * 2] = new_start + 1;
+          returned_positions[el_c * 2]     = new_start + 1;
           returned_positions[(el_c * 2)+1] = new_end + 1;
-
-          /* weia... */
         }
       }
     }
 
-    break;
+    break; /* endcase CHAR_CONTEXT */
     
   case WORD_CONTEXT:
 
@@ -714,42 +803,37 @@ compose_kwic_line(Corpus *corpus,
       start = 0;
 
     for ( ; start < match_start; start++) {
+      cl_autostring_truncate(token, 0);
+      get_position_values(cd,
+                          start,
+                          token, &token_p,
+                          MAXKWICLINELEN,
+                          number_lines,
+                          orientation,
+                          pdr,
+                          nr_mappings, mappings);
+      /* Trennzeichen einfÃ¼gen, falls schon tokens in line drin sind */
+      if (line->len > 0)
+        cl_autostring_concat(line, pdr->TokenSeparator);
 
-      token_p = 0;
-      if (get_position_values(cd, 
-                              start, 
-                              token, &token_p, 
-                              MAXKWICLINELEN, 
-                              number_lines,
-                              orientation, 
-                              pdr, 
-                              nr_mappings, mappings)) {
+      this_token_start = line->len;
 
-        /* Trennzeichen einfügen, falls schon tokens in line drin sind */
-        if (line_p > 0)
-          append(line, pdr->TokenSeparator, &line_p, MAXKWICLINELEN);
+      if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
+        cl_autostring_concat(line, word);
 
-        this_token_start = line_p;
+      cl_autostring_concat(line, pdr->BeforeToken);
+      cl_autostring_concat(line, token->data);
+      cl_autostring_concat(line, pdr->AfterToken);
 
-        if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
-        append(line, token, &line_p, MAXKWICLINELEN);
-        append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
+      if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
+        cl_autostring_concat(line, word);
 
-        if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        this_token_end = line_p;
+      this_token_end = line->len;
 
-        remember_this_position(start,
-                               this_token_start, this_token_end,
-                               position_list, nr_positions,
-                               returned_positions);
-      }
-      else
-        break;
+      remember_this_position(start,
+                             this_token_start, this_token_end,
+                             position_list, nr_positions,
+                             returned_positions);
     }
 
     break;
@@ -758,7 +842,7 @@ compose_kwic_line(Corpus *corpus,
   case ALIGN_CONTEXT:
     
     if (!cd->left_structure) {
-      fprintf(stderr, "concordance.o/compose_kwic_line: lcontext attribute pointer is NULL\n");
+      Rprintf("concordance.o/compose_kwic_line: lcontext attribute pointer is NULL\n");
       start = match_start - 20;
     }
     else {
@@ -801,168 +885,179 @@ compose_kwic_line(Corpus *corpus,
       start = 0;
       
     for ( ; start < match_start; start++) {
-      
-      token_p = 0;
-      if (get_position_values(cd, 
-                              start, 
-                              token, &token_p, 
-                              MAXKWICLINELEN, 
-                              number_lines,
-                              orientation,
-                              pdr, 
-                              nr_mappings, mappings)) {
-        
-        /* Trennzeichen einfügen, falls schon tokens in line drin sind */
-        if (line_p > 0)
-          append(line, pdr->TokenSeparator, &line_p, MAXKWICLINELEN);
+      cl_autostring_truncate(token, 0);
+      get_position_values(cd,
+                          start,
+                          token, &token_p,
+                          MAXKWICLINELEN,
+                          number_lines,
+                          orientation,
+                          pdr,
+                          nr_mappings, mappings);
+      /* Insert a separator iff there are already 1+ tokens in the line */
+      if (line->len > 0)
+        cl_autostring_concat(line, pdr->TokenSeparator);
 
-        this_token_start = line_p;
+      this_token_start = line->len;
 
-        /* jetzt den Feldstart */
-        if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
+      /* jetzt den Feldstart */
+      if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
+        cl_autostring_concat(line, word);
 
-        /* token an line dranhängen */
-        append(line, token, &line_p, MAXKWICLINELEN);
+      cl_autostring_concat(line, pdr->BeforeToken);
+      cl_autostring_concat(line, token->data);
+      cl_autostring_concat(line, pdr->AfterToken);
 
-        append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
+      /* jetzt das Feldende */
+      if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
+        cl_autostring_concat(line, word);
 
-        /* jetzt das Feldende */
-        if ((word = get_field_separators(start, fields, nr_fields, 1, pdr))) {
-          append(line, word, &line_p, MAXKWICLINELEN);
-        }
-        
-        this_token_end = line_p;
+      this_token_end = line->len;
 
-        remember_this_position(start,
-                               this_token_start, this_token_end,
-                               position_list, nr_positions,
-                               returned_positions);
-      }
-      else
-        break;
+      remember_this_position(start,
+                             this_token_start, this_token_end,
+                             position_list, nr_positions,
+                             returned_positions);
     }
 
     break;
   }
 
 
-  /* Der linke Kontext ist berechnet. Nun werden die Match-Tokens
-   * eingefügt
+  /*
+   * =======================================================================
+   * Left-hand co-text is now fully built, so now we insert the match tokens
+   * =======================================================================
    */
 
-  /* Trennzeichen einfügen, falls schon tokens in line drin sind */
-  if (line_p > 0)
-    append(line, pdr->TokenSeparator, &line_p, MAXKWICLINELEN);
+  /* Trennzeichen einfÃ¼gen, falls schon tokens in line drin sind */
+  if (line->len > 0)
+    cl_autostring_concat(line, pdr->TokenSeparator);
   
-  *s_mb = line_p;
+  /* out parameter: byte offset of begin-point of the hit */
+  *s_mb = line->len;
 
-  append(line, left_marker, &line_p, MAXKWICLINELEN);
+  cl_autostring_concat(line, left_marker);
   
   for (start = match_start; start <= match_end; start++) {
-    
-    token_p = 0;
-    if (get_position_values(cd, 
-                            start, 
-                            token, &token_p, 
-                            MAXKWICLINELEN, 
-                            number_lines,
-                            orientation, 
-                            pdr, 
-                            nr_mappings, mappings)) {
-            
-      /* token an line dranhängen */
+    cl_autostring_truncate(token, 0);
+    get_position_values(cd,
+                        start,
+                        token, &token_p,
+                        MAXKWICLINELEN,
+                        number_lines,
+                        orientation,
+                        pdr,
+                        nr_mappings, mappings);
+    this_token_start = line->len;
 
-      this_token_start = line_p;
+    if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
+      cl_autostring_concat(line, word);
 
+    cl_autostring_concat(line, pdr->BeforeToken);
+    cl_autostring_concat(line, token->data);
+    cl_autostring_concat(line, pdr->AfterToken);
 
-      if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
-        append(line, word, &line_p, MAXKWICLINELEN);
-  
-      append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
-      append(line, token, &line_p, MAXKWICLINELEN);
-      append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
-      
-      if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
-        append(line, word, &line_p, MAXKWICLINELEN);
+    if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
+      cl_autostring_concat(line, word);
 
-      this_token_end = line_p;
+    this_token_end = line->len;
 
-      remember_this_position(start,
-                             this_token_start, this_token_end,
-                             position_list, nr_positions,
-                             returned_positions);
+    remember_this_position(start,
+                           this_token_start, this_token_end,
+                           position_list, nr_positions,
+                           returned_positions);
 
-      if (start != match_end) {
-        /* Trennzeichen einfügen */
-        if (line_p > 0)
-          line[line_p++] = separator;
-      }
+    if (start != match_end) {
+      if (line->len > 0)
+        cl_autostring_concat(line, separator);
     }
-    else
-      break;
   }
   
-  append(line, right_marker, &line_p, MAXKWICLINELEN);
+  cl_autostring_concat(line, right_marker);
+
+  /* out parameter: byte offset of begin-point of waht follows the hit */
+  *s_me = line->len;
 
 
-  *s_me = line_p;
 
-  /* nun muß noch der Rechtskontext hinzugefügt werden */
+  /*
+   * ======================================================
+   * now all we have to do is add on the right-hand co-text
+   * ======================================================
+   */
 
 
   switch(cd->right_type) {
   case CHAR_CONTEXT:
     
-    acc_len = 0;                /* we have 0 characters so far */
+    //acc_len = 0;
+    /* we have 0 characters so far */
+    length_bytes = 0;
+    length_characters = 0;
     enough_context = 0;
 
     /* nun rechten Kontext ohne MatchToken berechnen */
 
-    for (start = match_end+1; 
-         (start < text_size && !enough_context); 
-         start++) {
+    for (start = match_end + 1; (start < text_size && !enough_context); start++) {
+      cl_autostring_truncate(token, 0);
+      if (length_characters >= cd->right_width)
+//      if (acc_len >= cd->right_width)
+        enough_context++; /* stop if the requested number of characters have been generated */
+      else {
+        get_position_values(cd,
+                            start,
+                            token, &token_p,
+                            MAXKWICLINELEN,
+                            number_lines,
+                            orientation,
+                            pdr,
+                            nr_mappings, mappings);
 
-      token_p = 0;
-
-      if (acc_len >= cd->right_width)
-        enough_context++;
-      else if (get_position_values(cd, 
-                                   start, 
-                                   token, &token_p, 
-                                   MAXKWICLINELEN, 
-                                   number_lines,
-                                   orientation,
-                                   pdr, 
-                                   nr_mappings, mappings)) {
-
-        if (line_p > 0)
-          acc_len += append(line, pdr->TokenSeparator, &line_p, MAXKWICLINELEN);
-
-        this_token_start = line_p;
-
-        /* jetzt den Feldstart */
-        if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
-
-        token_p = 0;
-        while (token[token_p] && 
-               acc_len < cd->right_width) {
-          line[line_p++] = token[token_p++];
-          acc_len++;
-          /* acc_len += append(line, token, &line_p, MAXKWICLINELEN); */
+        if (line->len > 0) {
+          old_len = line->len;
+          cl_autostring_concat(line, pdr->TokenSeparator);
+          length_bytes += line->len - old_len;
+          length_characters += cl_charset_strlen(corpus->charset, pdr->TokenSeparator);
         }
-        append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
+
+        this_token_start = line->len;
+
+        /* now the beginning-of-field separators */
+        if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
+          cl_autostring_concat(line, word);
+        
+        cl_autostring_concat(line, pdr->BeforeToken);
+
+        old_len = line->len;
+        cl_autostring_concat(line, token->data);
+        length_bytes += line->len - old_len;
+        length_characters += cl_charset_strlen(corpus->charset, token->data);
+        if (length_characters > cd->right_width) {
+          if (corpus->charset != utf8) {
+            /* simple truncation by count of bytes */
+            cl_autostring_truncate(line, line->len - (length_characters - cd->right_width));
+            length_characters = length_bytes = cd->right_width;
+          }
+          else {
+            /* rewind through the string until we have removed the correct n of characters */
+            char *mark = line->data + (line->len - 1);
+            while (length_characters > cd->right_width) {
+              while (cl_string_utf8_continuation_byte(*mark))
+                --mark;
+              --length_characters, --mark;
+            }
+            cl_autostring_truncate(line, (mark - line->data + 1));
+          }
+        }
+
+        cl_autostring_concat(line, pdr->AfterToken);
 
         /* jetzt das Feldende */
         if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
+          cl_autostring_concat(line, word);
 
-        this_token_end = line_p;
+        this_token_end = line->len;
 
         if (this_token_start != this_token_end)
           remember_this_position(start,
@@ -970,60 +1065,45 @@ compose_kwic_line(Corpus *corpus,
                                  position_list, nr_positions,
                                  returned_positions);
       }
-      else
-        enough_context = 1;
     }
 
-    /* auffüllen (padding) mit Blanks, bis rechter Kontext erreicht */
-    while (line_p < cd->right_width)
-      line[line_p++] = ' ';
-    
     break;
     
   case WORD_CONTEXT:
 
-    for (start = 1; 
-         (start <= cd->right_width && 
-          match_end + start < text_size); 
-         start++) {
-
-      token_p = 0;
-      if (get_position_values(cd, 
-                              match_end + start, 
-                              token, &token_p, 
-                              MAXKWICLINELEN, 
-                              number_lines,
-                              orientation,
-                              pdr, 
-                              nr_mappings, mappings)) {
+    for (start = 1 ; start <= cd->right_width && match_end + start < text_size ; start++) {
+      cl_autostring_truncate(token, 0);
+      get_position_values(cd,
+                          match_end + start,
+                          token, &token_p,
+                          MAXKWICLINELEN,
+                          number_lines,
+                          orientation,
+                          pdr,
+                          nr_mappings, mappings);
         
-        /* Trennzeichen einfügen, falls schon tokens in line drin sind */
-        if (line_p > 0)
-          append(line, pdr->TokenSeparator, &line_p, MAXKWICLINELEN);
+      /* Trennzeichen einfÃ¼gen, falls schon tokens in line drin sind */
+      if (line->len > 0)
+        cl_autostring_concat(line, pdr->TokenSeparator);
 
-        this_token_start = line_p;
+      this_token_start = line->len;
 
-        if ((word = get_field_separators(match_end + start, 
-                                         fields, nr_fields, 0, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
-        append(line, token, &line_p, MAXKWICLINELEN);
-        append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
+      if ((word = get_field_separators(match_end + start, fields, nr_fields, 0, pdr)))
+        cl_autostring_concat(line, word);
 
-        if ((word = get_field_separators(match_end + start, 
-                                         fields, nr_fields, 1, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        this_token_end = line_p;
+      cl_autostring_concat(line, pdr->BeforeToken);
+      cl_autostring_concat(line, token->data);
+      cl_autostring_concat(line, pdr->AfterToken);
 
-        remember_this_position(match_end + start,
-                               this_token_start, this_token_end,
-                               position_list, nr_positions,
-                               returned_positions);
-      }
-      else
-        break;
+      if ((word = get_field_separators(match_end + start, fields, nr_fields, 1, pdr)))
+        cl_autostring_concat(line, word);
+
+      this_token_end = line->len;
+
+      remember_this_position(match_end + start,
+                             this_token_start, this_token_end,
+                             position_list, nr_positions,
+                             returned_positions);
     }
 
     break;
@@ -1032,7 +1112,7 @@ compose_kwic_line(Corpus *corpus,
   case ALIGN_CONTEXT:
 
     if (!cd->right_structure) {
-      fprintf(stderr, "concordance.o/compose_kwic_line: rcontext attribute pointer is NULL\n");
+      Rprintf("concordance.o/compose_kwic_line: rcontext attribute pointer is NULL\n");
       end = match_end + 20;
     }
     else {
@@ -1067,7 +1147,7 @@ compose_kwic_line(Corpus *corpus,
             if (!cl_struc2cpos(cd->right_structure,
                                rng_n,
                                &rng_s, &rng_e)) 
-            end = match_end + 20;
+              end = match_end + 20;
             else
               end = rng_e;
           }
@@ -1079,102 +1159,53 @@ compose_kwic_line(Corpus *corpus,
       match_end = text_size - 1;
 
     for (start = match_end + 1; start <= end; start++) {
-      
-      token_p = 0;
-      if (get_position_values(cd, 
-                              start, 
-                              token, &token_p, 
-                              MAXKWICLINELEN, 
-                              number_lines,
-                              orientation,
-                              pdr, 
-                              nr_mappings, mappings)) {
-        
-        /* Trennzeichen einfügen, falls schon tokens in line drin sind */
-        if (line_p > 0)
-          line[line_p++] = separator;
+      cl_autostring_truncate(token, 0);
+      get_position_values(cd,
+                          start,
+                          token, &token_p,
+                          MAXKWICLINELEN,
+                          number_lines,
+                          orientation,
+                          pdr,
+                          nr_mappings, mappings);
 
-        this_token_start = line_p;
-        
-        if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        append(line, pdr->BeforeToken, &line_p, MAXKWICLINELEN);
-        append(line, token, &line_p, MAXKWICLINELEN);
-        append(line, pdr->AfterToken, &line_p, MAXKWICLINELEN);
-
-        if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
-          append(line, word, &line_p, MAXKWICLINELEN);
-        
-        this_token_end = line_p;
-
-        remember_this_position(start,
-                               this_token_start, this_token_end,
-                               position_list, nr_positions,
-                               returned_positions);
+      /* Trennzeichen einfÃ¼gen, falls schon tokens in line drin sind */
+      if ( (this_token_start = line->len) > 0) {
+        cl_autostring_concat(line, separator);
+        this_token_start++;
       }
-      else
-        break;
+
+      if ((word = get_field_separators(start, fields, nr_fields, 0, pdr)))
+        cl_autostring_concat(line, word);
+
+      cl_autostring_concat(line, pdr->BeforeToken);
+      cl_autostring_concat(line, token->data);
+      cl_autostring_concat(line, pdr->AfterToken);
+
+      if ((word = get_field_separators(start, fields, nr_fields, 1, pdr)))
+        cl_autostring_concat(line, word);
+
+      this_token_end = line->len;
+
+      remember_this_position(start,
+                             this_token_start, this_token_end,
+                             position_list, nr_positions,
+                             returned_positions);
     }
 
     break;
   }
 
-  append(line, pdr->AfterField, &line_p, MAXKWICLINELEN);
+  cl_autostring_concat(line, pdr->AfterField);
 
-  line[line_p] = '\0';
+  /*
+   * OK, the line is complete!
+   */
 
-  /* so, das war's ... :-) */
+  *length = line->len;
 
-  *length = line_p;
+  return cl_strdup(cl_autostring_ptr(line));
 
   /* TODO: returned_positions richtig setzen */
-
-  return cl_strdup(line);
-}
-
-
-ConcordanceLine 
-MakeConcordanceLine(Corpus *corpus,
-                    Attribute *attribute,
-                    int focus_start_position,
-                    int focus_end_position,
-                    ContextDescriptor *context,
-                    int nr_fields,
-                    ConcLineField *fields)
-{
-  return NULL;
-}
-
-void FreeConcordanceLine(ConcordanceLine *line_p)
-{
-  if (line_p) {
-
-    ConcordanceLine line = *line_p;
-
-    if (line->type == 0) {
-
-      /* simple string */
-      
-      if (line->simpleString.s) {
-        free(line->simpleString.s);
-        line->simpleString.s = NULL;
-      }
-      
-    }
-    else {
-
-      int i;
-
-      for (i = 0; i < line->nestedString.nr_subelements; i++)
-        FreeConcordanceLine(&(line->nestedString.subElements[i]));
-
-    }
-
-    free(*line_p);
-
-    *line_p = NULL;
-
-  }
 }
 

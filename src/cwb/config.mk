@@ -16,9 +16,9 @@
 ##  WWW at http://www.gnu.org/copyleft/gpl.html).
 
 
-# *********************************************************
-# *  Edit this file to configure the CWB for your system  *
-# *********************************************************
+# **********************************************************
+# * Edit this file to configure CWB for your system *
+# **********************************************************
 
 # 
 # PLATFORM-SPECIFIC CONFIGURATION (OS and CPU type)
@@ -28,17 +28,19 @@
 #       linux         i386-Linux (generic)
 #         linux-64       - configuration for 64-bit CPUs
 #         linux-opteron  - with optimimzation for AMD Opteron processor
-#       darwin        Mac OS X / Darwin [use one of the CPU-specific entries below]
-#         darwin-g4      - with optimization for PowerPC G4 processor
-#         darwin-g5      - with optimization for PowerPC G5 processor
-#         darwin-i386    - configuration for i386-compatible processors
-#         darwin-64      - 64-bit build on Intel Core2 and newer processors
-#         darwin-universal - Universal build for ppc, i386 and x86_64 architecturs
-#         darwin-core2   - optimised build for Core 2 CPU (requires Xcode 3.1 / OS X 10.5)
+#       darwin        Mac OS X / Darwin [use one of the more specific entries below]
+#         darwin-brew       - 64-bit, natively tuned, prerequisites installed with HomeBrew (recommended)
+#         darwin-universal  - universal build on Mac OS X 10.6 and newer
+#         darwin-64         - 64-bit build on Mac OS X 10.6 and newer
+#         darwin-port-core2  - universal build optimized for Core2 CPUs, prerequisites installed with MacPorts (deprecated)
 #       solaris       SUN Solaris 8 for SPARC CPU
 #       cygwin        Win32 build using Cygwin emulation layer (experimental)
+#       mingw-cross   Cross-compile for Win32-on-i586 from a *nix system with MinGW installed (experimental)
+#       mingw-native  Build natively on Win32 using MinGW (new, at research stage only, does not work yet)
 #
+ifndef PLATFORM
 PLATFORM=darwin-64
+endif
 include $(TOP)/config/platform/$(PLATFORM)
 
 #
@@ -46,6 +48,7 @@ include $(TOP)/config/platform/$(PLATFORM)
 #
 # Pre-defined site configuration files:
 #       standard        standard configuration (installation in /usr/local tree)
+#         beta-install    ... install into separate tree /usr/local/cwb-<VERSION> (unless CWB_LIVE_DANGEROUSLY is set)
 #       classic         "classic" configuration (CWB v2.2, uses /corpora/c1/registry)
 #       osx-fink        Mac OS X installation in Fink's /sw tree
 #       binary-release  Build binary package for release (static if possible, use with "make release")
@@ -53,9 +56,13 @@ include $(TOP)/config/platform/$(PLATFORM)
 #         linux-release   ... for i386 Linux
 #         solaris-release ... for SUN Solaris 2.x
 #         linux-rpm       ... build binary RPM package on Linux (together with rpm-linux.spec)
+#         windows-release ... for Windows binaries cross-compiled with MinGW; use with "mingw" platform
 #       cygwin          Win32 / Cygwin configuration (experimental)
 #       
-include $(TOP)/config/site/standard
+ifndef SITE
+SITE=beta-install
+endif
+include $(TOP)/config/site/$(SITE)
 
 
 #
@@ -106,6 +113,15 @@ include $(TOP)/config/site/standard
 # SITE_CFLAGS =
 # SITE_LDFLAGS =
 
+
+#
+# The following settings will only need to be changed in very rare cases.  If necessary, 
+# they are usually set in the platform configuration file to work around OS deficiencies.
+#
+# When (cross-)compiling for Windows with MinGW, most of these settings are ignored
+# and unconditionally replaced by hard-coded defaults. See file INSTALL-WIN for details.
+#
+
 ## Some platforms require special libraries for socket/internet functionality 
 # NETWORK_LIBS =
 
@@ -113,22 +129,24 @@ include $(TOP)/config/site/standard
 # TERMCAP_LIBS =
 # TERMCAP_DEFINES = 
 
+## GNU Readline library for command-line editing (optional)
+# READLINE_LIBS = -L<path_to_readline_libs> -lreadline -lhistory
+# READLINE_DEFINES = -I<path_to_readline_headers>
 
-#
-# The following settings will only need to be changed in very rare cases.  If necessary, 
-# they are usually set in the platform configuration file to work around OS deficiencies.
-#
+## GLIB2 for platform-independent support functions
+# GLIB_LIBS = -L<path_to_glib_libs> -lglib-2.0
+# GLIB_DEFINES = -I<path_to_glib_headers>
 
-## Readline library for command-line editing (currently, only the included editline library is supported)
-# READLINE_LIBS = -L $(TOP)/editline -leditline
-# READLINE_DEFINES = -I $(TOP)/editline
+## PCRE regular expression library (v8.20 or newer strongly recommended)
+# PCRE_LIBS = -L<path_to_pcre_libs> -lpcre
+# PCRE_DEFINES = -I<path_to_pcre_headers>
 
 ## CWB uses Flex/Bison for parsing registry files and CQP commands
 # YACC = bison -d -t
 # LEX = flex -8
 
 ## GNU-compatible install program (defaults to included shell script)
-# INSTALL = $(TOP)/install.sh
+# INSTALL = $(TOP)/instutils/install.sh
 
 ## Sometimes, extra install flags are needed for files or directories (e.g. preserve modification time on OS X)
 # INSTFLAGS_FILE = ???
@@ -142,6 +160,29 @@ include $(TOP)/config/site/standard
 
 ## In the unlikely event that "date" does not work properly, or if you want to lie about the date
 # COMPILE_DATE = $(shell date)
+
+
+#
+# WINDOWS-ONLY CONFIGURATION
+#
+# If you are building a Windows release, then the make system needs to know where to find
+# the library DLLs to add to the release. If you use the auto-build script, it will insert
+# a "guess" as to where they might be. Define the following variables if (a) you want to
+# override the guess or (b) you want to make for Windows without using the auto-build script.
+#
+## Library/Include/DLL/PKG-config files for the cross compiler are to be found beneath this folder
+# MINGW_CROSS_HOME =
+## The mingw-cross config file will ATTEMPT to set this by asking the cross compiler program to tell us. 
+## If its attempt is no good, you can overrride the setting  directly above. 
+#
+## Path to the directory containing libpcre-0.dll
+# LIBPCRE_DLL_PATH = 
+## Path to the directory containing libglib-2.0-0.dll
+# LIBGLIB_DLL_PATH =
+## If they are in the same place, just define this variable (overrides the preceding two)
+# LIB_DLL_PATH =
+# If no LIB_DLL variables are set, they are assumed to be in $MINGW_CROSS_HOME/bin.
+
 
 
 #

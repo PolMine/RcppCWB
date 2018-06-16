@@ -45,13 +45,21 @@ RANLIB = ranlib
 # B) Optional (recommended) settings
 #
 
-## Support for command-line editing in CQP (using included editline library)
-# READLINE_LIBS = -L../editline -leditline
-# READLINE_DEFINES = -I../editline
+## Support for command-line editing in CQP (using external GNU Readline)
+# READLINE_LIBS = -L <path_to_readline_libs> -lreadline -lhistory
+# READLINE_DEFINES = -I <path_to_readline_headers>
 
 ## Support for text highlighting in CQP (Termcap or Curses library, ncurses is widely available)
 # TERMCAP_LIBS = -lncurses
 # TERMCAP_DEFINES = 
+
+## Glib-2 library with platform-independent utilities (auto-detected with pkg-config by default)
+# GLIB_LIBS = 
+# GLIB_DEFINES = 
+
+## PCRE regular expression library (auto-detected with pcre-config by default)
+# PCRE_LIBS = 
+# PCRE_DEFINES = 
 
 ## Include debugging information in binaries (depends on C compiler, only recommended for developers)
 # DEBUG_FLAGS = -g

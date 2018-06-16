@@ -33,7 +33,9 @@
 #define cregwrap() 1
 */
 
-/* remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place */
+/**
+ * remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place
+ */
 void
 unescape_string (char *string) {
   char *p, *q;
@@ -52,7 +54,7 @@ unescape_string (char *string) {
 
 %}
 
-id              [a-zA-Z0-9_\-/$À-ÿ][^ \t\n\r\(\)\:\,]*
+id              [a-zA-Z0-9_\-/$][^ \t\n\r\(\)\:\,]*
 path            [a-zA-Z0-9/$]+
 number          [0-9]+
 

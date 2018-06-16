@@ -1,3 +1,11 @@
+# v0.2.4
+* for linux and macOS, CWB 3.4.14 included, so that UTF-8 support is realized
+* bug removed in check_cqp_query that would prevent special characters from working
+in CQP queries
+* check_strucs, check_cpos and check_id are checking for NAs now to avoid crashes
+* cwb command line tools cwb-makeall, cwb-huffcode and cwb-compress-rdx exposed
+  as cwb_makeall, cwb_huffcode and cwb_compress_rdx
+
 # v0.2.3
 * when loading the package, a check is performed to make sure that paths in the 
 registry files point to the data files of the sample data (issues may occur when

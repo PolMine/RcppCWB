@@ -30,6 +30,7 @@ char *progname;
 int print_nr = 0;           /**< boolean: flag whether we should print line numbers */
 int print_freqs = 0;        /**< boolean: print the frequencies of the words? */
 int print_len = 0;          /**< boolean: print the word length s? */
+int dont_pad_cols = 0;      /**< boolean: omit padding spaces on numeric columns? */
 int sort = 0;               /**< boolean: print the lexicon in a sorted order? */
 int input_are_numbers = 0;  /**< boolean: read lexicon IDs from file? */
 int show_size_only = 0;     /**< boolean: do_show should just print the size of the lexicon and exit? */
@@ -50,18 +51,19 @@ char *input_filename = NULL;
  *                    (use NULL to use a default fallback string)
  */
 void
-print_info(Attribute *attr, int id, char *fallback_s)
+lexdecode_print_item_info(Attribute *attr, int id, char *fallback_s)
 {
-  char *lemma;
+  char *format;
+  char *item;
   int freq, slen;
 
   if (id >= 0) {
     if (fallback_s == NULL)
       fallback_s = "(none)";
 
-    lemma = get_id_info(attr, id, &freq, &slen);
-    if (cderrno != CDA_OK) {
-      cdperror("(aborting) get_id_info() failed");
+    item = cl_id2all(attr, id, &freq, &slen);
+    if (cl_errno != CDA_OK) {
+      cl_error("(aborting) get_id_info() failed");
       exit(1);
     }
   }
@@ -69,13 +71,14 @@ print_info(Attribute *attr, int id, char *fallback_s)
     id = -1;
     freq = 0;
     slen = 0;
-    lemma = NULL;
+    item = NULL;
   }
 
-  if (print_nr)    printf("%7d\t", id);
-  if (print_freqs) printf("%7d\t", freq);
-  if (print_len)   printf("%7d\t", slen);
-  printf("%s\n", lemma ? lemma : fallback_s);
+  format = (dont_pad_cols ? "%d\t" : "%7d\t" );
+  if (print_nr)    printf(format, id);
+  if (print_freqs) printf(format, freq);
+  if (print_len)   printf(format, slen);
+  printf("%s\n", item ? item : fallback_s);
 }
 
 /**
@@ -89,7 +92,7 @@ print_info(Attribute *attr, int id, char *fallback_s)
  * @param rx_flags   IGNORE_CASE; IGNORE_DIAC; both; or neither.
  */
 void
-do_show(char *attr_name, char *rx, int rx_flags)
+lexdecode_show(char *attr_name, char *rx, int rx_flags)
 {
   int i, k, len, size;
   int attr_size;
@@ -97,7 +100,7 @@ do_show(char *attr_name, char *rx, int rx_flags)
   int *idlist = NULL;
   FILE *input_fd;
 
-  char s[1024];
+  char s[CL_MAX_LINE_LENGTH];
 
   Attribute *attr = NULL;
 
@@ -108,14 +111,14 @@ do_show(char *attr_name, char *rx, int rx_flags)
   }
 
   attr_size = cl_max_cpos(attr);
-  if (cderrno != CDA_OK) {
-    cdperror("(aborting) cl_max_cpos() failed");
+  if (cl_errno != CDA_OK) {
+    cl_error("(aborting) cl_max_cpos() failed");
     exit(1);
   }
 
   size = cl_max_id(attr);
-  if (cderrno != CDA_OK) {
-    cdperror("(aborting) cl_max_id() failed");
+  if (cl_errno != CDA_OK) {
+    cl_error("(aborting) cl_max_id() failed");
     exit(1);
   }
 
@@ -127,15 +130,13 @@ do_show(char *attr_name, char *rx, int rx_flags)
 
     if (input_filename != NULL) { /* with -F <file> option */
 
-      if (strcmp(input_filename, "-") == 0) {
-        input_fd = stdin;
-      }
-      else if ((input_fd = fopen(input_filename, "r")) == NULL) {
-        perror(input_filename);
+      input_fd = cl_open_stream(input_filename, CL_STREAM_READ, CL_STREAM_MAGIC);
+      if (input_fd == NULL) {
+        cl_error(input_filename);
         exit(1);
       }
 
-      while (fgets(s, 1024, input_fd) != NULL) {
+      while (fgets(s, CL_MAX_LINE_LENGTH, input_fd) != NULL) {
 
         len = strlen(s);
         if (len <= 0) {
@@ -156,13 +157,12 @@ do_show(char *attr_name, char *rx, int rx_flags)
           if ((i < 0) && (!freq_0_if_unknown))
               fprintf(stderr, "%s Warning: ``%s'' not found in lexicon (ignored)\n", progname, s);
             else
-              print_info(attr, i, (input_are_numbers) ? NULL : s);
+              lexdecode_print_item_info(attr, i, (input_are_numbers) ? NULL : s);
         }
 
       }
 
-      if (input_fd != stdin)
-        fclose(input_fd);
+      cl_close_stream(input_fd);
 
     }
     else {                        /* without -F option */
@@ -179,9 +179,9 @@ do_show(char *attr_name, char *rx, int rx_flags)
           i = idlist[k];
         }
         else if (sort) {
-          i = get_id_from_sortidx(attr, k);
-          if (cderrno != CDA_OK) {
-            cdperror("(aborting) get_id_from_sortidx() failed");
+          i = cl_sort2id(attr, k);
+          if (cl_errno != CDA_OK) {
+            cl_error("(aborting) cl_sort2id() failed");
             exit(1);
           }
         }
@@ -189,7 +189,7 @@ do_show(char *attr_name, char *rx, int rx_flags)
           i = k;
         }
 
-        print_info(attr, i, NULL);
+        lexdecode_print_item_info(attr, i, NULL);
       }
     }
 
@@ -201,7 +201,7 @@ do_show(char *attr_name, char *rx, int rx_flags)
  * Prints a message describing how to use the program to STDERR and then exits.
  */
 void
-usage(void)
+lexdecode_usage(void)
 {
   fprintf(stderr, "\n");
   fprintf(stderr, "Usage:  %s [options] <corpus>\n\n", progname);
@@ -215,12 +215,13 @@ usage(void)
   fprintf(stderr, "  -f        show frequency (number of occurrences)\n");
   fprintf(stderr, "  -n        show internal lexicon ID\n");
   fprintf(stderr, "  -l        show length of annotation string\n");
+  fprintf(stderr, "  -b        do not pad columns with space characters\n");
   fprintf(stderr, "  -s        print in (lexically) sorted order\n");
   fprintf(stderr, "  -p <rx>   show lexicon entries matching regexp <rx> only\n");
   fprintf(stderr, "  -c        [with -p <rx>] ignore case\n");
   fprintf(stderr, "  -d        [with -p <rx>] ignore diacritics\n");
   fprintf(stderr, "  -F <file> lookup strings read from <file> ('-' for stdin)\n");
-  fprintf(stderr, "  -0        [with -F <file>] show non-existing strings with freq. 0\n");
+  fprintf(stderr, "  -0        [with -F <file>] show non-existing strings with frequency 0\n");
   fprintf(stderr, "  -N        [with -F <file>] read lexicon IDs from <file>\n");
   fprintf(stderr, "  -h        this help page\n\n");
   fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
@@ -255,10 +256,10 @@ main(int argc, char **argv) {
   progname = argv[0];
 
   if (argc == 1)
-    usage();
+    lexdecode_usage();
 
   /* parse arguments */
-  while ((c = getopt(argc, argv, "+P:Sr:fnlsp:cdF:O0Nh")) != EOF) {
+  while ((c = getopt(argc, argv, "+P:Sr:fnlbsp:cdF:O0Nh")) != EOF) {
 
     switch (c) {
     case 'S':                        /* S: show lexicon size only */
@@ -288,6 +289,10 @@ main(int argc, char **argv) {
 
     case 'l':                        /* l: print word length */
       print_len++;
+      break;
+
+    case 'b':                        /* b: omit space passing on numberic columns */
+      dont_pad_cols++;
       break;
 
     case 's':                        /* s: print sorted */
@@ -326,7 +331,7 @@ main(int argc, char **argv) {
 
     default:
     case 'h':
-      usage();
+      lexdecode_usage();
       break;
     }
 
@@ -350,7 +355,7 @@ main(int argc, char **argv) {
       exit(2);
     }
 
-    do_show(attr_name, rx, rx_flags);
+    lexdecode_show(attr_name, rx, rx_flags);
 
     cl_delete_corpus(corpus);
   }

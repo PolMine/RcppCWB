@@ -16,6 +16,7 @@
  */
 
 #include "globals.h"
+void Rprintf(const char *, ...);
 
 /**
  *  global configuration variable: debug level.
@@ -55,7 +56,7 @@ size_t cl_memory_limit = 0;
 void
 cl_set_debug_level(int level) {
   if ((level < 0) || (level > 2)) {
-    fprintf(stderr, "cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
+    Rprintf("cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
   }
   else {
     cl_debug = level;
@@ -74,18 +75,16 @@ cl_set_optimize(int state) {
 }
 
 /**
- * Sets the memory limit.
+ * Sets the memory limit respected by some CL functions.
  *
- *
- * NOTE name of parameter differs here and in cl.h -- TODO
  * @see cl_memory_limit
  */
 void 
-cl_set_memory_limit(int limit) {
-  if (limit <= 0) {
+cl_set_memory_limit(int megabytes) {
+  if (megabytes <= 0) {
     cl_memory_limit = 0;
   }
   else {
-    cl_memory_limit = limit;
+    cl_memory_limit = megabytes;
   }
 }

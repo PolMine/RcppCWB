@@ -30,8 +30,9 @@ cqp_is_initialized() # check initialization status
 if (!cqp_is_initialized()) cqp_initialize()
 cqp_is_initialized() # check initialization status (TRUE now?)
 cqp_get_registry() # get registry dir used by CQP
-regdir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-if (cqp_get_registry() != regdir) cqp_reset_registry(registry = regdir)
+
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
+if (cqp_get_registry() != registry) cqp_reset_registry(registry = registry)
 cqp_list_corpora() # get list of corpora
 }
 \author{

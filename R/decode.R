@@ -20,7 +20,7 @@
 #' @rdname s_attribute_decode
 #' @return a character vector
 #' @examples 
-#' registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' Sys.setenv(CORPUS_REGISTRY = registry)
 #' 
 #' # pure R implementation (Rcpp implementation fails on Windows in vanilla mode)

@@ -27,6 +27,8 @@
  *
  * Exists only to call other functions, with silent set to true.
  *
+ * Note that cqpcl is DEPRACATED.
+ *
  * @see silent
  * @param argc  Number of commandline arguments.
  * @param argv  Pointer to array of commandline arguments.
@@ -41,7 +43,7 @@ main(int argc, char *argv[])
   which_app = cqpcl;
 
   if (!initialize_cqp(argc, argv)) {
-    fprintf(stderr, "Can't initialize CQP\n");
+    Rprintf("Can't initialize CQP\n");
     exit(1);
   }
 
@@ -50,17 +52,17 @@ main(int argc, char *argv[])
 
   if (query_string) {
     if (!cqp_parse_string(query_string)) {
-      fprintf(stderr, "Syntax error in %s, exiting\n", query_string);
+      Rprintf("Syntax error in %s, exiting\n", query_string);
       exit(1);
     }
   }
   else {
     for (i = optind; i < argc; i++)
       if (!cqp_parse_string(argv[i])) {
-        fprintf(stderr, "Syntax error, exiting\n");
+        Rprintf("Syntax error, exiting\n");
         exit(1);
       }
   }
 
-  return (0);
+  return 0;
 }

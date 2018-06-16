@@ -15,17 +15,22 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-/* ****************************************************************** */
-/* regular expression to DFA converter -- originally written by       */
-/*                                        markh@csd4.csd.uwm.edu      */
-/* Derived from the syntax:                                           */
-/* Rule = (ID "=" Ex ",")* Ex.                                        */
-/* Ex = "0" | "1" | ID | "(" Ex ")" | "[" Ex "]" | Ex "+" | Ex "*" |  */
-/*       Ex Ex | Ex "|" Ex.                                           */
-/* with the usual precedence rules.                                   */
-/* ****************************************************************** */
+/**
+ * @file
+ *
+ * Regular expression to DFA converter -- originally written by markh@csd4.csd.uwm.edu
+ *
+ * Derived from the syntax:
+ *
+ * Rule = (ID "=" Ex ",")* Ex.
+ *
+ * Ex = "0" | "1" | ID | "(" Ex ")" | "[" Ex "]" | Ex "+" | Ex "*" | Ex Ex | Ex "|" Ex.                                           *
+ *
+ * with the usual precedence rules.
+ *
+ * (Note, this is the token-sequence regex = not the string-level regex!
+ */
 
-void Rprintf(const char *, ...);
 
 #include <stdio.h>
 #include <ctype.h>
@@ -34,16 +39,22 @@ void Rprintf(const char *, ...);
 #include <stdlib.h>
 #include <assert.h>
 
+#include "../cl/globals.h"
 #include "../cl/macros.h"
 
 #include "eval.h"
 #include "options.h"
 #include "regex2dfa.h"
 
-
+/**
+ * Global variable containing a search string that is to be converted to a DFA.
+ * (Needs to be global; functions using the DFA write to it, and then the DFA
+ * parser reads from it. Declared as an external global in cqp.h so other parts
+ * of CQP can access it.)
+ */
 char *searchstr;
 
-/* DATA STRUCTURES */
+/* DATA STRUCTURES: internal to the regex2dfa module */
 typedef unsigned char byte;
 
 typedef struct symbol *Symbol;
@@ -52,24 +63,20 @@ typedef struct exp *Exp;
 
 typedef struct equation *Equation;
 
-typedef enum 
-{ 
+typedef enum {
   SymX, ZeroX, OneX, AndX, OrX, StarX, PlusX, OptX 
 } ExpTag;
 
-typedef enum 
-{ 
+typedef enum {
   RULE, EQU, PAR, OPT, OR, AND 
 } StackTag;
 
-typedef struct 
-{ 
+typedef struct {
   StackTag Tag; 
   int Q; 
 } StackCard;
 
-typedef struct state 
-{
+typedef struct state {
   int Class, States, *SList;
   int Empty, Shifts;
   struct 
@@ -82,22 +89,19 @@ State STab = (State)NULL;
 int Ss;
 
 /* THE SCANNER */
-typedef enum 
-{
+typedef enum {
   EndT, CommaT, RParT, RBrT, EqualT, BarT,
   ZeroT, OneT, IdenT, LParT, LBrT, PlusT, StarT
 } Lexical;
 
-typedef struct item 
-{
+typedef struct item {
   Symbol LHS; 
   int Size, *RHS;
 } *Item;
 Item IBuf = (Item)NULL; 
 int Is, IMax;
 
-struct exp 
-{
+struct exp {
   ExpTag Tag; 
   int Hash, Class; 
   Exp Tail;
@@ -108,8 +112,7 @@ struct exp
     } Body;
 };
 
-struct symbol 
-{ 
+struct symbol {
   char *Name; 
   int Hash; 
   Symbol Next, Tail; 
@@ -130,17 +133,28 @@ char *Action[7] =
 char *LastW;
 
 #define MAX_CHAR 0x4000
+/* TODO do we need a 16Kb string given the limits on string length elsewhere in CWB/CQP ?
+ * Is there any way we could make this an AutoString instead, maybe?
+ * If we do, should this name be more transparent? (CH_ARR_MAX better perhaps) */
 static char ChArr[MAX_CHAR];
 char *ChP;
 
-int LINE, ERRORS;
+int LINE;
 
+/** The number of errors enocuntered while parsing a regex to a DFA */
+int ERRORS;
+
+/** The maximum number of errors that the regex2dfa module will allow before killing the program */
 #define MAX_ERRORS 25
 
 #define HASH_MAX 0x200
-Symbol HashTab[HASH_MAX], FirstB, LastB;
+/** Global hash table containing Symbols. */
+Symbol HashTab[HASH_MAX];
+Symbol FirstB, LastB;
 
+/** TODO needs a comment! */
 #define NN 0x200
+/** TODO needs a comment! */
 Exp ExpHash[NN];
 
 #define EQU_EXTEND 0x200
@@ -170,13 +184,20 @@ struct Equiv
 
 int Es, EMax;
 
+/** Index into searchstr showing the next character that will be read. */
 int currpos;
 
-static int GET(void)
+/**
+ * Gets the next character from the searchstr, and
+ * increments its pointer; returns EOF if we are at
+ * the end of the string.
+ *
+ * @see searchstr
+ * @see currpos
+ */
+static int
+GET(void)
 {
-  /* Thu Aug  3 13:25:13 1995 (oli) -- 
-   * minor changes */
-
   unsigned char ch;
 
   ch = searchstr[currpos];
@@ -189,31 +210,41 @@ static int GET(void)
   }
 }
 
-static void UNGET(int Ch)
+/**
+ * Ungets a character from the search string (by decrementing the index into the
+ * search string; the actual string itself isn't modified).
+ *
+ * @param Ch  Ignored.
+ */
+static void
+UNGET(int Ch)
 {
-
   if (currpos != 0)
     --currpos;
 }
 
-static void ERROR(char *Format, ...) 
+/**
+ * Prints an error message to stdout, and
+ * exits the program if there are now just too many errors.
+ */
+static void
+REGEX2DFA_ERROR(char *Format, ...)
 {
-
   va_list AP;
   
-  fprintf(stderr, "[%d] ", LINE);
-  va_start(AP, Format); vfprintf(stderr, Format, AP); va_end(AP);
+  Rprintf("[%d] ", LINE);
+  va_start(AP, Format); Rprintf(Format, AP); va_end(AP);
   fputc('\n', stderr);
   if (++ERRORS == MAX_ERRORS) {
-    fprintf(stderr, "regex2dfa: Reached the %d error limit.\n",
-            MAX_ERRORS);
+    Rprintf("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
     exit(1);
   }
 }
 
-Lexical LEX(void) 
+/** Gets the Lexical symbol corresponding to the next non-whitespace character in the searchstr. */
+Lexical
+LEX(void)
 {
-
   int Ch;
 
   do {
@@ -250,7 +281,7 @@ Lexical LEX(void)
   if (isalpha(Ch) || Ch == '_' || Ch == '$') {
     for (LastW = ChP; isalnum(Ch) || Ch == '_' || Ch == '$'; ChP++) {
       if (ChP - ChArr == MAX_CHAR) {
-       Rprintf("Out of character space.\n");
+        Rprintf("Out of character space.\n");
         exit(1);
       }
       *ChP = Ch;
@@ -259,7 +290,7 @@ Lexical LEX(void)
     if (Ch != EOF) 
       UNGET(Ch);
     if (ChP - ChArr == MAX_CHAR) {
-     Rprintf("Out of character space.\n");
+      Rprintf("Out of character space.\n");
       exit(1);
     }
     *ChP++ = '\0';
@@ -269,53 +300,34 @@ Lexical LEX(void)
     Ch = GET();
     for (LastW = ChP; Ch != '"' && Ch != EOF; ChP++) {
       if (ChP - ChArr == MAX_CHAR) {
-       Rprintf("Out of character space.\n");
+        Rprintf("Out of character space.\n");
         exit(1);
       }
       *ChP = Ch;
       Ch = GET();
     }
     if (Ch == EOF) {
-     Rprintf("Missing closing \".\n");
+      Rprintf("Missing closing \".\n");
       exit(1);
     }
     if (ChP - ChArr == MAX_CHAR) {
-     Rprintf("Out of character space.\n");
+      Rprintf("Out of character space.\n");
       exit(1);
     }
     *ChP++ = '\0';
     return IdenT;
   } 
   else {
-    ERROR("extra character %c", Ch); 
+    REGEX2DFA_ERROR("extra character %c", Ch);
     return EndT;
   }
 }
 
-void *Allocate(unsigned Bytes) 
-{
-  void *X = cl_malloc(Bytes);
-  return X;
-}
 
-void *Reallocate(void *X, unsigned Bytes) 
+/** Creates a one-byte hash of the string S. */
+byte
+Hash(char *S)
 {
-  
-  X = cl_realloc(X, Bytes);
-  return X;
-}
-
-char *CopyS(char *S) 
-{
-  char *NewS = (char *)Allocate(strlen(S) + 1);
-  
-  strcpy(NewS, S); 
-  return NewS;
-}
-
-byte Hash(char *S) 
-{
-
   int H; 
   char *T;
   
@@ -324,17 +336,18 @@ byte Hash(char *S)
   return H&0xff;
 }
 
-Symbol LookUp(char *S) 
+/** Look up the symbol contained in string S in the global hash table. */
+Symbol
+LookUp(char *S)
 {
-  
   Symbol Sym; 
   byte H;
   
   for (H = Hash(S), Sym = HashTab[H]; Sym != 0; Sym = Sym->Next)
     if (strcmp(Sym->Name, S) == 0) 
       return Sym;
-  Sym = (Symbol)Allocate(sizeof *Sym);
-  Sym->Name = CopyS(S);
+  Sym = (Symbol)cl_malloc(sizeof *Sym);
+  Sym->Name = cl_strdup(S);
   Sym->Hash = H;
   Sym->Next = HashTab[H];
   HashTab[H] = Sym;
@@ -346,7 +359,8 @@ Symbol LookUp(char *S)
   return LastB = Sym;
 }
 
-int DUP(int A, int B) 
+int
+DUP(int A, int B)
 {
 
   long L, S;
@@ -363,7 +377,8 @@ int DUP(int A, int B)
   return (int)(L/NN);
 }
 
-void Store(Symbol S, int Q) 
+void
+Store(Symbol S, int Q)
 {
 
   int H = 0x100 + S->Hash; 
@@ -374,7 +389,7 @@ void Store(Symbol S, int Q)
       break;
   if (E == 0) 
     {
-      E = (Exp)Allocate(sizeof *E);
+      E = (Exp)cl_malloc(sizeof *E);
       E->Tag = SymX;
       E->Body.Leaf = S;
       E->Hash = H;
@@ -384,7 +399,8 @@ void Store(Symbol S, int Q)
   E->Class = Q;
 }
 
-int MakeExp(int Q, ExpTag Tag, ...) 
+int
+MakeExp(int Q, ExpTag Tag, ...)
 {
 
   va_list AP; 
@@ -469,13 +485,13 @@ int MakeExp(int Q, ExpTag Tag, ...)
       break;
     }
   va_end(AP);
-  E = (Exp)Allocate(sizeof *E);
+  E = (Exp)cl_malloc(sizeof *E);
   E->Tag = Tag;
   if (Tag == SymX) 
     E->Body.Leaf = Sym;
   else 
     {
-      E->Body.Arg = (int *) ((Args > 0) ? Allocate(Args*sizeof(int)) : NULL);
+      E->Body.Arg = (int *) ((Args > 0) ? cl_malloc(Args*sizeof(int)) : NULL);
       if (Args > 0) 
         E->Body.Arg[0] = Q0;
       if (Args > 1) 
@@ -489,7 +505,7 @@ int MakeExp(int Q, ExpTag Tag, ...)
       if (Equs == EquMax) 
         {
           EquMax += EQU_EXTEND;
-          EquTab = (Equation)Reallocate(EquTab, sizeof *EquTab * EquMax);
+          EquTab = (Equation)cl_realloc(EquTab, sizeof *EquTab * EquMax);
         }
       EquTab[Equs].Hash = H;
       EquTab[Equs].Stack = 0;
@@ -500,12 +516,12 @@ int MakeExp(int Q, ExpTag Tag, ...)
   return Q;
 }
 
-void PUSH(StackTag Tag, int Q) 
+void
+PUSH(StackTag Tag, int Q)
 {
-
   if (SP >= Stack + STACK_MAX) 
     {
-      ERROR("Expression too complex ... aborting.");
+      REGEX2DFA_ERROR("Expression too complex ... aborting.");
       exit(1);
     }
   SP->Tag = Tag;
@@ -517,10 +533,10 @@ void PUSH(StackTag Tag, int Q)
 #define TOP ((SP - 1)->Tag)
 #define POP() ((--SP)->Q)
 
-/* the parser proper */
-int Parse(void) 
+/** the regex parser proper: private function */
+int
+Parse(void)
 {
-  
   Lexical L; 
   Symbol ID = NULL; 
   int RHS; 
@@ -529,6 +545,7 @@ int Parse(void)
 
   SP = Stack;
  LHS:
+  /* get next symbol from the lexer */
   L = LEX();
   if (L == IdenT) 
     {
@@ -549,106 +566,104 @@ int Parse(void)
   else 
     PUSH(RULE, -1);
  EXP:
-  switch (L) 
-    {
-    case LParT: 
-      PUSH(PAR, -1); 
-      L = LEX(); 
-      goto EXP;
-    case LBrT: 
-      PUSH(OPT, -1); 
-      L = LEX(); 
-      goto EXP;
-    case ZeroT: 
-      RHS = MakeExp(-1, ZeroX); 
-      L = LEX(); 
-      goto END;
-    case OneT: 
-      RHS = MakeExp(-1, OneX); 
-      L = LEX(); 
-      goto END;
-    case IdenT: 
-      RHS = MakeExp(-1, SymX, LookUp(LastW)); 
-      L = LEX(); 
-      goto END;
-    default: 
-      ERROR("Corrupt expression."); 
-      return -1;
-    }
+  switch (L)   {
+  case LParT:
+    PUSH(PAR, -1);
+    L = LEX();
+    goto EXP;
+  case LBrT:
+    PUSH(OPT, -1);
+    L = LEX();
+    goto EXP;
+  case ZeroT:
+    RHS = MakeExp(-1, ZeroX);
+    L = LEX();
+    goto END;
+  case OneT:
+    RHS = MakeExp(-1, OneX);
+    L = LEX();
+    goto END;
+  case IdenT:
+    RHS = MakeExp(-1, SymX, LookUp(LastW));
+    L = LEX();
+    goto END;
+  default:
+    REGEX2DFA_ERROR("Corrupt expression.");
+    return -1;
+  }
   
  END:
-  switch (Action[TOP][L]) 
-    {
-    case 'A': 
-      ERROR("Extra ','"); 
-      exit(1);
-    case 'B': 
-      ERROR("Unmatched ).");  
-      L = LEX(); 
-      goto END;
-    case 'C': 
-      ERROR("Unmatched ].");  
-      L = LEX(); 
-      goto END;
-    case 'D': 
-      ERROR("Unmatched (."); 
-      ignore_value = POP();
-      goto END;
-    case 'E': 
-      ERROR("Unmatched [."); 
-      goto MakeOpt;
-    case 'F': 
-      ERROR("( ... ]."); 
-      ignore_value = POP(); 
-      L = LEX(); 
-      goto END;
-    case 'G': 
-      ERROR("[ ... )."); 
-      L = LEX(); 
-      goto MakeOpt;
-    case 'H': 
-      ERROR("Left-hand side of '=' must be symbol."); 
-      exit(1);
-    case 'I': 
-      ERROR("Missing evaluation."); 
-      exit(1);
-    case '.': 
-      ignore_value = POP(); 
-      return RHS;
-    case ')': 
-      ignore_value = POP(); 
-      L = LEX(); 
-      goto END;
-    case ']':
-      L = LEX();
-    MakeOpt:
-      ignore_value = POP(); 
-      RHS = MakeExp(-1, OptX, RHS);
-      goto END;
-    case '=': 
-      Store(ID, RHS); 
-      ignore_value = POP(); 
-      goto LHS;
-    case 'v': 
-      RHS = MakeExp(-1, OrX, POP(), RHS); 
-      goto END;
-    case 'x': 
-      RHS = MakeExp(-1, AndX, POP(), RHS); 
-      goto END;
-    case '*': 
-      RHS = MakeExp(-1, StarX, RHS); 
-      L = LEX(); 
-      goto END;
-    case '+': 
-      RHS = MakeExp(-1, PlusX, RHS); 
-      L = LEX(); 
-      goto END;
-    case '|': 
-      PUSH(OR, RHS); L = LEX(); 
-      goto EXP;
-    case '&': 
-      PUSH(AND, RHS); 
-      goto EXP;
+  switch (Action[TOP][L])  {
+  case 'A':
+    REGEX2DFA_ERROR("Extra ','");
+    exit(1);
+  case 'B':
+    REGEX2DFA_ERROR("Unmatched ).");
+    L = LEX();
+    goto END;
+  case 'C':
+    REGEX2DFA_ERROR("Unmatched ].");
+    L = LEX();
+    goto END;
+  case 'D':
+    REGEX2DFA_ERROR("Unmatched (.");
+    ignore_value = POP();
+    goto END;
+  case 'E':
+    REGEX2DFA_ERROR("Unmatched [.");
+    goto MakeOpt;
+  case 'F':
+    REGEX2DFA_ERROR("( ... ].");
+    ignore_value = POP();
+    L = LEX();
+    goto END;
+  case 'G':
+    REGEX2DFA_ERROR("[ ... ).");
+    L = LEX();
+    goto MakeOpt;
+  case 'H':
+    REGEX2DFA_ERROR("Left-hand side of '=' must be symbol.");
+    exit(1);
+  case 'I':
+    REGEX2DFA_ERROR("Missing evaluation.");
+    exit(1);
+  case '.':
+    ignore_value = POP();
+    return RHS;
+  case ')':
+    ignore_value = POP();
+    L = LEX();
+    goto END;
+  case ']':
+    L = LEX();
+  MakeOpt:
+    ignore_value = POP();
+    RHS = MakeExp(-1, OptX, RHS);
+    goto END;
+  case '=':
+    Store(ID, RHS);
+    ignore_value = POP();
+    goto LHS;
+  case 'v':
+    RHS = MakeExp(-1, OrX, POP(), RHS);
+    goto END;
+  case 'x':
+    RHS = MakeExp(-1, AndX, POP(), RHS);
+    goto END;
+  case '*':
+    RHS = MakeExp(-1, StarX, RHS);
+    L = LEX();
+    goto END;
+  case '+':
+    RHS = MakeExp(-1, PlusX, RHS);
+    L = LEX();
+    goto END;
+  case '|':
+    PUSH(OR, RHS); L = LEX();
+    goto EXP;
+  case '&':
+    PUSH(AND, RHS);
+    goto EXP;
   }
 
   assert(0 && "Not reached");
@@ -663,22 +678,24 @@ void PushQ(int Q)
   if (Xs == XMax)
     {
       XMax += X_EXTEND;
-      XStack = Reallocate(XStack, sizeof *XStack * XMax);
+      XStack = cl_realloc(XStack, sizeof *XStack * XMax);
     }
   XStack[Xs++] = Q; 
   EquTab[Q].Stack = 1;
 }
 
-void PopQ(void) 
+void
+PopQ(void)
 {
 
-   int Q = XStack[--Xs];
+  int Q = XStack[--Xs];
 
-   EquTab[Q].Stack = 0;
+  EquTab[Q].Stack = 0;
 }
 
 
-int AddState(int States, int *SList) 
+int
+AddState(int States, int *SList)
 {
 
   int D, I; 
@@ -698,7 +715,8 @@ int AddState(int States, int *SList)
           return D; 
         }
     }
-  /* Brilliant ... the Reallocate() below might move the state table around in memory if it cannot
+  /* TODO
+   * Brilliant ... the cl_realloc() below might move the state table around in memory if it cannot
      be expanded in place, breaking any pointers into the table held in local variables of the calling
      function.  Fortunately, AddState() is only called from FormState() in a loop that modifies 
      "embedded" variables, so that this bug only surfaces if the original memory location is overwritten
@@ -707,7 +725,7 @@ int AddState(int States, int *SList)
      on a PowerPC G4 running Mac OS X 10.4 (God knows why it happens in this configuration).
      To avoid the problem, local pointers into STab[] should be updated after every call to AddState(). */
   if ((Ss&7) == 0) 
-    STab = Reallocate(STab, sizeof *STab * (Ss + 8));
+    STab = cl_realloc(STab, sizeof *STab * (Ss + 8));
   STab[Ss].Class = Ss;
   STab[Ss].States = States;
   STab[Ss].SList = SList;
@@ -715,7 +733,8 @@ int AddState(int States, int *SList)
 }
 
 
-void AddBuf(Symbol LHS, int Q) 
+void
+AddBuf(Symbol LHS, int Q)
 {
 
   int Diff, I, J, S, T; 
@@ -732,7 +751,7 @@ void AddBuf(Symbol LHS, int Q)
   if (Is >= IMax)
     { 
       IMax += 8;
-      IBuf = Reallocate(IBuf, sizeof *IBuf * IMax);
+      IBuf = cl_realloc(IBuf, sizeof *IBuf * IMax);
     }
   for (J = Is++; J > I; J--) 
     IBuf[J] = IBuf[J - 1];
@@ -748,13 +767,14 @@ void AddBuf(Symbol LHS, int Q)
         break;
     }
   if ((IP->Size&7) == 0)
-    IP->RHS = Reallocate(IP->RHS, sizeof *IP->RHS * (IP->Size + 8));
+    IP->RHS = cl_realloc(IP->RHS, sizeof *IP->RHS * (IP->Size + 8));
   for (T = IP->Size++; T > S; T--) 
     IP->RHS[T] = IP->RHS[T - 1];
   IP->RHS[S] = Q;
 }
 
-void FormState(int Q) 
+void
+FormState(int Q)
 {
 
   int I, S, S1, X; 
@@ -774,96 +794,93 @@ void FormState(int Q)
       SP = &STab[S];
       for (Xs = 0, S1 = 0; S1 < SP->States; S1++) 
         PushQ(SP->SList[S1]);
-      for (SP->Empty = 0, Is = 0, X = 0; X < Xs; X++) 
-        {
-          qX = XStack[X];
-        EVALUATE:
-          E = EquTab[qX].Value;
-          switch (E->Tag) 
-            {
-            case SymX: 
-              AddBuf(E->Body.Leaf, MakeExp(-1, OneX)); 
-              break;
-            case OneX: 
-              SP->Empty = 1; 
-              break;
-            case ZeroX: 
-              break;
-            case OptX:
-              Q1 = E->Body.Arg[0];
-              MakeExp(qX, OrX, MakeExp(-1, OneX), E->Body.Arg[0]);
-              goto EVALUATE;
-            case PlusX:
-              Q1 = E->Body.Arg[0];
-              MakeExp(qX, AndX, Q1, MakeExp(-1, StarX, Q1));
-              goto EVALUATE;
-            case StarX:
-              Q1 = E->Body.Arg[0];
-              MakeExp(qX, OrX, MakeExp(-1, OneX), MakeExp(-1, PlusX, Q1));
-              goto EVALUATE;
-            case OrX:
-              Q1 = E->Body.Arg[0]; 
-              Q2 = E->Body.Arg[1];
-              PushQ(Q1);
-              PushQ(Q2);
-              break;
-            case AndX: 
-              Q1 = E->Body.Arg[0], Q2 = E->Body.Arg[1];
-              E1 = EquTab[Q1].Value;
-              switch (E1->Tag) 
-                {
-                case SymX: 
-                  AddBuf(E1->Body.Leaf, Q2); 
-                  break;
-                case OneX: 
-                  EquTab[qX].Value = EquTab[Q2].Value; 
-                  goto EVALUATE;
-                case ZeroX: 
-                  MakeExp(qX, ZeroX); 
-                  break;
-                case OptX:
-                  A = E1->Body.Arg[0];
-                  MakeExp(qX, OrX, Q2, MakeExp(-1, AndX, A, Q2));
-                  goto EVALUATE;
-                case PlusX:
-                  A = E1->Body.Arg[0];
-                  MakeExp(qX, AndX, A, MakeExp(-1, OrX, Q2, qX));
-                  goto EVALUATE;
-                case StarX:
-                  A = E1->Body.Arg[0];
-                  MakeExp(qX, OrX, Q2, MakeExp(-1, AndX, A, qX));
-                  goto EVALUATE;
-                case OrX:
-                  A = E1->Body.Arg[0], B = E1->Body.Arg[1];
-                  MakeExp(qX, OrX,
-                          MakeExp(-1, AndX, A, Q2), MakeExp(-1, AndX, B, Q2));
-                  goto EVALUATE;
-                case AndX:
-                  A = E1->Body.Arg[0], B = E1->Body.Arg[1];
-                  MakeExp(qX, AndX, A, MakeExp(-1, AndX, B, Q2));
-                  goto EVALUATE;
-                }
-            }
+      for (SP->Empty = 0, Is = 0, X = 0; X < Xs; X++)  {
+        qX = XStack[X];
+      EVALUATE:
+        E = EquTab[qX].Value;
+        switch (E->Tag)  {
+        case SymX:
+          AddBuf(E->Body.Leaf, MakeExp(-1, OneX));
+          break;
+        case OneX:
+          SP->Empty = 1;
+          break;
+        case ZeroX:
+          break;
+        case OptX:
+          Q1 = E->Body.Arg[0];
+          MakeExp(qX, OrX, MakeExp(-1, OneX), E->Body.Arg[0]);
+          goto EVALUATE;
+        case PlusX:
+          Q1 = E->Body.Arg[0];
+          MakeExp(qX, AndX, Q1, MakeExp(-1, StarX, Q1));
+          goto EVALUATE;
+        case StarX:
+          Q1 = E->Body.Arg[0];
+          MakeExp(qX, OrX, MakeExp(-1, OneX), MakeExp(-1, PlusX, Q1));
+          goto EVALUATE;
+        case OrX:
+          Q1 = E->Body.Arg[0];
+          Q2 = E->Body.Arg[1];
+          PushQ(Q1);
+          PushQ(Q2);
+          break;
+        case AndX:
+          Q1 = E->Body.Arg[0], Q2 = E->Body.Arg[1];
+          E1 = EquTab[Q1].Value;
+          switch (E1->Tag) {
+          case SymX:
+            AddBuf(E1->Body.Leaf, Q2);
+            break;
+          case OneX:
+            EquTab[qX].Value = EquTab[Q2].Value;
+            goto EVALUATE;
+          case ZeroX:
+            MakeExp(qX, ZeroX);
+            break;
+          case OptX:
+            A = E1->Body.Arg[0];
+            MakeExp(qX, OrX, Q2, MakeExp(-1, AndX, A, Q2));
+            goto EVALUATE;
+          case PlusX:
+            A = E1->Body.Arg[0];
+            MakeExp(qX, AndX, A, MakeExp(-1, OrX, Q2, qX));
+            goto EVALUATE;
+          case StarX:
+            A = E1->Body.Arg[0];
+            MakeExp(qX, OrX, Q2, MakeExp(-1, AndX, A, qX));
+            goto EVALUATE;
+          case OrX:
+            A = E1->Body.Arg[0], B = E1->Body.Arg[1];
+            MakeExp(qX, OrX,
+                    MakeExp(-1, AndX, A, Q2), MakeExp(-1, AndX, B, Q2));
+            goto EVALUATE;
+          case AndX:
+            A = E1->Body.Arg[0], B = E1->Body.Arg[1];
+            MakeExp(qX, AndX, A, MakeExp(-1, AndX, B, Q2));
+            goto EVALUATE;
+          }
         }
+      }
       while (Xs > 0) 
         PopQ();
       SP->Shifts = Is;
-      SP->ShList = Allocate(sizeof *SP->ShList * Is);
-      for (I = 0; I < Is; I++) 
-        {
-          int rhs_state = -1;
-          SP->ShList[I].LHS = IBuf[I].LHS;
-          rhs_state = AddState(IBuf[I].Size, IBuf[I].RHS);
-          SP = &STab[S];        /* AddState() might have reallocated state table -> update pointer */
-          SP->ShList[I].RHS = rhs_state;
-        }
+      SP->ShList = cl_malloc(sizeof *SP->ShList * Is);
+      for (I = 0; I < Is; I++)  {
+        int rhs_state = -1;
+        SP->ShList[I].LHS = IBuf[I].LHS;
+        rhs_state = AddState(IBuf[I].Size, IBuf[I].RHS);
+        SP = &STab[S];        /* AddState() might have reallocated state table -> update pointer */
+        SP->ShList[I].RHS = rhs_state;
+      }
     }
   free(IBuf);
   IBuf = 0;
   Is = IMax = 0;
 }
 
-void AddEquiv(int L, int R) 
+void
+AddEquiv(int L, int R)
 {
   int E; 
   State SL, SR;
@@ -885,19 +902,18 @@ void AddEquiv(int L, int R)
   for (E = 0; E < Es; E++)
     if (SL == ETab[E].L && SR == ETab[E].R) 
       return;
-  if (Es >= EMax)
-    {
-      EMax += 8;
-      ETab = Reallocate(ETab, sizeof *ETab * EMax);
-    }
+  if (Es >= EMax)     {
+    EMax += 8;
+    ETab = cl_realloc(ETab, sizeof *ETab * EMax);
+  }
   ETab[Es].L = SL;
   ETab[Es].R = SR;
   Es++;
 }
 
-void MergeStates(void) 
+void
+MergeStates(void)
 {
-
   int Classes, S, S1, E, Sh; 
   State SP, SP1, QL, QR;
 
@@ -945,6 +961,7 @@ void MergeStates(void)
     }
 }
 
+/** Write states to stdout. Private function. */
 void
 WriteStates(void)
 {
@@ -958,25 +975,25 @@ WriteStates(void)
       if (SP->Class != Classes) 
         continue;
       Classes++;
-     Rprintf("s%d =", SP->Class);
-      if (SP->Empty) 
-        {
-         Rprintf(" fin");
-          if (SP->Shifts > 0) 
-            Rprintf(" |");
-        }
-      for (Sh = 0; Sh < SP->Shifts; Sh++) 
-        {
-          C = SP->ShList[Sh].RHS;
-          if (Sh > 0) 
-            Rprintf(" |");
-          Rprintf(" %s s%d", SP->ShList[Sh].LHS->Name, STab[C].Class);
-        }
+      Rprintf("s%d =", SP->Class);
+      if (SP->Empty) {
+        Rprintf(" fin");
+        if (SP->Shifts > 0)
+          Rprintf(" |");
+      }
+      for (Sh = 0; Sh < SP->Shifts; Sh++) {
+        C = SP->ShList[Sh].RHS;
+        if (Sh > 0)
+          Rprintf(" |");
+        Rprintf(" %s s%d", SP->ShList[Sh].LHS->Name, STab[C].Class);
+      }
       putchar('\n');
     }
 }
 
-void init_dfa(DFA *dfa)
+/** Initialises the members of the given DFA object. */
+void
+init_dfa(DFA *dfa)
 {
   assert(dfa);
 
@@ -985,7 +1002,9 @@ void init_dfa(DFA *dfa)
   dfa->Max_States = dfa->Max_Input = 0;
 }
 
-void free_dfa(DFA *dfa)
+/** Frees all the memory associated with this DFA. */
+void
+free_dfa(DFA *dfa)
 {
   
   int i;
@@ -1007,6 +1026,7 @@ void free_dfa(DFA *dfa)
   dfa->Max_Input = 0;
 }
 
+/** Prints the contents of a DFA to stdout. */
 void
 show_complete_dfa(DFA dfa)
 {
@@ -1018,18 +1038,20 @@ show_complete_dfa(DFA dfa)
       Rprintf("(final)");
     else
       putchar('\t');
-    for (j = 0; j < dfa.Max_Input; j++)
-      {
-        Rprintf("\t%d -> ", j);
-        if (dfa.TransTable[i][j] == dfa.E_State)
-          Rprintf("E\t");
-        else
-          Rprintf("s%d,",dfa.TransTable[i][j]);
-      }
+    for (j = 0; j < dfa.Max_Input; j++)   {
+      Rprintf("\t%d -> ", j);
+      if (dfa.TransTable[i][j] == dfa.E_State)
+        Rprintf("E\t");
+      else
+        Rprintf("s%d,",dfa.TransTable[i][j]);
+    }
     putchar('\n');
   }
 }
 
+/**
+ * Initialises the global variables in the regex2dfa module.
+ */
 void
 init(void)
 {
@@ -1076,10 +1098,10 @@ init(void)
 }
 
 /**
- * Converts a regular expression to a DFA.
+ * Converts a regular expression to a DFA. Public function.
  *
  * @param rxs         The regular expression.
- * @param automaton   Pointer to the DFA to write to.
+ * @param automaton   Pointer to the DFA object to write to.
  */
 void
 regex2dfa(char *rxs, DFA *automaton)
@@ -1095,7 +1117,7 @@ regex2dfa(char *rxs, DFA *automaton)
   Q = Parse();
   
   if (ERRORS > 0) 
-    fprintf(stderr, "%d error(s)\n", ERRORS);
+    Rprintf("%d error(s)\n", ERRORS);
   if (Q == -1) 
     exit(1);
   FormState(Q);
@@ -1105,40 +1127,35 @@ regex2dfa(char *rxs, DFA *automaton)
   automaton->Max_Input = Environment[eep].MaxPatIndex + 1;
   automaton->E_State = automaton->Max_States;
 
-  if (show_dfa)
+  if (show_dfa) /* TODO: Use a module-internal debug variable (for encapsulation). */
     WriteStates();
 
   /* allocate memory for the transition table and initialize it. */
-  automaton->TransTable = 
-    (int **)Allocate(sizeof(int *) * automaton->Max_States);
-  for (i = 0; i < Ss; i++)
-    {
-      automaton->TransTable[i] = 
-        (int *)Allocate(sizeof(int) * automaton->Max_Input);
-      for (j = 0; j < automaton->Max_Input; j++)
-        automaton->TransTable[i][j] = automaton->E_State;
-    }
+  automaton->TransTable = (int **)cl_malloc(sizeof(int *) * automaton->Max_States);
+  for (i = 0; i < Ss; i++)  {
+    automaton->TransTable[i] = (int *)cl_malloc(sizeof(int) * automaton->Max_Input);
+    for (j = 0; j < automaton->Max_Input; j++)
+      automaton->TransTable[i][j] = automaton->E_State;
+  }
 
   /* allocate memory for the table of final states. */
-  automaton->Final = (Boolean *)Allocate(sizeof(Boolean) * (Ss + 1));
+  automaton->Final = (Boolean *)cl_malloc(sizeof(Boolean) * (Ss + 1));
 
   /* initialize the table of final states. */
   for (i = 0; i <= automaton->Max_States; i++)
     automaton->Final[i] = False;
 
-  for (S = Classes = 0; S < Ss; S++) 
-    {
-      SP = &STab[S];
-      if (SP->Class != Classes) 
-        continue;
-      Classes++;
-      if (SP->Empty) 
-        automaton->Final[SP->Class] = True;
-      for (Sh = 0; Sh < SP->Shifts; Sh++) 
-        {
-          C = SP->ShList[Sh].RHS;
-          automaton->TransTable[SP->Class][atoi(SP->ShList[Sh].LHS->Name)] = 
-            STab[C].Class;
-        }
+  for (S = Classes = 0; S < Ss; S++) {
+    SP = &STab[S];
+    if (SP->Class != Classes)
+      continue;
+    Classes++;
+    if (SP->Empty)
+      automaton->Final[SP->Class] = True;
+    for (Sh = 0; Sh < SP->Shifts; Sh++) {
+      C = SP->ShList[Sh].RHS;
+      automaton->TransTable[SP->Class][atoi(SP->ShList[Sh].LHS->Name)] =
+        STab[C].Class;
     }
+  }
 }

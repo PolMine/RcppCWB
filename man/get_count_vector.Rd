@@ -23,7 +23,7 @@ unique tokens in the corpus / the number of unique ids. The order of the counts
 corresponds to the number of ids.
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 y <- get_count_vector(
   corpus = "REUTERS", p_attribute = "word",
   registry = registry

@@ -15,6 +15,11 @@
 ##  Public License for more details (in the file "COPYING", or available via
 ##  WWW at http://www.gnu.org/copyleft/gpl.html).
 
+
+##  This is the Makefile for the CWB Corpus Library. 
+
+
+
 ## Read configuration settings and standard definitions
 TOP = $(R_PACKAGE_SOURCE)
 include $(TOP)/config.mk
@@ -39,6 +44,7 @@ PARSES  = registry.tab.c lex.creg.c
 PARSEG  = registry.l registry.y
 PARSEO  = registry.tab.o lex.creg.o
 
+
 ## cl.h header file will be installed in subdirectory cwb/
 REALINCINSTDIR = $(INCINSTDIR)/cwb
 
@@ -46,44 +52,47 @@ REALINCINSTDIR = $(INCINSTDIR)/cwb
 ## CORPUS LIBRARY  headers / sources / objects 
 
 HDRS = globals.h macros.h \
-	  list.h lexhash.h \
-	  bitfields.h storage.h fileutils.h \
-          special-chars.h regopt.h \
-	  corpus.h attributes.h makecomps.h \
-	  $(PARSEH) \
-          cdaccess.h \
-	  bitio.h \
-	  endian2.h \
-	  compression.h \
-	  binsert.h \
-	  class-mapping.h   # used by lexdecode
+       list.h lexhash.h ngram-hash.h \
+       bitfields.h storage.h fileutils.h \
+       special-chars.h regopt.h \
+       corpus.h attributes.h makecomps.h \
+       $(PARSEH) \
+       cdaccess.h \
+       bitio.h \
+       endian2.h \
+       compression.h \
+       binsert.h \
+       class-mapping.h \
+       $(MMAPH)
 
-SRCS   = globals.c macros.c \
-	  list.c lexhash.c \
-          bitfields.c storage.c fileutils.c \
-	  special-chars.c regopt.c \
-	  corpus.c attributes.c makecomps.c \
-	  $(PARSES) \
-	  cdaccess.c \
-	  bitio.c \
-	  endian.c \
-	  compression.c \
-	  binsert.c \
-	  class-mapping.c 
+SRCS = globals.c macros.c \
+       list.c lexhash.c ngram-hash.c \
+       bitfields.c storage.c fileutils.c \
+       special-chars.c regopt.c \
+       corpus.c attributes.c makecomps.c \
+       $(PARSES) \
+       cdaccess.c \
+       bitio.c \
+       endian.c \
+       compression.c \
+       binsert.c \
+       class-mapping.c \
+       $(MMAPS)
  
-OBJS   = globals.o macros.o \
-	  list.o lexhash.o \
-	  bitfields.o storage.o fileutils.o \
-	  special-chars.o regopt.o \
-	  corpus.o attributes.o \
-          $(PARSEO) \
-	  makecomps.o \
-	  cdaccess.o \
-	  bitio.o \
-	  endian.o \
-	  compression.o \
-	  binsert.o \
-	  class-mapping.o 
+OBJS = globals.o macros.o \
+       list.o lexhash.o ngram-hash.o \
+       bitfields.o storage.o fileutils.o \
+       special-chars.o regopt.o \
+       corpus.o attributes.o \
+       $(PARSEO) \
+       makecomps.o \
+       cdaccess.o \
+       bitio.o \
+       endian.o \
+       compression.o \
+       binsert.o \
+       class-mapping.o \
+       $(MMAPO)
 
 ## Extra objects (will be compiled, but not included in libcl.a) 
 #   - dl_stub.o is a dummy replacement for libdl.a, which is missing in Solaris
@@ -103,23 +112,6 @@ libcl.a: $(OBJS)
 	$(RM) $@
 	$(AR) $@ $^
 	$(RANLIB) $@
-
-install: libcl.a
-	if [ ! -d "$(LIBINSTDIR)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(LIBINSTDIR)" ; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) libcl.a "$(LIBINSTDIR)"
-	if [ ! -d "$(REALINCINSTDIR)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(REALINCINSTDIR)" ; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) cl.h "$(REALINCINSTDIR)"
-
-release: libcl.a
-	if [ ! -d "$(RELEASE_DIR)/lib" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/lib"; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) libcl.a "$(RELEASE_DIR)/lib"
-	if [ ! -d "$(RELEASE_DIR)/include/cwb" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/include/cwb"; fi;
-	$(INSTALL) $(INST_FLAGS_DATA) cl.h "$(RELEASE_DIR)/include/cwb"
-
-uninstall:
-	@$(ECHO) "ERROR: uninstall operation is currently not supported!"
-#	$(RM) $(LIBINSTDIR)/libcl.a
-#	(cd $(INCINSTDIR); $(RM) cl.h)
 
 depend:
 	-$(RM) depend.mk

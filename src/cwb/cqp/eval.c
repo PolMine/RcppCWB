@@ -15,8 +15,6 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...);
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -31,8 +29,6 @@ void Rprintf(const char *, ...);
 #include "../cl/globals.h"
 #include "../cl/macros.h"
 #include "../cl/corpus.h"
-
-#include <regex.h>                /* use the CWB regex package! */
 
 #include "../cl/attributes.h"
 #include "../cl/cdaccess.h"
@@ -57,7 +53,12 @@ void Rprintf(const char *, ...);
 
 
 
-
+/**
+ * Counts the number of token positions encompassed by all members
+ * of the ->range array of the CorpusList argument.
+ *
+ * That is, in oher words, it tells you the size of this corpus.
+ */
 int
 nr_positions(CorpusList *cp)
 {
@@ -101,8 +102,10 @@ red_factor(CorpusList *cp, int *nr_pos)
   return (*nr_pos + 0.0) / (size + 0.0);
 }
 
-/* set the appropriate values to the corpus id (given by its pointer to */
-/* the symbol table).                                                   */
+/**
+ * Set the appropriate values to the corpus id (given by its pointer to
+ * the symbol table).
+ */
 void
 set_corpus_matchlists(CorpusList *cp,
                       Matchlist *matchlist,
@@ -190,38 +193,47 @@ set_corpus_matchlists(CorpusList *cp,
   }
 }
 
-
 
+/**
+ * Gets a list of corpus positions where the given p-attribute has
+ * the specified form.
+ *
+ * Positions are placed into the "start" array of the matchlist.
+ *
+ * @param attribute  The p-attribute to search.
+ * @param wordform   The form to search for.
+ * @param matchlist  Where to put the results.
+ * @return           The size of the resulting matchlist table
+ *                   (also stored in its tabsize member).
+ */
 int
 get_corpus_positions(Attribute *attribute,
                      char *wordform,
                      Matchlist *matchlist)
 {
-
   int word_id;
 
   assert(attribute);
   assert(matchlist);
   assert(matchlist->start == NULL);
 
-  word_id = get_id_of_string(attribute, wordform);
+  word_id = cl_str2id(attribute, wordform);
   
-  if ((word_id >= 0) && (cderrno == CDA_OK)) {
+  if ((word_id >= 0) && (cl_errno == CDA_OK)) {
 
     /* get the positions of the id in the attribute */
-    matchlist->start = collect_matches(attribute,
-                                       &word_id,
-                                       1,
-                                       1,
-                                       &(matchlist->tabsize),
-                                       NULL, 0);
+    matchlist->start = cl_idlist2cpos(attribute,
+                                      &word_id,
+                                      1,
+                                      1,
+                                      &(matchlist->tabsize));
     matchlist->matches_whole_corpus = 0;
   }
 
   if (initial_matchlist_debug &&
       (matchlist->start != NULL) &&
       (matchlist->tabsize > 0) && !silent)
-    fprintf(stderr, "matched initial wordform for non-regex %s, "
+    Rprintf("matched initial wordform for non-regex %s, "
             "%d matches\n", wordform, matchlist->tabsize);
 
   return(matchlist->tabsize);
@@ -232,15 +244,16 @@ get_corpus_positions(Attribute *attribute,
  * Get corpus positions matching a regular expression on a given attribute.
  *
  * get_matched_corpus_positions looks in a corpus which is to be loaded for
- * a regular expression 'regstr' of attribute 'attr' and returns the table
+ * a regular expression 'regstr' of a given p-attribute and returns the table
  * of matching start indices (start_table) and the tablesize (tabsize).
  *
- * @param attribute        The attribute to search on. May be NULL, in which case DEFAULT_ATT_NAME is used.
+ * @param attribute        The attribute to search on. May be NULL, in
+ *                         which case DEFAULT_ATT_NAME is used.
  * @param regstr           String containing the regular expression.
  * @param canonicalize     Flags to be passed to the CL regex engine.
  * @param matchlist        Location where the list of matches will be placed.
- * @param restrictor_list  ??
- * @param restrictor_size  ??
+ * @param restrictor_list  Passed to cl_idlist2cpos_oldstyle
+ * @param restrictor_size  Passed to cl_idlist2cpos_oldstyle
  * @return                 The number of matches found.
  */
 int
@@ -259,47 +272,41 @@ get_matched_corpus_positions(Attribute *attribute,
   matchlist->is_inverted = 0;
 
   if (attribute == NULL)
-    attribute = find_attribute(evalenv->query_corpus->corpus,
-                               DEFAULT_ATT_NAME,
-                               ATT_POS, NULL);
+    attribute = cl_new_attribute_oldstyle(evalenv->query_corpus->corpus,
+                                          DEFAULT_ATT_NAME,
+                                          ATT_POS,
+                                          NULL);
 
   assert(attribute);
 
-  size = get_attribute_size(attribute);
-  range = get_id_range(attribute);
+  size = cl_max_cpos(attribute);
+  range = cl_max_id(attribute);
   
   /* changed .* / .+ optimization to .* only -- so "" will be handled correctly as an attribute value
      (will be standard in CWB 4.0, and may happen now if someone runs encode with -U "") */
+  /* AH notes Aug 2011: the above comment about 4.0 has nothing to do with the TODO-4.0 plan I sketched out! */
   if (STREQ(regstr, ".*")) {
     if (eval_debug) 
-      fprintf(stderr, "get_matched_corpus_positions: */+ optimization\n");
+      Rprintf("get_matched_corpus_positions: .* optimization\n");
     
     matchlist->start = (int *)cl_malloc(sizeof(int) * size);
 
-    /* we here produce a copy of a system corpus. TODO: optimize that
-     * with the "matches_whole_corpus"-flag.
-     */
-
+    /* we here produce a copy of a system corpus. TODO: optimize that with the "matches_whole_corpus"-flag. */
     for (i = 0; i < size; i++)
       matchlist->start[i] = i;
     matchlist->tabsize = size;
     matchlist->matches_whole_corpus = 1;
   }
   else {
-    
-    /* get the word ids of the word forms which are matched by the 
-     * regular expression  'regstr' 
-     */
+    /* get the word ids of the word forms which are matched by the regular expression  'regstr' */
 
-    word_ids = collect_matching_ids(attribute,
-                                    regstr,
-                                    canonicalize,
-                                    &nr_of_words);
+    word_ids = cl_regex2id(attribute,
+                           regstr,
+                           canonicalize,
+                           &nr_of_words);
 
     if (nr_of_words == range) {
-      
-      /* again, matches whole corpus. TODO: optimize.
-       */
+      /* again, matches whole corpus. TODO: optimize.  */
       
       matchlist->start = (int *)cl_malloc(sizeof(int) * size);
       
@@ -313,40 +320,39 @@ get_matched_corpus_positions(Attribute *attribute,
       matchlist->matches_whole_corpus = 1;
 
       cl_free(word_ids);
-
     }
     else if ((word_ids != NULL) && (nr_of_words > 0)) {
-
-      /* are there any matching word forms? */
+      /* Some matching wordforms have been found. */
       
       /* get the position numbers in the active corpus of the word ids */
-      matchlist->start = collect_matches(attribute,
-                                         word_ids,
-                                         nr_of_words,
-                                         1,
-                                         &(matchlist->tabsize),
-                                         restrictor_list,
-                                         restrictor_size);
+      matchlist->start = cl_idlist2cpos_oldstyle(attribute,
+                                                 word_ids,
+                                                 nr_of_words,
+                                                 1,
+                                                 &(matchlist->tabsize),
+                                                 restrictor_list,
+                                                 restrictor_size);
       cl_free(word_ids);
     }
     else {
+      /* no matching wordforms have been found. */
       matchlist->tabsize = 0;
       matchlist->matches_whole_corpus = 0;
     }
-  }
+  } /* end case where regstr is not ".*" */
 
+  /* finally, possibly print out a debug message */
   if (initial_matchlist_debug && 
       (matchlist->start != NULL) &&
       (matchlist->tabsize > 0) && !silent)
-    fprintf(stderr, "matched initial pattern for regex %s, "
-            "%d matches\n",
+    Rprintf("matched initial pattern for regex %s, %d matches\n",
             regstr,
             matchlist->tabsize);
 
   return(matchlist->tabsize);
 }
 
-
+
 
 /*
  * This is the function which evaluates an AVS to true or false.
@@ -376,7 +382,7 @@ eval_constraint(AVS avs, int corppos, RefTab labelrefs, RefTab target_labelrefs)
         char *val = cl_struc2str(avs->tag.attr, struc);
         if (val) {
           if (avs->tag.rx)
-            result = cl_regex_match(avs->tag.rx, val); /* pre-compiled regex available */
+            result = cl_regex_match(avs->tag.rx, val, 0); /* pre-compiled regex available */
           else
             result = (0 == strcmp(avs->tag.constraint, val)); /* no pre-compiled regex -> match as plain string */
         }
@@ -504,13 +510,13 @@ get_label_referenced_position(LabelEntry label, RefTab rt, int corppos)
   if (label) {
     referenced_position = get_reftab(rt, label->ref, corppos);
     if (eval_debug) 
-      fprintf(stderr, "Evaluating label %s = %d\n", label->name, referenced_position);
+      Rprintf("Evaluating label %s = %d\n", label->name, referenced_position);
   }
 
   return referenced_position;
 }
 
-
+
 
 Boolean
 get_leaf_value(Constrainttree ctptr,
@@ -600,7 +606,7 @@ get_leaf_value(Constrainttree ctptr,
       dcr->value.intres = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
       if (ctptr->pa_ref.delete) {
         if (eval_debug)
-          fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+          Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->pa_ref.label->name, dcr->value.intres);
         set_reftab(rt, ctptr->pa_ref.label->ref, -1);
       }
@@ -617,7 +623,7 @@ get_leaf_value(Constrainttree ctptr,
         referenced_position = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
         if (ctptr->pa_ref.delete) {
           if (eval_debug)
-            fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+            Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                    ctptr->pa_ref.label->name, referenced_position);
           set_reftab(rt, ctptr->pa_ref.label->ref, -1);
         }
@@ -668,7 +674,7 @@ get_leaf_value(Constrainttree ctptr,
           dcr->value.intres += 4;
         /* not really necessary, since get_struc_attribute() returns 0 if we're not inside a region */
       }
-      else if (cderrno != CDA_OK) { /* get_struc_attribtue() sets cderrno=CDA_OK if not in region */
+      else if (cderrno != CDA_ESTRUC) { /* get_struc_attribtue() sets cderrno=CDA_EDSTRUC if not in region */
         return False;                /* this _is_ an error */
       }
       
@@ -680,7 +686,7 @@ get_leaf_value(Constrainttree ctptr,
       
       if (ctptr->sa_ref.delete) {
         if (eval_debug)
-          fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+          Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->sa_ref.label->name, referenced_position);
         set_reftab(rt, ctptr->sa_ref.label->ref, -1);
       }
@@ -745,19 +751,20 @@ get_leaf_value(Constrainttree ctptr,
   return 0;
 }
 
-
 
-/* evaluate the boolean constraint tree by using recursion
- * "corppos" is the current corpus position 
- */
 
-static
-int
+/** Comparison function used when eval_bool() calls qsort(). */
+static int
 intcompare(const void *i, const void *j)
 {
   return(*(int *)i - *(int *)j);
 }
 
+
+/**
+ * evaluate the boolean constraint tree by using recursion;
+ * "corppos" is the current corpus position
+ */
 Boolean
 eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
 {
@@ -772,7 +779,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical and */
       case b_and: 
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean and\n");
+          Rprintf("eval_bool: evaluate boolean and\n");
         assert((ctptr->node.left != NULL) && (ctptr->node.right != NULL));
         return(eval_bool(ctptr->node.left, rt, corppos) &&
                eval_bool(ctptr->node.right, rt, corppos));
@@ -781,7 +788,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical or */
       case b_or:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean or\n");
+          Rprintf("eval_bool: evaluate boolean or\n");
         assert((ctptr->node.left != NULL) && (ctptr->node.right != NULL));
 
         return(eval_bool(ctptr->node.left, rt, corppos) ||
@@ -791,7 +798,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical implication */
       case b_implies:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean implication\n");
+          Rprintf("eval_bool: evaluate boolean implication\n");
         assert((ctptr->node.left != NULL) && (ctptr->node.right != NULL));
 
         return((eval_bool(ctptr->node.left, rt, corppos)) ? eval_bool(ctptr->node.right, rt, corppos) : True);
@@ -800,7 +807,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         /* logical not */
       case b_not:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean not\n");
+          Rprintf("eval_bool: evaluate boolean not\n");
 
         if (!ctptr->node.left)
           return(True);
@@ -819,7 +826,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
       case cmp_ex:
 
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate comparisons\n");
+          Rprintf("eval_bool: evaluate comparisons\n");
 
         /* check presence of arguments */
         assert((ctptr->node.left != NULL) &&
@@ -1043,8 +1050,8 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
 
               /* perform a regular expression match of the two */
               return((ctptr->node.op_id == cmp_eq) ?
-                     cl_regex_match(ctptr->node.right->leaf.rx, ls) :
-                     !cl_regex_match(ctptr->node.right->leaf.rx, ls));
+                     cl_regex_match(ctptr->node.right->leaf.rx, ls, 0) :
+                     !cl_regex_match(ctptr->node.right->leaf.rx, ls, 0));
             }
           }
           else {
@@ -1157,7 +1164,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
       int res;
 
       if (eval_debug)
-        fprintf(stderr, "eval_bool: evaluate id_list membership\n");
+        Rprintf("eval_bool: evaluate id_list membership\n");
 
       assert(ctptr->idlist.attr);
 
@@ -1165,7 +1172,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
         referenced_corppos = get_label_referenced_position(ctptr->idlist.label, rt, corppos);
         if (ctptr->idlist.delete) {
           if (eval_debug)
-            fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+            Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                    ctptr->idlist.label->name, referenced_corppos);
           set_reftab(rt, ctptr->idlist.label->ref, -1);
         }
@@ -1226,10 +1233,10 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
 }
 
 
-
 
-int mark_offrange_cells(Matchlist *matchlist, 
-                        CorpusList *corpus)
+
+int
+mark_offrange_cells(Matchlist *matchlist, CorpusList *corpus)
 {
   int rp, i, del;
 
@@ -1271,13 +1278,19 @@ int mark_offrange_cells(Matchlist *matchlist,
 
 
 
-
-Boolean calculate_initial_matchlist_1(Constrainttree ctptr, 
-                                      Matchlist *matchlist,
-                                      CorpusList *corpus)
+/**
+ * Gets the inital list of matches for a query.
+ *
+ * NB. This function is called recursively.
+ *
+ * @return  False iff something has gone wrong.
+ */
+Boolean
+calculate_initial_matchlist_1(Constrainttree ctptr,
+                              Matchlist *matchlist,
+                              CorpusList *corpus)
 {
-  int   i;
-
+  int i;
   Matchlist left, right;
 
   /* do NOT use free_matchlist here! */
@@ -1295,7 +1308,8 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
         assert(ctptr->node.left && ctptr->node.right);
 
         /* just the beginnings of an implementation for the b_and operator (by oli);
-           never mind, the entire <eval.c> code will have to be rewritten for CWB-3.0 */
+           never mind, the entire <eval.c> code will have to be rewritten at some point
+           TODO */
 #ifdef INITIAL_MATCH_BY_MU
 
         if (calculate_initial_matchlist_1(ctptr->node.left, &left, corpus) &&
@@ -1360,7 +1374,7 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
       case b_or:                /* logical or */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean or\n");
+          Rprintf("calc_initial_ml: boolean or\n");
 
         assert(ctptr->node.left && ctptr->node.right);
 
@@ -1424,7 +1438,7 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
       case b_not:                /* logical negation */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean not\n");
+          Rprintf("calc_initial_ml: boolean not\n");
 
         assert(ctptr->node.left);
 
@@ -1457,7 +1471,7 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
       case cmp_ex:
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: evaluate comparisons\n");
+          Rprintf("calc_initial_ml: evaluate comparisons\n");
 
         /* check argument types */
 
@@ -1546,7 +1560,6 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
 
             switch (ctptr->node.right->leaf.pat_type) {
             case REGEXP:
-
               /* check whether we have a ".+" or ".*" on the right --in this case
                * there is nothing to do (matched by everything)
                * TODO: change that in case "" may be returned by attribute access
@@ -1590,7 +1603,6 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
               break;
 
             case NORMAL:
-
               get_corpus_positions(ctptr->node.left->pa_ref.attr,
                                    ctptr->node.right->leaf.ctype.sconst,
                                    matchlist);
@@ -1598,7 +1610,6 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
               break;
 
             case CID:
-
               matchlist->start = get_positions(ctptr->node.left->pa_ref.attr,
                                                ctptr->node.right->leaf.ctype.cidconst,
                                                &(matchlist->tabsize),
@@ -1626,7 +1637,7 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
               if (!Setop(matchlist, Complement, NULL))
                 return False;        /* Auswertung bei Speicherueberlauf abbrechen */
           }
-          return(True);
+          return True;
 
           break;
 
@@ -1645,8 +1656,8 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
         assert("Internal error in calculate_initial_matchlist_1(): Unknown comparison operator." && 0);
         break;
 
-      }     /* switch (ctptr->node.op_id) ... */
-    }       
+      }     /* endswitch (ctptr->node.op_id) ... */
+    } /* endif (ctptr->type == bnode) */
     else if (ctptr->type == cnode) {
 
       if (ctptr->constnode.val == 0) {
@@ -1724,26 +1735,31 @@ Boolean calculate_initial_matchlist_1(Constrainttree ctptr,
                  ctptr->type);
       return(False);
     }   /* if (ctptr->type == bnode) ... else if ...  */
-  }
+  } /* endif ctptr */
   else {
-
+    /* if ctptr is NULL */
     return(True);
-
-  }     /* if (ctptr) ...  */
-  
+  }
 
   assert("Internal error in calculate_initial_matchlist1(): went over the edge." && 0);
   return 0;
 }
 
-Boolean calculate_initial_matchlist(Constrainttree ctptr, 
-                                    Matchlist *matchlist,
-                                    CorpusList *corpus)
+/**
+ * Wrapper around calculate_initial_matchlist_1, qv.
+ *
+ * @see calculate_initial_matchlist_1
+ */
+Boolean
+calculate_initial_matchlist(Constrainttree ctptr,
+                            Matchlist *matchlist,
+                            CorpusList *corpus)
 {
   Boolean res;
 
   res = calculate_initial_matchlist_1(ctptr, matchlist, corpus);
 
+  /* i.e. if calling the main function worked, and a matchlist was created */
   if (res && matchlist) {
 
     if (matchlist->is_inverted) {
@@ -1759,13 +1775,16 @@ Boolean calculate_initial_matchlist(Constrainttree ctptr,
   return res;
 }
 
-
 
 
-/* try to match the given word form pattern and return success. */
-Boolean matchfirstpattern(AVS pattern, 
-                          Matchlist *matchlist,
-                          CorpusList *corpus)
+
+/*
+ * try to match the given word form pattern and return success.
+ */
+Boolean
+matchfirstpattern(AVS pattern,
+                  Matchlist *matchlist,
+                  CorpusList *corpus)
 {
   int nr_strucs, nr_ok, ok, i, k, start, end, nr_pos, cpos;
   Bitfield bf;
@@ -1795,7 +1814,7 @@ Boolean matchfirstpattern(AVS pattern,
         val = cl_struc2str(pattern->tag.attr, i);
         if (val) {
           if (pattern->tag.rx)
-            ok = cl_regex_match(pattern->tag.rx, val);
+            ok = cl_regex_match(pattern->tag.rx, val, 0);
           else
             ok = (0 == strcmp(pattern->tag.constraint, val));
           if (pattern->tag.negated)
@@ -1894,6 +1913,8 @@ Boolean matchfirstpattern(AVS pattern,
     if (!Setop(matchlist, Reduce, NULL)) 
       return False;
     return True;
+
+    break; /* endcase Anchor */
     
   case Pattern:
 
@@ -1916,7 +1937,7 @@ Boolean matchfirstpattern(AVS pattern,
        */
 
       if (!silent)
-        fprintf(stderr, "QOpt: %f (pos %d)\n", red, nr_pos);
+        Rprintf("QOpt: %f (pos %d)\n", red, nr_pos);
 
       matchlist->start = (int *)cl_malloc(sizeof(int) * nr_pos);
       matchlist->end = NULL;
@@ -1938,7 +1959,7 @@ Boolean matchfirstpattern(AVS pattern,
       assert(k == nr_pos);
 
       if (!silent)
-        fprintf(stderr, "QOpt: copied ranges\n");
+        Rprintf("QOpt: copied ranges\n");
 
       return (k == nr_pos);
     }
@@ -1949,7 +1970,7 @@ Boolean matchfirstpattern(AVS pattern,
       return ok;
     }
 
-    break;
+    break; /* endcase Pattern */
 
   case MatchAll:
     get_matched_corpus_positions(NULL, ".*", 0, matchlist,
@@ -1963,14 +1984,20 @@ Boolean matchfirstpattern(AVS pattern,
 }
 
 
-
 
-
-void simulate(Matchlist *matchlist, int *cut,
-              int start_state, int start_offset, /* start_offset is always set to 0; no idea what it was meant for??? */
-              int *state_vector, int *target_vector,
-              RefTab *reftab_vector, RefTab *reftab_target_vector,
-              int start_transition)
+/*
+ * This function's name is totally useless.
+ */
+void
+simulate(Matchlist *matchlist,
+         int *cut,
+         int start_state,
+         int start_offset, /* start_offset is always set to 0; no idea what it was meant for??? */
+         int *state_vector,
+         int *target_vector,
+         RefTab *reftab_vector,
+         RefTab *reftab_target_vector,
+         int start_transition)
 {
   int i, p, cpos, effective_cpos, rp;
   int strict_regions_ok, lookahead_constraint, zero_width_pattern;
@@ -2034,8 +2061,8 @@ void simulate(Matchlist *matchlist, int *cut,
        * find the appropriate range
        * three cases:
        * 1 start point smaller than range beginning
-       *   we should have considered that start point before. so
-       *   we cannot have a match in this case.
+       *   we should have considered that start point before.
+       *   so we cannot have a match in this case.
        *   action: assign -1 to matchlist->start and increment i
        * 2 start point within range (ok)
        *   action: simulate automaton
@@ -2048,7 +2075,7 @@ void simulate(Matchlist *matchlist, int *cut,
       my_target = -1;
 
       if (debug_simulation)
-        fprintf(stderr, "Looking at matchlist element %d (cpos %d)\n"
+        Rprintf("Looking at matchlist element %d (cpos %d)\n"
                 "  range[rp=%d]=[%d,%d]\n",
                 i, matchlist->start[i],
                 rp,
@@ -2089,8 +2116,7 @@ void simulate(Matchlist *matchlist, int *cut,
         boundary = MIN(b1, b2);
 
         if (debug_simulation)
-          fprintf(stderr, "Starting NFA simulation. Max bound is %d\n",
-                  boundary);
+          Rprintf("Starting NFA simulation. Max bound is %d\n", boundary);
 
         if (boundary == -1) {
           /*
@@ -2098,7 +2124,7 @@ void simulate(Matchlist *matchlist, int *cut,
            */
           matchlist->start[i] = -1;
           if (debug_simulation)
-            fprintf(stderr, "  ... not within selected boundary\n");
+            Rprintf("  ... not within selected boundary\n");
         }
         else {
 
@@ -2133,7 +2159,7 @@ void simulate(Matchlist *matchlist, int *cut,
 
           /* bail out on the first winner, unless matching_strategy == longest match */
           /* (in longest_match strategy, wait until we don't have any running states left) */
-          while (((winner < 0) || (matching_strategy == longest_match))
+          while (((winner < 0) || (evalenv->matching_strategy == longest_match))
                  && (running_states > 0)) {
 
             /*
@@ -2151,7 +2177,7 @@ void simulate(Matchlist *matchlist, int *cut,
 
             for (state = 0;
                  (state < evalenv->dfa.Max_States) &&
-                   ((winner < 0) || (matching_strategy == longest_match)) &&  /* abort when we've found a winner, unless strategy is longest match */
+                   ((winner < 0) || (evalenv->matching_strategy == longest_match)) &&  /* abort when we've found a winner, unless strategy is longest match */
                    (running_states > 0);                      /* no remaining active states -> simulation finished */
                  state++) {
 
@@ -2163,7 +2189,7 @@ void simulate(Matchlist *matchlist, int *cut,
                */
 
               if (debug_simulation) {
-                fprintf(stderr, "  state %d, cpos %d...\n", state, cpos);
+                Rprintf("  state %d, cpos %d...\n", state, cpos);
                 if (symtab_debug)
                   print_label_values(evalenv->labels, reftab_vector[state], cpos);
               }
@@ -2181,7 +2207,7 @@ void simulate(Matchlist *matchlist, int *cut,
 
                 for (p = 0;        /* cycle through all possible transitions from this state */
                      (p < evalenv->dfa.Max_Input)
-                       && ((winner < 0) || (matching_strategy == longest_match)); /* in shortest_match mode, stop evaluation as soon as there is a winner */
+                       && ((winner < 0) || (evalenv->matching_strategy == longest_match)); /* in shortest_match mode, stop evaluation as soon as there is a winner */
                      p++) {
 
                   /* the target state (that is, the state we reach after the transition) */
@@ -2314,7 +2340,7 @@ void simulate(Matchlist *matchlist, int *cut,
                         }
 
                         if (debug_simulation) {
-                          fprintf(stderr, "Transition %d --%d-> %d  (pattern %d TRUE at cpos=%d)\n",
+                          Rprintf("Transition %d --%d-> %d  (pattern %d TRUE at cpos=%d)\n",
                                   state, p, target_state, p, effective_cpos);
                           if (symtab_debug)
                             print_label_values(evalenv->labels, reftab_target_vector[target_state], effective_cpos);
@@ -2342,7 +2368,7 @@ void simulate(Matchlist *matchlist, int *cut,
                         if (this_is_a_winner) {
 
                           if (debug_simulation)
-                            fprintf(stderr, "Winning cpos found at %d\n", cpos);
+                            Rprintf("Winning cpos found at %d\n", cpos);
 
                           /* remember the last token (cpos) of this winner & its target position (if set) */
                           winner = (zero_width_pattern) ?  cpos - 1 : cpos;
@@ -2360,7 +2386,7 @@ void simulate(Matchlist *matchlist, int *cut,
 
                         /* if our matching strategy is longest_match, we have to activate the target state,
                          * so our winner can expand to a longer match in queries like ''"ADJA" "NN"+;'' */
-                        if (!this_is_a_winner || (matching_strategy == longest_match)) {
+                        if (!this_is_a_winner || (evalenv->matching_strategy == longest_match)) {
                           /* for zero-width elements, don't increment corpus position (think of "<s><np> ... </np></s>" for instance) */
                           if (zero_width_pattern) {
                             target_vector[target_state] = cpos;  /* this is NOT the effective cpos, otherwise we'd go backwards! */
@@ -2388,7 +2414,7 @@ void simulate(Matchlist *matchlist, int *cut,
 
             /* if we haven't found a winner, or we're looking for other winners,
                check if there are still any active states */
-            if ((winner < 0) || (matching_strategy == longest_match)) {
+            if ((winner < 0) || (evalenv->matching_strategy == longest_match)) {
               running_states = 0;
               for (state = 0; state < evalenv->dfa.Max_States; state++)
                 if (target_vector[state] >= 0)
@@ -2434,7 +2460,7 @@ void simulate(Matchlist *matchlist, int *cut,
            */
 
           if (debug_simulation)
-            fprintf(stderr, "NFA sim terminated. Winner %d, running states %d\n",
+            Rprintf("NFA sim terminated. Winner %d, running states %d\n",
                     winner, running_states);
 
           /* queries like "</s>" will return empty matches -> ignore those (set to no match)
@@ -2458,7 +2484,8 @@ void simulate(Matchlist *matchlist, int *cut,
             matchlist->target_positions[i] = -1;
         }
 
-        i++;                        /* move to the next regarded matchlist element */
+        i++;
+        /* move to the next regarded matchlist element */
 
 
       } /* case 2: simulate automaton */
@@ -2474,13 +2501,14 @@ void simulate(Matchlist *matchlist, int *cut,
       i++;
     }
 
-  }     /* the big "else" (unless evalenv->query_corpus->size == 0) */
+  }     /* end of the big "else" (unless evalenv->query_corpus->size == 0) */
 }
 
 
-
 
-int check_alignment_constraints(Matchlist *ml)
+
+int
+check_alignment_constraints(Matchlist *ml)
 {
   int mlp, envp, i;
   int as, ae, dum1, dum2, dum3;
@@ -2589,18 +2617,19 @@ int check_alignment_constraints(Matchlist *ml)
   return 0;
 }
 
-/* simulate the dfa */
+/* TODO what a very helpful documentation comment the following is.... (AH) */
+/** simulate the dfa */
 void
 simulate_dfa(int envidx, int cut, int keep_old_ranges)
 {
   int p, maxresult, state, i;
   Matchlist matchlist;
-  Matchlist total_matchlist; 
+  Matchlist total_matchlist;
 
   int *state_vector;            /* currently active states are marked with corresponding cpos */
-  int *target_vector;                /* target states when simulating transition */
+  int *target_vector;           /* target states when simulating transition */
   RefTab *reftab_vector;        /* the reference tables corresponding to the state vector */
-  RefTab *reftab_target_vector;        /* the reference tables corresponding to the target vector */
+  RefTab *reftab_target_vector; /* the reference tables corresponding to the target vector */
 
   int allocate_target_space;
 
@@ -2612,7 +2641,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
 
 
   assert(envidx <= eep);        /* envidx == 0, actually ...  check_alignment_constraint EXPLICITLY assumes that everything
-                                   else is an alignment constraint! */
+                                 * else is an alignment constraint! */
   evalenv = &Environment[envidx];
 
   /* Apparently Max_Input is the maximal number of transitions that appears in the 
@@ -2636,8 +2665,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
 
   if (evalenv->dfa.Final[0] == True) {
     cqpmessage(Error, 
-               "Start state is final state, no evaluation "
-               "(whole corpus is matched)\n");
+               "Query matches empty string, evaluation aborted (otherwise whole corpus would be matched)\n");
 
     set_corpus_matchlists(evalenv->query_corpus, 
                           &matchlist, /* total_matchlist may be uninitialised */
@@ -2656,7 +2684,6 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
     /* allocate the state and reference table vectors here, so that this has
      * not to be done in every simulate iteration
      */
-
     state_vector = (int *)cl_malloc(sizeof(int) * evalenv->dfa.Max_States);
     target_vector = (int *)cl_malloc(sizeof(int) * evalenv->dfa.Max_States);
     reftab_vector = (RefTab *) cl_malloc(sizeof(RefTab) * evalenv->dfa.Max_States);
@@ -2695,7 +2722,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
                               evalenv->query_corpus) == True) {
 
           if (initial_matchlist_debug) {
-            fprintf(stderr, "After initial matching for transition %d: ", p);
+            Rprintf("After initial matching for transition %d: ", p);
             show_matchlist_firstelements(matchlist);
             print_symbol_table(evalenv->labels);
           }
@@ -2712,9 +2739,12 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
                 matchlist.target_positions[i] = -1;
             }
 
-            /* when 'cut <n>' is specified, try to get <n> matches from every intial pattern; */
-            /* then reduce to a total of <n> matches after sorting */
-            if (cut <= 0)
+            /* If 'cut <n>' is specified, try to get <n> matches from every initial pattern;
+             * then reduce to a total of <n> matches after sorting (this happens in do_StandardQuery<parse_actions.c>).
+             * Exception: aligned queries will remove an unpredictable number of matches below, so we must not apply a cut here and instead rely on the final reduction.
+             * This means that aligned queries will always run to completion even if cut is specified, but the inefficiency can't be helped with the current design.
+             */
+            if (cut <= 0 || eep > 0) /* eep > 0 iff there are alignment constraints */
               maxresult = -1;
             else
               maxresult = cut;
@@ -2725,7 +2755,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
                      p);
 
             if (initial_matchlist_debug) {
-              fprintf(stderr, "After simulation for transition %d:\n ", p);
+              Rprintf("After simulation for transition %d:\n ", p);
               show_matchlist(matchlist);
             }
 
@@ -2741,7 +2771,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
             }
 
             if (initial_matchlist_debug && (!FirstTransitionIsDeterministic)) {
-              fprintf(stderr, "Complete Matchlist after simulating transition %d: \n", p);
+              Rprintf("Complete Matchlist after simulating transition %d: \n", p);
               show_matchlist(total_matchlist);
             }
           }
@@ -2767,7 +2797,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
       total_matchlist = matchlist;
 
     if (initial_matchlist_debug) {
-      fprintf(stderr, "After total simulation:\n");
+      Rprintf("After total simulation:\n");
       show_matchlist(total_matchlist);
     }
 
@@ -2784,7 +2814,7 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
     Setop(&total_matchlist, Reduce, NULL);
     
     if (initial_matchlist_debug) {
-      fprintf(stderr, "after final reducing\n");
+      Rprintf("after final reducing\n");
       show_matchlist(total_matchlist);
     }
     
@@ -2805,6 +2835,12 @@ simulate_dfa(int envidx, int cut, int keep_old_ranges)
   }
 }
 
+/**
+ * This function wraps round simulate_dfa (the only other thing it does is enforce the hard_cut limit).
+ *
+ * @see hard_cut
+ * @see simulate_dfa
+ */
 void
 cqp_run_query(int cut, int keep_old_ranges)
 {
@@ -2867,14 +2903,15 @@ cqp_run_mu_query(int keep_old_ranges, int cut_value)
 }
 
 void
-cqp_run_tab_query(int implode)
+cqp_run_tab_query()
 {
   int nr_columns, i, this_col;
   Evaltree col;
 
-  int smallest_col; 
+  int smallest_col;
+  int n_res, max_res;
 
-  Matchlist *lists;
+  Matchlist *lists, result;
   int *positions;
   Evaltree *constraints;
 
@@ -2883,141 +2920,164 @@ cqp_run_tab_query(int implode)
   evalenv = &Environment[0];
 
   assert(evalenv->query_corpus);
-
-  /* here: eval. */
+  /* corpus_size = evalenv->query_corpus->mother_size; */
 
   nr_columns = 0;
   for (col = evalenv->evaltree; col; col = col->tab_el.next) {
     assert((col->type = tabular));
+    if (evalenv->patternlist[col->tab_el.patindex].type != Pattern) {
+      cqpmessage(Error, "matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n", nr_columns + 1);
+      init_matchlist(&result);
+      set_corpus_matchlists(evalenv->query_corpus, &result, 1, 0); /* return empty result set */
+      return;
+    }
     nr_columns++;
   }
-
   assert(nr_columns > 0);
 
-  /* die Matchlisten */
+  /* allocate matchlists for all TAB columns, a vector of list offsets, and a list of constraint trees */
+  lists = (Matchlist *)cl_calloc(nr_columns, sizeof(Matchlist));
+  positions = (int *)cl_calloc(nr_columns, sizeof(int));
+  constraints = (Evaltree *)cl_calloc(nr_columns, sizeof(Evaltree));
 
-  lists = (Matchlist *)cl_malloc(nr_columns * sizeof(Matchlist));
-  memset((char *)lists, '\0', nr_columns * sizeof(Matchlist));
-
-  /* die Positionen in den einzelnen Matchlisten */
-
-  positions = (int *)cl_malloc(nr_columns * sizeof(int));
-  memset((char *)positions, '\0', nr_columns * sizeof(int));
-
-  /* zur Bequemlichkeit, damit wir die Constraints als Array
-   * adressieren k?nnen */
-
-  constraints = (Evaltree *)cl_malloc(nr_columns * sizeof(Evaltree));
-  memset((char *)constraints, '\0', nr_columns * sizeof(Evaltree));
-
-  /* ---------------------------------------- */
-
+  /* compute matchlists for all column constraints in the TAB query */
   i = 0;
   smallest_col = 0;
   for (col = evalenv->evaltree; col; col = col->tab_el.next) {
-
     constraints[i] = col;
 
     init_matchlist(&lists[i]);
     calculate_initial_matchlist(evalenv->patternlist[col->tab_el.patindex].con.constraint, 
                                 &lists[i], evalenv->query_corpus);
 
-    if (i > 0) {
-      if (lists[smallest_col].tabsize > lists[i].tabsize)
-        smallest_col = i;
-    }
+    /** useful for debugging:
+     * printf("TAB pattern #%d: %d hits %s %s\n", i + 1, lists[i].tabsize,
+     *   (lists[i].is_inverted) ? "(inverted)" : "", (lists[i].matches_whole_corpus) ? "(whole corpus)" : "");
+     */
+    if (lists[smallest_col].tabsize > lists[i].tabsize)
+      smallest_col = i;
     i++;
   }
+  max_res = lists[smallest_col].tabsize;
 
-  /* OK. Let's reduce them. */
+  init_matchlist(&result);
+  if (max_res > 0) {
 
-  /* simple, silly algorighm. Just to test the beast. */
-  /* TODO: optimize by using smallest_col */
+    /* ---------------------------------------- */
+    /* A simple greedy algorithm:
+     *  - for each start position (column 0)
+     *  - find nearest item from next column within distance range
+     *  - if successful, fix this item and proceed to next column
+     *  - if greedy algorithm doesn't find a match, the start position is discarded (even if it might match with different assignment)
+     *  - the original algorithm used to "consume" the items from all columns that participate in a match (so they are no longer available for subsequent matches);
+     *    this produces inconsistent results that are hard to predict, similar to the original implementation of MU queries
+     *    (consider e.g. the sequence A1 .. A2 .. B1 .. C1 .. B2 .. C2: the algorithm would match A1-B1-C1 and A2-B2-C2, but without A1 it would match A2-B1-C1)
+     *  - new algorithm does not to consume items from columns >= 1, so it now predictably matches A1-B1-C1 and A2-B1-C1
+     *  - similar to the standard matching strategy of regular queries, nested matches are discarded, returning only the "early match" A1-B1-C1 in the example
+     *  - as a consequence, each item from any column cannot participate in more than one of the final matches and the result set is bounded by the shortest column
+     *  - TAB queries do not respect the matching strategy setting because this makes little sense without implementing a complete combinatorial search
+     */
 
-  while (positions[0] < lists[0].tabsize) {
+    /* allocate result matchlist (for up to max_res matches) */
+    result.start = (int *)cl_malloc(sizeof(int) * max_res);
+    result.end = (int *)cl_malloc(sizeof(int) * max_res);
+    n_res = 0; /* also serves as pointer into the result matchlist */
 
-    int next_col, this_pos, next_pos, l_pos, r_pos;
+    while (positions[0] < lists[0].tabsize) {
+      int next_col, this_pos, next_pos, l_pos, r_pos, boundary;
 
-    next_pos = -1;
-
-    for (next_col = 1; next_col < nr_columns; next_col++) {
-
-      this_col = next_col - 1;
-
-      /* position in der aktuellen Liste */
-      this_pos = lists[this_col].start[positions[this_col]];
-
-      /* Minimale und maximale CP fuer Hit */
-      l_pos = this_pos + constraints[next_col]->tab_el.min_dist;
-
-      if (constraints[next_col]->tab_el.max_dist == repeat_inf)
-        r_pos = this_pos + hard_boundary;
-      else
-        r_pos = this_pos + constraints[next_col]->tab_el.max_dist;
-
-      while (positions[next_col] < lists[next_col].tabsize &&
-             (next_pos = lists[next_col].start[positions[next_col]]) < l_pos) {
-
-        /* mark for deletion */
-        lists[next_col].start[positions[next_col]] = -1;
-        positions[next_col]++;
-
+      /* The original implementation of TAB queries completely ignored the optional "within" constraint (which defaults to hard_boundary tokens).
+       * In order to evaluate the query correctly, we must first determine a right boundary for the complete TAB match, which will also be used
+       * to cut off unlimited distances (repeat_inf) between TAB columns.
+       */
+      boundary = calculate_rightboundary(evalenv->query_corpus, lists[0].start[positions[0]], evalenv->search_context);
+      if (boundary < 0) {
+        /* can't get a match here (because of a "within <s-att>" constraint);
+         * note that we cannot rely on falling through in the first iteration of the for loop in case there is just a single column
+         * (e.g. "TAB [] within head;" would fail to apply the "within" constraint)
+         */
+        positions[0]++;
+        continue;
       }
 
-      if (positions[next_col] >= lists[next_col].tabsize ||
-          next_pos > r_pos)
-        break;
-    }
+      /* iterate over pairs of adjacent columns, scanning for a greedy match within specified distance */
+      next_pos = -1;
+      for (next_col = 1; next_col < nr_columns; next_col++) {
+        this_col = next_col - 1;
 
-    if (next_col >= nr_columns) {
+        /* offset in matchlist for current column */
+        this_pos = lists[this_col].start[positions[this_col]];
 
-      /* hit */
-      for (i = 0; i < nr_columns; i++)
-        positions[i]++;
-      
-    }
-    else {
-      lists[0].start[positions[0]] = -1;
+        /* valid range for a matching cpos in the next column */
+        l_pos = cl_cpos_offset(this_pos, constraints[next_col]->tab_el.min_dist, boundary + 1, 0); /* NB: set virtual corpus size to boundary + 1 */
+        if (l_pos < 0)
+          break; /* beyond search boundary, no match possible */
+
+        if (constraints[next_col]->tab_el.max_dist == repeat_inf)
+          r_pos = cl_cpos_offset(this_pos, hard_boundary, boundary + 1, 1);
+        else
+          r_pos = cl_cpos_offset(this_pos, constraints[next_col]->tab_el.max_dist, boundary + 1, 1);
+
+        /* scan next column for a potential match (with cpos >= l_pos) */
+        while (positions[next_col] < lists[next_col].tabsize &&
+            (next_pos = lists[next_col].start[positions[next_col]]) < l_pos) {
+          positions[next_col]++;
+        }
+
+        /* no potential match found or not in range (i.e. !(next_pos <= r_pos)) */
+        if (positions[next_col] >= lists[next_col].tabsize || next_pos > r_pos)
+          break;
+      }
+
+      if (next_col >= nr_columns) {
+        /* we have found a greedy match: copy it to the result matchlist */
+        l_pos = lists[0].start[positions[0]]; /* start of match = cpos of first column */
+        r_pos = lists[nr_columns - 1].start[positions[nr_columns - 1]]; /* end of match = cpos of last column */
+        /* discard nested matches; the only possible case is that r_pos == result.end[n_res - 1] */
+        if (n_res == 0 || r_pos > result.end[n_res - 1]) {
+          assert(n_res < max_res);
+          result.start[n_res] = l_pos;
+          result.end[n_res] = r_pos;
+          n_res++;
+        }
+      }
+
       positions[0]++;
     }
-  }
 
-  /* go throuh all lists and mark positions which are not yet visited */
-  for (this_col = 0; this_col < nr_columns; this_col++) {
+    /* finalize the result matchlist */
+    if (n_res > 0) {
+      if (n_res < max_res) {
+        /* shorten vectors if necessary */
+        result.start = (int *)cl_realloc(result.start, sizeof(int) * n_res);
+        result.end = (int *)cl_realloc(result.end, sizeof(int) * n_res);
+      }
+      result.tabsize = n_res;
 
-    for (i = positions[this_col]; i < lists[this_col].tabsize; i++)
-      lists[this_col].start[i] = -1;
-    Setop(&(lists[this_col]), Reduce, NULL);
+      /* delete offrange cells if we are in a subcorpus */
+      if (mark_offrange_cells(&result, evalenv->query_corpus) > 0)
+        Setop(&result, Reduce, NULL);
 
-  }
+    }
+    else {
+      /* no matches: return empty matchlist */
+      cl_free(result.start);
+      cl_free(result.end);
+      result.tabsize = 0;
+    }
 
-
-  /* delete offrange cells when we are in a subcorpus */
-
-  if (lists[0].tabsize > 0) {
-
-    mark_offrange_cells(&lists[0], evalenv->query_corpus);
-
-    Setop(&lists[0], Reduce, NULL);
-
-    lists[0].end = (int *)cl_malloc(sizeof(int) * lists[0].tabsize);
-    memcpy(lists[0].end, lists[0].start, sizeof(int) * lists[0].tabsize);
-  }
-  else {
-    assert(lists[0].start == NULL);
-  }
+  } /* otherwise max_res == 0 and result has already been initialized as an empty matchlist */
 
   set_corpus_matchlists(evalenv->query_corpus, 
-                        lists,
-                        nr_columns,
-                        0);
+                        &result, 1, 0);
 
-  free(positions);
-  free(constraints);
-
+  /* cleanup */
+  cl_free(positions);
+  cl_free(constraints);
   for (i = 0; i < nr_columns; i++)
     free_matchlist(&lists[i]);
-  free(lists);
+  cl_free(lists);
+  free_matchlist(&result);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -3028,20 +3088,12 @@ meet_mu(Matchlist *list1, Matchlist *list2,
         int lw, int rw,
         Attribute *struc)
 {
-
-  /* this is very similar to Setop(Intersection)/matchlist.c, but we
-   * have to take care of the context (lw, rw, struc) */
-
-  Matchlist tmp;
-
+  /* NB: list1 will be modified in place, list2 remains unchanged and will be deallocated by the caller */
   int i, j, k, start, end;
-
+  int corpus_size = evalenv->query_corpus->mother_size; /* corpus size needed for boundary checks below */
 
   if ((list1->tabsize == 0) || (list2->tabsize == 0)) {
-
-    /*
-     * Bingo. one of the two is empty. So is their intersection.
-     */
+    /* If one of the two lists is empty, so is their intersection and we're done. */
 
     cl_free(list1->start);
     cl_free(list1->end);
@@ -3049,76 +3101,87 @@ meet_mu(Matchlist *list1, Matchlist *list2,
     list1->matches_whole_corpus = 0;
   }
   else {
-
-    /*
-     * We have to do some work now
+    /* Implementation modified to give consistent "filtering" semantics (SE, 2017-07-01)
+     *  - result of (meet A B <win>) are those items of A for which at least one item of B occurs within <win>
+     *  - the same item of B can satisfy this constraint for multiple items of A, which is achieved simply by not "consuming" this item
+     *  - because both match lists are ordered, the filter can be applied efficiently in a single forward pass
+     *  - new consistent behaviour is now documented in the CQP Query Language Tutorial
      */
 
-    tmp.tabsize = MIN(list1->tabsize, list2->tabsize);
-    
-    tmp.start = (int *)cl_malloc(sizeof(int) * tmp.tabsize);
-    tmp.end = NULL;
-    
-    i = 0;                        /* the position in list1 */
-    j = 0;                        /* the position in list2 */
-    k = 0;                        /* the insertion point in the result list */
+    /* since we're filtering list1, we can simply upcopy items that pass the filter */
+    i = 0;                /* index in list1 */
+    j = 0;                /* index in list2 */
+    k = 0;                /* insertion point in list1 as result list */
     
     while ((i < list1->tabsize) && (j < list2->tabsize)) {
+      /* check whether this item from A can be matched against an item from B in the window [start, end] */
       
       if (struc != NULL) {
-
-        if (!get_struc_attribute(struc, list1->start[i],
-                                 &start, &end) || (cderrno != CDA_OK)) {
+        /* s-attribute context: find region containing current point in A, otherwise there can be no match here */
+        if (!get_struc_attribute(struc, list1->start[i], &start, &end)
+            || (cderrno != CDA_OK)) {
           i++;
           continue;
         }
-        else {
-          lw = start - list1->start[i];
-          rw = end   - list1->start[i];
+      }
+      else {
+        /* numeric context: compute start and end as offsets from current corpus position in A
+         *  - in principle, no boundary checks would be needed because we will only compare valid positions (from B) with the window
+         *  - however, we need to check for integer overflow in case we are dealing with a very large corpus
+         *    (or with an idiot who thinks it's funny to specify a context window of -2147483647 +2147483647 in his query)
+         *  - we need to distinguish between two cases: whether the boundary specifies a (i) minimum or (ii) a maximum distance
+         *  - case (i) occurs for a start offset lw > 0 (e.g. 2 5) and for an end offset rw < 0 (e.g. -4 -2)
+         *  - if a minimum distance boundary (i) falls outside the corpus, we cannot possibly find a match -> skip and continue
+         *  - a maximum distance boundary (ii) can simply be clamped to the range of valid corpus positions
+         *  - because of these case distinctions, the boundary checks are fairly expensive, but cannot be avoided without 64bit ints
+         */
+        start = cl_cpos_offset(list1->start[i], lw, corpus_size, lw <= 0); /* clamp to corpus if lw specifies a maximum distance */
+        end   = cl_cpos_offset(list1->start[i], rw, corpus_size, rw >= 0); /* clamp if rw specifies a maximum distance */
+
+        /* if a minimum distance is outside the corpus, there can be no match here */
+        if (start < 0 || end < 0) {
+          i++;
+          continue;
         }
       }
 
-      if (list1->start[i]+rw < list2->start[j]) {
-        i++;
-      }
-      else if (list1->start[i]+lw > list2->start[j]) {
-        j++;
+      /* [start, end] is now a valid cpos range (which may be empty for end < start) and we try to find an item from B in this window */
+      if (end < list2->start[j]) {
+        i++; /* no item of B within context window */
       }
       else {
+        while (j < list2->tabsize && list2->start[j] < start)
+          j++; /* skip items of B before start of current context window */
+        /* note that we never have to move backwards in list2 because the context windows will be strictly increasing */
 
-        assert((list1->start[i]+lw <= list2->start[j]) &&
-               (list1->start[i]+rw >= list2->start[j]));
+        /* now check for a match within the context window unless we have already reached the end of B */
+        if (j < list2->tabsize && list2->start[j] <= end) {
+          assert((start <= list2->start[j]) && (list2->start[j] <= end)); /* verify that this is a valid match, as it should be */
 
-        tmp.start[k] = list1->start[i];
-
-        i++;
-        j++;
-        k++;
+          list1->start[k] = list1->start[i]; /* upcopy match to insertion point within A */
+          i++;
+          k++;
+        }
+        else {
+          i++; /* no match for current point in A */
+        }
       }
-    }
-    
-    assert(k <= tmp.tabsize);
-    
+
+      assert(k <= list1->tabsize && k <= i); /* make sure that the upcopy works correctly */
+    } /* end of loop filtering A against B */
+
     if (k == 0) {
-      /* we did not copy anything. result is empty. */
-      cl_free(tmp.start); tmp.start = NULL;
+      /* the result is empty, so free list1 */
+      cl_free(list1->start); /* also sets the pointer to NULL */
     }
-    else if (k < tmp.tabsize) {
-      
-      /* we did not eliminate any duplicates if k==tmp.tabsize. 
-       * So, in that case, we do not have to bother with reallocs.
-       */
-      
-      tmp.start = (int *)cl_realloc((char *)tmp.start, sizeof(int) * k);
+    else if (k < list1->tabsize) {
+      /* reallocate vector if the number of matches has been reduced */
+      list1->start = (int *)cl_realloc(list1->start, sizeof(int) * k);
     }
-    
-    cl_free(list1->start);
-    
-    list1->start = tmp.start; tmp.start = NULL;
-    list1->end   = NULL;
+
     list1->tabsize = k;
-    list1->matches_whole_corpus = 0;
-  }
+    list1->matches_whole_corpus = 0; /* should already be the case */
+  } /* end of case where neither of the two matchlists is empty */
 
   return 1;
 }
@@ -3200,10 +3263,20 @@ eval_mu_tree(Evaltree et, Matchlist* ml)
 
 /* ---------------------------------------------------------------------- */
 
-int next_environment(void)
+/**
+ * Sets up a new environment in the global array.
+ *
+ * The next slot upwards is used (and eep is incremented).
+ *
+ * @see     eep
+ * @see     Environment
+ * @return  True for all OK, false for an error (overflow of MAXENVIRONMENT).
+ */
+int
+next_environment(void)
 {
   if (eep >= MAXENVIRONMENT) {
-    fprintf(stderr, "No more environments for evaluation (max %d exceeded)\n",
+    Rprintf("No more environments for evaluation (max %d exceeded)\n",
             MAXENVIRONMENT);
     return 0;
   }
@@ -3233,6 +3306,7 @@ int next_environment(void)
     Environment[eep].search_context.size = 0;
 
     Environment[eep].negated = 0;
+    Environment[eep].matching_strategy = matching_strategy; /* initialize from current global setting */
 
     CurEnv = &Environment[eep];
 
@@ -3243,6 +3317,10 @@ int next_environment(void)
 /**
  * Frees an evaluation environment.
  *
+ * The environment must be one currently occupied within the global array.
+ *
+ * @see            Environment
+ * @see            eep
  * @param thisenv  The eval environment to free.
  * @return         Boolean: true if the deletion went OK;
  *                 false if the environment to be freed was
@@ -3254,8 +3332,7 @@ free_environment(int thisenv)
   int i;
 
   if ((thisenv < 0) || (thisenv > eep)) {
-    fprintf(stderr, "Environment %d not occupied\n",
-            thisenv);
+    Rprintf("Environment %d not occupied\n", thisenv);
     return 0;
   }
   else {
@@ -3324,23 +3401,36 @@ free_environment(int thisenv)
   }
 }
 
+/**
+ * Prints the contents of an EvalEnvironment object to STDOUT.
+ *
+ * Which bits of information are printed depends on which of a group of
+ * debugging-variables are set to true.
+ *
+ * The EvalEnvironment to print is specified as an index into the global
+ * array (Environment).
+ *
+ * @see Environment
+ * @param thisenv  Index into Environment indicating which EvalEnvironment
+ *                 should be displayed.
+ */
 void
 show_environment(int thisenv)
 {
   if ((thisenv < 0) || (thisenv > eep))
-    fprintf(stderr, "Environment %d not used\n",
-            thisenv);
-  else {
-    
-   Rprintf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
-    
-   Rprintf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
+    Rprintf("Environment %d not used\n", thisenv);
+  else if (show_compdfa || show_evaltree || show_gconstraints || show_patlist) {
+    /* Note, at least one of the above debugging-variables must be true, or there is nothing to print! */
+
+    Rprintf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
+
+    Rprintf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
 
     if (show_compdfa) {
       Rprintf("\n==================== DFA:\n\n");
       show_complete_dfa(Environment[thisenv].dfa);
     }
-    
+
     if (show_evaltree) {
       Rprintf("\n==================== Evaluation Tree:\n\n");
       print_evaltree(thisenv, Environment[thisenv].evaltree, 0);
@@ -3350,7 +3440,7 @@ show_environment(int thisenv)
       Rprintf("\n==================== Global Constraints:\n\n");
       print_booltree(Environment[thisenv].gconstraint, 0);
     }
-    
+
     if (show_patlist)
       show_patternlist(thisenv);
 
@@ -3359,6 +3449,9 @@ show_environment(int thisenv)
   }
 }
 
+/**
+ * Frees all eval environments in the global array, and sets the eep pointer to -1
+ */
 void
 free_environments(void)
 {
@@ -3366,7 +3459,7 @@ free_environments(void)
 
   for (i = 0; i <= eep; i++)
     if (!free_environment(i)) {
-      fprintf(stderr, "Problems while free'ing environment %d\n", i);
+      Rprintf("Problems while free'ing environment %d\n", i);
       break;
     }
   eep = -1;

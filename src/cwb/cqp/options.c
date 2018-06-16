@@ -15,8 +15,6 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...);
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,6 +31,7 @@ void Rprintf(const char *, ...);
 #include "../cl/attributes.h"
 #include "../cl/macros.h"
 
+/* these boolean constants SHOULD NOT be used. Present only to make sure old code doesn't break. */
 #ifndef True
 #define True 1
 #endif
@@ -44,100 +43,117 @@ void Rprintf(const char *, ...);
    "sort -k 2 -k 1n "
 
 #define DEFAULT_EXTERNAL_GROUPING_COMMAND \
-   "sort -n %s +0n +1n -2 | uniq -c | sort -n -r +1n +0rn +2n"
-
+   "sort %s -k 1,1n -k 2,2n | uniq -c | sort -k 1,1nr -k 2,2n -k 3,3n"
 /**
  * Global array of options for CQP.
  */
 CQPOption cqpoptions[] = {
 
-  /* Abbr  VariableName           Type        Where to store    String- Int- Environ Side-  Option
-   *                                                            Default Def. VarName Effect Type
-   * ---------------------------------------------------------------------------------------------*/
+  /* Abbr  VariableName           Type        Where to store           String-       Int- Environ Side-  Option
+   *                                                                   Default       Def. VarName Effect Flags
+   * ----------------------------------------------------------------------------------------------------------*/
 
-  /* debugging options */
-  { NULL, "VerboseParser",        OptBoolean, &verbose_parser,    NULL, 0,  NULL, 0, 0},
-  { NULL, "ShowSymtab",           OptBoolean, &show_symtab,       NULL, 0,  NULL, 0, 0},
-  { NULL, "ShowGconstraints",     OptBoolean, &show_gconstraints, NULL, 0,  NULL, 0, 0},
-  { NULL, "ShowEvaltree",         OptBoolean, &show_evaltree,     NULL, 0,  NULL, 0, 0},
-  { NULL, "ShowPatlist",          OptBoolean, &show_patlist,      NULL, 0,  NULL, 0, 0},
-  { NULL, "ShowDFA",              OptBoolean, &show_dfa,          NULL, 0,  NULL, 0, 0},
-  { NULL, "ShowCompDFA",          OptBoolean, &show_compdfa,      NULL, 0,  NULL, 0, 0},
-  { NULL, "SymtabDebug",          OptBoolean, &symtab_debug,      NULL, 0,  NULL, 0, 0},
-  { NULL, "ParserDebug",          OptBoolean, &parser_debug,      NULL, 0,  NULL, 0, 0},
-  { NULL, "TreeDebug",            OptBoolean, &tree_debug,        NULL, 0,  NULL, 0, 0},
-  { NULL, "EvalDebug",            OptBoolean, &eval_debug,        NULL, 0,  NULL, 0, 0},
-  { NULL, "InitialMatchlistDebug",OptBoolean, &initial_matchlist_debug, NULL, 0,  NULL, 0, 0},
-  { NULL, "DebugSimulation",      OptBoolean, &debug_simulation,  NULL, 0,  NULL, 0, 0},
-  { NULL, "SearchDebug",          OptBoolean, &search_debug,      NULL, 0,  NULL, 0, 0},
-  { NULL, "ServerLog",            OptBoolean, &server_log,        NULL, 1,  NULL, 0, 0},
-  { NULL, "ServerDebug",          OptBoolean, &server_debug,      NULL, 0,  NULL, 0, 0}, 
-  { NULL, "Snoop",                OptBoolean, &snoop,             NULL, 0,  NULL, 0, 0},
-  { NULL, "ParseOnly",            OptBoolean, &parseonly,         NULL, 0,  NULL, 0, 0},
-  { NULL, "Silent",               OptBoolean, &silent,            NULL, 0,  NULL, 0, 0},
-  { NULL, "ChildProcess",         OptBoolean, &child_process,     NULL, 0,  NULL, 0, 0},
-  { NULL, "MacroDebug",           OptBoolean, &macro_debug,       NULL, 0,  NULL, 0, 0},
-  { NULL, "CLDebug",              OptBoolean, &activate_cl_debug, NULL, 0,  NULL, 4, 0},
+  /* debugging options (anything that controls whether or not a message of some kind is printed) */
+  { NULL, "VerboseParser",        OptBoolean, &verbose_parser,         NULL,         0,   NULL,   0,     0 },
+  { NULL, "ShowSymtab",           OptBoolean, &show_symtab,            NULL,         0,   NULL,   0,     0 },
+  { NULL, "ShowGconstraints",     OptBoolean, &show_gconstraints,      NULL,         0,   NULL,   0,     0 },
+  { NULL, "ShowEvaltree",         OptBoolean, &show_evaltree,          NULL,         0,   NULL,   0,     0 },
+  { NULL, "ShowPatlist",          OptBoolean, &show_patlist,           NULL,         0,   NULL,   0,     0 },
+  { NULL, "ShowDFA",              OptBoolean, &show_dfa,               NULL,         0,   NULL,   0,     0 },
+  { NULL, "ShowCompDFA",          OptBoolean, &show_compdfa,           NULL,         0,   NULL,   0,     0 },
+  { NULL, "SymtabDebug",          OptBoolean, &symtab_debug,           NULL,         0,   NULL,   0,     0 },
+  { NULL, "ParserDebug",          OptBoolean, &parser_debug,           NULL,         0,   NULL,   0,     0 },
+  { NULL, "TreeDebug",            OptBoolean, &tree_debug,             NULL,         0,   NULL,   0,     0 },
+  { NULL, "EvalDebug",            OptBoolean, &eval_debug,             NULL,         0,   NULL,   0,     0 },
+  { NULL, "InitialMatchlistDebug",OptBoolean, &initial_matchlist_debug,NULL,         0,   NULL,   0,     0 },
+  { NULL, "DebugSimulation",      OptBoolean, &debug_simulation,       NULL,         0,   NULL,   0,     0 },
+  { NULL, "SearchDebug",          OptBoolean, &search_debug,           NULL,         0,   NULL,   0,     0 },
+  { NULL, "ServerLog",            OptBoolean, &server_log,             NULL,         1,   NULL,   0,     0 },
+  { NULL, "ServerDebug",          OptBoolean, &server_debug,           NULL,         0,   NULL,   0,     0 },
+  { NULL, "Snoop",                OptBoolean, &snoop,                  NULL,         0,   NULL,   0,     0 },
+  { NULL, "ParseOnly",            OptBoolean, &parseonly,              NULL,         0,   NULL,   0,     0 },
+  { NULL, "Silent",               OptBoolean, &silent,                 NULL,         0,   NULL,   0,     0 },
+  { NULL, "ChildProcess",         OptBoolean, &child_process,          NULL,         0,   NULL,   0,     0 },
+  { NULL, "MacroDebug",           OptBoolean, &macro_debug,            NULL,         0,   NULL,   0,     0 },
+  { NULL, "CLDebug",              OptBoolean, &activate_cl_debug,      NULL,         0,   NULL,   4,     0 },
 
   /* "secret" internal options */
-  { NULL, "PrintNrMatches",       OptInteger, &printNrMatches,    NULL, 0,  NULL, 0, 0}, 
+  { NULL, "PrintNrMatches",       OptInteger, &printNrMatches,         NULL,         0,   NULL,   0,     0 },
 
-  { "eg", "ExternalGroup",        OptBoolean, &UseExternalGrouping, NULL, 0, NULL, 0, 0},
-  { "egc","ExternalGroupCommand", OptString,  &ExternalGroupingCommand, NULL, 0, NULL, 0, 0}, 
-  { "lcv", "LessCharsetVariable", OptString,  &less_charset_variable, "LESSCHARSET", 0, NULL, 0, 0},
+  { "eg", "ExternalGroup",        OptBoolean, &UseExternalGrouping,    NULL,         0,   NULL,   0,     0 },
+  { "egc","ExternalGroupCommand", OptString,  &ExternalGroupingCommand,NULL,         0,   NULL,   0,     0 },
+  { "lcv", "LessCharsetVariable", OptString,  &less_charset_variable,  "LESSCHARSET",0,   NULL,   0,     0 },
 
   /* options set by command-line flags */
-  { NULL, "Readline",             OptBoolean, &use_readline,      NULL, 0,  NULL, 0, 0},
-  { "dc", "DefaultCorpus",        OptString,  &default_corpus,    NULL, 0,  NULL, 0, 0},
-  { "hb", "HardBoundary",         OptInteger, &hard_boundary,     NULL, DEFAULT_HARDBOUNDARY, NULL, 0, 0},
-  { "hc", "HardCut",              OptInteger, &hard_cut,          NULL, 0,  NULL, 0, 0},
-  { "ql", "QueryLock",            OptInteger, &query_lock,        NULL, 0,  NULL, 0, 0},
-  { "m",  "Macros",               OptBoolean, &enable_macros,     NULL, 1,  NULL, 0, 0},
-  { NULL, "UserLevel",            OptInteger, &user_level,        NULL, 0,  NULL, 0, 0}, 
+  { NULL, "Readline",             OptBoolean, &use_readline,           NULL,         0,   NULL,   0,     0 },
+  { "dc", "DefaultCorpus",        OptString,  &default_corpus,         NULL,         0,   NULL,   0,     0 },
+  { "hb", "HardBoundary",         OptInteger, &hard_boundary,          NULL,         DEFAULT_HARDBOUNDARY,
+                                                                                          NULL,   0,     0 },
+  { "hc", "HardCut",              OptInteger, &hard_cut,               NULL,         0,   NULL,   0,     0 },
+  { "ql", "QueryLock",            OptInteger, &query_lock,             NULL,         0,   NULL,   0,     0 },
+  { "m",  "Macros",               OptBoolean, &enable_macros,          NULL,         1,   NULL,   0,     0 },
+  { NULL, "UserLevel",            OptInteger, &user_level,             NULL,         0,   NULL,   0,     0 },
+
+  /* Abbr  VariableName           Type        Where to store           String-       Int- Environ Side-  Option
+   *                                                                   Default       Def. VarName Effect Flags
+   * ----------------------------------------------------------------------------------------------------------*/
 
   /* now called DataDirectory, but we keep the old name (secretly) for compatibility */
-  { "lcd","LocalCorpusDirectory", OptString,  &LOCAL_CORP_PATH,   NULL, 0,  NULL, 2, 0 },
+  { "lcd","LocalCorpusDirectory", OptString,  &LOCAL_CORP_PATH,        NULL,         0,   NULL,   2,     0 },
 
-  /* user options */
-  { "r",  "Registry",             OptString,  &registry,          NULL, 0,  REGISTRY_ENVVAR, 1,  OPTION_CQP }, 
-  { "dd", "DataDirectory",        OptString,  &LOCAL_CORP_PATH,   NULL, 0,  DEFAULT_LOCAL_PATH_ENV_VAR, 2,  OPTION_CQP },
-  { "hf", "HistoryFile",          OptString,  &cqp_history_file,  NULL, 0,  NULL, 0, OPTION_CQP },
-  { "wh", "WriteHistory",         OptBoolean, &write_history_file, NULL, 0, NULL, 0, OPTION_CQP },
-  { "ms", "MatchingStrategy",     OptString,  &matching_strategy_name, "standard", 0, NULL, 9, OPTION_CQP },
-  { "sr", "StrictRegions",        OptBoolean, &strict_regions,    NULL, 1,  NULL, 0, OPTION_CQP},
-  { "p",  "Paging",               OptBoolean, &paging,            NULL, 1,  NULL, 0, OPTION_CQP},
-  { "pg", "Pager",                OptString,  &pager,             "less -FRX -+S", 0,  "CQP_PAGER", 0, OPTION_CQP},
-  { "h",  "Highlighting",         OptBoolean, &highlighting,      NULL, 1,  NULL, 0, OPTION_CQP },
-  { "col","Colour",               OptBoolean, &use_colour,        NULL, 0,  NULL, 0, OPTION_CQP },
-  { "pb", "ProgressBar",          OptBoolean, &progress_bar,      NULL, 0,  NULL, 0, OPTION_CQP },
-  { "pp", "PrettyPrint",          OptBoolean, &pretty_print,      NULL, 1,  NULL, 0, OPTION_CQP },
-  { "c",  "Context",              OptContext, &CD,                NULL, 0,  NULL, 0, OPTION_CQP },
-  { "lc", "LeftContext",          OptContext, &CD,                NULL, 0,  NULL, 0, OPTION_CQP },
-  { "rc", "RightContext",         OptContext, &CD,                NULL, 0,  NULL, 0, OPTION_CQP },
-  { "ld", "LeftKWICDelim",        OptString,  &left_delimiter,    "<",  0,  NULL, 0, OPTION_CQP },
-  { "rd", "RightKWICDelim",       OptString,  &right_delimiter,   ">",  0,  NULL, 0, OPTION_CQP },
-  { "pm", "PrintMode",            OptString,  &printModeString,   "ascii", 0,  NULL, 6, OPTION_CQP},
-  { "po", "PrintOptions",         OptString,  &printModeOptions,  NULL, 0,  NULL, 8, OPTION_CQP},
-  { "ps", "PrintStructures",      OptString,  &printStructure,    NULL, 0,  NULL, 7, OPTION_CQP},
-  { "sta","ShowTagAttributes",    OptBoolean, &show_tag_attributes, NULL, 1,  NULL, 0, OPTION_CQP},
-  { "st", "ShowTargets",          OptBoolean, &show_targets,      NULL, 0,  NULL, 0, OPTION_CQP},
-  { "as", "AutoShow",             OptBoolean, &autoshow,          NULL, 1,  NULL, 0, OPTION_CQP },
-  { NULL, "Timing",               OptBoolean, &timing,            NULL, 0,  NULL, 0, OPTION_CQP },
-  { "o",  "Optimize",             OptBoolean, &query_optimize,    NULL, 0,  NULL, 3, OPTION_CQP }, 
-  { "es", "ExternalSort",         OptBoolean, &UseExternalSorting,NULL, 0,  NULL, 0, OPTION_CQP },
-  { "esc","ExternalSortCommand",  OptString,  &ExternalSortingCommand, NULL, 0, NULL, 0, OPTION_CQP }, 
-  { "da", "DefaultNonbrackAttr",  OptString,  &def_unbr_attr,     DEFAULT_ATT_NAME, 0, NULL, 0, OPTION_CQP },
-  { "sub","AutoSubquery",         OptBoolean, &subquery,          NULL, 0,  NULL, 0, OPTION_CQP },
-  { NULL, "AutoSave",             OptBoolean, &auto_save,         NULL, 0,  NULL, 0, OPTION_CQP }, 
-  { NULL, "SaveOnExit",           OptBoolean, &save_on_exit,      NULL, 0,  NULL, 0, OPTION_CQP }, 
+  /* user options: assumed to be settable via the interface (thus the use of the OPTION_CQP flag that makes them visible). */
+  { "r",  "Registry",             OptString,  &registry,               NULL,         0,   REGISTRY_ENVVAR,
+                                                                                                  1,     OPTION_CQP },
+  { "dd", "DataDirectory",        OptString,  &LOCAL_CORP_PATH,        NULL,         0,   DEFAULT_LOCAL_PATH_ENV_VAR,
+                                                                                                  2,     OPTION_CQP },
+  { "hf", "HistoryFile",          OptString,  &cqp_history_file,       NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "wh", "WriteHistory",         OptBoolean, &write_history_file,     NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "ms", "MatchingStrategy",     OptString,  &matching_strategy_name, "standard",   0,   NULL,   9,     OPTION_CQP },
+  { "sr", "StrictRegions",        OptBoolean, &strict_regions,         NULL,         1,   NULL,   0,     OPTION_CQP},
+  { "p",  "Paging",               OptBoolean, &paging,                 NULL,         1,   NULL,   0,     OPTION_CQP},
+#ifndef __MINGW__
+  { "pg", "Pager",                OptString,  &pager,                  "less -FRX -+S",0, "CQP_PAGER",0, OPTION_CQP},
+  { "h",  "Highlighting",         OptBoolean, &highlighting,           NULL,         1,   NULL,   0,     OPTION_CQP },
+#else
+  /* use more as default pager under Windows (because it exists whereas less may not :-P ) */
+  { "pg", "Pager",                OptString,  &pager,                  "more",       0,   "CQP_PAGER",0, OPTION_CQP},
+  /* this implies that the default value for highlighting must be "off" under Windows */
+  { "h",  "Highlighting",         OptBoolean, &highlighting,           NULL,         0,   NULL,   0,     OPTION_CQP },
+#endif
+  { "col","Colour",               OptBoolean, &use_colour,             NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "pb", "ProgressBar",          OptBoolean, &progress_bar,           NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "pp", "PrettyPrint",          OptBoolean, &pretty_print,           NULL,         1,   NULL,   0,     OPTION_CQP },
+  { "c",  "Context",              OptContext, &CD,                     NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "lc", "LeftContext",          OptContext, &CD,                     NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "rc", "RightContext",         OptContext, &CD,                     NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "ld", "LeftKWICDelim",        OptString,  &left_delimiter,         "<",          0,   NULL,   0,     OPTION_CQP },
+  { "rd", "RightKWICDelim",       OptString,  &right_delimiter,        ">",          0,   NULL,   0,     OPTION_CQP },
+  { "pm", "PrintMode",            OptString,  &printModeString,        "ascii",      0,   NULL,   6,     OPTION_CQP},
+  { "po", "PrintOptions",         OptString,  &printModeOptions,       NULL,         0,   NULL,   8,     OPTION_CQP},
+  { "ps", "PrintStructures",      OptString,  &printStructure,         NULL,         0,   NULL,   7,     OPTION_CQP},
+  { "sta","ShowTagAttributes",    OptBoolean, &show_tag_attributes,    NULL,         1,   NULL,   0,     OPTION_CQP},
+  { "st", "ShowTargets",          OptBoolean, &show_targets,           NULL,         0,   NULL,   0,     OPTION_CQP},
+  { "as", "AutoShow",             OptBoolean, &autoshow,               NULL,         1,   NULL,   0,     OPTION_CQP },
+  { NULL, "Timing",               OptBoolean, &timing,                 NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "o",  "Optimize",             OptBoolean, &query_optimize,         NULL,         0,   NULL,   3,     OPTION_CQP },
+  { "es", "ExternalSort",         OptBoolean, &UseExternalSorting,     NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "esc","ExternalSortCommand",  OptString,  &ExternalSortingCommand, NULL,         0,   NULL,   0,     OPTION_CQP },
+  { "da", "DefaultNonbrackAttr",  OptString,  &def_unbr_attr,          DEFAULT_ATT_NAME,0,NULL,   0,     OPTION_CQP },
+  { "sub","AutoSubquery",         OptBoolean, &subquery,               NULL,         0,   NULL,   0,     OPTION_CQP },
+  { NULL, "AutoSave",             OptBoolean, &auto_save,              NULL,         0,   NULL,   0,     OPTION_CQP },
+  { NULL, "SaveOnExit",           OptBoolean, &save_on_exit,           NULL,         0,   NULL,   0,     OPTION_CQP },
 
-  { NULL, NULL,                   OptString,  NULL,               NULL, 0,  NULL, 0, 0}
+  /* empty option to terminate array */
+  { NULL, NULL,                   OptString,  NULL,                    NULL,         0,   NULL,   0,     0}
 };
 
+/**
+ * The return value is a newly-allocated string.
+ */
 char *
 expand_filename(char *fname)
 {
-  char fn[1024];
+  char fn[CL_MAX_FILENAME_LENGTH];
   char *home;
   int s, t;
 
@@ -161,7 +177,7 @@ expand_filename(char *fname)
       /*  reference to the name of another component. */
 
       int rpos;
-      char rname[128];
+      char rname[CL_MAX_LINE_LENGTH];
       char *reference;
 
       s++;                        /* skip the $ */
@@ -176,7 +192,7 @@ expand_filename(char *fname)
       reference = getenv(rname);
 
       if (reference == NULL) {
-        fprintf(stderr, "options: can't get value of environment variable ``%s''\n", rname);
+        Rprintf("options: can't get value of environment variable ``%s''\n", rname);
 
         fn[t++] = '$';
         reference = &rname[0];
@@ -199,88 +215,96 @@ expand_filename(char *fname)
   
 }
 
-void syntax(void)
+/**
+ * Prints the usage message for the different CQP applications
+ * to standard error and then shuts down the program with exit status 1.
+ */
+void
+cqp_usage(void)
 {
   switch (which_app) {
   case cqpserver:
-    fprintf(stderr, "Usage: %s [options] [<user>:<password> ...]\n", progname);
+    Rprintf("Usage: %s [options] [<user>:<password> ...]\n", progname);
     break;
   case cqpcl:
-    fprintf(stderr, "Usage: %s [options] '<query>'\n", progname);
+    Rprintf("Usage: %s [options] '<query>'\n", progname);
     break;
   case cqp:
-    fprintf(stderr, "Usage: %s [options]\n", progname);
+    Rprintf("Usage: %s [options]\n", progname);
     break;
   default:
-    fprintf(stderr, "??? Unknown application ???\n");
+    Rprintf("??? Unknown application ???\n");
     exit(1);
   }
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "    -h           help\n");
-  fprintf(stderr, "    -v           version and copyright information\n");
-  fprintf(stderr, "    -r dir       use <dir> as default registry\n");
-  fprintf(stderr, "    -l dir       store/load subcorpora in <dir>\n");
-  fprintf(stderr, "    -I file      read <file> as init file\n");
-  fprintf(stderr, "    -M file      read macro definitions from <file>\n");
-  fprintf(stderr, "    -m           disable macro expansion\n");
+  Rprintf("Options:\n");
+  Rprintf("    -h           help\n");
+  Rprintf("    -v           version and copyright information\n");
+  Rprintf("    -r dir       use <dir> as default registry\n");
+  Rprintf("    -l dir       store/load subcorpora in <dir>\n");
+  Rprintf("    -I file      read <file> as init file\n");
+  Rprintf("    -M file      read macro definitions from <file>\n");
+  Rprintf("    -m           disable macro expansion\n");
   if (which_app == cqpcl) 
-    fprintf(stderr, "    -E variable  execute query in $(<variable>)\n");
+    Rprintf("    -E variable  execute query in $(<variable>)\n");
   if (which_app == cqp) {
-    fprintf(stderr, "    -e           enable input line editing\n");
-    fprintf(stderr, "    -C           enable ANSI colours (experimental)\n");
-    fprintf(stderr, "    -f filename  execute commands from file (batch mode)\n");
-    fprintf(stderr, "    -p           turn pager off\n");
-    fprintf(stderr, "    -P pager     use program <pager> to display query results\n");
+    Rprintf("    -e           enable input line editing\n");
+#ifndef __MINGW__
+    Rprintf("    -C           enable ANSI colours (experimental)\n");
+#endif
+    Rprintf("    -f filename  execute commands from file (batch mode)\n");
+    Rprintf("    -p           turn pager off\n");
+    Rprintf("    -P pager     use program <pager> to display query results\n");
   }
   if (which_app != cqpserver) {
-    fprintf(stderr, "    -s           auto subquery mode\n");
-    fprintf(stderr, "    -c           child process mode\n");
-    fprintf(stderr, "    -i           print matching ranges only (binary output)\n");
-    fprintf(stderr, "    -W num       show <num> chars to the left & right of match\n");
-    fprintf(stderr, "    -L num       show <num> chars to the left of match\n");
-    fprintf(stderr, "    -R num       show <num> chars to the right of match\n");
+    Rprintf("    -s           auto subquery mode\n");
+    Rprintf("    -c           child process mode\n");
+    Rprintf("    -i           print matching ranges only (binary output)\n");
+    Rprintf("    -W num       show <num> chars to the left & right of match\n");
+    Rprintf("    -L num       show <num> chars to the left of match\n");
+    Rprintf("    -R num       show <num> chars to the right of match\n");
   }
-  fprintf(stderr, "    -D corpus    set default corpus to <corpus>\n");
-  fprintf(stderr, "    -b num       set hard boundary for kleene star to <num> tokens\n");
-  fprintf(stderr, "    -S           SIG_PIPE handler toggle\n");
-  fprintf(stderr, "    -x           insecure mode (when run SETUID)\n");
+  Rprintf("    -D corpus    set default corpus to <corpus>\n");
+  Rprintf("    -b num       set hard boundary for kleene star to <num> tokens\n");
+  Rprintf("    -S           SIG_PIPE handler toggle\n");
+  Rprintf("    -x           insecure mode (when run SETUID)\n");
   if (which_app == cqpserver) {
-    fprintf(stderr, "    -1           single client server (exits after 1 connection)\n");
-    fprintf(stderr, "    -P  port     listen on port #<port> [default=CQI_PORT]\n");
-    fprintf(stderr, "    -L           accept connections from localhost only (loopback)\n");
-    fprintf(stderr, "    -q           fork() and quit before accepting connections\n");
+    Rprintf("    -1           single client server (exits after 1 connection)\n");
+    Rprintf("    -P  port     listen on port #<port> [default=CQI_PORT]\n");
+    Rprintf("    -L           accept connections from localhost only (loopback)\n");
+    Rprintf("    -q           fork() and quit before accepting connections\n");
   }
-  fprintf(stderr, "    -d mode      activate/deactivate debug mode, where <mode> is one of: \n");
-  fprintf(stderr, "       [ ShowSymtab, ShowPatList, ShowEvaltree, ShowDFA, ShowCompDFA,   ]\n");
-  fprintf(stderr, "       [ ShowGConstraints, SymtabDebug, TreeDebug, CLDebug,             ]\n");
-  fprintf(stderr, "       [ EvalDebug, InitialMatchlistDebug, DebugSimulation,             ]\n");
-  fprintf(stderr, "       [ VerboseParser, ParserDebug, ParseOnly, SearchDebug, MacroDebug ]\n");
+  Rprintf("    -d mode      activate/deactivate debug mode, where <mode> is one of: \n");
+  Rprintf("       [ ShowSymtab, ShowPatList, ShowEvaltree, ShowDFA, ShowCompDFA,   ]\n");
+  Rprintf("       [ ShowGConstraints, SymtabDebug, TreeDebug, CLDebug,             ]\n");
+  Rprintf("       [ EvalDebug, InitialMatchlistDebug, DebugSimulation,             ]\n");
+  Rprintf("       [ VerboseParser, ParserDebug, ParseOnly, SearchDebug, MacroDebug ]\n");
   if (which_app == cqpserver) {
-    fprintf(stderr, "       [ ServerLog [on], ServerDebug, Snoop (log all network traffic)   ]\n");
+    Rprintf("       [ ServerLog [on], ServerDebug, Snoop (log all network traffic)   ]\n");
   }
-  fprintf(stderr, "       [ ALL (activate all modes except ParseOnly)                      ]\n");
-  fprintf(stderr, "\n");
+  Rprintf("       [ ALL (activate all modes except ParseOnly)                      ]\n");
+  Rprintf("\n");
   exit(1);
 }
 
 
 void 
-print_option_value(int opt) {
+print_option_value(int opt)
+{
   int show_lc_rc = 0;                /* "set context;" should also display left and right context settings */
 
   if (cqpoptions[opt].opt_abbrev != NULL)
-   Rprintf("[%s]\t", cqpoptions[opt].opt_abbrev);
+    Rprintf("[%s]\t", cqpoptions[opt].opt_abbrev);
   else 
-   Rprintf("\t");
- Rprintf("%-22s", cqpoptions[opt].opt_name);
+    Rprintf("\t");
+  Rprintf("%-22s", cqpoptions[opt].opt_name);
 
   if (cqpoptions[opt].address != NULL) {
 
-   Rprintf("=  ");
+    Rprintf("=  ");
     switch (cqpoptions[opt].type) {
     case OptString:
       if (strcasecmp(cqpoptions[opt].opt_name, "PrintOptions") == 0) {
-       Rprintf("%ctbl %chdr %cwrap %cbdr %cnum",
+        Rprintf("%ctbl %chdr %cwrap %cbdr %cnum",
                GlobalPrintOptions.print_tabular ? '+' : '-',
                GlobalPrintOptions.print_header ? '+' : '-',
                GlobalPrintOptions.print_wrap ? '+' : '-',
@@ -288,9 +312,9 @@ print_option_value(int opt) {
                GlobalPrintOptions.number_lines ? '+' : '-');
       }
       else if (*((char **)cqpoptions[opt].address))
-       Rprintf("%s", *((char **)cqpoptions[opt].address));
+        Rprintf("%s", *((char **)cqpoptions[opt].address));
       else
-       Rprintf("<no value>");
+        Rprintf("<no value>");
       break;
 
     case OptBoolean: 
@@ -377,7 +401,11 @@ print_option_value(int opt) {
   }
 }
 
-void print_option_values()
+/**
+ * Prints out the values of all the CQP configuration options.
+ */
+void
+print_option_values()
 {
   int opt;
   int lc_opt = find_option("LeftContext"); /* left and right context are automatically shown together with context option */
@@ -459,11 +487,12 @@ set_default_option_values(void)
 
   CD.print_cpos = 1;
 
-
+  /* TODO: should the following be scrubbed at some point? */
   ExternalSortingCommand = cl_strdup(DEFAULT_EXTERNAL_SORTING_COMMAND);
   ExternalGroupingCommand = cl_strdup(DEFAULT_EXTERNAL_GROUPING_COMMAND);
  
-  private_server = 0;                /* CQPserver options */
+  /* CQPserver options */
+  private_server = 0;
   server_port = 0;
   server_quit = 0;
   localhost = 0;
@@ -480,13 +509,41 @@ set_default_option_values(void)
 
 
 /**
+ * Look up matching strategy by name.
+ *
+ * Returns the appropriate enum code for the selected matching strategy or -1 if the argument is invalid.
+ *
+ * @param s  Name of the desired matching strategy (case insensitive)
+ * @return   Code of the matching strategy, or -1 if s isn't a recognized matching strategy name.
+ *           The return value can be assigned to enum type matching_strategy unless it is -1.
+ */
+int find_matching_strategy(const char *s) {
+  if (strcasecmp(s, "traditional") == 0) {
+    return traditional;
+  }
+  else if (strcasecmp(s, "shortest") == 0) {
+    return shortest_match;
+  }
+  else if (strcasecmp(s, "standard") == 0) {
+    return standard_match;
+  }
+  else if (strcasecmp(s, "longest") == 0) {
+    return longest_match;
+  }
+  else {
+    Rprintf("invalid matching strategy: %s\n", s);
+    return -1;
+  }
+}
+
+/**
  * Finds the index of an option.
  *
  * Return the index in the global options array of the option with name
  * s. This should be never called from outside.
  *
  * @see      cqpoptions
- * @param s  Name of the option to find.
+ * @param s  Name of the option to find (or abbreviation); matched case-insensitively.
  * @return   Index of element in cqpoptions corresponding to the name s,
  *           or -1 if no corresponding element was found.
  */
@@ -510,11 +567,15 @@ int find_option(char *s)
 /**
  * Carries out any "side effects" of setting an option.
  *
- * @param opt  The option that has just been set.
+ * @param opt  The option that has just been set (index into the cqpoptions array).
+ *
+ * TODO This use of integer indexes as the pass from parse_options is very messy....
  */
 void
 execute_side_effects(int opt)
 {
+  int code;
+
   switch (cqpoptions[opt].side_effect) {
   case 0:  /* <no side effect> */
     break;
@@ -562,34 +623,26 @@ execute_side_effects(int opt)
     break;
 
   case 9:  /* set MatchingStrategy ( traditional | shortest | standard | longest ); */
-    if (strcasecmp(matching_strategy_name, "traditional") == 0) {
-      matching_strategy = traditional;
-    }
-    else if (strcasecmp(matching_strategy_name, "shortest") == 0) {
-      matching_strategy = shortest_match;
-    }
-    else if (strcasecmp(matching_strategy_name, "standard") == 0) {
-      matching_strategy = standard_match;
-    }
-    else if (strcasecmp(matching_strategy_name, "longest") == 0) {
-      matching_strategy = longest_match;
-    }
-    else {
+    code = find_matching_strategy(matching_strategy_name);
+    if (code < 0) {
       cqpmessage(Error, "USAGE: set MatchingStrategy (traditional | shortest | standard | longest);");
       matching_strategy = standard_match;
       cl_free(matching_strategy_name);
       matching_strategy_name = strdup("standard");
+    } else {
+      matching_strategy = code;
     }
     break;
     
   default:
-    fprintf(stderr, "Unknown side-effect #%d invoked by option %s.\n", 
+    Rprintf("Unknown side-effect #%d invoked by option %s.\n", 
             cqpoptions[opt].side_effect, cqpoptions[opt].opt_name);
     assert(0 && "Aborted. Please contact technical support.");
   }
 }
 
-int validate_string_option_value(int opt, char *value)
+int
+validate_string_option_value(int opt, char *value)
 {
 #ifdef __NEVER__
   switch (opt) {
@@ -599,7 +652,7 @@ int validate_string_option_value(int opt, char *value)
 
       DIR *dp;
 
-      fprintf(stderr, "Validating ... %s\n", value);
+      Rprintf("Validating ... %s\n", value);
     
       if ((dp = opendir(value)) != NULL) {
         closedir(dp);
@@ -639,7 +692,8 @@ int validate_string_option_value(int opt, char *value)
   return 1;
 }
 
-int validate_integer_option_value(int opt, int value)
+int
+validate_integer_option_value(int opt, int value)
 {
   return 1;
 }
@@ -648,7 +702,7 @@ int validate_integer_option_value(int opt, int value)
 /**
  * Sets a string-valued option.
  *
- * An error string
+ * An error string (function-internal constant, do NOT free)
  * is returned if the type of the option does not correspond to
  * the function which is called. Upon success, NULL is returned.
  *
@@ -695,9 +749,9 @@ set_string_option_value(char *opt_name, char *value)
 
 
 /**
- * Sets an integer or string-valued option.
+ * Sets an integer-valued option.
  *
- * An error string
+ * An error string (function-internal constant, do NOT free)
  * is returned if the type of the option does not correspond to
  * the function which is called. Upon success, NULL is returned.
  *
@@ -728,6 +782,7 @@ set_integer_option_value(char *opt_name, int value)
 }
 
 
+/* TODO following docblock doesn;t actually match the function!!! */
 /* these two set integer or string-valued options. An error string
  * is returned if the type of the option does not correspond to
  * the function which is called. Upon success, NULL is returned.
@@ -836,7 +891,7 @@ parse_options(int ac, char *av[])
   insecure = 0;
 
   progname = av[0];
-  licensee = 
+  licensee =
     "\n"
     "The IMS Open Corpus Workbench (CWB)\n"
     "\n"
@@ -870,7 +925,8 @@ parse_options(int ac, char *av[])
     valid_options = "+1b:d:D:FhI:l:LmM:P:qr:Svx";
     break;
   default:
-    syntax();                        /* this will display the 'unknown application' message */
+    cqp_usage();
+    /* this will display the 'unknown application' message */
   }
 
   while ((c = getopt(ac, av, valid_options)) != EOF)
@@ -902,7 +958,7 @@ parse_options(int ac, char *av[])
 
     case 'E':
       if ((query_string = getenv(optarg)) == NULL) {
-        fprintf(stderr, "Environment variable %s has no value, exiting\n", optarg);
+        Rprintf("Environment variable %s has no value, exiting\n", optarg);
         exit(1);
       }
       break;
@@ -925,6 +981,7 @@ parse_options(int ac, char *av[])
 
     case 'm':
       enable_macros = 0;        /* -m = DISABLE macros */
+      break;
 
     case 'M':
       macro_init_file = optarg;
@@ -959,14 +1016,14 @@ parse_options(int ac, char *av[])
           cl_set_debug_level(activate_cl_debug);
         }
         else {
-          fprintf(stderr, "Invalid debug mode: -d %s\nType '%s -h' for more information.\n",
+          Rprintf("Invalid debug mode: -d %s\nType '%s -h' for more information.\n",
                   optarg, progname);
           exit(1);
         }
       }
       break;
     case 'h':
-      syntax();
+      cqp_usage();
       break;
     case 'v':
       Rprintf("%s\n", licensee);
@@ -1004,9 +1061,12 @@ parse_options(int ac, char *av[])
 
     case 'i':
       silent = rangeoutput = True;
-      verbose_parser = show_symtab = show_gconstraints = 
-        show_evaltree = show_patlist =
-        symtab_debug = parser_debug = eval_debug = search_debug = False;
+      verbose_parser = show_symtab
+        = show_gconstraints = show_evaltree
+        = show_patlist = symtab_debug
+        = parser_debug = eval_debug
+        = search_debug = False;
+      /* cf. options.h; there are more debug vars than this now, should they all be set to false? */
       break;
       
     case 'c':
@@ -1014,6 +1074,7 @@ parse_options(int ac, char *av[])
       paging = highlighting = False;
       autoshow = auto_save = False;
       progress_bar_child_mode(1);
+      /* TODO: would it be useful to set PrettyPrint automatically to "off" in child mode? */
       break;
 
     case 'e':
@@ -1028,14 +1089,14 @@ parse_options(int ac, char *av[])
         symtab_debug = parser_debug = eval_debug = search_debug = False;
       if (strcmp(optarg, "-") == 0) 
         batchfd = stdin;
-      else if ((batchfd = OpenFile(optarg, "r")) == NULL) {
+      else if ((batchfd = open_file(optarg, "r")) == NULL) {
         perror(optarg);
         exit(1);
       }
       break;
     default:
 
-      fprintf(stderr, "Invalid option. Type '%s -h' for more information.\n",
+      Rprintf("Invalid option. Type '%s -h' for more information.\n",
               progname);
       exit(1);
       break;

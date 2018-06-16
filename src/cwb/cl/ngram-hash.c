@@ -23,6 +23,7 @@
 
 #include <math.h>
 
+void Rprintf(const char *, ...);
 
 /** Defines the default number of buckets in an n-gram hash. */
 #define DEFAULT_NR_OF_BUCKETS 250000
@@ -143,13 +144,13 @@ void
 cl_delete_ngram_hash(cl_ngram_hash hash)
 {
   int i;
-  cl_ngram_hash_entry entry, temp;
+  cl_ngram_hash_entry entry;
   
   if (hash != NULL && hash->table != NULL) {
     for (i = 0; i < hash->buckets; i++) {
       entry = hash->table[i];
       while (entry != NULL) {
-        temp = entry;
+        /* temp = entry; */
         entry = entry->next;
         cl_free(entry);
       }
@@ -278,7 +279,7 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
     target_size = floor(((double) hash->entries) / hash->fillrate_target);
     if (target_size > MAX_BUCKETS) {
       if (cl_debug) {
-        fprintf(stderr, "[n-gram hash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n",
+        Rprintf("[n-gram hash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n",
                 (double) MAX_BUCKETS, target_size);
       }
       hash->auto_grow = 0; /* disable auto-grow to avoid further unnecessary attempts */
@@ -294,7 +295,7 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
     new_buckets = (int) target_size;
     old_buckets = hash->buckets;
     if (cl_debug) {
-      fprintf(stderr, "[n-gram hash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n",
+      Rprintf("[n-gram hash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n",
               fill_rate, hash->entries, old_buckets);
       if (cl_debug >= 2)
         cl_ngram_hash_print_stats(hash, 12);
@@ -321,7 +322,7 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
     cl_free(temp);                      /* we can simply deallocate temp now, having stolen its hash table */
     if (cl_debug) {
       fill_rate = ((double) hash->entries) / hash->buckets;
-      fprintf(stderr, "[n-gram hash autogrow: new fill rate = %3.1f (%d/%d)]\n",
+      Rprintf("[n-gram hash autogrow: new fill rate = %3.1f (%d/%d)]\n",
               fill_rate, hash->entries, hash->buckets);
     }
     return 1;
@@ -671,23 +672,23 @@ cl_ngram_hash_print_stats(cl_ngram_hash hash, int max_n)
   int i;
   
   rate = ((double) hash->entries) / hash->buckets;
-  fprintf(stderr, "N-gram hash fill rate: %5.2f (%d entries in %d buckets)\n",
+  Rprintf("N-gram hash fill rate: %5.2f (%d entries in %d buckets)\n",
           rate, hash->entries, hash->buckets);
-  fprintf(stderr, "# entries: ");
+  Rprintf("# entries: ");
   for (i = 0; i <= max_n; i++)
-    fprintf(stderr, "%8d", i);
-  fprintf(stderr, "+\n");
-  fprintf(stderr, "bucket cnt:");
+    Rprintf("%8d", i);
+  Rprintf("+\n");
+  Rprintf("bucket cnt:");
   for (i = 0; i <= max_n; i++)
-    fprintf(stderr, "%8d", stats[i]);
-  fprintf(stderr, "\n");
-  fprintf(stderr, "expected:  ");
+    Rprintf("%8d", stats[i]);
+  Rprintf("\n");
+  Rprintf("expected:  ");
   p = exp(-rate); /* expected number of entries for ideal hash function (Poisson distribution) */
   for (i = 0; i < max_n; i++) {
-    fprintf(stderr, "%8.0f", p * hash->buckets);
+    Rprintf("%8.0f", p * hash->buckets);
     p *= rate / (i + 1);
   }
-  fprintf(stderr, "\n");
+  Rprintf("\n");
 
   cl_free(stats);
 }

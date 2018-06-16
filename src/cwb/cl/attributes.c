@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <ctype.h>
 #include <sys/types.h>
 
@@ -35,14 +37,28 @@
  *******************************************************************
  * FLAGS controlling how ensure_component() behaves.
  *******************************************************************
+ */
 
- * if ENSURE_COMPONENT_EXITS is defined, ensure_component will exit
+/* TODO: these should be either
+ * (a) dynamic - set at runtime or
+ * (b) bound to a setting in config.mk or definitions.mk
+ * changing these settings should not require hacking the source! */
+
+/**
+ * if CL_ENSURE_COMPONENT_EXITS is defined, ensure_component will exit
  * when the component can't be created or loaded.
- *
+ */
+#if 0
+#define CL_ENSURE_COMPONENT_EXITS
+#endif
 
- * if ALLOW_COMPONENT_CREATION is defined, components may be created
+/**
+ * if CL_ENSURE_COMPONENT_ALLOW_CREATION is defined, components may be created
  * on the fly by ensure_component.
  */
+#if 0
+#define CL_ENSURE_COMPONENT_ALLOW_CREATION
+#endif
 
 /**
  * if KEEP_SILENT is defined, ensure_component won't complain about
@@ -50,7 +66,7 @@
  *
  * @see ensure_component
  */
-#define KEEP_SILENT
+#define CL_ENSURE_COMPONENT_KEEP_SILENT
 
 
 
@@ -62,10 +78,13 @@
  * @see Component_Field_Specs
  */
 typedef struct component_field_spec {
-  ComponentID id;        /**< the ID code used as the index for this component in an Attribute's component array */
-  char *name;            /**< String used as the label for this component */
-  int using_atts;        /**< The attributes that use this component */
-  char *default_path;    /**< default location of the file corresponding to this component */
+  ComponentID id;        /**< the specifier for what kind of blob of info this component is; also used
+                              as the index for this component in its Attribute's component array. */
+  char *name;            /**< String used as the label for this component  (abbreviation of the
+                              relevant label from in the ComponentID enumeration). */
+  int using_atts;        /**< The attribute type of the Attributes that use this component */
+  char *default_path;    /**< The default location of the file corresponding to this component;
+                              can contain variables ($DIR=directory, $ANAME=attribute name) */
 } component_field_spec;
 
 /**
@@ -77,28 +96,28 @@ static struct component_field_spec Component_Field_Specs[] =
 { 
   { CompDirectory,    "DIR",     ATT_ALL,    "$APATH"},
 
-  { CompCorpus,       "CORPUS",  ATT_POS,    "$DIR/$ANAME.corpus"},
+  { CompCorpus,       "CORPUS",  ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.corpus"},
   { CompRevCorpus,    "REVCORP", ATT_POS,    "$CORPUS.rev"},
   { CompRevCorpusIdx, "REVCIDX", ATT_POS,    "$CORPUS.rdx"},
   { CompCorpusFreqs,  "FREQS",   ATT_POS,    "$CORPUS.cnt"},
-  { CompLexicon,      "LEXICON", ATT_POS,    "$DIR/$ANAME.lexicon"},
+  { CompLexicon,      "LEXICON", ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.lexicon"},
   { CompLexiconIdx,   "LEXIDX",  ATT_POS,    "$LEXICON.idx"},
   { CompLexiconSrt,   "LEXSRT",  ATT_POS,    "$LEXICON.srt"},
 
 
-  { CompAlignData,    "ALIGN",   ATT_ALIGN,  "$DIR/$ANAME.alg"},
-  { CompXAlignData,   "XALIGN",  ATT_ALIGN,  "$DIR/$ANAME.alx"},
+  { CompAlignData,    "ALIGN",   ATT_ALIGN,  "$DIR" SUBDIR_SEP_STRING "$ANAME.alg"},
+  { CompXAlignData,   "XALIGN",  ATT_ALIGN,  "$DIR" SUBDIR_SEP_STRING "$ANAME.alx"},
 
-  { CompStrucData,    "STRUC",   ATT_STRUC,  "$DIR/$ANAME.rng"},
-  { CompStrucAVS,     "STRAVS",  ATT_STRUC,  "$DIR/$ANAME.avs"},
-  { CompStrucAVX,     "STRAVX",  ATT_STRUC,  "$DIR/$ANAME.avx"},
+  { CompStrucData,    "STRUC",   ATT_STRUC,  "$DIR" SUBDIR_SEP_STRING "$ANAME.rng"},
+  { CompStrucAVS,     "STRAVS",  ATT_STRUC,  "$DIR" SUBDIR_SEP_STRING "$ANAME.avs"},
+  { CompStrucAVX,     "STRAVX",  ATT_STRUC,  "$DIR" SUBDIR_SEP_STRING "$ANAME.avx"},
 
-  { CompHuffSeq,      "CIS",     ATT_POS,    "$DIR/$ANAME.huf"},
-  { CompHuffCodes,    "CISCODE", ATT_POS,    "$DIR/$ANAME.hcd"},
+  { CompHuffSeq,      "CIS",     ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.huf"},
+  { CompHuffCodes,    "CISCODE", ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.hcd"},
   { CompHuffSync,     "CISSYNC", ATT_POS,    "$CIS.syn"},
 
-  { CompCompRF,       "CRC",     ATT_POS,    "$DIR/$ANAME.crc"},
-  { CompCompRFX,      "CRCIDX",  ATT_POS,    "$DIR/$ANAME.crx"},
+  { CompCompRF,       "CRC",     ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.crc"},
+  { CompCompRFX,      "CRCIDX",  ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.crx"},
 
   { CompLast,         "INVALID", 0,          "INVALID"}
 };
@@ -106,7 +125,7 @@ static struct component_field_spec Component_Field_Specs[] =
 
 
 /* ---------------------------------------------------------------------- */
-
+/*TODO needed here? move to header file? */
 ComponentState comp_component_state(Component *component);
 
 /* ---------------------------------------------------------------------- */
@@ -204,6 +223,8 @@ MayHaveComponent(int attr_type, ComponentID cid)
  * @param i  The attribute-type whose name is required.
  *           (Should be one of the values of the constants
  *           defined in cl.h.)
+ * @return   String (pointer to internal constant string,
+ *           do not change or free).
  */
 char *
 aid_name(int i)
@@ -216,6 +237,8 @@ aid_name(int i)
   case ATT_DYN:   return "Dynamic Attribute"; break;
   default:        return "ILLEGAL ATTRIBUTE TYPE"; break;
   }
+  /* NOTREACHED */
+  return NULL;
 }
 
 /**
@@ -226,6 +249,8 @@ aid_name(int i)
  * @param i  The argument-type whose name is required.
  *           (Should be one of the values of the constants
  *           defined in cl.h.)
+ * @return   String (pointer to internal constant string,
+ *           do not change or free).
  */
 char *
 argid_name(int i)
@@ -240,6 +265,8 @@ argid_name(int i)
   case ATTAT_PAREF:  return "PARef"; break;
   default:           return "ILLEGAL*ARGUMENT*TYPE"; break;
   }
+  /* NOTREACHED */
+  return NULL;
 }
 
 
@@ -253,7 +280,7 @@ argid_name(int i)
  * with its "next" pointer set to NULL.
  *
  * @see            DynArg
- * @param type_id  String specifying the type of argument required, choose from:
+ * @param type_id  String specifying the type of argument required; choose from:
  *                 STRING, POS, INT, VARARG, FLOAT
  * @return         Pointer to the new DynArg object, or NULL in case of an invalid
  *                 type_id.
@@ -305,9 +332,9 @@ makearg(char *type_id)
  * NEVER CALL THIS!! ONLY USED WHILE PARSING A REGISTRY ENTRY!!!!
  *
  * @param corpus          The corpus this attribute belongs to.
- * @param attribute_name  The name of the attribute (i.e. the handle it has in the registry file)
+ * @param attribute_name  The name of the attribute (i.e. the handle it has in the registry file).
  * @param type            Type of attribute to be created.
- * @param data            Used for a call to find_attribute. It is unused there.
+ * @param data            Unused. It can just be NULL.
  */
 Attribute *
 setup_attribute(Corpus *corpus,
@@ -318,14 +345,14 @@ setup_attribute(Corpus *corpus,
   Attribute *attr;
   Attribute *prev;
 
-  /* count of attributes that the corpus possesses already, including the default */
-  /* used to calculate this attribute's attr_number value. */
+  /* count of attributes that the corpus possesses already, including the default
+   * used to calculate this attribute's attr_number value. */
   int a_num;
 
   attr = NULL;
 
-  if (find_attribute(corpus, attribute_name, type, data) != NULL)
-    fprintf(stderr, "attributes:setup_attribute(): Warning: \n"
+  if (cl_new_attribute(corpus, attribute_name, type) != NULL)
+    Rprintf("attributes:setup_attribute(): Warning: \n"
             "  Attribute %s of type %s already defined in corpus %s\n",
             attribute_name, aid_name(type), corpus->id);
   else {
@@ -384,27 +411,39 @@ setup_attribute(Corpus *corpus,
 
 
 /**
- * Finds an attribute that matches the specified parameters, if one exists.
+ * Finds an attribute that matches the specified parameters, if one exists,
+ * for the given corpus.
+ *
+ * Note that although this is a cl_new_* function, and it is the canonical way
+ * that we get an Attribute to call Attribute-functions on, it doesn't actually
+ * create any kind of object. The Attribute exists already as one of the dependents
+ * of the Corpus object; this function simply locates it and returns a pointer
+ * to it.
+ *
+ * This function is DEPRACATED. Use cl_new_attribute() instead (which is
+ * actually a macro to this function, but the parameter list is different.)
+ *
+ * @see                   cl_new_attribute
  *
  * @param corpus          The corpus in which to search for the attribute.
- * @param attribute_name  The name of the attribute (i.e. the handle it has in the registry file)
+ * @param attribute_name  The name of the attribute (i.e. the handle it has in the registry file).
  * @param type            Type of attribute to be searched for.
  * @param data            NOT USED.
  *
  * @return                Pointer to Attribute object, or NULL if not found.
  */
 Attribute *
-find_attribute(Corpus *corpus,
-               char *attribute_name,
-               int type,
-               char *data)
+cl_new_attribute_oldstyle(Corpus *corpus,
+                          char *attribute_name,
+                          int type,
+                          char *data)
 {
   Attribute *attr;
 
   attr = NULL;
 
   if (corpus == NULL)
-    fprintf(stderr, "attributes:find_attribute(): called with NULL corpus\n");
+    Rprintf("attributes:cl_new_attribute_oldstyle(): called with NULL corpus\n");
   else {
     
     for (attr = corpus->attributes; attr != NULL; attr = attr->any.next)
@@ -419,12 +458,19 @@ find_attribute(Corpus *corpus,
  * Drops an attribute for the given corpus.
  *
  * The attribute to be dropped is specified by its attribute name
- * and its type (i.e. no pointer needed: compare attr_drop_attribute).
+ * and its type (i.e. no pointer needed: compare cl_delete_attribute).
  *
  * After calling this, the corpus does not have the attribute any
  * longer -- it is the same as it was never defined.
  *
- * @see      attr_drop_attribute
+ * This is an internal function; the function exposed in the API for
+ * this purpose is cl_delete_attribute().
+ *
+ * tODO: this function can probably actually be deleted. It doesn't
+ * todo: seem to be used anywhere, and is much more complex than
+ * todo: cl_delete_attribute
+ *
+ * @see      cl_delete_attribute
  * @return   Boolean: true for all OK, false for a problem
  */
 int
@@ -434,49 +480,50 @@ drop_attribute(Corpus *corpus,
                char *data)
 {
   if (corpus == NULL) {
-    fprintf(stderr, "attributes:drop_attribute(): called with NULL corpus\n");
+    Rprintf("attributes:drop_attribute(): called with NULL corpus\n");
     return 0;
   }
   else
-    return attr_drop_attribute(find_attribute(corpus, attribute_name, type, data));
+    return cl_delete_attribute(cl_new_attribute_oldstyle(corpus, attribute_name, type, data));
 }
 
 /**
  * Deletes the specified Attribute object.
  *
+ * The function also appropriately amends the Corpus object of which this
+ * Attribute is a dependent. This means you can call it repreatedly on the first
+ * element of a Corpus's Attribute list (as the linked list is automatically
+ * adjusted).
+ *
  * @return   Boolean: true for all OK, false for a problem.
  */
 int
-attr_drop_attribute(Attribute *attribute)
+cl_delete_attribute(Attribute *attribute)
 {
-  Attribute *prev;
+  Attribute *prev = NULL;
   DynArg *arg;
   Corpus *corpus;
   ComponentID cid;
-
 
   if (attribute == NULL)
     return 0;
   else {
 
-    prev = NULL;
     corpus = attribute->any.mother;
     
     assert("NULL corpus in attribute" && (corpus != NULL));
 
+    /* remove attribute from corpus attribute list */
     if (attribute == corpus->attributes)
       corpus->attributes = attribute->any.next;
     else {
-
-      /* remove attribute from corpus attribute list */
-
       for (prev = corpus->attributes; 
            (prev != NULL) && (prev->any.next != attribute);
            prev = prev->any.next)
         ;
       
       if (prev == NULL)
-        fprintf(stderr, "attributes:attr_drop_attribute():\n"
+        Rprintf("attributes:cl_delete_attribute():\n"
                 "  Warning: Attribute %s not in list of corpus attributes\n",
                 attribute->any.name);
       else {
@@ -516,18 +563,27 @@ attr_drop_attribute(Attribute *attribute)
       break;
     }
 
+    /* TODO do we really need to overwrite these members when we are about to free the attribute? */
     attribute->any.mother = NULL;
     attribute->any.type = ATT_NONE;
     attribute->any.next = NULL;
-    /* attribute->any.components = NULL; */
     
-    free(attribute);
+    cl_free(attribute);
     return 1;
   }
   
   /* notreached */
   assert("Notreached point reached ..." && 0);
   return 1;
+}
+
+/**
+ * Accessor function to get the mother corpus of the attribute.
+ */
+Corpus *
+cl_attribute_mother_corpus(Attribute *attribute)
+{
+  return attribute->any.mother;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -557,12 +613,13 @@ declare_component(Attribute *attribute, ComponentID cid, char *path)
   Component *component;
 
   if (attribute == NULL) {
-    fprintf(stderr, "attributes:declare_component(): \n"
+    Rprintf("attributes:declare_component(): \n"
             "  NULL attribute passed in declaration of %s component\n",
             cid_name(cid));
     return NULL;
   }
-  else if ((component = attribute->any.components[cid]) == NULL) {
+
+  if ((component = attribute->any.components[cid]) == NULL) {
 
     component = new(Component);
 
@@ -573,25 +630,17 @@ declare_component(Attribute *attribute, ComponentID cid, char *path)
 
     init_mblob(&(component->data));
 
-    /* important to do this before the call to component_full_name */
     attribute->any.components[cid] = component;
     
-    /* initialize component path */
+    /* we can then initialize the component path within the attribute */
     (void) component_full_name(attribute, cid, path);
-
-    return component;
   }
   else {
-
-    fprintf(stderr, "attributes:declare_component(): Warning:\n"
+    Rprintf("attributes:declare_component(): Warning:\n"
             "  Component %s of %s declared twice\n",
             cid_name(cid), attribute->any.name);
-    return component;
   }
-
-  /* notreached */
-  assert("Notreached point reached ..." && 0);
-  return NULL;
+  return component;
 }
 
 
@@ -609,13 +658,14 @@ declare_default_components(Attribute *attribute)
   int i;
 
   if (attribute == NULL)
-    fprintf(stderr, "attributes:declare_default_components(): \n"
+    Rprintf("attributes:declare_default_components(): \n"
             "  NULL attribute passed -- can't create defaults\n");
   else {
     for (i = CompDirectory; i < CompLast; i++)
       if (((Component_Field_Specs[i].using_atts & attribute->type) != 0) &&
           (attribute->any.components[i] == NULL))
         (void) declare_component(attribute, i, NULL);
+      /* TODO should the return value of declare_component be checked for error? */
   }
 }
 
@@ -691,6 +741,7 @@ component_state(Attribute *attribute, ComponentID cid)
  *                             path (NB: NOT to the path in the actual component! which
  *                             is a copy). If a path already exists, a pointer to that
  *                             path. NULL in case of error in Component_Field_Specs.
+ *                             TODO: could this be a void function?
  */
 char *
 component_full_name(Attribute *attribute, ComponentID cid, char *path)
@@ -698,12 +749,12 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
   component_field_spec *compspec;
   Component *component;
   
-  static char buf[MAX_LINE_LENGTH];
-  char rname[MAX_LINE_LENGTH];
+  static char buf[CL_MAX_LINE_LENGTH];
+  char rname[CL_MAX_LINE_LENGTH];
   char *reference;
   char c;
 
-  int ppos, bpos, dollar, rpos;
+  int ppos, bpos, rpos;
 
 
   /*  did we do the job before? */
@@ -718,7 +769,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 
   if (path == NULL) {
     if ((compspec = find_cid_id(cid)) == NULL) {
-      fprintf(stderr, "attributes:component_full_name(): Warning:\n"
+      Rprintf("attributes:component_full_name(): Warning:\n"
               "  can't find component table entry for Component #%d\n", cid);
       return NULL;
     }
@@ -729,7 +780,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
   ppos = 0;
   /* index in string "buf" */
   bpos = 0;
-  dollar = 0;
+  /* dollar = 0; */
   rpos = 0;
   buf[bpos] = '\0';
 
@@ -739,7 +790,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 
       /*  reference to the name of another component. */
 
-      dollar = ppos;            /* memorize the position of the $ */
+      /* dollar = ppos; */           /* memorize the position of the $ */
 
       rpos = 0;
       c = path[++ppos];         /* first skip the '$' */
@@ -766,7 +817,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
         reference = component_full_name(attribute, compspec->id, NULL);
       
       if (reference == NULL) {
-        fprintf(stderr, "attributes:component_full_name(): Warning:\n"
+        Rprintf("attributes:component_full_name(): Warning:\n"
                 "  Can't reference to the value of %s -- copying\n",
                 rname);
         reference = rname;
@@ -804,8 +855,8 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
  * "Loading" means that the file specified by the component's "path" member
  * is read into the "data" member.
  *
- * If the component is CompHuffCodes, the data is also copied to the
- * attribute's pos.hc member.
+ * If the component is CompHuffCodes, part of the data is also copied to the
+ * attribute's pos.hc member (that is, the beginning of the file).
  *
  * Note that the action of this function is dependent on the component's state.
  * If the component's state is ComponentUnloaded, the component is loaded.
@@ -828,7 +879,7 @@ load_component(Attribute *attribute, ComponentID cid)
   comp = attribute->any.components[cid];
 
   if (comp == NULL) {
-    fprintf(stderr, "attributes:load_component(): Warning:\n"
+    Rprintf("attributes:load_component(): Warning:\n"
             "  Component %s is not declared for %s attribute\n",
             cid_name(cid), aid_name(attribute->type));
   }
@@ -838,16 +889,16 @@ load_component(Attribute *attribute, ComponentID cid)
 
     if (cid == CompHuffCodes) {
 
-      if (item_sequence_is_compressed(attribute)) {
+      if (cl_sequence_compressed(attribute)) {
 
         if (read_file_into_blob(comp->path, MMAPPED, sizeof(int), &(comp->data)) == 0)
-          fprintf(stderr, "attributes:load_component(): Warning:\n"
+          Rprintf("attributes:load_component(): Warning:\n"
                   "  Data of %s component of attribute %s can't be loaded\n",
                   cid_name(cid), attribute->any.name);
         else {
           
           if (attribute->pos.hc != NULL)
-            fprintf(stderr, "attributes:load_component: WARNING:\n\t"
+            Rprintf("attributes:load_component: WARNING:\n\t"
                     "HCD block already loaded, overwritten.\n");
           
           attribute->pos.hc = new(HCD);
@@ -873,7 +924,7 @@ load_component(Attribute *attribute, ComponentID cid)
         }
       }
       else {
-        fprintf(stderr, "attributes/load_component: missing files of compressed PA,\n"
+        Rprintf("attributes/load_component: missing files of compressed PA,\n"
                 "\tcomponent CompHuffCodes not loaded\n");
       }
 
@@ -882,7 +933,7 @@ load_component(Attribute *attribute, ComponentID cid)
       /* i.e. any ComponentID value except CompDirectory / CompLast and CompHuffCodes */
 
       if (read_file_into_blob(comp->path, MMAPPED, sizeof(int), &(comp->data)) == 0)
-        fprintf(stderr, "attributes:load_component(): Warning:\n"
+        Rprintf("attributes:load_component(): Warning:\n"
                 "  Data of %s component of attribute %s can't be loaded\n",
                 cid_name(cid), attribute->any.name);
       else {
@@ -907,7 +958,7 @@ load_component(Attribute *attribute, ComponentID cid)
  * This function only works for the following components:
  * CompRevCorpus, CompRevCorpusIdx, CompLexiconSrt, CompCorpusFreqs.
  * Also, it only works if the state of the component is
- * ComponentDefined
+ * ComponentDefined.
  *
  * "Create" here means create the CWB data files.  This is accomplished by
  * calling one of the "creat_*" functions, of which there is one for each
@@ -923,7 +974,6 @@ load_component(Attribute *attribute, ComponentID cid)
  *                   error (e.g. if an invalid component was requested).
  *
  */
-
 Component *
 create_component(Attribute *attribute, ComponentID cid)
 {
@@ -931,7 +981,7 @@ create_component(Attribute *attribute, ComponentID cid)
   Component *comp = attribute->any.components[cid];
   
   if (cl_debug) {
-    fprintf(stderr, "Creating %s\n", cid_name(cid));
+    Rprintf("Creating %s\n", cid_name(cid));
   }
 
   if (component_state(attribute, cid) == ComponentDefined) {
@@ -939,7 +989,7 @@ create_component(Attribute *attribute, ComponentID cid)
     assert(comp != NULL);
     assert(comp->data.data == NULL);
     assert(comp->path != NULL);
-    
+
     switch (cid) {
       
     case CompLast:
@@ -950,7 +1000,7 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompCorpus:
     case CompLexicon:
     case CompLexiconIdx:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component. Use 'encode' to create it"
               " out of a text file\n",
               cid_name(cid));
@@ -960,7 +1010,7 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompHuffSeq:
     case CompHuffCodes:
     case CompHuffSync:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component. Use 'huffcode' to create it"
               " out of an item sequence file\n",
               cid_name(cid));
@@ -969,7 +1019,7 @@ create_component(Attribute *attribute, ComponentID cid)
       
     case CompCompRF:
     case CompCompRFX:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component. Use 'compress-rdx' to create it"
               " out of the reversed file index\n",
               cid_name(cid));
@@ -997,22 +1047,23 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompStrucData:
     case CompStrucAVS:
     case CompStrucAVX:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component of %s attribute %s.\n"
               "  Use the appropriate external tool to create it.\n",
-               cid_name(cid), aid_name(attribute->type), attribute->any.name);
+              cid_name(cid), aid_name(attribute->type), attribute->any.name);
       return NULL;
       break;
       
 
     default:
       comp = NULL;
-      fprintf(stderr, "attributes:create_component(): Unknown cid: %d\n", cid);
+      Rprintf("attributes:create_component(): Unknown cid: %d\n", cid);
       assert(0);
       break;
     }
     return comp;
   }
+
   return NULL;
 }
 
@@ -1031,17 +1082,17 @@ create_component(Attribute *attribute, ComponentID cid)
  * this function (e.g. if failure to ensure causes the program
  * to abort).
  *
- * @see KEEP_SILENT
- * @see ENSURE_COMPONENT_EXITS
- * @see ALLOW_COMPONENT_CREATION
+ * @see CL_ENSURE_COMPONENT_KEEP_SILENT
+ * @see CL_ENSURE_COMPONENT_EXITS
+ * @see CL_ENSURE_COMPONENT_ALLOW_CREATION
  *
  * @param attribute     The Attribute object to work with.
  * @param cid           The identifier of the Component to "ensure".
  * @param try_creation  Boolean. True = attempt to create a
  *                      component that does not exist. False = don't.
  *                      This behaviour only applies when
- *                      ALLOW_COMPONENT CREATION is defined; otherwise
- *                      component creation will never be attempted.
+ *                      CL_ENSURE_COMPONENT_ALLOW_CREATION is defined;
+ *                      otherwise component creation will never be attempted.
  * @return              A pointer to the specified component (or NULL
  *                      if the component cannot be "ensured").
  */
@@ -1051,11 +1102,10 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
   Component *comp = NULL;
   
   if ((comp = attribute->any.components[cid]) == NULL) {
-
     /*  component is undeclared */
-    fprintf(stderr, "attributes:ensure_component(): Warning:\n"
+    Rprintf("attributes:ensure_component(): Warning:\n"
             "  Undeclared component: %s\n", cid_name(cid));
-#ifdef ENSURE_COMPONENT_EXITS    
+#ifdef CL_ENSURE_COMPONENT_EXITS
     exit(1);
 #endif
     return NULL;
@@ -1070,12 +1120,12 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
     case ComponentUnloaded:
       (void) load_component(attribute, cid); /* try to load the component */
       if (comp_component_state(comp) != ComponentLoaded) {
-#ifndef KEEP_SILENT
-        fprintf(stderr, "attributes:ensure_component(): Warning:\n"
+#ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
+        Rprintf("attributes:ensure_component(): Warning:\n"
                 "  Can't load %s component of %s\n", 
                 cid_name(cid), attribute->any.name);
 #endif
-#ifdef ENSURE_COMPONENT_EXITS    
+#ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
 #endif
         return NULL;
@@ -1086,25 +1136,25 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
 
       if (try_creation != 0) {
 
-#ifdef ALLOW_COMPONENT_CREATION
+#ifdef CL_ENSURE_COMPONENT_ALLOW_CREATION
 
         (void) create_component(attribute, cid);
         if (comp_component_state(comp) != ComponentLoaded) {
-#ifndef KEEP_SILENT
-          fprintf(stderr, "attributes:ensure_component(): Warning:\n"
+#ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
+          Rprintf("attributes:ensure_component(): Warning:\n"
                   "  Can't load or create %s component of %s\n", 
                   cid_name(cid), attribute->any.name);
 #endif
-#ifdef ENSURE_COMPONENT_EXITS
+#ifdef CL_ENSURE_COMPONENT_EXITS
           exit(1);
 #endif
           return NULL;
         }
 #else
-        fprintf(stderr, "Sorry, but this program is not set up to allow the\n"
+        Rprintf("Sorry, but this program is not set up to allow the\n"
                 "creation of corpus components. Please refer to the manuals\n"
-                "or use the ''makeall'' tool.\n");
-#ifdef ENSURE_COMPONENT_EXITS    
+                "or use the ''cwb-makeall'' tool.\n");
+#ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
 #endif
         return NULL;
@@ -1112,12 +1162,12 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
 
       }
       else {
-#ifndef KEEP_SILENT
-        fprintf(stderr, "attributes:ensure_component(): Warning:\n"
+#ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
+        Rprintf("attributes:ensure_component(): Warning:\n"
                 "  I'm not allowed to create %s component of %s\n", 
                   cid_name(cid), attribute->any.name);
 #endif
-#ifdef ENSURE_COMPONENT_EXITS    
+#ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
 #endif
         return NULL;
@@ -1125,19 +1175,19 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
       break;
 
     case ComponentUndefined:      /*  don't have this, -> error */
-      fprintf(stderr, "attributes:ensure_component(): Warning:\n"
+      Rprintf("attributes:ensure_component(): Warning:\n"
               "  Can't ensure undefined/illegal %s component of %s\n", 
               cid_name(cid), attribute->any.name);
-#ifdef ENSURE_COMPONENT_EXITS    
+#ifdef CL_ENSURE_COMPONENT_EXITS
       exit(1);
 #endif
       break;
 
     default:
-      fprintf(stderr, "attributes:ensure_component(): Warning:\n"
+      Rprintf("attributes:ensure_component(): Warning:\n"
               "  Illegal state of  %s component of %s\n", 
               cid_name(cid), attribute->any.name);
-#ifdef ENSURE_COMPONENT_EXITS    
+#ifdef CL_ENSURE_COMPONENT_EXITS
       exit(1);
 #endif
       break;
@@ -1180,8 +1230,7 @@ comp_drop_component(Component *comp)
 
   if (comp->id == CompHuffCodes) {
 
-    /* it may be empty, since declare_component doesn't yet load the
-     * data */
+    /* it may be empty, since declare_component doesn't yet load the data */
 
     cl_free(comp->attribute->pos.hc);
   }
@@ -1231,7 +1280,8 @@ Attribute *loop_ptr;
  *
  * @return NULL if the corpus parameter is NULL; otherwise a pointer to Attribute.
  */
-Attribute *first_corpus_attribute(Corpus *corpus)
+Attribute *
+first_corpus_attribute(Corpus *corpus)
 {
   if (corpus)
     loop_ptr = corpus->attributes;
@@ -1244,7 +1294,8 @@ Attribute *first_corpus_attribute(Corpus *corpus)
 /**
  * Get a pointer to the next attribute on the list currently being processed.
  */
-Attribute *next_corpus_attribute()
+Attribute *
+next_corpus_attribute()
 {
   if (loop_ptr)
     loop_ptr = loop_ptr->any.next;
@@ -1257,73 +1308,76 @@ Attribute *next_corpus_attribute()
 /**
  * Prints a description of the attribute (inc.components) to STDOUT.
  */
-void describe_attribute(Attribute *attribute)
+void
+describe_attribute(Attribute *attribute)
 {
   DynArg *arg;
   ComponentID cid;
   
-  printf("Attribute %s:\n", attribute->any.name);
-  printf("  Type:        %s\n", aid_name(attribute->any.type));
+  Rprintf("Attribute %s:\n", attribute->any.name);
+  Rprintf("  Type:        %s\n", aid_name(attribute->any.type));
 
   /* print type dependent additional data */
 
   if (attribute->type == ATT_DYN) {
-    printf("  Arguments:   (");
+    Rprintf("  Arguments:   (");
     for (arg = attribute->dyn.arglist; arg; arg = arg->next) {
-      printf("%s", argid_name(arg->type));
+      Rprintf("%s", argid_name(arg->type));
       if (arg->next != NULL)
-        printf(", ");
+        Rprintf(", ");
     }
-    printf("):%s\n"
+    Rprintf("):%s\n"
            "               by \"%s\"\n",
            argid_name(attribute->dyn.res_type),
            attribute->dyn.call);
   }
-  printf("\n");
+  Rprintf("\n");
   for (cid = CompDirectory; cid < CompLast; cid++)
     if (attribute->any.components[cid])
       describe_component(attribute->any.components[cid]);
 
-  printf("\n\n");
+  Rprintf("\n\n");
 }
 
 /**
  * Prints a description of the component to STDOUT.
  */
-void describe_component(Component *component)
+void
+describe_component(Component *component)
 {
-  printf("  Component %s:\n", cid_name(component->id));
-  printf("    Attribute:   %s\n", component->attribute->any.name);
-  printf("    Path/Value:  %s\n", component->path);
-  printf("    State:       ");
+  Rprintf("  Component %s:\n", cid_name(component->id));
+  Rprintf("    Attribute:   %s\n", component->attribute->any.name);
+  Rprintf("    Path/Value:  %s\n", component->path);
+  Rprintf("    State:       ");
 
   switch (comp_component_state(component)) {
   case ComponentLoaded: 
-    printf("loaded");
+    Rprintf("loaded");
     break;
   case ComponentUnloaded:
-    printf("unloaded (valid & on disk)");
+    Rprintf("unloaded (valid & on disk)");
     break;
   case ComponentDefined:
-    printf("defined  (valid, but not on disk)");
+    Rprintf("defined  (valid, but not on disk)");
     break;
   case ComponentUndefined:
-    printf("undefined (not valid)");
+    Rprintf("undefined (not valid)");
     break;
   default:
-    printf("ILLEGAL! (Illegal component state %d)", comp_component_state(component));
+    Rprintf("ILLEGAL! (Illegal component state %d)", comp_component_state(component));
     break;
   }
-  printf("\n\n");
+  Rprintf("\n\n");
 }
 
 
 
 /* =============================================== SET ATTRIBUTES */
 
+/* TODO the feature set functions don't really seemt o belong in this file */
 
 /**
- * Generates a set attribute value.
+ * Generates a feature-set attribute value.
  *
  * @param s      The input string.
  * @param split  Boolean; if True, s is split on whitespace.
@@ -1340,7 +1394,7 @@ cl_make_set(char *s, int split)
   char *p, *mark, *set;
   int i, sl, length;
 
-  cderrno = CDA_OK;
+  cl_errno = CDA_OK;
 
   /* (1) split input string into set elements */
   if (split) {
@@ -1399,7 +1453,7 @@ cl_make_set(char *s, int split)
   if (!ok) {
     cl_delete_string_list(l);
     cl_free(copy);
-    cderrno = CDA_EFSETINV;
+    cl_errno = CDA_EFSETINV;
     return NULL;
   }
 
@@ -1442,9 +1496,9 @@ cl_set_size(char *s)
 {
   int count = 0;
 
-  cderrno = CDA_OK;
+  cl_errno = CDA_OK;
   if (*s++ != '|') {
-    cderrno = CDA_EFSETINV;
+    cl_errno = CDA_EFSETINV;
     return -1;
   }
   while (*s) {
@@ -1452,7 +1506,7 @@ cl_set_size(char *s)
     s++;
   }
   if (s[-1] != '|') {
-    cderrno = CDA_EFSETINV;
+    cl_errno = CDA_EFSETINV;
     return -1;
   }
   return count;
@@ -1477,14 +1531,14 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
   char *p;
   int comparison;
 
-  cderrno = CDA_OK;
+  cl_errno = CDA_OK;
 
   if ((*s1++ != '|') || (*s2++ != '|')) {
-    cderrno = CDA_EFSETINV;
+    cl_errno = CDA_EFSETINV;
     return 0;
   }
   if (strlen(s1) >= CL_DYN_STRING_SIZE || strlen(s2) >= CL_DYN_STRING_SIZE) {
-    cderrno = CDA_EBUFFER;
+    cl_errno = CDA_EBUFFER;
     return 0;
   }
 
@@ -1496,7 +1550,7 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
     if (*s1 != '|') { 
       for (p = f1; *s1 != '|'; s1++) {
         if (!*s1) {
-          cderrno = CDA_EFSETINV;
+          cl_errno = CDA_EFSETINV;
           return 0;     /* unexpected end of string */
         }
         *p++ = *s1;
@@ -1507,7 +1561,7 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
     if (*s2 != '|') { 
       for (p = f2; *s2 != '|'; s2++) {
         if (!*s2) {
-          cderrno = CDA_EFSETINV;
+          cl_errno = CDA_EFSETINV;
           return 0;     /* unexpected end of string */
         }
         *p++ = *s2;

@@ -125,3 +125,15 @@
     .Call(`_RcppCWB_region_matrix_to_count_matrix`, corpus, p_attribute, registry, matrix)
 }
 
+.cwb_makeall <- function(x, registry_dir, p_attribute) {
+    .Call(`_RcppCWB_cwb_makeall`, x, registry_dir, p_attribute)
+}
+
+.cwb_huffcode <- function(x, registry_dir, p_attribute) {
+    .Call(`_RcppCWB_cwb_huffcode`, x, registry_dir, p_attribute)
+}
+
+.cwb_compress_rdx <- function(x, registry_dir, p_attribute) {
+    .Call(`_RcppCWB_cwb_compress_rdx`, x, registry_dir, p_attribute)
+}
+

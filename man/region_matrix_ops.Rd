@@ -25,7 +25,7 @@ region_matrix_to_count_matrix(corpus, p_attribute,
 Get IDs and Counts for Region Matrices.
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 
 # Scenario 1: Get full text for a subcorpus defined by regions
 m <- get_region_matrix(

@@ -20,7 +20,7 @@ that token ids are zero-based, i.e. when iterating through tokens, start at
 0, the maximum will be \code{cl_lexicon_size()} minus 1.
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 Sys.setenv(CORPUS_REGISTRY = registry)
 lexicon_size <- cl_lexicon_size("REUTERS", p_attribute = "word")
 token_ids <- seq.int(from = 0, to = lexicon_size - 1)

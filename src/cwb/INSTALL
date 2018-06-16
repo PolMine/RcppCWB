@@ -1,6 +1,6 @@
 
         IMS Open Corpus Workbench (CWB)
-        Release 3
+        Release 3.5 BETA
 
         Installation Guide
 
@@ -12,17 +12,17 @@ packages for popular platforms are available from the CWB homepage
 
 together with detailed installation instructions.
 
-The CWB development wiki 
-
-    http://cwb.sslmit.unibo.it/
-
-offers hints for building the CWB on specific platforms and addresses some
-common problems.  If you encounter a problem that you cannot solve with the
-information provided on the wiki, you should join the CWBdev mailing list
+If you encounter a problem that you cannot solve with the information provided
+in this installation guide or on the website, you can join the CWBdev mailing 
+list
 
     http://devel.sslmit.unibo.it/mailman/listinfo/cwb
 
 and ask your question there.
+
+A companion file to this one, INSTALL-WIN, covers additional info related to 
+building/installing on Windows. It can be ignored if you are building on Unix.  
+
 
         PREREQUISITES
 
@@ -30,25 +30,51 @@ and ask your question there.
  - GCC 3.3 or newer recommended (other ANSI C compilers might also work)
  - the ar and ranlib code archive utilities
  - GNU make or a compatible program
+ - GNU bison & flex for updating automatically generated parsers
+ - the pkg-config program
  - the ncurses library (or a similar terminal control library)
+ - the PCRE library (see notes below)
+ - the Glib library (see notes below)
+
 
         RECOMMENDED SOFTWARE (not essential)
 
+ - the GNU Readline library for command-line editing (strongly recommended)
  - GNU install or a compatible program
- - GNU bison & flex for updating automatically generated parsers
  - Perl with pod2man script for rebuilding manual pages
- - GNU less pager for interactive display of query results in CQP
+ - GNU less pager for interactive display of query results in CQP 
+   (strongly recommended)
+
+
+        PREREQUISITE LIBRARIES ON LINUX: A WARNING
+
+If you have installed the prerequisite libraries listed above from source,
+then you will have all the files you need. However, if you are on Linux and
+have installed the libraries via your distro's repository, you may have to
+install *more than one package per library* to be able to build CWB 
+properly. For instance, on Fedora, installing the package "ncurses" is not
+sufficient to have the library available for building extra software - 
+you also need the "ncurses-devel" package. The details of precisely what 
+packages you need vary from distro to distro, but in many cases packages
+for building software end in "-devel"  or "-dev".
 
 
         QUICK INSTALLATION
 
 [There are one-step setup scripts for some operating systems: see 
-"AUTO-INSTALL SCRIPTS", below. Otherwise, follow the instructions here.]
+"AUTO-INSTALL SCRIPTS", below. You will also find specific instructions
+for Windows and Mac OS X in sections "BUILDING WINDOWS BINARIES" and
+"INSTALLATION GUIDE FOR MAC OS X". Otherwise, follow the instructions here.]
 
 Edit "config.mk", selecting suitable platform and site configuration files
 for your system (available options are documented in "config.mk").  You
 can also override individual settings manually there.  If you cannot find an
 appropriate configuration, see WRITING YOUR OWN CONFIGURATION FILES below.
+
+Alternatively, platform and site settings can be overriden by adding
+appropriate flags "PLATFORM=### SITE=###" to the end of each of the
+make commands below.  This approach is particularly recommended if you
+are working from a SVN sandbox.
 
 Now, to compile the Corpus Library, CQP, CQPcl, CQPserver, and the
 command-line utilities, type
@@ -91,8 +117,9 @@ instructions above.
 
 The Linux variants with specific scripts are currently Ubuntu and Fedora.
 
-The Ubuntu script will probably work on other Debian variants, and the
-Fedora script will probably work on other RPM-based Linux distros.  
+The Ubuntu script is known to work with Debian, and will probably work on 
+other Debian variants such as Mint; the Fedora script will probably work 
+on other RPM-based Linux distros.  
 
 From the main CWB directory (the one containing this INSTALL file), run
 
@@ -109,6 +136,19 @@ scripts do for you:
  - installs the CWB programs to the "usual" place on your system. 
  
 After running these scripts, you are ready to start using CWB.
+
+For recent Mac OS X releases, a semi-automatic install script is provided,
+which requires either the HomeBrew or the MacPorts package manager to be
+available. Use the package manager to install the prerequisite external 
+libraries, then run
+
+         sudo ./install-scripts/cwb-install-mac-osx
+
+This script will check whether all prerequisites are satisfied and prompt
+you to install missing libraries; then it will compile and install CWB.
+
+However, it is recommended to follow the step-by-step instructions in
+section "INSTALLATION GUIDE FOR MAC OS X" for a trouble-free install process.
 
 If you are on another common system (e.g. SunOS, Cygwin) for which there
 isn't yet an auto-install script, you can still take a shortcut by using the 
@@ -199,6 +239,134 @@ Otherwise, the build process will automatically select the generic Linux
 configuration for standard i386-compatible processors.
 
 
+        INSTALLATION GUIDE FOR MAC OS X
+
+On recent versions of Mac OS X (10.6 "Snow Leopard" and newer versions), it is
+quite easy to compile and install CWB.
+
+ - install XCode Command Line Tools
+
+   Mavericks (10.9) and newer:
+     - enter "xcode-select --install" in a terminal window
+
+   Lion (10.7) and Mountain Lion (10.8):
+     - install XCode from the Mac App store (XCode 4.2.1 or newer)
+     - start XCode and accept Apple license agreement (requires admin password)
+     - depending on your XCode version, do one of the following
+        - go to Preferences dialog, select Downloads | Components, 
+          then install Command Line Tools
+        - enter "xcode-select --install" in a terminal window
+
+   Snow Leopard (10.6):
+      - obtain a free Apple developer account
+      - install XCode from https://developer.apple.com/xcode/ (XCode 3.2.6 or newer)
+
+ - install HomeBrew package manager from http://brew.sh/
+
+Make sure that no other package managers (Fink, MacPorts) are installed on your
+system, as they might conflict with the build process described here.  Now install
+the required external libraries with the following shell commands:
+
+        brew -v install glib
+        brew -v install pcre
+        brew -v install readline
+
+Now edit the file "config.mk", setting the platform entry to
+
+        include $(TOP)/config/platform/darwin-brew
+
+and the site configuration as desired.  This will build a version of CWB tuned
+to your hardware platform.  See comments at the end of this section if you prefer
+to build universal binaries (with support for 32-bit and 64-bit CPUs).
+
+Then enter the shell commands
+
+        make clean
+        make depend
+        make all
+        make install
+
+as shown in the section "QUICK INSTALLATION" above.
+
+If you want to build universal binaries or another configuration that is not
+tuned to the hardware of the build machine, you cannot use HomeBrew to install
+the required libraries.  Follow the instructions in the section below, then 
+select platform "darwin-universal" (for universal binaries) or "darwin-64"
+(for an explicit 64-bit build).  Note that Apple is phasing out support for
+32-bit code beginning with MacOS Sierra (10.12).
+
+A non-HomeBrew build will attempt to auto-detect a version of GNU Readline
+installed manually or with a package manager such as HomeBrew or MacPorts.  It
+will fall back on the system-provided Editline library only if no installation
+of GNU Readline can be found.  In order to check which library CQP will use for
+command-line editing, type
+
+        instutils/find_readline.perl --check
+
+The other libraries have to be set up so that configuration information can
+be determined with pkg-config (Glib) and pcre-config (PCRE).
+
+
+        INSTALLING PREREQUISITE EXTERNAL LIBRARIES
+
+The Glib and PCRE libraries are needed to compile CWB. If you are using a 
+Linux flavour such as Debian, Fedora etc. then the easiest way to do this is
+via your package repository, which should almost certainly include both. 
+In fact, the auto-install scripts will actually check that you have got
+the packages in question using the package-management tool. So if you are
+using the auto-install scripts, you don't need to worry about it. 
+
+Otherwise, PCRE and Glib are available to download from these addresses:
+
+        http://www.pcre.org/
+        http://www.gtk.org/download.html
+
+Use the instructions included in the source code downloads to build the 
+libraries.
+
+For Glib, at least version 2 is required.
+
+For PCRE, at least version 8.10 is required. You must use a copy of PCRE
+which has been compiled with Unicode (UTF-8) support and Unicode
+properties support. (You can find out whether this is the case using the
+pcretest utility with the -C option.) Note that the new-and-improved PCRE2
+library (PCRE v10.0.0 and up) is NOT a suitable substitute. 
+
+We strongly recommend to use a recent version of PCRE v8 (>= 8.32) with JIT
+compilation enabled (check with "pcretest -C") in order to ensure good
+performance. For complex regular expressions, this will make the lexicon
+search A LOT faster (see http://sljit.sourceforge.net/regex_perf.html).
+Note that standard packages shipped with various Linux distributions may
+not include JIT support and you may have to compile PCRE yourself for
+optimal performance. The following Linux distributions appear to include 
+a PCRE version high enough to include JIT:
+
+        Ubuntu 14.10 ("Utopic") and newer
+        Debian 7 ("Wheezy") and newer
+        Fedora 20 ("Heisenbug") and newer
+
+For info on PCRE and Glib on Mac OS X, see the specific section above for 
+that OS.
+
+The CWB build process makes the following assumptions:
+
+ - that the location of header/library files for Glib can be discovered
+   using the pkg-config utility (should be the case if you have used the
+   standard installation procedure);
+
+ - that the location of header/library files for PCRE can be discovered
+   using the pcre-config utility (which should also be the case if you
+   have used the standard installation procedure).
+
+If you want to use your own copy of Glib or PCRE instead of the version
+provided by a standard package, set up your search path so that the 
+appropriate pkg-config or pcre-config binary is found first.
+
+If you cannot provide installation details through pkg-config and
+pcre-config, quite a bit of tinkering with the Makefile includes will be
+needed to make things work.
+
+
         PACKAGE CONTENTS
 
 Makefile                top-level makefile
@@ -206,7 +374,12 @@ config.mk               makefile configuration
 definitions.mk          standard settings and definitions for make system
 rpm-linux.spec          configuration file for building binary RPM packages
 install.sh              a GNU-compatible install program (shell script)
-README, INSTALL, ...    the usual open source "boilerplate"
+README                  the usual open source "boilerplate"
+INSTALL                 this file
+INSTALL-WIN             supplement to this file on Windows-specific matters
+COPYING                 licence info
+CHANGES                 change log
+AUTHORS                 info on who wrote CWB, copyright, etc. 
 
 doc/                    some technical documentation
 
@@ -216,12 +389,15 @@ config/                 platform and site configuration files
 
 instutils/              utilities for installing and binary packages
 
+install-scripts         shell scripts that automate building/installing for
+                        common systems
+
 cl/                     corpus library (CL) source code
-cqp/                    CQP query processor source code
-CQi/                    CQPserver (implements client-server interface CQi)
+cqp/                    corpus query processor (CQP) source code
+CQi/                    cqpserver source code (inc client-server interface CQi)
 utils/                  source code of command-line utilities
 
 man/                    manpages for CQP and the command-line utilities
 
-editline/               local copy of the CSTR Editline library used by CQP
+editline/               local copy of the CSTR Editline library (no longer used)
 

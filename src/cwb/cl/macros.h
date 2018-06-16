@@ -31,16 +31,15 @@
  * Allocates a new object.
  *
  * A macro for memory allocation which implements an object-oriented-style
- * "new" term: it evaluates to a pointer to a newly-laid out memory block
+ * "new" term: it evaluates to a pointer to a newly-laid-out memory block
  * of the size of the specified type.
  *
  * @param T  The data type of the "object" to be created.
- * @return   A pointer to the new "object"
- * memory allocation macros
+ * @return   A pointer to the new "object".
  */
 #define new(T) (T *)cl_malloc(sizeof(T))
 /**
- * Synonym for new (making it case-insensitive)
+ * New-object allocator with alternative syntax.
  * @see new
  */
 #define New(P,T)  P = (T *)cl_malloc(sizeof(T))
@@ -62,28 +61,28 @@
 /**
  * Evaluates to the smaller of two integer arguments.
  */
+#ifndef MIN  /* may already have been imported from glib */
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
+#endif
+
 /**
  * Evaluates to the greater of two integer arguments.
  */
+#ifndef MAX  /* may already have been imported from glib */
 #define MAX(a,b) ((a)>(b) ? (a) : (b))
-
+#endif
 
 /*
  * display progress bar in terminal window (STDERR, child mode: STDOUT)
  */
 
-void
-progress_bar_child_mode(int on_off);
+void progress_bar_child_mode(int on_off);
 
-void
-progress_bar_clear_line(void);
+void progress_bar_clear_line(void);
 
-void
-progress_bar_message(int pass, int total, char *message);
+void progress_bar_message(int pass, int total, char *message);
 
-void
-progress_bar_percentage(int pass, int total, int percentage);
+void progress_bar_percentage(int pass, int total, int percentage);
 
 
 
@@ -98,17 +97,13 @@ progress_bar_percentage(int pass, int total, int percentage);
 #define ilist_print_item(s) print_indented_list_item(s)
 #define ilist_end end_indented_list
 
-void
-start_indented_list(int linewidth, int tabsize, int indent);
+void start_indented_list(int linewidth, int tabsize, int indent);
 
-void
-print_indented_list_br(char *label);
+void print_indented_list_br(char *label);
 
-void
-print_indented_list_item(char *string);
+void print_indented_list_item(char *string);
 
-void
-end_indented_list(void);
+void end_indented_list(void);
 
 /* default configuration of indented lists */
 #define ILIST_INDENT      4

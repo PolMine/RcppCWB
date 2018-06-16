@@ -15,21 +15,24 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 
 #include "globals.h"
 #include "macros.h"
 #include "lexhash.h"
 
+#include <math.h>
+
 
 /** Defines the default number of buckets in a lexhash. */
 #define DEFAULT_NR_OF_BUCKETS 250000
 
-/** The update interval for hash performance estimation. */
-#define PERFORMANCE_COUNT 1000
+/** Default parameters for auto-growing the table of buckets (@see cl_lexhash_auto_grow_fillrate for details). */
+#define DEFAULT_FILLRATE_LIMIT 2.0
+#define DEFAULT_FILLRATE_TARGET 0.4
 
-/** The default value for the performance limit (avg no of comparisons) before the hash is expanded. */
-#define DEFAULT_PERFORMANCE_LIMIT 10
-
+/** Maximum number of buckets lexhash will try to allocate when auto-growing. */
+#define MAX_BUCKETS 1000000007  /* 1 billion (incremented to next prime number) */
 
 
 /*
@@ -49,7 +52,7 @@ is_prime(int n) {
 /** Returns smallest prime >= n */
 int 
 find_prime(int n) {
-  for( ; n > 0 ; n++)           /* will exit on int overflow */
+  for( ; n > 0 ; n++)           /* loop will break on signed int overflow */
     if (is_prime(n)) 
       return n;
   return 0;
@@ -59,11 +62,48 @@ find_prime(int n) {
 unsigned int 
 hash_string(char *string) {
   unsigned char *s = (unsigned char *)string;
-  unsigned int result = 0;
+  unsigned int result = 0;   /* TODO: 5381 as proposed in DJB2? */
   for( ; *s; s++)
-    result = (result * 33 ) ^ (result >> 27) ^ *s;
+    result = (result * 33) ^ (result >> 27) ^ *s;
   return result;
 }
+
+/** TODO: consider alternative hash functions
+
+The hash function above appears to have been purloined from some version of the Perl source code.
+This claim cannot be confirmed, though. Perl5 has used various hash functions over time, but older
+versions (at least up to Perl 5.8.1) implement the simple DJB2 algorithm (see below).
+
+According to 
+
+    http://burtleburtle.net/bob/hash/
+  
+the algorithm is recommended in Don Knuth's "Art of Computer Programming" (Vol. 3, Sec. 6.4),
+but we haven't been able to find the actual reference there.
+
+The URL above also discusses properties of hash functions at length and suggests a number of better algorithms.
+
+Prime-number-sized hash tables are required by Knuth's algorithm, but make hashing more expensive.
+Growing a hash from 2^n to 2^(n+1) also gives a highly predicatble redistribution of buckets.
+Good hash functions should not require division by prime number in order to achieve good distribution.
+
+DJB2:
+unsigned long hash = 5381;
+int c;
+
+while (c = *str++)
+    hash = ((hash << 5) + hash) + c; // hash * 33 + c 
+
+DJB2a:
+    hash = hash * 33 ^ str[i]
+
+MurmurHash:
+see http://en.wikipedia.org/wiki/MurmurHash
+
+Experimental comparison:
+http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
+
+***/
 
 
 /*
@@ -71,7 +111,7 @@ hash_string(char *string) {
  */
 
 
-/* cl_lexhash_entry now in <cl.h> */
+/* cl_lexhash_entry is in <cl.h> */
 
 /**
  * A function pointer type defining functions that can be used as the "cleanup" for a deleted cl_lexhash_entry.
@@ -91,14 +131,15 @@ typedef void (*cl_lexhash_cleanup_func)(cl_lexhash_entry);
  */
 struct _cl_lexhash {
   cl_lexhash_entry *table;      /**< table of buckets; each "bucket" is a pointer to the list of entries that make up that bucket */
-  unsigned int buckets;         /**< number of buckets in the list */
+  unsigned int buckets;         /**< number of buckets in the hash table */
   int next_id;                  /**< ID that will be assigned to next new entry */
   int entries;                  /**< current number of entries in this hash */
   cl_lexhash_cleanup_func cleanup_func; /**< callback function used when deleting entries (see cl.h) */
-  int performance_counter;      /**< a variable used for estimating hash performance (avg no of comparisons) */
-  int comparisons;              /**< a variable used for estimating hash performance (avg no of comparisons) */
-  double last_performance;      /**< a variable used for estimating hash performance (avg no of comparisons) */
   int auto_grow;                /**< boolean: whether to expand this hash automatically; true by default */
+  double fillrate_limit;        /**< fillrate limit that triggers expansion of bucket table (with auto_grow) */
+  double fillrate_target;       /**< target fillrate after expansion of bucket table (with auto_grow) */
+  int iter_bucket;              /**< bucket currently processed by the single iterator of the hash table */
+  cl_lexhash_entry iter_point;  /**< next entry to be returned by the iterator (NULL -> go to next bucket) */
 };
 
 
@@ -109,8 +150,8 @@ struct _cl_lexhash {
 /**
  * Creates a new cl_lexhash object.
  *
- * @param buckets    The number of buckets in the newly-created cl_lexhash; set to 0 to use the
- *                   default number of buckets.
+ * @param buckets    The number of buckets in the newly-created cl_lexhash;
+ *                   set to 0 to use the default number of buckets.
  * @return           The new cl_lexhash.
  */
 cl_lexhash 
@@ -118,17 +159,19 @@ cl_new_lexhash(int buckets)
 {
   cl_lexhash hash;
   
-  if (buckets <= 0) buckets = DEFAULT_NR_OF_BUCKETS;
+  if (buckets <= 0)
+    buckets = DEFAULT_NR_OF_BUCKETS;
   hash = (cl_lexhash) cl_malloc(sizeof(struct _cl_lexhash));
   hash->buckets = find_prime(buckets);
   hash->table = cl_calloc(hash->buckets, sizeof(cl_lexhash_entry));
   hash->next_id = 0;
   hash->entries = 0;
   hash->cleanup_func = NULL;
-  hash->performance_counter = PERFORMANCE_COUNT;
-  hash->comparisons = 0;
-  hash->last_performance = 0.0;
   hash->auto_grow = 1;
+  hash->fillrate_limit = DEFAULT_FILLRATE_LIMIT;
+  hash->fillrate_target = DEFAULT_FILLRATE_TARGET;
+  hash->iter_bucket = -1;
+  hash->iter_point = NULL;
   return hash;
 }
 
@@ -155,7 +198,7 @@ cl_delete_lexhash_entry(cl_lexhash hash, cl_lexhash_entry entry)
     if (hash->cleanup_func != NULL) {
       (*(hash->cleanup_func))(entry);
     }
-    cl_free(entry->key);
+    /* key is embedded in struct, so it mustn't be deallocated separately */
     cl_free(entry);
   }
 }
@@ -208,7 +251,7 @@ cl_lexhash_set_cleanup_function(cl_lexhash hash, cl_lexhash_cleanup_func func)
 }
 
 /**
- * Turns a cl_lexhash's ability to autogrow on or off.
+ * Turns a cl_lexhash's ability to auto-grow on or off.
  *
  * When this setting is switched on, the lexhash will grow
  * automatically to avoid performance degradation.
@@ -227,17 +270,59 @@ cl_lexhash_auto_grow(cl_lexhash hash, int flag)
     hash->auto_grow = flag;
 }
 
+/**
+ * Configure auto-grow parameters.
+ *
+ * These settings are only relevant if auto-growing is enabled.
+ *
+ * The decision to expand the bucket table of a lexhash is based
+ * on its fill rate, i.e. the average number of entries in each
+ * bucket. Under normal circumstances, this value corresponds to 
+ * the average number of comparisons required to insert a new 
+ * entry into the hash (locating an existing value should require
+ * roughly half as many comparisons).
+ *
+ * Auto-growing is triggered if the fill rate exceeds a specified
+ * limit.  The new number of buckets is chosen so that the fill
+ * rate after expansion corresponds to the specified target value.
+ *
+ * The limit should not be set too low in order to reduce memory
+ * overhead and avoid frequent reallocation due to expansion in 
+ * small increments.  Good values seem to be in the range 2.0-5.0;
+ * depending on whether speed or memory efficiency is more important.
+ * A reasonable value for the target fill rate is 0.4, which corresponds
+ * to a 42% overhead over the storage required for entry data structures
+ * (48 bytes per entry vs. 8 bytes for each bucket).
+ * 
+ * @see          cl_lexhash_auto_grow, cl_lexhash_check_grow
+ * @param hash   The hash that will be affected.
+ * @param limit  Fill rate limit, which triggers expansion of the lexhash
+ * @param target Target fill rate after expansion (determines new number of buckets)
+ */
+void
+cl_lexhash_auto_grow_fillrate(cl_lexhash hash, double limit, double target)
+{
+  if (hash != NULL) {
+    /* set parameters with basic sanity checks */
+    hash->fillrate_target = (target > 0.01) ? target : 0.01;
+    hash->fillrate_limit = (limit > 2 * hash->fillrate_target) ? limit : 2 * hash->fillrate_target;
+  }
+}
+
 
 
 /**
  * Grows a lexhash table, increasing the number of buckets, if necessary.
  *
- * This function checks whether growing the hash is necessary by updating
- * the performance estimate. If it is above the threshold, and auto_grow
- * is enabled, then the hashes is expanded by increasing the number of
- * buckets, such that the average fill rate is 1 (i.e. 1 lexhash_entry per
- * bucket, 1 lexhash index == 1 key-string ... on average). This gives the
+ * This functions is called after inserting a new entry into the lexhash.
+ * If checks whether the current fill rate exceeds the specified limit. 
+ * If this is the case, and auto_grow is enabled, then the hash is expanded
+ * by increasing the number of buckets, such that the new average fill rate
+ * corresponds to the specified target value.  This gives the
  * hash better performance and makes it capable of absorbing more keys.
+ *
+ * If the bucket table would be expanded to more than MAX_BUCKETS entries,
+ * auto-grow is automatically disabled for this lexhash.
  *
  * Note: this function also implements the hashing algorithm and must be
  * consistent with cl_lexhash_find_i().
@@ -246,39 +331,53 @@ cl_lexhash_auto_grow(cl_lexhash hash, int flag)
  *
  * This is a non-exported function.
  *
+ * @see         cl_lexhash_auto_grow, cl_lexhash_auto_grow_fillrate
  * @param hash  The lexhash to autogrow.
  * @return      Always 0.
  */
 int
 cl_lexhash_check_grow(cl_lexhash hash)
 {
-  double fill_rate = ((double) hash->entries) / hash->buckets;
+  double fill_rate, target_size;
   cl_lexhash temp;
   cl_lexhash_entry entry, next;
   int idx, offset, old_buckets, new_buckets;
 
-  hash->last_performance = ((double) hash->comparisons) / PERFORMANCE_COUNT;
-  if (hash->auto_grow && (hash->last_performance > DEFAULT_PERFORMANCE_LIMIT)) {
-    if (cl_debug) {
-      fprintf(stderr, "[lexhash autogrow: (perf = %3.1f  @ fill rate = %3.1f (%d/%d)]\n",
-              hash->last_performance, fill_rate, hash->entries, hash->buckets);
+  old_buckets = hash->buckets;
+  fill_rate = ((double) hash->entries) / old_buckets;
+  if (hash->auto_grow && (fill_rate > hash->fillrate_limit)) {
+    /* auto-grow is triggered */
+    target_size = floor(((double) hash->entries) / hash->fillrate_target);
+    if (target_size > MAX_BUCKETS) {
+      if (cl_debug) {
+        Rprintf("[lexhash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n",
+                (double) MAX_BUCKETS, target_size);
+      }
+      hash->auto_grow = 0; /* disable auto-grow to avoid further unnecessary attempts */
+      /* grow lexhash to maximum size, but not if this would extend bucket vector by less than 2x (to avoid large reallocation for little benefit) */
+      if (old_buckets > target_size / 2.0) {
+        return 0;
+      }
+      else {
+        target_size = MAX_BUCKETS;
+      }
     }
-    if (fill_rate < 2.0) {
-      /* there are, on average, less than two entries per bucket. */
-      if (cl_debug)
-        fprintf(stderr, "[autogrow aborted because of low fill rate]\n");
-      return 0;
-    }
-    temp = cl_new_lexhash(hash->entries); /* create new hash with fill rate == 1.0 */
+    /* now grow bucket table from old_buckets entries to new_buckets entries */
+    new_buckets = (int) target_size;
     old_buckets = hash->buckets;
-    new_buckets = temp->buckets; /* will be a prime number >= hash->entries */
+    if (cl_debug) {
+      Rprintf("[lexhash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n",
+              fill_rate, hash->entries, old_buckets);
+    }
+    temp = cl_new_lexhash(new_buckets); /* create new hash with target fill rate */
+    new_buckets = temp->buckets; /* the actual number of entries (next prime number) */
     /* move all entries from hash to the appropriate bucket in temp */
     for (idx = 0; idx < old_buckets; idx++) {
       entry = hash->table[idx];
       while (entry != NULL) {
         next = entry->next;     /* remember pointer to next entry */
         offset = hash_string(entry->key) % new_buckets;
-        entry->next = temp->table[offset]; /* insert entry into its bucket in temp (most buckets should contain only 1 entry) */
+        entry->next = temp->table[offset]; /* insert entry into its bucket in temp (most buckets should contain only 1 entry, as long as hash->fillrate_target is less than 1) */
         temp->table[offset] = entry;
         temp->entries++;
         entry = next;           /* continue while loop */
@@ -288,13 +387,13 @@ cl_lexhash_check_grow(cl_lexhash hash)
     cl_free(hash->table);               /* old hash table should be empty and can be deallocated */
     hash->table = temp->table;          /* update hash from temp (copy hash table and its size) */
     hash->buckets = temp->buckets;
-    hash->last_performance = 0.0;       /* reset performance estimate */
     cl_free(temp);                      /* we can simply deallocate temp now, having stolen its hash table */
     if (cl_debug) {
       fill_rate = ((double) hash->entries) / hash->buckets;
-      fprintf(stderr, "[grown to %d buckets  @ fill rate = %3.1f (%d/%d)]\n",
-              hash->buckets, fill_rate, hash->entries, hash->buckets);
+      Rprintf("[lexhash autogrow: new fill rate = %3.1f (%d/%d)]\n",
+              fill_rate, hash->entries, hash->buckets);
     }
+    return 1;
   }
   return 0;
 }
@@ -309,7 +408,8 @@ cl_lexhash_check_grow(cl_lexhash hash)
  * the hashtable), unless *ret_offset == NULL.
  *
  * Note that this function hides the hashing algorithm details from the
- * rest of the lexhash implementation.
+ * rest of the lexhash implementation (except cl_lexhash_check_grow, which 
+ * re-implements the hashing algorithm for performance reasons).
  *
  * Usage: entry = cl_lexhash_find_i(cl_lexhash hash, char *token, unsigned int *ret_offset);
  *
@@ -318,7 +418,7 @@ cl_lexhash_check_grow(cl_lexhash hash)
  * @param hash        The hash to search.
  * @param token       The key-string to look for.
  * @param ret_offset  This integer address will be filled with the token's
- *                    hashtable offset.
+ *                    hashtable offset (can be NULL, in which case, ignored).
  * @return            The entry that is found (or NULL if the string is not
  *                    in the hash).
  */
@@ -329,24 +429,15 @@ cl_lexhash_find_i(cl_lexhash hash, char *token, unsigned int *ret_offset)
   cl_lexhash_entry entry;
 
   assert((hash != NULL && hash->table != NULL && hash->buckets > 0) && "cl_lexhash object was not properly initialised");
+
   /* get the offset of the bucket to look in by computing the hash of the string */
   offset = hash_string(token) % hash->buckets;
   if (ret_offset != NULL)
     *ret_offset = offset;
+  /* check all entries in this bucket against the specified key */
   entry = hash->table[offset];
-  if (entry != NULL) 
-    hash->comparisons++;        /* will need one comparison at least */
-  while (entry != NULL && strcmp(entry->key, token) != 0) {
+  while (entry != NULL && strcmp(entry->key, token) != 0)
     entry = entry->next;
-    hash->comparisons++;        /* this counts additional comparisons */
-  }
-  hash->performance_counter--;
-  if (hash->performance_counter <= 0) {
-    if (cl_lexhash_check_grow(hash)) 
-      entry = cl_lexhash_find_i(hash, token, ret_offset); /* if hash was expanded, need to recompute offset */
-    hash->performance_counter = PERFORMANCE_COUNT;
-    hash->comparisons = 0;
-  }
   return entry;
 }
 
@@ -354,6 +445,9 @@ cl_lexhash_find_i(cl_lexhash hash, char *token, unsigned int *ret_offset)
 /**
  * Finds the entry corresponding to a particular string within a cl_lexhash.
  *
+ * This function is basically a wrapper around the internal function cl_lexhash_find_i.
+ *
+ * @see               cl_lexhash_find_i
  * @param hash        The hash to search.
  * @param token       The key-string to look for.
  * @return            The entry that is found (or NULL if the string is not
@@ -375,7 +469,7 @@ cl_lexhash_find(cl_lexhash hash, char *token)
  *
  * Otherwise, a new entry is created, with an auto-assigned ID;
  * note that the string is duplicated, so the original string
- * that is passed to this function does not need ot be kept in
+ * that is passed to this function does not need to be kept in
  * memory.
  *
  * @param hash   The hash table to add to.
@@ -390,37 +484,44 @@ cl_lexhash_add(cl_lexhash hash, char *token)
                                    by the call to cl_lexhash_find_i                                     */
   
   entry = cl_lexhash_find_i(hash, token, &offset);
+
   if (entry != NULL) {
     /* token already in hash -> increment frequency count */
     entry->freq++;
-    return entry;
   }
   else {
-    /* add new entry for this token */
-    entry = (cl_lexhash_entry) cl_malloc(sizeof(struct _cl_lexhash_entry));
-    entry->key = cl_strdup(token);
+    /* token not in hash -> add new entry for this token */
+    int keylen = strlen(token);
+    /* allocate enough space for key string appended to the struct */
+    entry = (cl_lexhash_entry) cl_malloc(sizeof(struct _cl_lexhash_entry) + keylen);
+    strcpy(entry->key, token); /* embed copy of key in struct */
     entry->freq = 1;
     entry->id = (hash->next_id)++;
     entry->data.integer = 0;            /* initialise data fields to zero values */
     entry->data.numeric = 0.0;
     entry->data.pointer = NULL;
     entry->next = NULL;
-    insert_point = hash->table[offset]; /* insert entry into its bucket in the hash table */
+
+    /* insert entry into its bucket in the hash table */
+    insert_point = hash->table[offset];
     if (insert_point == NULL) {
       hash->table[offset] = entry;      /* only entry in this bucket so far */
     }
-    else { /* always insert as last entry in its bucket (because of Zipf's Law:
-              frequent lexemes tend to occur early in the corpus and should be first in their buckets for faster access) */
+    else {
+      /* always insert a new entry as the last entry in its bucket (because of Zipf's Law:
+       * frequent lexemes tend to occur early in the corpus and should be first in their buckets for faster access) */
       while (insert_point->next != NULL)
         insert_point = insert_point->next;
       insert_point->next = entry;
     }
     hash->entries++;
-    return entry;
+    
+    /* check whether hash needs to auto-grow */
+    if (hash->auto_grow && hash->entries > (hash->fillrate_limit * hash->buckets))
+      cl_lexhash_check_grow(hash);
   }
+  return entry;
 }
-
-/* returns ID of <token>, -1 if not in hash */
 
 /**
  * Gets the ID of a particular string within a lexhash.
@@ -450,7 +551,7 @@ cl_lexhash_id(cl_lexhash hash, char *token)
  *
  * @param hash   The hash to look in.
  * @param token  The string to look for.
- * @return       The frrequency of that string, or 0
+ * @return       The frequency of that string, or 0
  *               if the string is not in the hash
  *               (whgich is, of course, actually its frequency).
  */
@@ -463,7 +564,7 @@ cl_lexhash_freq(cl_lexhash hash, char *token)
   return (entry != NULL) ? entry->freq : 0;
 } 
 
-/* deletes <token> from hash & returns its frequency */
+
 /**
  * Deletes a string from a hash.
  *
@@ -473,7 +574,7 @@ cl_lexhash_freq(cl_lexhash hash, char *token)
  *
  * @param hash   The hash to alter.
  * @param token  The string to remove.
- * @return       The frequency of the deleted entry.
+ * @return       The frequency of the deleted entry (0 if the string was not found in the hash).
  */
 int 
 cl_lexhash_del(cl_lexhash hash, char *token)
@@ -508,24 +609,62 @@ cl_lexhash_del(cl_lexhash hash, char *token)
  * Gets the number of different strings stored in a lexhash.
  *
  * This returns the total number of entries in all the
- * bucket linked-lists in the whole hashtable.
+ * buckets in the whole hash table.
  *
  * @param hash  The hash to size up.
  */
 int 
 cl_lexhash_size(cl_lexhash hash)
 {
-  cl_lexhash_entry entry;
-  int i, size = 0;
+  return (hash != NULL) ? hash->entries : 0;
+}
 
+
+/**
+ * Resets a lexhash's entry-iterator to the start of the hash.
+ *
+ * The iterator allows access over all entries in a lexhash.
+ *
+ * Note that there is only a single iterator for each cl_lexhash object,
+ * so different parts of the application code must not try to iterate through
+ * the hash at the same time.
+ *
+ * @param hash      The lexhash to iterate over.
+ */
+void
+cl_lexhash_iterator_reset(cl_lexhash hash)
+{
   assert((hash != NULL && hash->table != NULL && hash->buckets > 0) && "cl_lexhash object was not properly initialised");
-  for (i = 0; i < hash->buckets; i++) {
-    entry = hash->table[i];
-    while (entry != NULL) {
-      size++;
-      entry = entry->next;
-    }
-  }
+  hash->iter_bucket = -1;
+  hash->iter_point = NULL;
+}
 
-  return size;
+/**
+ * Gets the next entry from the hash's entry-iterator.
+ *
+ * This function returns the next entry from the hash, or NULL if there are
+ * no more entries. Keep in mind that the hash is traversed in an unspecified order.
+ *
+ * The iterator allows access over all the entries in a lexhash.
+ *
+ * Note that there is only a single iterator for each cl_lexhash object,
+ * so different parts of the application code must not try to iterate through
+ * the hash at the same time.
+ *
+ * @param hash      The lexhash to iterate over.
+ */
+cl_lexhash_entry
+cl_lexhash_iterator_next(cl_lexhash hash)
+{
+  cl_lexhash_entry point;
+
+  point = hash->iter_point;
+  while (point == NULL) {
+    hash->iter_bucket++;
+    if (hash->iter_bucket >= hash->buckets)
+      return NULL; /* we've reached the end of the hash */
+    point = hash->table[hash->iter_bucket];
+  }
+  hash->iter_point = point->next;
+  return point;
 }

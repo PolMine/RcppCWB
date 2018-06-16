@@ -1,50 +1,50 @@
 #!/bin/bash
 
-config_file=$(cat config.mk)
-target="include \$(TOP)/config/platform/darwin-universal"
-rep="include \$(TOP)/config/platform/"
+## NB: this script prints command-line flags that should be appended to all make commands,
+##     i.e. typical usage will be:  CONFIG_FLAGS=`install-scripts/cwb-config-basic`
 
+platform=""
+siteflags=""
 uname_output=$(uname -a)
 
 if [[ "$uname_output" == Linux* ]]
 then
-  rep="${rep}linux"
-# don't know how to detect opteron?
-  if [[ "$uname_output" == *x86_64* ]]
-  then
-    rep="${rep}-64"
-  fi
+    platform="linux"
+    # don't know how to detect opteron?
+    if [[ "$uname_output" == *x86_64* ]]
+    then
+        platform="${platform}-64"
+    fi
 
 elif [[ "$uname_output" == Darwin* ]]
 then
-  if [[ "$uname_output" == *ppc ]]
-  then
-    rep="${rep}darwin-g4" # don't make assumptions about more recent processor or ability to produce Universal binaries
-  else
-    rep="${rep}darwin-universal" # build Universal binaries by default (best for linking libcl.a into other programs such as Perl and Python)
-  fi
-
+    if [[ "$uname_output" == *ppc ]]
+    then
+        echo "*** Mac OS X is no longer supported on PowerPC processors ***"
+        exit
+    else
+        # build core2-optimised universal binaries (i386 + x86_64) by default on recent Mac OS X
+        if [[ -f /opt/local/lib/libglib-2.0.dylib || -f /opt/local/lib/libglib-2.0.a ]]
+        then
+            platform="darwin-port-core2" # GLib seems to be provided by MacPorts
+        else
+            platform="darwin-64" # assume that GLib is provided by HomeBrew or has been compiled by user
+        fi
+    fi
+    
 elif [[ "$uname_output" == SunOS* ]]
 then
-  rep="${rep}solaris"
+    platform="solaris"
 
 elif [[ "$uname_output" == CYGWIN* ]]
 then
-  rep="${rep}cygwin"
-  # and add switch to cygwin in site as well
-  config_file = ${config_file/"include \$(TOP)/config/site/standard"/"include \$(TOP)/config/site/cygwin"}
+    platform="cygwin"
+    # and force site to be cygwin
+    siteflags="SITE=cygwin"
 
 else
-        # go for generic unix
-        rep="${rep}unix"
+    # go for generic unix
+    platform="unix"
 fi
 
-echo "$target => $rep"
-
-config_file=${config_file/"$target"/"$rep"}
-
-mv config.mk config.mk.bak
-echo "$config_file" > config.mk
-
-
-
+echo "PLATFORM=$platform $siteflags"

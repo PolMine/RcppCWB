@@ -1,6 +1,6 @@
 =head1 NAME
 
-cqpcl - The corpus query processor of the CWB (command-line version)
+cqpcl - The CWB Corpus Query Processor (B<depracated> commandline-only version)
 
 =head1 SYNOPSIS
 
@@ -11,62 +11,58 @@ B<cqpcl> [-hvmscixS] [-D I<corpus>] [-r I<registry_dir>]
 
 =head1 DESCRIPTION
 
-B<TODO>
-
 B<Use of this command-line version of CQP is deprecated>, due to security issues and problems with shell metacharacters.
-B<It may no longer be included in future releases of the CWB.>  The recommended methods for batch
-processing with CQP are to run it as a slave process in the background (which is facilitated by
-he C<-c> option and interface packages for various programming languages), or to read an automatically
+B<It may be omitted from future releases of the CWB.>  The recommended methods for batch
+processing with CQP are (a) to run B<cqp> as a slave process in the background (which is facilitated by
+the C<-c> option and interface packages for various programming languages), or (b) to read an automatically
 generated CQP script file with the C<-f> option.
 
-=head1 OPTIONS
+Given B<cqpcl>'s depracation, this manual will not longer be updated (after summer 2011).
 
-    -h           help
-    -v           version and copyright information
-    -r dir       use <dir> as default registry
-    -l dir       store/load subcorpora in <dir>
-    -I file      read <file> as init file
-    -M file      read macro definitions from <file>
-    -m           disable macro expansion
-    -E variable  execute query in $(<variable>)
-    -s           auto subquery mode
-    -c           child process mode
-    -i           print matching ranges only (binary output)
-    -W num       show <num> chars to the left & right of match
-    -L num       show <num> chars to the left of match
-    -R num       show <num> chars to the right of match
-    -D corpus    set default corpus to <corpus>
-    -b num       set hard boundary for kleene star to <num> tokens
-    -S           SIG_PIPE handler toggle
-    -x           insecure mode (when run SETUID)
-    -d mode      activate/deactivate debug mode, where <mode> is one of: 
-       [ ShowSymtab, ShowPatList, ShowEvaltree, ShowDFA, ShowCompDFA,   ]
-       [ ShowGConstraints, SymtabDebug, TreeDebug, CLDebug,             ]
-       [ EvalDebug, InitialMatchlistDebug, DebugSimulation,             ]
-       [ VerboseParser, ParserDebug, ParseOnly, SearchDebug, MacroDebug ]
-       [ ALL (activate all modes except ParseOnly)                      ]
+=head1 OPTIONS (see also man cqp)
 
-=over 4
+ -h           help
+ -v           version and copyright information
+ -r dir       use <dir> as default registry
+ -l dir       store/load subcorpora in <dir>
+ -I file      read <file> as init file
+ -M file      read macro definitions from <file>
+ -m           disable macro expansion
+ -E variable  execute query in $(<variable>)
+ -s           auto subquery mode
+ -c           child process mode
+ -i           print matching ranges only (binary output)
+ -W num       show <num> chars to the left & right of match
+ -L num       show <num> chars to the left of match
+ -R num       show <num> chars to the right of match
+ -D corpus    set default corpus to <corpus>
+ -b num       set hard boundary for kleene star to <num> tokens
+ -S           SIG_PIPE handler toggle
+ -x           insecure mode (when run SETUID)
+ -d mode      activate/deactivate debug mode, where <mode> is one of: 
+    [ ShowSymtab, ShowPatList, ShowEvaltree, ShowDFA, ShowCompDFA,   ]
+    [ ShowGConstraints, SymtabDebug, TreeDebug, CLDebug,             ]
+    [ EvalDebug, InitialMatchlistDebug, DebugSimulation,             ]
+    [ VerboseParser, ParserDebug, ParseOnly, SearchDebug, MacroDebug ]
+    [ ALL (activate all modes except ParseOnly)                      ]
 
-=item B<TODO>
+=head1 ENVIRONMENT
 
-=back
+B<cqpcl> uses the same environment variables as B<cqp>.
 
+=head1 SEE ALSO
+
+L<cqp>, L<cqpserver>, L<cwb-align>, L<cwb-align-show>, L<cwb-align-encode>, L<cwb-align-decode>, L<cwb-atoi>, L<cwb-compress-rdx>,
+L<cwb-config>, L<cwb-decode-nqrfile>, L<cwb-decode>, L<cwb-describe-corpus>, L<cwb-encode>, L<cwb-huffcode>,
+L<cwb-itoa>, L<cwb-lexdecode>, L<cwb-makeall>, L<cwb-scan-corpus>, L<cwb-s-decode>, L<cwb-s-encode>.
 
 =head1 COPYRIGHT
 
-=over 4
-
-=item
 B<IMS Open Corpus Workbench (CWB)> L<http://cwb.sourceforge.net/>
 
-=item
 Copyright (C) 1993-2006 by IMS, University of Stuttgart
 
-=item
 Copyright (C) 2007- by the respective contributers (see file F<AUTHORS>)
-
-=back
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

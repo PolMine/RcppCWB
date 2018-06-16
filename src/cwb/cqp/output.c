@@ -24,7 +24,7 @@
 #include <sys/time.h>           /* for select() */
 
 
-#include "../cl/cl.h"
+#include "../cl/globals.h"
 #include "../cl/corpus.h"
 #include "../cl/attributes.h"
 #include "../cl/cdaccess.h"
@@ -47,18 +47,22 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
+
+#ifndef __MINGW__
 #include <pwd.h>
+#endif
 
 /* ---------------------------------------------------------------------- */
 
-TabulationItem TabulationList = NULL; /* global list of tabulation items */
+/** Global list of tabulation items for use with the "tabulate" operator */
+TabulationItem TabulationList = NULL;
 
 /* ---------------------------------------------------------------------- */
 
 /* stupid Solaris doesn't have setenv() function, so we need to emulate it with putenv() */
 #ifdef EMULATE_SETENV
 
-char emulate_setenv_buffer[MAX_IDENTIFIER_LENGTH]; /* should be big enough for "var=value" string */
+char emulate_setenv_buffer[CL_MAX_LINE_LENGTH]; /* should be big enough for "var=value" string */
 
 int
 setenv(const char *name, const char *value, int overwrite) {
@@ -104,189 +108,266 @@ print_corpus_info_header(CorpusList *cl,
 
 /* ---------------------------------------------------------------------- */
 
+/**
+ * Creates, and opens for text-mode write, a temporary file.
+ *
+ * Temporary files have the prefix "cqpt.$PID" (where $PID = the process ID of this copy of CQP)
+ * and are placed in the directory defined as TEMPDIR_PATH.
+ *
+ * @see                   TEMPDIR_PATH
+ * @see                   TEMP_FILENAME_BUFSIZE
+ * @param tmp_nam_buffer  A pre-allocated buffer which will be overwritten
+ *                        with the name of the temporary file. This should be at least
+ *                        TEMP_FILENAME_BUFSIZE bytes in size. If opening is unsuccessful,
+ *                        this will be set to "".
+ * @return                A stream (FILE *) to the opened temporary file, or NULL
+ *                        if unsuccessful.
+ */
+/*
 FILE *
-OpenTemporaryFile(char *tmp_name_buffer) {
-  int fnum;
-  FILE *fd;
+open_temporary_file(char *tmp_name_buffer)
+{
+  char *tempfile_name;
+  char prefix[64];
+  FILE *fd = NULL;
 
-  assert((tmp_name_buffer != NULL) && "Invalid NULL argument in OpenTemporaryFile().");
-  sprintf(tmp_name_buffer, "/tmp/cqp.tmp.XXXXXX");
-  fnum = mkstemp(tmp_name_buffer);
-  if (fnum >= 0) {
-    fd = fdopen(fnum, "w");
-    if (fd) 
-      return fd;
-    else {
-      perror("OpenTemporaryFile(): can't open stream for temporary file");
-      close(fnum);
-      return NULL;
-    }
+  assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
+  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); 
+  tempfile_name = tempnam(TEMPDIR_PATH, prefix);
+  if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
+    perror("open_temporary_file(): filename too long for buffer");
+    *tmp_name_buffer = '\0';
+    cl_free(tempfile_name);
+    return NULL;
   }
   else {
-    perror("OpenTemporaryFile(): can't create temporary file");
+    strcpy(tmp_name_buffer, tempfile_name);
+    cl_free(tempfile_name);
+  }
+
+  fd = fopen(tmp_name_buffer, "w");
+
+  if (fd)
+    return fd;
+  else {
+    perror("open_temporary_file(): can't create temporary file");
+    *tmp_name_buffer = '\0';
     return NULL;
   }
 }
+*/
 
+/**
+ * This function is a wrapper round fopen() which provides checks for
+ * different shorthands for a "home" directory, such as ~ or $HOME.
+ *
+ * Its arguments and return values are the same as fopen().
+ *
+ * TODO: The function is retained for backward compatibility. Its use should be
+ * replaced by cl_open_stream() with automagic, but care has to be taken
+ * to change the corresponding fclose() calls to cl_close_stream().
+ */
 FILE *
-OpenFile(char *name, char *mode)
+open_file(char *name, char *mode)
 {
-  if (name == NULL || mode == NULL || 
-      name[0] == '\0' || mode[0] == '\0')
+  if (name == NULL || mode == NULL || name[0] == '\0' || mode[0] == '\0')
     return NULL;
   else if (name[0] == '~' || (strncasecmp(name, "$home", 5) == 0)) {
 
-    char s[1024];
+    char s[CL_MAX_FILENAME_LENGTH];
     char *home;
-    int i, sp;
+    int i, s_offset;
 
     home = getenv("HOME");
 
     if (!home || home[0] == '\0') 
       return NULL;
 
-    sp = 0;
+    s_offset = 0;
 
-    for (i = 0; sp < 1023 && home[i]; i++)
-      s[sp++] = home[i];
+    for (i = 0; s_offset < (CL_MAX_FILENAME_LENGTH-1) && home[i]; i++)
+      s[s_offset++] = home[i];
     
     if (name[0] == '~')
       i = 1;
     else
       i = strlen("$home");
 
-    for ( ; sp < 1023 && name[i]; i++)
-      s[sp++] = name[i];
-    s[sp] = '\0';
+    for ( ; s_offset < (CL_MAX_FILENAME_LENGTH-1) && name[i]; i++)
+      s[s_offset++] = name[i];
+    s[s_offset] = '\0';
     
     return fopen(s, mode);
-    
   }
   else
     return fopen(name, mode);
 }
 
 
-/* try to open pager <cmd> / if different from <tested_pager>, run a test first */
+/**
+ * Create a pipe to a new instance of a specified program to be used as
+ * an output pager.
+ *
+ * If cmd is different from the program specified in the global
+ * variable "tested_pager", run a test first.
+ *
+ * This would normally be something like "more" or "less".
+ *
+ * @see            tested_pager
+ * @see            less_charset_variable
+ * @param cmd      Program command to start pager procress.
+ * @param charset  Charset to which to set the pager-charset-environment variable
+ * @return         Writable stream for the pipe to the pager, or NULL if a
+ *                 test of the pager program failed; must be closed with cl_close_stream()
+ */
 FILE *
-open_pager(char *cmd, CorpusCharset charset) {
+open_pager(char *cmd, CorpusCharset charset)
+{
   FILE *pipe;
 
   if ((tested_pager == NULL) || (strcmp(tested_pager, cmd) != 0)) {
+    /* this is a new pager, so test it */
     pipe = popen(cmd, "w");
     if ((pipe == NULL) || (pclose(pipe) != 0)) {
       return NULL;              /* new pager cmd doesn't work -> return error */
     }
     if (tested_pager != NULL)
-      free(tested_pager);
+      cl_free(tested_pager);
     tested_pager = cl_strdup(cmd);
   }
 
-  /* if (less_charset_variable != "" and charset != ascii) set environment variable accordingly */
-  if (*less_charset_variable && charset != ascii) {     
-    char *new_value = "iso8859"; /* default setting is ISO-8859 */
+  /* if (less_charset_variable != "" ) set environment variable accordingly */
+  if (*less_charset_variable) {
+    char *new_value;
+
+    switch (charset){
+    case ascii:   /* fallthru is intentional: ASCII is a subset of valid UTF-8 */
+    case utf8:    new_value = "utf-8";    break;
+
+    /* "less" does not distinguish between the different ISO-8859 character sets,
+     * so if not using UTF-8, always use ISO-8859
+     */
+    default:      new_value = "iso8859";  break;
+    }
+
     char *current_value = getenv(less_charset_variable);
-    if (charset == utf8) 
-      new_value = "utf-8";      /* UTF-8 */
+
     /* call setenv() if variable is not set or different from desired value */
-    if (!current_value || strcmp(current_value, new_value)) {
+    if (!current_value || strcmp(current_value, new_value) != 0) {
       setenv(less_charset_variable, new_value, 1);
     }
   }
 
-  pipe = popen(cmd, "w");
-  return pipe;                  /* NULL if popen() failed for some reason */
+  return cl_open_stream(cmd, CL_STREAM_WRITE, CL_STREAM_PIPE);
 }
 
+/**
+ * Callback handler for SIGPIPE now moved to <cl_broken_pipe>
+ *
+int broken_pipe = 0;
+
+static void
+bp_signal_handler(int signum)
+{
+#ifndef __MINGW__
+  broken_pipe = 1;
+  if (signal(SIGPIPE, bp_signal_handler) == SIG_ERR)
+    perror("Can't reinstall signal handler for broken pipe");
+#endif
+}
+ */
+
+/**
+ * Open the (output) stream within a Redir(ection) structure.
+ *
+ * If output is sent to a pipe, a signal handler for SIGPIPE is automatically
+ * installed and configured to set the global variable broken_pipe to True.
+ * Output functions should check this variable and abort if it is set. The
+ * signal handler is uninstalled when close_pipe is called, which may lead to
+ * undesired behaviour if multiple streams are open at the same time.
+ *
+ * @param rd       Redir structure to be opened.
+ * @param charset  The charset to be used. Only has an effect if the stream
+ *                 to be opened is to an output pager.
+ * @return         True for success, false for failure.
+ */
 int
 open_stream(struct Redir *rd, CorpusCharset charset)
 {
-  int i;
+  int mode;
 
   assert(rd);
+  if (rd->stream != NULL) {
+    /* stream appears to be already open: close, then reopen */
+    cl_close_stream(rd->stream);
+    rd->stream = NULL;
+  }
 
   if (rd->name) {
-    i = 0;
-    while (rd->name[i] == ' ')
-      i++;
-    
-    if ((rd->name[i] == '|') &&
-        (rd->name[i+1] != '\0')) {
-      
-      if (insecure) {
-        rd->stream = NULL;
-        rd->is_pipe = False;
-        rd->is_paging = False;
-      }
-      else {
-        
-        /* we send the output to a pipe */
-
-        rd->is_pipe = True;
-        rd->is_paging = False;
-        rd->stream = popen(rd->name+i+1, rd->mode);
-      }
-    }
-    else {
-
-      /* normal output to file */
-      
-      rd->is_pipe = False;
-      rd->is_paging = False;
-      rd->stream = OpenFile(rd->name, rd->mode);
-
-    }
+    /* open file (with compression and pipe magic) */
+    mode = (strcmp(rd->mode, "a") == 0) ? CL_STREAM_APPEND : CL_STREAM_WRITE;
+    rd->stream = cl_open_stream(rd->name, mode, (insecure) ? CL_STREAM_MAGIC_NOPIPE : CL_STREAM_MAGIC);
+    rd->is_paging = False;
   }
   else {
     if (pager && paging && isatty(fileno(stdout))) {
       if (insecure) {
         cqpmessage(Error, "Insecure mode, paging not allowed.\n");
-        rd->stream = stdout;
-        rd->is_paging = False;
-        rd->is_pipe = False;
-      }
-      else if ((rd->stream = open_pager(pager, charset)) == NULL) {
-        cqpmessage(Warning, "Could not start pager '%s', trying fallback '%s'.\n", pager, CQP_FALLBACK_PAGER);
-        if ((rd->stream = open_pager(CQP_FALLBACK_PAGER, charset)) == NULL) {
-          cqpmessage(Warning, "Could not start fallback pager '%s'. Paging disabled.\n", CQP_FALLBACK_PAGER);
-          set_integer_option_value("Paging", 0);
-          rd->is_pipe = False;
-          rd->is_paging = False;
-          rd->stream = stdout;
-        }
-        else {
-          rd->is_pipe = 1;
-          rd->is_paging = True;
-          set_string_option_value("Pager", cl_strdup(CQP_FALLBACK_PAGER));
-        }
+        /* ... and default back to bare stdout below */
       }
       else {
-        rd->is_pipe = 1;
-        rd->is_paging = True;
+        rd->stream = open_pager(pager, charset);
+        if (rd->stream == NULL) {
+          cqpmessage(Warning, "Could not start pager '%s', trying fallback '%s'.\n", pager, CQP_FALLBACK_PAGER);
+          rd->stream = open_pager(CQP_FALLBACK_PAGER, charset);
+          if (rd->stream == NULL) {
+            cqpmessage(Warning, "Could not start fallback pager '%s'. Paging disabled.\n", CQP_FALLBACK_PAGER);
+            set_integer_option_value("Paging", 0);
+            /* ... and default back to bare stdout below */
+          }
+          else {
+            set_string_option_value("Pager", cl_strdup(CQP_FALLBACK_PAGER));
+          }
+        }
       }
     }
+    /* if not paging or pager failed to start, open stdout */
+    if (rd->stream != NULL) {
+      rd->is_paging = True;
+    }
     else {
-      rd->stream = stdout;
+      rd->stream = cl_open_stream("", CL_STREAM_WRITE, CL_STREAM_STDIO);
       rd->is_paging = False;
-      rd->is_pipe = False;
     }
   }
-  return (rd->stream == NULL ? 0 : 1);
+
+  if (rd->stream == NULL) {
+    cqpmessage(Error, "Can't write to %s: %s", (rd->name) ? rd->name : "STDOUT", cl_error_string(cl_errno));
+    return 0;
+  }
+  else
+    return 1;
 }
 
+/**
+ * Closes the (output) stream within a Redir structure.
+ *
+ * If output was being sent to a pipe, SIGPIPE is set back to the SIG_IGN handler.
+ *
+ * @param rd  The Redir stream to close.
+ * @return    True for all OK, false if closing did not work. If rd does not
+ *            actually have an open stream, nothing is done, and that counts
+ *            as a success.
+ */
 int
 close_stream(struct Redir *rd)
 {
   int rv = 1;
 
   if (rd->stream) {
-    if (rd->is_pipe)
-      rv = ! pclose(rd->stream); /* pclose returns 0 = success, non-zero = failure */
-    else if (rd->stream != stdout)
-      rv = ! fclose(rd->stream); /* fclose the same */
-
+    rv = !cl_close_stream(rd->stream); /* returns 0 on success */
     rd->stream = NULL;
-    rd->is_pipe = 0;
+    rd->is_paging = 0;
   }
 
   return rv;
@@ -301,45 +382,53 @@ open_input_stream(struct InputRedir *rd)
   char *tmp;
 
   assert(rd);
-
-  /* TODO: check if stream is already open (options: ignore, warning, silently close old stream) */
+  if (rd->stream != NULL) {
+    /* stream appears to be already open: close, then reopen */
+    cl_close_stream(rd->stream);
+    rd->stream = NULL;
+  }
 
   if (rd->name) {
+    /* Check for old-style pipe notation, i.e.
+     *   ... < "ls -l |";
+     * which is unfortunately documented in the CQP tutorial.  New-style notation
+     *   ... < "| ls -l";
+     * is automatically supported by cl_open_stream();
+     */
     i = strlen(rd->name) - 1;
-    if (i < 0) i = 0;
     while (i > 0 && rd->name[i] == ' ')
       i--;
     
-    if ((rd->name[i] == '|') && i >= 1) {
-
+    if (i >= 1 && (rd->name[i] == '|')) {
       /* read input from a pipe (unless running in "secure" mode) */
       if (insecure) {
+        cqpmessage(Error, "Insecure mode, paging not allowed.\n");
         rd->stream = NULL;
-        rd->is_pipe = False;
+        return 0;
       }
       else {
-        rd->is_pipe = True;
-        tmp = (char *) cl_malloc(i + 1);
+        tmp = (char *) cl_malloc(i + 1); /* pipe command = rd->name[0 .. (i-1)] */
         strncpy(tmp, rd->name, i);
         tmp[i] = '\0';
-        rd->stream = popen(tmp, "r");
+        rd->stream = cl_open_stream(tmp, CL_STREAM_READ, CL_STREAM_PIPE);
         cl_free(tmp);
       }
-
     }
     else {
-
-      /* normal input from a regular file */
-      rd->is_pipe = False;
-      rd->stream = OpenFile(rd->name, "r");
-
+      /* open stream with CL automagic */
+      rd->stream = cl_open_stream(rd->name, CL_STREAM_READ, (insecure) ? CL_STREAM_MAGIC_NOPIPE : CL_STREAM_MAGIC);
     }
   }
   else {
-    rd->stream = stdin;
-    rd->is_pipe = True;  /* stdin behaves like a pipe */
+    rd->stream = cl_open_stream("", CL_STREAM_READ, CL_STREAM_STDIO);
   }
-  return (rd->stream == NULL ? 0 : 1);
+
+  if (rd->stream == NULL) {
+    cqpmessage(Error, "Can't read from %s: %s", (rd->name) ? rd->name : "STDIN", cl_error_string(cl_errno));
+    return 0;
+  }
+  else
+    return 1;
 }
 
 int
@@ -347,38 +436,20 @@ close_input_stream(struct InputRedir *rd)
 {
   int rv = 1;
 
-  if (rd->stream && rd->stream != stdin) {
-    if (rd->is_pipe)
-      rv = ! pclose(rd->stream); /* pclose returns 0 = success, non-zero = failure */
-    else
-      rv = ! fclose(rd->stream); /* fclose the same; */
+  if (rd->stream) {
+    rv = !cl_close_stream(rd->stream); /* returns 0 on success */
+    rd->stream = NULL;
   }
 
-  rd->stream = NULL;
-  rd->is_pipe = 0;
   return rv;
 }
 
 
 /* ---------------------------------------------------------------------- */
 
-
-int broken_pipe;
-
-static void 
-bp_signal_handler(int signum)
-{
-  broken_pipe = 1;
-
-  /* fprintf(stderr, "Handle broken pipe signal\n"); */
-
-  if (signal(SIGPIPE, bp_signal_handler) == SIG_ERR)
-    perror("Can't reinstall signal handler for broken pipe");
-}
-
-
-/* ---------------------------------------------------------------------- */
-
+/* print_output():
+ * Ausgabe von CL, ohne Header, auf stream
+ */
 void 
 print_output(CorpusList *cl, 
              FILE *fd,
@@ -411,6 +482,21 @@ print_output(CorpusList *cl,
   }
 }
 
+/**
+ * Prints a corpus, typically (some of) the matches of a query.
+ *
+ * (Not sure why it's called "catalog"; is this a pun on the cat keyword? -- AH 2012-07-17)
+ * (I suspect that it's a misinterpretation of what "cat" stands for. -- SE 2016-07-20)
+ *
+ * The query is represented by a subcorpus (cl); only results
+ * #first..#last; will be printed; use (0,-1) for entire corpus.
+ *
+ * @param cl     The corpus/subcorpus/query to output.
+ * @param rd     Block of output redirection info; if NULL, default settings will be used.
+ * @param first  Offset of first match to print.
+ * @param last   Offset of last match to print.
+ * @param mode   Print mode to use.
+ */
 void 
 catalog_corpus(CorpusList *cl,
                struct Redir *rd,
@@ -429,7 +515,6 @@ catalog_corpus(CorpusList *cl,
     default_redir.name = NULL;
     default_redir.mode = "w";
     default_redir.stream = NULL;
-    default_redir.is_pipe = 0;
     rd = &default_redir;
   }
 
@@ -460,21 +545,14 @@ catalog_corpus(CorpusList *cl,
 
     printHeader = GlobalPrintOptions.print_header;
 
-    /* fraglich... */
+    /* questionable... */
     if (GlobalPrintMode == PrintHTML)
       printHeader = True;
-
-    if (rd->is_pipe && handle_sigpipe) {
-      if (signal(SIGPIPE, bp_signal_handler) == SIG_ERR)
-        perror("Can't install signal handler for broken pipe (ignored)");
-    }
 
     /* do the job. */
     
     verify_context_descriptor(cl->corpus, &CD, 1);
     
-    broken_pipe = 0;
-
     /* first version (Oli Christ):
        if ((!silent || printHeader) && !(rd->stream == stdout || rd->is_paging));
        */
@@ -482,32 +560,35 @@ catalog_corpus(CorpusList *cl,
        if (printHeader || (mode == PrintASCII && !(rd->stream == stdout || rd->is_paging))); 
     */
 
-    /* header is printed _only_ when explicitly requested now
-     * (previous behaviour was to print header automatically when saving results to a file;
+    /* header is printed _only_ when explicitly requested now (or, when in HTML mode; see above);
+     * previous behaviour was to print header automatically when saving results to a file;
      * this makes sense when such files are created to document the results of a corpus search,
      * but nowadays they are mostly used for automatic post-processing (e.g. in a Web interface),
-     * where the header is just a nuisance that has to be stripped)
+     * where the header is just a nuisance that has to be stripped.
      */
     if (printHeader) {
       /* print something like a header */
       print_corpus_info_header(cl, rd->stream, mode, 1);
     }
     else if (printNrMatches && mode == PrintASCII)
-      fprintf(rd->stream, "%d matches.\n", cl->size);
+      Rprintf("%d matches.\n", cl->size);
     
     print_output(cl, rd->stream, 
                  isatty(fileno(rd->stream)) || rd->is_paging, 
                  &CD, first, last, mode);
-    
-    if (rd->is_paging && handle_sigpipe)
-      if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        perror("Can't reinstall SIG_IGN signal handler");
-    
+
   }
 
   close_stream(rd);
 }
 
+/**
+ * Print a message to output (for instance a debug message).
+ *
+ * @see           MessageType
+ * @param type    Specifies what type of message (messages of some types are not always printed)
+ * @param format  Format string (and ...) are passed as arguments to vfprintf().
+ */
 void 
 cqpmessage(MessageType type, char *format, ...)
 {
@@ -515,6 +596,7 @@ cqpmessage(MessageType type, char *format, ...)
 
   va_start(ap, format);
 
+  /* do not print Message unless parser is in verbose mode */
   if ((type != Message) || verbose_parser) {
     
     char *msg;
@@ -538,77 +620,88 @@ cqpmessage(MessageType type, char *format, ...)
     }
 
     if (!silent || type == Error) {
-      fprintf(stderr, "%s:\n\t", msg);
-      vfprintf(stderr, format, ap);
-      fprintf(stderr, "\n");
+      Rprintf("%s:\n\t", msg);
+      Rprintf(format, ap);
+      Rprintf("\n");
     }
 
   }
   va_end(ap);
 }
 
+/**
+ * Outputs a blob of information on the mother-corpus of the specified cl.
+ */
 void 
 corpus_info(CorpusList *cl)
 {
   FILE *fd;
   FILE *outfd;
-  char buf[1024];
+  char buf[CL_MAX_LINE_LENGTH];
   int i, ok, stream_ok;
-  struct Redir rd = { NULL, NULL, NULL, 0, 0 }; /* for paging (with open_stream()) */
+  struct Redir rd = { NULL, NULL, NULL, 0 }; /* for paging (with open_stream()) */
 
-  CorpusList * mom = NULL;
+  CorpusList *mom = NULL;
   CorpusProperty p;
 
+  /* first, the case where cl is actually a full corpus */
   if (cl->type == SYSTEM) {
+
     stream_ok = open_stream(&rd, ascii);
     outfd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
     /* print size (should be the mother_size entry) */
-    fprintf(outfd, "Size:    %d\n", cl->mother_size);
+    Rprintf("Size:    %d\n", cl->mother_size);
     /* print charset */
-    fprintf(outfd, "Charset: ");
+    Rprintf("Charset: ");
 
     if (cl->corpus->charset == unknown_charset) {
-      fprintf(outfd, "<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
+      Rprintf("<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
     }
     else {
-      fprintf(outfd, "%s\n", cl_charset_name(cl->corpus->charset));
+      Rprintf("%s\n", cl_charset_name(cl->corpus->charset));
     }
     /* print properties */
-    fprintf(outfd, "Properties:\n");
+    Rprintf("Properties:\n");
     p = cl_first_corpus_property(cl->corpus);
     if (p == NULL)
-      fprintf(outfd, "\t<none>\n");
+      Rprintf("\t<none>\n");
     else 
       for ( ; p != NULL; p = cl_next_corpus_property(p))
-        fprintf(outfd, "\t%s = '%s'\n", p->property, p->value);
-    fprintf(outfd, "\n");
+        Rprintf("\t%s = '%s'\n", p->property, p->value);
+    Rprintf("\n");
     
 
     if (cl->corpus->info_file == NULL)
-      fprintf(outfd, "No further information available about %s\n", cl->name);
-    else if ((fd = OpenFile(cl->corpus->info_file, "r")) == NULL)
+      Rprintf("No further information available about %s\n", cl->name);
+    else if ((fd = open_file(cl->corpus->info_file, "rb")) == NULL)
       cqpmessage(Warning,
                  "Can't open info file %s for reading",
                  cl->corpus->info_file);
     else {
       ok = 1;
       do {
-        i = fread(&buf[0], sizeof(char), 1024, fd);
+        i = fread(&buf[0], sizeof(char), CL_MAX_LINE_LENGTH, fd);
         if (fwrite(&buf[0], sizeof(char), i, outfd) != i)
           ok = 0;
-      } while (ok && (i == 1024));
+      } while (ok && (i == CL_MAX_LINE_LENGTH));
+      /* makes sure that .info file always ends in a newline,
+       * thus ensuring that output from the "info;" command always does too.*/
+      if (buf[strlen(buf)-1] != '\n')
+        Rprintf("\n");
       fclose(fd);
     }
 
     if (stream_ok) 
       close_stream(&rd);        /* close pipe to pager if we were using it */
   }
+  /* if cl is not actually a full corpus, try to find its mother and call this function on that */
   else if (cl->mother_name == NULL)
     cqpmessage(Warning, 
                "Corrupt corpus information for %s", cl->name);
   else if ((mom = findcorpus(cl->mother_name, SYSTEM, 0)) != NULL) {
     corpus_info(mom);
   }
+  /* if the mother is not loaded, we just have to print an error */
   else {
     cqpmessage(Info,
                "%s is a subcorpus of %s which is not loaded. Try 'info %s' "
@@ -619,6 +712,7 @@ corpus_info(CorpusList *cl)
 
 /* ---------------------------------------------------------------------- */
 
+/** free global list of tabulation items (before building new one) */
 void 
 free_tabulation_list(void) {
   TabulationItem item = TabulationList;
@@ -634,6 +728,7 @@ free_tabulation_list(void) {
   TabulationList = NULL;
 }
 
+/** allocate and initialize new tabulation item */
 TabulationItem
 new_tabulation_item(void) {
   TabulationItem item = (TabulationItem) cl_malloc(sizeof(struct _TabulationItem));
@@ -649,6 +744,7 @@ new_tabulation_item(void) {
   return item;
 }
 
+/** append tabulation item to end of current list */
 void
 append_tabulation_item(TabulationItem item) {
   TabulationItem end = TabulationList;
@@ -663,8 +759,19 @@ append_tabulation_item(TabulationItem item) {
   }
 }
 
+/**
+ * Gets the cpos of one of the "anchors" of a particular query result. Used for tabulation.
+ *
+ * @param cl      The query being tabulated.
+ * @param n       The number of the match we are requesting an anchor for (where first match is 0).
+ * @param anchor  Which of the anchors of the query match we are requesting.
+ * @param offset  Integer offset from the anchor that we are requesting.
+ * @return        The cpos of the requested position, which may fall outside the bounds of the corpus
+ *                if an offset has been specified; or CDA_CPOSUNDEF if the anchor has not been set.
+ */
 int
-pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset) {
+pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset)
+{
   int real_n, cpos;
 
   real_n = (cl->sortidx) ? cl->sortidx[n] : n; /* get anchor for n-th match */
@@ -687,13 +794,12 @@ pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset) {
     break;
   }
 
-  if (cpos < 0) return cpos;    /* -1 indicates undefined anchor */
-  
-  cpos += offset;
-  if (cpos < 0) cpos = 0;
-  if (cpos >= cl->mother_size) cpos = cl->mother_size - 1;
+  /* undefined anchor (-1) or invalid anchor position */
+  if (cpos < 0 || cpos >= cl->mother_size)
+    return CDA_CPOSUNDEF;
 
-  return cpos;
+  /* return anchor position with offset, may be out of bounds now */
+  return cpos + offset;
 }
 
 int
@@ -713,7 +819,8 @@ pt_validate_anchor(CorpusList *cl, FieldType anchor) {
     break;
   case MatchField:
   case MatchEndField:
-    assert(cl->range && cl->size > 0);
+    /* should always be present */
+    assert(cl->range != NULL);
     break;
   case NoField:
   default:
@@ -724,8 +831,11 @@ pt_validate_anchor(CorpusList *cl, FieldType anchor) {
   return 1;
 }
 
+/** tabulate specified query result, using settings from global list of tabulation items;
+   return value indicates whether tabulation was successful (otherwise, generates error message) */
 int
-print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd) {
+print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
+{
   TabulationItem item = TabulationList;
   int current;
   
@@ -755,8 +865,11 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd) {
     else {
       item->attribute_type = ATT_NONE; /* no attribute -> print corpus position */
     }
-    if (! (pt_validate_anchor(cl, item->anchor1) && pt_validate_anchor(cl, item->anchor2)))
-      return 0;
+    if (cl->size > 0) {
+      /* work around bug: anchor validation will fail for empty query result (but then loop below is void anyway) */
+      if (! (pt_validate_anchor(cl, item->anchor1) && pt_validate_anchor(cl, item->anchor2)))
+        return 0;
+    }
     item = item->next;
   }
 
@@ -766,22 +879,24 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd) {
   }
 
   /* tabulate selected attribute values for matches <first> .. <last> */
-  for (current = first; current <= last; current++) {
+  for (current = first; (current <= last) && !cl_broken_pipe; current++) {
     TabulationItem item = TabulationList;
     while (item) {
       int start = pt_get_anchor_cpos(cl, current, item->anchor1, item->offset1);
       int end   = pt_get_anchor_cpos(cl, current, item->anchor2, item->offset2);
       int cpos;
 
-      if (start < 0 || end < 0) /* one of the anchors is undefined -> print single undefined value for entire range */
+      /* if either of the anchors is undefined, print a single undef value for the entire range */
+      if (start == CDA_CPOSUNDEF || end == CDA_CPOSUNDEF)
         start = end = -1;
 
       for (cpos = start; cpos <= end; cpos++) {
-        if (item->attribute_type == ATT_NONE) {
-          fprintf(rd->stream, "%d", cpos);
-        }
-        else {
-          if (cpos >= 0) {      /* undefined anchors print empty string */
+        if (cpos >= 0 && cpos <= cl->mother_size) {
+          /* valid cpos: print cpos or requested attribute */
+          if (item->attribute_type == ATT_NONE) {
+            Rprintf("%d", cpos);
+          }
+          else {
             char *string = NULL;
             if (item->attribute_type == ATT_POS) 
               string = cl_cpos2str(item->attribute, cpos);
@@ -789,25 +904,30 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd) {
               string = cl_cpos2struc2str(item->attribute, cpos);
             if (string) {
               if (item->flags) {
-                char *copy = cl_strdup(string);
-                cl_string_canonical(copy, item->flags);
-                fprintf(rd->stream, "%s", copy);
+                /* get canonical string as newly alloc'ed duplicate, then print */
+                char *copy = cl_string_canonical(string, cl->corpus->charset, item->flags, CL_STRING_CANONICAL_STRDUP);
+                Rprintf("%s", copy);
                 cl_free(copy);
               }
               else {
-                fprintf(rd->stream, "%s", string);
+                Rprintf("%s", string);
               }
             }
           }
         }
-        if (cpos < end)         /* multiple values for tabulation item are separated by blanks */
-          fprintf(rd->stream, " "); 
+        else {
+          /* cpos out of bounds: print -1 or empty string */
+          if (item->attribute_type == ATT_NONE)
+            Rprintf("-1");
+        }
+        if (cpos < end)         /* tokens in a range item are separated by blanks */
+          Rprintf(" "); 
       }
       if (item->next)           /* multiple tabulation items are separated by TABs */
-        fprintf(rd->stream, "\t");
+        Rprintf("\t");
       item = item->next;
     }
-    fprintf(rd->stream, "\n");
+    Rprintf("\n");
   }
   
   close_stream(rd);

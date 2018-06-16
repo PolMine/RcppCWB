@@ -18,9 +18,6 @@
 #ifndef _cdaccess_h_
 #define _cdaccess_h_
 
-#include "globals.h"
-#include "attributes.h"
-
 /* error codes now in <cl.h> */
 
 /* typedef struct _DCR DynCallResult; now in <cl.h> */

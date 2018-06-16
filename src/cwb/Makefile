@@ -47,41 +47,13 @@
 TOP = $(R_PACKAGE_SOURCE)
 include $(TOP)/config.mk
 
-
-SUBDIRS = cl cqp	# subdirectories that have their own makefiles
+# targets for external libraries; currently not used (Glib and PCRE assumed to be on the system already)
+SUBDIRS = cl cqp # subdirectories that have their own makefiles
 SRCDIRS = cl cqp utils CQi	# subdirectories containing C source code
 
 
 .PHONY: clean realclean depend all test install uninstall release mingw-libgnurx-2.5.1 cl cqp utils man instutils tags size
 
-default:
-	@$(ECHO) "Please type one of the following:"
-	@$(ECHO) ""
-	@$(ECHO) "  make clean     remove binaries and temporary files"
-	@$(ECHO) "  make realclean deletes all automatically generated files"
-	@$(ECHO) "  make depend    updated dependencies"
-	@$(ECHO) "  make all       build CWB libaries, programs and man pages"
-	@$(ECHO) "  make install   install CWB into chosen location"
-	@$(ECHO) "  make release   create binary release in build/ directory"
-	@$(ECHO) ""
-	@$(ECHO) "  make cl        build low-level corpus library (CL)"
-	@$(ECHO) "  make cqp       build CQP query processor"
-	@$(ECHO) "  make utils     build command-line utilities"
-	@$(ECHO) "  make man       update manpages from POD sources"
-	@$(ECHO) "  make doxygen   update HTML code documentation"
-	@$(ECHO) "  make instutils configure installation scripts"
-	@$(ECHO) "  make tags      generate symbol index for GNU Emacs"
-	@$(ECHO) "  make size      check total size of CWB source code"   
-
-all:  $(EXTERNALS)
-	@$(ECHO) "--------------------------------- BUILDING CORPUS LIBRARY (CL)"
-	$(MAKE) -C cl
-	@$(ECHO) "--------------------------------- BUILDING CQP"
-	$(MAKE) -C cqp
-	@$(ECHO) "--------------------------------- BUILDING COMMAND-LINE UTILITIES"
-	$(MAKE) -C utils
-	@$(ECHO) "--------------------------------- BUILDING MANPAGES"
-	$(MAKE) -C man
 
 cl:
 	@$(ECHO) "--------------------------------- BUILDING CORPUS LIBRARY (CL)"
@@ -99,19 +71,6 @@ man:
 	@$(ECHO) "--------------------------------- BUILDING MANPAGES"
 	$(MAKE) -C man
 
-doxygen:
-	@$(ECHO) "--------------------------------- BUILDING CODE DOCUMENTATION"
-	-$(RM) -rf doc/html/*
-	doxygen doc/doxygen-config
-	(cd doc && perl textile2html.perl)
-
-instutils:
-	@$(ECHO) "--------------------------------- CONFIGURING INSTUTILS"
-	$(MAKE) -C instutils
-
-test:
-	@$(ECHO) "ERROR: no self tests available at the moment."
-#	$(MAKE) -C test
 
 size:
 	for i in $(SUBDIRS) ;\
@@ -131,41 +90,3 @@ clean:
 	-$(RM) *~ config/*/*~ CQi/*~ CQi/*.o technical/*~ TAGS
 	-$(RM) -rf build
 
-realclean:	clean
-	for i in $(SUBDIRS) ; do $(MAKE) -C $$i realclean; done;
-
-install:
-	$(MAKE) -C cl install   # not in for loop to make sure we abort on error
-	$(MAKE) -C cqp install
-	$(MAKE) -C utils install
-	$(MAKE) -C man install
-	$(MAKE) -C instutils all
-	$(MAKE) -C instutils install
-
-release:
-	if [ -d "$(RELEASE_DIR)" ]; then $(RM) -rf "$(RELEASE_DIR)"; fi
-	$(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)"
-	$(MAKE) -C cl release
-	$(MAKE) -C cqp release
-	$(MAKE) -C utils release
-	$(MAKE) -C man release
-	$(MAKE) -C instutils all
-	$(MAKE) -C instutils release
-	if [ -f "$(RELEASE_COMPRESSED_FILENAME)" ]; then $(RM) "$(RELEASE_COMPRESSED_FILENAME)"; fi
-	(cd build/ && $(COMPRESS_COMMAND) "$(RELEASE_COMPRESSED_FILENAME)" "$(RELEASE_NAME)")
-	@$(ECHO) "==> CREATED BINARY RELEASE build/$(RELEASE_COMPRESSED_FILENAME)"
-
-uninstall:
-	@$(ECHO) "ERROR: uninstall operation is currently not supported!"
-# 	for i in $(SUBDIRS) ;\
-# 	do \
-# 	$(MAKE) -C $$i uninstall; \
-# 	done;
-
-tags:
-	rm -f TAGS
-	for i in $(SRCDIRS) ;\
-	do \
-	$(ETAGS) -a -o TAGS $$i/*.[chly]; \
-	done
-# NB "-a" option is required because we build the TAGS file incrementally

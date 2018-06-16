@@ -79,6 +79,8 @@ check_strucs <- function(corpus, s_attribute, strucs, registry){
     stop("all values of vector strucs need to be >= 0")
   if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1))
     stop("highest value of strucs may not be larger than size of structural attribute")
+  if (any(is.na(strucs)))
+    stop("there is an NA value among strucs")
   return( TRUE )
 }
 
@@ -94,8 +96,12 @@ check_region_matrix <- function(region_matrix){
 #' @export check_cqp_query
 #' @rdname checks
 check_cqp_query <- function(query){
-  if (!substr(query, start = length(query), stop = length(query)) == ";"){
-    return( paste0(query, ";", sep = "") )
+  if (!substr(query, start = nchar(query), stop = nchar(query)) == ";"){
+    encoding_query <- Encoding(query)
+    retval <- paste0(query, ";", sep = "")
+    if (Encoding(retval) != encoding_query)
+      retval <- iconv(retval, from = Encoding(retval), to = encoding_query)
+    return( retval )
   } else {
     return( query )
   }
@@ -105,12 +111,12 @@ check_cqp_query <- function(query){
 #' @rdname checks
 check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
   attr_max <- cl_attribute_size(corpus = corpus, attribute = p_attribute, attribute_type = "p", registry = registry)
-  if (min(cpos) < 0){
+  if (min(cpos) < 0)
     stop("all corpus positions (cpos) need to be >= 0, not TRUE")
-  }
-  if (max(cpos) > attr_max){
+  if (max(cpos) > attr_max)
     stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
-  }
+  if (any(is.na(cpos)))
+    stop("there are NA values among the corpus positions")
   return( TRUE )
 }
 
@@ -118,11 +124,64 @@ check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv
 #' @rdname checks
 check_id <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
   lexicon_size <- cl_lexicon_size(corpus = corpus, p_attribute = p_attribute, registry = registry)
-  if (min(id) < 0){
+  if (min(id) < 0)
     stop("all corpus positions (cpos) need to be >= 0, not TRUE")
-  }
-  if (max(id) > lexicon_size){
+  if (max(id) > lexicon_size)
     stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
-  }
+  if (any(is.na(id)))
+    stop("there are NA values among the corpus positions")
   return( TRUE )
+}
+
+#' Check Paths in Registry Files
+#' 
+#' @param pkg Full path to package directory
+#' @param set Logical, whether 
+#' @return Logical value, whether home directories are set correctly.
+#' @export check_pkg_registry_files
+check_pkg_registry_files <- function(pkg = system.file(package = "RcppCWB"), set = FALSE){
+  pkg_cwb_dir <- file.path(pkg, "extdata", "cwb")
+  pkg_registry_dir <- file.path(pkg_cwb_dir, "registry")
+  pkg_indexed_corpora_dir <- file.path(pkg_cwb_dir, "indexed_corpora")
+  is_set <- lapply(
+    list.files(pkg_registry_dir),
+    function(corpus){
+      registry_file <- file.path(pkg_registry_dir, corpus)
+      registry <- readLines(registry_file)
+      home_line_no <- grep("^HOME", registry)
+      info_line_no <- grep("^INFO", registry)
+      registry_home_dir <- gsub("^HOME\\s+\"*(.*?)\"*\\s*$", "\\1", registry[home_line_no])
+      registry_info_file <- gsub("^INFO\\s+\"*(.*?)\"*\\s*$", "\\1", registry[info_line_no])
+      pkg_home_dir <- file.path(pkg_indexed_corpora_dir, corpus)
+      if (!identical(x = registry_home_dir, y = pkg_home_dir)) {
+        if (set){
+          message(sprintf("... adjusting data directory in registry for corpus '%s' in package '%s'", corpus, pkg))
+          info_file_new <- file.path(pkg_home_dir, basename(registry_info_file), fsep = "/")
+          if (.Platform$OS.type == "windows") {
+            registry[home_line_no] <- sprintf("HOME \"%s\"", pkg_home_dir)
+            registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
+          } else {
+            if (grepl("\\s+", pkg_home_dir)) {
+              registry[grep("^HOME", registry)] <- sprintf("HOME \"%s\"",  pkg_home_dir)
+              registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
+            } else {
+              registry[grep("^HOME", registry)] <- sprintf("HOME %s", pkg_home_dir)
+              registry[info_line_no] <- sprintf("INFO %s", info_file_new)
+            }
+          }
+          if (file.access(registry_file, mode = 2) == -1){
+            warning(sprintf("Not sufficient permissions to modify registry file %s", registry_file),
+                    " which would be necessary to have access to sample corpora in package. ",
+                    "Consider loading package with admin rights one."
+            )
+          }
+          writeLines(text = registry, con = registry_file, sep = "\n")
+          return(TRUE)
+        } else {
+          return(FALSE)
+        }
+      }
+    }
+  )
+  all(unlist(is_set))
 }

@@ -18,7 +18,9 @@
 
 
 #include <sys/time.h>
+#ifndef __MINGW__
 #include <sys/resource.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -57,8 +59,6 @@
 /* macro expansion */
 #include "macro.h"
  
-
-
 /* ============================================================ YACC IF */
 
 extern int yychar;
@@ -73,18 +73,22 @@ void yyerror (char *s)
 
 void warn_query_lock_violation(void) {
   if (which_app != cqpserver)
-    fprintf(stderr, "WARNING: query lock violation attempted\n");
+    Rprintf("WARNING: query lock violation attempted\n");
   query_lock_violation++;       /* this is for the CQPserver */
 }
 
 /* ============================================================ */
 
+/* note: SYCHRONIZE is a windows API identifier, and it doesn't seem at all
+necessary here - it is just defined, then tested.
+So: commented out. AH 2/4/2010
 #define SYNCHRONIZE
+*/
 
 void
 synchronize(void)
 {
-#if defined(SYNCHRONIZE)
+/*#if defined(SYNCHRONIZE)*/
   int macro_status;
 
   /* delete macro buffers & disable macro expansion while sync'ing */
@@ -93,18 +97,18 @@ synchronize(void)
   enable_macros = 0;
 
   if (cqp_input_string != NULL) {
-    fprintf(stderr, "Synchronizing to end of line ... \n");
+    Rprintf("Synchronizing to end of line ... \n");
     while (!(yychar <= 0))
       yychar = yylex();
   }
   else {
-    fprintf(stderr, "Synchronizing until next ';'...\n");
+    Rprintf("Synchronizing until next ';'...\n");
     while (!(yychar <= 0 || yychar == ';'))
       yychar = yylex();
   }
 
   enable_macros = macro_status; /* reset enable_macros to previous value */
-#endif
+/*#endif*/
 }
 
 #define YYERROR_VERBOSE
@@ -183,9 +187,9 @@ synchronize(void)
   TabulationItem     tabulation_item;
 }
 
-%token <strval> ID QID LABEL STRING FLAG TAGSTART TAGEND VARIABLE IPAddress IPSubnet
+%token <strval> ID QID NQRID LABEL STRING FLAG TAGSTART TAGEND VARIABLE IPAddress IPSubnet
 %token <ival> INTEGER
-%token <fval> FLOAT
+%token <fval> DOUBLEFLOAT
 %token <field> FIELD FIELDLABEL ANCHORTAG ANCHORENDTAG
 %token <search_strategy> SEARCH_STRATEGY
 
@@ -259,20 +263,21 @@ synchronize(void)
 %token EOL_SYM           /* '.EOL.' */
 %token ELLIPSIS          /* '..' or '...' */
 
-%token MATCHALL                 /* [] */
-%token LCSTART                  /* [: */
-%token LCEND                    /* :] */
-%token LCMATCHALL               /* [::] */
+%token MATCHALL          /* [] */
+%token LCSTART           /* [: */
+%token LCEND             /* :] */
+%token LCMATCHALL        /* [::] */
+%token EXTENSION         /* (? */        
 
 %token PLUSEQ
 %token MINUSEQ
 
-%token UNLOCK_SYM               /* unlock 'QueryLock' mode */
+%token UNLOCK_SYM        /* unlock 'QueryLock' mode */
 
-%token USER_SYM                 /* CQPserver user authentication */
+%token USER_SYM          /* CQPserver user authentication */
 %token HOST_SYM
 
-%token UNDEFINED_MACRO          /* dummy symbol which forces parse error when an undefined macro is encountered */
+%token UNDEFINED_MACRO   /* dummy symbol which forces parse error when an undefined macro is encountered */
 %token MACRO_SYM
 
 %token RANDOMIZE_SYM
@@ -281,7 +286,7 @@ synchronize(void)
 %token INCLUSIVE_SYM
 %token EXCLUSIVE_SYM
 
-%token NULL_SYM           /* 'NULL' */
+%token NULL_SYM          /* 'NULL' */
 
 
   /* operator precedence */
@@ -292,14 +297,14 @@ synchronize(void)
 
 %type <evalt> RegWordfExpr RegWordfTerm RegWordfFactor RegWordfPower
 %type <evalt> Repeat MUStatement MeetStatement UnionStatement
-%type <ival> OptNumber OptInteger OptMaxNumber OptionalFlag CutStatement OptNot OptKeep
+%type <ival> OptNumber OptInteger PosInt OptMaxNumber OptionalFlag CutStatement OptNot OptKeep
 %type <ival> OptExpansion OptPercent InclusiveExclusive
 %type <index> NamedWfPattern WordformPattern XMLTag AnchorPoint
 %type <evalt> TabPatterns TabOtherPatterns
 %type <boolt> GlobalConstraint ExtConstraint LookaheadConstraint BoolExpr
 %type <boolt> RelExpr RelLHS RelRHS FunctionCall
 %type <boolo> RelOp
-%type <strval> LabelReference OptRefId
+%type <strval> LabelReference OptRefId ID_OR_NQRID
 %type <context> Description MeetContext OptDistance
 %type <direction> OptDirection
 %type <redir> OptionalRedir Redir
@@ -308,9 +313,10 @@ synchronize(void)
 %type <varsetting> VariableValueSpec
 
 %type <cl> CorpusCommand UnnamedCorpusCommand CID OptionalCID 
-%type <cl> CYCommand Query AQuery CorpusSetExpr SubsetExpr MUQuery 
+%type <cl> CYCommand Query AQuery CorpusSetExpr TranslateExpr SubsetExpr MUQuery 
 %type <cl> StandardQuery TABQuery
 
+%type <strval> EmbeddedModifier
 %type <ival> OptTargetSign
 %type <apl> FunctionArgList SingleArg
 %type <varval> VarValue
@@ -321,6 +327,10 @@ synchronize(void)
 %type <tabulation_item> TabulationItem
 %type <AnchorPair> TabulationRange
 %type <AttributeSpecification> OptAttributeSpec
+
+/* -------------------- Group */
+
+%type <ival> GroupBy
 
 /* -------------------- Sort */
 
@@ -349,13 +359,15 @@ synchronize(void)
 
 /* ============================================================ RULES */
 
+/* a note for the non-Bison/Yacc savvy: "epsilon" = an empty rule alternative */ 
+
 line:                                  { prepare_parse(); }
                   command              { if (generate_code)
                                            addHistoryLine();
                                          resetQueryBuffer();
                                          YYACCEPT; }
                 | ';'                 { YYACCEPT; }  /* empty command */
-                | /* eps */           { YYACCEPT; }
+                | /* epsilon */       { YYACCEPT; }
                 ;
 
 command:                                 { prepare_input(); }
@@ -366,8 +378,8 @@ command:                                 { prepare_input(); }
                         query_lock = 0;
                       }
                       else {
-                        fprintf(stderr, "ALERT! Query lock violation.\n");
-                        printf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
+                        Rprintf("ALERT! Query lock violation.\n");
+                        Rprintf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
                         exit(1);
                       }
                     } ';'
@@ -376,9 +388,9 @@ command:                                 { prepare_input(); }
                   InteractiveCommand ';' { }
                 |                        {if (query_lock) {warn_query_lock_violation(); YYABORT;} }
                   EXIT_SYM               { exit_cqp++; }
-                | error                  { /* in case of syntax errors, don't save 
-                                              history file */
-                                           synchronize();
+                | error                  { if (yychar == YYEMPTY) yychar = yylex(); /* so synchronize works if lookahead yychar is empty */
+                						   synchronize();
+                						   /* in case of syntax errors, don't save history file */
                                            resetQueryBuffer();
                                            YYABORT; /* Oli did this:   yyerrok; */
                                            /* but we don't want to continue processing a line, when part of it failed */
@@ -388,6 +400,7 @@ command:                                 { prepare_input(); }
 CorpusCommand:  UnnamedCorpusCommand    { $$ = $1; }
                 | ID '=' UnnamedCorpusCommand
                                         { $$ = in_CorpusCommand($1, $3); }
+                | ID '=' TranslateExpr  { $$ = in_CorpusCommand($1, after_CorpusSetExpr($3)); }
                 ;
 
 UnnamedCorpusCommand:
@@ -431,16 +444,19 @@ EOLCmd:           EOL_SYM               { printf("-::-EOL-::-\n"); fflush(stdout
                 ;
 
 Cat:              CAT_SYM OptionalCID
-                          OptionalRedir       { do_cat($2, &($3), 0, -1); } 
+                          OptionalRedir       { do_cat($2, &($3), 0, -1); cl_free($3.name); } 
                   /* cat entire subcorpus */
                 | CAT_SYM OptionalCID OptFROM INTEGER OptTO INTEGER
-                          OptionalRedir       { do_cat($2, &($7), $4, $6); } 
+                          OptionalRedir       { do_cat($2, &($7), $4, $6); cl_free($7.name); } 
                   /* cat part of subcorpus (matches #$3 .. #$4) */
                 | CAT_SYM CorpusSetExpr OptionalRedir   
                           { if (generate_code) 
                               do_cat($2, &($3), 0, -1);
+                            cl_free($3.name);
                             drop_temp_corpora();
                           }
+                | CAT_SYM STRING 
+                          OptionalRedir       { do_echo($2, &($3)); cl_free($3.name); cl_free($2); } 
                 ;
 
 Saving:           SAVE_SYM OptionalCID
@@ -448,36 +464,31 @@ Saving:           SAVE_SYM OptionalCID
                 ;
 
 OptionalRedir:    Redir
-                | /* epsilon */         { $$.name = (char *)NULL;
-                                          $$.mode = (char *)NULL;
-                                          $$.stream = stdout;
-                                          $$.is_pipe = 0;
+                | /* epsilon */         { $$.name = NULL; /* will open STDOUT */
+                                          $$.mode = "w";
+                                          $$.stream = NULL;
                                         }
                 ;
 
 Redir:            '>' STRING            { $$.name = $2;
                                           $$.mode = "w";
                                           $$.stream = NULL;
-                                          $$.is_pipe = 0;
                                         }
                 | APPEND STRING         { $$.name = $2;
                                           $$.mode = "a";
                                           $$.stream = NULL;
-                                          $$.is_pipe = 0;
                                         }
                 ;
 
 
 OptionalInputRedir:    InputRedir
-                | /* epsilon */         { $$.name = (char *)NULL;
-                                          $$.stream = stdin;
-                                          $$.is_pipe = 0;
+                | /* epsilon */         { $$.name = NULL; /* will open STDIN */
+                                          $$.stream = NULL;
                                         }
                 ;
 
 InputRedir:       '<' STRING            { $$.name = $2;
                                           $$.stream = NULL;
-                                          $$.is_pipe = 0;
                                         }
                 ;
 
@@ -513,6 +524,9 @@ AttributeSelections:
 AttributeSelection:
                   '+' ID                        { do_attribute_show($2, 1); }
                 | '-' ID                        { do_attribute_show($2, 0); }
+                ;
+
+TranslateExpr:  FROM_SYM CID TO_SYM ID { if (query_lock) {warn_query_lock_violation(); YYABORT;} $$ = do_translate($2, $4); }
                 ;
 
 CorpusSetExpr:  SetOp CID CID           { if (query_lock) {warn_query_lock_violation(); YYABORT;} $$ = do_setop($1, $2, $3); }
@@ -701,16 +715,10 @@ InfoCmd:          INFO_SYM CID          { do_info($2); }
                 | INFO_SYM              { do_info(current_corpus); }
                 ;
 
-GroupCmd:       GROUP_SYM CID Anchor ID BY_SYM Anchor ID 
+GroupCmd:       GROUP_SYM CID Anchor ID GroupBy Anchor ID 
                   CutStatement OptExpansion OptionalRedir
                                 { 
-                                  do_group($2, $3.anchor, $3.offset, $4, $6.anchor, $6.offset, $7, $8, $9, &($10)); 
-                                  cl_free($10.name);
-                                }
-              | GROUP_SYM CID Anchor ID FOREACH_SYM Anchor ID 
-                  CutStatement OptExpansion OptionalRedir
-                                { 
-                                  do_group($2, $3.anchor, $3.offset, $4, $6.anchor, $6.offset, $7, $8, $9, &($10));
+                                  do_group($2, $3.anchor, $3.offset, $4, $6.anchor, $6.offset, $7, $8, $9, $5, &($10)); 
                                   cl_free($10.name);
                                 }
               | GROUP_SYM CID Anchor ID 
@@ -721,10 +729,19 @@ GroupCmd:       GROUP_SYM CID Anchor ID BY_SYM Anchor ID
                                 }
               ;
 
+GroupBy:      BY_SYM                  { $$ = 0; } 
+              | FOREACH_SYM           { $$ = 0; }
+              | GROUP_SYM BY_SYM      { $$ = 1; }
+              | GROUP_SYM FOREACH_SYM { $$ = 1; }
+              ;
+
+
 /* the 'expand' flag is not implemented in the group command */
 OptExpansion:    EXPAND_SYM { $$ = 1; } 
                | /* epsilon */ { $$ = 0; }
                ;
+
+
 
 /* ================================================== Tabulate */
 
@@ -765,7 +782,7 @@ TabulationRange:   Anchor
 
 OptAttributeSpec:    ID OptionalFlag
                        { $$.name = $1; $$.flags = $2; }
-                   | /* eps */
+                   | /* epsilon */
                        { $$.name = NULL; $$.flags = 0; }
                    ;
 
@@ -800,9 +817,9 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
                 }
               | COUNT_SYM OptionalCID SortClause CutStatement OptionalRedir
                 { 
-                  int ok;
+                  /* int ok; */
                   if ($2 && generate_code) {
-                    ok = SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
+                    SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
                     FreeSortClause($3);
                     cl_free($5.name);
                   }
@@ -811,7 +828,7 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
 
 OptionalSortClause: 
                 SortClause              { $$ = $1; }
-              | /* eps */               { $$ = NULL; }
+              | /* epsilon */           { $$ = NULL; }
               ;
 
 SortClause:     BY_SYM ID OptionalFlag SortBoundaries SortDirection OptReverse
@@ -836,23 +853,23 @@ SortBoundaries: OptON Anchor { $$.anchor1 = $$.anchor2 = $2.anchor; $$.offset1 =
               | OptON Anchor OptELLIPSIS Anchor
                             { $$.anchor1 = $2.anchor; $$.offset1 = $2.offset;
                               $$.anchor2 = $4.anchor; $$.offset2 = $4.offset; } 
-              | /* eps */
+              | /* epsilon */
                             { $$.anchor1 = MatchField;    $$.offset1 = 0;
                               $$.anchor2 = MatchEndField; $$.offset2 = 0; }
               ;
 
-SortDirection:  ASC_SYM     { $$ = 1; }
-              | DESC_SYM    { $$ = 0; }
-              | /* eps */   { $$ = 1; }
+SortDirection:  ASC_SYM       { $$ = 1; }
+              | DESC_SYM      { $$ = 0; }
+              | /* epsilon */ { $$ = 1; }
               ;
 
-OptReverse:     REVERSE_SYM { $$ = 1; }
-              | /* eps */   { $$ = 0; }
+OptReverse:     REVERSE_SYM   { $$ = 1; }
+              | /* epsilon */ { $$ = 0; }
               ;
 
 /* ================================================== Deletions */
 
-Reduction:        REDUCE_SYM OptionalCID TO_SYM INTEGER OptPercent
+Reduction:        REDUCE_SYM OptionalCID TO_SYM PosInt OptPercent
                                         {
                                           do_reduce($2, $4, $5);
                                         }
@@ -860,18 +877,18 @@ Reduction:        REDUCE_SYM OptionalCID TO_SYM INTEGER OptPercent
                                         {
                                           RangeSetop($2, RMaximalMatches, NULL, NULL);
                                         }
-                | CUT_SYM OptionalCID INTEGER
+                | CUT_SYM OptionalCID PosInt
                                         {
                                           do_cut($2, 0, $3-1);
                                         }
-                | CUT_SYM OptionalCID INTEGER INTEGER
+                | CUT_SYM OptionalCID PosInt PosInt
                                         {
                                           do_cut($2, $3, $4);
                                         }                                       
                 ;
         
-OptPercent:       '%'       { $$ = 1; }
-                | /* eps */ { $$ = 0; }
+OptPercent:       '%'           { $$ = 1; }
+                | /* epsilon */ { $$ = 0; }
                 ;
 
 Delete:           DELETE_SYM OptionalCID WITH_SYM FIELD
@@ -919,12 +936,12 @@ UndumpCmd: UNDUMP_SYM ID OptWithTargetKeyword OptAscending OptionalInputRedir
             { do_undump($2, $3, !$4, &($5)); cl_free($5.name); }
         ;
 
-OptAscending:  ASC_SYM    { $$ = 1; }
-             | /* eps */  { $$ = 0; }
+OptAscending:  ASC_SYM        { $$ = 1; }
+             | /* epsilon */  { $$ = 0; }
              ;
 
 OptWithTargetKeyword:
-          /* eps */     { $$ = 0; }
+          /* epsilon */       { $$ = 0; }
         | WITH_SYM FIELD        
           { 
             if ($2 == TargetField) { $$ = 1; }
@@ -957,10 +974,15 @@ AQuery:         StandardQuery
               | TABQuery
               ;
 
-StandardQuery:  SearchPattern
+StandardQuery:  EmbeddedModifier
+                SearchPattern
                 AlignmentConstraints
-                CutStatement OptKeep    { $$ = do_StandardQuery($3, $4); }
+                CutStatement OptKeep    { $$ = do_StandardQuery($4, $5, $1); }
 ;
+
+EmbeddedModifier: EXTENSION ID ')'      { $$ = $2; }
+                | /* epsilon */         { $$ = NULL; }
+                ;
 
 MUQuery:          MU_SYM
                   MUStatement OptKeep CutStatement { $$ = do_MUQuery($2, $3, $4); }
@@ -1031,13 +1053,22 @@ RegWordfPower:    '(' RegWordfExpr ')'  { $$ = $2; }
                                         }
                  ;
 
-Repeat:           '{' INTEGER '}'       { if (generate_code)
+Repeat:           '{' PosInt '}'       { if (generate_code)
                                             NEW_EVALNODE($$, re_repeat, NULL, NULL, $2, $2);
                                           else
                                             $$ = NULL;
                                         }
-                | '{' INTEGER ',' OptMaxNumber '}'
-                                        { if (generate_code)
+                | '{' ',' PosInt '}'    { if (generate_code) /* new syntax for consistency with TAB queries */
+                                            NEW_EVALNODE($$, re_repeat, NULL, NULL, 0, $3);
+                                          else
+                                            $$ = NULL;
+                                        }
+                | '{' PosInt ',' OptMaxNumber '}'
+                                        { if ($4 != repeat_inf && $4 < $2) {
+                                        	yyerror("invalid repetition range (maximum < minimum)");
+                                        	YYERROR;
+                                          }
+                                          if (generate_code)
                                             NEW_EVALNODE($$, re_repeat, NULL, NULL, $2, $4);
                                           else
                                             $$ = NULL;
@@ -1058,7 +1089,7 @@ XMLTag:           TAGSTART '>'          { $$ = do_XMLTag($1, 0, 0, NULL, 0); }
 RegexpOp:         MvalOp                { $$ = $1; }
                 | NEQ                   { $$ = OP_EQUAL | OP_NOT; }
                 | '='                   { $$ = OP_EQUAL; }
-                | /* eps */             { $$ = OP_EQUAL; }
+                | /* epsilon */         { $$ = OP_EQUAL; }
                 ;
 
 NamedWfPattern: OptTargetSign
@@ -1155,7 +1186,7 @@ AlignmentConstraints:
                          SearchPattern { if (generate_code)
                                            CurEnv->negated = $5;
                                        }
-                   | /* epsilon */     { }
+                   | /* epsilon */     { };
                     ;
 
 OptNot:             '!'                { $$ = 1; }
@@ -1178,7 +1209,7 @@ SearchSpace:    WITHIN_SYM OptDirection Description
                                         }
                 ;
 
-CutStatement:   CUT_SYM INTEGER         { $$ = abs($2); }
+CutStatement:   CUT_SYM PosInt          { $$ = $2; }
               | /* epsilon */           { $$ = 0; }
                 ;
 
@@ -1190,7 +1221,16 @@ OptInteger:     INTEGER                 { $$ = $1; }
               | /* epsilon */           { $$ = 0; }
                 ;
 
-OptMaxNumber:   INTEGER                 { $$ = $1; }
+/* a non-negative integer (called PosInt because that is easier to remember) */
+PosInt:			INTEGER					{ if ($1 < 0) {
+											yyerror("expected a non-negative integer value");
+											YYERROR;
+										  }
+										  $$ = $1;
+										}
+				;
+
+OptMaxNumber:   PosInt                  { $$ = $1; }
               | /* epsilon */           { $$ = repeat_inf; }
                 ;
 
@@ -1221,7 +1261,7 @@ OptionalCID:    CID                     { $$ = $1; }
                 ;
 
 
-CID:            ID                      { CorpusList *cl;
+CID:            ID_OR_NQRID             { CorpusList *cl;
 
                                           cqpmessage(Message, "CID: %s", $1);
 
@@ -1239,6 +1279,10 @@ CID:            ID                      { CorpusList *cl;
                                           else
                                             $$ = cl;
                                         }
+                ;
+
+ID_OR_NQRID:    NQRID                   { $$ = $1; }
+              | ID                      { $$ = $1; }
                 ;
 
 BoolExpr:     BoolExpr IMPLIES BoolExpr { $$ = bool_implies($1, $3); }
@@ -1266,8 +1310,8 @@ MvalOp:   OptionalNot CONTAINS_SYM  {$$ = OP_CONTAINS | $1;}
         | OptionalNot MATCHES_SYM   {$$ = OP_MATCHES  | $1;}
 ;       
 
-OptionalNot:   NOT_SYM    {$$ = OP_NOT;}
-             | /* eps */  {$$ = 0;}
+OptionalNot:   NOT_SYM        {$$ = OP_NOT;}
+             | /* epsilon */  {$$ = 0;}
 ;
 
 RelLHS:           LabelReference        { $$ = do_LabelReference($1, 0); }  /* label reference "label.att"*/
@@ -1309,7 +1353,7 @@ RelRHS:           RelLHS                { $$ = $1; }
                                           else
                                             $$ = NULL;
                                         }
-                | FLOAT                 { if (generate_code) {
+                | DOUBLEFLOAT           { if (generate_code) {
                                             NEW_BNODE($$);
                                             $$->type = float_leaf;
                                             $$->leaf.ctype.fconst = $1;
@@ -1407,24 +1451,35 @@ TABQuery:        TAB_SYM
                 ;
 
 
-TabPatterns:      NamedWfPattern
+TabPatterns:      WordformPattern
                   TabOtherPatterns      { $$ = make_first_tabular_pattern($1, $2); }
                 ;
 
 TabOtherPatterns: TabOtherPatterns
                   OptDistance
-                  NamedWfPattern        { $$ = add_tabular_pattern($1, &($2), $3); }
+                  WordformPattern       { $$ = add_tabular_pattern($1, &($2), $3); }
                   
-                | /* eps */             { $$ = NULL; }
+                | /* epsilon */         { $$ = NULL; }
                 ;
 
-OptDistance:      '{' INTEGER '}'       { do_OptDistance(&($$), $2, $2); }
-                | '{' INTEGER ',' OptMaxNumber '}'
-                                        { do_OptDistance(&($$), $2, $4); }
-                | '{' ',' INTEGER '}'   { do_OptDistance(&($$), 0, $3); }
-                | /* eps */             { do_OptDistance(&($$), 0, 0); }
+OptDistance:      '{' PosInt '}'       { do_OptDistance(&($$), $2 + 1, $2 + 1); }
+                | '{' PosInt ',' OptMaxNumber '}'
+                                        { if ($4 == repeat_inf)
+                                        	do_OptDistance(&($$), $2 + 1, repeat_inf);
+                                          else {
+                                            if ($4 < $2) {
+                                        	  yyerror("invalid distance range (maximum < minimum)");
+                                        	  YYERROR;
+                                            }
+                                            do_OptDistance(&($$), $2 + 1, $4 + 1);
+                                          } 
+                                        }
+                | '{' ',' PosInt '}'    { do_OptDistance(&($$), 1, $3 + 1); }
+                | '*'                   { do_OptDistance(&($$), 1, repeat_inf); }
+                | '+'                   { do_OptDistance(&($$), 2, repeat_inf); }
+                | '?'                   { do_OptDistance(&($$), 1, 2); }
+                | /* epsilon */         { do_OptDistance(&($$), 1, 1); }
                 ;
-
 
 /* implementations of the following 'actions' can be found in ../CQi/auth.c */
 AuthorizeCmd:     USER_SYM ID STRING    { add_user_to_list($2, $3); }
@@ -1435,13 +1490,13 @@ AuthorizeCmd:     USER_SYM ID STRING    { add_user_to_list($2, $3); }
                 ;
 
 OptionalGrants:   '(' Grants ')'
-                | /* eps */
+                | /* epsilon */
                 ;
 
 /* add_grant_to_last_user() saves us the trouble of passing username from above */
 Grants:           Grants
                   ID                    { add_grant_to_last_user($2); }
-                | /* eps */
+                | /* epsilon */
                 ;
 
 /* macro definition */
@@ -1471,7 +1526,7 @@ Macro:            OptDEFINE_SYM MACRO_SYM
                 ;
 
 OptDEFINE_SYM:    DEFINE_SYM
-                | /* eps */
+                | /* epsilon */
                 ;
 
 /* displaying macros */
@@ -1509,25 +1564,25 @@ RandomizeCmd:     RANDOMIZE_SYM         { cl_randomize(); }  /* seed internal RN
                 | RANDOMIZE_SYM INTEGER { cl_set_seed($2); } /* set seed for internal RNG */
                 ;
 
-OtherCommand:   /* eps */
+OtherCommand:   /* epsilon */
                 ;
 
 
 /* optional symbols (as returned from flex) */
 OptionalFIELD:    FIELD                 { $$ = $1; }
-                | /* eps */             { $$ = NoField; }
+                | /* epsilon */         { $$ = NoField; }
                 ;
 OptON:            ON_SYM 
-                | /* eps */
+                | /* epsilon */
                 ;
 OptFROM:          FROM_SYM 
-                | /* eps */
+                | /* epsilon */
                 ;
 OptTO:            TO_SYM 
-                | /* eps */
+                | /* epsilon */
                 ;
 OptELLIPSIS:      ELLIPSIS 
-                | /* eps */
+                | /* epsilon */
                 ;
 
 /* anchor with optional offset:  e.g.  match:4  target:-1  matchend (== matchend:0) */

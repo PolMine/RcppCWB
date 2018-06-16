@@ -40,6 +40,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
+void Rprintf(const char *, ...);
+
 /* end standard C headers. */
 
 /* flex integer type definitions */
@@ -433,14 +435,14 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    7,    7,    7,    7,    7,    7,    7,    7,    7,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7,    7,    7,    7,    7,    7,
-        7,    7,    7,    7,    7
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1
     } ;
 
 static yyconst flex_int32_t yy_meta[35] =
@@ -598,7 +600,9 @@ char *cregtext;
 #define cregwrap() 1
 */
 
-/* remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place */
+/**
+ * remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place
+ */
 void
 unescape_string (char *string) {
   char *p, *q;
@@ -615,7 +619,7 @@ unescape_string (char *string) {
   *q = '\0';  
 }
 
-#line 619 "lex.creg.c"
+#line 621 "lex.creg.c"
 
 #define INITIAL 0
 
@@ -674,7 +678,7 @@ extern int cregwrap (void );
 #endif
 #endif
 
-    static void yyunput (int c,char *buf_ptr  );
+    /* static void yyunput (int c,char *buf_ptr  ); */
     
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
@@ -684,16 +688,17 @@ static void yy_flex_strncpy (char *,yyconst char *,int );
 static int yy_flex_strlen (yyconst char * );
 #endif
 
+/*
 #ifndef YY_NO_INPUT
-
 #ifdef __cplusplus
 static int yyinput (void );
 #else
 static int input (void );
 #endif
-
 #endif
+*/
 
+ 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
 #define YY_READ_BUF_SIZE 8192
@@ -797,10 +802,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 62 "registry.l"
+#line 64 "registry.l"
 
 
-#line 804 "lex.creg.c"
+#line 806 "lex.creg.c"
 
 	if ( !(yy_init) )
 		{
@@ -885,173 +890,173 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 64 "registry.l"
+#line 66 "registry.l"
 { return(NAME_SYM); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 65 "registry.l"
+#line 67 "registry.l"
 { return(ID_SYM);   }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 66 "registry.l"
+#line 68 "registry.l"
 { return(INFO_SYM); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 67 "registry.l"
+#line 69 "registry.l"
 { return(HOME_SYM); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 69 "registry.l"
+#line 71 "registry.l"
 { return(ATTRIBUTE_SYM); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 71 "registry.l"
+#line 73 "registry.l"
 { return(IGNORE_SYM); }   /* *** ignore MAPTABLEs and NGRAMs *** */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 72 "registry.l"
+#line 74 "registry.l"
 { return(IGNORE_SYM); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "registry.l"
+#line 76 "registry.l"
 { return(DIR_SYM); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 75 "registry.l"
+#line 77 "registry.l"
 { return(CORPUS_SYM); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 76 "registry.l"
+#line 78 "registry.l"
 { return(REVCORP_SYM); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 77 "registry.l"
+#line 79 "registry.l"
 { return(REVCIDX_SYM); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 78 "registry.l"
+#line 80 "registry.l"
 { return(FREQS_SYM); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 79 "registry.l"
+#line 81 "registry.l"
 { return(LEXICON_SYM); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 80 "registry.l"
+#line 82 "registry.l"
 { return(LEXIDX_SYM); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 81 "registry.l"
+#line 83 "registry.l"
 { return(LEXSRT_SYM); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 83 "registry.l"
+#line 85 "registry.l"
 { return(STRUCTURE_SYM); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 84 "registry.l"
+#line 86 "registry.l"
 { return(ALIGNED_SYM); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 85 "registry.l"
+#line 87 "registry.l"
 { return(DYNAMIC_SYM); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 88 "registry.l"
+#line 90 "registry.l"
 { return(ADMIN_SYM); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 89 "registry.l"
+#line 91 "registry.l"
 { return(ACCESS_SYM); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 90 "registry.l"
+#line 92 "registry.l"
 { return(USER_SYM); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 91 "registry.l"
+#line 93 "registry.l"
 { return(GROUP_SYM); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 92 "registry.l"
+#line 94 "registry.l"
 { return(ASSERT_SYM); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 93 "registry.l"
+#line 95 "registry.l"
 { return(HOST_SYM); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 96 "registry.l"
+#line 98 "registry.l"
 { return(DOTS_SYM); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 98 "registry.l"
+#line 100 "registry.l"
 { return(PROPERTY_SYM); }
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 99 "registry.l"
+#line 101 "registry.l"
 ; /* single line comment, skip; unless the comment begins with '##::' */
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 100 "registry.l"
+#line 102 "registry.l"
 ;
 	YY_BREAK
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 101 "registry.l"
+#line 103 "registry.l"
 ;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 102 "registry.l"
+#line 104 "registry.l"
 ;
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 104 "registry.l"
+#line 106 "registry.l"
 ;  /* skip */
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 107 "registry.l"
+#line 109 "registry.l"
 { creglval.ival = atoi(cregtext);
                   return(NUMBER); 
                 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 110 "registry.l"
+#line 112 "registry.l"
 { creglval.strval = cl_strdup(cregtext);
                   return(IDENTIFIER); 
                 }
@@ -1059,7 +1064,7 @@ YY_RULE_SETUP
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 113 "registry.l"
+#line 115 "registry.l"
 { creglval.strval = cl_strdup(cregtext+1);
                   creglval.strval[cregleng - 2] = '\0';
                   unescape_string(creglval.strval);
@@ -1068,15 +1073,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 119 "registry.l"
+#line 121 "registry.l"
 return cregtext[0];
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 121 "registry.l"
+#line 123 "registry.l"
 ECHO;
 	YY_BREAK
-#line 1080 "lex.creg.c"
+#line 1082 "lex.creg.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1405,18 +1410,16 @@ static int yy_get_next_buffer (void)
 	return yy_is_jam ? 0 : yy_current_state;
 }
 
-    static void yyunput (int c, register char * yy_bp )
+/*
+static void yyunput (int c, register char * yy_bp )
 {
 	register char *yy_cp;
     
     yy_cp = (yy_c_buf_p);
 
-	/* undo effects of setting up cregtext */
 	*yy_cp = (yy_hold_char);
 
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-		{ /* need to shift things up to make room */
-		/* +2 for EOB chars. */
 		register yy_size_t number_to_move = (yy_n_chars) + 2;
 		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
@@ -1441,7 +1444,9 @@ static int yy_get_next_buffer (void)
 	(yy_hold_char) = *yy_cp;
 	(yy_c_buf_p) = yy_cp;
 }
+*/
 
+/*
 #ifndef YY_NO_INPUT
 #ifdef __cplusplus
     static int yyinput (void)
@@ -1456,36 +1461,19 @@ static int yy_get_next_buffer (void)
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
 		{
-		/* yy_c_buf_p now points to the character we want to return.
-		 * If this occurs *before* the EOB characters, then it's a
-		 * valid NUL; if not, then we've hit the end of the buffer.
-		 */
 		if ( (yy_c_buf_p) < &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[(yy_n_chars)] )
-			/* This was really a NUL. */
 			*(yy_c_buf_p) = '\0';
 
 		else
-			{ /* need more input */
+			{ 
 			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
 				{
 				case EOB_ACT_LAST_MATCH:
-					/* This happens because yy_g_n_b()
-					 * sees that we've accumulated a
-					 * token and flags that we need to
-					 * try matching the token before
-					 * proceeding.  But for input(),
-					 * there's no matching to consider.
-					 * So convert the EOB_ACT_LAST_MATCH
-					 * to EOB_ACT_END_OF_FILE.
-					 */
-
-					/* Reset buffer status. */
 					cregrestart(cregin );
 
-					/*FALLTHROUGH*/
 
 				case EOB_ACT_END_OF_FILE:
 					{
@@ -1508,14 +1496,15 @@ static int yy_get_next_buffer (void)
 			}
 		}
 
-	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
-	*(yy_c_buf_p) = '\0';	/* preserve cregtext */
+	c = *(unsigned char *) (yy_c_buf_p);	
+	*(yy_c_buf_p) = '\0';
 	(yy_hold_char) = *++(yy_c_buf_p);
 
 	return c;
 }
-#endif	/* ifndef YY_NO_INPUT */
-
+#endif	
+*/
+ 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
  * 
@@ -1874,7 +1863,7 @@ YY_BUFFER_STATE creg_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_le
 
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
+    	(void) Rprintf("%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 
@@ -2073,7 +2062,7 @@ void cregfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 121 "registry.l"
+#line 123 "registry.l"
 
 
 

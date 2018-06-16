@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 
 #include "globals.h"
 
@@ -83,7 +84,7 @@ read_mapping(Corpus *corpus,
   FILE *fd;
   Attribute *attr;
   Mapping m = NULL;
-  char s[1024];
+  char s[CL_MAX_LINE_LENGTH];
 
   if (corpus == NULL) {
     *error_string = "corpus argument missing";
@@ -121,7 +122,7 @@ read_mapping(Corpus *corpus,
     drop_mapping(&m);
   }
 
-  while ( m  &&  fgets(s, 1024, fd) != NULL ) {
+  while ( m  &&  fgets(s, CL_MAX_LINE_LENGTH, fd) != NULL ) {
 
     if (s[0] && s[strlen(s)-1] == '\n')
       s[strlen(s)-1] = '\0';
@@ -337,27 +338,27 @@ print_mapping(Mapping map)
 {
   int cp, tp;
 
-  fprintf(stderr, "---------------------------------------- Mapping: \n");
+  Rprintf("---------------------------------------- Mapping: \n");
 
-  fprintf(stderr, "Name:  %s\n", map->mapping_name);
-  fprintf(stderr, "Valid: %s/%s\n", 
+  Rprintf("Name:  %s\n", map->mapping_name);
+  Rprintf("Valid: %s/%s\n", 
           map->corpus->registry_name,
           map->attribute->any.name);
-  fprintf(stderr, "NrCls: %d\n", 
+  Rprintf("NrCls: %d\n", 
           map->nr_classes);
 
   for (cp = 0; cp < map->nr_classes; cp++) {
-    fprintf(stderr, "%5d/%s with %d members: \n", 
+    Rprintf("%5d/%s with %d members: \n", 
             cp, map->classes[cp].class_name, map->classes[cp].nr_tokens);
     for (tp = 0; tp < map->classes[cp].nr_tokens; tp++) {
-      fprintf(stderr, "\t%d/%s", 
+      Rprintf("\t%d/%s", 
               map->classes[cp].tokens[tp],
               get_string_of_id(map->attribute, map->classes[cp].tokens[tp]));
     }
-    fprintf(stderr, "\n");
+    Rprintf("\n");
   }
 
-  fprintf(stderr, "------------------------------------------------- \n");
+  Rprintf("------------------------------------------------- \n");
 
 }
 

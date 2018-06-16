@@ -20,7 +20,6 @@
 
 #include "globals.h"
 
-#include "storage.h"                      /* gets sys/types.h for caddr_t */
 
 
 
@@ -66,14 +65,14 @@ struct TCorpus {
   char *path;                      /**< the ``home directory'' of the corpus  */
   char *info_file;                 /**< the path of the info file of the corpus */
 
-  CorpusCharset charset;           /**< a special corpus property: internal support for 'latin1' to 'latin9' planned */
+  CorpusCharset charset;           /**< a special corpus property: specifies character set of the encoded text */
   CorpusProperty properties;       /**< head of a linked list of CorpusProperty object. */
 
   char *admin;                     /**< {doesn't seem to be used?} */
 
   IDList groupAccessList;          /**< List of groups allowed to access this corpus (can be NULL) */
   IDList userAccessList;           /**< List of users allowed to access this corpus (can be NULL) */
-  IDList hostAccessList;
+  IDList hostAccessList;           /**< List of host machines allowed to access this corpus (can be NULL) */
   
   char *registry_dir;              /**< Directory where this corpus's registry file is located */
   char *registry_name;             /**< the cwb-name of this corpus */
@@ -88,6 +87,8 @@ struct TCorpus {
 
 /* ---------------------------------------------------------------------- */
 
+/* external variable declarations: from the registry parser */
+
 extern char *cregin_path;
 extern char *cregin_name;
 
@@ -100,5 +101,7 @@ extern Corpus *loaded_corpora;
 /* (most) function prototypes are now in <cl.h> */
 
 void add_corpus_property(Corpus *corpus, char *property, char *value);
+Corpus *find_corpus(char *registry_dir, char *registry_name);
+void describe_corpus(Corpus *corpus);
 
 #endif

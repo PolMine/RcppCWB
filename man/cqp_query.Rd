@@ -34,7 +34,7 @@ query. The \code{cqp_dump_subcorpus} function will return a two-column matrix
 with the left and right corpus positions of the matches for the CQP query.
 }
 \examples{
-registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 
 if (!cqp_is_initialized()){
   cqp_initialize(registry = registry)

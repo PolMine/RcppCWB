@@ -401,6 +401,45 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cwb_makeall
+int cwb_makeall(SEXP x, SEXP registry_dir, SEXP p_attribute);
+RcppExport SEXP _RcppCWB_cwb_makeall(SEXP xSEXP, SEXP registry_dirSEXP, SEXP p_attributeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_makeall(x, registry_dir, p_attribute));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cwb_huffcode
+int cwb_huffcode(SEXP x, SEXP registry_dir, SEXP p_attribute);
+RcppExport SEXP _RcppCWB_cwb_huffcode(SEXP xSEXP, SEXP registry_dirSEXP, SEXP p_attributeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_huffcode(x, registry_dir, p_attribute));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cwb_compress_rdx
+int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute);
+RcppExport SEXP _RcppCWB_cwb_compress_rdx(SEXP xSEXP, SEXP registry_dirSEXP, SEXP p_attributeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_compress_rdx(x, registry_dir, p_attribute));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},
@@ -434,6 +473,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_region_matrix_to_ids", (DL_FUNC) &_RcppCWB_region_matrix_to_ids, 4},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
+    {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
+    {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
+    {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
     {NULL, NULL, 0}
 };
 

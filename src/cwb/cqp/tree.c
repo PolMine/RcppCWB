@@ -15,8 +15,6 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...);
-
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -97,12 +95,12 @@ print_pattern(int envidx, int index, int indent)
       Rprintf("[]\n");
       break;
     default:
-      fprintf(stderr, "Unknown pattern type in print_pattern: %d\n", 
+      Rprintf("Unknown pattern type in print_pattern: %d\n", 
               Environment[envidx].patternlist[index].type);
       break;
     }
   else 
-    fprintf(stderr, "Illegal index in print_pattern: %d\n", index);
+    Rprintf("Illegal index in print_pattern: %d\n", index);
 }
 
 
@@ -439,12 +437,22 @@ init_booltree(Constrainttree *ctptr)
 }
 
 
-/*
- * pretty printer: traverse boolean evaluation tree and print its contents
- * with appropriate indentation.                                           
+/**
+ * Prints a boolean evaluation tree.
+ *
+ * This function is a pretty-printer for the Constrainttree data type. It
+ * traverses a boolean evaluation tree and prints its contents. An indentation
+ * level must be specified.
+ *
+ * (The indentation is needed because this function calls itself recursively for sub-branches.)
+ *
+ * @param ctptr   Constrainttree to print.
+ * @param indent  Number of indent levels at which to start printing. Each
+ *                indent level is realised as two spaces.
  */ 
 
-void print_booltree(Constrainttree ctptr, int indent)
+void
+print_booltree(Constrainttree ctptr, int indent)
 {
   int i;
   ActualParamList *arg;
@@ -972,7 +980,7 @@ try_optimization(Constraint *tree)
         Matchlist left_list;
         Matchlist right_list;
       
-/*      fprintf(stderr, "Performing ->IDLIST opt\n"); */
+/*      Rprintf("Performing ->IDLIST opt\n"); */
 
         init_matchlist(&left_list);
         init_matchlist(&right_list);
