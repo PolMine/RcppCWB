@@ -6,6 +6,7 @@ Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=dev)](https://travi
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=dev&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
 [![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/dev/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/dev)
+[![DOI](https://zenodo.org/badge/116121859.svg)](https://zenodo.org/badge/latestdoi/116121859)
 
 # Rcpp bindings for the Corpus Workbench (CWB)
 
