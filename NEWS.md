@@ -1,3 +1,9 @@
+# v0.2.5
+* In Makevars.win, libiconv is explicitly linked, to make RcppCWB compatible with new
+release of Rtools.
+* regex in check_s_attribute() for parsing registry file improved so that it does not
+produce an error if '# [attribute]' follows after declaration of s_attribute
+
 # v0.2.4
 * for linux and macOS, CWB 3.4.14 included, so that UTF-8 support is realized
 * bug removed in check_cqp_query that would prevent special characters from working

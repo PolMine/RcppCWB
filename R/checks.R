@@ -43,13 +43,11 @@ check_corpus <- function(corpus, registry){
 #' @export check_s_attribute
 #' @rdname checks
 check_s_attribute <- function(s_attribute, corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  if (length(s_attribute) != 1)
-    stop("s_attribute needs to be a length 1 vector")
-  if (!is.character(s_attribute))
-    stop("s_attribute needs to be a character vector")
+  if (length(s_attribute) != 1) stop("s_attribute needs to be a length 1 vector")
+  if (!is.character(s_attribute)) stop("s_attribute needs to be a character vector")
   registry_file <- readLines(file.path(registry, tolower(corpus)))
   sattr_lines <- registry_file[grep("^STRUCTURE", registry_file)]
-  sattrs_declared <- gsub("^STRUCTURE\\s+(.*?)\\s*.*?", "\\1", sattr_lines)
+  sattrs_declared <- gsub("^STRUCTURE\\s+(.*?)(\\s.*$|$)", "\\1", sattr_lines)
   if (!s_attribute %in% sattrs_declared)
     stop(sprintf("s_attribute '%s' is not declared in registry file of corpus '%s'", s_attribute, corpus))
   return( TRUE )
