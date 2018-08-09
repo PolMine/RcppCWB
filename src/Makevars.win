@@ -8,7 +8,7 @@ PKG_CXXFLAGS=-D_LIB
 
 PKG_LIBS = \
     -L../windows/libcl-master/lib${R_ARCH} \
-    -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl \
+    -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl -liconv \
     -lws2_32 -lwinmm -lole32 
 
 all: clean winlibs
