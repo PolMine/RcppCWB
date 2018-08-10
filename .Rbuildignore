@@ -10,3 +10,4 @@
 ^src/cwb/instutils$
 ^_pkgdown\.yml$
 ^docs$
+^CONDUCT.md$
