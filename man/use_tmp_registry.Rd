@@ -4,7 +4,7 @@
 \alias{use_tmp_registry}
 \title{Use Temporary Registry}
 \usage{
-use_tmp_registry(pkg)
+use_tmp_registry(pkg = system.file(package = "RcppCWB"))
 }
 \arguments{
 \item{pkg}{full path to a package}

@@ -8,3 +8,5 @@
 ^src/cwb/doc$
 ^src/cwb/man$
 ^src/cwb/instutils$
+^_pkgdown\.yml$
+^docs$
