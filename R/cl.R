@@ -263,3 +263,8 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
   .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
 }
 
+
+cl_delete_corpus <- function(corpus){
+  .cl_delete_corpus(corpus = corpus)
+}
+

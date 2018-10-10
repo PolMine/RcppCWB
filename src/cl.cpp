@@ -5,7 +5,11 @@ extern "C" {
   #include <string.h>
   #include "cl_min.h"
   #include <pcre.h>
+  #include <corpmanag.h>
 }
+
+
+
 
 #include <Rcpp.h>
 
@@ -217,3 +221,21 @@ int _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry){
   cl_struc2cpos(att, struc, &lb, &rb);
   return( rb );
 }
+
+
+// [[Rcpp::export(name=".cl_delete_corpus")]]
+int _cl_delete_corpus(SEXP corpus){
+  
+  CorpusList * cl;
+  char* corpus_name  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  
+  for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
+    printf(cl->name);
+    if (cl->name == corpus_name) cl_delete_corpus(cl->corpus);
+  }
+  
+  return( 0 );
+}
+
+
+
