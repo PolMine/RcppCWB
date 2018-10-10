@@ -12,4 +12,4 @@
 ^docs$
 ^CONDUCT.md$
 ^README.Rmd$
-
+^revdep$

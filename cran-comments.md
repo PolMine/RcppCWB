@@ -1,15 +1,12 @@
 ## General remarks
 
-This version (v0.2.4) addresses an issue raised by Kurt Hornik: A required path within a 'registry'-file within the package is not adjusted by the configure/configure.win when installing a binary package. The previous version did the adjustment during .onLoad() mechanism, changing a file in the package directory -- thus violating CRAN requirements. The new version of RcppCWB creates temporary registry files in the temporary session directory. Thanks to Kurt Hornik for suggesting this solution.
+This version (v0.2.5) is a maintanence release. It integrates a pull request be Jeroen Ooms to include libiconv in configure.win, so that RcppCWB will be compatible with an upcoming version of Rtools.
 
-To avoid encoding issues, I updated the source code of the Corpus Workbench (CWB) included in the package to v3.5 BETA. The update implies that 'Glib' is now a dependency for compiling the package. 'Glib' had already been a dependency for cross-compiling the static libraries required for Windows binaries, so I do not think changing the DESCRIPTION is necessary. 'Glib' is already addressed.
+In addition, there is only a minor change to make handling registry files more robust. 
 
-However, I think I recall that 'Glib' is not present on all build systems, and I am afraid that compiling RcppCWB might fail on either Fedora or Debian. If that happens: I would be very happy, if you could install 'Glib', which might be needed by other packages as well (such as Rpoppler).
+Binaries of the package are not available at CRAN for macOS. Compilation fails in this case, because 'Glib is not present on CRAN build machines for macOS. It would be great for RcppCWB, if you could install Glib, which might be needed by other packages as well (such as Rpoppler). On my system, using Homebrow for installing Glib works nicely (brew install glib).
 
-On macOS: brew install glib
-Debian: apt-get install libglib2.0-dev
-Fedora: yum install glib2-devel
-
+Making RcppCWB compile on Solaris is still on my list of to dos!
 
 
 ## Test environments
@@ -19,7 +16,6 @@ Fedora: yum install glib2-devel
 * Ubuntu 14.04 (project server), R 3.4.3
 * win-builder (devel and release), R 3.5.0
 * Windows AppVeyorR, 3.5.0 Patched
-* Windows on Amazon WorkSpaces, R 3.4.3
 
 
 ## R CMD check results
@@ -33,5 +29,3 @@ On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb |
 
 I have also checked downstream dependencies using devtools::revdep(),
 without seeing ERRORs, WARNINGs, or NOTEs.
-
-On the issue with polmineR, see the explanation in the general remarks.
