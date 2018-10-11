@@ -1,3 +1,6 @@
+# v0.2.5.9001
+* A new `cl_delete_corpus()`-function can remove loaded corpora from memory.
+
 # v0.2.5
 * In Makevars.win, libiconv is explicitly linked, to make RcppCWB compatible with new
 release of Rtools.

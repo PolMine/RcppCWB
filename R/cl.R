@@ -263,8 +263,23 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
   .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
 }
 
-
-cl_delete_corpus <- function(corpus){
-  .cl_delete_corpus(corpus = corpus)
+#' Drop loaded corpus.
+#' 
+#' Remove a corpus from the list of loaded corpora of the corpus library (CL).
+#' 
+#' The corpus library (CL) internally maintains a list of corpora including
+#' information on positional and structural attributes so that the registry file
+#' needs not be parsed again and again. However, when an attribute has been
+#' added to the corpus, it will not yet be visible, because it is not part of
+#' the data that has been loaded. The \code{cl_delete_corpus} function exposes a
+#' CL function named identically, to force reloading the corpus (after it has
+#' been deleted), which will include parsing an updated registry file.
+#' 
+#' @param corpus name of a CWB corpus (upper case) 
+#' @param registry path to the registry directory, defaults to the value of the
+#'   environment variable CORPUS_REGISTRY
+#' @export cl_delete_corpus
+cl_delete_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .cl_delete_corpus(corpus = corpus, registry = registry)
 }
 
