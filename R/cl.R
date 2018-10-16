@@ -283,3 +283,23 @@ cl_delete_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cl_delete_corpus(corpus = corpus, registry = registry)
 }
 
+#' Get charset of a corpus.
+#' 
+#' The encoding of a corpus is declared in the registry file (corpus property
+#' "charset"). Once a corpus is loaded, this information is available without
+#' parsing the registry file again and again. The \code{cl_charset_name} offers
+#' a quick access to this information.
+#' 
+#' @param corpus Name of a CWB corpus (upper case).
+#' @param registry Path to the registry directory, defaults to the value of the
+#'   environment variable CORPUS_REGISTRY
+#' @export cl_charset_name
+#' @examples
+#' cl_charset_name(
+#'   corpus = "REUTERS",
+#'   registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' )
+cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .cl_charset_name(corpus = corpus, registry = registry)
+}
+

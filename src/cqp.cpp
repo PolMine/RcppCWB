@@ -262,6 +262,21 @@ int _cl_delete_corpus(SEXP corpus, SEXP registry){
 
 
 
+// [[Rcpp::export(name=".cl_charset_name")]]
+Rcpp::StringVector _cl_charset_name(SEXP corpus, SEXP registry){
+  
+  char* corpus_pointer  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  char* reg_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  Corpus *corpus_obj = cl_new_corpus(reg_dir, corpus_pointer);
+  
+  Rcpp::StringVector result(1);
+  
+  result(0) = cl_charset_name(cl_corpus_charset(corpus_obj));
+  
+  return( result );
+}
+
+
 
 
 // [[Rcpp::export(name=".init_cqp")]]
