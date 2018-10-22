@@ -200,6 +200,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _cl_delete_corpus
+int _cl_delete_corpus(SEXP corpus, SEXP registry);
+RcppExport SEXP _RcppCWB__cl_delete_corpus(SEXP corpusSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(_cl_delete_corpus(corpus, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _cl_charset_name
+Rcpp::StringVector _cl_charset_name(SEXP corpus, SEXP registry);
+RcppExport SEXP _RcppCWB__cl_charset_name(SEXP corpusSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(_cl_charset_name(corpus, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
 // init_cqp
 void init_cqp();
 RcppExport SEXP _RcppCWB_init_cqp() {
@@ -456,6 +480,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_id2cpos", (DL_FUNC) &_RcppCWB__cl_id2cpos, 4},
     {"_RcppCWB__cl_cpos2lbound", (DL_FUNC) &_RcppCWB__cl_cpos2lbound, 4},
     {"_RcppCWB__cl_cpos2rbound", (DL_FUNC) &_RcppCWB__cl_cpos2rbound, 4},
+    {"_RcppCWB__cl_delete_corpus", (DL_FUNC) &_RcppCWB__cl_delete_corpus, 2},
+    {"_RcppCWB__cl_charset_name", (DL_FUNC) &_RcppCWB__cl_charset_name, 2},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
     {"_RcppCWB_cqp_get_registry", (DL_FUNC) &_RcppCWB_cqp_get_registry, 0},
     {"_RcppCWB_cqp_get_status", (DL_FUNC) &_RcppCWB_cqp_get_status, 0},

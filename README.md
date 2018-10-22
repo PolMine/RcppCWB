@@ -2,10 +2,10 @@
 [![License](https://img.shields.io/aur/license/yaourt.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![Travis-CI Build
-Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=dev)](https://travis-ci.org/PolMine/RcppCWB)
+Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=master)](https://travis-ci.org/PolMine/RcppCWB)
 [![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=dev&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
-[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/dev/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/dev)
+Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=master&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
+[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
 [![DOI](https://zenodo.org/badge/116121859.svg)](https://zenodo.org/badge/latestdoi/116121859)
 
 # Rcpp bindings for the Corpus Workbench (CWB)

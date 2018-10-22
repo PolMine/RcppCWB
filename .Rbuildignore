@@ -11,5 +11,5 @@
 ^_pkgdown\.yml$
 ^docs$
 ^CONDUCT.md$
-^README.Rmd$
 ^revdep$
+^README.Rmd$

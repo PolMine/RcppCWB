@@ -1,3 +1,10 @@
+# v0.2.5.9002
+* Function `cl_charset_name()` is exposed, it will return the charset of a 
+corpus. Faster than parsing the registry file again and again.
+
+# v0.2.5.9001
+* A new `cl_delete_corpus()`-function can remove loaded corpora from memory.
+
 # v0.2.5
 * In Makevars.win, libiconv is explicitly linked, to make RcppCWB compatible with new
 release of Rtools.

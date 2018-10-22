@@ -263,3 +263,43 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
   .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
 }
 
+#' Drop loaded corpus.
+#' 
+#' Remove a corpus from the list of loaded corpora of the corpus library (CL).
+#' 
+#' The corpus library (CL) internally maintains a list of corpora including
+#' information on positional and structural attributes so that the registry file
+#' needs not be parsed again and again. However, when an attribute has been
+#' added to the corpus, it will not yet be visible, because it is not part of
+#' the data that has been loaded. The \code{cl_delete_corpus} function exposes a
+#' CL function named identically, to force reloading the corpus (after it has
+#' been deleted), which will include parsing an updated registry file.
+#' 
+#' @param corpus name of a CWB corpus (upper case) 
+#' @param registry path to the registry directory, defaults to the value of the
+#'   environment variable CORPUS_REGISTRY
+#' @export cl_delete_corpus
+cl_delete_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .cl_delete_corpus(corpus = corpus, registry = registry)
+}
+
+#' Get charset of a corpus.
+#' 
+#' The encoding of a corpus is declared in the registry file (corpus property
+#' "charset"). Once a corpus is loaded, this information is available without
+#' parsing the registry file again and again. The \code{cl_charset_name} offers
+#' a quick access to this information.
+#' 
+#' @param corpus Name of a CWB corpus (upper case).
+#' @param registry Path to the registry directory, defaults to the value of the
+#'   environment variable CORPUS_REGISTRY
+#' @export cl_charset_name
+#' @examples
+#' cl_charset_name(
+#'   corpus = "REUTERS",
+#'   registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+#' )
+cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .cl_charset_name(corpus = corpus, registry = registry)
+}
+
