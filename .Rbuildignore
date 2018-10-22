@@ -12,3 +12,5 @@
 ^docs$
 ^CONDUCT.md$
 ^revdep$
+^README.Rmd$
+^README.md$
