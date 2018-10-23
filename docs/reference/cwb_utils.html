@@ -64,7 +64,7 @@ positional attribute, and produce all components." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.6</span>
       </span>
     </div>
 
@@ -172,7 +172,7 @@ environment variable CORPUS_REGISTRY</p></td>
 
 <span class='co'># perform cwb_makeall (equivalent to cwb-makeall command line utility)</span>
 <span class='fu'>cwb_makeall</span>(<span class='kw'>corpus</span> <span class='kw'>=</span> <span class='st'>"UNGA"</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>tmp_regdir</span>)</div><div class='output co'>#&gt; === Makeall: processing corpus UNGA ===
-#&gt; Registry directory: /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/registry
+#&gt; Registry directory: /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/registry
 #&gt; ATTRIBUTE word
 #&gt;  + creating LEXSRT ... OK
 #&gt;  - lexicon      OK
@@ -220,21 +220,21 @@ environment variable CORPUS_REGISTRY</p></td>
 #&gt;  17    3200        0     4751
 #&gt; ----------------------------------------
 #&gt;        7951
-#&gt; - writing code descriptor block to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.hcd
-#&gt; - writing compressed item sequence to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.huf
-#&gt; - writing sync (every 128 tokens) to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.huf.syn
+#&gt; - writing code descriptor block to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.hcd
+#&gt; - writing compressed item sequence to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.huf
+#&gt; - writing sync (every 128 tokens) to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.huf.syn
 #&gt; VALIDATING UNGA.word
-#&gt; - reading code descriptor block from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.hcd
-#&gt; - reading compressed item sequence from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.huf
-#&gt; - reading sync (mod 128) from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.huf.syn
-#&gt; !! You can delete the file &lt;/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.corpus&gt; now.</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='fu'>cwb_compress_rdx</span>(<span class='kw'>corpus</span> <span class='kw'>=</span> <span class='st'>"UNGA"</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>tmp_regdir</span>)</div><div class='output co'>#&gt; COMPRESSING INDEX of UNGA.word
-#&gt; - writing compressed index to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.crc
-#&gt; - writing compressed index offsets to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.crx
+#&gt; - reading code descriptor block from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.hcd
+#&gt; - reading compressed item sequence from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.huf
+#&gt; - reading sync (mod 128) from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.huf.syn
+#&gt; !! You can delete the file &lt;/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.corpus&gt; now.</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='fu'>cwb_compress_rdx</span>(<span class='kw'>corpus</span> <span class='kw'>=</span> <span class='st'>"UNGA"</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>tmp_regdir</span>)</div><div class='output co'>#&gt; COMPRESSING INDEX of UNGA.word
+#&gt; - writing compressed index to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.crc
+#&gt; - writing compressed index offsets to /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.crx
 #&gt; VALIDATING UNGA.word
-#&gt; - reading compressed index from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.crc
-#&gt; - reading compressed index offsets from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.crx
-#&gt; !! You can delete the file &lt;/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.corpus.rev&gt; now.
-#&gt; !! You can delete the file &lt;/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpBeoLiK/indexed_corpora/unga/word.corpus.rdx&gt; now.</div><div class='output co'>#&gt; [1] 0</div></pre>
+#&gt; - reading compressed index from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.crc
+#&gt; - reading compressed index offsets from /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.crx
+#&gt; !! You can delete the file &lt;/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.corpus.rev&gt; now.
+#&gt; !! You can delete the file &lt;/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmpfnlipg/indexed_corpora/unga/word.corpus.rdx&gt; now.</div><div class='output co'>#&gt; [1] 0</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

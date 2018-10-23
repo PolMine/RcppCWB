@@ -1,10 +1,8 @@
 ## General remarks
 
-This version (v0.2.5) is a maintanence release. It integrates a pull request be Jeroen Ooms to include libiconv in configure.win, so that RcppCWB will be compatible with an upcoming version of Rtools.
+This version (v0.2.6) expands the exposed functionality of the Corpus Workbench.
 
-In addition, there is only a minor change to make handling registry files more robust. 
-
-Binaries of the package are not available at CRAN for macOS. Compilation fails in this case, because 'Glib is not present on CRAN build machines for macOS. It would be great for RcppCWB, if you could install Glib, which might be needed by other packages as well (such as Rpoppler). On my system, using Homebrow for installing Glib works nicely (brew install glib).
+Compilation of RcppCWB fails for macOS because 'Glib' is not present on CRAN build machines for macOS. It would be great, if you could install 'Glib' on your macOS build machine, which might be needed by other packages as well (e.g. 'Rpoppler'). On my system, using Homebrow for installing Glib works nicely (brew install glib).
 
 Making RcppCWB compile on Solaris is still on my list of to dos!
 
@@ -22,10 +20,9 @@ Making RcppCWB compile on Solaris is still on my list of to dos!
 
 There were no ERRORs, WARNINGs or NOTEs on the Linux / macOS environments I used. 
 
-On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb | sub-directories of 1Mb or more: libs 5.2Mb". This results from the dependency on pcre, and glib.
+On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb | sub-directories of 1Mb or more: libs 5.2Mb". This results from the dependency on pcre, and glib which are included.
 
 
 ## Downstream dependencies
 
-I have also checked downstream dependencies using devtools::revdep(),
-without seeing ERRORs, WARNINGs, or NOTEs.
+I have also checked downstream dependencies using devtools::revdep(). I did not see WARNINGs, or NOTEs, but one ERROR, caused by the package 'polmineR' which I maintain myself. Accidentaly, there is a call to RStudio's `View()` when checking the package in interactive mode using 'devtools::revdep()'. This is an polmineR issue which I can fix as soon as RcppCWB v0.2.6 is on CRAN.

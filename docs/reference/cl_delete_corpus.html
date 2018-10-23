@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Check Input to Rcpp Functions. — check • RcppCWB</title>
+<title>Drop loaded corpus. — cl_delete_corpus • RcppCWB</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,12 +30,9 @@
 
 
 
-<meta property="og:title" content="Check Input to Rcpp Functions. — check" />
+<meta property="og:title" content="Drop loaded corpus. — cl_delete_corpus" />
 
-<meta property="og:description" content="A set of functions to check whether the input values to the Rcpp
-wrappers for the C functions of the Corpus Workbench potentially causing
-crashes are valid. These auxiliary functions are called by the cl_ and cqp_
-functions." />
+<meta property="og:description" content="Remove a corpus from the list of loaded corpora of the corpus library (CL)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -98,81 +95,42 @@ functions." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Check Input to Rcpp Functions.</h1>
+    <h1>Drop loaded corpus.</h1>
     
-    <div class="hidden name"><code>checks.Rd</code></div>
+    <div class="hidden name"><code>cl_delete_corpus.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>A set of functions to check whether the input values to the Rcpp
-wrappers for the C functions of the Corpus Workbench potentially causing
-crashes are valid. These auxiliary functions are called by the cl_ and cqp_
-functions.</p>
+    <p>Remove a corpus from the list of loaded corpora of the corpus library (CL).</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>check_registry</span>(<span class='no'>registry</span>)
-
-<span class='fu'>check_corpus</span>(<span class='no'>corpus</span>, <span class='no'>registry</span>)
-
-<span class='fu'>check_s_attribute</span>(<span class='no'>s_attribute</span>, <span class='no'>corpus</span>,
-  <span class='kw'>registry</span> <span class='kw'>=</span> <span class='fu'>Sys.getenv</span>(<span class='st'>"CORPUS_REGISTRY"</span>))
-
-<span class='fu'>check_p_attribute</span>(<span class='no'>p_attribute</span>, <span class='no'>corpus</span>,
-  <span class='kw'>registry</span> <span class='kw'>=</span> <span class='fu'>Sys.getenv</span>(<span class='st'>"CORPUS_REGISTRY"</span>))
-
-<span class='fu'>check_strucs</span>(<span class='no'>corpus</span>, <span class='no'>s_attribute</span>, <span class='no'>strucs</span>, <span class='no'>registry</span>)
-
-<span class='fu'>check_region_matrix</span>(<span class='no'>region_matrix</span>)
-
-<span class='fu'>check_cqp_query</span>(<span class='no'>query</span>)
-
-<span class='fu'>check_cpos</span>(<span class='no'>corpus</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='no'>cpos</span>,
-  <span class='kw'>registry</span> <span class='kw'>=</span> <span class='fu'>Sys.getenv</span>(<span class='st'>"CORPUS_REGISTRY"</span>))
-
-<span class='fu'>check_id</span>(<span class='no'>corpus</span>, <span class='no'>p_attribute</span>, <span class='no'>id</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='fu'>Sys.getenv</span>(<span class='st'>"CORPUS_REGISTRY"</span>))</pre>
+    <pre class="usage"><span class='fu'>cl_delete_corpus</span>(<span class='no'>corpus</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='fu'>Sys.getenv</span>(<span class='st'>"CORPUS_REGISTRY"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>registry</th>
-      <td><p>path to registry directory</p></td>
-    </tr>
-    <tr>
       <th>corpus</th>
-      <td><p>name of a CWB corpus</p></td>
+      <td><p>name of a CWB corpus (upper case)</p></td>
     </tr>
     <tr>
-      <th>s_attribute</th>
-      <td><p>a structural attribute</p></td>
-    </tr>
-    <tr>
-      <th>p_attribute</th>
-      <td><p>a positional attribute</p></td>
-    </tr>
-    <tr>
-      <th>strucs</th>
-      <td><p>strucs (indices of structural attributes)</p></td>
-    </tr>
-    <tr>
-      <th>region_matrix</th>
-      <td><p>a region matrix</p></td>
-    </tr>
-    <tr>
-      <th>query</th>
-      <td><p>a CQP query</p></td>
-    </tr>
-    <tr>
-      <th>cpos</th>
-      <td><p>vector of corpus positions</p></td>
-    </tr>
-    <tr>
-      <th>id</th>
-      <td><p>id (encoded p-attribute), integer value</p></td>
+      <th>registry</th>
+      <td><p>path to the registry directory, defaults to the value of the
+environment variable CORPUS_REGISTRY</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>The corpus library (CL) internally maintains a list of corpora including
+information on positional and structural attributes so that the registry file
+needs not be parsed again and again. However, when an attribute has been
+added to the corpus, it will not yet be visible, because it is not part of
+the data that has been loaded. The <code>cl_delete_corpus</code> function exposes a
+CL function named identically, to force reloading the corpus (after it has
+been deleted), which will include parsing an updated registry file.</p>
     
 
   </div>
@@ -180,7 +138,9 @@ functions.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#details">Details</a></li>
+          </ul>
 
   </div>
 </div>
