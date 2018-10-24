@@ -19,7 +19,7 @@ case $(uname -s) in
         echo "* glib missing, downloading static library from GitHub repo";
         ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd` # checks whether glib is installed, download if necessary
         export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
-        LINTL=" -lintl "
+        INTL=" -lintl "
         CARBON=" -framework Carbon"
       fi
     else
