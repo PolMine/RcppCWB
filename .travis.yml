@@ -22,7 +22,7 @@ r_packages:
 
 warnings_are_errors: false
 
-r_build_args: '-F/Library/Frameworks/R.framework/.. -framework R -Wl,-framework -Wl,CoreFoundation'
+r_check_args: --install-args='-F/Library/Frameworks/R.framework/.. -framework R -Wl,-framework -Wl,CoreFoundation'
 
 notifications:
   email:
