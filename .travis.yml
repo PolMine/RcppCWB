@@ -22,6 +22,8 @@ r_packages:
 
 warnings_are_errors: false
 
+r_build_args: '-F/Library/Frameworks/R.framework/.. -framework R -Wl,-framework -Wl,CoreFoundation'
+
 notifications:
   email:
   on_success: change
