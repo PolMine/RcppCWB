@@ -7,7 +7,7 @@ matrix:
       dist: trusty
     - os: osx
       osx_image: xcode9.1
-      brew_packages: pkg-config glib pcre
+      brew_packages: pkg-config pcre
 
 addons:
   apt:
@@ -21,7 +21,7 @@ r_packages:
   - digest
   - testthat
 
-warnings_are_errors: true
+warnings_are_errors: false
 
 notifications:
   email:
