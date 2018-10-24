@@ -54,7 +54,7 @@ CWB_DIR=`pwd`/src/cwb
 GLIB_LIBDIRS=`pkg-config --libs-only-L glib-2.0`
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
 echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/src/cwb/cqp -I"$BUILD_DIR"/src/cwb/cl -I"$BUILD_DIR"/src/cwb/CQi" > ./src/Makevars
-echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -L"$CWB_DIR"/utils "$GLIB_LIBDIRS" -lcwb -lcqp -lcl -lglib-2.0 -lpcre\n" >> ./src/Makevars
+echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -L"$CWB_DIR"/utils "$GLIB_LIBDIRS" -lcwb -lcqp -lcl -lglib-2.0 -lintl -lpcre\n" >> ./src/Makevars
 echo -e "\$(SHLIB): libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 echo "libcl.a: depend" >> ./src/Makevars
 echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) -C cwb cl\n" >> ./src/Makevars
