@@ -105,6 +105,10 @@
     .Call(`_RcppCWB_cqp_drop_subcorpus`, inSubcorpus)
 }
 
+.check_corpus <- function(corpus) {
+    .Call(`_RcppCWB_check_corpus`, corpus)
+}
+
 .decode_s_attribute <- function(corpus, s_attribute, registry) {
     .Call(`_RcppCWB_decode_s_attribute`, corpus, s_attribute, registry)
 }

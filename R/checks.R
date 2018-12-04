@@ -35,8 +35,10 @@ check_corpus <- function(corpus, registry){
     stop("corpus needs to be a vector of length 1")
   if (!is.character(corpus))
     stop("corpus needs to be a character vector")
-  if (!tolower(corpus) %in% list.files(registry))
-    stop("no file describing corpus in registry directory: Does corpus exists / check whether there is a typo.")
+  if (!cqp_is_initialized()) cqp_initialize()
+  if (.check_corpus(toupper(corpus)) == 0)
+  # if (!tolower(corpus) %in% list.files(registry))
+    stop(sprintf("corpus %s is not available (check whether there is a typo)", sQuote(corpus)))
   return( TRUE )
 }
 

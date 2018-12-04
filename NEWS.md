@@ -1,3 +1,15 @@
+# RcppCWB 0.2.6.9001
+
+* Calling the 'find_readline.perl' utility script is omitted on macOS, to 
+previous warning messages when running the makefile do not show up any more.
+* If glib-2.0 is not present on macOS, binaries of the static library and 
+header files are downloaded from a GitHub repo. This prepares to get RcppCWB
+pass macOS checking on CRAN machines.
+* A new C++-level function 'check_corpus' checks whether a given corpus is
+available and is used by the `check_corpus()`-function. Prior problems with 
+the previous implementation that used files in the registry directory to
+ensure the presence of a corpus hopefully do not occur.
+
 # RcppCWB 0.2.6
 
 * Function `cl_charset_name()` is exposed, it will return the charset of a 

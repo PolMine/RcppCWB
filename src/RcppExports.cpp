@@ -331,6 +331,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// check_corpus
+int check_corpus(SEXP corpus);
+RcppExport SEXP _RcppCWB_check_corpus(SEXP corpusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_corpus(corpus));
+    return rcpp_result_gen;
+END_RCPP
+}
 // decode_s_attribute
 Rcpp::StringVector decode_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry);
 RcppExport SEXP _RcppCWB_decode_s_attribute(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP) {
@@ -492,6 +503,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},
     {"_RcppCWB_cqp_dump_subcorpus", (DL_FUNC) &_RcppCWB_cqp_dump_subcorpus, 1},
     {"_RcppCWB_cqp_drop_subcorpus", (DL_FUNC) &_RcppCWB_cqp_drop_subcorpus, 1},
+    {"_RcppCWB_check_corpus", (DL_FUNC) &_RcppCWB_check_corpus, 1},
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},
     {"_RcppCWB_get_count_vector", (DL_FUNC) &_RcppCWB_get_count_vector, 3},
     {"_RcppCWB_get_region_matrix", (DL_FUNC) &_RcppCWB_get_region_matrix, 4},

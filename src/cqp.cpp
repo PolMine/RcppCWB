@@ -509,3 +509,21 @@ SEXP cqp_drop_subcorpus(SEXP inSubcorpus)
 }
 
 
+
+// [[Rcpp::export(name=".check_corpus")]]
+int check_corpus(SEXP corpus){
+  
+  char * c;
+  CorpusList * cl;
+  
+  c = (char*)CHAR(STRING_ELT(corpus,0));
+  cl = findcorpus(c, SYSTEM, 0);
+  
+  if (cl == NULL || !access_corpus(cl)) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+
