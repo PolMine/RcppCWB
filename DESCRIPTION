@@ -24,6 +24,7 @@ Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), a
   package. To achieve cross-platform portability (including Windows), using 'Rcpp' for wrapper code
   is the approach used by 'RcppCWB'.
 License: GPL-3
+Encoding: UTF-8
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
 SystemRequirements: On Unix-like operating systems, pcre (>= 7) needs to be present to compile
