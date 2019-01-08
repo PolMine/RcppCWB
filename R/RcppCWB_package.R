@@ -119,6 +119,7 @@
 #' # access to the CWB corpus library (CL)
 #' 
 #' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
+#' print(registry)
 #' ids <- cl_cpos2id("REUTERS", cpos = 1:20, p_attribute = "word", registry = registry)
 #' tokens <- cl_id2str("REUTERS", id = ids, p_attribute = "word", registry = registry)
 #' print(paste(tokens, collapse = " "))
@@ -139,3 +140,4 @@
 #'  )
 #' 
 NULL
+

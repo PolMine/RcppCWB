@@ -1,6 +1,6 @@
 # RcppCWB 0.2.6.9001
 
-* Calling the 'find_readline.perl' utility script is omitted on macOS, to 
+* Calling the 'find_readline.perl' utility script is omitted on macOS, so 
 previous warning messages when running the makefile do not show up any more.
 * If glib-2.0 is not present on macOS, binaries of the static library and 
 header files are downloaded from a GitHub repo. This prepares to get RcppCWB
