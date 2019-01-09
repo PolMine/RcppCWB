@@ -13,7 +13,9 @@ CARBON=""
 case $(uname -s) in
   Darwin)
     if [ -x "$(command -v pkg-config)" ]; then
-      if [ -x "$(pkg-config --exists glib-2.0)" ]; then
+      pkg-config --exists glib-2.0
+      GLIB_EXISTS=$?
+      if [ $GLIB_EXISTS = 0 ]; then
         echo "* pkg-config has information on glib-2.0";
       else
         echo "* glib missing, downloading static library from GitHub repo";

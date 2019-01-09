@@ -1,18 +1,18 @@
-# RcppCWB 0.2.6.9001
+# RcppCWB 0.2.7
 
+* If glib-2.0 is not present on macOS, binaries of the static library and 
+header files are downloaded from a GitHub repo. This prepares to get RcppCWB
+pass macOS checking on CRAN machines.
 * A slight modification of the C code will now prevent previous crashes resulting
 from a faulty CQP syntax. The solution will not yet be effective for Windows
 systems until we have recompiled the libcqp static library that is downloaded
 during the installation process.
+* A new C++-level function 'check_corpus' checks whether a given corpus is
+available and is used by the `check_corpus()`-function. Problems with 
+the previous implementation that relied on files in the registry directory to
+ensure the presence of a corpus hopefully do not occur.
 * Calling the 'find_readline.perl' utility script is omitted on macOS, so 
 previous warning messages when running the makefile do not show up any more.
-* If glib-2.0 is not present on macOS, binaries of the static library and 
-header files are downloaded from a GitHub repo. This prepares to get RcppCWB
-pass macOS checking on CRAN machines.
-* A new C++-level function 'check_corpus' checks whether a given corpus is
-available and is used by the `check_corpus()`-function. Prior problems with 
-the previous implementation that used files in the registry directory to
-ensure the presence of a corpus hopefully do not occur.
 
 # RcppCWB 0.2.6
 
