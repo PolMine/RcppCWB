@@ -1,7 +1,9 @@
 # RcppCWB 0.2.6.9001
 
 * A slight modification of the C code will now prevent previous crashes resulting
-from a faulty CQP syntax.
+from a faulty CQP syntax. The solution will not yet be effective for Windows
+systems until we have recompiled the libcqp static library that is downloaded
+during the installation process.
 * Calling the 'find_readline.perl' utility script is omitted on macOS, so 
 previous warning messages when running the makefile do not show up any more.
 * If glib-2.0 is not present on macOS, binaries of the static library and 
