@@ -340,7 +340,9 @@ extern int yylex(void);
 
 void yyerror (char *s)
 {
-  cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
+  /* Commented out to avoid a crash */
+  /* cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer); */
+  cqpmessage(Error, "CQP Syntax Error: %s", s); /* slight modification */
   generate_code = 0;
 }
 

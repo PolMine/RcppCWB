@@ -15,6 +15,7 @@ extern "C" {
 
 #include <Rcpp.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 
 
@@ -362,13 +363,18 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   char * cqp_query;
   CorpusList *cl;
   
+  /* is this necessary */
+  char	*c, *sc;
+  if (!split_subcorpus_spec(mother, &c, &sc)) {
+    Rprintf("ERROR (function: split_subcorpus_spec)");
+  }
   
   cl = cqi_find_corpus(mother);
   set_current_corpus(cl, 0);
 
   int len = strlen(child) + strlen(q) + 10;
-  
   cqp_query = (char *) cl_malloc(len);
+  
   sprintf(cqp_query, "%s = %s", child, q);
 
   if (!cqi_activate_corpus(mother)){
@@ -378,16 +384,20 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
     Rprintf("checking subcorpus name failed \n");
   }
   
-  cqp_parse_string(cqp_query);
+  if (!cqp_parse_string(cqp_query)){
+    Rprintf("ERROR: Cannot parse the CQP query.\n");
+  } else {
+    char *			full_child;
+    CorpusList *	childcl;
+    
+    full_child = combine_subcorpus_spec(mother, child); /* c is the 'physical' part of the mother corpus */
 
-  char *			full_child;
-  CorpusList *	childcl;
-  
-  full_child = combine_subcorpus_spec(mother, child); /* c is the 'physical' part of the mother corpus */
-  childcl = cqi_find_corpus(full_child);
-  /* if ((childcl) == NULL) {
+    childcl = cqi_find_corpus(full_child);
+    /* if ((childcl) == NULL) {
     printf("subcorpus not found\n");
-  } */
+    } */
+  }
+
   
   SEXP result = R_NilValue;
   return result;

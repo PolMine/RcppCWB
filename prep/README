@@ -252,3 +252,13 @@ _cwb_makeall.c: In function ‘validate_revcorp’:
 _cwb_makeall.c:139:3: warning: implicit declaration of function ‘ntohl’ [-Wimplicit-function-declaration]
 if (ntohl(revcorp->data.data[ptab[id]]) != cpos) {
 ^
+
+
+parser.tab.c
+------------
+parser.tab.c line 345
+cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
+replaced by:
+cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
+
+The previous version resulted in an awful total crash. QueryBuffer causes the problem! 
