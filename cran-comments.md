@@ -1,19 +1,21 @@
 ## General remarks
 
-This version (v0.2.6) expands the exposed functionality of the Corpus Workbench.
+Apart from bug fixes, this version (v0.2.7) tries to address the current failure to build RcppCWB on your macOS build machines.
 
-Compilation of RcppCWB fails for macOS because 'Glib' is not present on CRAN build machines for macOS. It would be great, if you could install 'Glib' on your macOS build machine, which might be needed by other packages as well (e.g. 'Rpoppler'). On my system, using Homebrow for installing Glib works nicely (brew install glib).
+The problem appears to be that glib-2.0 is not installed on the system. As a remedy, the configure script now checks whether glib is present (using pkg-config). If glib is missing, a pre-compiled static library is downloaded from a GitHub repo (). If glib is present, 
 
-Making RcppCWB compile on Solaris is still on my list of to dos!
+This approach is a variation of the approach of packages that rely on https://github.com/rwinlib, already used for build in the Windows binaries.
+
+Making RcppCWB compile on Solaris is still on my list of to dos. Because this is the larger group of users by far, making things smooth for macOS is the priority of this release.
 
 
 ## Test environments
 
-* local OS X install, R 3.5.0
-* Ubuntu 14.04 (on travis-ci), R 3.5.0
+* local OS X install, R 3.5.1
+* Ubuntu 14.04 (on travis-ci), R 3.5.2
 * Ubuntu 14.04 (project server), R 3.4.3
-* win-builder (devel and release), R 3.5.0
-* Windows AppVeyorR, 3.5.0 Patched
+* win-builder (devel and release), R 3.5.2
+* Windows AppVeyorR, 3.5.2 Patched
 
 
 ## R CMD check results
@@ -25,4 +27,4 @@ On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb |
 
 ## Downstream dependencies
 
-I have also checked downstream dependencies using devtools::revdep(). I did not see WARNINGs, or NOTEs, but one ERROR, caused by the package 'polmineR' which I maintain myself. Accidentaly, there is a call to RStudio's `View()` when checking the package in interactive mode using 'devtools::revdep()'. This is an polmineR issue which I can fix as soon as RcppCWB v0.2.6 is on CRAN.
+I have also checked downstream dependencies using revdepcheck::revdep_check(). I did not see WARNINGs, or NOTEs, or ERRORs.

@@ -1,0 +1,24 @@
+CL: p_attributes        Using Positional Attributes.
+CL: s_attributes        Using Structural Attributes.
+RcppCWB-package         Rcpp Bindings for the Corpus Workbench (CWB).
+check                   Check Input to Rcpp Functions.
+check_pkg_registry_files
+                        Check Paths in Registry Files
+cl_attribute_size       Get Attribute Size (of Positional/Structural
+                        Attribute).
+cl_charset_name         Get charset of a corpus.
+cl_delete_corpus        Drop loaded corpus.
+cl_lexicon_size         Get Lexicon Size.
+cqp_initialize          Initialize Corpus Query Processor (CQP).
+cqp_list_corpora        List Available CWB Corpora.
+cqp_query               Execute CQP Query and Retrieve Results.
+cwb_makeall             CWB Tools for Creating Corpora
+get_cbow_matrix         Get CBOW Matrix.
+get_count_vector        Get Vector with Counts for Positional
+                        Attribute.
+get_pkg_registry        Get Registry Directory Within Package
+get_region_matrix       Get Matrix with Regions for Strucs.
+ids_to_count_matrix     Perform Count for Vector of IDs.
+region_matrix_ops       Get IDs and Counts for Region Matrices.
+s_attribute_decode      Decode Structural Attribute.
+use_tmp_registry        Use Temporary Registry
