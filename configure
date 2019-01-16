@@ -41,11 +41,14 @@ case $(uname -s) in
   SunOS)
     CPU_INFO=`psrinfo -pv | sed -n '2p'`
     case $CPU_INFO in
-      x86)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
       SPARK)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=solaris/" ./src/cwb/config.mk;;
-    esac;;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=solaris_spark/" ./src/cwb/config.mk;;
+      *)
+        sed -e "s/PLATFORM=.*/PLATFORM=solaris_x86/" ./src/cwb/config.mk > ./src/cwb/config.mk.mod
+        rm ./src/cwb/config.mk
+        mv ./src/cwb/config.mk.mod ./src/cwb/config.mk;;
+    esac
+    SOCKETLIB='-lsocket';;
   *)
     sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
 esac

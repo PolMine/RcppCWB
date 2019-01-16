@@ -270,3 +270,8 @@ to satisfy solaris
 #include <signal.h> /* added by Andreas Blaette  */
 #include <sys/socket.h> /* added by Andreas Blaette */
 
+
+config - Verzeichnis
+--------------------
+copy of platform-file 'solaris': 'solaris_x86', with modification 
+CFLAGS = -Wall -O3 -fPIC 
