@@ -111,7 +111,7 @@ lex.creg.c: registry.l registry.y registry.tab.h corpus.h macros.h attributes.h
 libcl.a: $(OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
-	$(AR) -s $@
+#	$(AR) -s $@
 
 depend:
 	-$(RM) depend.mk

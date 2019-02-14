@@ -48,7 +48,7 @@ case $(uname -s) in
         rm ./src/cwb/config.mk
         mv ./src/cwb/config.mk.mod ./src/cwb/config.mk;;
     esac
-    SOCKETLIB=' -lsocket';;
+    SOCKETLIB=' -lsocket -Wl,--allow-multiple-definition';;
   *)
     sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
 esac
