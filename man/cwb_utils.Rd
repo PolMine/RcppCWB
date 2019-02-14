@@ -74,6 +74,8 @@ tokens_sentence_1 <- cl_id2str(
   registry = tmp_regdir, id = ids_sentence_1
   )
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
+\dontrun{
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+}
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
