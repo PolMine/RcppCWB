@@ -3,6 +3,13 @@ Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
 Version: 0.2.7.9002
 Date: 2019-02-13
+Author: Andreas Blaette [aut, cre],
+  Bernard Desgraupes [aut],
+  Sylvain Loiseau [aut],
+  Oliver Christ [ctb],
+  Bruno Maximilian Schulze [ctb],
+  Stefan Evert [ctb],
+  Arne Fitschen [ctb]
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),
@@ -27,7 +34,7 @@ License: GPL-3
 Encoding: UTF-8
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: pcre (>= 7), Glib. On Windows, no prior installations are necessary,
+SystemRequirements: GNU make, pcre (>= 7), GLib (>= 2.0.0). On Windows, no prior installations are necessary,
   as pre-built (i.e. cross-compiled) binaries of required libraries are downloaded from a GitHub
   repository (<https://github.com/PolMine/libcl>) during installation. On macOS, static libraries
   of Glib are downloaded (<https://github.com/PolMine/libglib>) if Glib is not present.
