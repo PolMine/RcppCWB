@@ -65,7 +65,9 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 #' @rdname cwb_utils
 #' @export cwb_huffcode
 #' @examples 
+#' \dontrun{
 #' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+#' }
 cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
