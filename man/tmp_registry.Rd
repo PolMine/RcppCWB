@@ -2,14 +2,17 @@
 % Please edit documentation in R/misc.R
 \name{use_tmp_registry}
 \alias{use_tmp_registry}
+\alias{get_tmp_registry}
 \title{Use Temporary Registry}
 \usage{
 use_tmp_registry(pkg = system.file(package = "RcppCWB"))
+
+get_tmp_registry()
 }
 \arguments{
-\item{pkg}{full path to a package}
+\item{pkg}{Full path to a package.}
 }
 \description{
-Use a temporary registry directory to describe and access the corpora in 
-a package
+Use and get temporary registry directory to describe and access the corpora
+in a package.
 }

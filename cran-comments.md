@@ -1,12 +1,10 @@
 ## General remarks
 
-Apart from bug fixes, this version (v0.2.7) tries to address the current failure to build RcppCWB on your macOS build machines.
+staged installs
 
-The problem appears to be that glib-2.0 is not installed on the system. As a remedy, the configure script now checks whether glib is present (using pkg-config). If glib is missing, a pre-compiled static library is downloaded from a GitHub repo (). If glib is present, 
+-march
 
-This approach is a variation of the approach of packages that rely on https://github.com/rwinlib, already used for build in the Windows binaries.
-
-Making RcppCWB compile on Solaris is still on my list of to dos. Because this is the larger group of users by far, making things smooth for macOS is the priority of this release.
+GNU make / Making RcppCWB compile on Solaris is still on my list of to dos. Because this is the larger group of users by far, making things smooth for macOS is the priority of this release.
 
 
 ## Test environments
