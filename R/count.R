@@ -11,7 +11,7 @@
 #' @rdname get_count_vector
 #' @export get_count_vector
 #' @examples 
-#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
+#' registry <- use_tmp_registry()
 #' y <- get_count_vector(
 #'   corpus = "REUTERS", p_attribute = "word",
 #'   registry = registry
