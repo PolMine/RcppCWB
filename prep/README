@@ -262,3 +262,16 @@ replaced by:
 cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
 
 The previous version resulted in an awful total crash. QueryBuffer causes the problem! 
+
+
+cl/fileutils.cd
+---------------
+to satisfy solaris
+#include <signal.h> /* added by Andreas Blaette  */
+#include <sys/socket.h> /* added by Andreas Blaette */
+
+
+config - Verzeichnis
+--------------------
+copy of platform-file 'solaris': 'solaris_x86', with modification 
+CFLAGS = -Wall -O3 -fPIC 

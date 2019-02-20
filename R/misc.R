@@ -1,9 +1,10 @@
 #' Use Temporary Registry
 #' 
-#' Use a temporary registry directory to describe and access the corpora in 
-#' a package
-#' @param pkg full path to a package
+#' Use and get temporary registry directory to describe and access the corpora
+#' in a package.
+#' @param pkg Full path to a package.
 #' @export use_tmp_registry
+#' @rdname tmp_registry
 use_tmp_registry <- function(pkg = system.file(package = "RcppCWB")){
   
   tmp_registry_dir <- file.path(tempdir(), "registry_tmp")
@@ -31,6 +32,12 @@ use_tmp_registry <- function(pkg = system.file(package = "RcppCWB")){
   if (cqp_is_initialized()) cqp_reset_registry(tmp_registry_dir)
   tmp_registry_dir
 }
+
+#' @rdname tmp_registry
+#' @export get_tmp_registry
+get_tmp_registry <- function() file.path(tempdir(), "registry_tmp")
+
+
 
 #' Get Registry Directory Within Package
 #' @param pkgname Name of package (character vector)

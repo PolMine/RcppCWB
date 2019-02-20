@@ -9,6 +9,7 @@ output: github_document
 [![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/dev/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/dev)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2540653.svg)](https://doi.org/10.5281/zenodo.2540653)
 
+
 # Rcpp bindings for the Corpus Workbench (CWB)
 
 The package exposes functions of the Corpus Worbench (CWB) by way of Rcpp wrappers. Furthermore, the packages includes Rcpp code for performance critical operations. The main purpose of the package is to serve as an interface to the CWB for the package [polmineR](https://CRAN.R-project.org/package=RcppCWB).

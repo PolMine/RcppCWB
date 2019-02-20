@@ -57,36 +57,34 @@ SRCDIRS = cl cqp utils CQi	# subdirectories containing C source code
 
 cl:
 	@$(ECHO) "--------------------------------- BUILDING CORPUS LIBRARY (CL)"
-	$(MAKE) -C cl
+	cd cl; $(MAKE)
 
 cqp:
 	@$(ECHO) "--------------------------------- BUILDING CQP"
-	$(MAKE) -C cqp
+	cd cqp; $(MAKE)
 
 utils:
 	@$(ECHO) "--------------------------------- BUILDING COMMAND-LINE UTILITIES"
-	$(MAKE) -C utils
+	cd utils; $(MAKE)
 
 man:
 	@$(ECHO) "--------------------------------- BUILDING MANPAGES"
-	$(MAKE) -C man
+	cd man; $(MAKE)
 
 
 size:
 	for i in $(SUBDIRS) ;\
 	do \
 	$(ECHO) "--------------------------------- $$i"; \
-	$(MAKE) -C $$i size; \
+	cd $$i; \
+	$(MAKE) size; \
 	done;
 
 depend:
-	for i in $(SUBDIRS) ;\
-	do \
-	$(MAKE) -C $$i depend; \
-	done;
+	for i in $(SUBDIRS) ; do cd $$i; $(MAKE) depend.mk; cd ..; done;
 
 clean:
-	for i in $(SUBDIRS) $(EXTERNALS); do if [ -f "$$i/Makefile" ]; then $(MAKE) -C $$i clean; fi; done;
+	for i in $(SUBDIRS); do if [ -f "$$i/Makefile" ]; then cd $$i; $(MAKE) clean; cd ..; fi; done;
 	-$(RM) *~ config/*/*~ CQi/*~ CQi/*.o technical/*~ TAGS
 	-$(RM) -rf build
 

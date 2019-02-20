@@ -48,8 +48,8 @@ all: libcwb.a
 libcwb.a: $(OBJS)
 	@$(ECHO) "--------------------------------- CREATING ARCHIVE"
 	$(RM) $@
-	$(AR) $@ $^
-	$(RANLIB) $@
+	$(AR) cq $@ $^
+#	$(AR) -s $@
 
 _cwb_makeall.o: _cwb_makeall.c
 	${CC} -c ${CFLAGS} -o _cwb_makeall.o _cwb_makeall.c

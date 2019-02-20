@@ -38,7 +38,8 @@ LEX = flex -8
 
 ## How to combine object files into a library archive (*.a) and build a table of contents
 ## (ranlib is optional, simply set to "echo" or so to skip
-AR = ar cq
+## modification by Andreas Blaette: options 'cq' removed here, and stated explicitly in Makefiles
+AR = ar
 RANLIB = ranlib
 
 #

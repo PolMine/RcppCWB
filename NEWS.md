@@ -1,3 +1,11 @@
+# RcppCWB 0.2.8
+
+* Modifiations of the C code so that compilation does not fail on Solaris.
+* Using the '-C' flag in the CWB Makefiles replaced by cd cl / cd cqp to avoid dependence on GNU make.
+* Removed action on 'depend.mk' from cleanup script to avoid error messages that depend.mk is not present when Makefiles are first loaded.
+* Dummy depend.mk files will satisfy include statement in Makefiles when running 'make clean' (depend.mk files are created only when running depend.mk)
+* For creating index of static archives (libcl, libcqb, libcwb), replaced call to 'ranlib' by 'ar -s' in the Makefiles.
+
 # RcppCWB 0.2.7
 
 * If glib-2.0 is not present on macOS, binaries of the static library and 

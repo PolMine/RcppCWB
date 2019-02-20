@@ -41,11 +41,14 @@ case $(uname -s) in
   SunOS)
     CPU_INFO=`psrinfo -pv | sed -n '2p'`
     case $CPU_INFO in
-      x86)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
       SPARK)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=solaris/" ./src/cwb/config.mk;;
-    esac;;
+        sed -i -e "s/PLATFORM=.*/PLATFORM=solaris_spark/" ./src/cwb/config.mk;;
+      *)
+        sed -e "s/PLATFORM=.*/PLATFORM=solaris_x86/" ./src/cwb/config.mk > ./src/cwb/config.mk.mod
+        rm ./src/cwb/config.mk
+        mv ./src/cwb/config.mk.mod ./src/cwb/config.mk;;
+    esac
+    SOCKETLIB=' -lsocket -Wl,--allow-multiple-definition';;
   *)
     sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
 esac
@@ -61,18 +64,18 @@ CWB_DIR=`pwd`/src/cwb
 GLIB_LIBDIRS=`pkg-config --libs-only-L glib-2.0`
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
 echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/src/cwb/cqp -I"$BUILD_DIR"/src/cwb/cl -I"$BUILD_DIR"/src/cwb/CQi" > ./src/Makevars
-echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -L"$CWB_DIR"/utils "$GLIB_LIBDIRS" -lcwb -lcqp -lcl -lglib-2.0"$INTL"-lpcre"$CARBON"\n" >> ./src/Makevars
+echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -L"$CWB_DIR"/utils "$GLIB_LIBDIRS" -lcwb -lcqp -lcl -lglib-2.0"$INTL"-lpcre"$SOCKETLIB$CARBON"\n" >> ./src/Makevars
 echo -e "\$(SHLIB): libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 echo "libcl.a: depend" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) -C cwb cl\n" >> ./src/Makevars
+echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) cl\n" >> ./src/Makevars
 echo "libcqp.a: depend" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) -C cwb cqp\n" >> ./src/Makevars
+echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) cqp\n" >> ./src/Makevars
 echo "libcwb.a: depend" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) -C cwb utils\n" >> ./src/Makevars
+echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) utils\n" >> ./src/Makevars
 echo "depend: clean" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) -C cwb depend\n" >> ./src/Makevars
+echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) depend\n" >> ./src/Makevars
 echo "clean:" >> ./src/Makevars
-echo -e "\tR_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) -C cwb clean\n" >> ./src/Makevars
+echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) clean\n" >> ./src/Makevars
 
 
 # Step 3: Modify data directory in registry file

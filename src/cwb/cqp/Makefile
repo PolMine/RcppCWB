@@ -98,8 +98,8 @@ all: libcqp.a
 
 libcqp.a: $(OBJS) $(CQI_OBJS)
 	$(RM) $@
-	$(AR) $@ $^
-	$(RANLIB) $@
+	$(AR) cq $@ $^
+#	$(AR) -s $@
 
 
 parser.tab.c parser.tab.h: parser.y

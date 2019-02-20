@@ -3,8 +3,7 @@
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![Travis-CI Build
 Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=dev)](https://travis-ci.org/PolMine/RcppCWB)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=dev&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=dev&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
 [![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/dev/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/dev)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2540653.svg)](https://doi.org/10.5281/zenodo.2540653)
 
