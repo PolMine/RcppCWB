@@ -4,7 +4,8 @@
 * Using the '-C' flag in the CWB Makefiles replaced by cd cl / cd cqp to avoid dependence on GNU make.
 * Removed action on 'depend.mk' from cleanup script to avoid error messages that depend.mk is not present when Makefiles are first loaded.
 * Dummy depend.mk files will satisfy include statement in Makefiles when running 'make clean' (depend.mk files are created only when running depend.mk)
-* For creating index of static archives (libcl, libcqb, libcwb), replaced call to 'ranlib' by 'ar -s' in the Makefiles.
+* For creating index of static archives (libcl, libcqb, libcwb), replaced call to 'ranlib' by 'ar -s' in the Makefiles, but commented out.
+* In the platform-specific config files of the CWB, the '-march'-option has been taken out, to safeguard portability.
 
 # RcppCWB 0.2.7
 

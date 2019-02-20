@@ -28,7 +28,7 @@ include $(TOP)/config/platform/darwin
 CC = /usr/bin/gcc
 
 ## Universal build for Intel 32-bit & 64-bit CPUs tuned to Intel Core 2 architecture
-CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -march=core2 -mtune=core2
+CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -mtune=core2
 
 DEPEND_CFLAGS = -Wall -O3
 

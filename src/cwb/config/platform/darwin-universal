@@ -28,7 +28,7 @@ include $(TOP)/config/platform/darwin
 CC = /usr/bin/gcc
 
 ## needs universal versions of glib and pcre (see installation notes)
-CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -march=core2 -mtune=core2
+CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -mtune=core2
 
 DEPEND_CFLAGS = -Wall -O3
 
