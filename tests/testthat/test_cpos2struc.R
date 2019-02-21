@@ -9,7 +9,7 @@ test_that(
       corpus = "REUTERS",
       s_attribute = "places",
       cpos = 100L,
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
     expect_equal(N, 1L)
   }

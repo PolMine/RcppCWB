@@ -8,7 +8,7 @@ test_that(
     M <- get_cbow_matrix(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
+      registry = use_tmp_registry(),
       matrix = matrix(c(0, 91), nrow = 1),
       window = 5
     )

@@ -6,6 +6,8 @@
 * Dummy depend.mk files will satisfy include statement in Makefiles when running 'make clean' (depend.mk files are created only when running depend.mk)
 * For creating index of static archives (libcl, libcqb, libcwb), a call to 'ranlib' has been replaced by an equivalent 'ar -s' in the Makefiles, but commented out.
 * In the platform-specific config files of the CWB, the '-march'-option has been taken out, to safeguard portability.
+* To meet the requirements of the upcoming changes in the CRAN check process to use staged installs, the procedure to reset the paths in the test data within the package has been replaced throughout by using a temporary registry directory. The `get_tmp_registry()` will return the whereabouts of this directory.
+
 
 # RcppCWB 0.2.7
 

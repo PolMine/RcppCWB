@@ -8,7 +8,7 @@ test_that(
     Ns <- get_count_vector(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = use_tmp_registry()
     )
     expect_equal(length(Ns), 1192)
     expect_equal(Ns[16], 78L)

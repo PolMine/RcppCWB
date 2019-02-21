@@ -8,7 +8,7 @@ test_that(
     sAttrDF <- s_attribute_decode(
       corpus = "REUTERS",
       s_attribute = "places",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
+      registry = use_tmp_registry(),
       method = "Rcpp"
     )
     expect_equal(sAttrDF[["value"]][1:4], c("usa", "usa", "canada", "usa"))

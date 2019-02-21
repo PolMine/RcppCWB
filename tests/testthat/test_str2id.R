@@ -9,7 +9,7 @@ test_that(
       corpus = "REUTERS",
       p_attribute = "word",
       str = "oil",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
     expect_equal(id, 15L)
   }

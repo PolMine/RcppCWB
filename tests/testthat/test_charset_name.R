@@ -7,7 +7,7 @@ test_that(
   {
     charset <- cl_charset_name(
       corpus = "REUTERS",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
       
     expect_equal(charset, "latin1")

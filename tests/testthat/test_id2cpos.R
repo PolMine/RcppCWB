@@ -9,7 +9,7 @@ test_that(
       corpus = "REUTERS",
       p_attribute = "word",
       id = 15,
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
     expect_equal(sum(cpos), 155788L)
   }

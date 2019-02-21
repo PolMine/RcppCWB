@@ -8,7 +8,7 @@ test_that(
     token <- cl_cpos2str(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry"),
+      registry = use_tmp_registry(),
       cpos = 0L:3L
     )
     expect_equal(token, c("Diamond", "Shamrock", "Corp", "said"))

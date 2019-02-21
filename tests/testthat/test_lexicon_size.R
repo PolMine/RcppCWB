@@ -8,7 +8,7 @@ test_that(
     N <- cl_lexicon_size(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
     expect_equal(N, 1192)
   }

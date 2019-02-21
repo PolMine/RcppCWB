@@ -9,7 +9,7 @@ test_that(
       corpus = "REUTERS",
       attribute = "places",
       attribute_type = "s",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
     expect_equal(N, 20)
   }
@@ -22,7 +22,7 @@ test_that(
       corpus = "REUTERS",
       attribute = "word",
       attribute_type = "p",
-      registry = system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+      registry = get_tmp_registry()
     )
     expect_equal(N, 4050)
   }
