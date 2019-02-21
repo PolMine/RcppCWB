@@ -29,9 +29,9 @@ The following object is masked from 'package:testthat':
 ... activating corpus: REUTERS
 > 
 > test_check("polmineR")
-══ testthat results  ════════════════════════════════════════════════════════════════════════════════
-OK: 158 SKIPPED: 1 FAILED: 0
+══ testthat results  ════════════════════════════════════════════════════════════════════════════════════════
+OK: 159 SKIPPED: 1 FAILED: 0
 > 
 > proc.time()
    user  system elapsed 
- 16.440   0.969   7.910 
+ 21.024   1.440   8.467 

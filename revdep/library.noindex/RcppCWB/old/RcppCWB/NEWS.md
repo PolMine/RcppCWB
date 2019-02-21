@@ -1,17 +1,35 @@
-# v0.2.5.9002
+# RcppCWB 0.2.7
+
+* If glib-2.0 is not present on macOS, binaries of the static library and 
+header files are downloaded from a GitHub repo. This prepares to get RcppCWB
+pass macOS checking on CRAN machines.
+* A slight modification of the C code will now prevent previous crashes resulting
+from a faulty CQP syntax. The solution will not yet be effective for Windows
+systems until we have recompiled the libcqp static library that is downloaded
+during the installation process.
+* A new C++-level function 'check_corpus' checks whether a given corpus is
+available and is used by the `check_corpus()`-function. Problems with 
+the previous implementation that relied on files in the registry directory to
+ensure the presence of a corpus hopefully do not occur.
+* Calling the 'find_readline.perl' utility script is omitted on macOS, so 
+previous warning messages when running the makefile do not show up any more.
+
+# RcppCWB 0.2.6
+
 * Function `cl_charset_name()` is exposed, it will return the charset of a 
 corpus. Faster than parsing the registry file again and again.
-
-# v0.2.5.9001
 * A new `cl_delete_corpus()`-function can remove loaded corpora from memory.
 
-# v0.2.5
+
+# RcppCWB 0.2.5
+
 * In Makevars.win, libiconv is explicitly linked, to make RcppCWB compatible with new
 release of Rtools.
 * regex in check_s_attribute() for parsing registry file improved so that it does not
 produce an error if '# [attribute]' follows after declaration of s_attribute
 
-# v0.2.4
+
+# RcppCWB 0.2.4
 * for linux and macOS, CWB 3.4.14 included, so that UTF-8 support is realized
 * bug removed in check_cqp_query that would prevent special characters from working
 in CQP queries
@@ -19,7 +37,8 @@ in CQP queries
 * cwb command line tools cwb-makeall, cwb-huffcode and cwb-compress-rdx exposed
   as cwb_makeall, cwb_huffcode and cwb_compress_rdx
 
-# v0.2.3
+# RcppCWB 0.2.3
+
 * when loading the package, a check is performed to make sure that paths in the 
 registry files point to the data files of the sample data (issues may occur when
 installing binaries)
@@ -27,7 +46,9 @@ installing binaries)
 are now exported and documented
 * more consistent validity checks of input to functions for structural attributes
 
-# v0.2.2
+
+# RcppCWB 0.2.2
+
 * Compiling RcppCWB on unix-like systems (macOS, Linux) will work now without
 the presence of glib (on Windows, the dependency persists).
 * The presence of the bison parser is not required any more. The package includes 
@@ -39,7 +60,8 @@ defined scope of RcppCWB to expose functionality of the C code of the CWB.
 * Minor intervention in function 'valid_subcorpus_name' to omit a -Wtautological-pointer-compare warning leading to a WARNING when checking package
 for R 3.5.0 with option --as-cran
 
-# v0.2.1
+# RcppCWB 0.2.1
+
 * In previous versions the drive of the working directory and of the 
 registry/data directory had to be identical on Windows; this limitation 
 does not persist;
@@ -47,7 +69,8 @@ does not persist;
 identity of the drives of the working directory and the data.
 
 
-# v0.2.0
+# RcppCWB 0.2.0
+
 * In addition to low-level functionality of the corpus library (CL), functions
 of the Corpus Query Processor (CQP) are exposed, building  on C wrappers in the
 rcqp package;
@@ -62,18 +85,24 @@ included;
 * sanity checks in R wrappers for Rcpp functions.
 
 
-# v0.1.7
+# RcppCWB 0.1.7
+
 * CWB source code included in package to be GPL compliant
 * template to adjust HOME and INFO in registry file used (tools/setpaths.R)
 * using VignetteBuilder has been removed
 * definition of Rprintf in cwb/cl/macros.c
 
-# v0.1.6
+# RcppCWB 0.1.6
+
 * now using configure/configure.win script in combination with setpaths.R
 
-# v0.1.1
+
+# RcppCWB 0.1.1
+
 * vignette included that explains cross-compiling CWB for Windows
 * check in struc2str to ensure that structure has attributes
 
-# v0.1.0
+
+# RcppCWB 0.1.0
+
 * Windows compatibility (potentially still limited)

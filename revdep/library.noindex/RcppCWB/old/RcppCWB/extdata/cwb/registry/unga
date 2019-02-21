@@ -7,9 +7,9 @@ NAME "UNGA"
 # corpus ID (must be lowercase in registry!)
 ID   unga
 # path to binary data files
-HOME /Users/blaette/Lab/github/RcppCWB/revdep/library.noindex/RcppCWB/old/RcppCWB/extdata/cwb/indexed_corpora/unga
+HOME /Volumes/SSD-Data/Builds/R-dev-web/QA/Simon/packages/el-capitan-x86_64/Rlib/3.5/RcppCWB/extdata/cwb/indexed_corpora/unga
 # optional info file (displayed by ",info;" command in CQP)
-INFO /Users/blaette/Lab/github/RcppCWB/revdep/library.noindex/RcppCWB/old/RcppCWB/extdata/cwb/indexed_corpora/unga/.info
+INFO /Volumes/SSD-Data/Builds/R-dev-web/QA/Simon/packages/el-capitan-x86_64/Rlib/3.5/RcppCWB/extdata/cwb/indexed_corpora/unga/.info
 
 # corpus properties provide additional information about the corpus:
 ##:: charset = "utf8"

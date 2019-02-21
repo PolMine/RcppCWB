@@ -272,7 +272,7 @@ elvetic/uhvr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/ut
 mb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
 /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local
 /texlive/2017/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (94 pages, 319257 bytes).
+Output written on Rd2.pdf (94 pages, 319255 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2017] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (458 entries accepted, 13 rejected).
@@ -598,7 +598,7 @@ elvetic/uhvr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/ut
 mb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
 /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local
 /texlive/2017/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (102 pages, 355571 bytes).
+Output written on Rd2.pdf (102 pages, 355569 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2017] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (458 entries accepted, 13 rejected).
@@ -919,8 +919,8 @@ elvetic/uhvr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/ut
 mb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
 /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local
 /texlive/2017/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (102 pages, 356240 bytes).
+Output written on Rd2.pdf (102 pages, 356243 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘polmineR-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//RtmpR62W3l/Rd2pdf16e521edafff5'
+You may want to clean up by 'rm -Rf /var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T//Rtmp5wiBUt/Rd2pdf164ad2eb47a3b'

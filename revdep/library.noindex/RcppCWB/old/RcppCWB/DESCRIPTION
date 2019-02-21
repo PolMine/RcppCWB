@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.2.6
-Date: 2018-10-22
+Version: 0.2.7
+Date: 2019-01-09
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),
@@ -24,6 +24,7 @@ Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), a
   package. To achieve cross-platform portability (including Windows), using 'Rcpp' for wrapper code
   is the approach used by 'RcppCWB'.
 License: GPL-3
+Encoding: UTF-8
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and
         acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
@@ -40,11 +41,11 @@ LinkingTo: Rcpp
 Biarch: true
 URL: https://www.github.com/PolMine/RcppCWB
 BugReports: https://github.com/PolMine/RcppCWB/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Collate: 'RcppCWB_package.R' 'cl.R' 'cqp.R' 'cwb.R' 'checks.R'
         'count.R' 'RcppExports.R' 'decode.R' 'cbow.R' 'region_matrix.R'
         'misc.R' 'zzz.R'
-Packaged: 2018-10-22 13:22:10 UTC; blaette
+Packaged: 2019-01-09 17:01:40 UTC; blaette
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -53,5 +54,6 @@ Author: Andreas Blaette [aut, cre],
   Stefan Evert [ctb],
   Arne Fitschen [ctb]
 Repository: CRAN
-Date/Publication: 2018-10-22 14:00:03 UTC
-Built: R 3.5.1; x86_64-apple-darwin15.6.0; 2019-01-09 16:41:12 UTC; unix
+Date/Publication: 2019-01-09 17:30:10 UTC
+Built: R 3.5.2; x86_64-apple-darwin15.6.0; 2019-01-10 07:24:19 UTC; unix
+Archs: RcppCWB.so.dSYM

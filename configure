@@ -84,5 +84,5 @@ echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH
 # files needs to be set during installation. We call a standardized script
 # in the tools directory for that purpose. 
 
-${R_HOME}/bin/Rscript ./tools/setpaths.R --args "$R_PACKAGE_DIR"
+# ${R_HOME}/bin/Rscript ./tools/setpaths.R --args "$R_PACKAGE_DIR"
 

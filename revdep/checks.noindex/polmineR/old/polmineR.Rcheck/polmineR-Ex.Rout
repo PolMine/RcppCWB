@@ -560,6 +560,7 @@ Warning in .local(.Object, ...) :
 ... activating corpus: GERMAPARLMINI
 ... activating corpus: REUTERS
 > library(data.table)
+Warning: package ‘data.table’ was built under R version 3.5.2
 > m <- partition(
 +   "GERMAPARLMINI", speaker = "Merkel", interjection = "speech",
 +   regex = TRUE, p_attribute = "word"
@@ -2266,12 +2267,12 @@ count:               not available
 > ### ** Examples
 > 
 > registry() # returns temporary registry directory
-[1] "/private/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T/RtmpoxoAn8/polmineR_registry"
+[1] "/private/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T/Rtmpb5bBRi/polmineR_registry"
 > registry(pkg = "polmineR") # returns registry directory in polmineR-package
 [1] "/Users/blaette/Lab/github/RcppCWB/revdep/checks.noindex/polmineR/old/polmineR.Rcheck/polmineR/extdata/cwb/registry"
 > 
 > data_dir()
-[1] "/private/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T/RtmpoxoAn8/polmineR_data_dir"
+[1] "/private/var/folders/r6/1k6mxnbj5077980k11xvr0q40000gn/T/Rtmpb5bBRi/polmineR_data_dir"
 > data_dir(pkg = "polmineR")
 [1] "/Users/blaette/Lab/github/RcppCWB/revdep/checks.noindex/polmineR/old/polmineR.Rcheck/polmineR/extdata/cwb/indexed_corpora"
 > 
@@ -21078,7 +21079,7 @@ detaching ‘package:magrittr’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  16.676 1.389 16.211 0.833 0.362 
+Time elapsed:  41.465 3.105 19.075 0.862 0.317 
 > grDevices::dev.off()
 null device 
           1 
