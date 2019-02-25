@@ -36,4 +36,4 @@ On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb |
 
 ## Downstream dependencies
 
-I have also checked downstream dependencies using revdepcheck::revdep_check(). I did not see WARNINGs, or NOTEs, or ERRORs.
+I have also checked RcppCWB v0.2.8 against the polmineR package, the existing reverse dependency at this time. I did not see WARNINGs, or NOTEs, or ERRORs.
