@@ -37,7 +37,8 @@ case $(uname -s) in
         sed -i -e "s/PLATFORM=.*/PLATFORM=linux/" ./src/cwb/config.mk;;
       *)
         sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
-    esac;;
+    esac
+    sed -i -e "s#CC\s*=\s*gcc#CC=$(R CMD config CC)#" ./src/cwb/config/platform/unix;;
   SunOS)
     CPU_INFO=`psrinfo -pv | sed -n '2p'`
     case $CPU_INFO in
