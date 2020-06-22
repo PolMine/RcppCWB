@@ -23,7 +23,7 @@
 include $(TOP)/config/platform/linux
 
 ## 64-bit CPUs seem to require position-independent code
-CFLAGS += -fPIC -m64
+CFLAGS += -fPIC -m64 -fcommon
 
 ## CPU architecture and operating system used to name binary releases
 RELEASE_ARCH = x86_64

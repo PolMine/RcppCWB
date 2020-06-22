@@ -63,7 +63,7 @@ BUILD_DIR=`pwd`
 CWB_DIR=`pwd`/src/cwb
 GLIB_LIBDIRS=`pkg-config --libs-only-L glib-2.0`
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
-echo "PKG_CPPFLAGS=-I"$BUILD_DIR"/src/cwb/cqp -I"$BUILD_DIR"/src/cwb/cl -I"$BUILD_DIR"/src/cwb/CQi" > ./src/Makevars
+echo "PKG_CPPFLAGS=-fcommon -I"$BUILD_DIR"/src/cwb/cqp -I"$BUILD_DIR"/src/cwb/cl -I"$BUILD_DIR"/src/cwb/CQi" > ./src/Makevars
 echo -e "PKG_LIBS=-L"$CWB_DIR"/cl -L"$CWB_DIR"/cqp -L"$CWB_DIR"/utils "$GLIB_LIBDIRS" -lcwb -lcqp -lcl -lglib-2.0"$INTL"-lpcre"$SOCKETLIB$CARBON"\n" >> ./src/Makevars
 echo -e "\$(SHLIB): libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 echo "libcl.a: depend" >> ./src/Makevars
@@ -76,16 +76,3 @@ echo "depend: clean" >> ./src/Makevars
 echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) depend\n" >> ./src/Makevars
 echo "clean:" >> ./src/Makevars
 echo -e "\tcd cwb; R_PACKAGE_SOURCE="$CWB_DIR" PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \$(MAKE) clean\n" >> ./src/Makevars
-
-
-# THIS STEP 3 is not performed any more, because hardcoded paths within the directory
-# are not compatible with the new CRAN procedure of 'staged installs'
-
-# Step 3: Modify data directory in registry file
-# 
-# The package includes a small binary sample corpus. The path to the binary
-# files needs to be set during installation. We call a standardized script
-# in the tools directory for that purpose. 
-
-# ${R_HOME}/bin/Rscript ./tools/setpaths.R --args "$R_PACKAGE_DIR"
-
