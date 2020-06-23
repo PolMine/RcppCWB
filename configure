@@ -9,6 +9,7 @@
 
 INTL=" "
 CARBON=""
+CC_R=$($R_HOME/bin/R CMD config CC)
 
 case $(uname -s) in
   Darwin)
@@ -38,7 +39,7 @@ case $(uname -s) in
       *)
         sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
     esac
-    sed -i -e "s#CC\s*=\s*gcc#CC=$(R CMD config CC)#" ./src/cwb/config/platform/unix;;
+    sed -i -e "s#CC\s*=\s*gcc#CC=$CC_R#" ./src/cwb/config/platform/unix;;
   SunOS)
     CPU_INFO=`psrinfo -pv | sed -n '2p'`
     case $CPU_INFO in

@@ -1,29 +1,22 @@
 ## General remarks
 
-This version of RcppCWB has finally seen the modifications required to make it installable on Solaris.
+This is a maintenance release to address issues errors reported by the Fedora machines of CRAN. Brian Ripley sent me a respective alert and asked me to fix the issues by June 25. This version of RcppCWB solves the issues:
 
-A remaining requirement for Solaris is the use of GNU make. The reason is an include statement in the Makefiles that is hard to omit. The GNU make requirement is stated in the 'SystemRequirements' field of the DESCRIPTION file. In our conversation, Brian Ripley confirmed that this would be ok.
+- It is now possible to compile the C code in the src/cwb/ using clang using the setting of CC in the Makeconf file or ~/.R/Makevars as returned by `R CMD config CC`.
 
-On a Solaris VMWare image (prepared by Jeroen Ooms, R 3.2.0), this works with the current RcppCWB version:
-MAKE=gmake R CMD INSTALL RcppCWB_0.2.8.tar.gz
-MAKE=gmake R CMD check RcppCWB_0.2.8.tar.gz
-
-Brian Ripley alerted me that there has been a recent ERROR to build RcppCWB on Fedora with the clang compiler. As explained to me by Tomas Kalibera, this will be a problem throughout when staged installs are introduced for all build systems.
-
-The problem causing the issue was that the configure script sets a hardcoded path to the package (in so-called 'registry' files describing sample data/corpora in the package) during the installation process, which will not work with staged installs. The solution is that the necessity for hardcoded paths is omitted by working with temporary 'registry'-files in the temporary directory provided by 'tempdir()'.
-
-Finally, Brian Ripley alerted me that the '-march' compiler option is not compatible with requirements for portability. I have removed the option wherever it occurred.
+- The "multiple definition" errors newly thrown by GCC 10 are addressed by setting the '-fcommon' flag as a compiler option. In a future RcppCWB version I will adjust the the C code such that the root cause is addressed (adjustments of includes etc.), but for the time being I think the solution is appropriate. I do not see any risk that conflicting symbol definitions might occurr. The issue results from the multiple inclusion of the same header files by other header files further down the hierarchy.
 
 
 ## Test environments
 
-* OS X (local install), R 3.5.1
-* OX X (on travis-ci), R 3.5.2
-* Solaris (VMWare virtual machine), R 3.2.0
-* Ubuntu 14.04 (on travis-ci), R 3.5.2
-* Ubuntu 14.04 (project server), R 3.4.3
-* win-builder (devel and release), R 3.5.2
+* win-builder (R-devel and R-release), R 3.5.2
 * Windows AppVeyorR, 3.5.2 Patched
+* OS X (local install), R 4.0.0
+* OS X (on travis-ci), R 3.5.2
+* Ubuntu 14.04 (on travis-ci), R 4.0.0
+* Fedora 32 (docker image), both clang and gcc compilers, R 3.6.3 
+* Fedora 31 (R-hub), GCC, R-devel
+* Ubuntu 14.04 (project server), R 3.6.3
 
 
 ## R CMD check results
