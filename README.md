@@ -1,11 +1,13 @@
 
-[![License](https://img.shields.io/aur/license/yaourt.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
+[![License: GPL
+v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![Travis-CI Build
-Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=dev)](https://travis-ci.org/PolMine/RcppCWB)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=dev&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
-[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/dev/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/dev)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2540653.svg)](https://doi.org/10.5281/zenodo.2540653)
+Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=master)](https://travis-ci.org/PolMine/RcppCWB)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=master&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
+[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/dev)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3904235.svg)](https://doi.org/10.5281/zenodo.3904235)
 
 # Rcpp bindings for the Corpus Workbench (CWB)
 
@@ -34,8 +36,7 @@ If you want to get the development version, you need to compile RcppCWB
 yourself. Having
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed on
 your system is necessary. Using the mechanism offered by the devtools
-package, you can install RcppCWB from
-GitHub.
+package, you can install RcppCWB from GitHub.
 
 ``` r
 if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
@@ -68,8 +69,7 @@ install.packages("RcppCWB")
 ```
 
 To install the development version, using the mechanism offered by the
-devtools package is
-recommended.
+devtools package is recommended.
 
 ``` r
 if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
@@ -105,8 +105,7 @@ install.packages("RcppCWB")
 ```
 
 To install the development version, using the mechanism offered by the
-devtools package is
-recommended.
+devtools package is recommended.
 
 ``` r
 if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
@@ -164,23 +163,20 @@ id_oil <- cl_str2id(corpus = "REUTERS", p_attribute = "word", str = token_to_get
 cpos_oil <- cl_id2cpos <- cl_id2cpos(corpus = "REUTERS", p_attribute = "word", id = id_oil)
 ```
 
-Get the frequency of
-token.
+Get the frequency of token.
 
 ``` r
 oil_freq <- cl_id2freq(corpus = "REUTERS", p_attribute = "word", id = id_oil)
 ```
 
-Using regular
-expressions.
+Using regular expressions.
 
 ``` r
 ids <- cl_regex2id(corpus = "REUTERS", p_attribute = "word", regex = "M.*")
 m_words <- cl_id2str(corpus = "REUTERS", p_attribute = "word", id = ids)
 ```
 
-To use the CQP syntax, we need to initialize CQP
-    first.
+To use the CQP syntax, we need to initialize CQP first.
 
 ``` r
 cqp_initialize(registry = registry)
