@@ -1,6 +1,6 @@
 
 [![License: GPL
-v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![Travis-CI Build
 Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=master)](https://travis-ci.org/PolMine/RcppCWB)
