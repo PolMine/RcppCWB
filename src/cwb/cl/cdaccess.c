@@ -2696,7 +2696,7 @@ cl_dynamic_call(Attribute *attribute,
       break;
       
     case ATTAT_STRING:          /* copy output */
-      fgets(call, CL_MAX_LINE_LENGTH, pipe);
+      (void)fgets(call, CL_MAX_LINE_LENGTH, pipe);
       dcr->value.charres = (char *)cl_strdup(call);
         
       break;
