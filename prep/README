@@ -275,3 +275,14 @@ config - Verzeichnis
 --------------------
 copy of platform-file 'solaris': 'solaris_x86', with modification 
 CFLAGS = -Wall -O3 -fPIC 
+
+cl/storage.c:337:7
+------------------
+warning: ignoring return value of 'write', declared with attribute warn_unused_result [-Wunused-result]
+solved by prepending "(void)"  
+  
+
+cdaccess.c:2699:7
+-----------------
+warning: ignoring return value of 'fgets', declared with attribute warn_unused_result [-Wunused-result]
+solved by prepending "(void)"  

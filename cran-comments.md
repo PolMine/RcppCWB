@@ -1,11 +1,17 @@
 ## General remarks
 
-This is a maintenance release to address errors reported by CRAN Fedora machines. Brian Ripley sent me a respective alert and asked me to fix the issues by June 25. This version of RcppCWB solves the issues:
+This is the second submission of a maintenance release to address errors reported by CRAN Fedora machines. Brian Ripley sent me a respective alert and asked me to fix the issues by June 25. Another 
+unexpected issue that occurred with bashisms in the configure and cleanup scripts prevented meeting this 
+deadline and the package has been temporarily removed from CRAN. I would hope very much that it will be 
+available soon agin.
+
+This version of RcppCWB solves any issues I am aware of:
 
 - It is now possible to compile everything using clang. The setting of CC in the Makeconf file or ~/.R/Makevars as returned by `R CMD config CC` is used throughout.
 
 - The "multiple definition" errors newly thrown by GCC 10 are addressed by setting the '-fcommon' flag as a compiler option. In a future RcppCWB version I will adjust the the C code such that the root cause is addressed (adjustments of includes etc.). For the time being I think the solution is appropriate as I do not see any risk that conflicting symbol definitions might occurr. (The issue results from the multiple inclusion of the same header files by other header files further down the hierarchy.)
 
+- All bashisms are removed from the scripts configure and cleanup.
 
 ## Test environments
 
