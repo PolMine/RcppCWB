@@ -2,6 +2,8 @@
 
 * Starting with GCC 10, the compiler defaults to -fno-common, resulting in error messages during the linker stage, see [the change log of the GCC compiler](https://gcc.gnu.org/gcc-10/changes.html). To address this issue, the -fcommon option is now used by default when compiling the CWB C files on Linux 64bit systems. The CWB code includes header files multiple times, causing multiple definitions.
 * On Linux systems, the hard-coded definition as the preferred C compiler in the CWB configuration sripts will be replaced by what the CC variable defines (in ~/.R/Makevars or the Makeconf file, the result returned by R CMD config CC).
+* Remaining bashisms have been removed from the cleanup file. The shebang line of the
+cleanup and the configure file is now #!/bin/sh, to avoid any reliance on bash.
 
 # RcppCWB 0.2.8
 
