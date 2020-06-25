@@ -78,5 +78,3 @@ printf "depend: clean\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} depend\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
 printf "clean:\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} clean\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
-
-cat ./src/Makevars

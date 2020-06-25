@@ -334,7 +334,7 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
       /* scroll to the len_ptr'th byte, then overwrite the last integer with a random integer (why? not sure  -- AH),
        * then rewind file */
       lseek(fd, *len_ptr - sizeof(int), SEEK_SET);
-      (void)write(fd, &fd, sizeof(int));
+      ssize_t success = write(fd, &fd, sizeof(int));
       lseek(fd, 0, SEEK_SET);
       
       space = mmap(NULL, *len_ptr, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
