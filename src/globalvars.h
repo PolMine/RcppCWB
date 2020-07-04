@@ -79,30 +79,25 @@ int handle_sigpipe;
 char *progname;
 char *licensee;
 FILE *batchfd;
-
-#ifdef __unix__
-CorpusList *current_corpus;
-CorpusList *corpuslist;
-CYCtype LastExpression;
-int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
-char *cqp_input_string;
-int cqp_input_string_position;
-#endif
-
 int initialize_cqp(int argc, char **argv);
 int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
 int cqp_parse_string(char *s);
-
-#ifdef __unix__
-int EvaluationIsRunning;
-#endif
-
 int setInterruptCallback(InterruptCheckProc f);
 void CheckForInterrupts(void);
-
-#ifdef __unix__
-int signal_handler_is_installed;
-#endif
-
 void install_signal_handler(void);
 int eep;
+
+#ifdef _WIN32
+  /* nothing to be done */
+#elif _WIN64
+  /* nothing to be done */
+#else
+  CorpusList *current_corpus;
+  CorpusList *corpuslist;
+  CYCtype LastExpression;
+  int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
+  char *cqp_input_string;
+  int cqp_input_string_position;
+  int EvaluationIsRunning;
+  int signal_handler_is_installed;
+#endif
