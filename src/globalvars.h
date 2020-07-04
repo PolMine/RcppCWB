@@ -1,4 +1,4 @@
-/* enum _which_app { undef, cqp, cqpcl, cqpserver} which_app; */#
+enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
 int insecure;                     /**< Boolean: != 0 means we should not allow pipes etc. (For example, in CGI.) */
 int inhibit_activation;           /**< Boolean: inhibit corpus activations in parser */
 int parseonly;                    /**< if true, queries are only parsed, not evaluated. */
@@ -33,7 +33,7 @@ int hard_cut;                     /**< Query option: use hard cut value for all 
 int subquery;                     /**< Query option: use auto-subquery mode (TODO rename to auto_subquery for clarity) */
 char *def_unbr_attr;              /**< Query option: unbracketed attribute (attribute matched by "..." patterns) */
 int query_optimize;               /**< Query option: use query optimisation (untested and expensive optimisations) */
-/* enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy; */
+enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
 char *matching_strategy_name;     /**< The matching strategy option: which is implemented as a vstring option with side-effect */
 int strict_regions;               /**< boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
 int use_readline;                 /**< UI option: use GNU Readline for input line editing if available */

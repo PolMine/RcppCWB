@@ -93,7 +93,8 @@ extern char *def_unbr_attr;              /**< Query option: unbracketed attribut
 extern int query_optimize;               /**< Query option: use query optimisation (untested and expensive optimisations) */
 
 /** matching strategy */
-extern enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
+extern enum _matching_strategy { traditional, shortest_match, standard_match, longest_match };
+extern enum _matching_strategy matching_strategy;
 extern char *matching_strategy_name;     /**< The matching strategy option: which is implemented as a vstring option with side-effect */
 extern int strict_regions;               /**< boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
 

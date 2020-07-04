@@ -5,13 +5,14 @@ extern "C" {
   #include <string.h>
   #include "cl_min.h"
   #include <pcre.h>
-  #include "globals.h"
-  #include "context_descriptor.h"
-  #include "_options.h"
+/*  #include "globals.h" */
+/*  #include "context_descriptor.h" */
+/*  #include "_options.h" */
 /*  #include "cqp.h" */
 /*  #include "corpmanag.h" */
   #include "server.h"
   #include "globalvars.h"
+  #include "eval.h"
 }
 
 #include <Rcpp.h>
@@ -23,7 +24,6 @@ extern "C" {
 using namespace Rcpp;
 
 int cqp_initialization_status = 0;
-
 
 Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry){
   

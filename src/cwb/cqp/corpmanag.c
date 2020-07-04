@@ -67,7 +67,7 @@ CorpusList *GetSystemCorpus(char *name, char *registry);
 /* -------------------------------------------------- */
 
 /** Global list of currently-loaded corpora */
-CorpusList *corpuslist;
+extern CorpusList *corpuslist;
 
 
 /**
