@@ -131,7 +131,7 @@ typedef union c_tree {
     enum bnodetype type;                  /**< must be pa_ref */
     LabelEntry     label;                 /**< may be empty (NULL) */
     Attribute     *attr;                  /**< the P-attribute we are referring to */
-    int            delete;                /**< delete label after using it ? */
+    int            del;                /**< delete label after using it ? */
   }                pa_ref;
 
   /**
@@ -150,7 +150,7 @@ typedef union c_tree {
     enum bnodetype type;                  /**< must be sa_ref */
     LabelEntry     label;                 /**< may be empty (NULL) */
     Attribute     *attr;                  /**< the s-attribute we are referring to */
-    int            delete;                /**< delete label after using it ? */
+    int            del;                /**< delete label after using it ? */
   }                sa_ref;
 
   struct {
@@ -165,7 +165,7 @@ typedef union c_tree {
     int            negated;
     int            nr_items;
     int           *items;                 /**< an array of item IDs of size nr_items */
-    int            delete;                /**< delete label after using it ? */
+    int            del;                /**< delete label after using it ? */
   }                idlist;
 
   /** constant (string, int, float, ...) */

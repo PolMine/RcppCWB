@@ -12,7 +12,7 @@ extern "C" {
 /*  #include "corpmanag.h" */
   #include "server.h"
   #include "globalvars.h"
-  #include "eval.h"
+  #include "env.h"
 }
 
 #include <Rcpp.h>

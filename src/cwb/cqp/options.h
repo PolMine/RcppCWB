@@ -36,7 +36,7 @@
 
 
 
-extern enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
+enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;
 /* this variable is set in the binaries' main() functions */
 
 

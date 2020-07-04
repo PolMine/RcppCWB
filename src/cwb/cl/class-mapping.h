@@ -119,12 +119,12 @@ number_of_tokens(SingleMapping map);
 
 int
 member_of_class_s(Mapping map, 
-                  SingleMapping class, 
+                  SingleMapping obj, 
                   char *token);
 
 int
 member_of_class_i(Mapping map, 
-                  SingleMapping class, 
+                  SingleMapping obj, 
                   int id);
 
 #endif
