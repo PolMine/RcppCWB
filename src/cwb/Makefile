@@ -64,7 +64,7 @@ cqp:
 	cd cqp; $(MAKE)
 
 utils:
-	@$(ECHO) "--------------------------------- BUILDING COMMAND-LINE UTILITIES"
+	@$(ECHO) "--------------------------------- BUILDING UTILITIES"
 	cd utils; $(MAKE)
 
 man:
