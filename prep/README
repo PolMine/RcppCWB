@@ -331,3 +331,6 @@ dito
 RcppCWB/src/cwb/cqp/../cl/class-mapping.h
 -----------------------------------------
 argumet names class renamed to obj
+
+
+STREQ macro dissolved to avoid warnings in attributes.c
