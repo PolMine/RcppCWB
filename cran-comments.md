@@ -1,14 +1,46 @@
 ## General remarks
 
-This is a very quick follow up to an earlier submission of RcppCWB today. 
-Among others, the earlier submission should remove bashisms from
-the configure and the cleanup script.
+0) The case in configure only covers 3 OSes, a violation of the policy
 
-The earlier version did not take into accout sufficiently that 'echo' works 
-differently across systems if bash is not used. The are errors I see in the 
-check results on Fedora and Solaris. This version of RcppCWB 
-uses 'printf' rather than 'echo' in the shell scripts. I do not see errors
-in the checks I could run.
+
+
+1) You force -fcommon, which is deprecated for GCC and not portable so
+should only be used for a version of GCC which supports it.  It is a
+compiler and not a CPP flag.
+
+2) As the manual told you, test -e is not portable.
+
+3) On Solaris
+
+./configure: syntax error at line 12: `CC_R=$' unexpected
+ERROR: configuration failed for package ‘RcppCWB’
+where the manual warned that $(cmd) is a bashism and to use backticks.
+
+4) You have
+
+SystemRequirements: GNU make, pcre (>= 7), GLib (>= 2.0.0).
+
+but mean PCRE1 not PCRE2 as the latter does not suffice.  So it needs
+'(>= 7 < 10)'.  And this does not check for it in configure (as the
+manual requires), just fails to find pcre.h.  (I no longer had PCRE1
+installed on macOS: nothing else needs it.)
+
+You also do not check for 'glib-2' (sic).
+
+5) See the results page for woes on macOS.
+
+6) There are many compilation warnings, including:
+
+attributes.c: In function ‘component_full_name’:
+macros.h:59:22: warning: the address of ‘rname’ will always evaluate as
+‘true’ [-Waddress]
+
+eval.c:1045:17: warning: result of comparison against a string literal
+is unspecified (use an explicit string comparison function instead)
+[-Wstring-compare]
+
+
+
 
 
 ## Test environments
