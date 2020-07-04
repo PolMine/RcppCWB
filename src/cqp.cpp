@@ -9,8 +9,9 @@ extern "C" {
   #include "context_descriptor.h"
   #include "_options.h"
 /*  #include "cqp.h" */
-  #include "corpmanag.h"
+/*  #include "corpmanag.h" */
   #include "server.h"
+  #include "globalvars.h"
 }
 
 #include <Rcpp.h>

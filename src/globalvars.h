@@ -1,4 +1,4 @@
-enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
+/* enum _which_app { undef, cqp, cqpcl, cqpserver} which_app; */#
 int insecure;                     /**< Boolean: != 0 means we should not allow pipes etc. (For example, in CGI.) */
 int inhibit_activation;           /**< Boolean: inhibit corpus activations in parser */
 int parseonly;                    /**< if true, queries are only parsed, not evaluated. */
@@ -9,8 +9,8 @@ int show_evaltree;                /**< if true, the evaluation tree is printed w
 int show_patlist;                 /**< if true, the pattern list is printed when an EvalEnvironment is displayed */
 int show_compdfa;                 /**< if true, the complete DFA is printed when an EvalEnvironment is displayed */
 int show_dfa;                     /**< if true, the regex2dfa module will print out the states of the DFA after it is parsed. */
-int symtab_debug;                 /**< if this AND debug_simulation are true, print extra messages relating to eval
-int parser_debug;                 /**< if true, the parser's internal Bison-generated debug setting is turned on. */
+int symtab_debug;                 /**< if this AND debug_simulation are true, print extra messages relating to eval */
+int parser_debug;
 int tree_debug;                   /**< if true, extra messages are embedded when an evaluation tree is pretty-printed */
 int eval_debug;                   /**< if true, assorted debug messages related to query evaluation are printed */
 int search_debug;                 /**< if true, the evaltree of a pattern is pretty-printed before the DFA is created. */
@@ -33,7 +33,7 @@ int hard_cut;                     /**< Query option: use hard cut value for all 
 int subquery;                     /**< Query option: use auto-subquery mode (TODO rename to auto_subquery for clarity) */
 char *def_unbr_attr;              /**< Query option: unbracketed attribute (attribute matched by "..." patterns) */
 int query_optimize;               /**< Query option: use query optimisation (untested and expensive optimisations) */
-enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
+/* enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy; */
 char *matching_strategy_name;     /**< The matching strategy option: which is implemented as a vstring option with side-effect */
 int strict_regions;               /**< boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
 int use_readline;                 /**< UI option: use GNU Readline for input line editing if available */
@@ -64,7 +64,7 @@ char *macro_init_file;            /**< secondary init file for loading macro def
 char *cqp_history_file;           /**< filename where CQP command history will be saved */
 int write_history_file;           /**< Controls whether CQP command history is written to file */
 int batchmode;                    /**< set by -f {file} option (don't read ~/.cqprc, then process input from {file}) */
-int silent;                       /**< Disables some messages & warnings (used rather inconsistently).
+int silent;                       /**< Disables some messages & warnings (used rather inconsistently). */
 char *default_corpus;             /**< corpus specified with -D {corpus} */
 char *query_string;               /**< query specified on command line (-E {string}, cqpcl only) */
 int UseExternalSorting;           /**< (option which should not exist) use external sorting algorithm */
@@ -94,6 +94,3 @@ void CheckForInterrupts(void);
 int signal_handler_is_installed;
 void install_signal_handler(void);
 int eep;
-EvalEnvironment Environment[MAXENVIRONMENT];
-EEP CurEnv, evalenv;
-Corpus *corpus;
