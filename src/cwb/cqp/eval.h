@@ -371,7 +371,7 @@ typedef struct ctxtsp {
  * eep contains the index of the highest currently-occupied slot within Environment.
  * @see Environment
  */
-int eep;
+extern int eep;
 
 /**
  * The EvalEnvironment object: environment variables for the evaluation of
@@ -417,9 +417,9 @@ typedef struct evalenv {
 typedef EvalEnvironment *EEP;
 
 /** A global array of EvalEnvironment structures */
-EvalEnvironment Environment[MAXENVIRONMENT];
+extern EvalEnvironment Environment[MAXENVIRONMENT];
 
-EEP CurEnv, evalenv;
+extern EEP CurEnv, evalenv;
 
 /* ---------------------------------------------------------------------- */
 

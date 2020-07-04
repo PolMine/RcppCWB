@@ -65,7 +65,7 @@ BUILD_DIR=`pwd`
 CWB_DIR=`pwd`/src/cwb
 GLIB_LIBDIRS=`pkg-config --libs-only-L glib-2.0`
 if [ -e ./src/Makevars ]; then rm ./src/Makevars; fi
-printf "PKG_CPPFLAGS=-fcommon -I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi\n" $BUILD_DIR $BUILD_DIR $BUILD_DIR > ./src/Makevars
+printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi\n" $BUILD_DIR $BUILD_DIR $BUILD_DIR > ./src/Makevars
 printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s -lcwb -lcqp -lcl -lglib-2.0 %s -lpcre%s\n" $CWB_DIR $CWB_DIR $CWB_DIR $GLIB_LIBDIRS $INTL $SOCKETLIB$CARBON>> ./src/Makevars
 printf "\${SHLIB}: libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 printf "libcl.a: depend\n" >> ./src/Makevars
