@@ -6,6 +6,7 @@
 has been modified such that multiple symbol definitions are omitted.
 
 
+
 # RcppCWB 0.2.9
 
 * Starting with GCC 10, the compiler defaults to -fno-common, resulting in error messages during the linker stage, see [the change log of the GCC compiler](https://gcc.gnu.org/gcc-10/changes.html). To address this issue, the -fcommon option is now used by default when compiling the CWB C files on Linux 64bit systems. The CWB code includes header files multiple times, causing multiple definitions.
