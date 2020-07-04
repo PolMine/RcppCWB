@@ -10,6 +10,7 @@
 INTL=" "
 CARBON=""
 CC_R=`$R_HOME/bin/R CMD config CC`
+SOCKETLIB=""
 
 case `uname -s` in
   Darwin)
@@ -23,7 +24,7 @@ case `uname -s` in
         ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd` # checks whether glib is installed, download if necessary
         export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
         INTL=" -lintl "
-        CARBON=" -framework Carbon"
+        CARBON="-framework Carbon"
       fi
     else
       echo "WARNING: pkg-config tool missing, compiling surce code likely to fail"
@@ -61,12 +62,13 @@ esac
 # The Makevars file is generated here, to pass the directory where RcppCWB
 # is build (variable PKG_DIR) into the Makevars file.
 
-BUILD_DIR=`pwd`
-CWB_DIR=`pwd`/src/cwb
-GLIB_LIBDIRS=`pkg-config --libs-only-L glib-2.0`
+BUILD_DIR="`pwd`"
+CWB_DIR="`pwd`/src/cwb"
+GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
+
 if [ -f ./src/Makevars ]; then rm ./src/Makevars; fi
 printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi\n" $BUILD_DIR $BUILD_DIR $BUILD_DIR > ./src/Makevars
-printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s -lcwb -lcqp -lcl -lglib-2.0 %s -lpcre %s %s\n" $CWB_DIR $CWB_DIR $CWB_DIR $GLIB_LIBDIRS $INTL $SOCKETLIB $CARBON >> ./src/Makevars
+printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s -lcwb -lcqp -lcl -lglib-2.0 %s -lpcre %s %s\n" $CWB_DIR $CWB_DIR $CWB_DIR "$GLIB_LIBDIRS" $INTL $SOCKETLIB "$CARBON" >> ./src/Makevars
 printf "\${SHLIB}: libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 printf "libcl.a: depend\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} cl\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
