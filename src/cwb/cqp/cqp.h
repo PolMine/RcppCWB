@@ -52,7 +52,7 @@ typedef enum _cyctype {
 } CYCtype;
 
 /** Global variable indicating type (CYC) of last expression */
-CYCtype LastExpression;
+extern CYCtype LastExpression;
 
 extern int reading_cqprc;
 
@@ -70,16 +70,16 @@ extern int QueryBufferOverflow;
 /* ======================================== Other global variables */
 
 extern char *searchstr;         /* needs to be global, unfortunately */
-int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
+extern int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
 
-char *cqp_input_string;
-int cqp_input_string_position;
+extern char *cqp_input_string;
+extern int cqp_input_string_position;
 
-int initialize_cqp(int argc, char **argv);
+extern int initialize_cqp(int argc, char **argv);
 
-int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
+extern int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
 
-int cqp_parse_string(char *s);
+extern int cqp_parse_string(char *s);
 
 /* ====================================================================== */
 
@@ -96,15 +96,15 @@ typedef void (*InterruptCheckProc)(void);
  *
  * @see sigINT_signal_handler
  */
-int EvaluationIsRunning;
+extern int EvaluationIsRunning;
 
-int setInterruptCallback(InterruptCheckProc f);
+extern int setInterruptCallback(InterruptCheckProc f);
 
-void CheckForInterrupts(void);
+extern void CheckForInterrupts(void);
 
-int signal_handler_is_installed;
+extern int signal_handler_is_installed;
 
-void install_signal_handler(void);
+extern void install_signal_handler(void);
 
 
 /* ====================================================================== */

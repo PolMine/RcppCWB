@@ -119,12 +119,12 @@ typedef struct cl {
 /**
  * Global pointer to the "current" corpus.
  */
-CorpusList *current_corpus;
+extern CorpusList *current_corpus;
 
 /**
  * Global pointer to the head of CQP's linked list of corpora.
  */
-CorpusList *corpuslist;
+extern CorpusList *corpuslist;
 
 /* ---------------------------------------------------------------------- */
 

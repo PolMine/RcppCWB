@@ -1,4 +1,4 @@
-Corpus *corpus;
+extern Corpus *corpus;
 int cleanup(int error_code);
 void compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug);
 void decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug);

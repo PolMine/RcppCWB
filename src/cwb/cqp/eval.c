@@ -604,7 +604,7 @@ get_leaf_value(Constrainttree ctptr,
 
       dcr->type = ATTAT_POS;
       dcr->value.intres = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
-      if (ctptr->pa_ref.delete) {
+      if (ctptr->pa_ref.del) {
         if (eval_debug)
           Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->pa_ref.label->name, dcr->value.intres);
@@ -621,7 +621,7 @@ get_leaf_value(Constrainttree ctptr,
       else {
 
         referenced_position = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
-        if (ctptr->pa_ref.delete) {
+        if (ctptr->pa_ref.del) {
           if (eval_debug)
             Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                    ctptr->pa_ref.label->name, referenced_position);
@@ -684,7 +684,7 @@ get_leaf_value(Constrainttree ctptr,
       /* label reference to S-attribute -> return value of containing region */
       int referenced_position = get_label_referenced_position(ctptr->sa_ref.label, rt, corppos);
       
-      if (ctptr->sa_ref.delete) {
+      if (ctptr->sa_ref.del) {
         if (eval_debug)
           Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->sa_ref.label->name, referenced_position);
@@ -1170,7 +1170,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
 
       if (ctptr->idlist.label) {
         referenced_corppos = get_label_referenced_position(ctptr->idlist.label, rt, corppos);
-        if (ctptr->idlist.delete) {
+        if (ctptr->idlist.del) {
           if (eval_debug)
             Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                    ctptr->idlist.label->name, referenced_corppos);

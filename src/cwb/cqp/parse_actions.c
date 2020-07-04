@@ -1575,7 +1575,7 @@ OptimizeStringConstraint(Constrainttree left,
           c->type = id_list;
           c->idlist.attr = left->pa_ref.attr;
           c->idlist.label = left->pa_ref.label;
-          c->idlist.delete = left->pa_ref.delete;
+          c->idlist.del = left->pa_ref.del;
 
           c->idlist.nr_items = nr_items;
           c->idlist.items = items;
@@ -1729,7 +1729,7 @@ do_StringConstraint(char *s, int flags)
       left->type = pa_ref;
       left->pa_ref.attr = attr;
       left->pa_ref.label = NULL;
-      left->pa_ref.delete = 0;
+      left->pa_ref.del = 0;
 
       c = OptimizeStringConstraint(left, cmp_eq, right);
     }
@@ -1759,7 +1759,7 @@ Varref2IDList(Attribute *attr, enum b_ops op, char *varName)
       node->type = id_list;
       node->idlist.attr = attr;
       node->idlist.label = NULL;
-      node->idlist.delete = 0;
+      node->idlist.del = 0;
       node->idlist.negated = (op == cmp_eq ? 0 : 1);
       node->idlist.items = GetVariableItems(v, 
                                             query_corpus->corpus,
@@ -2039,7 +2039,7 @@ do_RelExpr(Constrainttree left,
         /* be careful: res might be of type cnode, when an empty id_list has been optimised away */
         if (res && res->type == id_list && generate_code) {
           res->idlist.label = left->pa_ref.label;
-          res->idlist.delete = left->pa_ref.delete;
+          res->idlist.del = left->pa_ref.del;
         }
       }
       else {
@@ -2150,7 +2150,7 @@ do_LabelReference(char *label_name, int auto_delete)
       res->type = pa_ref;
       res->pa_ref.attr = attr;
       res->pa_ref.label = lab;
-      res->pa_ref.delete = auto_delete;
+      res->pa_ref.del = auto_delete;
     }
     else if ((attr = find_attribute(query_corpus->corpus,
                                     hack,
@@ -2174,7 +2174,7 @@ do_LabelReference(char *label_name, int auto_delete)
         res->type = sa_ref;
         res->sa_ref.attr = attr;
         res->sa_ref.label = lab;
-        res->sa_ref.delete = auto_delete;
+        res->sa_ref.del = auto_delete;
       }
     }
   }
@@ -2207,7 +2207,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
       res->type = pa_ref;
       res->pa_ref.attr = attr;
       res->pa_ref.label = NULL;
-      res->pa_ref.delete = 0;
+      res->pa_ref.del = 0;
     }
     else if ((lab = labellookup(CurEnv->labels, id_name, LAB_USED, 0)) != NULL) {
       NEW_BNODE(res);
@@ -2218,7 +2218,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
         cqpmessage(Warning, "Cannot auto-delete special label '%s' [ignored].", id_name);
         auto_delete = 0;
       }
-      res->pa_ref.delete = auto_delete;
+      res->pa_ref.del = auto_delete;
       auto_delete = 0;                /* we'll check that below */
     }
     else if ((attr = find_attribute(query_corpus->corpus,
@@ -2240,7 +2240,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
       /* Need to set label to NULL now that we put sa_ref's to better use.
          A label's sa_ref now returns the value of the enclosing region */
       res->sa_ref.label = NULL;
-      res->sa_ref.delete = 0;
+      res->sa_ref.del = 0;
     }
     else {
       if (within_gc) {

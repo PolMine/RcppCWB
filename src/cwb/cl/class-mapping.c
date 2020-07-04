@@ -499,13 +499,13 @@ number_of_tokens(SingleMapping map)
  *
  * @see member_of_class_i
  * @param map    The mapping to look in.
- * @param class  The class to check.
+ * @param obj  The class to check.
  * @param token  The token to look for (identified by its actual string).
  * @return       Boolean.
  */
 int
 member_of_class_s(Mapping map, 
-                  SingleMapping class,
+                  SingleMapping obj,
                   char *token)
 {
   int id;
@@ -515,7 +515,7 @@ member_of_class_s(Mapping map,
   if (id < 0 || cderrno != CDA_OK) 
     return 0;
   else
-    return member_of_class_i(map, class, id);
+    return member_of_class_i(map, obj, id);
 }
 
 /**
@@ -523,18 +523,18 @@ member_of_class_s(Mapping map,
  *
  * @see member_of_class_s
  * @param map    The mapping to look in.
- * @param class  The class to check.
+ * @param obj  The class to check.
  * @param id     The token to look for (identified by its integer ID).
  * @return       Boolean.
  */
 int
 member_of_class_i(Mapping map, 
-                  SingleMapping class,
+                  SingleMapping obj,
                   int id)
 {
   if (bsearch(&id, 
-              class->tokens,
-              class->nr_tokens,
+              obj->tokens,
+              obj->nr_tokens,
               sizeof(int),
               intcompare) != NULL)
     return 1;
