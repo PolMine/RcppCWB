@@ -394,9 +394,9 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
     full_child = combine_subcorpus_spec(mother, child); /* c is the 'physical' part of the mother corpus */
 
     childcl = cqi_find_corpus(full_child);
-    /* if ((childcl) == NULL) {
-    printf("subcorpus not found\n");
-    } */
+    if ((childcl) == NULL) {
+      Rprintf("subcorpus not found\n");
+    } 
   }
 
   

@@ -806,12 +806,12 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 
       reference = NULL;
 
-      if (STREQ(rname, "HOME"))
+      if (strcmp(rname, "HOME") == 0)
         reference = getenv(rname);
-      else if (STREQ(rname, "APATH"))
+      else if (strcmp(rname, "APATH") == 0)
         reference = (attribute->any.path ? attribute->any.path 
                      : attribute->any.mother->path);
-      else if (STREQ(rname, "ANAME"))
+      else if (strcmp(rname, "ANAME") == 0)
         reference = attribute->any.name;
       else if ((compspec = find_cid_name(rname)) != NULL)
         reference = component_full_name(attribute, compspec->id, NULL);
