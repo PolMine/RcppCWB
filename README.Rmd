@@ -60,7 +60,7 @@ devtools::install_github("PolMine/RcppCWB")
 
 ## Installation on MacOS
 
-On macOS, the [pcre](https://www.pcre.org/) and [Glib](https://developer.gnome.org/glib/) libraries need to be present. We recommend to use 'Homebrew' as a package manager for macOS. To install Homebrew, follow the instructions on the [Homebrew Website](https://brew.sh/index_de.html). It may also be necessary to also install [Xcode](https://developer.apple.com/xcode/) and [XQuartz](https://www.xquartz.org).
+On macOS, the [pcre](http://www.pcre.org/) and [Glib](https://developer.gnome.org/glib/) libraries need to be present. We recommend to use 'Homebrew' as a package manager for macOS. To install Homebrew, follow the instructions on the [Homebrew Website](https://brew.sh/index_de.html). It may also be necessary to also install [Xcode](https://developer.apple.com/xcode/) and [XQuartz](https://www.xquartz.org).
 
 The following commands then need to be executed from a terminal window. They will install the C libraries the CWB relies on:
 

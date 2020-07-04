@@ -286,3 +286,48 @@ cdaccess.c:2699:7
 -----------------
 warning: ignoring return value of 'fgets', declared with attribute warn_unused_result [-Wunused-result]
 solved by prepending "(void)"  
+
+
+src/cwb/cl/makecomps.c
+----------------------
+commented out: char errmsg[CL_MAX_LINE_LENGTH];
+because also defined elsewhere
+
+Flag -fcommon
+-------------
+Removed from config and config/platform/linux again
+
+/src/cwb/cqp/_options.h
+-----------------------
+all global variables prepended by "extern" statement
+
+/src/cwb/cqp/corpmanag.h
+-----------------------
+global variables current_corpus and corpusList prepended by "extern" statement
+
+
+/src/cwb/cqp/corpmanag.h
+------------------------
+global variable corpuslist prepended by extern statement
+
+/src/cwb/cqp/corpmanag.c
+------------------------
+global variable corpuslist prepended by extern statement
+
+
+src/cwb/cqp/cqp.h
+-----------------
+global variables prepended by "extern"
+
+
+/src/cwb/cqp/eval.h
+-------------------
+dito
+
+/src/cwb/cqp/options.h
+----------------------
+dito
+
+RcppCWB/src/cwb/cqp/../cl/class-mapping.h
+-----------------------------------------
+argumet names class renamed to obj

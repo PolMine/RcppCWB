@@ -78,7 +78,7 @@ devtools::install_github("PolMine/RcppCWB")
 
 ## Installation on MacOS
 
-On macOS, the [pcre](https://www.pcre.org/) and
+On macOS, the [pcre](http://www.pcre.org/) and
 [Glib](https://developer.gnome.org/glib/) libraries need to be present.
 We recommend to use ‘Homebrew’ as a package manager for macOS. To
 install Homebrew, follow the instructions on the [Homebrew
