@@ -102,13 +102,13 @@ libcqp.a: $(OBJS) $(CQI_OBJS)
 #	$(AR) -s $@
 
 
-parser.tab.c parser.tab.h: parser.y
-	$(RM) parser.tab.* parser.output
-	$(YACC) $<
+# parser.tab.c parser.tab.h: parser.y
+# 	$(RM) parser.tab.* parser.output
+# 	$(YACC) $<
 
-lex.yy.c: parser.l parser.y
-	$(RM) lex.yy.*
-	$(LEX) $<
+# lex.yy.c: parser.l parser.y
+# 	$(RM) lex.yy.*
+#	$(LEX) $<
 
 cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 	$(RM) $@
