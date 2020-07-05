@@ -154,7 +154,7 @@ clean:
 	-$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
 
 realclean:	clean
-	-$(RM) lex.yy.c parser.tab.c parser.tab.h 
+#	-$(RM) lex.yy.c parser.tab.c parser.tab.h 
 	-$(RM) depend.mk
 
 # create parser C source, if necessary
