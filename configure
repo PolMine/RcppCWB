@@ -7,16 +7,82 @@
 # configuration is available. If not, the standard unix configuration is
 # used. 
 
-CC_R=`$R_HOME/bin/R CMD config CC` # get compiler used by R
+# Get compiler used by R
+CC_R=`$R_HOME/bin/R CMD config CC` 
+
 INTL=""
 CARBON=""
 SOCKETLIB=""
 
-case `uname -s` in
+OS=`uname -s`
+echo "* operating system detected for CWB configuration: $OS"
+
+case $OS in
+  
   Darwin)
-    echo "* OS detected: Darwin/macOS - using CWB configuration 'darwin-64'"
-    sed -i -e "s/PLATFORM=.*/PLATFORM=darwin-64/" ./src/cwb/config.mk;;
+    CWB_PLATFORM_CONFIG_FILE="darwin-64"
+    CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+  Linux)
+    # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
+    DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
+    if [ [$DISTRO = "ubuntu"] || [$DISTRO = "fedora"] || [$DISTRO] = "debian"] ]; then
+      echo "* Linux distribution ID: $DISTRO (supported)";
+    else
+      echo "* Linux distribution ID: $DISTRO (unsupported, adapting the configuration may be necessary)";
+    fi
     
+    # For Debian, Fedora and Ubuntu, the generic Linux configuration works, 
+    # there are no known required adaptions so far. If another distribution is used,
+    # the previous message informs users that adaptions may be necessary.
+    ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
+    case "$ARCH" in 
+      x86_64)
+        CWB_PLATFORM_CONFIG_FILE="linux-64"
+        ;;
+      i386) 
+        CWB_PLATFORM_CONFIG_FILE="linux"
+        ;;
+      *)
+        echo "* unknown architecture (`$ARCH`), using Linux config as default"
+        CWB_PLATFORM_CONFIG_FILE="linux"
+        ;;
+    esac
+    
+    # The compiler is set in the unix config file for all architectures
+    CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+  SunOS)
+    CPU_INFO=`psrinfo -pv | sed -n '2p'`
+    case $CPU_INFO in
+      SPARK)
+        CWB_PLATFORM_CONFIG_FILE="solaris_spark"
+        ;;
+      *)
+        CWB_PLATFORM_CONFIG_FILE="solaris_x86"
+        ;;
+    esac
+    SOCKETLIB='-lsocket -Wl,--allow-multiple-definition';;
+    
+  *)
+    CWB_PLATFORM_CONFIG_FILE="unix"
+    echo "* OS unknown, resorting to Unix as CWB default configuration (modifications may be necessary)"
+    ;;
+esac
+
+# Inform user about CWB configuration used. To safeguard portability, no inplace 
+# sed modification (sed option -i is not available on Solaris)
+echo "* using CWB platform configuration file: $CWB_PLATFORM_CONFIG_FILE"
+sed -e "s/PLATFORM=.*/PLATFORM=$CWB_PLATFORM_CONFIG_FILE/" ./src/cwb/config.mk > ./src/cwb/config.mk.mod
+rm ./src/cwb/config.mk
+mv ./src/cwb/config.mk.mod ./src/cwb/config.mk
+
+
+# Adapt CWB configuration file that defines compiler to use compiler chosen
+# by user (Makeconf, Makevars file)
+echo "* adapt CWB config file to use compiler: $CC_R"
+sed -i -e "s#CC\s*=\s*gcc#CC=$CC_R#" "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
+
+case $OS in
+  Darwin)
     if [ -x "`command -v pkg-config`" ]; then
       pkg-config --exists glib-2.0
       GLIB_EXISTS=$?
@@ -30,45 +96,15 @@ case `uname -s` in
         CARBON="-framework Carbon"
       fi
     else
-      echo "WARNING: pkg-config tool missing, compiling surce code likely to fail"
+      echo "WARNING: pkg-config tool missing, compiling source code likely to fail"
     fi 
+    ;;
   Linux) # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
-    DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
-    if [ [$DISTRO = "ubuntu"] || [$DISTRO = "fedora"] || [$DISTRO] = "debian"] ]; then
-      echo "* Linux distribution ID: $DISTRO (supported)";
-    else
-      echo "* Linux distribution ID: $DISTRO (unsupported, adapting configuration may be necessary)";
-    fi
-    
-    # For Debian, Fedora and Ubuntu, the generic Linux configuration works, 
-    # there are no known required adaptions so far
-    ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
-    case "$ARCH" in 
-      x86_64)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=linux-64/" ./src/cwb/config.mk;;
-      i386) 
-        sed -i -e "s/PLATFORM=.*/PLATFORM=linux/" ./src/cwb/config.mk;;
-      *)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
-    esac
-    
-    # Adapt CWB configuration script about compiler to be used;
-    # the unix config script is included by the linux-64/linux scripts
-    sed -i -e "s#CC\s*=\s*gcc#CC=$CC_R#" ./src/cwb/config/platform/unix;;
+  ;;
   SunOS)
-    CPU_INFO=`psrinfo -pv | sed -n '2p'`
-    case $CPU_INFO in
-      SPARK)
-        sed -i -e "s/PLATFORM=.*/PLATFORM=solaris_spark/" ./src/cwb/config.mk;;
-      *)
-        sed -e "s/PLATFORM=.*/PLATFORM=solaris_x86/" ./src/cwb/config.mk > ./src/cwb/config.mk.mod
-        rm ./src/cwb/config.mk
-        mv ./src/cwb/config.mk.mod ./src/cwb/config.mk;;
-    esac
-    SOCKETLIB='-lsocket -Wl,--allow-multiple-definition';;
+  ;;
   *)
-    echo "* OS unknown, resorting to Unix as CWB default configuration (adaptions may be necessary)"
-    sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
+  ;;
 esac
 
 
