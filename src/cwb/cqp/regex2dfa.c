@@ -541,7 +541,7 @@ Parse(void)
   Symbol ID = NULL; 
   int RHS; 
   
-  int ignore_value;             /* ignore value of POP() macro */
+  int ignore_value __attribute__((unused));             /* ignore value of POP() macro */
 
   SP = Stack;
  LHS:
