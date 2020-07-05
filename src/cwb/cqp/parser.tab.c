@@ -2945,7 +2945,7 @@ yyreduce:
   case 133:
 #line 819 "parser.y"
     { 
-                  int ok;
+                  int ok __attribute__((unused));
                   if ((yyvsp[(2) - (5)].cl) && generate_code) {
                     ok = SortSubcorpus((yyvsp[(2) - (5)].cl), (yyvsp[(3) - (5)].sortclause), ((yyvsp[(4) - (5)].ival) >= 1) ? (yyvsp[(4) - (5)].ival) : 1, &((yyvsp[(5) - (5)].redir)));
                     FreeSortClause((yyvsp[(3) - (5)].sortclause));
