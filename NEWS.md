@@ -8,6 +8,9 @@ has been modified such that multiple symbol definitions are omitted.
 * On Solaris, the configure script would define the flag "-Wl,--allow-multiple-definition" to be passed 
 to the linker flags. The rework of the CWB includes and the inclusion of the header file 'env.h' makes it
 possible to drop this flag. It was defined at a confusing place anyway.
+* Using the compiler desired by the user (in Makeconf, Makevars file) is now there for all OSes.
+* If pkg-config is not present on macOS, a warning is issued; the user gets the advice to use the brew 
+package manager to install pkg-config.
 
 
 # RcppCWB 0.2.9

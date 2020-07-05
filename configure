@@ -78,35 +78,40 @@ mv ./src/cwb/config.mk.mod ./src/cwb/config.mk
 
 # Adapt CWB configuration file that defines compiler to use compiler chosen
 # by user (Makeconf, Makevars file)
-echo "* adapt CWB config file to use compiler: $CC_R"
+echo "* adapt CWB configuration file to use compiler: $CC_R"
 sed -i -e "s#CC\s*=\s*gcc#CC=$CC_R#" "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
 
-case $OS in
-  Darwin)
-    if [ -x "`command -v pkg-config`" ]; then
-      pkg-config --exists glib-2.0
-      GLIB_EXISTS=$?
-      if [ $GLIB_EXISTS = 0 ]; then
-        echo "* pkg-config has information on glib-2.0";
-      else
-        echo "* glib missing, downloading static library from GitHub repo";
-        ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd` # checks whether glib is installed, download if necessary
-        export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
-        INTL="-lintl"
-        CARBON="-framework Carbon"
-      fi
-    else
-      echo "WARNING: pkg-config tool missing, compiling source code likely to fail"
-    fi 
-    ;;
-  Linux) # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
-  ;;
-  SunOS)
-  ;;
-  *)
-  ;;
-esac
-
+# Check availability of glib2.0 (download on macOS)
+if [ -x "`command -v pkg-config`" ]; then
+  printf "* using pkg-config to check whether glib-2.0 is available ... ";
+  pkg-config --exists glib-2.0
+  PKG_CONFIG_GLIB_INFO=$?
+  if [ $PKG_CONFIG_GLIB_INFO = 0 ]; then
+    printf "yes\n";
+  else
+    printf "no\n";
+    if [ $OS = "Darwin" ]; then
+      echo "* glib2.0 missing, downloading static library from GitHub (https://github.com/PolMine/libglib)";
+      ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd`
+      export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
+      # Setting further args required to compile agains glib2.0 in this scenario
+      INTL="-lintl"
+      CARBON="-framework Carbon"
+    else 
+      echo "----------------------- CONFIGURATION ERROR --------------------------"
+      echo "Configuration failed because 'glib-2.0' was not found. Try installing:"
+      echo " * deb: libglib2.0-dev (Debian, Ubuntu, etc)"
+      echo " * yum: glib-devel (Fedora, etc)"
+      echo "----------------------------------------------------------------------"
+    fi
+  fi
+else
+  echo "WARNING: Aborting as the 'pkg-config' tool required to find include paths is missing."
+  echo "Check whether 'pkg-config' is installed and make sure that 'pkg-config' is on your PATH."
+  exit 1
+fi 
+GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
+echo "* using pkg-config to get -L flags for glib-2.0: $GLIB_LIBDIRS"
 
 # Step 2: Generate Makevars file
 #
@@ -115,7 +120,6 @@ esac
 
 BUILD_DIR="`pwd`"
 CWB_DIR="`pwd`/src/cwb"
-GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
 
 if [ -f ./src/Makevars ]; then rm ./src/Makevars; fi
 printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi\n" $BUILD_DIR $BUILD_DIR $BUILD_DIR > ./src/Makevars
