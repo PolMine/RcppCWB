@@ -101,7 +101,7 @@ if [ -x "`command -v pkg-config`" ]; then
       echo "----------------------- CONFIGURATION ERROR --------------------------"
       echo "Configuration failed because 'glib-2.0' was not found. Try installing:"
       echo " * deb: libglib2.0-dev (Debian, Ubuntu, etc)"
-      echo " * yum: glib-devel (Fedora, etc)"
+      echo " * yum: glib* (Fedora, etc)"
       echo "----------------------------------------------------------------------"
       exit 1
     fi
@@ -113,6 +113,23 @@ else
 fi 
 echo "* using pkg-config to get -L flags for glib-2.0"
 GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
+
+
+# Check availability of ncurses
+printf "* using pkg-config to check whether ncurses is available ... ";
+pkg-config --exists ncurses
+PKG_CONFIG_NCURSES_INFO=$?
+if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
+  printf "yes\n";
+else
+  printf "no\n";
+  echo "----------------------- CONFIGURATION ERROR --------------------------"
+  echo "Configuration failed because 'ncurses' was not found. Try installing:"
+  echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
+  echo " * yum: ncurses (Fedora, etc)"
+  echo "----------------------------------------------------------------------"
+  exit 1
+fi
 
 
 # Step 2: Generate Makevars file
