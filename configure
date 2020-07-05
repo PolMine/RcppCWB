@@ -25,7 +25,7 @@ case $OS in
   Linux)
     # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
     DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
-    if [ [$DISTRO = "ubuntu"] || [$DISTRO = "fedora"] || [$DISTRO] = "debian"] ]; then
+    if [ $DISTRO = "ubuntu" -o "$DISTRO" = "fedora" -o "$DISTRO" = "debian" ]; then
       echo "* Linux distribution ID: $DISTRO (supported)";
     else
       echo "* Linux distribution ID: $DISTRO (unsupported, adapting the configuration may be necessary)";
