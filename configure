@@ -7,13 +7,16 @@
 # configuration is available. If not, the standard unix configuration is
 # used. 
 
-INTL=" "
+CC_R=`$R_HOME/bin/R CMD config CC` # get compiler used by R
+INTL=""
 CARBON=""
-CC_R=`$R_HOME/bin/R CMD config CC`
 SOCKETLIB=""
 
 case `uname -s` in
   Darwin)
+    echo "* OS detected: Darwin/macOS - using CWB configuration 'darwin-64'"
+    sed -i -e "s/PLATFORM=.*/PLATFORM=darwin-64/" ./src/cwb/config.mk;;
+    
     if [ -x "`command -v pkg-config`" ]; then
       pkg-config --exists glib-2.0
       GLIB_EXISTS=$?
@@ -23,14 +26,22 @@ case `uname -s` in
         echo "* glib missing, downloading static library from GitHub repo";
         ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd` # checks whether glib is installed, download if necessary
         export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
-        INTL=" -lintl "
+        INTL="-lintl"
         CARBON="-framework Carbon"
       fi
     else
       echo "WARNING: pkg-config tool missing, compiling surce code likely to fail"
     fi 
-    sed -i -e "s/PLATFORM=.*/PLATFORM=darwin-64/" ./src/cwb/config.mk;;
-  Linux)
+  Linux) # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
+    DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
+    if [ [$DISTRO = "ubuntu"] || [$DISTRO = "fedora"] || [$DISTRO] = "debian"] ]; then
+      echo "* Linux distribution ID: $DISTRO (supported)";
+    else
+      echo "* Linux distribution ID: $DISTRO (unsupported, adapting configuration may be necessary)";
+    fi
+    
+    # For Debian, Fedora and Ubuntu, the generic Linux configuration works, 
+    # there are no known required adaptions so far
     ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
     case "$ARCH" in 
       x86_64)
@@ -40,6 +51,9 @@ case `uname -s` in
       *)
         sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
     esac
+    
+    # Adapt CWB configuration script about compiler to be used;
+    # the unix config script is included by the linux-64/linux scripts
     sed -i -e "s#CC\s*=\s*gcc#CC=$CC_R#" ./src/cwb/config/platform/unix;;
   SunOS)
     CPU_INFO=`psrinfo -pv | sed -n '2p'`
@@ -51,8 +65,9 @@ case `uname -s` in
         rm ./src/cwb/config.mk
         mv ./src/cwb/config.mk.mod ./src/cwb/config.mk;;
     esac
-    SOCKETLIB=' -lsocket -Wl,--allow-multiple-definition';;
+    SOCKETLIB='-lsocket -Wl,--allow-multiple-definition';;
   *)
+    echo "* OS unknown, resorting to Unix as CWB default configuration (adaptions may be necessary)"
     sed -i -e "s/PLATFORM=.*/PLATFORM=unix/" ./src/cwb/config.mk;;
 esac
 
