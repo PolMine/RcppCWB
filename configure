@@ -134,7 +134,8 @@ fi
 # Check availability of pcre
 printf "* check whether pcre is available ... ";
 if [ -x "`command -v pcre-config`" ]; then
-  printf "yes\n"
+  PCRE_VERSION=`pcre-config --version`
+  printf "yes (version: $PCRE_VERSION)\n"
 else
   printf "no\n"
   echo "----------------------- CONFIGURATION ERROR --------------------------"
