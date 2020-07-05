@@ -126,9 +126,23 @@ else
   echo "----------------------- CONFIGURATION ERROR --------------------------"
   echo "Configuration failed because 'ncurses' was not found. Try installing:"
   echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
-  echo " * yum: ncurses (Fedora, etc)"
+  echo " * yum: ncurses-devel (Fedora, etc)"
   echo "----------------------------------------------------------------------"
   exit 1
+fi
+
+# Check availability of pcre
+printf "* check whether pcre is available ... ";
+if [ -x "`command -v pcre-config`" ]; then
+  printf "yes\n"
+else
+  printf "no\n"
+  echo "----------------------- CONFIGURATION ERROR --------------------------"
+  echo "Configuration failed because 'pcre' is not available. Try installing:"
+  echo " * deb: libpcre3 libpcre3-dev (Debian, Ubuntu, etc)"
+  echo " * yum: pcre pcre-devel (Fedora, etc)"
+  echo "----------------------------------------------------------------------"
+exit 1
 fi
 
 
