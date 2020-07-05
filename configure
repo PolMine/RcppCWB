@@ -103,6 +103,7 @@ if [ -x "`command -v pkg-config`" ]; then
       echo " * deb: libglib2.0-dev (Debian, Ubuntu, etc)"
       echo " * yum: glib-devel (Fedora, etc)"
       echo "----------------------------------------------------------------------"
+      exit 1
     fi
   fi
 else
@@ -110,8 +111,9 @@ else
   echo "Check whether 'pkg-config' is installed and make sure that 'pkg-config' is on your PATH."
   exit 1
 fi 
+echo "* using pkg-config to get -L flags for glib-2.0"
 GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
-echo "* using pkg-config to get -L flags for glib-2.0: $GLIB_LIBDIRS"
+
 
 # Step 2: Generate Makevars file
 #
