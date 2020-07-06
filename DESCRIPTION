@@ -36,10 +36,11 @@ License: GPL-3
 Encoding: UTF-8
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: GNU make, pcre (>= 7), GLib (>= 2.0.0). On Windows, no prior installations are
-  necessary, as pre-built (i.e. cross-compiled) binaries of required libraries are downloaded from
-  a GitHub repository (<https://github.com/PolMine/libcl>) during installation. On macOS, static
-  libraries of Glib are downloaded (<https://github.com/PolMine/libglib>) if Glib is not present.
+SystemRequirements: GNU make, ncurses, pcre (>= 7 < 10), GLib (>= 2.0.0). On Windows, no prior 
+  installations are necessary, as pre-built (i.e. cross-compiled) binaries of required libraries are 
+  downloaded from a GitHub repository (<https://github.com/PolMine/libcl>) during installation. On 
+  macOS, static libraries of Glib are downloaded (<https://github.com/PolMine/libglib>) if Glib is 
+  not present.
 Imports:
     Rcpp (>= 0.12.6)
 Suggests:

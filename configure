@@ -25,7 +25,7 @@ case $OS in
   Linux)
     # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
     DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
-    if [ $DISTRO = "ubuntu" -o "$DISTRO" = "fedora" -o "$DISTRO" = "debian" ]; then
+    if [ $DISTRO = "ubuntu" -o "$DISTRO" = "fedora" -o "$DISTRO" = "debian" -o "$DISTRO" = "centos"]; then
       echo "* Linux distribution ID: $DISTRO (supported)";
     else
       echo "* Linux distribution ID: $DISTRO (unsupported, adapting the configuration may be necessary)";
@@ -101,7 +101,7 @@ if [ -x "`command -v pkg-config`" ]; then
       echo "----------------------- CONFIGURATION ERROR --------------------------"
       echo "Configuration failed because 'glib-2.0' was not found. Try installing:"
       echo " * deb: libglib2.0-dev (Debian, Ubuntu, etc)"
-      echo " * yum: glib* (Fedora, etc)"
+      echo " * yum: glib* (Fedora, CentOS, etc)"
       echo "----------------------------------------------------------------------"
       exit 1
     fi
@@ -126,7 +126,7 @@ else
   echo "----------------------- CONFIGURATION ERROR --------------------------"
   echo "Configuration failed because 'ncurses' was not found. Try installing:"
   echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
-  echo " * yum: ncurses-devel (Fedora, etc)"
+  echo " * yum: ncurses-devel (Fedora, CentOS, etc)"
   echo "----------------------------------------------------------------------"
   exit 1
 fi
@@ -141,7 +141,7 @@ else
   echo "----------------------- CONFIGURATION ERROR --------------------------"
   echo "Configuration failed because 'pcre' is not available. Try installing:"
   echo " * deb: libpcre3 libpcre3-dev (Debian, Ubuntu, etc)"
-  echo " * yum: pcre pcre-devel (Fedora, etc)"
+  echo " * yum: pcre pcre-devel (Fedora, CentOS, etc)"
   echo "----------------------------------------------------------------------"
 exit 1
 fi
