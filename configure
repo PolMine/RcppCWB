@@ -79,7 +79,9 @@ mv ./src/cwb/config.mk.mod ./src/cwb/config.mk
 # Adapt CWB configuration file that defines compiler to use compiler chosen
 # by user (Makeconf, Makevars file)
 echo "* adapt CWB configuration file to use compiler: $CC_R"
-sed -i -e "s#CC\s*=\s*gcc#CC=$CC_R#" "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
+sed -e "s#CC\s*=\s*gcc#CC=$CC_R#" > "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC.mod"
+rm "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
+mv "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC.mod" "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
 
 # Check availability of glib2.0 (download on macOS)
 if [ -x "`command -v pkg-config`" ]; then
