@@ -55,15 +55,18 @@ case $OS in
     case $CPU_INFO in
       SPARK)
         CWB_PLATFORM_CONFIG_FILE="solaris_spark"
+        CWB_PLATFORM_CONFIG_FILE_CC="solaris_spark"
         ;;
       *)
         CWB_PLATFORM_CONFIG_FILE="solaris_x86"
+        CWB_PLATFORM_CONFIG_FILE_CC="solaris_x86"
         ;;
     esac
     SOCKETLIB='-lsocket -Wl,--allow-multiple-definition';;
     
   *)
     CWB_PLATFORM_CONFIG_FILE="unix"
+    CWB_PLATFORM_CONFIG_FILE_CC="unix"
     echo "* OS unknown, resorting to Unix as CWB default configuration (modifications may be necessary)"
     ;;
 esac
