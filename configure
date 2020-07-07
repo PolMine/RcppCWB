@@ -82,7 +82,7 @@ mv ./src/cwb/config.mk.mod ./src/cwb/config.mk
 # Adapt CWB configuration file that defines compiler to use compiler chosen
 # by user (Makeconf, Makevars file)
 echo "* adapt CWB configuration file to use compiler: $CC_R"
-sed -e "s#CC\s*=\s*gcc#CC=$CC_R#" ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC} > ./tmpile
+sed -e "s#CC\s*=\s*gcc#CC=$CC_R#" ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC} > ./tmpfile
 rm ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC}
 mv ./tempfile ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC}
 
