@@ -82,9 +82,9 @@ mv ./src/cwb/config.mk.mod ./src/cwb/config.mk
 # Adapt CWB configuration file that defines compiler to use compiler chosen
 # by user (Makeconf, Makevars file)
 echo "* adapt CWB configuration file to use compiler: $CC_R"
-sed -e "s#CC\s*=\s*gcc#CC=$CC_R#" > "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC.mod"
-rm "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
-mv "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC.mod" "./src/cwb/config/platform/$CWB_PLATFORM_CONFIG_FILE_CC"
+sed -e "s#CC\s*=\s*gcc#CC=$CC_R#" ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC} > ./tmpile
+rm ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC}
+mv ./tempfile ./src/cwb/config/platform/${CWB_PLATFORM_CONFIG_FILE_CC}
 
 # Check availability of glib2.0 (download on macOS)
 if [ -x "`command -v pkg-config`" ]; then
@@ -148,6 +148,7 @@ else
   echo "Configuration failed because 'pcre' is not available. Try installing:"
   echo " * deb: libpcre3 libpcre3-dev (Debian, Ubuntu, etc)"
   echo " * yum: pcre pcre-devel (Fedora, CentOS, etc)"
+  echo " * csw: pcre libpcre_dev (Solaris)"
   echo "----------------------------------------------------------------------"
 exit 1
 fi
