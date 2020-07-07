@@ -132,8 +132,9 @@ else
   echo "Configuration failed because 'ncurses' was not found. Try installing:"
   echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
   echo " * yum: ncurses-devel (Fedora, CentOS, etc)"
+  echo " * csw: ncurses libncurses_dev (Solaris)"
   echo "----------------------------------------------------------------------"
-  exit 1
+  # exit 1
 fi
 
 # Check availability of pcre
