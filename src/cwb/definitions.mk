@@ -67,9 +67,9 @@ ifndef AR
 $(error Configuration variable AR is not set (for building archive from .o files))
 endif
 
-ifndef RANLIB
-$(error Configuration variable RANLIB is not set (make table of contents for .a files))
-endif
+# ifndef RANLIB
+# $(error Configuration variable RANLIB is not set (make table of contents for .a files))
+# endif
 
 
 #
