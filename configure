@@ -107,6 +107,7 @@ if [ -x "`command -v pkg-config`" ]; then
       echo "Configuration failed because 'glib-2.0' was not found. Try installing:"
       echo " * deb: libglib2.0-dev (Debian, Ubuntu, etc)"
       echo " * yum: glib* (Fedora, CentOS, etc)"
+      echo " * csw: glib2 (Solaris)"
       echo "----------------------------------------------------------------------"
       exit 1
     fi
@@ -128,13 +129,13 @@ if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
   printf "yes\n";
 else
   printf "no\n";
-  echo "----------------------- CONFIGURATION ERROR --------------------------"
-  echo "Configuration failed because 'ncurses' was not found. Try installing:"
+  echo "----------------------- CONFIGURATION CRITICAL --------------------------"
+  echo "Configuration may fail because 'ncurses' was not found. Try installing:"
   echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
   echo " * yum: ncurses-devel (Fedora, CentOS, etc)"
-  echo " * csw: ncurses libncurses_dev (Solaris)"
+  echo " * csw: libncurses_dev (Solaris)"
   echo "----------------------------------------------------------------------"
-  # exit 1
+  # no abort because pkg-config will not find ncurses on Solaris
 fi
 
 # Check availability of pcre
@@ -148,7 +149,7 @@ else
   echo "Configuration failed because 'pcre' is not available. Try installing:"
   echo " * deb: libpcre3 libpcre3-dev (Debian, Ubuntu, etc)"
   echo " * yum: pcre pcre-devel (Fedora, CentOS, etc)"
-  echo " * csw: pcre libpcre_dev (Solaris)"
+  echo " * csw: libpcre_dev (Solaris)"
   echo "----------------------------------------------------------------------"
 exit 1
 fi
