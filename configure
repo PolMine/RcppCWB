@@ -128,7 +128,6 @@ PKG_CONFIG_NCURSES_INFO=$?
 if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
   printf "yes\n";
 else
-  /opt/csw/bin/pkgutil -y -i -W ncurses 
   printf "no\n";
   echo "----------------------- CONFIGURATION CRITICAL --------------------------"
   echo "Configuration may fail because 'ncurses' was not found. Try installing:"
@@ -152,9 +151,7 @@ else
   echo " * yum: pcre pcre-devel (Fedora, CentOS, etc)"
   echo " * csw: libpcre_dev (Solaris)"
   echo "----------------------------------------------------------------------"
-  /opt/csw/bin/pkgutil -y -i -W libpcre_dev
 fi
-/opt/csw/bin/pkgutil -y -i -W libpcre_dev
 PCRE_LIBDIRS="`pcre-config --libs`"
 
 # Step 2: Generate Makevars file
