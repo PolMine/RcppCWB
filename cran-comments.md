@@ -1,13 +1,13 @@
 ## General remarks
 
-This is an immmediate follow-up to issues that occurred after the release
-of RcppCWB v0.2.10 (2020-06-25). It tried to remove (most) remaining bashisms 
+This is a follow-up to issues that occurred after the release
+of RcppCWB v0.2.10 (2020-06-25). It had tried to remove remaining bashisms 
 from the configure and the cleanup scripts, but unperfectly so.
 
 Brian Ripley alerted me in a June 26 mail that a couple of issues are not
-in line with CRAN policies and expectations and need to be fixed until
+in line with CRAN policies and expectations, and need to be fixed until
 July 10. I do understand all issues raised and I have worked hard to 
-improve things. My apologies that parts of my work failed to meet
+improve things. My apologies that I failed to meet
 CRAN standards. I am very grateful for the scrutiny you investd in 
 inspecting the RcppCWB package and pinpointing shortcomings.
 
@@ -17,7 +17,7 @@ Brian Ripley).
 0) OSes covered by the the package
 
 All OSes checked by CRAN by Default (Windows, macOS, Linux distros Debian,
-Fedora, Ubuntu) are dealt with explicitly by the configure script that
+Fedora, Ubuntu) are dealt with now explicitly by the configure script that
 has been reworked thorughly. If the OS is unknown, there is a warning 
 message, and a Unix configuration is used as a fallback option.
 
@@ -25,9 +25,9 @@ message, and a Unix configuration is used as a fallback option.
 1) You force -fcommon, which is deprecated for GCC
 
 And it has been placed wrongly, as pointed out by Brian Ripley. I needed
-the flag as a murky workaround because the structure of includes is 
-fairly complicated. Usage of the -fcommon flag has been dropped.
-It is not necessary by using the "extern" whereever necessary. A 
+the flag as a workaround because the structure of includes is 
+fairly complicated. Now, the usage of the -fcommon flag has been dropped.
+C script use the "extern" statement whereever necessary. A 
 new header file has been written. 
 
 
@@ -35,15 +35,15 @@ new header file has been written.
 
 I had used the checkbashisms script to detect bashisms and I was not 
 aware that checks are not comprehensive. My apologies for having missed what
-"Writing R extensions" says. -e has been replace by -f which works for
-Bourne shell scripts. Backticks are now use throughout to replace $(cmd).
+"Writing R extensions" says. -e has been replace by -f. Backticks are now used
+throughout to replace $(cmd).
 
 
 4) Check for pcre and glib-2.0
 
-RcppCWB is a wrapper the Corpus Workbench (CWB) is based on PCRE1. My 
-grasp is that pcre has superseded but it is still widely used today. 
-The situation will be different two or three years from now. So I am in 
+RcppCWB is a wrapper the Corpus Workbench (CWB) which still uses PCRE1. My 
+grasp is that pcre has superseded but is still widely used. 
+The situation will be different coming soon. So I am in 
 touch with Stefan Evert, the main developer of the CWB to modernize 
 the CWB in time, moving from PCRE1 to PCRE2.
 
@@ -53,7 +53,6 @@ The configure script now checks or the presence of ncurses, pcre and
 glib-2.0 (using pkg-config / pcre-config) and will issue an error 
 message with installation instructions if a dependency is missing. 
 
-You also do not check for 'glib-2' (sic).
 
 5) Woes on macOS
 
@@ -63,8 +62,8 @@ configure script that had unintended side effects. Solved.
 6) compilation warnings
 
 RcppCWB is a wrapper for the CWB and I was too hesitant to intervene
-in the original CWB code. Now, I do not get compiler warnings on the 
-test environments used.
+in the original CWB code. Compiler warnings issued by gcc or clang have
+been addressed by modyfing the C code.
 
 
 

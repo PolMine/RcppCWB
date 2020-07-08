@@ -12,8 +12,8 @@ possible to drop this flag. It was defined at a confusing place anyway.
 * If pkg-config is not present on macOS, a warning is issued; the user gets the advice to use the brew 
 package manager to install pkg-config.
 * There is an explicit check in the configure script whether the dependencies ncurses, pcre and glib-2.0
-are present. If not, a telling error with installation instructions is issued.
-* When unloading the package, the dynamic library is unloaded.
+are present. If not, a telling error with installation instructions is displayed.
+* When unloading the package, the dynamic library RcppCWB.so is unloaded.
 * When loading the package, CQP is initialized by default (call `cqp_initialize()`)
 
 

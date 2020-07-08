@@ -14,9 +14,9 @@
 <script src="pkgdown.js"></script><meta property="og:title" content="Rcpp Bindings for the Corpus Workbench (CWB)">
 <meta property="og:description" content="Rcpp Bindings for the C code of the Corpus Workbench (CWB), an indexing and query 
   engine to efficiently analyze large corpora (&lt;http://cwb.sourceforge.net&gt;). RcppCWB is licensed
-  under the GNU GPL-3, in line with the GPL-3 license of the CWB (&lt;https://www.r-project.org/
-  Licenses/GPL-3&gt;). The CWB relies on pcre (BSD license, see &lt;https://www.pcre.org/
-  licence.txt&gt;) and GLib (LGPL license, see &lt;https://www.gnu.org/licenses/lgpl-3.0.en.html&gt;).
+  under the GNU GPL-3, in line with the GPL-3 license of the CWB (&lt;https://www.r-project.org/Licenses/GPL-3&gt;).
+  The CWB relies on pcre (BSD license, see &lt;http://www.pcre.org/licence.txt&gt;)
+  and GLib (LGPL license, see &lt;https://www.gnu.org/licenses/lgpl-3.0.en.html&gt;).
   See the file LICENSE.note for further information. The package includes modified code of the
   rcqp package (GPL-2, see &lt;https://cran.r-project.org/package=rcqp&gt;). The original work of the authors
   of the rcqp package is acknowledged with great respect, and they are listed as authors of this
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -111,7 +111,7 @@
 <div id="installation-on-macos" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation-on-macos" class="anchor"></a>Installation on MacOS</h2>
-<p>On macOS, the <a href="https://www.pcre.org/">pcre</a> and <a href="https://developer.gnome.org/glib/">Glib</a> libraries need to be present. We recommend to use ‘Homebrew’ as a package manager for macOS. To install Homebrew, follow the instructions on the <a href="https://brew.sh/index_de.html">Homebrew Website</a>. It may also be necessary to also install <a href="https://developer.apple.com/xcode/">Xcode</a> and <a href="https://www.xquartz.org">XQuartz</a>.</p>
+<p>On macOS, the <a href="http://www.pcre.org/">pcre</a> and <a href="https://developer.gnome.org/glib/">Glib</a> libraries need to be present. We recommend to use ‘Homebrew’ as a package manager for macOS. To install Homebrew, follow the instructions on the <a href="https://brew.sh/index_de.html">Homebrew Website</a>. It may also be necessary to also install <a href="https://developer.apple.com/xcode/">Xcode</a> and <a href="https://www.xquartz.org">XQuartz</a>.</p>
 <p>The following commands then need to be executed from a terminal window. They will install the C libraries the CWB relies on:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">brew</span> -v install pkg-config</a>
 <a class="sourceLine" id="cb6-2" title="2"><span class="ex">brew</span> -v install glib --universal</a>
@@ -227,7 +227,7 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a></li>
+<li><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="http://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a></li>
 <li><a href="https://cran.r-project.org/package=RcppCWB"><img src="http://www.r-pkg.org/badges/version/RcppCWB" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://travis-ci.org/PolMine/RcppCWB"><img src="https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=master" alt="Travis-CI Build Status"></a></li>
 <li><a href="https://ci.appveyor.com/project/PolMine/RcppCWB"><img src="https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
