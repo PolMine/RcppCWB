@@ -1,3 +1,4 @@
+
 #!/bin/sh
 
 # Step 1: Configure CWB
@@ -37,7 +38,7 @@ case $OS in
       *)
         SUPPORT="unsupported, adapting the configuration may be necessary";;
     esac
-    echo "* Linux distribution ID: $DISTRO ($SUPPORTED)";
+    echo "* Linux distribution ID: $DISTRO ($SUPPORT)";
 
     # For Debian, Fedora and Ubuntu, the generic Linux configuration works, 
     # there are no known required adaptions so far. If another distribution is used,
