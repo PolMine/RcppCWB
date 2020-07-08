@@ -1,5 +1,22 @@
 ## General remarks
 
+This is an immmediate follow-up to issues that occurred after the release
+of RcppCWB v0.2.10 (2020-06-25). It tried to remove (most) remaining bashisms 
+from the configure and the cleanup scripts, but unperfectly so.
+
+Brian Ripley alerted me in a June 26 mail that a couple of issues are not
+in line with CRAN policies and expectations and need to be fixed until
+July 10. I do understand all issues raised and I have worked hard to 
+improve things. My apologies that parts of my work failed to meet
+CRAN standards. I am very grateful for the scrutiny you investd in 
+inspecting the RcppCWB package and pinpointing shortcomings.
+
+These are the major changes (and responses to the issues raised by 
+Brian Ripley)
+
+
+
+
 0) The case in configure only covers 3 OSes, a violation of the policy
 
 
