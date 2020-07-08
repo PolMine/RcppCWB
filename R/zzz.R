@@ -13,4 +13,12 @@
   # corpora within the RcppCWB package remain unused, and using the
   # temporary directory is not necessary.
   use_tmp_registry(pkg = file.path(libname, pkgname))
+  if (!cqp_is_initialized()) cqp_initialize()
+}
+
+
+.onUnload <- function(libpath) {
+  # xml2 pkg served as model
+  gc() # trigger finalisers
+  library.dynam.unload("RcppCWB", libpath)
 }

@@ -12,51 +12,59 @@ CRAN standards. I am very grateful for the scrutiny you investd in
 inspecting the RcppCWB package and pinpointing shortcomings.
 
 These are the major changes (and responses to the issues raised by 
-Brian Ripley)
+Brian Ripley).
+
+0) OSes covered by the the package
+
+All OSes checked by CRAN by Default (Windows, macOS, Linux distros Debian,
+Fedora, Ubuntu) are dealt with explicitly by the configure script that
+has been reworked thorughly. If the OS is unknown, there is a warning 
+message, and a Unix configuration is used as a fallback option.
 
 
+1) You force -fcommon, which is deprecated for GCC
+
+And it has been placed wrongly, as pointed out by Brian Ripley. I needed
+the flag as a murky workaround because the structure of includes is 
+fairly complicated. Usage of the -fcommon flag has been dropped.
+It is not necessary by using the "extern" whereever necessary. A 
+new header file has been written. 
 
 
-0) The case in configure only covers 3 OSes, a violation of the policy
+2) Bashisms: -e not portable / avoid using $(cmd)
+
+I had used the checkbashisms script to detect bashisms and I was not 
+aware that checks are not comprehensive. My apologies for having missed what
+"Writing R extensions" says. -e has been replace by -f which works for
+Bourne shell scripts. Backticks are now use throughout to replace $(cmd).
 
 
+4) Check for pcre and glib-2.0
 
-1) You force -fcommon, which is deprecated for GCC and not portable so
-should only be used for a version of GCC which supports it.  It is a
-compiler and not a CPP flag.
+RcppCWB is a wrapper the Corpus Workbench (CWB) is based on PCRE1. My 
+grasp is that pcre has superseded but it is still widely used today. 
+The situation will be different two or three years from now. So I am in 
+touch with Stefan Evert, the main developer of the CWB to modernize 
+the CWB in time, moving from PCRE1 to PCRE2.
 
-2) As the manual told you, test -e is not portable.
+In SystemRequirements, the statement is now pcre (>= 7 < 10).
 
-3) On Solaris
-
-./configure: syntax error at line 12: `CC_R=$' unexpected
-ERROR: configuration failed for package ‘RcppCWB’
-where the manual warned that $(cmd) is a bashism and to use backticks.
-
-4) You have
-
-SystemRequirements: GNU make, pcre (>= 7), GLib (>= 2.0.0).
-
-but mean PCRE1 not PCRE2 as the latter does not suffice.  So it needs
-'(>= 7 < 10)'.  And this does not check for it in configure (as the
-manual requires), just fails to find pcre.h.  (I no longer had PCRE1
-installed on macOS: nothing else needs it.)
+The configure script now checks or the presence of ncurses, pcre and 
+glib-2.0 (using pkg-config / pcre-config) and will issue an error 
+message with installation instructions if a dependency is missing. 
 
 You also do not check for 'glib-2' (sic).
 
-5) See the results page for woes on macOS.
+5) Woes on macOS
 
-6) There are many compilation warnings, including:
+There was a build error resulting from the previous changes of the 
+configure script that had unintended side effects. Solved.
 
-attributes.c: In function ‘component_full_name’:
-macros.h:59:22: warning: the address of ‘rname’ will always evaluate as
-‘true’ [-Waddress]
+6) compilation warnings
 
-eval.c:1045:17: warning: result of comparison against a string literal
-is unspecified (use an explicit string comparison function instead)
-[-Wstring-compare]
-
-
+RcppCWB is a wrapper for the CWB and I was too hesitant to intervene
+in the original CWB code. Now, I do not get compiler warnings on the 
+test environments used.
 
 
 
@@ -64,7 +72,7 @@ is unspecified (use an explicit string comparison function instead)
 
 * win-builder (R-devel and R-release), R 4.0.2
 * Windows AppVeyorR, 4.0.2 Patched
-* OS X (local install), R 4.0.0
+* OS X (local install), R 4.0.2
 * Ubuntu 14.04 (on travis-ci), R 4.0.0
 * Fedora 32 (docker image), both clang and gcc compilers, R 3.6.3 
 * Fedora 31 (R-hub), GCC, R-devel
@@ -75,7 +83,7 @@ is unspecified (use an explicit string comparison function instead)
 
 There were no ERRORs, WARNINGs or NOTEs on the Linux / macOS environments I used.
 
-On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb | sub-directories of 1Mb or more: libs 5.2Mb". This results from the dependency on pcre, and glib which are included. I will try to re-compile the cross-compiled static libraris using the flag '-Os' to reduce the file size. I will be glad for your advice, if compiler optimization is more important than keeping the package below 5Mb.
+On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb | sub-directories of 1Mb or more: libs 5.2Mb". This results from the dependency on pcre, and glib which are included.
 
 
 ## Downstream dependencies

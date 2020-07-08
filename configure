@@ -25,23 +25,29 @@ case $OS in
   Linux)
     # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
     DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
-    if [ $DISTRO = "ubuntu" -o "$DISTRO" = "fedora" -o "$DISTRO" = "debian" -o "$DISTRO" = "centos"]; then
-      echo "* Linux distribution ID: $DISTRO (supported)";
-    else
-      echo "* Linux distribution ID: $DISTRO (unsupported, adapting the configuration may be necessary)";
-    fi
-    
+    case "$DISTRO" in
+      ubuntu)
+        SUPPORT="supported";;
+      fedora)
+        SUPPORT="supported";;
+      debian)
+        SUPPORT="supported";;
+      centos)
+        SUPPORT="supported";;
+      *)
+        SUPPORT="unsupported, adapting the configuration may be necessary";;
+    esac
+    echo "* Linux distribution ID: $DISTRO ($SUPPORTED)";
+
     # For Debian, Fedora and Ubuntu, the generic Linux configuration works, 
     # there are no known required adaptions so far. If another distribution is used,
     # the previous message informs users that adaptions may be necessary.
     ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
     case "$ARCH" in 
       x86_64)
-        CWB_PLATFORM_CONFIG_FILE="linux-64"
-        ;;
+        CWB_PLATFORM_CONFIG_FILE="linux-64";;
       i386) 
-        CWB_PLATFORM_CONFIG_FILE="linux"
-        ;;
+        CWB_PLATFORM_CONFIG_FILE="linux";;
       *)
         echo "* unknown architecture (`$ARCH`), using Linux config as default"
         CWB_PLATFORM_CONFIG_FILE="linux"

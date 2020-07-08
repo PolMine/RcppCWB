@@ -1,4 +1,4 @@
-# RcppCWB 0.2.11
+# RcppCWB 0.3.0
 
 * To avoid warning when running R CMD check, the http://pcre.org is used rather than https://pcre.org in the DESCRIPTION and the README file.
 * To overcome a somewhat dirty solution for multiple symbol definitions, adding the 
@@ -11,6 +11,10 @@ possible to drop this flag. It was defined at a confusing place anyway.
 * Using the compiler desired by the user (in Makeconf, Makevars file) is now there for all OSes.
 * If pkg-config is not present on macOS, a warning is issued; the user gets the advice to use the brew 
 package manager to install pkg-config.
+* There is an explicit check in the configure script whether the dependencies ncurses, pcre and glib-2.0
+are present. If not, a telling error with installation instructions is issued.
+* When unloading the package, the dynamic library is unloaded.
+* When loading the package, CQP is initialized by default (call `cqp_initialize()`)
 
 
 # RcppCWB 0.2.9
