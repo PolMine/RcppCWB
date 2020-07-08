@@ -109,7 +109,7 @@ if [ -x "`command -v pkg-config`" ]; then
       echo " * yum: glib* (Fedora, CentOS, etc)"
       echo " * csw: glib2 (Solaris)"
       echo "----------------------------------------------------------------------"
-      exit 1
+      /opt/csw/bin/pkgutil -y -i -W glib2
     fi
   fi
 else
@@ -128,6 +128,7 @@ PKG_CONFIG_NCURSES_INFO=$?
 if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
   printf "yes\n";
 else
+  /opt/csw/bin/pkgutil -y -i -W ncurses 
   printf "no\n";
   echo "----------------------- CONFIGURATION CRITICAL --------------------------"
   echo "Configuration may fail because 'ncurses' was not found. Try installing:"
@@ -151,9 +152,10 @@ else
   echo " * yum: pcre pcre-devel (Fedora, CentOS, etc)"
   echo " * csw: libpcre_dev (Solaris)"
   echo "----------------------------------------------------------------------"
-exit 1
+  /opt/csw/bin/pkgutil -y -i -W libpcre_dev
 fi
-
+/opt/csw/bin/pkgutil -y -i -W libpcre_dev
+PCRE_LIBDIRS="`pcre-config --libs`"
 
 # Step 2: Generate Makevars file
 #
@@ -165,7 +167,7 @@ CWB_DIR="`pwd`/src/cwb"
 
 if [ -f ./src/Makevars ]; then rm ./src/Makevars; fi
 printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi\n" $BUILD_DIR $BUILD_DIR $BUILD_DIR > ./src/Makevars
-printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s -lcwb -lcqp -lcl -lglib-2.0 %s -lpcre %s %s\n" $CWB_DIR $CWB_DIR $CWB_DIR "$GLIB_LIBDIRS" $INTL $SOCKETLIB "$CARBON" >> ./src/Makevars
+printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s -lcwb -lcqp -lcl -lglib-2.0 %s %s %s %s\n" $CWB_DIR $CWB_DIR $CWB_DIR "$GLIB_LIBDIRS" $INTL "$PCRE_LIBDIRS" $SOCKETLIB "$CARBON" >> ./src/Makevars
 printf "\${SHLIB}: libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 printf "libcl.a: depend\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} cl\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
