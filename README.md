@@ -1,4 +1,5 @@
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3936416.svg)](https://doi.org/10.5281/zenodo.3936416)
 [![License: GPL
 v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
@@ -7,7 +8,6 @@ Status](https://api.travis-ci.org/PolMine/RcppCWB.svg?branch=master)](https://tr
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=master&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
 [![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3904235.svg)](https://doi.org/10.5281/zenodo.3904235)
 
 # Rcpp bindings for the Corpus Workbench (CWB)
 

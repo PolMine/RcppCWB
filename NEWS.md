@@ -1,6 +1,6 @@
 # RcppCWB 0.3.0
 
-* To avoid warning when running R CMD check, the http://pcre.org is used rather than https://pcre.org in the DESCRIPTION and the README file.
+* To avoid warnings when running R CMD check, the http://pcre.org is used rather than https://pcre.org in the DESCRIPTION and the README file.
 * To overcome a somewhat dirty solution for multiple symbol definitions, adding the 
 'fcommon' flag to the CFLAGS in the configure script has been removed. The C code 
 has been modified such that multiple symbol definitions are omitted.
