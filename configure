@@ -21,8 +21,16 @@ echo "* operating system detected for CWB configuration: $OS"
 case $OS in
   
   Darwin)
-    CWB_PLATFORM_CONFIG_FILE="darwin-64"
-    CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+    ARCH=`uname -m`
+
+    case $ARCH in
+      arm64)
+        CWB_PLATFORM_CONFIG_FILE="darwin-arm64"
+        CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+
+      x86_64)
+        CWB_PLATFORM_CONFIG_FILE="darwin-64"
+        CWB_PLATFORM_CONFIG_FILE_CC="unix";;
   Linux)
     # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
     DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
