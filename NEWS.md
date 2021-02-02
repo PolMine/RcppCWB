@@ -1,3 +1,7 @@
+# RcppCWB 0.3.0.9001
+
+* The configure script now uses `pcre-config` 
+
 # RcppCWB 0.3.0
 
 * To avoid warning when running R CMD check, the http://pcre.org is used rather than https://pcre.org in the DESCRIPTION and the README file.
