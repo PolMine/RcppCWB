@@ -105,7 +105,7 @@ if [ -x "`command -v pkg-config`" ]; then
     if [ $OS = "Darwin" ]; then
       echo "* glib2.0 missing, downloading static library from GitHub (https://github.com/PolMine/libglib)";
       ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd`
-      export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
+      export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-silicon/pkgconfig
       # Setting further args required to compile agains glib2.0 in this scenario
       INTL="-lintl"
       CARBON="-framework Carbon"
