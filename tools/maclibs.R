@@ -18,5 +18,6 @@ pkgconfig_file <- file.path(target_dir, "libglib-silicon/pkgconfig/glib-2.0.pc")
 pc <- readLines(pkgconfig_file)
 pc[1] <- sprintf("prefix=%s/macos/libglib-silicon", getwd())
 pc[3] <- sprintf("libdir=${exec_prefix}/lib/%s", Sys.info()[["machine"]])
+print(pc)
 writeLines(text = pc, con = pkgconfig_file)
 
