@@ -135,15 +135,6 @@ else
   exit 1
 fi 
 
-if [ -x "`command -v pcretest`" ]; then
-  printf "* using pcretest to check whether pcre has been configured with unicode properties support ... ";
-  PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | grep --only-matching 'No'`";
-  if [ "$PCRE_UNICODE" = "No" ]; then
-    printf "no\n";
-  else 
-    printf "yes\n";
-  fi
-fi 
 echo "* using pkg-config to get -L flags for glib-2.0"
 GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
 
@@ -179,6 +170,23 @@ else
   echo " * csw: libpcre_dev (Solaris)"
   echo "----------------------------------------------------------------------"
 fi
+if [ -x "`command -v pcretest`" ]; then
+  printf "* using pcretest to check whether pcre has been configured with unicode properties support ... ";
+  PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | grep --only-matching 'No'`";
+  if [ "$PCRE_UNICODE" = "No" ]; then
+    printf "no\n";
+    echo "-------------------------------  WARNING- ------------------------------"
+    echo "No Unicode properties support found for pcre. RcppCWB may not work as"
+    echo "intended and throw errors. Recommended solution:"
+    echo "Configure pcre with '--enable-unicode-properties' option and re-compile."
+    echo "------------------------------------------------------------------------"
+
+  else 
+    printf "yes\n";
+  fi
+fi 
+
+
 PCRE_LIBDIRS="`pcre-config --libs`"
 PCRE_CFLAGS="`pcre-config --cflags`"
 

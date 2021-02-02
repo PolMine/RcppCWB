@@ -10,7 +10,8 @@ Author: Andreas Blaette [aut, cre],
   Bruno Maximilian Schulze [ctb],
   Stefan Evert [ctb],
   Arne Fitschen [ctb],
-  Jeroen Ooms [ctb]
+  Jeroen Ooms [ctb],
+  Marius Bertram [ctb]
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),
@@ -19,7 +20,8 @@ Authors@R: c(
   person("Bruno Maximilian", "Schulze", role = "ctb"),
   person("Stefan", "Evert", role = "ctb"),
   person("Arne", "Fitschen", role = "ctb"),
-  person("Jeroen", "Ooms", role = "ctb")
+  person("Jeroen", "Ooms", role = "ctb"),
+  person("Marius", "Bertram", role = "ctb")
   )
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
 Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query 
