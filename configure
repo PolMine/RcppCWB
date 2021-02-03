@@ -175,7 +175,7 @@ if [ -x "`command -v pcretest`" ]; then
   PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | grep --only-matching 'No'`";
   if [ "$PCRE_UNICODE" = "No" ]; then
     printf "no\n";
-    echo "-------------------------------  WARNING- ------------------------------"
+    echo "-------------------------------  WARNING -------------------------------"
     echo "No Unicode properties support found for pcre. RcppCWB may not work as"
     echo "intended and throw errors. Recommended solution:"
     echo "Configure pcre with '--enable-unicode-properties' option and re-compile."
