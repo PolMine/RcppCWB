@@ -135,9 +135,9 @@ else
   exit 1
 fi 
 
-echo "* using pkg-config to get -L flags for glib-2.0"
+printf "* using pkg-config to get -L flags for glib-2.0: "
 GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
-
+printf "%s\n" "$GLIB_LIBDIRS"
 
 # Check availability of ncurses
 printf "* using pkg-config to check whether ncurses is available ... ";
