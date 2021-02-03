@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.3.0.9001
-Date: 2021-02-02
+Version: 0.3.1
+Date: 2021-02-03
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -50,7 +50,7 @@ Suggests:
     testthat
 LinkingTo: Rcpp
 Biarch: true
-URL: https://www.github.com/PolMine/RcppCWB
+URL: https://github.com/PolMine/RcppCWB
 BugReports: https://github.com/PolMine/RcppCWB/issues
 RoxygenNote: 6.1.1
 Collate:

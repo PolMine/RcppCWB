@@ -1,8 +1,8 @@
 # RcppCWB 0.3.1
 
-* If RcppCWB is compiled on macOS, the package configure script checks the architecture of the machine and ensures that an M1-compatible version of glib is loaded in case an amd64 architecture is detected.
+* If RcppCWB is compiled on macOS, the package configure script checks the architecture of the machine and ensures that (if glib-2.0 is not yet present) a version of glib-2.0 compiled for Apple Silicon/the M1 chip is loaded in case an amd64 architecture is detected.
 * The package configure script now uses `pcre-config` to locate header files of PCRE.
-* The configure script checks whether pcre has been compiled with Unicode properties support and issue a warning (and a recommended solution) if not.
+* The configure script checks whether pcre has been compiled with Unicode properties support. If not, a warning is issued that also explains the recommended solution to use '--enable-unicode-properties' when calling configure.
 
 # RcppCWB 0.3.0
 
