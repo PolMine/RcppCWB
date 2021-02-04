@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 # Step 1: Configure CWB
@@ -20,9 +19,20 @@ echo "* operating system detected for CWB configuration: $OS"
 
 case $OS in
   
-  Darwin)
-    CWB_PLATFORM_CONFIG_FILE="darwin-64"
-    CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+ Darwin)
+    ARCH=`uname -m`
+    case $ARCH in
+      arm64)
+        echo "* compiling for darwin-arm64"
+        CWB_PLATFORM_CONFIG_FILE="darwin-arm64"
+        CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+
+      *)
+        echo "* compiling for darwin-64"
+        CWB_PLATFORM_CONFIG_FILE="darwin-64"
+        CWB_PLATFORM_CONFIG_FILE_CC="unix";;
+    esac
+    ;;
   Linux)
     # the 'uname -s' command returns 'Linux' on Fedora, Debian and Ubuntu
     DISTRO=`awk -F= '$1=="ID" { print $2 ;}' /etc/os-release`
@@ -124,9 +134,10 @@ else
   echo "Check whether 'pkg-config' is installed and make sure that 'pkg-config' is on your PATH."
   exit 1
 fi 
-echo "* using pkg-config to get -L flags for glib-2.0"
-GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
 
+printf "* using pkg-config to get -L flags for glib-2.0: "
+GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
+printf "%s\n" "$GLIB_LIBDIRS"
 
 # Check availability of ncurses
 printf "* using pkg-config to check whether ncurses is available ... ";
@@ -159,7 +170,26 @@ else
   echo " * csw: libpcre_dev (Solaris)"
   echo "----------------------------------------------------------------------"
 fi
+if [ -x "`command -v pcretest`" ]; then
+  printf "* using pcretest to check whether pcre has been configured with unicode properties support ... ";
+  PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | grep --only-matching 'No'`";
+  if [ "$PCRE_UNICODE" = "No" ]; then
+    printf "no\n";
+    echo "-------------------------------  WARNING -------------------------------"
+    echo "No Unicode properties support found for pcre. RcppCWB may not work as"
+    echo "intended and throw errors. Recommended solution:"
+    echo "Configure pcre with '--enable-unicode-properties' option and re-compile."
+    echo "------------------------------------------------------------------------"
+
+  else 
+    printf "yes\n";
+  fi
+fi 
+
 PCRE_LIBDIRS="`pcre-config --libs`"
+printf "* using pcre-config to get cflags for pcre: "
+PCRE_CFLAGS="`pcre-config --cflags`"
+printf "%s\n" "$PCRE_CFLAGS"
 
 # Step 2: Generate Makevars file
 #
@@ -167,11 +197,13 @@ PCRE_LIBDIRS="`pcre-config --libs`"
 # is build (variable PKG_DIR) into the Makevars file.
 
 BUILD_DIR="`pwd`"
+printf "* using build directory: %s\n" ${BUILD_DIR}
+
 CWB_DIR="`pwd`/src/cwb"
 
 if [ -f ./src/Makevars ]; then rm ./src/Makevars; fi
-printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi\n" $BUILD_DIR $BUILD_DIR $BUILD_DIR > ./src/Makevars
-printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s %s -lcwb -lcqp -lcl -lglib-2.0 %s %s %s\n" $CWB_DIR $CWB_DIR $CWB_DIR "$GLIB_LIBDIRS" $INTL "$PCRE_LIBDIRS" $SOCKETLIB "$CARBON" >> ./src/Makevars
+printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi %s\n" ${BUILD_DIR} ${BUILD_DIR} ${BUILD_DIR} "$PCRE_CFLAGS" > ./src/Makevars
+printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s %s -lcwb -lcqp -lcl -lglib-2.0 %s %s %s\n" ${CWB_DIR} ${CWB_DIR} ${CWB_DIR} "$GLIB_LIBDIRS" ${INTL} "$PCRE_LIBDIRS" ${SOCKETLIB} "$CARBON" >> ./src/Makevars
 printf "\${SHLIB}: libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 printf "libcl.a: depend\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} cl\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
@@ -183,3 +215,4 @@ printf "depend: clean\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} depend\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
 printf "clean:\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} clean\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars
+

@@ -1,88 +1,33 @@
 ## General remarks
 
-This is a follow-up to issues that occurred after the release
-of RcppCWB v0.2.10 (2020-06-25). It had tried to remove remaining bashisms 
-from the configure and the cleanup scripts, but unperfectly so.
-
-Brian Ripley alerted me in a June 26 mail that a couple of issues are not
-in line with CRAN policies and expectations, and need to be fixed until
-July 10. I do understand all issues raised and I have worked hard to 
-improve things. My apologies that I failed to meet
-CRAN standards. I am very grateful for the scrutiny you investd in 
-inspecting the RcppCWB package and pinpointing shortcomings.
-
-These are the major changes (and responses to the issues raised by 
-Brian Ripley).
-
-0) OSes covered by the the package
-
-All OSes checked by CRAN by Default (Windows, macOS, Linux distros Debian,
-Fedora, Ubuntu) are dealt with now explicitly by the configure script that
-has been reworked thorughly. If the OS is unknown, there is a warning 
-message, and a Unix configuration is used as a fallback option.
+Update: This is the second submission. The logs for the Mac M1 reported an issue with header includes. I do thing that I solved the issue by consistently putting variables in curly braces or by quotating them where necessary. If another submission should be necessary, additional verbosity of the configure script will help me to locate the bug.
 
 
-1) You force -fcommon, which is deprecated for GCC
+This release picks up an alert of Brian Ripley (January 26) that RcppCWB fails to compile on an M1 Mac, see: https://www.stats.ox.ac.uk/pub/bdr/M1mac/RcppCWB.log. Very precise analysis: "You are attempting to use files of the wrong architecture: that needs checking at the configure stage before you download some of them.  And you have passed the wrong architecture to the compiler ...."
 
-And it has been placed wrongly, as pointed out by Brian Ripley. I needed
-the flag as a workaround because the structure of includes is 
-fairly complicated. Now, the usage of the -fcommon flag has been dropped.
-C script use the "extern" statement whereever necessary. A 
-new header file has been written. 
+Both issues are resolved with this RcppCWB version. Please note that part of the work to get glib-2.0 for the correct architecture is done be the R file ./tools/maclibs.R called by the configure script.
 
+There are two further changes of the configure script to improve things:
 
-2) Bashisms: -e not portable / avoid using $(cmd)
+- Apart from making RcppCWB compatible with M1, I use `pcre-config` now to get the location of PCRE headers more reliably.
 
-I had used the checkbashisms script to detect bashisms and I was not 
-aware that checks are not comprehensive. My apologies for having missed what
-"Writing R extensions" says. -e has been replace by -f. Backticks are now used
-throughout to replace $(cmd).
+- An additional check using `pcretest` (if available) issues a warning if PCRE has not been compiled with the Unicode support required.
 
-
-4) Check for pcre and glib-2.0
-
-RcppCWB is a wrapper the Corpus Workbench (CWB) which still uses PCRE1. My 
-grasp is that pcre has superseded but is still widely used. 
-The situation will be different coming soon. So I am in 
-touch with Stefan Evert, the main developer of the CWB to modernize 
-the CWB in time, moving from PCRE1 to PCRE2.
-
-In SystemRequirements, the statement is now pcre (>= 7 < 10).
-
-The configure script now checks or the presence of ncurses, pcre and 
-glib-2.0 (using pkg-config / pcre-config) and will issue an error 
-message with installation instructions if a dependency is missing. 
-
-
-5) Woes on macOS
-
-There was a build error resulting from the previous changes of the 
-configure script that had unintended side effects. Solved.
-
-6) compilation warnings
-
-RcppCWB is a wrapper for the CWB and I was too hesitant to intervene
-in the original CWB code. Compiler warnings issued by gcc or clang have
-been addressed by modyfing the C code.
 
 
 
 ## Test environments
 
-* win-builder (R-devel and R-release), R 4.0.2
-* Windows AppVeyorR, 4.0.2 Patched
-* OS X (local install), R 4.0.2
-* Ubuntu 14.04 (on travis-ci), R 4.0.0
-* Fedora 32 (docker image), both clang and gcc compilers, R 3.6.3 
-* Fedora 31 (R-hub), GCC, R-devel
+* R-hub (Fedora Linux, R-devel, clang, gfortran)
+* win-builder (R-devel [2021-01-31 r79912] and R 4.0.3)
+* macOS Catalina (local install), R 4.0.2
+* macOS Big Sur 11.0 (MacStadium, Mac mini with M1 chip) with R-devel
 * Ubuntu 14.04 (project server), R 3.6.3
 
 
 ## R CMD check results
 
-There were no ERRORs, WARNINGs or NOTEs on the Linux / macOS environments I used.
-
-On Windows, there is a NOTE concerning package size: "installed size is  5.5Mb | sub-directories of 1Mb or more: libs 5.2Mb". This results from the dependency on pcre, and glib which are included.
+There were no ERRORs, WARNINGs or NOTEs on the Linux / macOS / Windows environments I used. A NOTE concerning package size I used to see on Windows machines does not occur .
 
 
 ## Downstream dependencies
