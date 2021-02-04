@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
       </span>
     </div>
 
@@ -114,12 +114,22 @@
       <small>Source: <a href='https://github.com/PolMine/RcppCWB/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="rcppcwb-030" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.0">
-<a href="#rcppcwb-030" class="anchor"></a>RcppCWB 0.3.0<small> Unreleased </small>
+    <div id="rcppcwb-031" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.1">
+<a href="#rcppcwb-031" class="anchor"></a>RcppCWB 0.3.1<small> 2021-02-03 </small>
 </h1>
 <ul>
-<li>To avoid warning when running R CMD check, the <a href="http://pcre.org" class="uri">http://pcre.org</a> is used rather than <a href="https://pcre.org" class="uri">https://pcre.org</a> in the DESCRIPTION and the README file.</li>
+<li>If RcppCWB is compiled on macOS, the package configure script checks the architecture of the machine and ensures that (if glib-2.0 is not yet present) a version of glib-2.0 compiled for Apple Silicon/the M1 chip is loaded in case an amd64 architecture is detected.</li>
+<li>The package configure script now uses <code>pcre-config</code> to locate header files of PCRE.</li>
+<li>The configure script checks whether pcre has been compiled with Unicode properties support. If not, a warning is issued that also explains the recommended solution to use ‘–enable-unicode-properties’ when calling configure.</li>
+</ul>
+</div>
+    <div id="rcppcwb-030" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.0">
+<a href="#rcppcwb-030" class="anchor"></a>RcppCWB 0.3.0<small> 2020-07-08 </small>
+</h1>
+<ul>
+<li>To avoid warnings when running R CMD check, the <a href="http://pcre.org" class="uri">http://pcre.org</a> is used rather than <a href="https://pcre.org" class="uri">https://pcre.org</a> in the DESCRIPTION and the README file.</li>
 <li>To overcome a somewhat dirty solution for multiple symbol definitions, adding the ‘fcommon’ flag to the CFLAGS in the configure script has been removed. The C code has been modified such that multiple symbol definitions are omitted.</li>
 <li>The macOS image used for test on Travis CI is now ‘xcode9.4’</li>
 <li>On Solaris, the configure script would define the flag “-Wl,–allow-multiple-definition” to be passed to the linker flags. The rework of the CWB includes and the inclusion of the header file ‘env.h’ makes it possible to drop this flag. It was defined at a confusing place anyway.</li>

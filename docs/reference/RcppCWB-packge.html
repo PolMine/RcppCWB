@@ -75,7 +75,7 @@ the query syntax of the Corpus Query Processor (CQP)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
       </span>
     </div>
 
@@ -232,7 +232,7 @@ Kaufmann Publishing, San Francisco, 2nd edition.</p>
 
 <span class='co'># registry &lt;- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()</span>
 <span class='no'>registry</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tmp_registry.html'>use_tmp_registry</a></span>()
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>registry</span>)</div><div class='output co'>#&gt; [1] "/var/folders/m_/431fjnbs1t32_62d35wvs7pr0000gp/T//Rtmpp10nX2/registry_tmp"</div><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='p_attributes.html'>cl_cpos2id</a></span>(<span class='st'>"REUTERS"</span>, <span class='kw'>cpos</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>registry</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>registry</span>)</div><div class='output co'>#&gt; [1] "/var/folders/m_/431fjnbs1t32_62d35wvs7pr0000gp/T//RtmpWoNUG4/registry_tmp"</div><div class='input'><span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='p_attributes.html'>cl_cpos2id</a></span>(<span class='st'>"REUTERS"</span>, <span class='kw'>cpos</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>registry</span>)
 <span class='no'>tokens</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='p_attributes.html'>cl_id2str</a></span>(<span class='st'>"REUTERS"</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='no'>ids</span>, <span class='kw'>p_attribute</span> <span class='kw'>=</span> <span class='st'>"word"</span>, <span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>registry</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span>(<span class='no'>tokens</span>, <span class='kw'>collapse</span> <span class='kw'>=</span> <span class='st'>" "</span>))</div><div class='output co'>#&gt; [1] "Shamrock Corp said that effective today it had cut its contract prices for crude oil by 1.50 dlrs a barrel"</div><div class='input'>
 <span class='co'># To use the corpus query processor (CQP) and its syntax, it is necessary first</span>

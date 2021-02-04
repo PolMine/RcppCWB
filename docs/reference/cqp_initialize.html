@@ -76,7 +76,7 @@ cqp_is_initialized" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
       </span>
     </div>
 
@@ -148,7 +148,7 @@ call <code>cqp_initialize</code>. To reset the registry, use the function
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>cqp_is_initialized</span>() <span class='co'># check initialization status</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='kw'>if</span> (!<span class='fu'>cqp_is_initialized</span>()) <span class='fu'>cqp_initialize</span>()
-<span class='fu'>cqp_is_initialized</span>() <span class='co'># check initialization status (TRUE now?)</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'>cqp_get_registry</span>() <span class='co'># get registry dir used by CQP</span></div><div class='output co'>#&gt; [1] "/var/folders/m_/431fjnbs1t32_62d35wvs7pr0000gp/T//Rtmpp10nX2/registry_tmp"</div><div class='input'>
+<span class='fu'>cqp_is_initialized</span>() <span class='co'># check initialization status (TRUE now?)</span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'>cqp_get_registry</span>() <span class='co'># get registry dir used by CQP</span></div><div class='output co'>#&gt; [1] "/var/folders/m_/431fjnbs1t32_62d35wvs7pr0000gp/T//RtmpWoNUG4/registry_tmp"</div><div class='input'>
 <span class='no'>registry</span> <span class='kw'>&lt;-</span> <span class='kw'>if</span> (!<span class='fu'><a href='check_pkg_registry_files.html'>check_pkg_registry_files</a></span>()) <span class='fu'><a href='tmp_registry.html'>use_tmp_registry</a></span>() <span class='kw'>else</span> <span class='fu'><a href='get_pkg_registry.html'>get_pkg_registry</a></span>()
 <span class='kw'>if</span> (<span class='fu'>cqp_get_registry</span>() <span class='kw'>!=</span> <span class='no'>registry</span>) <span class='fu'>cqp_reset_registry</span>(<span class='kw'>registry</span> <span class='kw'>=</span> <span class='no'>registry</span>)
 <span class='fu'><a href='cqp_list_corpora.html'>cqp_list_corpora</a></span>() <span class='co'># get list of corpora</span></div><div class='output co'>#&gt; [1] "UNGA"    "REUTERS"</div></pre>
