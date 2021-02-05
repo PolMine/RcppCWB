@@ -1,6 +1,5 @@
 ^windows$
 ^prep$
-.travis\.yml$
 ^cran-comments\.md$
 ^paper.md$
 ^data-raw$
@@ -15,3 +14,4 @@
 ^README.Rmd$
 ^include$
 ^CRAN-RELEASE$
+^\.github$
