@@ -1,3 +1,7 @@
+# RcppCWB 0.3.2.9001
+
+* Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS
+
 # RcppCWB 0.3.2
 
 * If RcppCWB is compiled on macOS, the package configure script checks the architecture of the machine and ensures that (if glib-2.0 is not yet present) a version of glib-2.0 compiled for Apple Silicon/the M1 chip is loaded in case an amd64 architecture is detected.
