@@ -60,7 +60,7 @@ case $OS in
       i386) 
         CWB_PLATFORM_CONFIG_FILE="linux";;
       *)
-        echo "* unknown architecture (`$ARCH`), using Linux config as default"
+        echo "* unknown architecture ($ARCH), using Linux config as default"
         CWB_PLATFORM_CONFIG_FILE="linux"
         ;;
     esac
