@@ -79,6 +79,18 @@ jobs:
           options(crayon.enabled = TRUE)
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
+        
+      - Build Windows package
+        if: runner.os != 'Windows'
+        run: |
+          R CMD build .
+          R CMD INSTALL --build *.tar.gz
+
+      - name: Upload Windows package tarball
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-binary
+          path: ./*.zip
 
       - name: Upload check results
         if: failure()
