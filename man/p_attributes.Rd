@@ -11,26 +11,29 @@
 \alias{cl_id2cpos}
 \title{Using Positional Attributes.}
 \usage{
-cl_cpos2str(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"), cpos)
+cl_cpos2str(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  cpos
+)
 
-cl_cpos2id(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
-  cpos)
+cl_cpos2id(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos)
 
-cl_id2str(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"),
-  id)
+cl_id2str(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), id)
 
-cl_regex2id(corpus, p_attribute, regex,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_regex2id(
+  corpus,
+  p_attribute,
+  regex,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_str2id(corpus, p_attribute, str,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_str2id(corpus, p_attribute, str, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cl_id2freq(corpus, p_attribute, id,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_id2freq(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cl_id2cpos(corpus, p_attribute, id,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_id2cpos(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}

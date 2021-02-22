@@ -9,20 +9,40 @@
 \alias{cl_cpos2rbound}
 \title{Using Structural Attributes.}
 \usage{
-cl_cpos2struc(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_cpos2struc(
+  corpus,
+  s_attribute,
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_struc2cpos(corpus, s_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"), struc)
+cl_struc2cpos(
+  corpus,
+  s_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  struc
+)
 
-cl_struc2str(corpus, s_attribute, struc,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_struc2str(
+  corpus,
+  s_attribute,
+  struc,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_cpos2lbound(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_cpos2lbound(
+  corpus,
+  s_attribute,
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_cpos2rbound(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_cpos2rbound(
+  corpus,
+  s_attribute,
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}

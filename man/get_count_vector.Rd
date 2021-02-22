@@ -4,8 +4,7 @@
 \alias{get_count_vector}
 \title{Get Vector with Counts for Positional Attribute.}
 \usage{
-get_count_vector(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+get_count_vector(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{a CWB corpus}

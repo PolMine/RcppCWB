@@ -5,7 +5,6 @@
 #' wrappers will always perform a specific indexing/compression step on one
 #' positional attribute, and produce all components.
 #' 
-#' @rdname cwb_utils
 #' @param corpus name of a CWB corpus (upper case)
 #' @param p_attribute name p-attribute
 #' @param registry path to the registry directory, defaults to the value of the

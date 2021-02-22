@@ -1,6 +1,8 @@
 # RcppCWB 0.3.2.9001
 
-* Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS
+* Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS so that this flag will be used when Linux default configuration is used as fallback.
+* 
+
 
 # RcppCWB 0.3.2
 

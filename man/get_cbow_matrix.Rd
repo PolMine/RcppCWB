@@ -4,8 +4,13 @@
 \alias{get_cbow_matrix}
 \title{Get CBOW Matrix.}
 \usage{
-get_cbow_matrix(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"), matrix, window)
+get_cbow_matrix(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  matrix,
+  window
+)
 }
 \arguments{
 \item{corpus}{a CWB corpus}

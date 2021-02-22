@@ -6,14 +6,11 @@
 \alias{cwb_compress_rdx}
 \title{CWB Tools for Creating Corpora}
 \usage{
-cwb_makeall(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_huffcode(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_compress_rdx(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}

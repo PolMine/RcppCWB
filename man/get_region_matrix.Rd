@@ -4,8 +4,12 @@
 \alias{get_region_matrix}
 \title{Get Matrix with Regions for Strucs.}
 \usage{
-get_region_matrix(corpus, s_attribute, strucs,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+get_region_matrix(
+  corpus,
+  s_attribute,
+  strucs,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 }
 \arguments{
 \item{corpus}{a CWB corpus}
