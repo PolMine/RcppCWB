@@ -79,6 +79,13 @@ jobs:
           options(crayon.enabled = TRUE)
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
+      
+      - name: Build Windows binary package
+        if: runner.os == 'Windows'
+        run: |
+          R CMD build ../cwbtools
+          R CMD INSTALL --build *.tar.gz
+
         
       - name: Build macOS binary package
         if: runner.os == 'macOS'
@@ -86,10 +93,11 @@ jobs:
           R CMD build .
           R CMD INSTALL --build *.tar.gz
 
-      - name: Upload package tarball
+      - name: Upload macOS binary
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v2
         with:
-          name: macOS-binary
+          name: RcppCWB-macOS-binary
           path: ./*.tgz
 
       - name: Upload check results
