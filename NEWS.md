@@ -2,6 +2,7 @@
 
 * Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS so that this flag will be used when Linux default configuration is used as fallback.
 * The implementation of the `s_attribute_decode()` method was incomplete for method "Rcpp". This alternative to the "pure R" approach is now implemented (#2).
+* The unused file 'setpaths.R' has been removed from the tools directory (#10).
 
 
 # RcppCWB 0.3.2
