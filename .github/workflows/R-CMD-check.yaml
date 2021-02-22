@@ -80,8 +80,8 @@ jobs:
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
         
-      - Build Windows package
-        if: runner.os != 'Windows'
+      - name: Build Windows package
+        if: runner.os == 'Windows'
         run: |
           R CMD build .
           R CMD INSTALL --build *.tar.gz
