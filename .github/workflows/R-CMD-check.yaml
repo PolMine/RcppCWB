@@ -97,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: RcppCWB-Windows-binary
-          path: *.zip
+          path: ./*.zip
 
       - name: Build macOS binary package
         if: runner.os == 'macOS'
