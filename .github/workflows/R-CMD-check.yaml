@@ -84,9 +84,9 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           dir
-          echo ˋ%CD%ˋ
-          R CMD build %CD%
-          R CMD INSTALL --build %CD%/*.tar.gz
+          echo $GITHUB_WORKSPACE
+          R CMD build $GITHUB_WORKSPACE
+          R CMD INSTALL --build $GITHUB_WORKSPACE/*.tar.gz
 
         
       - name: Build macOS binary package
