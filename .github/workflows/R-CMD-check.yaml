@@ -83,8 +83,9 @@ jobs:
       - name: Build Windows binary package
         if: runner.os == 'Windows'
         run: |
-          R CMD build %CD%/cwbtools
-          R CMD INSTALL --build *.tar.gz
+          echo %CD%
+          R CMD build %CD%
+          R CMD INSTALL --build %CD%/*.tar.gz
 
         
       - name: Build macOS binary package
