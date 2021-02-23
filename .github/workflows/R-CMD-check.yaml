@@ -70,6 +70,7 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("covr")
+          remotes::install_cran("pkgbuild")
         shell: Rscript {0}
 
       - name: Check
@@ -82,12 +83,13 @@ jobs:
       
       - name: Build Windows binary package
         if: runner.os == 'Windows'
-        run: |
-          dir
-          echo $GITHUB_WORKSPACE
-          "D:\a\_temp\R-4.0.4-win.exe" CMD build .
-          "D:\a\_temp\R-4.0.4-win.exe" CMD INSTALL --build *.tar.gz
-        
+        run: pkgbuild::build(binary = TRUE)
+        shell: Rscript {0}
+
+      - name: Search Windows binary package
+        if: runner.os == 'Windows'
+        run: dir
+
       - name: Build macOS binary package
         if: runner.os == 'macOS'
         run: |
