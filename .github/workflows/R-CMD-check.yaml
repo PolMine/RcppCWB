@@ -83,7 +83,7 @@ jobs:
       - name: Build Windows binary package
         if: runner.os == 'Windows'
         run: |
-          R CMD build ../cwbtools
+          R CMD build ../RcppCWB
           R CMD INSTALL --build *.tar.gz
 
         
