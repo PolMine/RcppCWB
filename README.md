@@ -5,8 +5,6 @@ v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/lic
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![R build
 status](https://github.com/PolMine/RcppCWB/workflows/R-CMD-check/badge.svg)](https://github.com/PolMine/RcppCWB/actions)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/PolMine/RcppCWB?branch=dev&svg=true)](https://ci.appveyor.com/project/PolMine/RcppCWB)
 [![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
 
 # Rcpp bindings for the Corpus Workbench (CWB)
