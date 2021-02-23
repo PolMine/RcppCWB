@@ -70,6 +70,7 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("covr")
+          remotes::install_cran("pkgbuild")
         shell: Rscript {0}
 
       - name: Check
@@ -82,11 +83,16 @@ jobs:
       
       - name: Build Windows binary package
         if: runner.os == 'Windows'
-        run: |
-          R CMD build ../RcppCWB
-          R CMD INSTALL --build *.tar.gz
+        run: pkgbuild::build(binary = TRUE, dest_path = Sys.getenv("GITHUB_WORKSPACE"))
+        shell: Rscript {0}
+          
+      - name: Upload Windows binary
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: RcppCWB-Windows-binary
+          path: ./*.zip
 
-        
       - name: Build macOS binary package
         if: runner.os == 'macOS'
         run: |
