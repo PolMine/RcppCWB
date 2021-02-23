@@ -85,12 +85,6 @@ jobs:
         if: runner.os == 'Windows'
         run: pkgbuild::build(binary = TRUE, dest_path = Sys.getenv("GITHUB_WORKSPACE"))
         shell: Rscript {0}
-
-      - name: Search Windows binary package
-        if: runner.os == 'Windows'
-        run: |
-          dir check
-          dir windows
           
       - name: Upload Windows binary
         if: runner.os == 'Windows'
