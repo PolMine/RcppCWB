@@ -36,10 +36,10 @@ include $(TOP)/config.mk
 ## ----------------------------------------------------------------------
 ## CWB command-line utilities  headers / sources / binaries 
 
-SRCS =  _cwb_makeall.c \
+SRCS =  _cwb_encode.c _cwb_makeall.c \
 	_cwb_huffcode.c _cwb_compress_rdx.c \
 
-OBJS =  _cwb_makeall.o \
+OBJS =  _cwb_encode.o _cwb_makeall.o \
 	_cwb_huffcode.o _cwb_compress_rdx.o \
 
 
@@ -50,6 +50,9 @@ libcwb.a: $(OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
 #	$(AR) -s $@
+
+_cwb_encode.o: _cwb_encode.c
+	${CC} -c ${CFLAGS} -o _cwb_encode.o _cwb_encode.c
 
 _cwb_makeall.o: _cwb_makeall.c
 	${CC} -c ${CFLAGS} -o _cwb_makeall.o _cwb_makeall.c
