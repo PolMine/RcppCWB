@@ -83,7 +83,8 @@ jobs:
       - name: Build Windows binary package
         if: runner.os == 'Windows'
         run: |
-          echo %CD%
+          dir
+          echo ˋ%CD%ˋ
           R CMD build %CD%
           R CMD INSTALL --build %CD%/*.tar.gz
 
