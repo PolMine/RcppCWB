@@ -226,9 +226,9 @@ int cwb_encode(SEXP regfile, SEXP dir){
   wattr_declare(strdup("pos"), directory, 0);
   wattr_declare(strdup("lemma"), directory, 0);
 
-  range_declare(strdup("plenary_protocol"), directory, 1, 0);
-  range_declare(strdup("speaker"), directory, 1, 0);
-  range_declare(strdup("p"), directory, 1, 0);
+  range_declare(strdup("plenary_protocol"), directory, 0, 0);
+  range_declare(strdup("speaker"), directory, 0, 0);
+  range_declare(strdup("p"), directory, 0, 0);
   
   input_files = cl_new_string_list();
   cl_string_list dir_files;
