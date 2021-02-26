@@ -145,7 +145,7 @@
     .Call(`_RcppCWB_cwb_huffcode`, x, registry_dir, p_attribute)
 }
 
-.cwb_encode <- function(registry_dir, dir) {
-    .Call(`_RcppCWB_cwb_encode`, registry_dir, dir)
+.cwb_encode <- function(regfile, dir) {
+    .Call(`_RcppCWB_cwb_encode`, regfile, dir)
 }
 

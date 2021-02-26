@@ -78,3 +78,16 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
+
+#' @rdname cwb_utils
+#' @export cwb_encode
+#' @examples
+#' \dontrun{
+#' cwb_encode(
+#'   registry = file.path(Sys.getenv("CORPUS_REGISTRY"), "TMP"),
+#'   dir = system.file(package = "RcppCWB", "extdata", "vrt")
+#' )
+#' }
+cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), dir){
+  .cwb_encode(regfile = registry, dir)
+}

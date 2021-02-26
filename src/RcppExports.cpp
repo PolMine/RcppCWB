@@ -463,14 +463,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // cwb_encode
-int cwb_encode(SEXP registry_dir, SEXP dir);
-RcppExport SEXP _RcppCWB_cwb_encode(SEXP registry_dirSEXP, SEXP dirSEXP) {
+int cwb_encode(SEXP regfile, SEXP dir);
+RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP dirSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type regfile(regfileSEXP);
     Rcpp::traits::input_parameter< SEXP >::type dir(dirSEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_encode(registry_dir, dir));
+    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, dir));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -35,6 +35,7 @@
 #include "../cl/endian2.h"
 #include "../cl/attributes.h"   /* for DEFAULT_ATT_NAME */
 
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 /* ---------------------------------------------------------------------- */
 
@@ -76,28 +77,28 @@
 /* global variables representing configuration */
 
 
-char *field_separators = FIELDSEPS;     /**< string containing the characters that can function as field separators */
-char *undef_value = UNDEF_VALUE;        /**< string used as value of P-attributes when a value is missing
+char *field_separators;     /**< string containing the characters that can function as field separators */
+char *undef_value;        /**< string used as value of P-attributes when a value is missing
                                              ie if a tab-delimited field is empty */
-int debugmode = 0;                          /**< debug mode on or off? */
-int quietly = 0;                         /**< hide messages */
-int verbose = 0;                        /**< show progress (this is _not_ the opposite of silent!) */
-int xml_aware = 0;                      /**< substitute XML entities in p-attributes & ignore <? and <! lines */
-int skip_empty_lines = 0;               /**< skip empty lines when encoding? */
-unsigned line = 0;                      /**< corpus position currently being encoded (ie cpos of _next_ token) */
+int debugmode;                          /**< debug mode on or off? */
+int quietly;                         /**< hide messages */
+int verbose;                        /**< show progress (this is _not_ the opposite of silent!) */
+int xml_aware;                      /**< substitute XML entities in p-attributes & ignore <? and <! lines */
+int skip_empty_lines;               /**< skip empty lines when encoding? */
+unsigned line;                      /**< corpus position currently being encoded (ie cpos of _next_ token) */
 /* unsigned so it doesn't wrap after first 2^31 tokens and we can abort encoding when corpus size is exceeded */
-int strip_blanks = 0;                   /**< strip leading and trailing blanks from input and token annotations */
-cl_string_list input_files = NULL;      /**< list of input file(s) (-f option(s)) */
-int nr_input_files = 0;                 /**< number of input files (length of list after option processing) */
-int current_input_file = 0;             /**< index of input file currently being processed */
-char *current_input_file_name = NULL;   /**< filename of current input file, for error messages */
-FILE *input_fd = NULL;                  /**< file handle for current input file (or pipe) (text mode!) */
-unsigned long input_line = 0;           /**< input line number (reset for each new file) for error messages */
-char *registry_file = NULL;             /**< if set, auto-generate registry file named {registry_file}, listing declared attributes */
-char *directory = NULL;                 /**< corpus data directory (no longer defaults to current directory) */
-char *corpus_character_set = "latin1";  /**< character set label that is inserted into the registry file */
+int strip_blanks;                   /**< strip leading and trailing blanks from input and token annotations */
+cl_string_list input_files;      /**< list of input file(s) (-f option(s)) */
+int nr_input_files;                 /**< number of input files (length of list after option processing) */
+int current_input_file;             /**< index of input file currently being processed */
+char *current_input_file_name;   /**< filename of current input file, for error messages */
+FILE *input_fd;                  /**< file handle for current input file (or pipe) (text mode!) */
+unsigned long input_line;           /**< input line number (reset for each new file) for error messages */
+char *registry_file;             /**< if set, auto-generate registry file named {registry_file}, listing declared attributes */
+char *directory;                 /**< corpus data directory (no longer defaults to current directory) */
+char *corpus_character_set;  /**< character set label that is inserted into the registry file */
 CorpusCharset encoding_charset;         /**< a charset object to be generated from corpus_character_set */
-int clean_strings = 0;                  /**< clean up input strings by replacing invalid bytes with '?' */
+int clean_strings;                  /**< clean up input strings by replacing invalid bytes with '?' */
 
 
 /* ---------------------------------------------------------------------- */
@@ -151,7 +152,7 @@ typedef struct _Range {
 /** A global array for keeping track of S-attributes being encoded. */
 Range ranges[MAXRANGES];
 /** @see ranges */
-int range_ptr = 0;
+int range_ptr;
 
 /**
  * WAttr object: represents a P-attribute being encoded.
@@ -180,7 +181,7 @@ int wattr_ptr = 0;
  * lookup hash for undeclared s-attributes and s-attributes declared with -S that
  * have annotations (which will be ignored), so warnings are issued only once
  */
-cl_lexhash undeclared_sattrs = NULL; 
+cl_lexhash undeclared_sattrs; 
 
 /* ---------------------------------------------------------------------- */
 
@@ -1262,7 +1263,7 @@ int
 encode_get_input_line(char *buffer, int bufsize)
 {
   int ok;
-
+  
   if (nr_input_files == 0) {
     /* read one line of text from stdin */
     ok = (NULL != fgets(buffer, MAX_INPUT_LINE_LENGTH, stdin));
@@ -1274,7 +1275,6 @@ encode_get_input_line(char *buffer, int bufsize)
         return 0;
       
       current_input_file_name = cl_string_list_get(input_files, current_input_file);
-
       input_fd = cl_open_stream(current_input_file_name, CL_STREAM_READ, CL_STREAM_MAGIC);
       if (input_fd == NULL) {
         cl_error(current_input_file_name);

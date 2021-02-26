@@ -4,6 +4,7 @@
 \alias{cwb_makeall}
 \alias{cwb_huffcode}
 \alias{cwb_compress_rdx}
+\alias{cwb_encode}
 \title{CWB Tools for Creating Corpora}
 \usage{
 cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -11,6 +12,8 @@ cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+cwb_encode(registry = Sys.getenv("CORPUS_REGISTRY"), dir)
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}
@@ -75,4 +78,7 @@ sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse 
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+\dontrun{
+cwb_encode(dir = system.file(package = "RcppCWB", "extdata", "vrt"))
+}
 }

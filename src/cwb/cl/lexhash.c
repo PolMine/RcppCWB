@@ -20,6 +20,7 @@ void Rprintf(const char *, ...);
 #include "globals.h"
 #include "macros.h"
 #include "lexhash.h"
+#include <unistd.h>
 
 #include <math.h>
 
@@ -158,7 +159,6 @@ cl_lexhash
 cl_new_lexhash(int buckets)
 {
   cl_lexhash hash;
-  
   if (buckets <= 0)
     buckets = DEFAULT_NR_OF_BUCKETS;
   hash = (cl_lexhash) cl_malloc(sizeof(struct _cl_lexhash));
