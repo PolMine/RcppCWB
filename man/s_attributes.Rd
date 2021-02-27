@@ -58,11 +58,11 @@ environment variable CORPUS_REGISTRY}
 }
 \description{
 Structural attributes store the metadata of texts in a CWB
-  corpus and/or any kind of annotation of a region of text. The fundamental
-  unit are so-called strucs, i.e. indices of regions identified by a left and
-  a right corpus position. The corpus library (CL) offers a set of functions
-  to make the translations between corpus positions (cpos) and strucs
-  (struc).
+corpus and/or any kind of annotation of a region of text. The fundamental
+unit are so-called strucs, i.e. indices of regions identified by a left and
+a right corpus position. The corpus library (CL) offers a set of functions
+to make the translations between corpus positions (cpos) and strucs
+(struc).
 }
 \examples{
 registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()

@@ -145,6 +145,10 @@
     .Call(`_RcppCWB_cwb_huffcode`, x, registry_dir, p_attribute)
 }
 
+.cwb_compress_rdx <- function(x, registry_dir, p_attribute) {
+    .Call(`_RcppCWB_cwb_compress_rdx`, x, registry_dir, p_attribute)
+}
+
 .cwb_encode <- function(regfile, data_dir, vrt_dir, p_attributes, s_attributes_anno, s_attributes_noanno) {
     .Call(`_RcppCWB_cwb_encode`, regfile, data_dir, vrt_dir, p_attributes, s_attributes_anno, s_attributes_noanno)
 }

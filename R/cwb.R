@@ -80,6 +80,16 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 }
 
 #' @param p_attributes Positional attributes (p-attributes) to be declared.
+#' @param data_dir The data directory where `cwb_encode` will put the binary
+#'   files of the indexed corpus.
+#' @param vrt_dir Directory with input corpus files (verticalised format / file
+#'   ending *.vrt).
+#' @param s_attributes A `list` of named `character` vectors to declare
+#'   structural attributes that shall be encoded. The names of the list are the
+#'   XML elements present in the corpus. Character vectors making up the list
+#'   declare the attributes that include the metadata of regions. To declare a
+#'   structural attribute without annotations, provide a zero-length character
+#'   vector using `character()` - see examples.
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples

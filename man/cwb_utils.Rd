@@ -29,7 +29,20 @@ cwb_encode(
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
 
+\item{data_dir}{The data directory where \code{cwb_encode} will put the binary
+files of the indexed corpus.}
+
+\item{vrt_dir}{Directory with input corpus files (verticalised format / file
+ending *.vrt).}
+
 \item{p_attributes}{Positional attributes (p-attributes) to be declared.}
+
+\item{s_attributes}{A \code{list} of named \code{character} vectors to declare
+structural attributes that shall be encoded. The names of the list are the
+XML elements present in the corpus. Character vectors making up the list
+declare the attributes that include the metadata of regions. To declare a
+structural attribute without annotations, provide a zero-length character
+vector using \code{character()} - see examples.}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},

@@ -19,27 +19,27 @@ s_attribute_decode(
 \item{data_dir}{The data directory where the binary files of the corpus are
 stored.}
 
-\item{s_attribute}{A structural attribute (length 1 `character` vector).}
+\item{s_attribute}{A structural attribute (length 1 \code{character} vector).}
 
 \item{encoding}{Encoding of the values ("latin-1" or "utf-8")}
 
 \item{registry}{The CWB registry directory.}
 
-\item{method}{A length-one `character` vector, whether to use "R" or "Rcpp"
+\item{method}{A length-one \code{character} vector, whether to use "R" or "Rcpp"
 implementation for decoding structural attribute.}
 }
 \value{
 A \code{data.frame} with three columns. Column \code{cpos_left} are
-  the start corpus positions of a structural annotation, \code{cpos_right}
-  the end corpus positions. Column \code{value} is the value of the
-  annotation.
+the start corpus positions of a structural annotation, \code{cpos_right}
+the end corpus positions. Column \code{value} is the value of the
+annotation.
 }
 \description{
 Get \code{data.frame} with left and right corpus positions (cpos) for structural
 attributes and values.
 }
 \details{
-Two approaches are implemented: A pure R solution will decode the files directly in 
+Two approaches are implemented: A pure R solution will decode the files directly in
 the directory specified by \code{data_dir}. An implementation using Rcpp will use the
 registry file for \code{corpus} to find the data directory.
 }
