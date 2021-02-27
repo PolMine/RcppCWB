@@ -463,8 +463,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // cwb_encode
-int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes);
-RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP p_attributesSEXP) {
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno);
+RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -472,7 +472,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type data_dir(data_dirSEXP);
     Rcpp::traits::input_parameter< SEXP >::type vrt_dir(vrt_dirSEXP);
     Rcpp::traits::input_parameter< Rcpp::StringVector >::type p_attributes(p_attributesSEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, p_attributes));
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type s_attributes_anno(s_attributes_annoSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type s_attributes_noanno(s_attributes_noannoSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, p_attributes, s_attributes_anno, s_attributes_noanno));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -514,7 +516,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
-    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 4},
+    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 6},
     {NULL, NULL, 0}
 };
 

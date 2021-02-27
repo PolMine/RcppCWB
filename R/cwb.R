@@ -90,14 +90,42 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'   registry = file.path(Sys.getenv("CORPUS_REGISTRY"), "TMP"),
 #'   vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
 #'   data_dir = data_dir,
-#'   p_attributes = c("word", "pos", "lemma")
+#'   p_attributes = c("word", "pos", "lemma"),
+#'   s_attributes = list(
+#'     plenary_protocol = c(
+#'       "lp", "protocol_no", "date", "year", "birthday", "version",
+#'       "url", "filetype"
+#'     ),
+#'     speaker = c(
+#'       "id", "type", "lp", "protocol_no", "date", "year", "ai_no", "ai_id",
+#'       "ai_type", "who", "name", "parliamentary_group", "party", "role"
+#'      ),
+#'     p = character()
+#'   )
 #' )
 #' }
-cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma")){
+cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
+  
+  s_attributes_noanno <- unlist(lapply(
+    names(s_attributes),
+    function(s_attr) if (length(s_attributes[[s_attr]]) == 0L) s_attr else character()
+  ))
+  
+  for (s_attr in s_attributes_noanno) s_attributes[[s_attr]] <- NULL
+  
+  s_attributes_anno <- unname(
+    sapply(
+      names(s_attributes),
+      function(s_attr) paste(s_attr, ":", 0L, "+", paste(s_attributes[[s_attr]], collapse = "+"), sep = "")
+    )
+  )
+  
   .cwb_encode(
     regfile = registry,
     data_dir = data_dir,
     vrt_dir = vrt_dir,
-    p_attributes = p_attributes
+    p_attributes = p_attributes,
+    s_attributes_anno = s_attributes_anno,
+    s_attributes_noanno = s_attributes_noanno
   )
 }

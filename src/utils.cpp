@@ -190,7 +190,7 @@ int clean_strings = 0;                  /**< clean up input strings by replacing
 
 
 // [[Rcpp::export(name=".cwb_encode")]]
-int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes){
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno){
   
   /* the following code is copied from cwb_encode.c */
   
@@ -225,11 +225,18 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
     wattr_declare(p_attributes(m), directory, 0);
   }
 
-  /* -V: declare s-attribute with annotations */
-
-  range_declare(strdup("plenary_protocol:0+lp+protocol_no+date+year+birthday+version+url+filetype"), directory, 1, 0);
-  range_declare(strdup("speaker:0+id+type+lp+protocol_no+date+year+ai_no+ai_id+ai_type+who+name+parliamentary_group+party+role"), directory, 1, 0);
-  range_declare(strdup("p"), directory, 0, 0);
+  /* declare s-attribute with annotations */
+  
+  int s_attrs_len = s_attributes_anno.length();
+  for (m = 0; m < s_attrs_len; m++){
+    range_declare(s_attributes_anno(m), directory, 1, 0);
+  }
+  
+  /* declare s-attribute without annotations */
+  s_attrs_len = s_attributes_noanno.length();
+  for (m = 0; m < s_attrs_len; m++){
+    range_declare(s_attributes_noanno(m), directory, 0, 0);
+  }
   
   input_files = cl_new_string_list();
   cl_string_list dir_files;
