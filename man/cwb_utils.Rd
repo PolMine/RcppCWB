@@ -13,7 +13,13 @@ cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_encode(registry = Sys.getenv("CORPUS_REGISTRY"), dir)
+cwb_encode(
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  data_dir,
+  vrt_dir,
+  p_attributes = c("word", "pos", "lemma"),
+  s_attributes
+)
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}
@@ -22,6 +28,8 @@ cwb_encode(registry = Sys.getenv("CORPUS_REGISTRY"), dir)
 
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
+
+\item{p_attributes}{Positional attributes (p-attributes) to be declared.}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
@@ -79,6 +87,24 @@ cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 \dontrun{
-cwb_encode(dir = system.file(package = "RcppCWB", "extdata", "vrt"))
+data_dir <- file.path(tempdir(), "tmp_data_dir")
+dir.create(data_dir)
+cwb_encode(
+  registry = file.path(Sys.getenv("CORPUS_REGISTRY"), "TMP"),
+  vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
+  data_dir = data_dir,
+  p_attributes = c("word", "pos", "lemma"),
+  s_attributes = list(
+    plenary_protocol = c(
+      "lp", "protocol_no", "date", "year", "birthday", "version",
+      "url", "filetype"
+    ),
+    speaker = c(
+      "id", "type", "lp", "protocol_no", "date", "year", "ai_no", "ai_id",
+      "ai_type", "who", "name", "parliamentary_group", "party", "role"
+     ),
+    p = character()
+  )
+)
 }
 }
