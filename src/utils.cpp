@@ -190,9 +190,7 @@ int clean_strings = 0;                  /**< clean up input strings by replacing
 
 
 // [[Rcpp::export(name=".cwb_encode")]]
-int cwb_encode(SEXP regfile, SEXP dir){
-  
-  Rprintf("cwb_encode ====================");
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes){
   
   /* the following code is copied from cwb_encode.c */
   
@@ -215,24 +213,27 @@ int cwb_encode(SEXP regfile, SEXP dir){
   clean_strings++; /*< clean up input strings by replacing invalid bytes with '?' */
   xml_aware++; /* -x: translate XML entities and ignore declarations & comments */
   corpus_character_set = cl_charset_name_canonical(strdup("utf8"));
-  directory = strdup(Rcpp::as<std::string>(dir).c_str());
+  directory = strdup(Rcpp::as<std::string>(data_dir).c_str());
   registry_file = strdup(Rcpp::as<std::string>(regfile).c_str());
   skip_empty_lines++; /* -s: skip empty lines */
   
-  /* -S: declare s-attribute without annotations */
-  /* -V: declare s-attribute with annotations */
+  /* declare p-attributes */
   
-  wattr_declare(strdup("word"), directory, 0);
-  wattr_declare(strdup("pos"), directory, 0);
-  wattr_declare(strdup("lemma"), directory, 0);
+  int p_attrs_n = p_attributes.length();
+  int m;
+  for (m = 0; m < p_attrs_n; m++){
+    wattr_declare(p_attributes(m), directory, 0);
+  }
 
-  range_declare(strdup("plenary_protocol"), directory, 0, 0);
-  range_declare(strdup("speaker"), directory, 0, 0);
+  /* -V: declare s-attribute with annotations */
+
+  range_declare(strdup("plenary_protocol:0+lp+protocol_no+date+year+birthday+version+url+filetype"), directory, 1, 0);
+  range_declare(strdup("speaker:0+id+type+lp+protocol_no+date+year+ai_no+ai_id+ai_type+who+name+parliamentary_group+party+role"), directory, 1, 0);
   range_declare(strdup("p"), directory, 0, 0);
   
   input_files = cl_new_string_list();
   cl_string_list dir_files;
-  dir_files = encode_scan_directory(directory);
+  dir_files = encode_scan_directory(strdup(Rcpp::as<std::string>(vrt_dir).c_str()));
   
   int l;
   l = cl_string_list_size(dir_files);

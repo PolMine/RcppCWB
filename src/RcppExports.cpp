@@ -463,14 +463,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // cwb_encode
-int cwb_encode(SEXP regfile, SEXP dir);
-RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP dirSEXP) {
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes);
+RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP p_attributesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type regfile(regfileSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type dir(dirSEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, dir));
+    Rcpp::traits::input_parameter< SEXP >::type data_dir(data_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type vrt_dir(vrt_dirSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type p_attributes(p_attributesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, p_attributes));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -512,7 +514,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
-    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 2},
+    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 4},
     {NULL, NULL, 0}
 };
 

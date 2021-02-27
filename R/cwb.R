@@ -79,15 +79,25 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
   .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
 
+#' @param p_attributes Positional attributes (p-attributes) to be declared.
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples
 #' \dontrun{
+#' data_dir <- file.path(tempdir(), "tmp_data_dir")
+#' dir.create(data_dir)
 #' cwb_encode(
 #'   registry = file.path(Sys.getenv("CORPUS_REGISTRY"), "TMP"),
-#'   dir = system.file(package = "RcppCWB", "extdata", "vrt")
+#'   vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
+#'   data_dir = data_dir,
+#'   p_attributes = c("word", "pos", "lemma")
 #' )
 #' }
-cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), dir){
-  .cwb_encode(regfile = registry, dir)
+cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma")){
+  .cwb_encode(
+    regfile = registry,
+    data_dir = data_dir,
+    vrt_dir = vrt_dir,
+    p_attributes = p_attributes
+  )
 }
