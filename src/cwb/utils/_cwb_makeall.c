@@ -7,8 +7,9 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 #include "../cl/globals.h"
 #include "../cl/attributes.h"
 #include "../cl/fileutils.h"
+#include "../cl/endian2.h"
 
-#include <netinet/in.h>
+/* #include <netinet/in.h> */
 
 Corpus *corpus;
 
