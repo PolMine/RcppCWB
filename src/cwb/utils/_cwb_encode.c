@@ -270,9 +270,9 @@ void
 encode_print_input_lineno(void)
 {
   if (nr_input_files > 0 && current_input_file_name != NULL)
-    fprintf(stderr, "file %s, line #%ld", current_input_file_name, input_line);
+    Rprintf("file %s, line #%ld", current_input_file_name, input_line);
   else
-    fprintf(stderr, "input line #%ld", input_line);
+    Rprintf("input line #%ld", input_line);
 }
 
 /**
@@ -292,16 +292,16 @@ encode_error(char *format, ...)
 
   if (format != NULL) {
     vfprintf(stderr, format, ap);
-    fprintf(stderr, "\n");
+    Rprintf("\n");
   }
   else {
-    fprintf(stderr, "Internal error. Aborted.\n");
+    Rprintf("Internal error. Aborted.\n");
   }
   if ((input_line > 0) || (current_input_file > 0)) {
     /* show location only if we've already been reading input */
-    fprintf(stderr, "[location of error: ");
+    Rprintf("[location of error: ");
     encode_print_input_lineno();
-    fprintf(stderr, "]\n");
+    Rprintf("]\n");
   }
   exit(1);
 }
@@ -722,10 +722,10 @@ range_close(Range *rng, int end_pos)
         l = strlen(rng->annot);
         if (l >= CL_MAX_LINE_LENGTH) {
           if (!quietly) {
-            fprintf(stderr, "Value of <%s> region exceeds maximum string length (%d > %d chars), truncated (", 
+            Rprintf("Value of <%s> region exceeds maximum string length (%d > %d chars), truncated (", 
                     rng->name, l, CL_MAX_LINE_LENGTH-1);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
           rng->annot[CL_MAX_LINE_LENGTH-2] = '$'; /* truncation marker, as e.g. in Emacs */
           rng->annot[CL_MAX_LINE_LENGTH-1] = '\0';

@@ -305,7 +305,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
     else {
       Rprintf("Reading from standard input.\n");
     }
-    encode_print_time(stderr, "Start");
+    encode_print_time(stderr, strdup("Start"));
   }
   
   /* initialise loop variables ... */
@@ -328,7 +328,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
     input_line++;
     input_length = strlen(linebuf);
     if (input_length >= (MAX_INPUT_LINE_LENGTH - 1)) { /* buffer filled -> line may have been longer */
-  encode_error("Input line too long (max: %d characters/bytes).", MAX_INPUT_LINE_LENGTH - 2);
+  encode_error(strdup("Input line too long (max: %d characters/bytes)."), MAX_INPUT_LINE_LENGTH - 2);
     }
     
     /* remove trailing line break (LF or CR-LF) */
@@ -489,18 +489,17 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
    */
   if (rng->automatic) {     /* implicitly generated s-attributes should have been closed automatically */
   if (!quietly && rng->is_open) {
-    fprintf(stderr, "Warning: implicit s-attribute <%s> open at end of input (should not have happened).\n",
+    Rprintf("Warning: implicit s-attribute <%s> open at end of input (should not have happened).\n",
             rng->name);
   }
   }
   else {
     if (rng->is_open) {
       if (rng->recursion_level > 1) 
-        fprintf(stderr, "Warning: %d missing </%s> tags inserted at end of input.\n", 
+        Rprintf("Warning: %d missing </%s> tags inserted at end of input.\n", 
                 rng->recursion_level, rng->name);
       else
-        fprintf(stderr, "Warning: missing </%s> tag inserted at end of input.\n", 
-                rng->name);
+        Rprintf("Warning: missing </%s> tag inserted at end of input.\n", rng->name);
       
       /* close open region; this will automatically close children from recursion and element attributes;
        if multiple end tags are missing, we have to call range_close() repeatedly until we reach the top level */
@@ -510,7 +509,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
     }
     
     if (!quietly && (rng->max_recursion >= 0) && (rng->element_drop_count > 0)) {
-      fprintf(stderr, "%7d <%s> regions dropped because of deep nesting.\n",
+      Rprintf("%7d <%s> regions dropped because of deep nesting.\n",
               rng->element_drop_count, rng->name);
     }
   }
@@ -518,16 +517,16 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   /* close file handles for s-attributes */
   if (EOF == fclose(rng->fd)) {
     perror("fclose() failed");
-    encode_error("Error writing .rng file for s-attribute <%s>", rng->name);
+    encode_error(strdup("Error writing .rng file for s-attribute <%s>"), rng->name);
   }
   if (rng->store_values) {
     if (EOF == fclose(rng->avs)) {
       perror("fclose() failed");
-      encode_error("Error writing .avs file for s-attribute <%s>", rng->name);
+      encode_error(strdup("Error writing .avs file for s-attribute <%s>"), rng->name);
     }
     if (EOF == fclose(rng->avx)) {
       perror("fclose() failed");
-      encode_error("Error writing .avx file for s-attribute <%s>", rng->name);
+      encode_error(strdup("Error writing .avx file for s-attribute <%s>"), rng->name);
     }
   }
   
@@ -543,7 +542,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   }
   
   if (debugmode)
-    encode_print_time(stderr, "Done");
+    encode_print_time(stderr, strdup("Done"));
 
   return nr_input_files;
 }
