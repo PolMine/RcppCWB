@@ -197,10 +197,10 @@ cl_lexhash undeclared_sattrs;
  * @return       The next token from the string.
  */
 char *
-encode_strtok(register char *s, register const char *delim)
+encode_strtok(char *s, const char *delim)
 {
-  register char *spanp;
-  register int c, sc;
+  char *spanp;
+  int c, sc;
   char *tok;
   static char *last;
   

@@ -10,7 +10,7 @@ int do_attribute(Attribute *attr, ComponentID cid, int validate);
 /* --------------- functions in cwb_encode.c ------------------------------ */
 
 typedef struct _Range Range;
-char * encode_strtok(register char *s, register const char *delim);
+char * encode_strtok(char *s, const char *delim);
 void encode_print_time(FILE *stream, char *msg);
 void encode_usage(void);
 void encode_print_input_lineno(void);
