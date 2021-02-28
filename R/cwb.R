@@ -93,11 +93,12 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples
-#' \dontrun{
 #' data_dir <- file.path(tempdir(), "tmp_data_dir")
 #' dir.create(data_dir)
+#' 
 #' cwb_encode(
-#'   registry = file.path(Sys.getenv("CORPUS_REGISTRY"), "TMP"),
+#'   corpus = "BTMIN",
+#'   registry = Sys.getenv("CORPUS_REGISTRY"),
 #'   vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
 #'   data_dir = data_dir,
 #'   p_attributes = c("word", "pos", "lemma"),
@@ -113,8 +114,10 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'     p = character()
 #'   )
 #' )
-#' }
-cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
+#' 
+#' unlink(data_dir)
+#' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "BTMIN"))
+cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
   
   s_attributes_noanno <- unlist(lapply(
     names(s_attributes),
@@ -131,7 +134,7 @@ cwb_encode <- function(registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_d
   )
   
   .cwb_encode(
-    regfile = registry,
+    regfile = file.path(registry, tolower(corpus)),
     data_dir = data_dir,
     vrt_dir = vrt_dir,
     p_attributes = p_attributes,

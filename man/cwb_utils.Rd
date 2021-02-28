@@ -14,6 +14,7 @@ cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cwb_encode(
+  corpus,
   registry = Sys.getenv("CORPUS_REGISTRY"),
   data_dir,
   vrt_dir,
@@ -99,11 +100,12 @@ sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse 
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-\dontrun{
 data_dir <- file.path(tempdir(), "tmp_data_dir")
 dir.create(data_dir)
+
 cwb_encode(
-  registry = file.path(Sys.getenv("CORPUS_REGISTRY"), "TMP"),
+  corpus = "BTMIN",
+  registry = Sys.getenv("CORPUS_REGISTRY"),
   vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
   data_dir = data_dir,
   p_attributes = c("word", "pos", "lemma"),
@@ -119,5 +121,7 @@ cwb_encode(
     p = character()
   )
 )
-}
+
+unlink(data_dir)
+unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "BTMIN"))
 }

@@ -250,13 +250,13 @@ encode_strtok(char *s, const char *delim)
  * @param msg     Message to incorporate into the string that is printed.
  */
 void
-encode_print_time(FILE *stream, char *msg)
+encode_print_time(char *msg)
 {
   time_t now;
 
   time(&now);
 
-  fprintf(stream, "%s: %s\n", msg, ctime(&now));
+  Rprintf("%s: %s\n", msg, ctime(&now));
 }
 
 /* ======================================== print error message and exit */
@@ -291,7 +291,7 @@ encode_error(char *format, ...)
   va_start(ap, format);
 
   if (format != NULL) {
-    vfprintf(stderr, format, ap);
+    Rprintf(format, ap);
     Rprintf("\n");
   }
   else {
@@ -369,7 +369,7 @@ encode_scan_directory(char *dir)
     encode_error("Failed to scan directory specified with -F %s -- aborted.\n", dir);
   }
   if (n_files == 0) {
-    fprintf(stderr, "Warning: No input files found in directory -F %s !!\n", dir);
+    Rprintf("Warning: No input files found in directory -F %s !!\n", dir);
   }
   closedir(dirp);
   
@@ -506,7 +506,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   char *flag_SV = (store_values) ? "-V" : "-S";
 
   if (debugmode)
-    fprintf(stderr, "ATT: %s %s\n", flag_SV, name);
+    Rprintf("ATT: %s %s\n", flag_SV, name);
 
   if (range_ptr >= MAXRANGES) {
     encode_error("Too many s-attributes declared (last was <%s>).", name);
@@ -556,7 +556,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   if (null_attribute) {
     rng->null_attribute = 1;
     if (rec != NULL || ea_start != NULL)
-      fprintf(stderr, "Warning: recursion and element attribute specificiers are ignored for null attributes (-0 %s).'n", name);
+      Rprintf("Warning: recursion and element attribute specificiers are ignored for null attributes (-0 %s).'n", name);
     return rng;                 /* stop initialisation here; other functions shouldn't do anything with this att */
   }
   else {
@@ -679,9 +679,9 @@ range_close(Range *rng, int end_pos)
     if (rng->recursion_level < 0) {
       /* extra close tag (ignored) */
       if (!quietly) {
-        fprintf(stderr, "Surplus </%s> tag ignored (", rng->name);
+        Rprintf("Surplus </%s> tag ignored (", rng->name);
         encode_print_input_lineno();
-        fprintf(stderr, ").\n");
+        Rprintf(").\n");
       }
       rng->recursion_level = 0;
     }
@@ -703,9 +703,9 @@ range_close(Range *rng, int end_pos)
     else {
       /* extra close tag (ignored) */
       if (!quietly) {
-        fprintf(stderr, "Close tag </%s> without matching open tag ignored (", rng->name);
+        Rprintf("Close tag </%s> without matching open tag ignored (", rng->name);
         encode_print_input_lineno();
-        fprintf(stderr, ").\n");
+        Rprintf(").\n");
       }
     }
   }
@@ -849,10 +849,10 @@ range_open(Range *rng, int start_pos, char *annot)
         char *token = cl_make_set(rng->annot, /*split*/ 0);
         if (token == NULL) {
           if (! quietly) {
-            fprintf(stderr, "Warning: '%s' is not a valid feature set for s-attribute %s, replaced by empty set | (", 
+            Rprintf("Warning: '%s' is not a valid feature set for s-attribute %s, replaced by empty set | (", 
                             rng->annot, rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ")\n");
+            Rprintf(")\n");
           }
           token = cl_strdup("|"); /* rng->annot will be free()d later, so it must be an allocated string */
         }
@@ -865,9 +865,9 @@ range_open(Range *rng, int start_pos, char *annot)
       if ((!rng->has_children) && (*annot != '\0')) { 
         if (!cl_lexhash_freq(undeclared_sattrs, rng->name)) {
           if (!quietly) {
-            fprintf(stderr, "Annotations of s-attribute <%s> not stored (", rng->name);
+            Rprintf("Annotations of s-attribute <%s> not stored (", rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ", warning issued only once).\n");
+            Rprintf(", warning issued only once).\n");
           }
           cl_lexhash_add(undeclared_sattrs, rng->name); /* we can re-use the lookup hash for undeclared s-attributes :o) */
         }
@@ -904,9 +904,9 @@ range_open(Range *rng, int start_pos, char *annot)
       /* now annot[point] should be the separator '=' char */
       if (annot[point] != '=') {
         if (!quietly) {
-          fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (``='' not found) (", rng->name);
+          Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (``='' not found) (", rng->name);
           encode_print_input_lineno();
-          fprintf(stderr, ").\n");
+          Rprintf(").\n");
         }
         break;                  /* stop processing attributes */
       }
@@ -925,9 +925,9 @@ range_open(Range *rng, int start_pos, char *annot)
           point++;
         if (annot[point] == '\0') { /* syntax error: missing end quote */
           if (!quietly) {
-            fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (value missing end quote) (", rng->name);
+            Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (value missing end quote) (", rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
           break;                /* stop processing attributes */
         }
@@ -949,9 +949,9 @@ range_open(Range *rng, int start_pos, char *annot)
         }
         if (strlen(el_att_value) == 0) { /* syntax error: attribute=id with empty value (not allowed) */
           if (!quietly) {
-            fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (attribute=id with empty value (not allowed)) (", rng->name);
+            Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (attribute=id with empty value (not allowed)) (", rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
           break;                /* stop processing attributes */
         }
@@ -960,9 +960,9 @@ range_open(Range *rng, int start_pos, char *annot)
       /* syntax check: el_att_name must be non-empty (values "" and '' are allowed) */
       if (strlen(el_att_name) == 0) {
         if (!quietly) {
-          fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (empty attribute name)) (", rng->name);
+          Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (empty attribute name)) (", rng->name);
           encode_print_input_lineno();
-          fprintf(stderr, ").\n");
+          Rprintf(").\n");
         }
         break;          /* stop processing attributes */
       }
@@ -972,9 +972,9 @@ range_open(Range *rng, int start_pos, char *annot)
       if (entry == NULL) {      /* undeclared element attribute (ignored) */
         if (!cl_lexhash_freq(rng->el_undeclared_attributes, el_att_name)) {
           if (!quietly) {
-            fprintf(stderr, "Undeclared element attribute <%s %s=...> ignored (", rng->name, el_att_name);
+            Rprintf("Undeclared element attribute <%s %s=...> ignored (", rng->name, el_att_name);
             encode_print_input_lineno();
-            fprintf(stderr, ", warning issued only once).\n");
+            Rprintf(", warning issued only once).\n");
           }
           cl_lexhash_add(rng->el_undeclared_attributes, el_att_name);
         }
@@ -983,9 +983,9 @@ range_open(Range *rng, int start_pos, char *annot)
         if (entry->data.integer) {
           /* attribute already handled, i.e. it must have occurred twice in start tag -> issue warning */
           if (!quietly) {
-            fprintf(stderr, "Duplicate attribute value <%s %s=... %s=...> ignored (", rng->name, el_att_name, el_att_name);
+            Rprintf("Duplicate attribute value <%s %s=... %s=...> ignored (", rng->name, el_att_name, el_att_name);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
         }
         else {
@@ -1185,10 +1185,10 @@ encode_add_wattr_line(char *str)
       token = cl_make_set(field, /*split*/ 0);
       if (token == NULL) {
         if (! quietly) {
-          fprintf(stderr, "Warning: '%s' is not a valid feature set for -P %s/, replaced by empty set | (", 
+          Rprintf("Warning: '%s' is not a valid feature set for -P %s/, replaced by empty set | (", 
                           field, wattrs[fc].name);
           encode_print_input_lineno();
-          fprintf(stderr, ")\n");
+          Rprintf(")\n");
         }
         token = cl_strdup("|");
         /* so we always have to cl_free() token for feature set attributes,
@@ -1203,10 +1203,10 @@ encode_add_wattr_line(char *str)
     length = strlen(token);
     if (length >= CL_MAX_LINE_LENGTH) {
       if (!quietly) {
-        fprintf(stderr, "Value of p-attribute '%s' exceeds maximum string length (%d > %d chars), truncated (", 
+        Rprintf("Value of p-attribute '%s' exceeds maximum string length (%d > %d chars), truncated (", 
                 wattrs[fc].name, length, CL_MAX_LINE_LENGTH-1);
         encode_print_input_lineno();
-        fprintf(stderr, ").\n");
+        Rprintf(").\n");
       }
       token[CL_MAX_LINE_LENGTH-2] = '$'; /* truncation marker, as e.g. in Emacs */
       token[CL_MAX_LINE_LENGTH-1] = '\0';
@@ -1297,7 +1297,7 @@ encode_get_input_line(char *buffer, int bufsize)
       /* assume we're at end of file -> close current input file, and try reading from next one */
       ok = (0 == cl_close_stream(input_fd));
       if (! ok) {
-        fprintf(stderr, "ERROR reading from file %s (ignored).\n", current_input_file_name);
+        Rprintf("ERROR reading from file %s (ignored).\n", current_input_file_name);
         cl_error(current_input_file_name);
       }
 
@@ -1340,7 +1340,7 @@ encode_generate_registry_file(char *registry_file)
   int i;
 
   if (debugmode)
-    fprintf(stderr, "Writing registry file %s ...\n", registry_file);
+    Rprintf("Writing registry file %s ...\n", registry_file);
 
   if ((registry_fd = fopen(registry_file, "w")) == NULL) {
     perror(registry_file);

@@ -11,7 +11,7 @@ int do_attribute(Attribute *attr, ComponentID cid, int validate);
 
 typedef struct _Range Range;
 char * encode_strtok(char *s, const char *delim);
-void encode_print_time(FILE *stream, char *msg);
+void encode_print_time(char *msg);
 void encode_usage(void);
 void encode_print_input_lineno(void);
 void encode_error(char *format, ...);

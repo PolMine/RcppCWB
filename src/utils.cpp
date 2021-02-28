@@ -305,7 +305,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
     else {
       Rprintf("Reading from standard input.\n");
     }
-    encode_print_time(stderr, strdup("Start"));
+    encode_print_time(strdup("Start"));
   }
   
   /* initialise loop variables ... */
@@ -322,7 +322,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   while ( encode_get_input_line(linebuf, MAX_INPUT_LINE_LENGTH) ) {
     if (verbose && (line % 15000 == 0)) {
       Rprintf("%" COMMA_SEP_THOUSANDS_CONVSPEC "9dk tokens processed\r", line >> 10);
-      fflush(stdout);
+      /* fflush(stdout); */
     }
     
     input_line++;
@@ -542,7 +542,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   }
   
   if (debugmode)
-    encode_print_time(stderr, strdup("Done"));
+    encode_print_time(strdup("Done"));
 
   return nr_input_files;
 }
