@@ -6,6 +6,8 @@ PKG_CPPFLAGS = \
 
 PKG_CXXFLAGS=-D_LIB
 
+PKG_LDFLAGS = -Wl,--allow-multiple-definition
+
 PKG_LIBS = \
     -L../windows/libcl-dev/lib${R_ARCH} \
     -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl -liconv \
