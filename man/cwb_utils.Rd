@@ -100,7 +100,7 @@ sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse 
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-\donttest{
+\dontrun{
 data_dir <- file.path(tempdir(), "tmp_data_dir")
 dir.create(data_dir)
 

@@ -93,7 +93,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data_dir <- file.path(tempdir(), "tmp_data_dir")
 #' dir.create(data_dir)
 #' 
