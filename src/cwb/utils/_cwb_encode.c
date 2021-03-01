@@ -30,7 +30,7 @@
 #include "../cl/globals.h"
 #include "../cl/macros.h"
 #include "../cl/storage.h"      /* NwriteInt() & NwriteInts() */
-#include "../cl/lexhash.h"
+/* #include "../cl/lexhash.h" */ 
 /* byte order conversion functions taken from Corpus Library */
 #include "../cl/endian2.h"
 #include "../cl/attributes.h"   /* for DEFAULT_ATT_NAME */
