@@ -10,7 +10,7 @@ PKG_LIBS = \
     -L../windows/libcl-dev/lib${R_ARCH} \
     -Wl,--allow-multiple-definition \
     -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl -liconv \
-    -lws2_32 -lwinmm -lole32 -lcrtdll
+    -lws2_32 -lwinmm -lole32
 
 all: clean winlibs
 
