@@ -1,8 +1,8 @@
 PKG_CPPFLAGS = \
-    -I../windows/libcl-dev/include \
-    -I../windows/libcl-dev/include/cwb/cl \
-    -I../windows/libcl-dev/include/cwb/cqp \
-    -I../windows/libcl-dev/include/cwb/CQi
+    -I../windows/libcl-master/include \
+    -I../windows/libcl-master/include/cwb/cl \
+    -I../windows/libcl-master/include/cwb/cqp \
+    -I../windows/libcl-master/include/cwb/CQi
 
 PKG_CXXFLAGS=-D_LIB
 
