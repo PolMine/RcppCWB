@@ -332,7 +332,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
     }
     
     /* remove trailing line break (LF or CR-LF) */
-    cl_string_chomp(linebuf);
+    string_chomp(linebuf);
     
     buf = linebuf;
     if (strip_blanks) {

@@ -27,5 +27,6 @@ void wattr_close_all(void);
 void encode_add_wattr_line(char *str);
 int encode_get_input_line(char *buffer, int bufsize);
 void encode_generate_registry_file(char *registry_file);
+void string_chomp(char *s); /* replaces cl_string_chomp */
 
 /* ---------------------------------------------------------------------- */
