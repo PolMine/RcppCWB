@@ -59,7 +59,7 @@ cl_lexicon_size <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' 
 #' @param corpus name of a CWB corpus (upper case)
 #' @param s_attribute name of structural attribute (character vector)
-#' @param cpos corpus positions (integer vector)
+#' @param cpos An \code{integer} vector with corpus positions.
 #' @param struc a struc identifying a region
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY

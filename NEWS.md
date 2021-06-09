@@ -1,9 +1,10 @@
-# RcppCWB 0.3.2.9001 - 0.3.2.9002
+# RcppCWB 0.3.2.9001 - 0.3.2.9003
 
 * Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS so that this flag will be used when Linux default configuration is used as fallback.
 * The implementation of the `s_attribute_decode()` method was incomplete for method "Rcpp". This alternative to the "pure R" approach is now implemented (#2).
 * The unused file 'setpaths.R' has been removed from the tools directory (#10).
 * Encode XML (vrt file format) with new function `cwb_encode()` that exposes functionality of cwb-encode CWB utility.
+* The `cl_cpos2lbound()` will now accept an integer vector with length > 1 as argument `cpos` and return a vector with the same length. Useful to speed up iterated queries for left boundaries of regions (#19).
 
 
 # RcppCWB 0.3.2

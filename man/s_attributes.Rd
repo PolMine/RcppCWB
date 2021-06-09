@@ -49,7 +49,7 @@ cl_cpos2rbound(
 
 \item{s_attribute}{name of structural attribute (character vector)}
 
-\item{cpos}{corpus positions (integer vector)}
+\item{cpos}{An \code{integer} vector with corpus positions.}
 
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
