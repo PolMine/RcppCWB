@@ -187,14 +187,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // _cl_cpos2rbound
-int _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry);
+Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_cpos2rbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type cpos(cposSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     rcpp_result_gen = Rcpp::wrap(_cl_cpos2rbound(corpus, s_attribute, cpos, registry));
     return rcpp_result_gen;
