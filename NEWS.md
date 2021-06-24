@@ -5,6 +5,8 @@
 * The unused file 'setpaths.R' has been removed from the tools directory (#10).
 * Encode XML (vrt file format) with new function `cwb_encode()` that exposes functionality of cwb-encode CWB utility.
 * Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` will now accept an integer vector with length > 1 as argument `cpos` and return a vector with the same length. Useful to speed up iterated queries for left and right boundaries of regions (#19).
+* Function `check_corpus()` now includes checks whether the registry provided (argument `registry`) is identical with the registry defined internally by CQP. The registry is reset if directories are not identical.
+* A new function `cl_struc_values()` exposes the corresponding C function of the Corpus Library (CL). The previous implicit assumption that all structural attributes have values can thus be tested. Intended to work with annotations of sentences and paragraphs, i.e. common structural attributes that do usually not have values.
 
 
 # RcppCWB 0.3.2

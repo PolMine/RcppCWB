@@ -233,7 +233,6 @@ Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::Integer
 }
 
 
-
 // [[Rcpp::export(name=".cl_cpos2rbound")]]
 Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry){
   int lb, rb;
@@ -252,6 +251,7 @@ Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::Integer
   
   return( result );
 }
+
 
 
 // [[Rcpp::export(name=".cl_delete_corpus")]]
@@ -557,4 +557,11 @@ int check_corpus(SEXP corpus){
   }
 }
 
+// [[Rcpp::export(name=".cl_struc_values")]]
+int _cl_struc_values(SEXP corpus, SEXP s_attribute, SEXP registry){
+  Attribute* att = make_s_attribute(corpus, s_attribute, registry);
+  int y = cl_struc_values(att);
+  return y;
+}
+  
 
