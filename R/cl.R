@@ -303,3 +303,24 @@ cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cl_charset_name(corpus = corpus, registry = registry)
 }
 
+#' Check whether structural attribute has values
+#' 
+#' Structural attributes do not necessarily have values, structural attributes
+#' (such as annotations of sentences or paragraphs) may just define regions of
+#' corpus positions. Use this function to test whether an attribute has values.
+#' 
+#' @param corpus Corpus ID, a length-one `character` vector.
+#' @param s_attribute Structural attribute to check, a length-one `character` vector.
+#' @param registry The registry directory of the corpus.
+#' @return `TRUE` if the attribute has values and `FALSE` if not. `NA` if the structural
+#'   attribute is not available.
+#' @export cl_struc_values
+#' @examples
+#' cl_struc_values("REUTERS", "places") # TRUE - attribute has values
+#' cl_struc_values("REUTERS", "date") # NA - attribute does not exist
+cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- normalizePath(path.expand(registry))
+  i <- .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
+  if (i == 1L) TRUE else if (i == 0L) FALSE else if (i < 0L) as.integer(NA)
+}

@@ -109,6 +109,10 @@
     .Call(`_RcppCWB_check_corpus`, corpus)
 }
 
+.cl_struc_values <- function(corpus, s_attribute, registry) {
+    .Call(`_RcppCWB__cl_struc_values`, corpus, s_attribute, registry)
+}
+
 .decode_s_attribute <- function(corpus, s_attribute, registry) {
     .Call(`_RcppCWB_decode_s_attribute`, corpus, s_attribute, registry)
 }
