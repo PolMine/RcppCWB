@@ -110,6 +110,13 @@ if [ -x "`command -v pkg-config`" ]; then
   PKG_CONFIG_GLIB_INFO=$?
   if [ $PKG_CONFIG_GLIB_INFO = 0 ]; then
     printf "yes\n";
+    if [ $OS = "Darwin" ]; then
+      INTL="-lintl"
+      CARBON="-framework Carbon"
+    else
+      INTL=""
+      CARBON=""
+    fi
   else
     printf "no\n";
     if [ $OS = "Darwin" ]; then
