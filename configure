@@ -193,7 +193,10 @@ if [ -x "`command -v pcretest`" ]; then
   fi
 fi 
 
+printf "* using pcre-config to get libdirs for pcre: "
 PCRE_LIBDIRS="`pcre-config --libs`"
+printf "%s\n" "$PCRE_LIBDIRS"
+
 printf "* using pcre-config to get cflags for pcre: "
 PCRE_CFLAGS="`pcre-config --cflags`"
 printf "%s\n" "$PCRE_CFLAGS"
