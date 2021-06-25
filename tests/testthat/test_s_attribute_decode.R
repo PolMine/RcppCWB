@@ -24,3 +24,16 @@ test_that(
     expect_identical(s_attr_df_r, s_attr_df_rcpp)
   }
 )
+
+test_that(
+  "s_attr_regions",
+  {
+    m1 <- s_attr_regions("REUTERS", "id")
+    m2 <- get_region_matrix(
+      corpus = "REUTERS",
+      s_attribute = "id",
+      strucs = 0L:(cl_attribute_size("REUTERS", attribute = "id", attribute_type = "s") - 1L)
+    )
+    expect_identical(m1, m2)
+  }
+)

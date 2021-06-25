@@ -113,6 +113,10 @@
     .Call(`_RcppCWB__cl_struc_values`, corpus, s_attribute, registry)
 }
 
+.corpus_data_dir <- function(corpus, registry) {
+    .Call(`_RcppCWB__corpus_data_dir`, corpus, registry)
+}
+
 .decode_s_attribute <- function(corpus, s_attribute, registry) {
     .Call(`_RcppCWB_decode_s_attribute`, corpus, s_attribute, registry)
 }

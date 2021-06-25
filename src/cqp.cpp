@@ -565,3 +565,18 @@ int _cl_struc_values(SEXP corpus, SEXP s_attribute, SEXP registry){
 }
   
 
+// [[Rcpp::export(name=".corpus_data_dir")]]
+Rcpp::StringVector _corpus_data_dir(SEXP corpus, SEXP registry){
+  
+  Corpus * c;
+  Rcpp::StringVector result(1);
+  
+  char* corpus_id  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  
+  c = cl_new_corpus(registry_dir, corpus_id);
+
+  result(0) = c->path;
+  return( result );
+
+}

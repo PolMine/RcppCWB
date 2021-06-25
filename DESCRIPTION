@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.3.2.9004
-Date: 2021-06-24
+Version: 0.3.2.9005
+Date: 2021-06-25
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -67,3 +67,4 @@ Collate:
   'region_matrix.R'
   'misc.R'
   'zzz.R'
+  'xml.R'

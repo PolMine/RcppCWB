@@ -1,12 +1,21 @@
-# RcppCWB 0.3.2.9001 - 0.3.2.9004
+# RcppCWB 0.4.0
 
+## New Features
+
+* Encode XML (vrt file format) with new function `cwb_encode()` that exposes functionality of cwb-encode CWB utility.
+* Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` will now accept an integer vector with length > 1 as argument `cpos` and return a vector with the same length. Useful to speed up iterated queries for left and right boundaries of regions (#19).
+* A new function `cl_struc_values()` exposes the corresponding C function of the Corpus Library (CL). The previous implicit assumption that all structural attributes have values can thus be tested. Intended to work with annotations of sentences and paragraphs, i.e. common structural attributes that do usually not have values.
+* A new function `corpus_data_dir()` will derive the data directory from the internal C representation of a corpus.
+* New function `s_attr_regions()` will derive regions defined by a structural attribute from the *.rng file. Fastest option for large corpora.
+* New functions `s_attr_is_sibling()` and `s_attr_is_descendent()` test the sibling/descendent relationship of structural attributes.
+
+
+## Minor Improvements
+
+* Function `check_corpus()` now includes checks whether the registry provided (argument `registry`) is identical with the registry defined internally by CQP. The registry is reset if directories are not identical.
 * Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS so that this flag will be used when Linux default configuration is used as fallback.
 * The implementation of the `s_attribute_decode()` method was incomplete for method "Rcpp". This alternative to the "pure R" approach is now implemented (#2).
 * The unused file 'setpaths.R' has been removed from the tools directory (#10).
-* Encode XML (vrt file format) with new function `cwb_encode()` that exposes functionality of cwb-encode CWB utility.
-* Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` will now accept an integer vector with length > 1 as argument `cpos` and return a vector with the same length. Useful to speed up iterated queries for left and right boundaries of regions (#19).
-* Function `check_corpus()` now includes checks whether the registry provided (argument `registry`) is identical with the registry defined internally by CQP. The registry is reset if directories are not identical.
-* A new function `cl_struc_values()` exposes the corresponding C function of the Corpus Library (CL). The previous implicit assumption that all structural attributes have values can thus be tested. Intended to work with annotations of sentences and paragraphs, i.e. common structural attributes that do usually not have values.
 * The argument `method` previously setting "wininet" in ./tools/winlibs.R is omitted to avoid the warning "the 'wininet' method is deprecated for http:// and https:// URLs" on Windows.
 * The configure script will print the libdirs derived using pcre-config and link against libintl on macOS by default.
 

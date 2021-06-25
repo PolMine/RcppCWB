@@ -106,3 +106,31 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
   
   df
 }
+
+
+#' Get regions defined by a structural attribute
+#' 
+#' Get all regions defined by a structural attribute. Unlike
+#' `get_region_matrix()` that returns a region matrix for a defined subset of
+#' strucs, all regions are returned. As it is the fastest option, the function
+#' reads the binary *.rng file for the structural attribute directly. The corpus
+#' library (CL) is not used in this case.
+#' 
+#' @param corpus A length-one `character` vector with a corpus ID.
+#' @param s_attr A length-one `character` vector stating a structural attribute.
+#' @param registry A length-one `character` vector stating the registry
+#'   directory (defaults to CORPUS_REGISTRY environment variable).
+#' @param data_dir The data directory of the corpus.
+#' @return A two-colum `matrix` with the regions defined by the structural
+#'   attribute: Column 1 defines left corpus positions and column 2 right corpus
+#'   positions of regions.
+#' @examples 
+#' s_attr_regions("REUTERS", s_attr = "id")
+s_attr_regions <- function(corpus, s_attr, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir = corpus_data_dir(corpus = corpus, registry = registry)){
+  rng_file <- file.path(data_dir, paste(s_attr, "rng", sep = "."))
+  rng_file_size <- file.info(rng_file)[["size"]]
+  con <- file(rng_file, open = "rb")
+  rng <- readBin(con, what = integer(), size = 4L, n = rng_file_size / 4L, endian = "big")
+  close(con)
+  matrix(rng, ncol = 2L, byrow = TRUE)
+}

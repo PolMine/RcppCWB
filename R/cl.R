@@ -324,3 +324,19 @@ cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_R
   i <- .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
   if (i == 1L) TRUE else if (i == 0L) FALSE else if (i < 0L) as.integer(NA)
 }
+
+#' Get data directory of a corpus
+#' 
+#' Extract the data directory from the intenal C representation of the content
+#' of the registry file for a corpus.
+#' @param corpus A length-one `character` vector with the corpus ID.
+#' @param registry A length-one `character` vector with the registry directory.
+#' @return A length-one `character` vector stating the data directory.
+#' @export corpus_data_dir
+#' @examples
+#' corpus_data_dir("REUTERS")
+corpus_data_dir <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- normalizePath(path.expand(registry))
+  .corpus_data_dir(corpus = corpus, registry = registry)
+}
