@@ -4,8 +4,7 @@
 \alias{get_count_vector}
 \title{Get Vector with Counts for Positional Attribute.}
 \usage{
-get_count_vector(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+get_count_vector(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{a CWB corpus}
@@ -18,7 +17,7 @@ get_count_vector(corpus, p_attribute,
 an integer vector
 }
 \description{
-The return value is an integer vector. The length of the vector is the number of 
+The return value is an integer vector. The length of the vector is the number of
 unique tokens in the corpus / the number of unique ids. The order of the counts
 corresponds to the number of ids.
 }

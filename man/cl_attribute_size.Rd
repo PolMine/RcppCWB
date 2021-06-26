@@ -4,8 +4,12 @@
 \alias{cl_attribute_size}
 \title{Get Attribute Size (of Positional/Structural Attribute).}
 \usage{
-cl_attribute_size(corpus, attribute, attribute_type,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_attribute_size(
+  corpus,
+  attribute,
+  attribute_type,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}

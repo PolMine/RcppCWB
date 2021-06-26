@@ -48,8 +48,8 @@
 #include <netinet/in.h>
 #else
 /* but in windows we need to use winsock2.h (poss also windows.h?) from the Windows API instead */
+#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
 #include <windows.h>
-#include <winsock2.h>
 /* for consistency: define the ntohl and htonl macros since they are functions (not macros) in winsock2.h */
 #define ntohl ntohl
 #define htonl htonl

@@ -9,27 +9,47 @@
 \alias{cl_cpos2rbound}
 \title{Using Structural Attributes.}
 \usage{
-cl_cpos2struc(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_cpos2struc(
+  corpus,
+  s_attribute,
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_struc2cpos(corpus, s_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"), struc)
+cl_struc2cpos(
+  corpus,
+  s_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  struc
+)
 
-cl_struc2str(corpus, s_attribute, struc,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_struc2str(
+  corpus,
+  s_attribute,
+  struc,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_cpos2lbound(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_cpos2lbound(
+  corpus,
+  s_attribute,
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-cl_cpos2rbound(corpus, s_attribute, cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_cpos2rbound(
+  corpus,
+  s_attribute,
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}
 
 \item{s_attribute}{name of structural attribute (character vector)}
 
-\item{cpos}{corpus positions (integer vector)}
+\item{cpos}{An \code{integer} vector with corpus positions.}
 
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
@@ -38,11 +58,11 @@ environment variable CORPUS_REGISTRY}
 }
 \description{
 Structural attributes store the metadata of texts in a CWB
-  corpus and/or any kind of annotation of a region of text. The fundamental
-  unit are so-called strucs, i.e. indices of regions identified by a left and
-  a right corpus position. The corpus library (CL) offers a set of functions
-  to make the translations between corpus positions (cpos) and strucs
-  (struc).
+corpus and/or any kind of annotation of a region of text. The fundamental
+unit are so-called strucs, i.e. indices of regions identified by a left and
+a right corpus position. The corpus library (CL) offers a set of functions
+to make the translations between corpus positions (cpos) and strucs
+(struc).
 }
 \examples{
 registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()

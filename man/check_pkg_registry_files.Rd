@@ -4,8 +4,7 @@
 \alias{check_pkg_registry_files}
 \title{Check Paths in Registry Files}
 \usage{
-check_pkg_registry_files(pkg = system.file(package = "RcppCWB"),
-  set = FALSE)
+check_pkg_registry_files(pkg = system.file(package = "RcppCWB"), set = FALSE)
 }
 \arguments{
 \item{pkg}{Full path to package directory}

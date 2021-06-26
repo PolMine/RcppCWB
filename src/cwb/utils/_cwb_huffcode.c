@@ -38,6 +38,7 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 #include "../cl/bitio.h"
 #include "../cl/macros.h"
 
+
 /** Level of progress-info (inc compression protocol) message output: 0 = none. */
 int do_protocol = 1;
 /** File handle for this program's progress-info output: always stdout */

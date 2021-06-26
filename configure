@@ -10,7 +10,6 @@
 # Get compiler used by R
 CC_R=`$R_HOME/bin/R CMD config CC` 
 
-INTL=""
 CARBON=""
 SOCKETLIB=""
 
@@ -60,7 +59,7 @@ case $OS in
       i386) 
         CWB_PLATFORM_CONFIG_FILE="linux";;
       *)
-        echo "* unknown architecture (`$ARCH`), using Linux config as default"
+        echo "* unknown architecture ($ARCH), using Linux config as default"
         CWB_PLATFORM_CONFIG_FILE="linux"
         ;;
     esac
@@ -110,6 +109,9 @@ if [ -x "`command -v pkg-config`" ]; then
   PKG_CONFIG_GLIB_INFO=$?
   if [ $PKG_CONFIG_GLIB_INFO = 0 ]; then
     printf "yes\n";
+    if [ $OS = "Darwin" ]; then
+      CARBON="-framework Carbon"
+    fi
   else
     printf "no\n";
     if [ $OS = "Darwin" ]; then
@@ -117,7 +119,6 @@ if [ -x "`command -v pkg-config`" ]; then
       ${R_HOME}/bin/Rscript ./tools/maclibs.R `pwd`
       export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:`pwd`/macos/libglib-master/pkgconfig
       # Setting further args required to compile agains glib2.0 in this scenario
-      INTL="-lintl"
       CARBON="-framework Carbon"
     else 
       echo "----------------------- CONFIGURATION ERROR --------------------------"
@@ -135,9 +136,9 @@ else
   exit 1
 fi 
 
-printf "* using pkg-config to get -L flags for glib-2.0: "
-GLIB_LIBDIRS="`pkg-config --libs-only-L glib-2.0`"
-printf "%s\n" "$GLIB_LIBDIRS"
+printf "* using pkg-config to get linker flags for glib-2.0: "
+GLIB_LINKER_FLAGS="`pkg-config --libs glib-2.0`"
+printf "%s\n" "$GLIB_LINKER_FLAGS"
 
 # Check availability of ncurses
 printf "* using pkg-config to check whether ncurses is available ... ";
@@ -186,7 +187,10 @@ if [ -x "`command -v pcretest`" ]; then
   fi
 fi 
 
+printf "* using pcre-config to get libdirs for pcre: "
 PCRE_LIBDIRS="`pcre-config --libs`"
+printf "%s\n" "$PCRE_LIBDIRS"
+
 printf "* using pcre-config to get cflags for pcre: "
 PCRE_CFLAGS="`pcre-config --cflags`"
 printf "%s\n" "$PCRE_CFLAGS"
@@ -203,7 +207,7 @@ CWB_DIR="`pwd`/src/cwb"
 
 if [ -f ./src/Makevars ]; then rm ./src/Makevars; fi
 printf "PKG_CPPFLAGS=-I%s/src/cwb/cqp -I%s/src/cwb/cl -I%s/src/cwb/CQi %s\n" ${BUILD_DIR} ${BUILD_DIR} ${BUILD_DIR} "$PCRE_CFLAGS" > ./src/Makevars
-printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils %s %s -lcwb -lcqp -lcl -lglib-2.0 %s %s %s\n" ${CWB_DIR} ${CWB_DIR} ${CWB_DIR} "$GLIB_LIBDIRS" ${INTL} "$PCRE_LIBDIRS" ${SOCKETLIB} "$CARBON" >> ./src/Makevars
+printf "PKG_LIBS=-L%s/cl -L%s/cqp -L%s/utils -lcwb -lcqp -lcl %s %s %s %s\n" ${CWB_DIR} ${CWB_DIR} ${CWB_DIR} "$GLIB_LINKER_FLAGS" "$PCRE_LIBDIRS" ${SOCKETLIB} "$CARBON" >> ./src/Makevars
 printf "\${SHLIB}: libcl.a libcqp.a libcwb.a\n" >>./src/Makevars
 printf "libcl.a: depend\n" >> ./src/Makevars
 printf "\tcd cwb; R_PACKAGE_SOURCE=%s PKG_CONFIG_PATH=%s \${MAKE} cl\n" ${CWB_DIR} ${PKG_CONFIG_PATH} >> ./src/Makevars

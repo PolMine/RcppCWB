@@ -17,11 +17,17 @@ check_registry(registry)
 
 check_corpus(corpus, registry)
 
-check_s_attribute(s_attribute, corpus,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+check_s_attribute(
+  s_attribute,
+  corpus,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-check_p_attribute(p_attribute, corpus,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+check_p_attribute(
+  p_attribute,
+  corpus,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
 check_strucs(corpus, s_attribute, strucs, registry)
 
@@ -29,11 +35,14 @@ check_region_matrix(region_matrix)
 
 check_cqp_query(query)
 
-check_cpos(corpus, p_attribute = "word", cpos,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+check_cpos(
+  corpus,
+  p_attribute = "word",
+  cpos,
+  registry = Sys.getenv("CORPUS_REGISTRY")
+)
 
-check_id(corpus, p_attribute, id,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+check_id(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{registry}{path to registry directory}

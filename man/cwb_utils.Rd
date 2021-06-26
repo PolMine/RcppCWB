@@ -4,16 +4,23 @@
 \alias{cwb_makeall}
 \alias{cwb_huffcode}
 \alias{cwb_compress_rdx}
+\alias{cwb_encode}
 \title{CWB Tools for Creating Corpora}
 \usage{
-cwb_makeall(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_huffcode(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 
-cwb_compress_rdx(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+cwb_encode(
+  corpus,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  data_dir,
+  vrt_dir,
+  p_attributes = c("word", "pos", "lemma"),
+  s_attributes
+)
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}
@@ -22,6 +29,21 @@ cwb_compress_rdx(corpus, p_attribute,
 
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
+
+\item{data_dir}{The data directory where \code{cwb_encode} will put the binary
+files of the indexed corpus.}
+
+\item{vrt_dir}{Directory with input corpus files (verticalised format / file
+ending *.vrt).}
+
+\item{p_attributes}{Positional attributes (p-attributes) to be declared.}
+
+\item{s_attributes}{A \code{list} of named \code{character} vectors to declare
+structural attributes that shall be encoded. The names of the list are the
+XML elements present in the corpus. Character vectors making up the list
+declare the attributes that include the metadata of regions. To declare a
+structural attribute without annotations, provide a zero-length character
+vector using \code{character()} - see examples.}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
@@ -78,4 +100,30 @@ sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse 
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+\dontrun{
+data_dir <- file.path(tempdir(), "tmp_data_dir")
+dir.create(data_dir)
+
+cwb_encode(
+  corpus = "BTMIN",
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
+  data_dir = data_dir,
+  p_attributes = c("word", "pos", "lemma"),
+  s_attributes = list(
+    plenary_protocol = c(
+      "lp", "protocol_no", "date", "year", "birthday", "version",
+      "url", "filetype"
+    ),
+    speaker = c(
+      "id", "type", "lp", "protocol_no", "date", "year", "ai_no", "ai_id",
+      "ai_type", "who", "name", "parliamentary_group", "party", "role"
+     ),
+    p = character()
+  )
+)
+
+unlink(data_dir)
+unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "BTMIN"))
+}
 }

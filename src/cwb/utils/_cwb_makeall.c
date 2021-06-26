@@ -1,5 +1,12 @@
 void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
+/* included by AB to ensure that winsock2.h is included before windows.h */
+#ifdef __MINGW__
+#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
+#endif
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,8 +14,9 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 #include "../cl/globals.h"
 #include "../cl/attributes.h"
 #include "../cl/fileutils.h"
+#include "../cl/endian2.h"
 
-#include <netinet/in.h>
+/* #include <netinet/in.h> */
 
 Corpus *corpus;
 

@@ -14,87 +14,87 @@ the query syntax of the \code{Corpus Query Processor} (CQP).
 \section{The Idea Behind RcppCWB}{
 
 
-  The \code{Open Corpus Workbench} (CWB) is an indexing and querying engine
-  popular in corpus-assisted research. Its core aim is to support working
-  efficiently with large, structurally and linguistically annotated corpora.
-  First of all, the CWB includes tools to index and compress corpora. Second,
-  the \code{Corpus Library} (CL) offers low-level functionality to retrieve
-  information from CWB indexed corpora. Third, the \code{Corpus Query
+The \code{Open Corpus Workbench} (CWB) is an indexing and querying engine
+popular in corpus-assisted research. Its core aim is to support working
+efficiently with large, structurally and linguistically annotated corpora.
+First of all, the CWB includes tools to index and compress corpora. Second,
+the \code{Corpus Library} (CL) offers low-level functionality to retrieve
+information from CWB indexed corpora. Third, the \code{Corpus Query
   Processor} (CQP) offers a syntax that allows to perform anything from
-  simple to complex queries, using different annotation layers of corpora.
+simple to complex queries, using different annotation layers of corpora.
 
-  The CWB is a classical tool which has inspired a set of developments. A
-  persisting advantage of the CWB is its mature, open source code base that
-  is actively maintained by a community of developers. It is used as a robust
-  and efficient backend for widely used tools such as TXM
-  (\url{http://textometrie.ens-lyon.fr}) or CQPweb
-  (\url{http://cwb.sourceforge.net/cqpweb.php}). Its uncompromising C
-  implementation guarantees speed and makes it well suited to be integrated
-  with R at the same time.
+The CWB is a classical tool which has inspired a set of developments. A
+persisting advantage of the CWB is its mature, open source code base that
+is actively maintained by a community of developers. It is used as a robust
+and efficient backend for widely used tools such as TXM
+(\url{http://textometrie.ens-lyon.fr}) or CQPweb
+(\url{http://cwb.sourceforge.net/cqpweb.php}). Its uncompromising C
+implementation guarantees speed and makes it well suited to be integrated
+with R at the same time.
 
-  The package \code{RcppCWB} is a follow-up on the \code{rcqp} package that
-  has pioneered to expose CWB functionality from within R. Indeed, the
-  \code{rcqp} package, published at CRAN in 2015, offers robust access to CWB
-  functionality. However, the "pure C" implementation of the \code{rcqp}
-  package creates difficulties to make the package portable to Windows. The
-  primary purpose of the \code{RcppCWB} package is to reimplement a wrapper
-  library for the CWB using a design that makes it easier to achieve
-  cross-platform portability.
-  
-  Even though \code{RcppCWB} functions may be used directly, the package is
-  designed to serve as an interface to CWB indexed corpora in packages with
-  higher-level functionality. In this regard, \code{RcppCWB} is the backend
-  of the \code{polmineR} package. It is deliberately open to be used in other
-  contexts. The package may stimulate using linguistically annotated, indexed
-  and compressed corpora on all platforms. The paradigm of working with text
-  as linguistic data may benefit from \code{RcppCWB}.
+The package \code{RcppCWB} is a follow-up on the \code{rcqp} package that
+has pioneered to expose CWB functionality from within R. Indeed, the
+\code{rcqp} package, published at CRAN in 2015, offers robust access to CWB
+functionality. However, the "pure C" implementation of the \code{rcqp}
+package creates difficulties to make the package portable to Windows. The
+primary purpose of the \code{RcppCWB} package is to reimplement a wrapper
+library for the CWB using a design that makes it easier to achieve
+cross-platform portability.
+
+Even though \code{RcppCWB} functions may be used directly, the package is
+designed to serve as an interface to CWB indexed corpora in packages with
+higher-level functionality. In this regard, \code{RcppCWB} is the backend
+of the \code{polmineR} package. It is deliberately open to be used in other
+contexts. The package may stimulate using linguistically annotated, indexed
+and compressed corpora on all platforms. The paradigm of working with text
+as linguistic data may benefit from \code{RcppCWB}.
 }
 
 \section{Implementation}{
 
 
-  When building the package, the first step is to compile the relevant parts
-  of the CWB on Linux and macOS machines. On Windows, cross-compiled binaries
-  are downloaded from a GitHub repository of the PolMine Project
-  (\url{https://github.com/PolMine/libcl}). Second, \code{Rcpp} wrappers are
-  compiled and make the relevant functions of the Corpus Library and CQP
-  accessible. In addition to genuine CWB functions, \code{RcppCWB} offers a
-  set of higher level functions implemented using \code{Rcpp} for common
-  performance critical tasks.
+When building the package, the first step is to compile the relevant parts
+of the CWB on Linux and macOS machines. On Windows, cross-compiled binaries
+are downloaded from a GitHub repository of the PolMine Project
+(\url{https://github.com/PolMine/libcl}). Second, \code{Rcpp} wrappers are
+compiled and make the relevant functions of the Corpus Library and CQP
+accessible. In addition to genuine CWB functions, \code{RcppCWB} offers a
+set of higher level functions implemented using \code{Rcpp} for common
+performance critical tasks.
 }
 
 \section{Getting Started with RcppCWB}{
 
 
-  To understand the data storage model of the CWB, in particular the notions
-  of positional and structural attributes (s- and p-attributes), the vignette
-  of the \code{rcqp} package is a very good starting point (see references).
+To understand the data storage model of the CWB, in particular the notions
+of positional and structural attributes (s- and p-attributes), the vignette
+of the \code{rcqp} package is a very good starting point (see references).
 
-  The CWB 'Corpus Encoding Tutorial' explains how to create your own corpus,
-  the 'CQP Query Language Tutorial' introduces the syntax of CQP (see
-  references).
+The CWB 'Corpus Encoding Tutorial' explains how to create your own corpus,
+the 'CQP Query Language Tutorial' introduces the syntax of CQP (see
+references).
 
-  The \code{RcppCWB} package includes a sample corpus (REUTERS, the data also
-  included in the \code{tm} package). The examples in the documentation
-  of the functions may be a good starting point to understand how to use
-  \code{RcppCWB}.
+The \code{RcppCWB} package includes a sample corpus (REUTERS, the data also
+included in the \code{tm} package). The examples in the documentation
+of the functions may be a good starting point to understand how to use
+\code{RcppCWB}.
 }
 
 \section{Digging Deeper}{
- 
 
-  The original paper of Christ (1994) explains the design choices of the CWB.
-  The indexing and compression techniques of the CWB (Huffman coding) are
-  explained in Witten et al. (1999).
+
+The original paper of Christ (1994) explains the design choices of the CWB.
+The indexing and compression techniques of the CWB (Huffman coding) are
+explained in Witten et al. (1999).
 }
 
 \section{Acknowledgements}{
 
 
-  The work of the all developers of the CWB is gratefully acknowledged. There
-  is a particular intellectual debt to Bernard Desgraupes and Sylvain
-  Loiseau, and the \code{rcqp} package they developed as the original R
-  wrapper to expose the functionality of the CWB.
+The work of the all developers of the CWB is gratefully acknowledged. There
+is a particular intellectual debt to Bernard Desgraupes and Sylvain
+Loiseau, and the \code{rcqp} package they developed as the original R
+wrapper to expose the functionality of the CWB.
 }
 
 \examples{

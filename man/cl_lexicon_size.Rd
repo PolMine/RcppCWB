@@ -4,8 +4,7 @@
 \alias{cl_lexicon_size}
 \title{Get Lexicon Size.}
 \usage{
-cl_lexicon_size(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"))
+cl_lexicon_size(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{name of a CWB corpus (upper case)}

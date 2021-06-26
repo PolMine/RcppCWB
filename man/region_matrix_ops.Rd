@@ -6,11 +6,19 @@
 \alias{region_matrix_to_count_matrix}
 \title{Get IDs and Counts for Region Matrices.}
 \usage{
-region_matrix_to_ids(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"), matrix)
+region_matrix_to_ids(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  matrix
+)
 
-region_matrix_to_count_matrix(corpus, p_attribute,
-  registry = Sys.getenv("CORPUS_REGISTRY"), matrix)
+region_matrix_to_count_matrix(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  matrix
+)
 }
 \arguments{
 \item{corpus}{a CWB corpus}

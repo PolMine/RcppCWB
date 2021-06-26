@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // _cl_attribute_size
 int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_attribute_size(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
@@ -173,28 +178,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // _cl_cpos2lbound
-int _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry);
+Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_cpos2lbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type cpos(cposSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     rcpp_result_gen = Rcpp::wrap(_cl_cpos2lbound(corpus, s_attribute, cpos, registry));
     return rcpp_result_gen;
 END_RCPP
 }
 // _cl_cpos2rbound
-int _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, SEXP cpos, SEXP registry);
+Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_cpos2rbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type cpos(cposSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     rcpp_result_gen = Rcpp::wrap(_cl_cpos2rbound(corpus, s_attribute, cpos, registry));
     return rcpp_result_gen;
@@ -342,6 +347,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _cl_struc_values
+int _cl_struc_values(SEXP corpus, SEXP s_attribute, SEXP registry);
+RcppExport SEXP _RcppCWB__cl_struc_values(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(_cl_struc_values(corpus, s_attribute, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _corpus_data_dir
+Rcpp::StringVector _corpus_data_dir(SEXP corpus, SEXP registry);
+RcppExport SEXP _RcppCWB__corpus_data_dir(SEXP corpusSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(_corpus_data_dir(corpus, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
 // decode_s_attribute
 Rcpp::StringVector decode_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry);
 RcppExport SEXP _RcppCWB_decode_s_attribute(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP) {
@@ -475,6 +505,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cwb_encode
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno);
+RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type regfile(regfileSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type data_dir(data_dirSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type vrt_dir(vrt_dirSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type p_attributes(p_attributesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type s_attributes_anno(s_attributes_annoSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type s_attributes_noanno(s_attributes_noannoSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, p_attributes, s_attributes_anno, s_attributes_noanno));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},
@@ -504,6 +550,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cqp_dump_subcorpus", (DL_FUNC) &_RcppCWB_cqp_dump_subcorpus, 1},
     {"_RcppCWB_cqp_drop_subcorpus", (DL_FUNC) &_RcppCWB_cqp_drop_subcorpus, 1},
     {"_RcppCWB_check_corpus", (DL_FUNC) &_RcppCWB_check_corpus, 1},
+    {"_RcppCWB__cl_struc_values", (DL_FUNC) &_RcppCWB__cl_struc_values, 3},
+    {"_RcppCWB__corpus_data_dir", (DL_FUNC) &_RcppCWB__corpus_data_dir, 2},
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},
     {"_RcppCWB_get_count_vector", (DL_FUNC) &_RcppCWB_get_count_vector, 3},
     {"_RcppCWB_get_region_matrix", (DL_FUNC) &_RcppCWB_get_region_matrix, 4},
@@ -514,6 +562,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
     {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
+    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 6},
     {NULL, NULL, 0}
 };
 

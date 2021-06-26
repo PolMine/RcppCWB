@@ -5,7 +5,6 @@
 #' wrappers will always perform a specific indexing/compression step on one
 #' positional attribute, and produce all components.
 #' 
-#' @rdname cwb_utils
 #' @param corpus name of a CWB corpus (upper case)
 #' @param p_attribute name p-attribute
 #' @param registry path to the registry directory, defaults to the value of the
@@ -78,4 +77,70 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 #' cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+}
+
+#' @param p_attributes Positional attributes (p-attributes) to be declared.
+#' @param data_dir The data directory where `cwb_encode` will put the binary
+#'   files of the indexed corpus.
+#' @param vrt_dir Directory with input corpus files (verticalised format / file
+#'   ending *.vrt).
+#' @param s_attributes A `list` of named `character` vectors to declare
+#'   structural attributes that shall be encoded. The names of the list are the
+#'   XML elements present in the corpus. Character vectors making up the list
+#'   declare the attributes that include the metadata of regions. To declare a
+#'   structural attribute without annotations, provide a zero-length character
+#'   vector using `character()` - see examples.
+#' @rdname cwb_utils
+#' @export cwb_encode
+#' @examples
+#' \dontrun{
+#' data_dir <- file.path(tempdir(), "tmp_data_dir")
+#' dir.create(data_dir)
+#' 
+#' cwb_encode(
+#'   corpus = "BTMIN",
+#'   registry = Sys.getenv("CORPUS_REGISTRY"),
+#'   vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
+#'   data_dir = data_dir,
+#'   p_attributes = c("word", "pos", "lemma"),
+#'   s_attributes = list(
+#'     plenary_protocol = c(
+#'       "lp", "protocol_no", "date", "year", "birthday", "version",
+#'       "url", "filetype"
+#'     ),
+#'     speaker = c(
+#'       "id", "type", "lp", "protocol_no", "date", "year", "ai_no", "ai_id",
+#'       "ai_type", "who", "name", "parliamentary_group", "party", "role"
+#'      ),
+#'     p = character()
+#'   )
+#' )
+#' 
+#' unlink(data_dir)
+#' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "BTMIN"))
+#' }
+cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
+  
+  s_attributes_noanno <- unlist(lapply(
+    names(s_attributes),
+    function(s_attr) if (length(s_attributes[[s_attr]]) == 0L) s_attr else character()
+  ))
+  
+  for (s_attr in s_attributes_noanno) s_attributes[[s_attr]] <- NULL
+  
+  s_attributes_anno <- unname(
+    sapply(
+      names(s_attributes),
+      function(s_attr) paste(s_attr, ":", 0L, "+", paste(s_attributes[[s_attr]], collapse = "+"), sep = "")
+    )
+  )
+  
+  .cwb_encode(
+    regfile = file.path(registry, tolower(corpus)),
+    data_dir = data_dir,
+    vrt_dir = vrt_dir,
+    p_attributes = p_attributes,
+    s_attributes_anno = s_attributes_anno,
+    s_attributes_noanno = s_attributes_noanno
+  )
 }

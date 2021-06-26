@@ -45,6 +45,7 @@
 #include "../cqp/corpmanag.h"
 #include "../cqp/parse_actions.h"
 #include "../cqp/hash.h"
+#include "../cl/lexhash.h" /* inserted by AB */
 
 #define NETBUFSIZE 512
 #define ATTHASHSIZE 16384

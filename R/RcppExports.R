@@ -109,6 +109,14 @@
     .Call(`_RcppCWB_check_corpus`, corpus)
 }
 
+.cl_struc_values <- function(corpus, s_attribute, registry) {
+    .Call(`_RcppCWB__cl_struc_values`, corpus, s_attribute, registry)
+}
+
+.corpus_data_dir <- function(corpus, registry) {
+    .Call(`_RcppCWB__corpus_data_dir`, corpus, registry)
+}
+
 .decode_s_attribute <- function(corpus, s_attribute, registry) {
     .Call(`_RcppCWB_decode_s_attribute`, corpus, s_attribute, registry)
 }
@@ -147,5 +155,9 @@
 
 .cwb_compress_rdx <- function(x, registry_dir, p_attribute) {
     .Call(`_RcppCWB_cwb_compress_rdx`, x, registry_dir, p_attribute)
+}
+
+.cwb_encode <- function(regfile, data_dir, vrt_dir, p_attributes, s_attributes_anno, s_attributes_noanno) {
+    .Call(`_RcppCWB_cwb_encode`, regfile, data_dir, vrt_dir, p_attributes, s_attributes_anno, s_attributes_noanno)
 }
 

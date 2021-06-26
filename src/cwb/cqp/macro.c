@@ -19,6 +19,7 @@
 #include "options.h"
 #include "output.h"
 #include "cqp.h"
+#include "../cl/lexhash.h" /* newly added by AB */
 #include "hash.h"
 #include "eval.h"
 #include "ranges.h"
