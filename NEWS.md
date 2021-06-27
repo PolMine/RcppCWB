@@ -1,3 +1,8 @@
+# RcppCWB 0.4.0.9001
+
+* A shortcoming when passing in variables into the format string to construct the PKG_LIBS variable resulted in a faulty call of the linker on Solaris and a compilation error. Fixed (#25).
+
+
 # RcppCWB 0.4.0
 
 ## New Features

@@ -173,8 +173,8 @@ else
 fi
 if [ -x "`command -v pcretest`" ]; then
   printf "* using pcretest to check whether pcre has been configured with unicode properties support ... ";
-  PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | grep --only-matching 'No'`";
-  if [ "$PCRE_UNICODE" = "No" ]; then
+  PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | sed 's/^[ \t]*//'`";
+  if [[ "$PCRE_UNICODE" = No* ]]; then
     printf "no\n";
     echo "-------------------------------  WARNING -------------------------------"
     echo "No Unicode properties support found for pcre. RcppCWB may not work as"
