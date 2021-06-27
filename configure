@@ -172,23 +172,26 @@ else
   echo "----------------------------------------------------------------------"
 fi
 
+printf "* checking whether pcretest is available to check unicode properties support ... ";
 if [ -x "`command -v pcretest`" ]; then
-  printf "* using pcretest to check whether pcre has been configured with unicode properties support ... ";
-  PCRE_UNICODE="`pcretest -C | grep 'Unicode properties support' | sed 's/^[ \t]*//'`";
-  case "$PCRE_UNICODE" in
-    No*)
+  printf "yes\n";
+  printf "* check whether pcre has been configured with unicode properties support ... ";
+  case "`pcretest -C ucp`" in
+    0)
       printf "no\n";
       echo "-------------------------------  WARNING -------------------------------"
       echo "No Unicode properties support found for pcre. RcppCWB may not work as"
       echo "intended and throw errors. Recommended solution:"
       echo "Configure pcre with '--enable-unicode-properties' option and re-compile."
       echo "------------------------------------------------------------------------";;
-    Unicode*)
+    1)
       printf "yes\n";;
     *)
       printf "unknown\n";;
   esac
-fi 
+else 
+  printf "no\n";
+fi
 
 printf "* using pcre-config to get libdirs for pcre: "
 PCRE_LIBDIRS="`pcre-config --libs`"
