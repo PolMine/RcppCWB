@@ -78,7 +78,7 @@ case $OS in
         CWB_PLATFORM_CONFIG_FILE_CC="solaris_x86"
         ;;
     esac
-    SOCKETLIB='-lsocket -Wl,--allow-multiple-definition';;
+    SOCKETLIB='-lsocket';;
     
   *)
     CWB_PLATFORM_CONFIG_FILE="unix"

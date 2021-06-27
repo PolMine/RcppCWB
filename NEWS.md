@@ -1,6 +1,9 @@
 # RcppCWB 0.4.0.9001
 
 * A shortcoming when passing in variables into the format string to construct the PKG_LIBS variable resulted in a faulty call of the linker on Solaris and a compilation error. Fixed (#25).
+* A hacky and recently unnecessary LDFLAG "-Wl,--allow-multiple-definition" on Solaris has been dropped.
+* Usage and evaluation of the pcretest utility is now in line with POSIX requirements, omitting an error on Solaris. A statement on the availability of the tool provides information whether it is available at all (#24).
+* The message on the findability of ncurses is more telling now, avoiding a "mission critial"-style alarm when ncurses may be present but is not findable by pkg-config (#26).
 
 
 # RcppCWB 0.4.0
