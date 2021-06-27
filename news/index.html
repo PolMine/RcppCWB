@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -114,6 +114,35 @@
       <small>Source: <a href='https://github.com/PolMine/RcppCWB/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rcppcwb-040" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.0">
+<a href="#rcppcwb-040" class="anchor"></a>RcppCWB 0.4.0<small> 2021-06-25 </small>
+</h1>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New Features</h2>
+<ul>
+<li>Encode XML (vrt file format) with new function <code><a href="../reference/cwb_makeall.html">cwb_encode()</a></code> that exposes functionality of cwb-encode CWB utility.</li>
+<li>Functions <code><a href="../reference/CL:%20s_attributes.html">cl_cpos2lbound()</a></code> and <code><a href="../reference/CL:%20s_attributes.html">cl_cpos2rbound()</a></code> will now accept an integer vector with length &gt; 1 as argument <code>cpos</code> and return a vector with the same length. Useful to speed up iterated queries for left and right boundaries of regions (<a href='https://github.com/PolMine/RcppCWB/issues/19'>#19</a>).</li>
+<li>A new function <code><a href="../reference/cl_struc_values.html">cl_struc_values()</a></code> exposes the corresponding C function of the Corpus Library (CL). The previous implicit assumption that all structural attributes have values can thus be tested. Intended to work with annotations of sentences and paragraphs, i.e. common structural attributes that do usually not have values.</li>
+<li>A new function <code><a href="../reference/corpus_data_dir.html">corpus_data_dir()</a></code> will derive the data directory from the internal C representation of a corpus.</li>
+<li>New function <code><a href="../reference/s_attr_regions.html">s_attr_regions()</a></code> will derive regions defined by a structural attribute from the *.rng file. Fastest option for large corpora.</li>
+<li>New functions <code><a href="../reference/s_attr_is_descendent.html">s_attr_is_sibling()</a></code> and <code><a href="../reference/s_attr_is_descendent.html">s_attr_is_descendent()</a></code> test the sibling/descendent relationship of structural attributes.</li>
+</ul>
+</div>
+<div id="minor-improvements" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements" class="anchor"></a>Minor Improvements</h2>
+<ul>
+<li>Function <code><a href="../reference/check.html">check_corpus()</a></code> now includes checks whether the registry provided (argument <code>registry</code>) is identical with the registry defined internally by CQP. The registry is reset if directories are not identical.</li>
+<li>Minor adjustments of configure script for aarch64, adding -fPIC to CFLAGS so that this flag will be used when Linux default configuration is used as fallback.</li>
+<li>The implementation of the <code><a href="../reference/s_attribute_decode.html">s_attribute_decode()</a></code> method was incomplete for method “Rcpp”. This alternative to the “pure R” approach is now implemented (<a href='https://github.com/PolMine/RcppCWB/issues/2'>#2</a>).</li>
+<li>The unused file ‘setpaths.R’ has been removed from the tools directory (<a href='https://github.com/PolMine/RcppCWB/issues/10'>#10</a>).</li>
+<li>The argument <code>method</code> previously setting “wininet” in ./tools/winlibs.R is omitted to avoid the warning “the ‘wininet’ method is deprecated for <a href="http://" class="uri">http://</a> and <a href="https://" class="uri">https://</a> URLs” on Windows.</li>
+<li>The configure script will print the libdirs derived using pcre-config and link against libintl on macOS by default.</li>
+</ul>
+</div>
+</div>
     <div id="rcppcwb-032" class="section level1">
 <h1 class="page-header" data-toc-text="0.3.2">
 <a href="#rcppcwb-032" class="anchor"></a>RcppCWB 0.3.2<small> 2021-02-03 </small>

@@ -75,7 +75,7 @@ positional attribute, and produce all components." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -126,14 +126,20 @@ wrappers will always perform a specific indexing/compression step on one
 positional attribute, and produce all components.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cwb_makeall</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>p_attribute</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>cwb_makeall</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>p_attribute</span>, registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>cwb_huffcode</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>p_attribute</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>cwb_huffcode</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>p_attribute</span>, registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>cwb_compress_rdx</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>p_attribute</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span></pre>
+<span class='fu'>cwb_compress_rdx</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>p_attribute</span>, registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'>cwb_encode</span><span class='op'>(</span>
+  <span class='va'>corpus</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>,
+  <span class='va'>data_dir</span>,
+  <span class='va'>vrt_dir</span>,
+  p_attributes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"word"</span>, <span class='st'>"pos"</span>, <span class='st'>"lemma"</span><span class='op'>)</span>,
+  <span class='va'>s_attributes</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -150,6 +156,29 @@ positional attribute, and produce all components.</p>
       <th>registry</th>
       <td><p>path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY</p></td>
+    </tr>
+    <tr>
+      <th>data_dir</th>
+      <td><p>The data directory where <code>cwb_encode</code> will put the binary
+files of the indexed corpus.</p></td>
+    </tr>
+    <tr>
+      <th>vrt_dir</th>
+      <td><p>Directory with input corpus files (verticalised format / file
+ending *.vrt).</p></td>
+    </tr>
+    <tr>
+      <th>p_attributes</th>
+      <td><p>Positional attributes (p-attributes) to be declared.</p></td>
+    </tr>
+    <tr>
+      <th>s_attributes</th>
+      <td><p>A <code>list</code> of named <code>character</code> vectors to declare
+structural attributes that shall be encoded. The names of the list are the
+XML elements present in the corpus. Character vectors making up the list
+declare the attributes that include the metadata of regions. To declare a
+structural attribute without annotations, provide a zero-length character
+vector using <code><a href='https://rdrr.io/r/base/character.html'>character()</a></code> - see examples.</p></td>
     </tr>
     </table>
 
@@ -189,7 +218,7 @@ environment variable CORPUS_REGISTRY</p></td>
 <span class='co'># perform cwb_makeall (equivalent to cwb-makeall command line utility)</span>
 <span class='fu'>cwb_makeall</span><span class='op'>(</span>corpus <span class='op'>=</span> <span class='st'>"UNGA"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>tmp_regdir</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; === Makeall: processing corpus UNGA ===
-#&gt; Registry directory: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/registry
+#&gt; Registry directory: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry
 #&gt; ATTRIBUTE word
 #&gt;  + creating LEXSRT ... OK
 #&gt;  - lexicon      OK
@@ -206,7 +235,7 @@ environment variable CORPUS_REGISTRY</p></td>
   corpus <span class='op'>=</span> <span class='st'>"UNGA"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>tmp_regdir</span>,
   cpos <span class='op'>=</span> <span class='fl'>0</span><span class='op'>:</span><span class='fl'>83</span>
   <span class='op'>)</span>
-<span class='va'>tokens_sentence_1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2str</a></span><span class='op'>(</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Resetting registry directory from '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry_tmp' to '/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpmY98Iq/registry'</span></div><div class='input'><span class='va'>tokens_sentence_1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2str</a></span><span class='op'>(</span>
   corpus <span class='op'>=</span> <span class='st'>"UNGA"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>,
   registry <span class='op'>=</span> <span class='va'>tmp_regdir</span>, id <span class='op'>=</span> <span class='va'>ids_sentence_1</span>
   <span class='op'>)</span>
@@ -216,13 +245,39 @@ environment variable CORPUS_REGISTRY</p></td>
 <span class='op'>}</span>
 <span class='fu'>cwb_compress_rdx</span><span class='op'>(</span>corpus <span class='op'>=</span> <span class='st'>"UNGA"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>tmp_regdir</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; COMPRESSING INDEX of UNGA.word
-#&gt; - writing compressed index to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/indexed_corpora/unga/word.crc
-#&gt; - writing compressed index offsets to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/indexed_corpora/unga/word.crx
+#&gt; - writing compressed index to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/indexed_corpora/unga/word.crc
+#&gt; - writing compressed index offsets to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/indexed_corpora/unga/word.crx
 #&gt; VALIDATING UNGA.word
-#&gt; - reading compressed index from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/indexed_corpora/unga/word.crc
-#&gt; - reading compressed index offsets from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/indexed_corpora/unga/word.crx
-#&gt; !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/indexed_corpora/unga/word.corpus.rev&gt; now.
-#&gt; !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/indexed_corpora/unga/word.corpus.rdx&gt; now.</div><div class='output co'>#&gt; [1] 0</div></pre>
+#&gt; - reading compressed index from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/indexed_corpora/unga/word.crc
+#&gt; - reading compressed index offsets from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/indexed_corpora/unga/word.crx
+#&gt; !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/indexed_corpora/unga/word.corpus.rev&gt; now.
+#&gt; !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/indexed_corpora/unga/word.corpus.rdx&gt; now.</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>data_dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"tmp_data_dir"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span><span class='va'>data_dir</span><span class='op'>)</span>
+
+<span class='fu'>cwb_encode</span><span class='op'>(</span>
+  corpus <span class='op'>=</span> <span class='st'>"BTMIN"</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>,
+  vrt_dir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span>package <span class='op'>=</span> <span class='st'>"RcppCWB"</span>, <span class='st'>"extdata"</span>, <span class='st'>"vrt"</span><span class='op'>)</span>,
+  data_dir <span class='op'>=</span> <span class='va'>data_dir</span>,
+  p_attributes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"word"</span>, <span class='st'>"pos"</span>, <span class='st'>"lemma"</span><span class='op'>)</span>,
+  s_attributes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+    plenary_protocol <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+      <span class='st'>"lp"</span>, <span class='st'>"protocol_no"</span>, <span class='st'>"date"</span>, <span class='st'>"year"</span>, <span class='st'>"birthday"</span>, <span class='st'>"version"</span>,
+      <span class='st'>"url"</span>, <span class='st'>"filetype"</span>
+    <span class='op'>)</span>,
+    speaker <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+      <span class='st'>"id"</span>, <span class='st'>"type"</span>, <span class='st'>"lp"</span>, <span class='st'>"protocol_no"</span>, <span class='st'>"date"</span>, <span class='st'>"year"</span>, <span class='st'>"ai_no"</span>, <span class='st'>"ai_id"</span>,
+      <span class='st'>"ai_type"</span>, <span class='st'>"who"</span>, <span class='st'>"name"</span>, <span class='st'>"parliamentary_group"</span>, <span class='st'>"party"</span>, <span class='st'>"role"</span>
+     <span class='op'>)</span>,
+    p <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='op'>)</span>
+<span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span><span class='op'>(</span><span class='va'>data_dir</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/unlink.html'>unlink</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>, <span class='st'>"BTMIN"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

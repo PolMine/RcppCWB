@@ -75,7 +75,7 @@ the query syntax of the Corpus Query Processor (CQP)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -134,81 +134,81 @@ the query syntax of the <code>Corpus Query Processor</code> (CQP).</p>
 
 
 <p>The <code>Open Corpus Workbench</code> (CWB) is an indexing and querying engine
-  popular in corpus-assisted research. Its core aim is to support working
-  efficiently with large, structurally and linguistically annotated corpora.
-  First of all, the CWB includes tools to index and compress corpora. Second,
-  the <code>Corpus Library</code> (CL) offers low-level functionality to retrieve
-  information from CWB indexed corpora. Third, the <code>Corpus Query
+popular in corpus-assisted research. Its core aim is to support working
+efficiently with large, structurally and linguistically annotated corpora.
+First of all, the CWB includes tools to index and compress corpora. Second,
+the <code>Corpus Library</code> (CL) offers low-level functionality to retrieve
+information from CWB indexed corpora. Third, the <code>Corpus Query
   Processor</code> (CQP) offers a syntax that allows to perform anything from
-  simple to complex queries, using different annotation layers of corpora.</p>
+simple to complex queries, using different annotation layers of corpora.</p>
 <p>The CWB is a classical tool which has inspired a set of developments. A
-  persisting advantage of the CWB is its mature, open source code base that
-  is actively maintained by a community of developers. It is used as a robust
-  and efficient backend for widely used tools such as TXM
-  (<a href='http://textometrie.ens-lyon.fr'>http://textometrie.ens-lyon.fr</a>) or CQPweb
-  (<a href='http://cwb.sourceforge.net/cqpweb.php'>http://cwb.sourceforge.net/cqpweb.php</a>). Its uncompromising C
-  implementation guarantees speed and makes it well suited to be integrated
-  with R at the same time.</p>
+persisting advantage of the CWB is its mature, open source code base that
+is actively maintained by a community of developers. It is used as a robust
+and efficient backend for widely used tools such as TXM
+(<a href='http://textometrie.ens-lyon.fr'>http://textometrie.ens-lyon.fr</a>) or CQPweb
+(<a href='http://cwb.sourceforge.net/cqpweb.php'>http://cwb.sourceforge.net/cqpweb.php</a>). Its uncompromising C
+implementation guarantees speed and makes it well suited to be integrated
+with R at the same time.</p>
 <p>The package <code>RcppCWB</code> is a follow-up on the <code>rcqp</code> package that
-  has pioneered to expose CWB functionality from within R. Indeed, the
-  <code>rcqp</code> package, published at CRAN in 2015, offers robust access to CWB
-  functionality. However, the "pure C" implementation of the <code>rcqp</code>
-  package creates difficulties to make the package portable to Windows. The
-  primary purpose of the <code>RcppCWB</code> package is to reimplement a wrapper
-  library for the CWB using a design that makes it easier to achieve
-  cross-platform portability.</p>  
+has pioneered to expose CWB functionality from within R. Indeed, the
+<code>rcqp</code> package, published at CRAN in 2015, offers robust access to CWB
+functionality. However, the "pure C" implementation of the <code>rcqp</code>
+package creates difficulties to make the package portable to Windows. The
+primary purpose of the <code>RcppCWB</code> package is to reimplement a wrapper
+library for the CWB using a design that makes it easier to achieve
+cross-platform portability.</p>
 <p>Even though <code>RcppCWB</code> functions may be used directly, the package is
-  designed to serve as an interface to CWB indexed corpora in packages with
-  higher-level functionality. In this regard, <code>RcppCWB</code> is the backend
-  of the <code>polmineR</code> package. It is deliberately open to be used in other
-  contexts. The package may stimulate using linguistically annotated, indexed
-  and compressed corpora on all platforms. The paradigm of working with text
-  as linguistic data may benefit from <code>RcppCWB</code>.</p>
+designed to serve as an interface to CWB indexed corpora in packages with
+higher-level functionality. In this regard, <code>RcppCWB</code> is the backend
+of the <code>polmineR</code> package. It is deliberately open to be used in other
+contexts. The package may stimulate using linguistically annotated, indexed
+and compressed corpora on all platforms. The paradigm of working with text
+as linguistic data may benefit from <code>RcppCWB</code>.</p>
     <h2 class="hasAnchor" id="implementation"><a class="anchor" href="#implementation"></a>Implementation</h2>
 
     
 
 
 <p>When building the package, the first step is to compile the relevant parts
-  of the CWB on Linux and macOS machines. On Windows, cross-compiled binaries
-  are downloaded from a GitHub repository of the PolMine Project
-  (<a href='https://github.com/PolMine/libcl'>https://github.com/PolMine/libcl</a>). Second, <code>Rcpp</code> wrappers are
-  compiled and make the relevant functions of the Corpus Library and CQP
-  accessible. In addition to genuine CWB functions, <code>RcppCWB</code> offers a
-  set of higher level functions implemented using <code>Rcpp</code> for common
-  performance critical tasks.</p>
+of the CWB on Linux and macOS machines. On Windows, cross-compiled binaries
+are downloaded from a GitHub repository of the PolMine Project
+(<a href='https://github.com/PolMine/libcl'>https://github.com/PolMine/libcl</a>). Second, <code>Rcpp</code> wrappers are
+compiled and make the relevant functions of the Corpus Library and CQP
+accessible. In addition to genuine CWB functions, <code>RcppCWB</code> offers a
+set of higher level functions implemented using <code>Rcpp</code> for common
+performance critical tasks.</p>
     <h2 class="hasAnchor" id="getting-started-with-rcppcwb"><a class="anchor" href="#getting-started-with-rcppcwb"></a>Getting Started with RcppCWB</h2>
 
     
 
 
 <p>To understand the data storage model of the CWB, in particular the notions
-  of positional and structural attributes (s- and p-attributes), the vignette
-  of the <code>rcqp</code> package is a very good starting point (see references).</p>
+of positional and structural attributes (s- and p-attributes), the vignette
+of the <code>rcqp</code> package is a very good starting point (see references).</p>
 <p>The CWB 'Corpus Encoding Tutorial' explains how to create your own corpus,
-  the 'CQP Query Language Tutorial' introduces the syntax of CQP (see
-  references).</p>
+the 'CQP Query Language Tutorial' introduces the syntax of CQP (see
+references).</p>
 <p>The <code>RcppCWB</code> package includes a sample corpus (REUTERS, the data also
-  included in the <code>tm</code> package). The examples in the documentation
-  of the functions may be a good starting point to understand how to use
-  <code>RcppCWB</code>.</p>
+included in the <code>tm</code> package). The examples in the documentation
+of the functions may be a good starting point to understand how to use
+<code>RcppCWB</code>.</p>
     <h2 class="hasAnchor" id="digging-deeper"><a class="anchor" href="#digging-deeper"></a>Digging Deeper</h2>
 
     
- 
+
 
 <p>The original paper of Christ (1994) explains the design choices of the CWB.
-  The indexing and compression techniques of the CWB (Huffman coding) are
-  explained in Witten et al. (1999).</p>
+The indexing and compression techniques of the CWB (Huffman coding) are
+explained in Witten et al. (1999).</p>
     <h2 class="hasAnchor" id="acknowledgements"><a class="anchor" href="#acknowledgements"></a>Acknowledgements</h2>
 
     
 
 
 <p>The work of the all developers of the CWB is gratefully acknowledged. There
-  is a particular intellectual debt to Bernard Desgraupes and Sylvain
-  Loiseau, and the <code>rcqp</code> package they developed as the original R
-  wrapper to expose the functionality of the CWB.</p>
+is a particular intellectual debt to Bernard Desgraupes and Sylvain
+Loiseau, and the <code>rcqp</code> package they developed as the original R
+wrapper to expose the functionality of the CWB.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Christ, O. 1994. "A modular and flexible architecture for an integrated
@@ -236,8 +236,8 @@ Kaufmann Publishing, San Francisco, 2nd edition.</p>
 <span class='co'># registry &lt;- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()</span>
 <span class='va'>registry</span> <span class='op'>&lt;-</span> <span class='fu'><a href='use_tmp_registry.html'>use_tmp_registry</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>registry</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpCIbiNO/registry_tmp"</div><div class='input'><span class='va'>ids</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_cpos2id</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, cpos <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>registry</span><span class='op'>)</span>
-<span class='va'>tokens</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2str</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, id <span class='op'>=</span> <span class='va'>ids</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>registry</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry_tmp"</div><div class='input'><span class='va'>ids</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_cpos2id</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, cpos <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>registry</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Resetting registry directory from '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry_tmp' to '/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpmY98Iq/registry_tmp'</span></div><div class='input'><span class='va'>tokens</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2str</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, id <span class='op'>=</span> <span class='va'>ids</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, registry <span class='op'>=</span> <span class='va'>registry</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>tokens</span>, collapse <span class='op'>=</span> <span class='st'>" "</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "Shamrock Corp said that effective today it had cut its contract prices for crude oil by 1.50 dlrs a barrel"</div><div class='input'>
 <span class='co'># To use the corpus query processor (CQP) and its syntax, it is necessary first</span>
@@ -254,7 +254,7 @@ Kaufmann Publishing, San Francisco, 2nd edition.</p>
     <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>tokens</span>, collapse <span class='op'>=</span> <span class='st'>" "</span><span class='op'>)</span>
   <span class='op'>}</span>
  <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Resetting registry directory from '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry_tmp' to '/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpmY98Iq/registry_tmp'</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

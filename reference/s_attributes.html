@@ -41,11 +41,11 @@
 
 <meta property="og:title" content="Using Structural Attributes. — CL: s_attributes" />
 <meta property="og:description" content="Structural attributes store the metadata of texts in a CWB
-  corpus and/or any kind of annotation of a region of text. The fundamental
-  unit are so-called strucs, i.e. indices of regions identified by a left and
-  a right corpus position. The corpus library (CL) offers a set of functions
-  to make the translations between corpus positions (cpos) and strucs
-  (struc)." />
+corpus and/or any kind of annotation of a region of text. The fundamental
+unit are so-called strucs, i.e. indices of regions identified by a left and
+a right corpus position. The corpus library (CL) offers a set of functions
+to make the translations between corpus positions (cpos) and strucs
+(struc)." />
 
 
 
@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -123,27 +123,47 @@
 
     <div class="ref-description">
     <p>Structural attributes store the metadata of texts in a CWB
-  corpus and/or any kind of annotation of a region of text. The fundamental
-  unit are so-called strucs, i.e. indices of regions identified by a left and
-  a right corpus position. The corpus library (CL) offers a set of functions
-  to make the translations between corpus positions (cpos) and strucs
-  (struc).</p>
+corpus and/or any kind of annotation of a region of text. The fundamental
+unit are so-called strucs, i.e. indices of regions identified by a left and
+a right corpus position. The corpus library (CL) offers a set of functions
+to make the translations between corpus positions (cpos) and strucs
+(struc).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cl_cpos2struc</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>s_attribute</span>, <span class='va'>cpos</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>cl_cpos2struc</span><span class='op'>(</span>
+  <span class='va'>corpus</span>,
+  <span class='va'>s_attribute</span>,
+  <span class='va'>cpos</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>cl_struc2cpos</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>s_attribute</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>, <span class='va'>struc</span><span class='op'>)</span>
+<span class='fu'>cl_struc2cpos</span><span class='op'>(</span>
+  <span class='va'>corpus</span>,
+  <span class='va'>s_attribute</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>,
+  <span class='va'>struc</span>
+<span class='op'>)</span>
 
-<span class='fu'>cl_struc2str</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>s_attribute</span>, <span class='va'>struc</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>cl_struc2str</span><span class='op'>(</span>
+  <span class='va'>corpus</span>,
+  <span class='va'>s_attribute</span>,
+  <span class='va'>struc</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>cl_cpos2lbound</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>s_attribute</span>, <span class='va'>cpos</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>cl_cpos2lbound</span><span class='op'>(</span>
+  <span class='va'>corpus</span>,
+  <span class='va'>s_attribute</span>,
+  <span class='va'>cpos</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>cl_cpos2rbound</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>s_attribute</span>, <span class='va'>cpos</span>,
-  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span></pre>
+<span class='fu'>cl_cpos2rbound</span><span class='op'>(</span>
+  <span class='va'>corpus</span>,
+  <span class='va'>s_attribute</span>,
+  <span class='va'>cpos</span>,
+  registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -158,7 +178,7 @@
     </tr>
     <tr>
       <th>cpos</th>
-      <td><p>corpus positions (integer vector)</p></td>
+      <td><p>An <code>integer</code> vector with corpus positions.</p></td>
     </tr>
     <tr>
       <th>registry</th>
@@ -179,7 +199,7 @@ environment variable CORPUS_REGISTRY</p></td>
 <span class='co'># scenario: id of the texts with occurrence of 'oil'</span>
 <span class='va'>token_to_get</span> <span class='op'>&lt;-</span> <span class='st'>"oil"</span>
 <span class='va'>token_id</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_str2id</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, str <span class='op'>=</span> <span class='st'>"oil"</span><span class='op'>)</span>
-<span class='va'>token_cpos</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2cpos</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, id <span class='op'>=</span> <span class='va'>token_id</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Resetting registry directory from '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry_tmp' to '/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpmY98Iq/registry_tmp'</span></div><div class='input'><span class='va'>token_cpos</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2cpos</a></span><span class='op'>(</span><span class='st'>"REUTERS"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>, id <span class='op'>=</span> <span class='va'>token_id</span><span class='op'>)</span>
 <span class='va'>strucs</span> <span class='op'>&lt;-</span> <span class='fu'>cl_cpos2struc</span><span class='op'>(</span><span class='st'>"REUTERS"</span>, s_attribute <span class='op'>=</span> <span class='st'>"id"</span>, cpos <span class='op'>=</span> <span class='va'>token_cpos</span><span class='op'>)</span>
 <span class='va'>strucs_unique</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>strucs</span><span class='op'>)</span>
 <span class='va'>text_ids</span> <span class='op'>&lt;-</span> <span class='fu'>cl_struc2str</span><span class='op'>(</span><span class='st'>"REUTERS"</span>, s_attribute <span class='op'>=</span> <span class='st'>"id"</span>, struc <span class='op'>=</span> <span class='va'>strucs_unique</span><span class='op'>)</span>

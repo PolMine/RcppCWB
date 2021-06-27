@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>List Available CWB Corpora. — cqp_list_corpora • RcppCWB</title>
+<title>Check whether structural attribute has values — cl_struc_values • RcppCWB</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="List Available CWB Corpora. — cqp_list_corpora" />
-<meta property="og:description" content="List the corpora described by the registry files in the registry directory
-that is currently set." />
+<meta property="og:title" content="Check whether structural attribute has values — cl_struc_values" />
+<meta property="og:description" content="Structural attributes do not necessarily have values, structural attributes
+(such as annotations of sentences or paragraphs) may just define regions of
+corpus positions. Use this function to test whether an attribute has values." />
 
 
 
@@ -112,30 +113,45 @@ that is currently set." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>List Available CWB Corpora.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/PolMine/RcppCWB/blob/master/R/cqp.R'><code>R/cqp.R</code></a></small>
-    <div class="hidden name"><code>cqp_list_corpora.Rd</code></div>
+    <h1>Check whether structural attribute has values</h1>
+    <small class="dont-index">Source: <a href='https://github.com/PolMine/RcppCWB/blob/master/R/cl.R'><code>R/cl.R</code></a></small>
+    <div class="hidden name"><code>cl_struc_values.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>List the corpora described by the registry files in the registry directory
-that is currently set.</p>
+    <p>Structural attributes do not necessarily have values, structural attributes
+(such as annotations of sentences or paragraphs) may just define regions of
+corpus positions. Use this function to test whether an attribute has values.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cqp_list_corpora</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>cl_struc_values</span><span class='op'>(</span><span class='va'>corpus</span>, <span class='va'>s_attribute</span>, registry <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv</a></span><span class='op'>(</span><span class='st'>"CORPUS_REGISTRY"</span><span class='op'>)</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>corpus</th>
+      <td><p>Corpus ID, a length-one <code>character</code> vector.</p></td>
+    </tr>
+    <tr>
+      <th>s_attribute</th>
+      <td><p>Structural attribute to check, a length-one <code>character</code> vector.</p></td>
+    </tr>
+    <tr>
+      <th>registry</th>
+      <td><p>The registry directory of the corpus.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau</p>
+    <p><code>TRUE</code> if the attribute has values and <code>FALSE</code> if not. <code>NA</code> if the structural
+attribute is not available.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='cqp_initialize.html'>cqp_is_initialized</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
-  <span class='va'>registry</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span>package <span class='op'>=</span> <span class='st'>"RcppCWB"</span>, <span class='st'>"extdata"</span>, <span class='st'>"cwb"</span>, <span class='st'>"registry"</span><span class='op'>)</span>
-  <span class='fu'><a href='cqp_initialize.html'>cqp_initialize</a></span><span class='op'>(</span><span class='va'>registry</span><span class='op'>)</span>
-<span class='op'>}</span>
-<span class='fu'>cqp_list_corpora</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "UNGA"    "REUTERS"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>cl_struc_values</span><span class='op'>(</span><span class='st'>"REUTERS"</span>, <span class='st'>"places"</span><span class='op'>)</span> <span class='co'># TRUE - attribute has values</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'>cl_struc_values</span><span class='op'>(</span><span class='st'>"REUTERS"</span>, <span class='st'>"date"</span><span class='op'>)</span> <span class='co'># NA - attribute does not exist</span>
+</div><div class='output co'>#&gt; [1] NA</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
