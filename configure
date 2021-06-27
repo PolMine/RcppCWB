@@ -148,8 +148,10 @@ if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
   printf "yes\n";
 else
   printf "no\n";
-  echo "----------------------- CONFIGURATION CRITICAL --------------------------"
-  echo "Configuration may fail because 'ncurses' was not found. Try installing:"
+  echo "--------------------------------- WARNING ----------------------------"
+  echo "Package ncurses was not found in the pkg-config search path. This does"
+  echo "not necessarily meant that ncurses is not installed. Ensure that ncurses "
+  echo "is installed and can be found by pkg-config by installing:"
   echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
   echo " * yum: ncurses-devel (Fedora, CentOS, etc)"
   echo " * csw: libncurses_dev (Solaris)"
