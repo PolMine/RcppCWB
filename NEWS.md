@@ -1,4 +1,4 @@
-# RcppCWB 0.4.0.9001
+# RcppCWB 0.4.1
 
 * A shortcoming when passing in variables into the format string to construct the PKG_LIBS variable resulted in a faulty call of the linker on Solaris and a compilation error. Fixed (#25).
 * A hacky and recently unnecessary LDFLAG "-Wl,--allow-multiple-definition" on Solaris has been dropped.

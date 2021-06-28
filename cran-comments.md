@@ -1,33 +1,34 @@
 ## General remarks
 
-Update: This is the second submission. The logs for the Mac M1 reported an issue with header includes. I do thing that I solved the issue by consistently putting variables in curly braces or by quotating them where necessary. If another submission should be necessary, additional verbosity of the configure script will help me to locate the bug.
+This is an immediate follow-up to the release of RcppCWB v0.4.0 on June 26. The primary purpose of this version (v0.4.1) is to fix an error at the linker stage on Solaris: Brian Ripley wrote me on June 26th asking me to fix the issue until July 7th. 
 
+In addition, a usage of grep in the configure file not in line with POSIX specifiations has been replaced (see NEWS.md).
 
-This release picks up an alert of Brian Ripley (January 26) that RcppCWB fails to compile on an M1 Mac, see: https://www.stats.ox.ac.uk/pub/bdr/M1mac/RcppCWB.log. Very precise analysis: "You are attempting to use files of the wrong architecture: that needs checking at the configure stage before you download some of them.  And you have passed the wrong architecture to the compiler ...."
+Brian Ripley also brought to my attention that the pcretest utility may not necessarily be available. Messages issued by the configure file now include an explicit information whether pcretest is available. 
 
-Both issues are resolved with this RcppCWB version. Please note that part of the work to get glib-2.0 for the correct architecture is done be the R file ./tools/maclibs.R called by the configure script.
+I refrain from lengthy warnings if pcretest is absent, and instructions how pcretest might be installed. The most likely scenario that pcretest is missing is that on Ubuntu the libpcre3-dev package has been installed, which does not include pcretest. But it will include pcre with unicode properties, which is what I test for. The relevant scenario when unicode properties might be missing is when a user has built pcre himself. But then pcretest will also be available by default, and a warning is issued if pcre has been compiled without unicode properties.
 
-There are two further changes of the configure script to improve things:
+A final change of the configure script is a somewhat relaxed warning that pkg-config cannot find ncurses. There are quite a few scenarios when ncurses libraries will be present and an overly alarmistic warning is confusing rather than helpful.
 
-- Apart from making RcppCWB compatible with M1, I use `pcre-config` now to get the location of PCRE headers more reliably.
-
-- An additional check using `pcretest` (if available) issues a warning if PCRE has not been compiled with the Unicode support required.
-
-
+The importance of r-devel-windows-x86_64-gcc10-UCRT is perfectly clear to me. Tomas Kalibera has offered comprehensive and extremeley helpful instructions on this. Unfortunately, I cannot accomplish the fix before July 7. And it has been confirmed to me that it will not threaten the presence of RcppCWB at CRAN if I approach this fix in August/September. So I see this as the next step. I appreciate your patience and support ...
 
 
 ## Test environments
 
-* R-hub (Fedora Linux, R-devel, clang, gfortran)
-* win-builder (R-devel [2021-01-31 r79912] and R 4.0.3)
-* macOS Catalina (local install), R 4.0.2
-* macOS Big Sur 11.0 (MacStadium, Mac mini with M1 chip) with R-devel
-* Ubuntu 14.04 (project server), R 3.6.3
+* R-hub (Oracle Solaris 10, x86, 32 bit, R release, Oracle Developer Studio 12.6)
+* Solaris 10 on local VirtualBox
+* Ubuntu 20.04 (R 4.1.0)
+* Fedora with gcc10 (R 4.1.0)
+* win-builder (R 4.1.0 and R-devel)
+* macOS Intel, R 4.1.0
+* macOS arm64, R-devel
 
 
 ## R CMD check results
 
-There were no ERRORs, WARNINGs or NOTEs on the Linux / macOS / Windows environments I used. A NOTE concerning package size I used to see on Windows machines does not occur .
+I see a NOTE concerning package size on CRAN machines (5.2 MB on r-release-macos-x86_64). I hope this is still tolerable. 
+
+The latest check for r-release-macos-arm64 is on v0.3.2, not yet for v0.4.0, but I addressed the difficulty to compile RcppCWB on CRAN. It works nicely on my Mac mini.
 
 
 ## Downstream dependencies
