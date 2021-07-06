@@ -116,7 +116,7 @@ extern int clean_strings;                  /**< clean up input strings by replac
  *
  * TODO should probably be called an SAttr or SAttEncoder or something.
  */
-typedef struct _Range {
+typedef struct _SAttEncoder {
   char *dir;                    /**< directory where this s-attribute is stored */
   char *name;                   /**< name of the s-attribute (range) */
 
@@ -143,7 +143,7 @@ typedef struct _Range {
   int max_recursion;            /**< maximum auto-recursion level; 0 = no recursion (maximal regions), -1 = assume flat structure */
   int recursion_level;          /**< keeps track of level of embedding when auto-recursion is activated */
   int element_drop_count;       /**< count how many recursive subelements were dropped because of the max_recursion limit */
-  struct _Range **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
+  struct _SAttEncoder **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
                                              use as array; recursion_children[0] points to self! */
 
   int is_open;                  /**< boolean: whether there is an open structure at the moment */
@@ -152,10 +152,10 @@ typedef struct _Range {
 
   int num;                      /**< number of current (if this->is_open) or next structure */
 
-} Range;
+} SAttEncoder;
 
 /** A global array for keeping track of S-attributes being encoded. */
-extern Range ranges[MAXRANGES];
+extern SAttEncoder ranges[MAXRANGES];
 /** @see ranges */
 extern int range_ptr;
 
@@ -441,9 +441,9 @@ range_find(char *name)
  * @param print_comment  Boolean: if true, a comment on the original XML tags is printed.
  */
 void
-range_print_registry_line(Range *rng, FILE *fd, int print_comment)
+range_print_registry_line(SAttEncoder *rng, FILE *fd, int print_comment)
 {
-  Range *child;
+  SAttEncoder *child;
   int i, n_atts;
 
   if (rng->in_registry)
@@ -493,7 +493,7 @@ range_print_registry_line(Range *rng, FILE *fd, int print_comment)
       for (i = 0; i < n_atts; i++) {
         cl_lexhash_entry entry = cl_lexhash_find(rng->el_attributes,
                                                  cl_string_list_get(rng->el_atts_list, i));
-        child = (Range *) entry->data.pointer;
+        child = (SAttEncoder *) entry->data.pointer;
         range_print_registry_line(child, fd, 0);
       }
     }
@@ -526,14 +526,14 @@ range_print_registry_line(Range *rng, FILE *fd, int print_comment)
  *                        program was invoked.
  * @param null_attribute  boolean: this is a null attribute, i.e. an XML
  *                        element to be ignored.
- * @return                Pointer to the new Range object (which is a member
+ * @return                Pointer to the new SAttEncoder object (which is a member
  *                        of the global ranges array).
  */
-Range *
+SAttEncoder *
 range_declare(char *name, char *directory, int store_values, int null_attribute)
 {
   char buf[CL_MAX_LINE_LENGTH];
-  Range *rng;
+  SAttEncoder *rng;
   char *p, *rec, *ea_start, *ea;
   cl_lexhash_entry entry;
   int i, is_feature_set;
@@ -637,7 +637,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   /* now that the range is initialised, declare its 'children' if necessary */
   /* recursion children */
   if (rng->max_recursion >= 0) {
-    rng->recursion_children = (Range **) cl_calloc(rng->max_recursion + 1, sizeof(Range *));
+    rng->recursion_children = (SAttEncoder **) cl_calloc(rng->max_recursion + 1, sizeof(SAttEncoder *));
     rng->recursion_children[0] = rng; /* zeroeth recursion level is stored in the att. itself */
     for (i = 1; i <= rng->max_recursion; i++) {
       /* recursion children have 'flat' structure, because recursion is handled explicitly */
@@ -650,7 +650,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   }
   /* element attributes children can handle recursion on their own */
   if (ea_start != NULL) {
-    Range *att_ptr;
+    SAttEncoder *att_ptr;
 
     rng->has_children = 1;
     rng->el_attributes = cl_new_lexhash(REP_CHECK_LEXHASH_SIZE);
@@ -699,7 +699,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
  * @param end_pos  The corpus position at which this instance closes.
  */
 void
-range_close(Range *rng, int end_pos)
+range_close(SAttEncoder *rng, int end_pos)
 {
   cl_lexhash_entry entry;
   int close_this_range = 0;     /* whether we actually have to close this range (may be skipped or delegated in recursion mode) */
@@ -808,7 +808,7 @@ range_close(Range *rng, int end_pos)
       if (entry == NULL) {
         encode_error("Internal error in <%s>: rng->el_attributes inconsistent with rng->el_atts_list!", rng->name);
       }
-      range_close((Range *) entry->data.pointer, end_pos);
+      range_close((SAttEncoder *) entry->data.pointer, end_pos);
     }
   }
 
@@ -827,7 +827,7 @@ range_close(Range *rng, int end_pos)
  * @param annot      The annotation string (the XML element's att-val pairs).
  */
 void
-range_open(Range *rng, int start_pos, char *annot)
+range_open(SAttEncoder *rng, int start_pos, char *annot)
 {
   cl_lexhash_entry entry;
   int open_this_range = 0;      /* whether we actually have to open this range (may be skipped or delegated in recursion mode) */
@@ -1025,7 +1025,7 @@ range_open(Range *rng, int start_pos, char *annot)
         else {
           entry->data.integer = 1; /* mark el. att. as handled */
           cl_xml_entity_decode(el_att_value);
-          range_open((Range *) entry->data.pointer, start_pos, el_att_value);
+          range_open((SAttEncoder *) entry->data.pointer, start_pos, el_att_value);
         }
       }
 
@@ -1038,7 +1038,7 @@ range_open(Range *rng, int start_pos, char *annot)
     for (i = 0; i < n_children; i++) {
       entry = cl_lexhash_find(rng->el_attributes, cl_string_list_get(rng->el_atts_list, i));
       if (entry->data.integer == 0) {
-        range_open((Range *) entry->data.pointer, start_pos, "");
+        range_open((SAttEncoder *) entry->data.pointer, start_pos, "");
       }
     }
 

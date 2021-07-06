@@ -160,7 +160,7 @@ cl_lexhash undeclared_sattrs;
  *
  * TODO should probably be called an SAttr or SAttEncoder or something.
  */
-typedef struct _Range {
+typedef struct _SAttEncoder {
   char *dir;                    /**< directory where this s-attribute is stored */
 char *name;                   /**< name of the s-attribute (range) */
 
@@ -187,7 +187,7 @@ cl_lexhash el_undeclared_attributes; /**< remembers undeclared element attribute
 int max_recursion;            /**< maximum auto-recursion level; 0 = no recursion (maximal regions), -1 = assume flat structure */
 int recursion_level;          /**< keeps track of level of embedding when auto-recursion is activated */
 int element_drop_count;       /**< count how many recursive subelements were dropped because of the max_recursion limit */
-struct _Range **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
+struct _SAttEncoder **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
  use as array; recursion_children[0] points to self! */
 
 int is_open;                  /**< boolean: whether there is an open structure at the moment */
@@ -196,10 +196,10 @@ char *annot;                  /**< and annotation (if there is one) */
 
 int num;                      /**< number of current (if this->is_open) or next structure */
 
-} Range;
+} SAttEncoder;
 
 
-Range ranges[MAXRANGES];
+SAttEncoder ranges[MAXRANGES];
 int range_ptr = 0;
 
 /* ---------------------------------------------------------------------- */
@@ -472,7 +472,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   
   /* close open regions at end of input; then close file handles for s-attributes */
   for (i = 0; i < range_ptr; i++) {
-    Range *rng = &ranges[i];
+    SAttEncoder *rng = &ranges[i];
     
     if (! rng->null_attribute) { /* don't attempt to close NULL attribute */
   
