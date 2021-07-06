@@ -18,7 +18,7 @@ There is a huge intellectual debt to the developers of the R-package 'rcqp', Ber
 
 ### Installation on Windows
 
-Pre-compiled binaries of the package 'RcppCWB' can be obtained from CRAN.
+Pre-compiled 'RcppCWB' binaries can be installed from CRAN.
 
 ```{r install_RcppCWB_cran, eval = FALSE}
 install.packages("RcppCWB")
@@ -31,7 +31,7 @@ if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtool
 devtools::install_github("PolMine/RcppCWB")
 ```
 
-During the installation, cross-compiled versions of the corpus library (CL) are downloaded from the GitHub repository [PolMine/libcl](https://github.com/PolMine/libcl). It is not necessary to install dependencies.
+During the installation, cross-compiled versions of the corpus library (CL) are downloaded from the GitHub repository [PolMine/libcl](https://github.com/PolMine/libcl). The libcl repository also includes a reproducible workflow using Docker to build static libraries from the CWB source code.
 
 
 ## Installation on Ubuntu

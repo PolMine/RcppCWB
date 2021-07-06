@@ -1,3 +1,9 @@
+# RcppCWB 0.4.2
+
+* Windows builds will be linked with a fresh and fully reproducible cross-compilation of CWB static libraries, see the PolMine/libcl repository. The consolidation of the workflow to prepare cross-compiled static libraries is a preparatory step to enable UCRT builds on Windows.
+
+
+
 # RcppCWB 0.4.1
 
 * A shortcoming when passing in variables into the format string to construct the PKG_LIBS variable resulted in a faulty call of the linker on Solaris and a compilation error. Fixed (#25).
