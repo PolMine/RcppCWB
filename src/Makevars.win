@@ -1,13 +1,13 @@
 PKG_CPPFLAGS = \
-    -I../windows/libcl-dev/include \
-    -I../windows/libcl-dev/include/cwb/cl \
-    -I../windows/libcl-dev/include/cwb/cqp \
-    -I../windows/libcl-dev/include/cwb/CQi
+    -I../windows/libcl-gcc11/include \
+    -I../windows/libcl-gcc11/include/cwb/cl \
+    -I../windows/libcl-gcc11/include/cwb/cqp \
+    -I../windows/libcl-gcc11/include/cwb/CQi
 
 PKG_CXXFLAGS=-D_LIB
 
 PKG_LIBS = \
-    -L../windows/libcl-dev/lib${R_ARCH} \
+    -L../windows/libcl-gcc11/lib${R_ARCH} \
     -Wl,--allow-multiple-definition \
     -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl -liconv \
     -lws2_32 -lwinmm -lole32
