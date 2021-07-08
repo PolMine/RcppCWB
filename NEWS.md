@@ -1,7 +1,7 @@
 # RcppCWB 0.4.2
 
 * Windows builds will be linked with a fresh and fully reproducible cross-compilation of CWB static libraries, see the PolMine/libcl repository. The consolidation of the workflow to prepare cross-compiled static libraries is a preparatory step to enable UCRT builds on Windows.
-
+* The Range struc in the code for util functionality (encode and more, files utils.h, utils.cpp and _cwb_encode.c) has been renamed as SAttrEncoder to avoid a C++ One Definition Rule warning resulting for a struc with the same name in the CL context (#28).
 
 
 # RcppCWB 0.4.1
