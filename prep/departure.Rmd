@@ -1,0 +1,176 @@
+---
+title: "Patching the CWB: Departure"
+author: "Andreas Blaette"
+date: "7/9/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(git2r)
+library(fs)
+library(magrittr)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
+```
+
+
+```{r}
+repodir <- path.expand("~/Lab/github/RcppCWB")
+```
+
+The aim is to reconstruct all changes to the CWB code so that we know which patches are
+necessary for adapting a fresh copy of the CWB such that it conforms R package requirements.
+
+The approach taken here is
+  (a) to create a branch with the original CWB code in the ./src/cwb directory
+  (b) to apply patches to this branch
+  (c) to check differences between the 'r1069'-branch (with patches) and the 'dev'-branch
+
+As a result, we should have a precise understanding which changes led from CWB 3.4.14 (r1069) 
+to the modified CWB code we have on the current 'dev'-branch. We should also have a reproducible 
+workflow that can also be applied to the copy of a recent version of the CWB. This is the
+basis for integrating upstream CWB code into RcppCWB.
+
+The first step (a) is to create a fresh copy of CWB 3.4.14 (r1069) on a branch
+named after the revision. The 'dev' branch is the point of departure and we refrain from 
+removing the src/cwb directory: This gives us a much better understanding which files 
+have been added during the development of RcppCWB and which ones have been deleted.
+
+
+```{r}
+# A copy of the SVN repo of the CWB is assumed to be present here ...
+cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk") # r1069
+```
+  
+
+### Create new branch r1069
+
+
+```{r}
+git2r::checkout(repodir, branch = "dev")
+if ("r1069" %in% names(branches(repodir))){
+  git2r::branch_delete(branch = branches(repodir)[["r1069"]])
+}
+git2r::branch_create(commit = last_commit(repo = repodir), name = "r1069")
+git2r::checkout(repodir, branch = "r1069")
+```
+
+
+### Copy files from SVN copy of CWB to RcppCWB repo
+
+```{r}
+cwb_dir_repo <- path(repodir, "src", "cwb")
+cwb_files_svn <- list.files(cwb_dir_svn, recursive = TRUE, full.names = TRUE)
+file.copy(
+  from = cwb_files_svn,
+  to = gsub(paste("^", cwb_dir_svn, sep = ""), cwb_dir_repo, cwb_files_svn),
+  overwrite = TRUE
+)
+```  
+
+
+### Remove untracked files (files that have been removed)
+
+Use git to detect files that were deleted from the original CWB code. These files have been copied but 
+are untracked.
+
+```{r root.dir = path.expand("~/Lab/github/RcppCWB")}
+removed_files <- status(repo = repodir, staged = FALSE, unstaged = FALSE, untracked = TRUE) %>%
+  unlist() %>%
+  unname() %>%
+  grep("^src/cwb", ., value = TRUE) %>%
+  path(repodir, .)
+file.remove(removed_files)
+removed_files
+```
+
+### Remove files that have been added (and that need to be added explicitly)
+
+To restore the state of RcppCWB development, these files need to be re-added
+or generated later on
+
+```{r}
+cwb_files_svn_truncated <- gsub(cwb_dir_svn, "", cwb_files_svn)
+cwb_files_repo <- list.files(cwb_dir_repo, recursive = TRUE, full.names = TRUE)
+cwb_files_repo_truncated <- gsub(cwb_dir_repo, "", cwb_files_repo)
+added_files <-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_files_svn_truncated]
+added_files_full_path <- path(cwb_dir_repo, added_files)
+added_files_existing <- added_files_full_path[file.exists(added_files_full_path)]
+rm_file(repo = repodir, path = added_files_existing)
+```
+  
+  
+### git add/commit so that we can perform diffs
+
+```{r}
+git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
+git2r::commit(repodir, message = "CWB r1069 restored")
+```
+
+
+### Inspect diffs
+  
+The code of CWB 3.4.14 has been used first on June 5 2018 and the commit message 
+was 'first try with v3.4.14'. Get the commit  ID
+
+```{r}
+commit_v3_4_14 <- "8f92126f525909347fd532d975afcf105b5ec8c0"
+v3_4_14_commit <- commits(repo = repodir)[[grep("first try with v3.4.14", sapply(commits(repo = repodir), `[[`, "message"))]]
+```
+
+
+#### cl directory
+  
+```{r, root.dir = "/Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl"}
+setwd("~/Lab/github/RcppCWB/src/cwb/cl")
+git_cmd <- sprintf(
+  "git diff %s..%s . %s",
+  git2r::last_commit(repo = repodir)[["sha"]], v3_4_14_commit[["sha"]],
+  "':!*endian.h'"
+)
+cat(paste(system(git_cmd, intern = TRUE), collapse = "\n"))
+```
+  Finding: Modifications of the Makefile, nothing else
+
+#### cqp directory
+
+```{r}  
+setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
+git_cmd <- sprintf(
+  "git diff %s..%s . %s",
+  git2r::last_commit()[["sha"]], v3_4_14_commit[["sha"]],
+  "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h'"
+)
+cat(paste(system(git_cmd, intern = TRUE), collapse ="\n"))
+```
+  
+Finding: The Makefile has beend modified, and functions hash_string() find_prime() is_prime() are commented out in hash.c
+
+
+#### CQi directory
+
+```{r}
+setwd("~/Lab/github/RcppCWB/src/cwb/CQi")
+cat(paste(system(git_cmd, intern = TRUE), collapse ="\n"))
+```
+
+Finding: Identity
+
+
+#### utils directory
+  
+```{r}
+setwd("~/Lab/github/RcppCWB/src/cwb/utils")
+git_cmd <- sprintf("git diff %s..%s ./*.c", git2r::last_commit()[["sha"]], v3_4_14_commit[["sha"]])
+cat(paste(system(git_cmd, intern = TRUE), collapse ="\n"))
+
+git_cmd <- sprintf("git diff %s..%s ./*.h", git2r::last_commit()[["sha"]], v3_4_14_commit[["sha"]])
+cat(paste(system(git_cmd, intern = TRUE), collapse ="\n"))
+
+```
+
+Finding: '#include <netinet/in.h>' added to fileutils.h
