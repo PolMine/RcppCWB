@@ -38,8 +38,10 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)
 
 
 ```{r}
-git2r::add(repo, path = "prep/*")
-git2r::commit(repo, message = "patch update")
+if (!is.null(unlist(status(repo)))){
+  git2r::add(repo, path = "prep/*")
+  git2r::commit(repo, message = "patch update")
+}
 ```
 
 Checkout the r1069 branch and apply patches.
