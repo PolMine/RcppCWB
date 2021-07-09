@@ -8,7 +8,8 @@ cwb_pkg_dir <- "~/Lab/github/RcppCWB/src/cwb"
 global_replacements <- list(
   c("(f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd-stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*\\(\\s*(stderr|yyoutput)," , "YY\\1PRINTF ("),
-  c("fprintf(", "Rprintf("),
+  c("fprintf\\(", "Rprintf("),
+  c("(\\s*)printf\\(", "\\1Rprintf(")
   c("#  define YYFPRINTF fprintf", "# define YYFPRINTF Rprintf")
 )
 
