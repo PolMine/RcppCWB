@@ -68,7 +68,7 @@ to_compare <- last_commit(repo)
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/cl")
 git_cmd <- sprintf(
-  "git diff HEAD..%s . %s", last_devbranch_commit[["sha"]],
+  "git diff %s..%s . %s", to_compare[["sha"]], last_devbranch_commit[["sha"]],
   "':!*endian.h' ':!*Makefile'"
 )
 result <- system(git_cmd, intern = TRUE)
@@ -81,7 +81,7 @@ cat(paste(result, collapse = "\n"))
 ```{r}  
 setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
 git_cmd <- sprintf(
-  "git diff HEAD..%s . %s", last_devbranch_commit[["sha"]],
+  "git diff %s..%s . %s", to_compare[["sha"]], last_devbranch_commit[["sha"]],
   "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h'"
 )
 result <- system(git_cmd, intern = TRUE)
@@ -94,7 +94,7 @@ cat(paste(result, collapse = "\n"))
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/CQi")
 git_cmd <- sprintf(
-  "git diff HEAD..%s .", last_devbranch_commit[["sha"]]
+  "git diff %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
@@ -106,7 +106,7 @@ cat(paste(result, collapse = "\n"))
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/utils")
 git_cmd <- sprintf(
-  "git diff HEAD..%s .", last_devbranch_commit[["sha"]]
+  "git diff %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
