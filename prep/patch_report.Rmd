@@ -113,6 +113,6 @@ cat(paste(result, collapse = "\n"))
 ### Cleaning up
 
 ```{r}
-checkout(repository(path = repodir), branch = "r1069", force = TRUE)
-checkout(repo = repodir, branch = "dev")
+# checkout(repository(path = repodir), branch = "r1069", force = TRUE)
+# checkout(repo = repodir, branch = "dev")
 ```
