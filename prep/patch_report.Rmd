@@ -54,7 +54,10 @@ source(tmp_patchfile)
 Add and commit changes so that we can prepare diffs.
 
 ```{r}
+point_of_departure <- last_commit(repo)
 git2r::add(repo = repodir, path = "src/cwb/*")
+commit(repo, message = "CWB patched")
+to_compare <- last_commit(repo)
 ```
 
 
