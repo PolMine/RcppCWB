@@ -11,24 +11,35 @@ editor_options:
 
 We assume that the branch 'r1069' has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.
 
-## Preparations
+
+## Apply patches
 
 ```{r}
 library(git2r)
+library(fs)
 repodir <- path.expand("~/Lab/github/RcppCWB")
+
+checkout(repodir, branch = "dev")
+last_devbranch_commit <- last_commit(repo = repodir)
+
+patchfile <- path(repodir, "prep", "patch.R")
+tmp_patchfile <- path(tempdir(), "path.R")
+file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)
+```
+
+```{r}
+checkout(repodir, branch = "r1069")
+source(tmp_patchfile)
+```
+
+```{r}
+add(repo = repodir, path = "src/cwb/*")
+commit(repo = repodir, message = "scripted cwb patch")
+last_patchbranch_commit <- last_commit(repo = repodir)
 ```
 
 
 ## Inspect diffs
-
-```{r}
-checkout(repodir, branch = "r1069")
-last_patchbranch_commit <- last_commit(repo = repodir)
-
-checkout(repodir, branch = "dev")
-last_devbranch_commit <- last_commit(repo = repodir)
-```
-
 
 #### cl directory
   
