@@ -105,3 +105,12 @@ git_cmd <- sprintf(
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
 ```
+
+
+### Cleaning up
+
+```{r}
+co <- commits()
+checkout(co[[2]])
+checkout(repo = repodir, branch = "dev")
+```
