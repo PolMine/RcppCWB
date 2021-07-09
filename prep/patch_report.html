@@ -190,7 +190,7 @@ tmp_patchfile &lt;- path(tempdir(), &quot;path.R&quot;)
 file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></pre>
 <pre class="r"><code>git2r::add(repo, path = &quot;prep/*&quot;)
 git2r::commit(repo, message = &quot;patch update&quot;)</code></pre>
-<pre><code>## [6e5ddf0] 2021-07-09: patch update</code></pre>
+<pre><code>## [1e1efe2] 2021-07-09: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
