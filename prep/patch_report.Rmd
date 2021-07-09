@@ -46,7 +46,7 @@ Add and commit changes so that we can prepare diffs.
 
 ```{r}
 add(repo = repodir, path = "src/cwb/*")
-commit(repo = repodir, message = "scripted cwb patch")
+# commit(repo = repodir, message = "scripted cwb patch")
 last_patchbranch_commit <- last_commit(repo = repodir)
 ```
 
