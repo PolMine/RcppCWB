@@ -12,7 +12,7 @@ global_replacements <- list(
   c("(\\s+)printf\\(", "\\1Rprintf("),
   c("#  define YYFPRINTF fprintf", "# define YYFPRINTF Rprintf"),
   
-  c('#include\\"endian\\.h"', '#include "endian2.h"') # only files in cl, maybe limit this
+  c('#include\\s+"endian\\.h"', '#include "endian2.h"') # only files in cl, maybe limit this
 )
 
 for (subdir in c("cl", "cqp", "CQi")){

@@ -190,7 +190,7 @@ tmp_patchfile &lt;- path(tempdir(), &quot;path.R&quot;)
 file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></pre>
 <pre class="r"><code>git2r::add(repo, path = &quot;prep/*&quot;)
 git2r::commit(repo, message = &quot;patch update&quot;)</code></pre>
-<pre><code>## [5c6637f] 2021-07-09: patch update</code></pre>
+<pre><code>## [6e5ddf0] 2021-07-09: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -320,83 +320,11 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/cl&quot;)
 git_cmd &lt;- sprintf(
   &quot;git diff HEAD..%s . %s&quot;, last_devbranch_commit[[&quot;sha&quot;]],
-  &quot;&#39;:!*endian.h&#39;&quot;
+  &quot;&#39;:!*endian.h&#39; &#39;:!*Makefile&#39;&quot;
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/Makefile b/src/cwb/cl/Makefile
-## index f6820a2..beec2b0 100644
-## --- a/src/cwb/cl/Makefile
-## +++ b/src/cwb/cl/Makefile
-## @@ -21,7 +21,7 @@
-##  
-##  
-##  ## Read configuration settings and standard definitions
-## -TOP = $(shell pwd)/..
-## +TOP = $(R_PACKAGE_SOURCE)
-##  include $(TOP)/config.mk
-##  
-##  ## The following targets are available:
-## @@ -44,16 +44,6 @@ PARSES  = registry.tab.c lex.creg.c
-##  PARSEG  = registry.l registry.y
-##  PARSEO  = registry.tab.o lex.creg.o
-##  
-## -## Compile and link-in windows-mmap functions only if we are in MinGW
-## -ifdef __MINGW__
-## -MMAPH = windows-mmap.h
-## -MMAPS = windows-mmap.c
-## -MMAPO = windows-mmap.o
-## -else
-## -MMAPH =
-## -MMAPS =
-## -MMAPO =
-## -endif 
-##  
-##  ## cl.h header file will be installed in subdirectory cwb/
-##  REALINCINSTDIR = $(INCINSTDIR)/cwb
-## @@ -69,7 +59,7 @@ HDRS = globals.h macros.h \
-##         $(PARSEH) \
-##         cdaccess.h \
-##         bitio.h \
-## -       endian.h \
-## +       endian2.h \
-##         compression.h \
-##         binsert.h \
-##         class-mapping.h \
-## @@ -120,30 +110,8 @@ lex.creg.c: registry.l registry.y registry.tab.h corpus.h macros.h attributes.h
-##  
-##  libcl.a: $(OBJS)
-##      $(RM) $@
-## -    $(AR) $@ $^
-## -    $(RANLIB) $@
-## -
-## -install: libcl.a
-## -ifndef __MINGW__
-## -    if [ ! -d &quot;$(LIBINSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(LIBINSTDIR)&quot; ; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) libcl.a &quot;$(LIBINSTDIR)&quot;
-## -    if [ ! -d &quot;$(REALINCINSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(REALINCINSTDIR)&quot; ; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) cl.h &quot;$(REALINCINSTDIR)&quot;
-## -else
-## -    @$(ECHO) &quot;ERROR: install operation is not supported for Windows binaries!&quot;
-## -endif
-## -
-## -release: libcl.a
-## -    if [ ! -d &quot;$(RELEASE_DIR)/lib&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/lib&quot;; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) libcl.a &quot;$(RELEASE_DIR)/lib&quot;
-## -    if [ ! -d &quot;$(RELEASE_DIR)/include/cwb&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/include/cwb&quot;; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) cl.h &quot;$(RELEASE_DIR)/include/cwb&quot;
-## -
-## -
-## -uninstall:
-## -    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
-## -#   $(RM) $(LIBINSTDIR)/libcl.a
-## -#   (cd $(REALINCINSTDIR); $(RM) cl.h)
-## +    $(AR) cq $@ $^
-## +#   $(AR) -s $@
-##  
-##  depend:
-##      -$(RM) depend.mk
-## diff --git a/src/cwb/cl/attributes.c b/src/cwb/cl/attributes.c
+<pre><code>## diff --git a/src/cwb/cl/attributes.c b/src/cwb/cl/attributes.c
 ## index 3f9a467..6d104df 100644
 ## --- a/src/cwb/cl/attributes.c
 ## +++ b/src/cwb/cl/attributes.c
