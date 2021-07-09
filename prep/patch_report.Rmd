@@ -1,0 +1,84 @@
+---
+title: "Patching the CWB: Diff report"
+author: "Andreas Blaette"
+date: "7/9/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## About this document
+
+We assume that the branch 'r1069' has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.
+
+## Preparations
+
+```{r}
+library(git2r)
+repodir <- path.expand("~/Lab/github/RcppCWB")
+```
+
+
+## Inspect diffs
+
+```{r}
+checkout(repodir, branch = "r1069")
+last_patchbranch_commit <- last_commit(repo = repodir)
+
+checkout(repodir, branch = "dev")
+last_devbranch_commit <- last_commit(repo = repodir)
+```
+
+
+#### cl directory
+  
+```{r}
+setwd("~/Lab/github/RcppCWB/src/cwb/cl")
+git_cmd <- sprintf(
+  "git diff %s..%s . %s",
+  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]],
+  "':!*endian.h'"
+)
+result <- system(git_cmd, intern = TRUE)
+cat(paste(result, collapse = "\n"))
+```
+  Finding: Modifications of the Makefile, nothing else
+
+#### cqp directory
+
+```{r}  
+setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
+git_cmd <- sprintf(
+  "git diff %s..%s . %s",
+  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]],
+  "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h'"
+)
+result <- system(git_cmd, intern = TRUE)
+cat(paste(result, collapse = "\n"))
+```
+
+
+#### CQi directory
+
+```{r}
+setwd("~/Lab/github/RcppCWB/src/cwb/CQi")
+git_cmd <- sprintf(
+  "git diff %s..%s .",
+  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]]
+)
+result <- system(git_cmd, intern = TRUE)
+cat(paste(result, collapse = "\n"))
+```
+
+
+#### utils directory
+  
+```{r}
+setwd("~/Lab/github/RcppCWB/src/cwb/utils")
+git_cmd <- sprintf(
+  "git diff %s..%s .",
+  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]]
+)
+result <- system(git_cmd, intern = TRUE)
+cat(paste(result, collapse = "\n"))
+```
