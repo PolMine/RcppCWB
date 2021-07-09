@@ -45,9 +45,7 @@ source(tmp_patchfile)
 Add and commit changes so that we can prepare diffs.
 
 ```{r}
-add(repo = repodir, path = "src/cwb/*")
-# commit(repo = repodir, message = "scripted cwb patch")
-last_patchbranch_commit <- last_commit(repo = repodir)
+git2r::add(repo = repodir, path = "src/cwb/*")
 ```
 
 
@@ -58,8 +56,7 @@ last_patchbranch_commit <- last_commit(repo = repodir)
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/cl")
 git_cmd <- sprintf(
-  "git diff %s..%s . %s",
-  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]],
+  "git diff HEAD..%s . %s", last_devbranch_commit[["sha"]],
   "':!*endian.h'"
 )
 result <- system(git_cmd, intern = TRUE)
@@ -72,8 +69,7 @@ cat(paste(result, collapse = "\n"))
 ```{r}  
 setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
 git_cmd <- sprintf(
-  "git diff %s..%s . %s",
-  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]],
+  "git diff HEAD..%s . %s", last_devbranch_commit[["sha"]],
   "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h'"
 )
 result <- system(git_cmd, intern = TRUE)
@@ -86,8 +82,7 @@ cat(paste(result, collapse = "\n"))
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/CQi")
 git_cmd <- sprintf(
-  "git diff %s..%s .",
-  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]]
+  "git diff HEAD..%s .", last_devbranch_commit[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
@@ -99,8 +94,7 @@ cat(paste(result, collapse = "\n"))
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/utils")
 git_cmd <- sprintf(
-  "git diff %s..%s .",
-  last_patchbranch_commit[["sha"]], last_devbranch_commit[["sha"]]
+  "git diff HEAD..%s .", last_devbranch_commit[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
@@ -110,7 +104,6 @@ cat(paste(result, collapse = "\n"))
 ### Cleaning up
 
 ```{r}
-co <- commits()
-checkout(co[[2]])
+git2r::reset(repodir, reset_type = "hard")
 checkout(repo = repodir, branch = "dev")
 ```
