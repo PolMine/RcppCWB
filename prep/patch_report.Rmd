@@ -104,6 +104,6 @@ cat(paste(result, collapse = "\n"))
 ### Cleaning up
 
 ```{r}
-git2r::reset(repodir, reset_type = "hard")
+git2r::reset(repodir, reset_type = "hard", path = "src/cwb/*")
 checkout(repo = repodir, branch = "dev")
 ```
