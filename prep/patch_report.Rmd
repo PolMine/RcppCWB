@@ -18,6 +18,7 @@ We assume that the branch 'r1069' has been created with a clean CWB v3.4.14 and 
 library(git2r)
 library(fs)
 repodir <- path.expand("~/Lab/github/RcppCWB")
+repo <- repository(repodir)
 ```
 
 Patches will be applied to the CWB code on the r1069 branch but will be compared against dev branch.
@@ -33,6 +34,12 @@ We need a temporary copy of (the most recent version of) patch.R. It may not be 
 patchfile <- path(repodir, "prep", "patch.R")
 tmp_patchfile <- path(tempdir(), "path.R")
 file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)
+```
+
+
+```{r}
+git2r::add(repo, path = "prep/*")
+git2r::commit(repo, message = "patch update")
 ```
 
 Checkout the r1069 branch and apply patches.
