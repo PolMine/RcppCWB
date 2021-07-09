@@ -64,7 +64,7 @@ git2r::add(repo = repodir, path = "src/cwb/*")
 setwd("~/Lab/github/RcppCWB/src/cwb/cl")
 git_cmd <- sprintf(
   "git diff HEAD..%s . %s", last_devbranch_commit[["sha"]],
-  "':!*endian.h'"
+  "':!*endian.h' ':!*Makefile'"
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))

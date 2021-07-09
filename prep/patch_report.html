@@ -179,7 +179,8 @@ pre code {
 <h2>Apply patches</h2>
 <pre class="r"><code>library(git2r)
 library(fs)
-repodir &lt;- path.expand(&quot;~/Lab/github/RcppCWB&quot;)</code></pre>
+repodir &lt;- path.expand(&quot;~/Lab/github/RcppCWB&quot;)
+repo &lt;- repository(repodir)</code></pre>
 <p>Patches will be applied to the CWB code on the r1069 branch but will be compared against dev branch.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;dev&quot;)
 last_devbranch_commit &lt;- last_commit(repo = repodir)</code></pre>
@@ -187,6 +188,9 @@ last_devbranch_commit &lt;- last_commit(repo = repodir)</code></pre>
 <pre class="r"><code>patchfile &lt;- path(repodir, &quot;prep&quot;, &quot;patch.R&quot;)
 tmp_patchfile &lt;- path(tempdir(), &quot;path.R&quot;)
 file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></pre>
+<pre class="r"><code>git2r::add(repo, path = &quot;prep/*&quot;)
+git2r::commit(repo, message = &quot;patch update&quot;)</code></pre>
+<pre><code>## [5c6637f] 2021-07-09: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
