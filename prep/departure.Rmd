@@ -174,3 +174,9 @@ cat(paste(system(git_cmd, intern = TRUE), collapse ="\n"))
 ```
 
 Finding: '#include <netinet/in.h>' added to fileutils.h
+
+### Cleaning up
+
+```{r}
+checkout(repo = repodir, branch = "dev")
+```
