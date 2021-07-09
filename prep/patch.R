@@ -18,7 +18,7 @@ for (subdir in c("cl", "cqp", "CQi")){
   for (f in files){
     message("- ", basename(f))
     code <- readLines(f)
-    for (i in length(global_replacements)){
+    for (i in 1:length(global_replacements)){
       code <- gsub(global_replacements[[i]][1], global_replacements[[i]][2], code)
     }
     writeLines(text = code, con = f)
