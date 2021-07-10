@@ -29,12 +29,15 @@ for (subdir in c("cl", "cqp", "CQi")){
 }
 
 insert_before <- list(
-  "src/cwb/cl/attributes.c" = list("foo", "foo")
+  "src/cwb/cl/attributes.c" = list(
+    "^#include\\s<ctype\\.h>",
+    c("void Rprintf(const char *, ...);", "")
+  )
 )
 
 for (i in 1L:length(insert_before)){
-  f <- path(repodir, names(insert_before)[[i]])
-  code <- readLines(f)
+  fname <- path(repodir, names(insert_before)[[i]])
+  code <- readLines(fname)
   position <- grep(pattern = insert_before[[i]][[1]], code)[1]
   if (!is.na(position)){
     code <- c(
@@ -42,6 +45,6 @@ for (i in 1L:length(insert_before)){
       insert_before[[i]][[2]],
       code[position:length(code)]
     )
-    writeLines(text = code, con = f)
+    writeLines(text = code, con = fname)
   }
 }
