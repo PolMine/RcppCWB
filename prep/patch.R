@@ -52,7 +52,7 @@ for (i in 1L:length(insert_before)){
 replace <- list(
   "src/cwb/cl/attributes.c" = c("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;"),
   "src/cwb/cl/attributes.c" = c("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */"),
-  "src/cwb/cl/attributes.c" = c("^(\\s+)dollar = ppos;", "\\1/* dollar = ppos; */  "),
+  "src/cwb/cl/attributes.c" = c("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */"),
   
   "src/cwb/cl/attributes.c" = c('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)'),
   "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)'),
