@@ -116,6 +116,6 @@ cat(paste(result, collapse = "\n"))
 ### Cleaning up
 
 ```{r}
-# checkout(repository(path = repodir), branch = "r1069", force = TRUE)
-# checkout(repo = repodir, branch = "dev")
+system("git reset --hard HEAD~1") # do not know which cmd would be R equivalent
+checkout(repo = repodir, branch = "dev")
 ```

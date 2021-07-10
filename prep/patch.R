@@ -28,6 +28,14 @@ for (subdir in c("cl", "cqp", "CQi")){
   }
 }
 
-if (FALSE){
-  status(repo = repodir)
+insert_before <- list(
+  # "src/cl/asdf.c" = list("", "")
+)
+
+for (i in 1L:length(insert_before)){
+  f <- path(repodir, names(insert_before)[[i]])
+  code <- readLines(f)
+  position <- grep(pattern = insert_before[[i]][[1]], code)[1]
+  code <- c(code[1L:(position - 1L)], insert_before[[i]][[2]], code[position:length(code)])
+  writeLines(text = code, con = f)
 }
