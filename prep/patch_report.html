@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [9a1b52e] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [4354264] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,16 +330,16 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/cdaccess.c b/src/cwb/cl/cdaccess.c
-## index 17b372a..5bac140 100644
+## index 07d04dc..5bac140 100644
 ## --- a/src/cwb/cl/cdaccess.c
 ## +++ b/src/cwb/cl/cdaccess.c
-## @@ -809,7 +809,7 @@ cl_id2cpos_oldstyle(Attribute *attribute, int id, int *freq, int *restrictor_lis
-##             *freq * sizeof(int));
+## @@ -1081,7 +1081,7 @@ cl_read_stream(PositionStream ps,
 ##  
-##      { /* convert network byte order to native integers */
+##      {
+##        /* convert network byte order to native integers */
 ## -      /* int i; */
 ## +      int i;
-##        for (i = 0; i &lt; *freq; i++)
+##        for (i = 0; i &lt; items_to_read; i++)
 ##          buffer[i] = ntohl(buffer[i]);
 ##      }
 ## @@ -1392,7 +1392,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match

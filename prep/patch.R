@@ -81,7 +81,7 @@ replace <- list(
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
-  "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\si;", "\\1/* int i; */", 2),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\si;", "\\1/* int i; */", 3),
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1),
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
