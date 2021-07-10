@@ -30,7 +30,6 @@ for (subdir in c("cl", "cqp", "CQi")){
 
 insert_before <- list(
   "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
-  "src/cwb/cl/bitfields.c" = list("^\\s*/\\*\\*", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/bitio.c" = list("^#include\\s<sys/types\\.h>", c("void Rprintf(const char *, ...);", ""))
 )
 
@@ -47,6 +46,25 @@ for (i in 1L:length(insert_before)){
     writeLines(text = code, con = fname)
   }
 }
+
+insert_after <- list(
+  "src/cwb/cl/bitio.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);")
+)
+
+for (i in 1L:length(insert_after)){
+  fname <- path(repodir, names(insert_after)[[i]])
+  code <- readLines(fname)
+  position <- grep(pattern = insert_after[[i]][[1]], code)[1]
+  if (!is.na(position)){
+    code <- c(
+      code[1L:position],
+      insert_before[[i]][[2]],
+      code[(position + 1L):length(code)]
+    )
+    writeLines(text = code, con = fname)
+  }
+}
+
 
 replace <- list(
   "src/cwb/cl/attributes.c" = c("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;"),

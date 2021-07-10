@@ -31,7 +31,6 @@ static int BaseTypeSize = sizeof(BFBaseType);
  * Size of the actual field of a Bitfield (in bits).
  */
 static int BaseTypeBits = sizeof(BFBaseType) * CHAR_BIT;
-
 void Rprintf(const char *, ...);
 
 /**
