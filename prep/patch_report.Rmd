@@ -69,7 +69,7 @@ to_compare <- last_commit(repo)
 setwd("~/Lab/github/RcppCWB/src/cwb/cl")
 git_cmd <- sprintf(
   "git diff %s..%s . %s", to_compare[["sha"]], last_devbranch_commit[["sha"]],
-  "':!*endian.h' ':!*Makefile' ':!*endian2.h' ':!*lex.creg.c' ':!*registry.tab.c'" 
+  "':!*endian.h' ':!*Makefile' ':!*endian2.h' ':!*lex.creg.c' ':!*registry.tab.c' ':!*registry.tab.h'" 
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
