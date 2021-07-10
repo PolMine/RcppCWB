@@ -48,3 +48,17 @@ for (i in 1L:length(insert_before)){
     writeLines(text = code, con = fname)
   }
 }
+
+replace <- list(
+  "src/cwb/cl/attributes.c" = c("int\\sppos,\\sbpos,\\sdollar,\\srpos;", "int ppos, bpos, rpos;")
+)
+
+for (i in 1L:length(replace)){
+  fname <- path(repodir, names(replace)[[i]])
+  code <- readLines(fname)
+  position <- grep(pattern = replace[[i]][[1]], code)[1]
+  if (!is.na(position)){
+    code[position] <- replace[[i]][2]
+    writeLines(text = code, con = fname)
+  }
+}
