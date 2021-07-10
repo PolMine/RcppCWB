@@ -69,29 +69,29 @@ for (i in 1L:length(insert_after)){
 
 
 replace <- list(
-  "src/cwb/cl/attributes.c" = c("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;"),
-  "src/cwb/cl/attributes.c" = c("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */"),
-  "src/cwb/cl/attributes.c" = c("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */"),
+  "src/cwb/cl/attributes.c" = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;"),
+  "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */"),
+  "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */"),
   
-  "src/cwb/cl/attributes.c" = c('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
-  "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
-  "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)', 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\si;", "\\1/* int i; */", 2),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1)
+  "src/cwb/cl/attributes.c" = list('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
+  "src/cwb/cl/attributes.c" = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
+  "src/cwb/cl/attributes.c" = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)', 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)int\\si;", "\\1/* int i; */", 2),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
+  "src/cwb/cl/cdaccess.c" = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1)
 )
 
 for (i in 1L:length(replace)){
   fname <- path(repodir, names(replace)[[i]])
   code <- readLines(fname)
-  position <- grep(pattern = replace[[i]][[1]], code)[replace[[i]][[3]] ]
+  position <- grep(pattern = replace[[i]][[1]], code)[ replace[[i]][[3]] ]
   if (!is.na(position)){
     code[position] <- gsub(replace[[i]][1], replace[[i]][2], code[position])
     writeLines(text = code, con = fname)
