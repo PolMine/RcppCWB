@@ -56,7 +56,7 @@ replace <- list(
   
   "src/cwb/cl/attributes.c" = c('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)'),
   "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)'),
-  "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)'),
+  "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)'),
 )
 
 for (i in 1L:length(replace)){
