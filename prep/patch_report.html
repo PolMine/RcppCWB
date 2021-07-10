@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [251eecb] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [c9ff96f] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,20 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/attributes.c b/src/cwb/cl/attributes.c
-## index d2d1966..6d104df 100644
-## --- a/src/cwb/cl/attributes.c
-## +++ b/src/cwb/cl/attributes.c
-## @@ -790,7 +790,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
-##  
-##        /*  reference to the name of another component. */
-##  
-## -      /* dollar = ppos; */              /* memorize the position of the $ */
-## +      /* dollar = ppos; */           /* memorize the position of the $ */
-##  
-##        rpos = 0;
-##        c = path[++ppos];         /* first skip the &#39;$&#39; */
-## diff --git a/src/cwb/cl/bitfields.c b/src/cwb/cl/bitfields.c
+<pre><code>## diff --git a/src/cwb/cl/bitfields.c b/src/cwb/cl/bitfields.c
 ## index d54e459..6e9012c 100644
 ## --- a/src/cwb/cl/bitfields.c
 ## +++ b/src/cwb/cl/bitfields.c
