@@ -50,7 +50,7 @@ for (i in 1L:length(insert_before)){
 }
 
 replace <- list(
-  "src/cwb/cl/attributes.c" = c("int\\sppos,\\sbpos,\\sdollar,\\srpos;", "int ppos, bpos, rpos;")
+  "src/cwb/cl/attributes.c" = c("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;")
 )
 
 for (i in 1L:length(replace)){
@@ -58,7 +58,7 @@ for (i in 1L:length(replace)){
   code <- readLines(fname)
   position <- grep(pattern = replace[[i]][[1]], code)[1]
   if (!is.na(position)){
-    code[position] <- replace[[i]][2]
+    code[position] <- gsub(replace[[i]][1], replace[[i]][2], code[position])
     writeLines(text = code, con = fname)
   }
 }
