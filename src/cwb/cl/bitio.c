@@ -16,7 +16,6 @@
  */
 
 void Rprintf(const char *, ...);
-
 #include <sys/types.h>
 
 #include "globals.h"
