@@ -36,7 +36,7 @@ for (i in 1L:length(insert_before)){
   f <- path(repodir, names(insert_before)[[i]])
   code <- readLines(f)
   position <- grep(pattern = insert_before[[i]][[1]], code)[1]
-  if (length(position) == 1L){
+  if (!is.na(position)){
     code <- c(
       code[1L:(position - 1L)],
       insert_before[[i]][[2]],
