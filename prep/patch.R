@@ -59,7 +59,7 @@ for (i in 1L:length(insert_after)){
   if (!is.na(position)){
     code <- c(
       code[1L:position],
-      insert_before[[i]][[2]],
+      insert_after[[i]][[2]],
       code[(position + 1L):length(code)]
     )
     writeLines(text = code, con = fname)
