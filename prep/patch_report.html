@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [1b933ed] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [9bebcb3] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,31 +329,24 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/bitfields.c b/src/cwb/cl/bitfields.c
-## index d54e459..fd05188 100644
-## --- a/src/cwb/cl/bitfields.c
-## +++ b/src/cwb/cl/bitfields.c
-## @@ -31,6 +31,7 @@ static int BaseTypeSize = sizeof(BFBaseType);
-##   * Size of the actual field of a Bitfield (in bits).
+<pre><code>## diff --git a/src/cwb/cl/bitio.c b/src/cwb/cl/bitio.c
+## index 48723c9..8e34b0f 100644
+## --- a/src/cwb/cl/bitio.c
+## +++ b/src/cwb/cl/bitio.c
+## @@ -15,6 +15,8 @@
+##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
 ##   */
-##  static int BaseTypeBits = sizeof(BFBaseType) * CHAR_BIT;
+##  
 ## +void Rprintf(const char *, ...);
+## +
+##  #include &lt;sys/types.h&gt;
 ##  
-##  
-##  /**
+##  #include &quot;globals.h&quot;
 ## diff --git a/src/cwb/cl/cdaccess.c b/src/cwb/cl/cdaccess.c
-## index f3e5b48..5bac140 100644
+## index 825dced..5bac140 100644
 ## --- a/src/cwb/cl/cdaccess.c
 ## +++ b/src/cwb/cl/cdaccess.c
-## @@ -34,7 +34,6 @@
-##  #include &quot;cdaccess.h&quot;
-##  void Rprintf(const char *, ...);
-##  
-## -
-##  /**
-##   * If COMPRESS_DEBUG is set to a positive integer, cl_cpos2id() will
-##   * print debugging messages. (2 prints more than 1!)
-## @@ -1352,11 +1351,11 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
+## @@ -1351,11 +1351,11 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
 ##    unsigned char bitmap_mask;    /* current bitmap offset (within-byte part, as bit mask) */
 ##    /* TODO might move bitmap to static variable and re-allocate only when necessary ... */
 ##    
@@ -368,7 +361,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##    check_arg(attribute, ATT_POS, NULL);
 ##  
-## @@ -1391,9 +1390,9 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
+## @@ -1390,9 +1390,9 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
 ##  
 ##    /* for each index in the lexicon... */
 ##    for (idx = 0; idx &lt; lexsize; idx++) {
@@ -381,7 +374,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##      /* compute start offset and length of current lexicon entry from lexidx, if possible)
 ##       *  -- no longer necessary because we can&#39;t pass len to cl_regex_match
-## @@ -1402,7 +1401,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
+## @@ -1401,7 +1401,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
 ##      off_start = ntohl(lexidx_data[idx]);
 ##      word = lex_data + off_start;
 ##      if (idx &lt; lexsize-1) {
@@ -390,7 +383,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##        /* len = off_end - off_start; */
 ##      }
 ##      else {
-## @@ -2532,7 +2531,7 @@ cl_dynamic_call(Attribute *attribute,
+## @@ -2531,7 +2531,7 @@ cl_dynamic_call(Attribute *attribute,
 ##    int i, k, ap, ins;
 ##  
 ##    FILE *pipe;
@@ -399,7 +392,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##    int argnum, val;
 ##    DynArg *p;
 ##    char c;
-## @@ -2547,7 +2546,7 @@ cl_dynamic_call(Attribute *attribute,
+## @@ -2546,7 +2546,7 @@ cl_dynamic_call(Attribute *attribute,
 ##    
 ##    while ((p != NULL) &amp;&amp; (argnum &lt; nr_args)) {
 ##      
@@ -408,7 +401,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##      
 ##      if ((p-&gt;type == args-&gt;type) ||
 ##            ((p-&gt;type == ATTAT_POS) &amp;&amp; (args-&gt;type == ATTAT_INT))) {
-## @@ -2696,7 +2695,7 @@ cl_dynamic_call(Attribute *attribute,
+## @@ -2695,7 +2695,7 @@ cl_dynamic_call(Attribute *attribute,
 ##        break;
 ##        
 ##      case ATTAT_STRING:          /* copy output */

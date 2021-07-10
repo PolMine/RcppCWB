@@ -29,7 +29,8 @@ for (subdir in c("cl", "cqp", "CQi")){
 }
 
 insert_before <- list(
-  "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", ""))
+  "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
+  "src/cwb/cl/bitio.c" = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);")
 )
 
 for (i in 1L:length(insert_before)){
