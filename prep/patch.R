@@ -49,7 +49,7 @@ for (i in 1L:length(insert_before)){
 
 insert_after <- list(
   "src/cwb/cl/bitio.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/cdaccess.c" = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/cdaccess.c" = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);")
 )
 
 for (i in 1L:length(insert_after)){
