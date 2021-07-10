@@ -33,6 +33,7 @@ static int BaseTypeSize = sizeof(BFBaseType);
 static int BaseTypeBits = sizeof(BFBaseType) * CHAR_BIT;
 void Rprintf(const char *, ...);
 
+
 /**
  * Create a new Bitfield object.
  *

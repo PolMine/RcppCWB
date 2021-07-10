@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e801c9e] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [ebd921a] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,21 +330,14 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/bitfields.c b/src/cwb/cl/bitfields.c
-## index b0e702b..6e9012c 100644
+## index d54e459..1a401b6 100644
 ## --- a/src/cwb/cl/bitfields.c
 ## +++ b/src/cwb/cl/bitfields.c
-## @@ -23,7 +23,6 @@
-##  
-##  #include &quot;bitfields.h&quot;
-##  
-## -void Rprintf(const char *, ...);
-##  /**
-##   * Size of the actual field of a Bitfield (in bytes).
-##   */
-## @@ -33,6 +32,7 @@ static int BaseTypeSize = sizeof(BFBaseType);
+## @@ -31,7 +31,7 @@ static int BaseTypeSize = sizeof(BFBaseType);
+##   * Size of the actual field of a Bitfield (in bits).
 ##   */
 ##  static int BaseTypeBits = sizeof(BFBaseType) * CHAR_BIT;
-##  
+## -
 ## +void Rprintf(const char *, ...);
 ##  
 ##  /**
