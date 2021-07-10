@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [d9ede11] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [e51fa5d] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,7 +330,7 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/cdaccess.c b/src/cwb/cl/cdaccess.c
-## index ffe678a..5bac140 100644
+## index cc73fb8..5bac140 100644
 ## --- a/src/cwb/cl/cdaccess.c
 ## +++ b/src/cwb/cl/cdaccess.c
 ## @@ -809,7 +809,7 @@ cl_id2cpos_oldstyle(Attribute *attribute, int id, int *freq, int *restrictor_lis
@@ -342,29 +342,18 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##        for (i = 0; i &lt; *freq; i++)
 ##          buffer[i] = ntohl(buffer[i]);
 ##      }
-## @@ -1355,7 +1355,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
-##    int optimised;
-##  
-##    CL_Regex rx;
-## -char *word;
-## +  char *word;
-##  
-##    check_arg(attribute, ATT_POS, NULL);
-##  
-## @@ -1390,9 +1390,9 @@ char *word;
-##  
+## @@ -1391,8 +1391,8 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
 ##    /* for each index in the lexicon... */
 ##    for (idx = 0; idx &lt; lexsize; idx++) {
-## -int off_start;     /* start and end offset of current lexicon entry */
+##      int off_start;     /* start and end offset of current lexicon entry */
 ## -    char *p;
 ## -    int i;
-## +    int off_start;     /* start and end offset of current lexicon entry */
 ## +    /* char *p; */
 ## +    /* int i; */
 ##  
 ##      /* compute start offset and length of current lexicon entry from lexidx, if possible)
 ##       *  -- no longer necessary because we can&#39;t pass len to cl_regex_match
-## @@ -1401,7 +1401,7 @@ int off_start;     /* start and end offset of current lexicon entry */
+## @@ -1401,7 +1401,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
 ##      off_start = ntohl(lexidx_data[idx]);
 ##      word = lex_data + off_start;
 ##      if (idx &lt; lexsize-1) {
