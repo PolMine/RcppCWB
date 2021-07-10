@@ -78,13 +78,14 @@ replace <- list(
   "src/cwb/cl/attributes.c" = c('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)'),
   "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;"),
   "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;"),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "char *word;"),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\soff_start,\\soff_end;", "int off_start;"),
+  "src/cwb/cl/cdaccess.c" = c("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;"),
+  "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;"),
   "src/cwb/cl/cdaccess.c" = c("^(\\s*)char *p;", "\\1/* char *p; */"),
   "src/cwb/cl/cdaccess.c" = c("^(\\s*)int\\si;", "\\1/* int i; */"),
   "src/cwb/cl/cdaccess.c" = c("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */"),
   "src/cwb/cl/cdaccess.c" = c("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */"),
-  "src/cwb/cl/cdaccess.c" = c("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");')
+  "src/cwb/cl/cdaccess.c" = c("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");'),
+  "src/cwb/cl/cdaccess.c" = c("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */")
 )
 
 for (i in 1L:length(replace)){
