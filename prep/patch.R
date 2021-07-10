@@ -69,9 +69,9 @@ for (i in 1L:length(insert_after)){
 
 
 replace <- list(
-  "src/cwb/cl/attributes.c" = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;"),
-  "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */"),
-  "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */"),
+  "src/cwb/cl/attributes.c" = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
+  "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
+  "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */", 1),
   
   "src/cwb/cl/attributes.c" = list('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
   "src/cwb/cl/attributes.c" = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
