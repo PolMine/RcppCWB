@@ -32,7 +32,6 @@
 #include "regopt.h"
 
 #include "cdaccess.h"
-
 void Rprintf(const char *, ...);
 
 /**
