@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [d4d06f7] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [3b448c7] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,19 +330,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/attributes.c b/src/cwb/cl/attributes.c
-## index 76f142d..6d104df 100644
+## index b4c5cf0..6d104df 100644
 ## --- a/src/cwb/cl/attributes.c
 ## +++ b/src/cwb/cl/attributes.c
-## @@ -754,7 +754,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
-##    char *reference;
-##    char c;
-##  
-## -int ppos, bpos, rpos;
-## +  int ppos, bpos, rpos;
-##  
-##  
-##    /*  did we do the job before? */
-## @@ -780,7 +780,7 @@ int ppos, bpos, rpos;
+## @@ -780,7 +780,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 ##    ppos = 0;
 ##    /* index in string &quot;buf&quot; */
 ##    bpos = 0;
@@ -351,7 +342,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##    rpos = 0;
 ##    buf[bpos] = &#39;\0&#39;;
 ##  
-## @@ -790,7 +790,7 @@ int ppos, bpos, rpos;
+## @@ -790,7 +790,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 ##  
 ##        /*  reference to the name of another component. */
 ##  
@@ -360,7 +351,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##        rpos = 0;
 ##        c = path[++ppos];         /* first skip the &#39;$&#39; */
-## @@ -806,12 +806,12 @@ int ppos, bpos, rpos;
+## @@ -806,12 +806,12 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 ##  
 ##        reference = NULL;
 ##  
