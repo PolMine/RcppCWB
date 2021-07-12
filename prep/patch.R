@@ -59,7 +59,7 @@ insert_after <- list(
   "src/cwb/cl/bitfields.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/cdaccess.c" = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/globals.c" = list('^#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/lexhash.c" = list('^#include\\s"lexhash\\.h", "#include <unistd.h>")
+  "src/cwb/cl/lexhash.c" = list('^#include\\s"lexhash\\.h"', "#include <unistd.h>")
 )
 
 for (i in 1L:length(insert_after)){
