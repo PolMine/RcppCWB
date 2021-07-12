@@ -71,8 +71,9 @@ insert_before <- list(
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*", "/*", 3), # begin of commenting out ComputeGroupExternally(Group *group)
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", c("*/", "")), # end of commenting out ComputeGroupExternally(Group *group)
   
-  "src/cwb/cqp/hash.c" = list("^\\s*int\\s$", "/*", 1),
-  "src/cwb/cqp/hash.c" = list("^\\s*int\\s$", "/*", 2)
+  "src/cwb/cqp/hash.c" = list("^\\s*int\\s*$", "/*", 1),
+  "src/cwb/cqp/hash.c" = list("^\\s*int\\s*$", "/*", 2),
+  "src/cwb/cqp/hash.c" = list("^unsigned\\sint\\s*$", "/*", 1)
 )
 
 for (i in 1L:length(insert_before)){

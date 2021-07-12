@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+
 /*
 int 
 is_prime(int n) {
@@ -29,7 +30,7 @@ is_prime(int n) {
 /*
 int 
 find_prime(int n) {
-  for( ; n > 0 ; n++)		
+  for( ; n > 0 ; n++)
     if (is_prime(n)) 
       return n;
   return 0;

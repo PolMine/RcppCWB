@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [9f8ec2f] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [e56fb20] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,7 +345,7 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
-## index 38d44d7..584905a 100644
+## index 4b22214..584905a 100644
 ## --- a/src/cwb/cqp/hash.c
 ## +++ b/src/cwb/cqp/hash.c
 ## @@ -15,7 +15,6 @@
@@ -360,7 +360,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  /*
 ##  int 
 ##  find_prime(int n) {
-## -  for( ; n &gt; 0 ; n++)       /* will exit on int overflow */
+## -  for( ; n &gt; 0 ; n++)
 ## +  for( ; n &gt; 0 ; n++)       
 ##      if (is_prime(n)) 
 ##        return n;

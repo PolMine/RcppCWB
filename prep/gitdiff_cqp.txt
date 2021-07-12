@@ -2,7 +2,7 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
-index 38d44d7..584905a 100644
+index 4b22214..584905a 100644
 --- a/src/cwb/cqp/hash.c
 +++ b/src/cwb/cqp/hash.c
 @@ -15,7 +15,6 @@
@@ -17,7 +17,7 @@ index 38d44d7..584905a 100644
  /*
  int 
  find_prime(int n) {
--  for( ; n > 0 ; n++)		/* will exit on int overflow */
+-  for( ; n > 0 ; n++)
 +  for( ; n > 0 ; n++)		
      if (is_prime(n)) 
        return n;
