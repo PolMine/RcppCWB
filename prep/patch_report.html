@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [0f309ca] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [99bb9e8] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,19 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/output.h b/src/cwb/cqp/output.h
-## index 9ca0607..3f9479d 100644
-## --- a/src/cwb/cqp/output.h
-## +++ b/src/cwb/cqp/output.h
-## @@ -76,7 +76,7 @@ extern TabulationItem TabulationList;
-##  
-##  /* ---------------------------------------------------------------------- */
-##  
-## -FILE *open_temporary_file(char *tmp_name_buffer);
-## +/* FILE *open_temporary_file(char *tmp_name_buffer); */
-##  
-##  FILE *open_file(char *name, char *mode);
-##  
 ## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
 ## index 1868445..53e4bcf 100644
 ## --- a/src/cwb/cqp/parse_actions.c
