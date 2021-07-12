@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [ab009b1] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [247db33] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,28 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/globals.h b/src/cwb/cl/globals.h
-## index de4ac0b..b4cd6f1 100644
-## --- a/src/cwb/cl/globals.h
-## +++ b/src/cwb/cl/globals.h
-## @@ -15,6 +15,7 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  #ifndef _globals_h_
-##  #define _globals_h_
-## @@ -144,7 +145,7 @@ extern size_t cl_memory_limit;
-##  /**
-##   * Macro which exits the program when a &quot;to do&quot; point is hit.
-##   */
-## -#define TODO {(void)Rprintf(&quot;TODO point reached: file \&quot;%s\&quot;, line %d\n&quot;, \
-## +#define TODO {(void) Rprintf(&quot;TODO point reached: file \&quot;%s\&quot;, line %d\n&quot;, \
-##                  __FILE__,  \
-##                  __LINE__); \
-##                  exit(1);}
-## diff --git a/src/cwb/cl/lexhash.c b/src/cwb/cl/lexhash.c
+<pre><code>## diff --git a/src/cwb/cl/lexhash.c b/src/cwb/cl/lexhash.c
 ## index 3ab635e..ddfb04c 100644
 ## --- a/src/cwb/cl/lexhash.c
 ## +++ b/src/cwb/cl/lexhash.c

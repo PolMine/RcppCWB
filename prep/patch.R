@@ -36,7 +36,8 @@ insert_before <- list(
   
   "src/cwb/cl/fileutils.c" = list('^#include\\s<sys/stat\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/fileutils.c" = list('^#include\\s"globals\\.h"', c("#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "")),
-  "src/cwb/cl/globals.h" = list('^#ifndef\\s_globals_h_', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/globals.h" = list('^#ifndef\\s_globals_h_', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/lexhash.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
 )
 
 for (i in 1L:length(insert_before)){
@@ -57,7 +58,8 @@ insert_after <- list(
   "src/cwb/cl/bitio.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/bitfields.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/cdaccess.c" = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/globals.c" = list('^#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/globals.c" = list('^#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/lexhash.c" = list('^#include\\s"lexhash\\.h", "#include <unistd.h>")
 )
 
 for (i in 1L:length(insert_after)){
