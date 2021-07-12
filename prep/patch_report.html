@@ -192,7 +192,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [8534c57] 2021-07-12: patch update</code></pre>
+<pre><code>## [8086454] 2021-07-12: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -316,7 +316,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [c4e61f6] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [e78e10f] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -337,63 +337,12 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/cqp&quot;)
 git_cmd &lt;- sprintf(
   &quot;git diff %s..%s . %s&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]],
-  &quot;&#39;:!*_options.h&#39; &#39;:!*parser.tab.c&#39; &#39;:!*parser.tab.h&#39; &#39;:!*lex.yy.c&#39;&quot;
+  &quot;&#39;:!*_options.h&#39; &#39;:!*parser.tab.c&#39; &#39;:!*parser.tab.h&#39; &#39;:!*lex.yy.c&#39; &#39;:!*Makefile&#39;&quot;
 )
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
-<pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-## index b17b9eb..1008edd 100644
-## --- a/src/cwb/cqp/Makefile
-## +++ b/src/cwb/cqp/Makefile
-## @@ -21,7 +21,7 @@
-##  
-##  
-##  ## Read configuration settings and standard definitions
-## -TOP = $(shell pwd)/..
-## +TOP = $(R_PACKAGE_SOURCE)
-##  include $(TOP)/config.mk
-##  
-##  ## The following targets are available:
-## @@ -94,15 +94,21 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
-##  
-##  ## ----------------------------------------------------------------------
-##  
-## -all: $(PROGRAMS)
-## +all: libcqp.a
-##  
-## -parser.tab.c parser.tab.h: parser.y
-## -    $(RM) parser.tab.* parser.output
-## -    $(YACC) $&lt;
-## +libcqp.a: $(OBJS) $(CQI_OBJS)
-## +    $(RM) $@
-## +    $(AR) cq $@ $^
-## +#   $(AR) -s $@
-## +
-## +
-## +# parser.tab.c parser.tab.h: parser.y
-## +#   $(RM) parser.tab.* parser.output
-## +#   $(YACC) $&lt;
-##  
-## -lex.yy.c: parser.l parser.y
-## -    $(RM) lex.yy.*
-## -    $(LEX) $&lt;
-## +# lex.yy.c: parser.l parser.y
-## +#   $(RM) lex.yy.*
-## +#   $(LEX) $&lt;
-##  
-##  cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
-##      $(RM) $@
-## @@ -148,7 +154,7 @@ clean:
-##      -$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
-##  
-##  realclean:  clean
-## -    -$(RM) lex.yy.c parser.tab.c parser.tab.h 
-## +#   -$(RM) lex.yy.c parser.tab.c parser.tab.h 
-##      -$(RM) depend.mk
-##  
-##  # create parser C source, if necessary
-## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
+<pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
