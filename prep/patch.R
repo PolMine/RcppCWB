@@ -6,8 +6,7 @@ repodir <- "~/Lab/github/RcppCWB"
 cwb_pkg_dir <- "~/Lab/github/RcppCWB/src/cwb"
 
 global_replacements <- list(
-  # c("(f|v|fv)printf\\s*\\(rd->stream,\\s*", "Rprintf("),
-  c("(f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
+  c("(f|v|fv)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*\\(\\s*(stderr|yyoutput)," , "YY\\1PRINTF ("),
   c("fprintf\\(", "Rprintf("),
   c("(\\s+)printf\\(", "\\1Rprintf("),

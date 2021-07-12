@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [eecbf28] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [6f807f3] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,62 +345,18 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-## index 19a2e2d..fa7251d 100644
+## index 19a2e2d..ecfb357 100644
 ## --- a/src/cwb/cqp/output.c
 ## +++ b/src/cwb/cqp/output.c
-## @@ -572,7 +572,7 @@ catalog_corpus(CorpusList *cl,
-##        print_corpus_info_header(cl, rd-&gt;stream, mode, 1);
+## @@ -622,7 +622,7 @@ cqpmessage(MessageType type, char *format, ...)
+##  
+##      if (!silent || type == Error) {
+##        Rprintf(&quot;%s:\n\t&quot;, msg);
+## -      vRprintf(format, ap);
+## +      Rprintf(format, ap);
+##        Rprintf(&quot;\n&quot;);
 ##      }
-##      else if (printNrMatches &amp;&amp; mode == PrintASCII)
-## -      Rprintf(&quot;%d matches.\n&quot;, cl-&gt;size);
-## +      Rprintf(rd-&gt;stream, &quot;%d matches.\n&quot;, cl-&gt;size);
-##      
-##      print_output(cl, rd-&gt;stream, 
-##                   isatty(fileno(rd-&gt;stream)) || rd-&gt;is_paging, 
-## @@ -895,7 +895,7 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
-##          if (cpos &gt;= 0 &amp;&amp; cpos &lt;= cl-&gt;mother_size) {
-##            /* valid cpos: print cpos or requested attribute */
-##            if (item-&gt;attribute_type == ATT_NONE) {
-## -            Rprintf(&quot;%d&quot;, cpos);
-## +            Rprintf(rd-&gt;stream, &quot;%d&quot;, cpos);
-##            }
-##            else {
-##              char *string = NULL;
-## @@ -907,11 +907,11 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
-##                if (item-&gt;flags) {
-##                  /* get canonical string as newly alloc&#39;ed duplicate, then print */
-##                  char *copy = cl_string_canonical(string, cl-&gt;corpus-&gt;charset, item-&gt;flags, CL_STRING_CANONICAL_STRDUP);
-## -                Rprintf(&quot;%s&quot;, copy);
-## +                Rprintf(rd-&gt;stream, &quot;%s&quot;, copy);
-##                  cl_free(copy);
-##                }
-##                else {
-## -                Rprintf(&quot;%s&quot;, string);
-## +                Rprintf(rd-&gt;stream, &quot;%s&quot;, string);
-##                }
-##              }
-##            }
-## @@ -919,16 +919,16 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
-##          else {
-##            /* cpos out of bounds: print -1 or empty string */
-##            if (item-&gt;attribute_type == ATT_NONE)
-## -            Rprintf(&quot;-1&quot;);
-## +            Rprintf(rd-&gt;stream, &quot;-1&quot;);
-##          }
-##          if (cpos &lt; end)         /* tokens in a range item are separated by blanks */
-## -          Rprintf(&quot; &quot;); 
-## +          Rprintf(rd-&gt;stream, &quot; &quot;); 
-##        }
-##        if (item-&gt;next)           /* multiple tabulation items are separated by TABs */
-## -        Rprintf(&quot;\t&quot;);
-## +        Rprintf(rd-&gt;stream, &quot;\t&quot;);
-##        item = item-&gt;next;
-##      }
-## -    Rprintf(&quot;\n&quot;);
-## +    Rprintf(rd-&gt;stream, &quot;\n&quot;);
-##    }
-##    
-##    close_stream(rd);
+##  
 ## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
 ## index a0f108f..53e4bcf 100644
 ## --- a/src/cwb/cqp/parse_actions.c
