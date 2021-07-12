@@ -97,7 +97,9 @@ git_cmd <- sprintf(
   "git diff %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
-cat(paste(result, collapse = "\n"))
+output <- paste(result, collapse = "\n")
+cat(output, file = path(repodir, "prep", "gitdiff_cqp.txt"))
+cat(output)
 ```
 
 

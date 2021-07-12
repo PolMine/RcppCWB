@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [7d9d484] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [e80cddd] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,18 +329,6 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/windows-mmap.c b/src/cwb/cl/windows-mmap.c
-## index 113ccf9..a7cc494 100644
-## --- a/src/cwb/cl/windows-mmap.c
-## +++ b/src/cwb/cl/windows-mmap.c
-## @@ -32,6 +32,7 @@
-##   *
-##   */
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  #include &quot;windows-mmap.h&quot;
-## </code></pre>
 <p>Finding: Modifications of the Makefile, nothing else</p>
 </div>
 <div id="cqp-directory" class="section level4">
