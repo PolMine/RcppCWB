@@ -33,7 +33,7 @@ delete_line_before <- list(
   "src/cwb/cqp/groups.c" = "^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"
 )
 
-for (i in 1L:length(delete_before)){
+for (i in 1L:length(delete_line_before)){
   fname <- path(repodir, names(delete_line_before)[[i]])
   code <- readLines(fname)
   position <- grep(pattern = delete_line_before[[i]][[1]], code)[1]
