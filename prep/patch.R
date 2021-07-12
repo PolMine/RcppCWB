@@ -109,3 +109,19 @@ for (i in 1L:length(replace)){
     writeLines(text = code, con = fname)
   }
 }
+
+remove_lines <- list(
+  "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 3),
+  "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 2),
+  "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 1)
+)
+
+for (i in 1L:length(remove_lines)){
+  fname <- path(repodir, names(remove_lines)[[i]])
+  code <- readLines(fname)
+  position <- grep(pattern = remove_lines[[i]][[1]], code)[ remove_lines[[i]][[2]] ]
+  if (!is.na(position)){
+    code <- code[-position]
+    writeLines(text = code, con = fname)
+  }
+}
