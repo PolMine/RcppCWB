@@ -1,19 +1,6 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/latex-print.c b/src/cwb/cqp/latex-print.c
-index 0d30d31..43c64e2 100644
---- a/src/cwb/cqp/latex-print.c
-+++ b/src/cwb/cqp/latex-print.c
-@@ -249,7 +249,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
-             cd->left_structure_name ? cd->left_structure_name : "???");
-     break;
-   default:
--    /*s = "error"; */
-+    /* s = "error"; */
-     break;
-   }
- 
 diff --git a/src/cwb/cqp/macro.c b/src/cwb/cqp/macro.c
 index 76c433d..7615a46 100644
 --- a/src/cwb/cqp/macro.c
