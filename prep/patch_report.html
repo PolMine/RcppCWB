@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [51b4194] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [57660e6] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,17 +330,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/class-mapping.c b/src/cwb/cl/class-mapping.c
-## index a2c9042..0a7564a 100644
+## index 015040b..0a7564a 100644
 ## --- a/src/cwb/cl/class-mapping.c
 ## +++ b/src/cwb/cl/class-mapping.c
-## @@ -523,17 +523,17 @@ member_of_class_s(Mapping map,
-##   *
-##   * @see member_of_class_s
-##   * @param map    The mapping to look in.
-## - * @param class  The class to check.
-## + * @param obj  The class to check.
-##   * @param id     The token to look for (identified by its integer ID).
-##   * @return       Boolean.
+## @@ -529,7 +529,7 @@ member_of_class_s(Mapping map,
 ##   */
 ##  int
 ##  member_of_class_i(Mapping map, 
@@ -349,11 +342,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##                    int id)
 ##  {
 ##    if (bsearch(&amp;id, 
-## -              class-&gt;tokens,
-## +              obj-&gt;tokens,
-##                obj-&gt;nr_tokens,
-##                sizeof(int),
-##                intcompare) != NULL)
 ## diff --git a/src/cwb/cl/class-mapping.h b/src/cwb/cl/class-mapping.h
 ## index b446120..8187e67 100644
 ## --- a/src/cwb/cl/class-mapping.h

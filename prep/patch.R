@@ -91,8 +91,8 @@ replace <- list(
   "src/cwb/cl/class-mapping.c" = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 2),
   "src/cwb/cl/class-mapping.c" = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)return\\smember_of_class_i\\(map,\\sclass,\\sid\\);", "\\1return member_of_class_i(map, obj, id);", 1),
-  "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
+  "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->tokens,", "\\1obj->tokens,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1)
 )
