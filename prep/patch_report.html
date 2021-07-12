@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [0291c0a] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [a63fcf5] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,44 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/corpus.c b/src/cwb/cl/corpus.c
-## index a5b5d0c..c1faaa6 100644
-## --- a/src/cwb/cl/corpus.c
-## +++ b/src/cwb/cl/corpus.c
-## @@ -15,6 +15,8 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +void Rprintf(const char *, ...);
-## +
-##  #include &lt;ctype.h&gt;
-##  #include &lt;sys/types.h&gt;
-##  #ifndef __MINGW__
-## @@ -288,7 +290,6 @@ check_access_conditions(Corpus *corpus, int verbose)
-##    if (corpus-&gt;userAccessList || corpus-&gt;groupAccessList) {
-##      /*     pwd = getpwuid(getuid()); */
-##      Rprintf(
-## -        stderr,
-##          &quot;CL Error: Sorry, user/group access restrictions are disabled due to incompatibilities.\n&quot;);
-##      if (pwd == NULL) {
-##        perror(&quot;getpwuid(getuid()): can&#39;t get user information&quot;);
-## @@ -325,7 +326,6 @@ check_access_conditions(Corpus *corpus, int verbose)
-##  
-##          /*      grpent = getgrgid(gidset[i]); */
-##          Rprintf(
-## -            stderr,
-##              &quot;CL Error: Sorry, user/group access restrictions are disabled due to incompatibilities.\n&quot;);
-##  
-##          if (grpent == NULL) {
-## @@ -437,7 +437,6 @@ cl_new_corpus(char *registry_dir, char *registry_name)
-##            /* check whether ID field corresponds to name of registry file */
-##            if (corpus-&gt;id &amp;&amp; (strcmp(corpus-&gt;id, canonical_name) != 0)) {
-##              Rprintf(
-## -                stderr,
-##                  &quot;CL warning: ID field &#39;%s&#39; does not match name of registry file %s/%s\n&quot;,
-##                  corpus-&gt;id, real_registry_name, canonical_name);
-##            }
-## diff --git a/src/cwb/cl/fileutils.c b/src/cwb/cl/fileutils.c
+<pre><code>## diff --git a/src/cwb/cl/fileutils.c b/src/cwb/cl/fileutils.c
 ## index 56ab75f..41fcb53 100644
 ## --- a/src/cwb/cl/fileutils.c
 ## +++ b/src/cwb/cl/fileutils.c

@@ -32,7 +32,10 @@ insert_before <- list(
   "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
   "src/cwb/cl/bitio.c" = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/class-mapping.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/corpus.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/corpus.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
+  
+  "src/cwb/cl/fileutils.c" = list('^#include\\s<sys/stat\\.h>', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/fileutils.c" = list('^#include\\s"globals\\.h"', c("#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "")
 )
 
 for (i in 1L:length(insert_before)){
