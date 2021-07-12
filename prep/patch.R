@@ -185,10 +185,8 @@ replace <- list(
   "src/cwb/cqp/html-print.c" = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1),
   "src/cwb/cqp/latex-print.c" = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
   "src/cwb/cqp/latex-print.c" = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
-  "src/cwb/cqp/latex-print.c" = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1)
-  # "src/cwb/cqp/macro.c" = list("^(\\s*)-- a/src/cwb/cqp/macro.c", "\\1++ b/src/cwb/cqp/macro.c", 1),
-  # "src/cwb/cqp/options.h" = list("^(\\s*)-- a/src/cwb/cqp/options.h", "\\1++ b/src/cwb/cqp/options.h", 1),
-  # "src/cwb/cqp/options.h" = list("^(\\s*)enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
+  "src/cwb/cqp/latex-print.c" = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
+  "src/cwb/cqp/options.h" = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1)
   # "src/cwb/cqp/output.c" = list("^(\\s*)-- a/src/cwb/cqp/output.c", "\\1++ b/src/cwb/cqp/output.c", 1),
   # "src/cwb/cqp/output.c" = list("^(\\s*)char prefix[64]; /* holds "cqpt.$$", so 64 chars is plenty of headroom */", "\\1char prefix[64];", 1),
   # "src/cwb/cqp/output.c" = list("^(\\s*)tempfile_name = tempnam(TEMPDIR_PATH, prefix); /* string is allocated by tempnam(), needs to be free'd below */", "\\1sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); ", 1),

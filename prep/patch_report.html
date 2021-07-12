@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [12ab0d6] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [aa9f09e] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,19 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/macro.c b/src/cwb/cqp/macro.c
-## index ff38389..7615a46 100644
-## --- a/src/cwb/cqp/macro.c
-## +++ b/src/cwb/cqp/macro.c
-## @@ -19,7 +19,7 @@
-##  #include &quot;options.h&quot;
-##  #include &quot;output.h&quot;
-##  #include &quot;cqp.h&quot;
-## -#include &quot;\../cl/lexhash.h&quot; /* newly added by AB */
-## +#include &quot;../cl/lexhash.h&quot; /* newly added by AB */
-##  #include &quot;hash.h&quot;
-##  #include &quot;eval.h&quot;
-##  #include &quot;ranges.h&quot;
 ## diff --git a/src/cwb/cqp/options.h b/src/cwb/cqp/options.h
 ## index 0689e80..fa60f11 100644
 ## --- a/src/cwb/cqp/options.h

@@ -1,19 +1,6 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/macro.c b/src/cwb/cqp/macro.c
-index ff38389..7615a46 100644
---- a/src/cwb/cqp/macro.c
-+++ b/src/cwb/cqp/macro.c
-@@ -19,7 +19,7 @@
- #include "options.h"
- #include "output.h"
- #include "cqp.h"
--#include "\../cl/lexhash.h" /* newly added by AB */
-+#include "../cl/lexhash.h" /* newly added by AB */
- #include "hash.h"
- #include "eval.h"
- #include "ranges.h"
 diff --git a/src/cwb/cqp/options.h b/src/cwb/cqp/options.h
 index 0689e80..fa60f11 100644
 --- a/src/cwb/cqp/options.h
