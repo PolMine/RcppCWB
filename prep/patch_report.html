@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [31bdbc6] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [9a3d388] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,19 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/macros.c b/src/cwb/cl/macros.c
-## index ca2bedc..fbd9535 100644
-## --- a/src/cwb/cl/macros.c
-## +++ b/src/cwb/cl/macros.c
-## @@ -15,6 +15,7 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  #include &quot;globals.h&quot;
-##  #include &quot;macros.h&quot;
-## diff --git a/src/cwb/cl/makecomps.c b/src/cwb/cl/makecomps.c
+<pre><code>## diff --git a/src/cwb/cl/makecomps.c b/src/cwb/cl/makecomps.c
 ## index e5e737d..7556472 100644
 ## --- a/src/cwb/cl/makecomps.c
 ## +++ b/src/cwb/cl/makecomps.c
@@ -535,19 +523,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##      -$(RM) depend.mk
 ##  
 ##  # create parser C source, if necessary
-## diff --git a/src/cwb/cqp/ascii-print.c b/src/cwb/cqp/ascii-print.c
-## index b2ea93a..b083c28 100644
-## --- a/src/cwb/cqp/ascii-print.c
-## +++ b/src/cwb/cqp/ascii-print.c
-## @@ -239,7 +239,7 @@ get_screen_escapes(void)
-##  
-##    /* Linux terminfo bug? fix: tigetstr(&quot;sgr0&quot;) returns an extra ^O (\x0f) character appended to the escape sequence
-##       (this may be some code used internally by the ncurses library).
-## -     Since we Rprintf() the escape sequences directly, we have to remove the extra character or &#39;less -R&#39; will get confused. */
-## +     Since we printf() the escape sequences directly, we have to remove the extra character or &#39;less -R&#39; will get confused. */
-##    l = strlen(sc_all_out);
-##    if ((l &gt; 0) &amp;&amp; (sc_all_out[l-1] == &#39;\x0f&#39;)) {
-##      sc_all_out = cl_strdup(sc_all_out);
 ## diff --git a/src/cwb/cqp/corpmanag.c b/src/cwb/cqp/corpmanag.c
 ## index e0bc17a..2ce8298 100644
 ## --- a/src/cwb/cqp/corpmanag.c
@@ -641,7 +616,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
-## index 85c6948..36c3bb1 100644
+## index 85c6948..0c5f5b3 100644
 ## --- a/src/cwb/cqp/eval.c
 ## +++ b/src/cwb/cqp/eval.c
 ## @@ -604,7 +604,7 @@ get_leaf_value(Constrainttree ctptr,
@@ -703,15 +678,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##      if (evalenv-&gt;patternlist[col-&gt;tab_el.patindex].type != Pattern) {
 ##        cqpmessage(Error, &quot;matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n&quot;, nr_columns + 1);
 ##        init_matchlist(&amp;result);
-## @@ -2951,7 +2951,7 @@ cqp_run_tab_query()
-##                                  &amp;lists[i], evalenv-&gt;query_corpus);
-##  
-##      /** useful for debugging:
-## -     * Rprintf(&quot;TAB pattern #%d: %d hits %s %s\n&quot;, i + 1, lists[i].tabsize,
-## +     * printf(&quot;TAB pattern #%d: %d hits %s %s\n&quot;, i + 1, lists[i].tabsize,
-##       *   (lists[i].is_inverted) ? &quot;(inverted)&quot; : &quot;&quot;, (lists[i].matches_whole_corpus) ? &quot;(whole corpus)&quot; : &quot;&quot;);
-##       */
-##      if (lists[smallest_col].tabsize &gt; lists[i].tabsize)
 ## diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
 ## index ac369dc..8b1a5cd 100644
 ## --- a/src/cwb/cqp/eval.h
@@ -1204,7 +1170,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  /**
 ##   * Labels for the types of CQP option.
 ## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-## index 4d6f542..6959e49 100644
+## index 4d6f542..0b2918c 100644
 ## --- a/src/cwb/cqp/output.c
 ## +++ b/src/cwb/cqp/output.c
 ## @@ -123,24 +123,17 @@ print_corpus_info_header(CorpusList *cl,
@@ -1254,15 +1220,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##      
 ##      print_output(cl, rd-&gt;stream, 
 ##                   isatty(fileno(rd-&gt;stream)) || rd-&gt;is_paging, 
-## @@ -594,7 +587,7 @@ catalog_corpus(CorpusList *cl,
-##   *
-##   * @see           MessageType
-##   * @param type    Specifies what type of message (messages of some types are not always printed)
-## - * @param format  Format string (and ...) are passed as arguments to vRprintf().
-## + * @param format  Format string (and ...) are passed as arguments to vfprintf().
-##   */
-##  void 
-##  cqpmessage(MessageType type, char *format, ...)
 ## @@ -628,7 +621,7 @@ cqpmessage(MessageType type, char *format, ...)
 ##  
 ##      if (!silent || type == Error) {
@@ -1433,18 +1390,9 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##      close_stream(rd);
 ## diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
-## index de87e37..618dd61 100644
+## index de87e37..666485b 100644
 ## --- a/src/cwb/cqp/parser.y
 ## +++ b/src/cwb/cqp/parser.y
-## @@ -440,7 +440,7 @@ InteractiveCommand:       Showing
-##  
-##  
-##  /* print special code ``-::-EOL-::-&#39;&#39; marking end-of-command in child mode */
-## -EOLCmd:           EOL_SYM               { Rprintf(&quot;-::-EOL-::-\n&quot;); fflush(stdout); }
-## +EOLCmd:           EOL_SYM               { printf(&quot;-::-EOL-::-\n&quot;); fflush(stdout); }
-##                  ;
-##  
-##  Cat:              CAT_SYM OptionalCID
 ## @@ -794,7 +794,7 @@ OptAttributeSpec:    ID OptionalFlag
 ##  
 ##  SortCmd:        SORT_SYM OptionalCID OptionalSortClause
@@ -1474,35 +1422,10 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##                      FreeSortClause($3);
 ##                      cl_free($5.name);
 ##                    }
-## diff --git a/src/cwb/cqp/print-modes.h b/src/cwb/cqp/print-modes.h
-## index 38c83ab..d78f324 100644
-## --- a/src/cwb/cqp/print-modes.h
-## +++ b/src/cwb/cqp/print-modes.h
-## @@ -58,7 +58,7 @@ typedef struct _print_option_rec_ {
-##   */
-##  typedef struct _print_descr_rec_ {
-##  
-## -  char *CPOSPrintFormat;              /**&lt; Rprintf()-Formatting String for display of a corpus position
-## +  char *CPOSPrintFormat;              /**&lt; printf()-Formatting String for display of a corpus position
-##                                             (needs a %d or %x or similar in it somewhere)               */
-##  
-##    char *BeforePrintStructures;        /**&lt; to print before PS */
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index ca316dd..1e90fa4 100644
+## index ca316dd..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
-## @@ -443,9 +443,9 @@ RangeSort(CorpusList *c, int mk_sortidx)
-##    _RS_range = c-&gt;range;         /* intialise global data for callback and run qsort()  */
-##    qsort(index, size, sizeof(int), _RS_compare_ranges);
-##  
-## -/*     Rprintf(&quot;Resort index is:\n&quot;); */
-## +/*     printf(&quot;Resort index is:\n&quot;); */
-##  /*     for (i = 0; i &lt; size; i++) */
-## -/*       Rprintf(&quot;\t%4d =&gt; [%d,%d]\n&quot;, index[i], c-&gt;range[index[i]].start, c-&gt;range[index[i]].end); */
-## +/*       printf(&quot;\t%4d =&gt; [%d,%d]\n&quot;, index[i], c-&gt;range[index[i]].start, c-&gt;range[index[i]].end); */
-##  
-##    new_range = cl_malloc(size * sizeof(Range)); /* allocate new range vector and fill it with sorted ranges */
-##    for (i = 0; i &lt; size; i++)
 ## @@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**&lt; alias to newly created sortidx, so it can b
 ##   * No parameters - the assumption is that everything is set up
 ##   * already by the SortSubCorpus function which calls this one.

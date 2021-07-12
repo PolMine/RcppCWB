@@ -38,7 +38,8 @@ insert_before <- list(
   "src/cwb/cl/fileutils.c" = list('^#include\\s"globals\\.h"', c("#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "")),
   "src/cwb/cl/globals.h" = list('^#ifndef\\s_globals_h_', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/lexhash.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/macros.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/macros.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/makecomps.c" = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", ""))
 )
 
 for (i in 1L:length(insert_before)){
@@ -105,7 +106,8 @@ replace <- list(
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->tokens,", "\\1obj->tokens,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1),
   "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
-  "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1)
+  "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
+  "src/cwb/cl/makecomps.c" = list("^(\\s*)char ´\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1)
 )
 
 for (i in 1L:length(replace)){
