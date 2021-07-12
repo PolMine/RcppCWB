@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [57660e6] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [43cf603] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,20 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/class-mapping.c b/src/cwb/cl/class-mapping.c
-## index 015040b..0a7564a 100644
-## --- a/src/cwb/cl/class-mapping.c
-## +++ b/src/cwb/cl/class-mapping.c
-## @@ -529,7 +529,7 @@ member_of_class_s(Mapping map,
-##   */
-##  int
-##  member_of_class_i(Mapping map, 
-## -                  SingleMapping class,
-## +                  SingleMapping obj,
-##                    int id)
-##  {
-##    if (bsearch(&amp;id, 
-## diff --git a/src/cwb/cl/class-mapping.h b/src/cwb/cl/class-mapping.h
+<pre><code>## diff --git a/src/cwb/cl/class-mapping.h b/src/cwb/cl/class-mapping.h
 ## index b446120..8187e67 100644
 ## --- a/src/cwb/cl/class-mapping.h
 ## +++ b/src/cwb/cl/class-mapping.h
