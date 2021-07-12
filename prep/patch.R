@@ -118,7 +118,7 @@ replace <- list(
   "src/cwb/cl/ngram-hash.c" = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1),
   "src/cwb/cl/regopt.c" = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1),
   
-  "src/cwb/cl/storage.c" = list("^(\\s+)write\\(fd,\\s&fd,\\ssizeof\\(int\\)\\);", "ssize_t success = write(fd, &fd, sizeof(int));", 1)
+  "src/cwb/cl/storage.c" = list("^(\\s+)write\\(fd,\\s&fd,\\ssizeof\\(int\\)\\);", "\\sssize_t success = write(fd, &fd, sizeof(int));", 1)
 )
 
 for (i in 1L:length(replace)){
