@@ -1,34 +1,6 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
-index 4b22214..584905a 100644
---- a/src/cwb/cqp/hash.c
-+++ b/src/cwb/cqp/hash.c
-@@ -15,7 +15,6 @@
-  *  WWW at http://www.gnu.org/copyleft/gpl.html).
-  */
- 
--
- /*
- int 
- is_prime(int n) {
-@@ -30,13 +29,14 @@ is_prime(int n) {
- /*
- int 
- find_prime(int n) {
--  for( ; n > 0 ; n++)
-+  for( ; n > 0 ; n++)		
-     if (is_prime(n)) 
-       return n;
-   return 0;
- }
- */
- 
-+/*
- unsigned int 
- hash_string(char *string) {
-   unsigned char *s = (unsigned char *)string;
 diff --git a/src/cwb/cqp/hash.h b/src/cwb/cqp/hash.h
 index 108f9d2..f5a59c3 100644
 --- a/src/cwb/cqp/hash.h
