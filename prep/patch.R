@@ -29,7 +29,7 @@ for (subdir in c("cl", "cqp", "CQi")){
 }
 
 delete_line_before <- list(
-  "src/cwb/cqp/groups.c" = list("^Group\\s\\*", "/*", 3),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*", 3),
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,")
 )
