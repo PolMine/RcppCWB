@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [a63fcf5] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [80d99bf] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,28 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/fileutils.c b/src/cwb/cl/fileutils.c
-## index 56ab75f..41fcb53 100644
-## --- a/src/cwb/cl/fileutils.c
-## +++ b/src/cwb/cl/fileutils.c
-## @@ -15,12 +15,16 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  #include &lt;sys/stat.h&gt;
-##  #include &lt;fcntl.h&gt;
-##  
-##  #include &lt;glib.h&gt;
-##  
-## +#include &lt;signal.h&gt; /* added by Andreas Blaette  */
-## +#include &lt;sys/socket.h&gt; /* added by Andreas Blaette */
-## +
-##  #include &quot;globals.h&quot;
-##  #include &quot;fileutils.h&quot;
-##  
-## diff --git a/src/cwb/cl/globals.c b/src/cwb/cl/globals.c
+<pre><code>## diff --git a/src/cwb/cl/globals.c b/src/cwb/cl/globals.c
 ## index 86f06a9..6257082 100644
 ## --- a/src/cwb/cl/globals.c
 ## +++ b/src/cwb/cl/globals.c
