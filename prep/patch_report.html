@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [64e5a0f] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [fd47a75] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,19 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/hash.h b/src/cwb/cqp/hash.h
-## index 0cc8d62..f5a59c3 100644
-## --- a/src/cwb/cqp/hash.h
-## +++ b/src/cwb/cqp/hash.h
-## @@ -15,6 +15,8 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +/* #include &quot;../cl/lexhash.h&quot; */  /* added by AB */
-## +
-##  /* int is_prime(int n); */
-##  /* int find_prime(int n); */        /* find next prime above &lt;n&gt; */
-##  /* unsigned int hash_string(char *s); */    /* get 32bit hash value for string */
 ## diff --git a/src/cwb/cqp/html-print.c b/src/cwb/cqp/html-print.c
 ## index a24ab17..eda7177 100644
 ## --- a/src/cwb/cqp/html-print.c
