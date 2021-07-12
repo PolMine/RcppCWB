@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [7525fe7] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [8ea32aa] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,14 +330,14 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/storage.c b/src/cwb/cl/storage.c
-## index f486638..2adbecf 100644
+## index 4028ea9..2adbecf 100644
 ## --- a/src/cwb/cl/storage.c
 ## +++ b/src/cwb/cl/storage.c
 ## @@ -334,7 +334,7 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
 ##         * then rewind file */
 ##        lseek(fd, *len_ptr - sizeof(int), SEEK_SET);
 ##        ssize_t success = write(fd, &amp;fd, sizeof(int));
-## -if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;);
+## -\1if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;);
 ## +      if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;);
 ##        lseek(fd, 0, SEEK_SET);
 ##        
