@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [a5bbc9c] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [610d9f6] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,19 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
-## index e5eb30d..0c5f5b3 100644
-## --- a/src/cwb/cqp/eval.c
-## +++ b/src/cwb/cqp/eval.c
-## @@ -2924,7 +2924,7 @@ cqp_run_tab_query()
-##  
-##    nr_columns = 0;
-##    for (col = evalenv-&gt;evaltree; col; col = col-&gt;tab_el.next) {
-## -    assert(col-&gt;type = tabular);
-## +    assert((col-&gt;type = tabular));
-##      if (evalenv-&gt;patternlist[col-&gt;tab_el.patindex].type != Pattern) {
-##        cqpmessage(Error, &quot;matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n&quot;, nr_columns + 1);
-##        init_matchlist(&amp;result);
 ## diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
 ## index fa7e817..8b1a5cd 100644
 ## --- a/src/cwb/cqp/eval.h

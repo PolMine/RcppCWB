@@ -1,19 +1,6 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
-index e5eb30d..0c5f5b3 100644
---- a/src/cwb/cqp/eval.c
-+++ b/src/cwb/cqp/eval.c
-@@ -2924,7 +2924,7 @@ cqp_run_tab_query()
- 
-   nr_columns = 0;
-   for (col = evalenv->evaltree; col; col = col->tab_el.next) {
--    assert(col->type = tabular);
-+    assert((col->type = tabular));
-     if (evalenv->patternlist[col->tab_el.patindex].type != Pattern) {
-       cqpmessage(Error, "matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n", nr_columns + 1);
-       init_matchlist(&result);
 diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
 index fa7e817..8b1a5cd 100644
 --- a/src/cwb/cqp/eval.h

@@ -128,12 +128,11 @@ replace <- list(
   "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
   "src/cwb/cqp/eval.c" = list("^(\\s*)int\\ssmallest_col,\\scorpus_size;", "\\1int smallest_col;", 1),
   "src/cwb/cqp/eval.c" = list("^(\\s*)corpus_size\\s=\\sevalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1),
-  "src/cwb/cqp/eval.c" = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1)
-  # "src/cwb/cqp/eval.h" = list("^(\\s*)-- a/src/cwb/cqp/eval.h", "\\1++ b/src/cwb/cqp/eval.h", 1),
-  # "src/cwb/cqp/eval.h" = list("^(\\s*)/*", "\\1#/*", 1),
-  # "src/cwb/cqp/eval.h" = list("^(\\s*)int            delete;                /**< delete label after using it ? */", "\\1int            del;                /**< delete label after using it ? */", 1),
-  # "src/cwb/cqp/eval.h" = list("^(\\s*)int            delete;                /**< delete label after using it ? */", "\\1int            del;                /**< delete label after using it ? */", 1),
-  # "src/cwb/cqp/eval.h" = list("^(\\s*)int            delete;                /**< delete label after using it ? */", "\\1int            del;                /**< delete label after using it ? */", 1),
+  "src/cwb/cqp/eval.c" = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1),
+  "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
+  "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
+  "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+
   # "src/cwb/cqp/groups.c" = list("^(\\s*)-- a/src/cwb/cqp/groups.c", "\\1++ b/src/cwb/cqp/groups.c", 1),
   # "src/cwb/cqp/groups.c" = list("^(\\s*)", "\\1/*", 1),
   # "src/cwb/cqp/groups.c" = list("^(\\s*)Rprintf("%d %d\n", get_group_id(group, i, 0), get_group_id(group, i, 1)); /* (source ID, target ID) */", "\\1Rprintf("%d %d\n", get_group_id(group, i, 0), get_group_id(group, i, 1));", 1),
