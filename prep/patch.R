@@ -88,10 +88,10 @@ replace <- list(
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
   "src/cwb/cl/cdaccess.c" = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1),
   
-  "src/cwb/cl/class-mapping.c" = list("\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "* @param obj  The class to check.", 1),
-  "src/cwb/cl/class-mapping.c" = list("\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "* @param obj  The class to check.", 2),
-  "src/cwb/cl/class-mapping.c" = list("^(\\s+)return\\1member_of_class_i\\(map,\\sclass,\\sid\\);", "\\1return member_of_class_i(map, obj, id);", 1),
-  "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\slass,", "\\1SingleMapping obj,", 1),
+  "src/cwb/cl/class-mapping.c" = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 1),
+  "src/cwb/cl/class-mapping.c" = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "* @param obj  The class to check.", 2),
+  "src/cwb/cl/class-mapping.c" = list("^(\\s+)return\\smember_of_class_i\\(map,\\sclass,\\sid\\);", "\\1return member_of_class_i(map, obj, id);", 1),
+  "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->tokens,\\slass,", "\\1obj->tokens,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1)
 )

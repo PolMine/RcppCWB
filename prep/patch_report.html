@@ -192,7 +192,6 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [a29b11c] 2021-07-12: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -316,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [707e8f7] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [6544113] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -331,25 +330,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/class-mapping.c b/src/cwb/cl/class-mapping.c
-## index e0162ee..47114d4 100644
+## index f976c53..0a7564a 100644
 ## --- a/src/cwb/cl/class-mapping.c
 ## +++ b/src/cwb/cl/class-mapping.c
-## @@ -15,6 +15,7 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  #include &quot;globals.h&quot;
-##  
-## @@ -498,13 +499,13 @@ number_of_tokens(SingleMapping map)
-##   *
-##   * @see member_of_class_i
-##   * @param map    The mapping to look in.
-## - * @param class  The class to check.
-## + * @param obj  The class to check.
-##   * @param token  The token to look for (identified by its actual string).
-##   * @return       Boolean.
+## @@ -505,7 +505,7 @@ number_of_tokens(SingleMapping map)
 ##   */
 ##  int
 ##  member_of_class_s(Mapping map, 
@@ -358,7 +342,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##                    char *token)
 ##  {
 ##    int id;
-## @@ -514,7 +515,7 @@ member_of_class_s(Mapping map,
+## @@ -515,7 +515,7 @@ member_of_class_s(Mapping map,
 ##    if (id &lt; 0 || cderrno != CDA_OK) 
 ##      return 0;
 ##    else
@@ -367,7 +351,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  }
 ##  
 ##  /**
-## @@ -522,18 +523,18 @@ member_of_class_s(Mapping map,
+## @@ -523,17 +523,17 @@ member_of_class_s(Mapping map,
 ##   *
 ##   * @see member_of_class_s
 ##   * @param map    The mapping to look in.
@@ -384,12 +368,10 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  {
 ##    if (bsearch(&amp;id, 
 ## -              class-&gt;tokens,
-## -              class-&gt;nr_tokens,
 ## +              obj-&gt;tokens,
-## +              obj-&gt;nr_tokens,
+##                obj-&gt;nr_tokens,
 ##                sizeof(int),
 ##                intcompare) != NULL)
-##      return 1;
 ## diff --git a/src/cwb/cl/class-mapping.h b/src/cwb/cl/class-mapping.h
 ## index b446120..8187e67 100644
 ## --- a/src/cwb/cl/class-mapping.h
