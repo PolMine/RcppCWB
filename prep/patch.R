@@ -190,7 +190,7 @@ replace <- list(
   "src/cwb/cqp/latex-print.c" = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
   "src/cwb/cqp/options.h" = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
   "src/cwb/cqp/output.c" = list('^(.*?)\\s*/\\*\\sholds\\s"cqpt\\.\\$\\$",\\sso\\s64\\schars\\sis\\splenty\\sof\\sheadroom\\s\\*/', "\\1", 1),
-#  "src/cwb/cqp/output.c" = list('^(.*?)\\s*/\\*\\s"cqpt\\.\\$\\$"\\s\\*/', "\\1", 1),
+  "src/cwb/cqp/output.c" = list('^(.*?)(\\s*)/\\*\\s"cqpt\\.\\$\\$"\\s\\*/', "\\1", 1),
   "src/cwb/cqp/output.c" = list("^(.*?)\\s/\\*\\sstring\\sis\\sallocated\\sby\\stempnam\\(\\),\\sneeds\\sto\\sbe\\sfree'd\\sbelow\\s\\*/", "\\1", 1)
   # "src/cwb/cqp/output.c" = list("^(\\s*)-- a/src/cwb/cqp/output.c", "\\1++ b/src/cwb/cqp/output.c", 1),
   # "src/cwb/cqp/output.c" = list("^(\\s*)char prefix[64]; /* holds "cqpt.$$", so 64 chars is plenty of headroom */", "\\1char prefix[64];", 1),
