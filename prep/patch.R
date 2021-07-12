@@ -46,7 +46,7 @@ for (i in 1L:length(delete_line_before)){
   position <- grep(pattern = delete_line_before[[i]][[1]], code)[which_position]
   times <- if (length(delete_line_before[[i]]) == 3L) delete_line_before[[i]][[3]] else 1L
   if (!is.na(position)){
-    for (i in 1L:times) code <- code[- (position - 1L)]
+    code <- code[-(position - 1L:times)]
     writeLines(text = code, con = fname)
   }
 }
