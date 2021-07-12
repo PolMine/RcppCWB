@@ -2,7 +2,7 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
-index fa7e817..8b1a5cd 100644
+index e032051..8b1a5cd 100644
 --- a/src/cwb/cqp/eval.h
 +++ b/src/cwb/cqp/eval.h
 @@ -1,4 +1,4 @@
@@ -11,33 +11,6 @@ index fa7e817..8b1a5cd 100644
   *  IMS Open Corpus Workbench (CWB)
   *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
   *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
-@@ -131,7 +131,7 @@ typedef union c_tree {
-     enum bnodetype type;                  /**< must be pa_ref */
-     LabelEntry     label;                 /**< may be empty (NULL) */
-     Attribute     *attr;                  /**< the P-attribute we are referring to */
--    int            delete;                /**< delete label after using it ? */
-+    int            del;                /**< delete label after using it ? */
-   }                pa_ref;
- 
-   /**
-@@ -150,7 +150,7 @@ typedef union c_tree {
-     enum bnodetype type;                  /**< must be sa_ref */
-     LabelEntry     label;                 /**< may be empty (NULL) */
-     Attribute     *attr;                  /**< the s-attribute we are referring to */
--    int            delete;                /**< delete label after using it ? */
-+    int            del;                /**< delete label after using it ? */
-   }                sa_ref;
- 
-   struct {
-@@ -165,7 +165,7 @@ typedef union c_tree {
-     int            negated;
-     int            nr_items;
-     int           *items;                 /**< an array of item IDs of size nr_items */
--    int            delete;                /**< delete label after using it ? */
-+    int            del;                /**< delete label after using it ? */
-   }                idlist;
- 
-   /** constant (string, int, float, ...) */
 @@ -417,6 +417,7 @@ typedef struct evalenv {
  typedef EvalEnvironment *EEP;
  

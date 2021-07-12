@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [610d9f6] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [48f3fc6] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,7 +345,7 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
-## index fa7e817..8b1a5cd 100644
+## index e032051..8b1a5cd 100644
 ## --- a/src/cwb/cqp/eval.h
 ## +++ b/src/cwb/cqp/eval.h
 ## @@ -1,4 +1,4 @@
@@ -354,33 +354,6 @@ cat(gitdiff_cqp)</code></pre>
 ##   *  IMS Open Corpus Workbench (CWB)
 ##   *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
 ##   *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
-## @@ -131,7 +131,7 @@ typedef union c_tree {
-##      enum bnodetype type;                  /**&lt; must be pa_ref */
-##      LabelEntry     label;                 /**&lt; may be empty (NULL) */
-##      Attribute     *attr;                  /**&lt; the P-attribute we are referring to */
-## -    int            delete;                /**&lt; delete label after using it ? */
-## +    int            del;                /**&lt; delete label after using it ? */
-##    }                pa_ref;
-##  
-##    /**
-## @@ -150,7 +150,7 @@ typedef union c_tree {
-##      enum bnodetype type;                  /**&lt; must be sa_ref */
-##      LabelEntry     label;                 /**&lt; may be empty (NULL) */
-##      Attribute     *attr;                  /**&lt; the s-attribute we are referring to */
-## -    int            delete;                /**&lt; delete label after using it ? */
-## +    int            del;                /**&lt; delete label after using it ? */
-##    }                sa_ref;
-##  
-##    struct {
-## @@ -165,7 +165,7 @@ typedef union c_tree {
-##      int            negated;
-##      int            nr_items;
-##      int           *items;                 /**&lt; an array of item IDs of size nr_items */
-## -    int            delete;                /**&lt; delete label after using it ? */
-## +    int            del;                /**&lt; delete label after using it ? */
-##    }                idlist;
-##  
-##    /** constant (string, int, float, ...) */
 ## @@ -417,6 +417,7 @@ typedef struct evalenv {
 ##  typedef EvalEnvironment *EEP;
 ##  

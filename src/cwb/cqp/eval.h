@@ -1,4 +1,4 @@
-#/*
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
@@ -417,7 +417,6 @@ typedef struct evalenv {
 typedef EvalEnvironment *EEP;
 
 /** A global array of EvalEnvironment structures */
-
 extern EvalEnvironment Environment[MAXENVIRONMENT];
 
 extern EEP CurEnv, evalenv;
