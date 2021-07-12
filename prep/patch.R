@@ -35,7 +35,8 @@ delete_line_before <- list(
   "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
   "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
   "src/cwb/cqp/groups.c" = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);"),
-  "src/cwb/cqp/groups.c" = list("^\\s*return\\sComputeGroupExternally\\(group\\);")
+  "src/cwb/cqp/groups.c" = list("^\\s*return\\sComputeGroupExternally\\(group\\);"),
+  "src/cwb/cqp/groups.c" = list("^(\\s*)(if\\s\\(UseExternalGrouping\\s&&\\s\\!insecure\\s&&\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))")
 )
 
 for (i in 1L:length(delete_line_before)){

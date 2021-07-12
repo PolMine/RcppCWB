@@ -2,16 +2,15 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
-index fc21b9e..4441be0 100644
+index 16765ae..4441be0 100644
 --- a/src/cwb/cqp/groups.c
 +++ b/src/cwb/cqp/groups.c
 @@ -486,10 +486,13 @@ Group *compute_grouping(CorpusList *cl,
    group->cutoff_frequency = cutoff_freq;
    group->is_grouped = is_grouped;
  
--  /*if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
 +
-+  /* if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
+   /* if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
      return ComputeGroupExternally(group);
    else
      return ComputeGroupInternally(group);
