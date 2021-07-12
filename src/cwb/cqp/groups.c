@@ -486,7 +486,6 @@ Group *compute_grouping(CorpusList *cl,
   group->cutoff_frequency = cutoff_freq;
   group->is_grouped = is_grouped;
 
-
   /* if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
     return ComputeGroupExternally(group);
   else
