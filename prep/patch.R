@@ -62,13 +62,15 @@ insert_before <- list(
   "src/cwb/cl/storage.c" = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/storage.c" = list("^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);", '      if (success < 0) Rprintf("Operation not successful");'),
   "src/cwb/cl/windows-mmap.c" = list('^#include\\s"windows-mmap\\.h"', "void Rprintf(const char *, ...);"),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*", "/*", 3), # begin of commenting out ComputeGroupExternally(Group *group)
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", c("*/", "")) # end of commenting out ComputeGroupExternally(Group *group)
 )
 
 for (i in 1L:length(insert_before)){
   fname <- path(repodir, names(insert_before)[[i]])
   code <- readLines(fname)
-  position <- grep(pattern = insert_before[[i]][[1]], code)[1]
+  which_position <- if (length(insert_before[[i]]) > 2L) insert_before[[i]][[3]] else 1
+  position <- grep(pattern = insert_before[[i]][[1]], code)[which_position]
   if (!is.na(position)){
     code <- c(
       code[1L:(position - 1L)],
