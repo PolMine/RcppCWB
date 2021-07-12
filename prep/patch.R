@@ -124,10 +124,10 @@ replace <- list(
   "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 2),
   "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1),
   
-  "src/cwb/cqp/eval.c" = list("^(\\s*)if\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1)
-  # "src/cwb/cqp/eval.c" = list("^(\\s*)if (ctptr->idlist.delete) {", "\\1if (ctptr->idlist.del) {", 1),
-  # "src/cwb/cqp/eval.c" = list("^(\\s*)int smallest_col, corpus_size;", "\\1int smallest_col;", 1),
-  # "src/cwb/cqp/eval.c" = list("^(\\s*)corpus_size = evalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1),
+  "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1),
+  "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
+  "src/cwb/cqp/eval.c" = list("^(\\s*)int\\ssmallest_col,\\scorpus_size;", "\\1int smallest_col;", 1),
+  "src/cwb/cqp/eval.c" = list("^(\\s*)corpus_size\\s=\\sevalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1)
   # "src/cwb/cqp/eval.c" = list("^(\\s*)assert(col->type = tabular);", "\\1assert((col->type = tabular));", 1),
   # "src/cwb/cqp/eval.h" = list("^(\\s*)-- a/src/cwb/cqp/eval.h", "\\1++ b/src/cwb/cqp/eval.h", 1),
   # "src/cwb/cqp/eval.h" = list("^(\\s*)/*", "\\1#/*", 1),
