@@ -32,8 +32,8 @@ delete_line_before <- list(
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*", 3),
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
-  "src/cwb/cqp/groups.c" = list("^\\s*if\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s{"),
-  "src/cwb/cqp/groups.c" = list("^\\s*if\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s{")
+  "src/cwb/cqp/groups.c" = list("^\\s*if\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
+  "src/cwb/cqp/groups.c" = list("^\\s*if\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{")
 )
 
 for (i in 1L:length(delete_line_before)){
