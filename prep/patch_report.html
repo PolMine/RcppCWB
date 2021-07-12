@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [aa9f09e] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [ca1847a] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,19 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/options.h b/src/cwb/cqp/options.h
-## index 0689e80..fa60f11 100644
-## --- a/src/cwb/cqp/options.h
-## +++ b/src/cwb/cqp/options.h
-## @@ -36,7 +36,7 @@
-##  
-##  
-##  
-## -enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
-## +enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;
-##  /* this variable is set in the binaries&#39; main() functions */
-##  
-##  
 ## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
 ## index 4d6f542..0b2918c 100644
 ## --- a/src/cwb/cqp/output.c

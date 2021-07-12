@@ -29,13 +29,14 @@ for (subdir in c("cl", "cqp", "CQi")){
 }
 
 delete_line_before <- list(
-  "src/cwb/cqp/groups.c" = list("^Group\\s\\*", 3),
-  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
-  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
-  "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
-  "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
-  "src/cwb/cqp/groups.c" = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);"),
-  "src/cwb/cqp/groups.c" = list("^\\s*return\\sComputeGroupExternally\\(group\\);")
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*", 3L),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
+  "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{", 1L),
+  "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{", 1L),
+  "src/cwb/cqp/groups.c" = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);", 1L),
+  "src/cwb/cqp/groups.c" = list("^\\s*return\\sComputeGroupExternally\\(group\\);", 1L),
+  "src/cwb/cqp/output.c" = list('sprintf(prefix, "cqpt.%d", (unsigned int)getpid());', 1L, 8L)
 )
 
 for (i in 1L:length(delete_line_before)){
@@ -43,8 +44,9 @@ for (i in 1L:length(delete_line_before)){
   code <- readLines(fname)
   which_position <- if (length(delete_line_before[[i]]) > 1L) delete_line_before[[i]][[2]] else 1L
   position <- grep(pattern = delete_line_before[[i]][[1]], code)[which_position]
+  times <- if (length(delete_line_before[[i]]) == 3L) delete_line_before[[i]][[3]] else 1L
   if (!is.na(position)){
-    code <- code[- (position - 1L)]
+    for (i in 1L:times) code <- code[- (position - 1L)]
     writeLines(text = code, con = fname)
   }
 }
