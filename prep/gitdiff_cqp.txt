@@ -2,10 +2,10 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-index 2ebf9d0..0b2918c 100644
+index 3035f15..0b2918c 100644
 --- a/src/cwb/cqp/output.c
 +++ b/src/cwb/cqp/output.c
-@@ -123,21 +123,22 @@ print_corpus_info_header(CorpusList *cl,
+@@ -123,16 +123,17 @@ print_corpus_info_header(CorpusList *cl,
   * @return                A stream (FILE *) to the opened temporary file, or NULL
   *                        if unsuccessful.
   */
@@ -19,23 +19,13 @@ index 2ebf9d0..0b2918c 100644
    FILE *fd = NULL;
  
    assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
--
--  /* note there is a potential problem using tempnam rather than tmpfile () or mkstemp () if there
--   * is more than one copy of cqp running and they both call this function at the same time.
--   * A race condition could result where copy#2 gets the same name as copy#1 by calling tempnam()
--   * after copy#1 calls it but before copy#1 opens the file.
--   *
--   * For this reason, the process ID is used to make the filename unique to this process.
+-  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); /* "cqpt.$$" */
+-  tempfile_name = tempnam(TEMPDIR_PATH, prefix); /* string is allocated by tempnam(), needs to be free'd below */
 +  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); 
 +  tempfile_name = tempnam(TEMPDIR_PATH, prefix);
-+  if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
-+    perror("open_temporary_file(): filename too long for buffer");
-+    *tmp_name_buffer = '\0';
-+    cl_free(tempfile_name);
-+    return NULL;
-   }
-   else {
-     strcpy(tmp_name_buffer, tempfile_name);
+   if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
+     perror("open_temporary_file(): filename too long for buffer");
+     *tmp_name_buffer = '\0';
 @@ -154,7 +155,7 @@ open_temporary_file(char *tmp_name_buffer)
      return NULL;
    }
