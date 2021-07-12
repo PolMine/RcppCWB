@@ -1,46 +1,1166 @@
-diff --git a/src/cwb/CQi/auth.c b/src/cwb/CQi/auth.c
-index fd1201c..462ada7 100644
---- a/src/cwb/CQi/auth.c
-+++ b/src/cwb/CQi/auth.c
-@@ -26,6 +26,8 @@
+diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
+index b17b9eb..1008edd 100644
+--- a/src/cwb/cqp/Makefile
++++ b/src/cwb/cqp/Makefile
+@@ -21,7 +21,7 @@
  
- #include "../cl/macros.h"
  
-+void Rprintf(const char *, ...);
+ ## Read configuration settings and standard definitions
+-TOP = $(shell pwd)/..
++TOP = $(R_PACKAGE_SOURCE)
+ include $(TOP)/config.mk
+ 
+ ## The following targets are available:
+@@ -94,15 +94,21 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
+ 
+ ## ----------------------------------------------------------------------
+ 
+-all: $(PROGRAMS)
++all: libcqp.a
+ 
+-parser.tab.c parser.tab.h: parser.y
+-	$(RM) parser.tab.* parser.output
+-	$(YACC) $<
++libcqp.a: $(OBJS) $(CQI_OBJS)
++	$(RM) $@
++	$(AR) cq $@ $^
++#	$(AR) -s $@
 +
- /* data structures (internal use only) */
- 
- /** Internal data structure: name of a corpus to which access is granted */
-diff --git a/src/cwb/CQi/cqpserver.c b/src/cwb/CQi/cqpserver.c
-index 80060e7..20fdf48 100644
---- a/src/cwb/CQi/cqpserver.c
-+++ b/src/cwb/CQi/cqpserver.c
-@@ -31,6 +31,7 @@
- #include "../cqp/corpmanag.h"
- #include "../cqp/groups.h"
- 
-+void Rprintf(const char *, ...);
- 
- /** String containing the username sent by the currently-connect CQi client */
- char *user = "";
-diff --git a/src/cwb/CQi/server.c b/src/cwb/CQi/server.c
-index 5aac73d..451d016 100644
---- a/src/cwb/CQi/server.c
-+++ b/src/cwb/CQi/server.c
-@@ -45,6 +45,7 @@
- #include "../cqp/corpmanag.h"
- #include "../cqp/parse_actions.h"
- #include "../cqp/hash.h"
-+#include "../cl/lexhash.h" /* inserted by AB */
- 
- #define NETBUFSIZE 512
- #define ATTHASHSIZE 16384
-@@ -57,6 +58,8 @@
- #define MSG_WAITALL 0
- #endif
- 
-+void Rprintf(const char *, ...);
 +
- /*
++# parser.tab.c parser.tab.h: parser.y
++# 	$(RM) parser.tab.* parser.output
++# 	$(YACC) $<
+ 
+-lex.yy.c: parser.l parser.y
+-	$(RM) lex.yy.*
+-	$(LEX) $<
++# lex.yy.c: parser.l parser.y
++# 	$(RM) lex.yy.*
++#	$(LEX) $<
+ 
+ cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
+ 	$(RM) $@
+@@ -148,7 +154,7 @@ clean:
+ 	-$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
+ 
+ realclean:	clean
+-	-$(RM) lex.yy.c parser.tab.c parser.tab.h 
++#	-$(RM) lex.yy.c parser.tab.c parser.tab.h 
+ 	-$(RM) depend.mk
+ 
+ # create parser C source, if necessary
+diff --git a/src/cwb/cqp/corpmanag.c b/src/cwb/cqp/corpmanag.c
+index e0bc17a..2ce8298 100644
+--- a/src/cwb/cqp/corpmanag.c
++++ b/src/cwb/cqp/corpmanag.c
+@@ -67,7 +67,7 @@ CorpusList *GetSystemCorpus(char *name, char *registry);
+ /* -------------------------------------------------- */
+ 
+ /** Global list of currently-loaded corpora */
+-CorpusList *corpuslist;
++extern CorpusList *corpuslist;
+ 
+ 
+ /**
+diff --git a/src/cwb/cqp/corpmanag.h b/src/cwb/cqp/corpmanag.h
+index 2a2d3f2..fc0dff5 100644
+--- a/src/cwb/cqp/corpmanag.h
++++ b/src/cwb/cqp/corpmanag.h
+@@ -119,12 +119,12 @@ typedef struct cl {
+ /**
+  * Global pointer to the "current" corpus.
+  */
+-CorpusList *current_corpus;
++extern CorpusList *current_corpus;
+ 
+ /**
+  * Global pointer to the head of CQP's linked list of corpora.
+  */
+-CorpusList *corpuslist;
++extern CorpusList *corpuslist;
+ 
+ /* ---------------------------------------------------------------------- */
+ 
+diff --git a/src/cwb/cqp/cqp.h b/src/cwb/cqp/cqp.h
+index a3b7b54..96b03d8 100644
+--- a/src/cwb/cqp/cqp.h
++++ b/src/cwb/cqp/cqp.h
+@@ -52,7 +52,7 @@ typedef enum _cyctype {
+ } CYCtype;
+ 
+ /** Global variable indicating type (CYC) of last expression */
+-CYCtype LastExpression;
++extern CYCtype LastExpression;
+ 
+ extern int reading_cqprc;
+ 
+@@ -70,16 +70,16 @@ extern int QueryBufferOverflow;
+ /* ======================================== Other global variables */
+ 
+ extern char *searchstr;         /* needs to be global, unfortunately */
+-int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
++extern int exit_cqp;                   /**< 1 iff exit-command was issued while parsing */
+ 
+-char *cqp_input_string;
+-int cqp_input_string_position;
++extern char *cqp_input_string;
++extern int cqp_input_string_position;
+ 
+-int initialize_cqp(int argc, char **argv);
++extern int initialize_cqp(int argc, char **argv);
+ 
+-int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
++extern int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
+ 
+-int cqp_parse_string(char *s);
++extern int cqp_parse_string(char *s);
+ 
+ /* ====================================================================== */
+ 
+@@ -96,15 +96,15 @@ typedef void (*InterruptCheckProc)(void);
   *
-  * Global variables for CQPSERVER
+  * @see sigINT_signal_handler
+  */
+-int EvaluationIsRunning;
++extern int EvaluationIsRunning;
+ 
+-int setInterruptCallback(InterruptCheckProc f);
++extern int setInterruptCallback(InterruptCheckProc f);
+ 
+-void CheckForInterrupts(void);
++extern void CheckForInterrupts(void);
+ 
+-int signal_handler_is_installed;
++extern int signal_handler_is_installed;
+ 
+-void install_signal_handler(void);
++extern void install_signal_handler(void);
+ 
+ 
+ /* ====================================================================== */
+diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
+index 85c6948..0c5f5b3 100644
+--- a/src/cwb/cqp/eval.c
++++ b/src/cwb/cqp/eval.c
+@@ -604,7 +604,7 @@ get_leaf_value(Constrainttree ctptr,
+ 
+       dcr->type = ATTAT_POS;
+       dcr->value.intres = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
+-      if (ctptr->pa_ref.delete) {
++      if (ctptr->pa_ref.del) {
+         if (eval_debug)
+           Rprintf("** AUTO-DELETING LABEL %s = %d\n",
+                  ctptr->pa_ref.label->name, dcr->value.intres);
+@@ -621,7 +621,7 @@ get_leaf_value(Constrainttree ctptr,
+       else {
+ 
+         referenced_position = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
+-        if (ctptr->pa_ref.delete) {
++        if (ctptr->pa_ref.del) {
+           if (eval_debug)
+             Rprintf("** AUTO-DELETING LABEL %s = %d\n",
+                    ctptr->pa_ref.label->name, referenced_position);
+@@ -684,7 +684,7 @@ get_leaf_value(Constrainttree ctptr,
+       /* label reference to S-attribute -> return value of containing region */
+       int referenced_position = get_label_referenced_position(ctptr->sa_ref.label, rt, corppos);
+       
+-      if (ctptr->sa_ref.delete) {
++      if (ctptr->sa_ref.del) {
+         if (eval_debug)
+           Rprintf("** AUTO-DELETING LABEL %s = %d\n",
+                  ctptr->sa_ref.label->name, referenced_position);
+@@ -1170,7 +1170,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int corppos)
+ 
+       if (ctptr->idlist.label) {
+         referenced_corppos = get_label_referenced_position(ctptr->idlist.label, rt, corppos);
+-        if (ctptr->idlist.delete) {
++        if (ctptr->idlist.del) {
+           if (eval_debug)
+             Rprintf("** AUTO-DELETING LABEL %s = %d\n",
+                    ctptr->idlist.label->name, referenced_corppos);
+@@ -2908,7 +2908,7 @@ cqp_run_tab_query()
+   int nr_columns, i, this_col;
+   Evaltree col;
+ 
+-  int smallest_col, corpus_size;
++  int smallest_col;
+   int n_res, max_res;
+ 
+   Matchlist *lists, result;
+@@ -2920,11 +2920,11 @@ cqp_run_tab_query()
+   evalenv = &Environment[0];
+ 
+   assert(evalenv->query_corpus);
+-  corpus_size = evalenv->query_corpus->mother_size;
++  /* corpus_size = evalenv->query_corpus->mother_size; */
+ 
+   nr_columns = 0;
+   for (col = evalenv->evaltree; col; col = col->tab_el.next) {
+-    assert(col->type = tabular);
++    assert((col->type = tabular));
+     if (evalenv->patternlist[col->tab_el.patindex].type != Pattern) {
+       cqpmessage(Error, "matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n", nr_columns + 1);
+       init_matchlist(&result);
+diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
+index ac369dc..8b1a5cd 100644
+--- a/src/cwb/cqp/eval.h
++++ b/src/cwb/cqp/eval.h
+@@ -1,4 +1,4 @@
+-/*
++#/*
+  *  IMS Open Corpus Workbench (CWB)
+  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+@@ -131,7 +131,7 @@ typedef union c_tree {
+     enum bnodetype type;                  /**< must be pa_ref */
+     LabelEntry     label;                 /**< may be empty (NULL) */
+     Attribute     *attr;                  /**< the P-attribute we are referring to */
+-    int            delete;                /**< delete label after using it ? */
++    int            del;                /**< delete label after using it ? */
+   }                pa_ref;
+ 
+   /**
+@@ -150,7 +150,7 @@ typedef union c_tree {
+     enum bnodetype type;                  /**< must be sa_ref */
+     LabelEntry     label;                 /**< may be empty (NULL) */
+     Attribute     *attr;                  /**< the s-attribute we are referring to */
+-    int            delete;                /**< delete label after using it ? */
++    int            del;                /**< delete label after using it ? */
+   }                sa_ref;
+ 
+   struct {
+@@ -165,7 +165,7 @@ typedef union c_tree {
+     int            negated;
+     int            nr_items;
+     int           *items;                 /**< an array of item IDs of size nr_items */
+-    int            delete;                /**< delete label after using it ? */
++    int            del;                /**< delete label after using it ? */
+   }                idlist;
+ 
+   /** constant (string, int, float, ...) */
+@@ -371,7 +371,7 @@ typedef struct ctxtsp {
+  * eep contains the index of the highest currently-occupied slot within Environment.
+  * @see Environment
+  */
+-int eep;
++extern int eep;
+ 
+ /**
+  * The EvalEnvironment object: environment variables for the evaluation of
+@@ -417,9 +417,10 @@ typedef struct evalenv {
+ typedef EvalEnvironment *EEP;
+ 
+ /** A global array of EvalEnvironment structures */
+-EvalEnvironment Environment[MAXENVIRONMENT];
+ 
+-EEP CurEnv, evalenv;
++extern EvalEnvironment Environment[MAXENVIRONMENT];
++
++extern EEP CurEnv, evalenv;
+ 
+ /* ---------------------------------------------------------------------- */
+ 
+diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
+index 35ef543..4441be0 100644
+--- a/src/cwb/cqp/groups.c
++++ b/src/cwb/cqp/groups.c
+@@ -253,7 +253,7 @@ ComputeGroupInternally(Group *group)
+   return group;
+ }
+ 
+-
++/*
+ Group *
+ ComputeGroupExternally(Group *group)
+ {
+@@ -266,8 +266,6 @@ ComputeGroupExternally(Group *group)
+   FILE *pipe;
+   char sort_call[CL_MAX_LINE_LENGTH];
+ 
+-  /* ---------------------------------------------------------------------- */
+-
+   if ((fd = open_temporary_file(temporary_name)) == NULL) {
+     perror("Error while opening temporary file");
+     cqpmessage(Warning, "Can't open temporary file");
+@@ -275,11 +273,10 @@ ComputeGroupExternally(Group *group)
+   }
+ 
+   for (i = 0; i < size; i++) {
+-    Rprintf("%d %d\n", get_group_id(group, i, 0), get_group_id(group, i, 1)); /* (source ID, target ID) */
++    Rprintf("%d %d\n", get_group_id(group, i, 0), get_group_id(group, i, 1));
+   }
+   fclose(fd);
+ 
+-  /* construct sort call */
+   sprintf(sort_call, ExternalGroupingCommand, temporary_name);
+   if (GROUP_DEBUG)
+     Rprintf("Running grouping sort: \n\t%s\n",
+@@ -340,7 +337,7 @@ ComputeGroupExternally(Group *group)
+   
+   return group;
+ }
+-
++*/
+ 
+ Group *compute_grouping(CorpusList *cl,
+                         FieldType source_field,
+@@ -489,11 +486,13 @@ Group *compute_grouping(CorpusList *cl,
+   group->cutoff_frequency = cutoff_freq;
+   group->is_grouped = is_grouped;
+ 
+-  if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
+-    /* external grouping doesn't support s-attributes and grouped counts */
+-    return ComputeGroupExternally(group); /* modifies Group object in place and returns pointer */
++
++  /* if (UseExternalGrouping && !insecure && !(source_is_struc || target_is_struc || is_grouped))
++    return ComputeGroupExternally(group);
+   else
+     return ComputeGroupInternally(group);
++   */
++  return group;
+ }
+ 
+ void
+diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
+index 2801586..584905a 100644
+--- a/src/cwb/cqp/hash.c
++++ b/src/cwb/cqp/hash.c
+@@ -15,7 +15,7 @@
+  *  WWW at http://www.gnu.org/copyleft/gpl.html).
+  */
+ 
+-
++/*
+ int 
+ is_prime(int n) {
+   int i;
+@@ -24,15 +24,19 @@ is_prime(int n) {
+       return 0;
+   return 1;
+ }
++*/
+ 
++/*
+ int 
+ find_prime(int n) {
+-  for( ; n > 0 ; n++)		/* will exit on int overflow */
++  for( ; n > 0 ; n++)		
+     if (is_prime(n)) 
+       return n;
+   return 0;
+ }
++*/
+ 
++/*
+ unsigned int 
+ hash_string(char *string) {
+   unsigned char *s = (unsigned char *)string;
+@@ -41,6 +45,7 @@ hash_string(char *string) {
+     result = (result * 33 ) ^ (result >> 27) ^ *s;
+   return result;
+ }
++*/
+ 
+ unsigned int 
+ hash_macro(char *macro_name, unsigned int args) {
+diff --git a/src/cwb/cqp/hash.h b/src/cwb/cqp/hash.h
+index 108f9d2..f5a59c3 100644
+--- a/src/cwb/cqp/hash.h
++++ b/src/cwb/cqp/hash.h
+@@ -15,7 +15,9 @@
+  *  WWW at http://www.gnu.org/copyleft/gpl.html).
+  */
+ 
+-int is_prime(int n);
+-int find_prime(int n);		/* find next prime above <n> */
+-unsigned int hash_string(char *s);	/* get 32bit hash value for string */
++/* #include "../cl/lexhash.h" */  /* added by AB */
++
++/* int is_prime(int n); */
++/* int find_prime(int n); */		/* find next prime above <n> */
++/* unsigned int hash_string(char *s); */	/* get 32bit hash value for string */
+ unsigned int hash_macro(char *name, unsigned int args); /* hash value for macro */
+diff --git a/src/cwb/cqp/html-print.c b/src/cwb/cqp/html-print.c
+index a24ab17..eda7177 100644
+--- a/src/cwb/cqp/html-print.c
++++ b/src/cwb/cqp/html-print.c
+@@ -314,7 +314,7 @@ html_print_aligned_line(FILE *stream,
+ 
+ void html_print_context(ContextDescriptor *cd, FILE *stream)
+ {
+-  char *s;
++  /* char *s; */
+ 
+   fputs("<tr><td nowrap><em>Left display context:</em></td><td nowrap>", stream);
+ 
+@@ -330,7 +330,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
+             cd->left_structure_name ? cd->left_structure_name : "???");
+     break;
+   default:
+-    s = "error";
++    /* s = "error"; */
+     break;
+   }
+ 
+@@ -350,7 +350,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
+             cd->right_structure_name ? cd->right_structure_name : "???");
+     break;
+   default:
+-    s = "error";
++    /* s = "error"; */
+     break;
+   }
+ 
+@@ -415,12 +415,12 @@ void html_print_output(CorpusList *cl,
+ {
+   int line, real_line;
+   ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
+-  AttributeList *strucs;
++  /* AttributeList *strucs; */
+   PrintDescriptionRecord *pdr;
+ 
+   ParsePrintOptions();
+ 
+-  strucs = cd->printStructureTags;
++  /* strucs = cd->printStructureTags; */
+ 
+   if (GlobalPrintOptions.print_tabular) {
+ 
+diff --git a/src/cwb/cqp/latex-print.c b/src/cwb/cqp/latex-print.c
+index 3a6916e..43c64e2 100644
+--- a/src/cwb/cqp/latex-print.c
++++ b/src/cwb/cqp/latex-print.c
+@@ -233,7 +233,7 @@ latex_print_aligned_line(FILE *stream, char *attribute_name, char *line)
+ 
+ void latex_print_context(ContextDescriptor *cd, FILE *stream)
+ {
+-  char *s;
++  /* char *s; */
+ 
+   fputs("{\\em Left display context:\\/}  & ", stream);
+ 
+@@ -249,7 +249,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
+             cd->left_structure_name ? cd->left_structure_name : "???");
+     break;
+   default:
+-    s = "error";
++    /* s = "error"; */
+     break;
+   }
+ 
+@@ -269,7 +269,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
+             cd->right_structure_name ? cd->right_structure_name : "???");
+     break;
+   default:
+-    s = "error";
++    /* s = "error"; */
+     break;
+   }
+ 
+diff --git a/src/cwb/cqp/macro.c b/src/cwb/cqp/macro.c
+index 76c433d..7615a46 100644
+--- a/src/cwb/cqp/macro.c
++++ b/src/cwb/cqp/macro.c
+@@ -19,6 +19,7 @@
+ #include "options.h"
+ #include "output.h"
+ #include "cqp.h"
++#include "../cl/lexhash.h" /* newly added by AB */
+ #include "hash.h"
+ #include "eval.h"
+ #include "ranges.h"
+diff --git a/src/cwb/cqp/options.h b/src/cwb/cqp/options.h
+index 6f1225e..fa60f11 100644
+--- a/src/cwb/cqp/options.h
++++ b/src/cwb/cqp/options.h
+@@ -36,7 +36,7 @@
+ 
+ 
+ 
+-enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
++enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;
+ /* this variable is set in the binaries' main() functions */
+ 
+ 
+@@ -44,106 +44,106 @@ enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
+  * CGI scripts should use the new query lock mode instead.
+  * [ insecure and inhibit_activation are kept for compatibility; inhibit_interactives has been removed. ]
+  */
+-int insecure;                     /**< Boolean: != 0 means we should not allow pipes etc. (For example, in CGI.) */
+-int inhibit_activation;           /**< Boolean: inhibit corpus activations in parser */
++extern int insecure;                     /**< Boolean: != 0 means we should not allow pipes etc. (For example, in CGI.) */
++extern int inhibit_activation;           /**< Boolean: inhibit corpus activations in parser */
+ 
+ 
+ /* debugging options */
+-int parseonly;                    /**< if true, queries are only parsed, not evaluated. */
+-int verbose_parser;               /**< if true, absolutely all messages from the parser get printed (inc Message-level). */
+-int show_symtab;                  /**< Doesn't seem to be used anywhere; should show_environment use it? if not, remove? TODO  */
+-int show_gconstraints;            /**< if true, the tree of global contraints is printed when an EvalEnvironment is displayed */
+-int show_evaltree;                /**< if true, the evaluation tree is printed when an EvalEnvironment is displayed */
+-int show_patlist;                 /**< if true, the pattern list is printed when an EvalEnvironment is displayed */
+-int show_compdfa;                 /**< if true, the complete DFA is printed when an EvalEnvironment is displayed */
+-int show_dfa;                     /**< if true, the regex2dfa module will print out the states of the DFA after it is parsed. */
++extern int parseonly;                    /**< if true, queries are only parsed, not evaluated. */
++extern int verbose_parser;               /**< if true, absolutely all messages from the parser get printed (inc Message-level). */
++extern int show_symtab;                  /**< Doesn't seem to be used anywhere; should show_environment use it? if not, remove? TODO  */
++extern int show_gconstraints;            /**< if true, the tree of global contraints is printed when an EvalEnvironment is displayed */
++extern int show_evaltree;                /**< if true, the evaluation tree is printed when an EvalEnvironment is displayed */
++extern int show_patlist;                 /**< if true, the pattern list is printed when an EvalEnvironment is displayed */
++extern int show_compdfa;                 /**< if true, the complete DFA is printed when an EvalEnvironment is displayed */
++extern int show_dfa;                     /**< if true, the regex2dfa module will print out the states of the DFA after it is parsed. */
+   /* TODO rename the above variable because it is NOT the same as the other show_* variables. regex2dfa_debug? dfa_debug? */
+-int symtab_debug;                 /**< if this AND debug_simulation are true, print extra messages relating to eval
++extern int symtab_debug;                 /**< if this AND debug_simulation are true, print extra messages relating to eval
+                                    *   environment labels when simulating an NFA. */
+-int parser_debug;                 /**< if true, the parser's internal Bison-generated debug setting is turned on. */
+-int tree_debug;                   /**< if true, extra messages are embedded when an evaluation tree is pretty-printed */
+-int eval_debug;                   /**< if true, assorted debug messages related to query evaluation are printed */
+-int search_debug;                 /**< if true, the evaltree of a pattern is pretty-printed before the DFA is created. */
+-int initial_matchlist_debug;      /**< if true, debug messages relating to the initial set of candidate matches are printed. */
+-int debug_simulation;             /**< if true, debug messages are printed when simulating an NFA. @see simulate */
+-int activate_cl_debug;            /**< if true, the CL's debug message setting is set to On. */
++extern int parser_debug;                 /**< if true, the parser's internal Bison-generated debug setting is turned on. */
++extern int tree_debug;                   /**< if true, extra messages are embedded when an evaluation tree is pretty-printed */
++extern int eval_debug;                   /**< if true, assorted debug messages related to query evaluation are printed */
++extern int search_debug;                 /**< if true, the evaltree of a pattern is pretty-printed before the DFA is created. */
++extern int initial_matchlist_debug;      /**< if true, debug messages relating to the initial set of candidate matches are printed. */
++extern int debug_simulation;             /**< if true, debug messages are printed when simulating an NFA. @see simulate */
++extern int activate_cl_debug;            /**< if true, the CL's debug message setting is set to On. */
+ 
+ /* CQPserver options */
+-int server_log;                   /**< cqpserver option: logging (print log messages to standard output) */
+-int server_debug;                 /**< cqpserver option: debugging output (print debug messages to standard error) */
+-int snoop;                        /**< cqpserver option: monitor CQi network communication */
+-int private_server;               /**< cqpserver option: makes CQPserver accept a single connection only */
+-int server_port;                  /**< cqpserver option: CQPserver's listening port (if 0, listens on CQI_PORT) */
+-int localhost;                    /**< cqpserver option: accept local connections (loopback) only */
+-int server_quit;                  /**< cqpserver option: spawn server and return to caller (for CQI::Server.pm) */
++extern int server_log;                   /**< cqpserver option: logging (print log messages to standard output) */
++extern int server_debug;                 /**< cqpserver option: debugging output (print debug messages to standard error) */
++extern int snoop;                        /**< cqpserver option: monitor CQi network communication */
++extern int private_server;               /**< cqpserver option: makes CQPserver accept a single connection only */
++extern int server_port;                  /**< cqpserver option: CQPserver's listening port (if 0, listens on CQI_PORT) */
++extern int localhost;                    /**< cqpserver option: accept local connections (loopback) only */
++extern int server_quit;                  /**< cqpserver option: spawn server and return to caller (for CQI::Server.pm) */
+ 
+-int query_lock;                   /**< cqpserver option: safe mode for network/HTTP servers (allow query execution only) */
+-int query_lock_violation;         /**< cqpserver option: set for CQPserver's sake to detect attempted query lock violation */
++extern int query_lock;                   /**< cqpserver option: safe mode for network/HTTP servers (allow query execution only) */
++extern int query_lock_violation;         /**< cqpserver option: set for CQPserver's sake to detect attempted query lock violation */
+ 
+ 
+ /* macro options */
+-int enable_macros;                /**< enable macros only at user request in case they introduce compatibility problems */
+-int macro_debug;                  /**< enable debugging of macros (and print macro hash stats on shutdown). */
++extern int enable_macros;                /**< enable macros only at user request in case they introduce compatibility problems */
++extern int macro_debug;                  /**< enable debugging of macros (and print macro hash stats on shutdown). */
+ 
+ /* query options */
+-int hard_boundary;                /**< Query option: use implicit 'within' clause (unless overridden by explicit spec) */
+-int hard_cut;                     /**< Query option: use hard cut value for all queries (cannot be changed) */
+-int subquery;                     /**< Query option: use auto-subquery mode (TODO rename to auto_subquery for clarity) */
+-char *def_unbr_attr;              /**< Query option: unbracketed attribute (attribute matched by "..." patterns) */
+-int query_optimize;               /**< Query option: use query optimisation (untested and expensive optimisations) */
++extern int hard_boundary;                /**< Query option: use implicit 'within' clause (unless overridden by explicit spec) */
++extern int hard_cut;                     /**< Query option: use hard cut value for all queries (cannot be changed) */
++extern int subquery;                     /**< Query option: use auto-subquery mode (TODO rename to auto_subquery for clarity) */
++extern char *def_unbr_attr;              /**< Query option: unbracketed attribute (attribute matched by "..." patterns) */
++extern int query_optimize;               /**< Query option: use query optimisation (untested and expensive optimisations) */
+ 
+ /** matching strategy */
+-enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
+-char *matching_strategy_name;     /**< The matching strategy option: which is implemented as a vstring option with side-effect */
+-int strict_regions;               /**< boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
++extern enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
++extern char *matching_strategy_name;     /**< The matching strategy option: which is implemented as a vstring option with side-effect */
++extern int strict_regions;               /**< boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
+ 
+ /* CQP user interface options */
+-int use_readline;                 /**< UI option: use GNU Readline for input line editing if available */
+-int highlighting;                 /**< UI option: highlight match / fields in terminal output? (default = yes) */
+-int paging;                       /**< UI option: activate/deactivate paging of query results */
+-char *pager;                      /**< UI option: pager program to used for paged kwic display */
+-char *tested_pager;               /**< UI option: CQP tests if selected pager works & will fall back to "more" if it doesn't */
+-char *less_charset_variable;      /**< UI option: name of environment variable for controlling less charset (usually LESSCHARSET) */
+-int use_colour;                   /**< UI option: use colours for terminal output (experimental) */
+-int progress_bar;                 /**< UI option: show progress bar during query execution */
+-int pretty_print;                 /**< UI option: pretty-print most of CQP's output (turn off to simplify parsing of CQP output) */
+-int autoshow;                     /**< UI option: show query results after evaluation (otherwise, just print number of matches) */
+-int timing;                       /**< UI option: time queries (printed after execution) */
++extern int use_readline;                 /**< UI option: use GNU Readline for input line editing if available */
++extern int highlighting;                 /**< UI option: highlight match / fields in terminal output? (default = yes) */
++extern int paging;                       /**< UI option: activate/deactivate paging of query results */
++extern char *pager;                      /**< UI option: pager program to used for paged kwic display */
++extern char *tested_pager;               /**< UI option: CQP tests if selected pager works & will fall back to "more" if it doesn't */
++extern char *less_charset_variable;      /**< UI option: name of environment variable for controlling less charset (usually LESSCHARSET) */
++extern int use_colour;                   /**< UI option: use colours for terminal output (experimental) */
++extern int progress_bar;                 /**< UI option: show progress bar during query execution */
++extern int pretty_print;                 /**< UI option: pretty-print most of CQP's output (turn off to simplify parsing of CQP output) */
++extern int autoshow;                     /**< UI option: show query results after evaluation (otherwise, just print number of matches) */
++extern int timing;                       /**< UI option: time queries (printed after execution) */
+ 
+ /* kwic display options */ 
+-int show_tag_attributes;          /**< kwic option: show values of s-attributes as SGML tag attributes in kwic lines */
+-int show_targets;                 /**< kwic option: show numbers of target anchors in brackets */
+-char *printModeString;            /**< kwic option: string of current printmode */
+-char *printModeOptions;           /**< kwic option: some printing options */
+-int printNrMatches;               /**< kwic option: -> 'cat' prints number of matches in first line (do we need this?) */
+-char *printStructure;             /**< kwic option: show annotations of structures containing match */
+-char *left_delimiter;             /**< kwic option: the match start prefix (defaults to '<') */
+-char *right_delimiter;            /**< kwic option: the match end suffix   (defaults to '>') */
++extern int show_tag_attributes;          /**< kwic option: show values of s-attributes as SGML tag attributes in kwic lines */
++extern int show_targets;                 /**< kwic option: show numbers of target anchors in brackets */
++extern char *printModeString;            /**< kwic option: string of current printmode */
++extern char *printModeOptions;           /**< kwic option: some printing options */
++extern int printNrMatches;               /**< kwic option: -> 'cat' prints number of matches in first line (do we need this?) */
++extern char *printStructure;             /**< kwic option: show annotations of structures containing match */
++extern char *left_delimiter;             /**< kwic option: the match start prefix (defaults to '<') */
++extern char *right_delimiter;            /**< kwic option: the match end suffix   (defaults to '>') */
+ 
+ /* files and directories */
+-char *registry;                   /**< registry directory */
+-char *LOCAL_CORP_PATH;            /**< directory where subcorpora are stored (saved & loaded) */
+-int auto_save;                    /**< automatically save subcorpora */
+-int save_on_exit;                 /**< save unsaved subcorpora upon exit */
+-char *cqp_init_file;              /**< changed from 'init_file' because of clash with a # define in {term.h} */
+-char *macro_init_file;            /**< secondary init file for loading macro definitions (not read if macros are disabled) */
+-char *cqp_history_file;           /**< filename where CQP command history will be saved */
+-int write_history_file;           /**< Controls whether CQP command history is written to file */
++extern char *registry;                   /**< registry directory */
++extern char *LOCAL_CORP_PATH;            /**< directory where subcorpora are stored (saved & loaded) */
++extern int auto_save;                    /**< automatically save subcorpora */
++extern int save_on_exit;                 /**< save unsaved subcorpora upon exit */
++extern char *cqp_init_file;              /**< changed from 'init_file' because of clash with a # define in {term.h} */
++extern char *macro_init_file;            /**< secondary init file for loading macro definitions (not read if macros are disabled) */
++extern char *cqp_history_file;           /**< filename where CQP command history will be saved */
++extern int write_history_file;           /**< Controls whether CQP command history is written to file */
+ 
+ /* options for non-interactive use */
+-int batchmode;                    /**< set by -f {file} option (don't read ~/.cqprc, then process input from {file}) */
+-int silent;                       /**< Disables some messages & warnings (used rather inconsistently).
++extern int batchmode;                    /**< set by -f {file} option (don't read ~/.cqprc, then process input from {file}) */
++extern int silent;                       /**< Disables some messages & warnings (used rather inconsistently).
+                                    *   NEW: suppresses cqpmessage() unless it is an error. */
+-char *default_corpus;             /**< corpus specified with -D {corpus} */
+-char *query_string;               /**< query specified on command line (-E {string}, cqpcl only) */
++extern char *default_corpus;             /**< corpus specified with -D {corpus} */
++extern char *query_string;               /**< query specified on command line (-E {string}, cqpcl only) */
+ 
+ /* options which just shouldn't exist */
+-int UseExternalSorting;           /**< (option which should not exist) use external sorting algorithm */
+-char *ExternalSortingCommand;     /**< (option which should not exist) external sort command to use */
+-int UseExternalGrouping;          /**< (option which should not exist) use external grouping algorithm */
+-char *ExternalGroupingCommand;    /**< (option which should not exist) external group command to use */
+-int user_level;                   /**< (option which should not exist) user level: 0 == normal, 1 == advanced, 2 == expert) */
+-int rangeoutput;                  /**< (option which should not exist) */
++extern int UseExternalSorting;           /**< (option which should not exist) use external sorting algorithm */
++extern char *ExternalSortingCommand;     /**< (option which should not exist) external sort command to use */
++extern int UseExternalGrouping;          /**< (option which should not exist) use external grouping algorithm */
++extern char *ExternalGroupingCommand;    /**< (option which should not exist) external group command to use */
++extern int user_level;                   /**< (option which should not exist) user level: 0 == normal, 1 == advanced, 2 == expert) */
++extern int rangeoutput;                  /**< (option which should not exist) */
+ 
+ 
+ /**
+@@ -156,7 +156,7 @@ int rangeoutput;                  /**< (option which should not exist) */
+  *
+  * This global variable is a Boolean: child process mode on or off.
+  */
+-int child_process;
++extern int child_process;
+ 
+ 
+ 
+@@ -166,14 +166,14 @@ int child_process;
+ /* some global variables */
+ 
+ /** The global context descriptor. TODO: Is this the only place a hard-allocated, rather than malloc'd, CD is used?*/
+-ContextDescriptor CD;
++extern ContextDescriptor CD;
+ 
+-int handle_sigpipe;
++extern int handle_sigpipe;
+ 
+-char *progname;
+-char *licensee;
++extern char *progname;
++extern char *licensee;
+ 
+-FILE *batchfd;
++extern FILE *batchfd;
+ 
+ /**
+  * Labels for the types of CQP option.
+diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
+index 4d6f542..0b2918c 100644
+--- a/src/cwb/cqp/output.c
++++ b/src/cwb/cqp/output.c
+@@ -123,24 +123,17 @@ print_corpus_info_header(CorpusList *cl,
+  * @return                A stream (FILE *) to the opened temporary file, or NULL
+  *                        if unsuccessful.
+  */
++/*
+ FILE *
+ open_temporary_file(char *tmp_name_buffer)
+ {
+   char *tempfile_name;
+-  char prefix[64]; /* holds "cqpt.$$", so 64 chars is plenty of headroom */
++  char prefix[64];
+   FILE *fd = NULL;
+ 
+   assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
+-
+-  /* note there is a potential problem using tempnam rather than tmpfile () or mkstemp () if there
+-   * is more than one copy of cqp running and they both call this function at the same time.
+-   * A race condition could result where copy#2 gets the same name as copy#1 by calling tempnam()
+-   * after copy#1 calls it but before copy#1 opens the file.
+-   *
+-   * For this reason, the process ID is used to make the filename unique to this process.
+-   */
+-  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); /* "cqpt.$$" */
+-  tempfile_name = tempnam(TEMPDIR_PATH, prefix); /* string is allocated by tempnam(), needs to be free'd below */
++  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); 
++  tempfile_name = tempnam(TEMPDIR_PATH, prefix);
+   if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
+     perror("open_temporary_file(): filename too long for buffer");
+     *tmp_name_buffer = '\0';
+@@ -162,7 +155,7 @@ open_temporary_file(char *tmp_name_buffer)
+     return NULL;
+   }
+ }
+-
++*/
+ 
+ /**
+  * This function is a wrapper round fopen() which provides checks for
+@@ -578,7 +571,7 @@ catalog_corpus(CorpusList *cl,
+       print_corpus_info_header(cl, rd->stream, mode, 1);
+     }
+     else if (printNrMatches && mode == PrintASCII)
+-      Rprintf(rd->stream, "%d matches.\n", cl->size);
++      Rprintf("%d matches.\n", cl->size);
+     
+     print_output(cl, rd->stream, 
+                  isatty(fileno(rd->stream)) || rd->is_paging, 
+@@ -628,7 +621,7 @@ cqpmessage(MessageType type, char *format, ...)
+ 
+     if (!silent || type == Error) {
+       Rprintf("%s:\n\t", msg);
+-      vRprintf(format, ap);
++      Rprintf(format, ap);
+       Rprintf("\n");
+     }
+ 
+@@ -901,7 +894,7 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
+         if (cpos >= 0 && cpos <= cl->mother_size) {
+           /* valid cpos: print cpos or requested attribute */
+           if (item->attribute_type == ATT_NONE) {
+-            Rprintf(rd->stream, "%d", cpos);
++            Rprintf("%d", cpos);
+           }
+           else {
+             char *string = NULL;
+@@ -913,11 +906,11 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
+               if (item->flags) {
+                 /* get canonical string as newly alloc'ed duplicate, then print */
+                 char *copy = cl_string_canonical(string, cl->corpus->charset, item->flags, CL_STRING_CANONICAL_STRDUP);
+-                Rprintf(rd->stream, "%s", copy);
++                Rprintf("%s", copy);
+                 cl_free(copy);
+               }
+               else {
+-                Rprintf(rd->stream, "%s", string);
++                Rprintf("%s", string);
+               }
+             }
+           }
+@@ -925,16 +918,16 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
+         else {
+           /* cpos out of bounds: print -1 or empty string */
+           if (item->attribute_type == ATT_NONE)
+-            Rprintf(rd->stream, "-1");
++            Rprintf("-1");
+         }
+         if (cpos < end)         /* tokens in a range item are separated by blanks */
+-          Rprintf(rd->stream, " "); 
++          Rprintf(" "); 
+       }
+       if (item->next)           /* multiple tabulation items are separated by TABs */
+-        Rprintf(rd->stream, "\t");
++        Rprintf("\t");
+       item = item->next;
+     }
+-    Rprintf(rd->stream, "\n");
++    Rprintf("\n");
+   }
+   
+   close_stream(rd);
+diff --git a/src/cwb/cqp/output.h b/src/cwb/cqp/output.h
+index 9ca0607..3f9479d 100644
+--- a/src/cwb/cqp/output.h
++++ b/src/cwb/cqp/output.h
+@@ -76,7 +76,7 @@ extern TabulationItem TabulationList;
+ 
+ /* ---------------------------------------------------------------------- */
+ 
+-FILE *open_temporary_file(char *tmp_name_buffer);
++/* FILE *open_temporary_file(char *tmp_name_buffer); */
+ 
+ FILE *open_file(char *name, char *mode);
+ 
+diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
+index 1868445..53e4bcf 100644
+--- a/src/cwb/cqp/parse_actions.c
++++ b/src/cwb/cqp/parse_actions.c
+@@ -541,7 +541,7 @@ do_echo(char *s, struct Redir *rd) {
+   }
+   *w = '\0'; /* terminate modified string */
+ 
+-  Rprintf(rd->stream, "%s", s);
++  Rprintf("%s", s);
+   cl_free(s);
+ 
+   close_stream(rd);
+@@ -1575,7 +1575,7 @@ OptimizeStringConstraint(Constrainttree left,
+           c->type = id_list;
+           c->idlist.attr = left->pa_ref.attr;
+           c->idlist.label = left->pa_ref.label;
+-          c->idlist.delete = left->pa_ref.delete;
++          c->idlist.del = left->pa_ref.del;
+ 
+           c->idlist.nr_items = nr_items;
+           c->idlist.items = items;
+@@ -1729,7 +1729,7 @@ do_StringConstraint(char *s, int flags)
+       left->type = pa_ref;
+       left->pa_ref.attr = attr;
+       left->pa_ref.label = NULL;
+-      left->pa_ref.delete = 0;
++      left->pa_ref.del = 0;
+ 
+       c = OptimizeStringConstraint(left, cmp_eq, right);
+     }
+@@ -1759,7 +1759,7 @@ Varref2IDList(Attribute *attr, enum b_ops op, char *varName)
+       node->type = id_list;
+       node->idlist.attr = attr;
+       node->idlist.label = NULL;
+-      node->idlist.delete = 0;
++      node->idlist.del = 0;
+       node->idlist.negated = (op == cmp_eq ? 0 : 1);
+       node->idlist.items = GetVariableItems(v, 
+                                             query_corpus->corpus,
+@@ -2039,7 +2039,7 @@ do_RelExpr(Constrainttree left,
+         /* be careful: res might be of type cnode, when an empty id_list has been optimised away */
+         if (res && res->type == id_list && generate_code) {
+           res->idlist.label = left->pa_ref.label;
+-          res->idlist.delete = left->pa_ref.delete;
++          res->idlist.del = left->pa_ref.del;
+         }
+       }
+       else {
+@@ -2150,7 +2150,7 @@ do_LabelReference(char *label_name, int auto_delete)
+       res->type = pa_ref;
+       res->pa_ref.attr = attr;
+       res->pa_ref.label = lab;
+-      res->pa_ref.delete = auto_delete;
++      res->pa_ref.del = auto_delete;
+     }
+     else if ((attr = find_attribute(query_corpus->corpus,
+                                     hack,
+@@ -2174,7 +2174,7 @@ do_LabelReference(char *label_name, int auto_delete)
+         res->type = sa_ref;
+         res->sa_ref.attr = attr;
+         res->sa_ref.label = lab;
+-        res->sa_ref.delete = auto_delete;
++        res->sa_ref.del = auto_delete;
+       }
+     }
+   }
+@@ -2207,7 +2207,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
+       res->type = pa_ref;
+       res->pa_ref.attr = attr;
+       res->pa_ref.label = NULL;
+-      res->pa_ref.delete = 0;
++      res->pa_ref.del = 0;
+     }
+     else if ((lab = labellookup(CurEnv->labels, id_name, LAB_USED, 0)) != NULL) {
+       NEW_BNODE(res);
+@@ -2218,7 +2218,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
+         cqpmessage(Warning, "Cannot auto-delete special label '%s' [ignored].", id_name);
+         auto_delete = 0;
+       }
+-      res->pa_ref.delete = auto_delete;
++      res->pa_ref.del = auto_delete;
+       auto_delete = 0;                /* we'll check that below */
+     }
+     else if ((attr = find_attribute(query_corpus->corpus,
+@@ -2240,7 +2240,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
+       /* Need to set label to NULL now that we put sa_ref's to better use.
+          A label's sa_ref now returns the value of the enclosing region */
+       res->sa_ref.label = NULL;
+-      res->sa_ref.delete = 0;
++      res->sa_ref.del = 0;
+     }
+     else {
+       if (within_gc) {
+@@ -3089,7 +3089,7 @@ do_dump(CorpusList *cl, int first, int last, struct Redir *rd)
+       target  = (cl->targets)  ? cl->targets[j]  : -1;
+       keyword = (cl->keywords) ? cl->keywords[j] : -1;
+       rg = cl->range + j;
+-      Rprintf(rd->stream, "%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
++      Rprintf("%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
+     }
+ 
+     close_stream(rd);
+diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
+index de87e37..666485b 100644
+--- a/src/cwb/cqp/parser.y
++++ b/src/cwb/cqp/parser.y
+@@ -794,7 +794,7 @@ OptAttributeSpec:    ID OptionalFlag
+ 
+ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
+                 { 
+-                  int ok;
++                  int ok __attribute__((unused));
+                   if ($2 && generate_code) {
+                     do_start_timer();
+                     ok = SortSubcorpus($2, $3, 0, NULL);
+@@ -806,7 +806,7 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
+                 }
+               | SORT_SYM OptionalCID RANDOMIZE_SYM OptInteger
+                 {
+-                  int ok;
++                  int ok __attribute__((unused));
+                   if ($2 && generate_code) {
+                     do_start_timer();
+                     ok = SortSubcorpusRandomize($2, $4);
+@@ -817,9 +817,8 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
+                 }
+               | COUNT_SYM OptionalCID SortClause CutStatement OptionalRedir
+                 { 
+-                  int ok;
+                   if ($2 && generate_code) {
+-                    ok = SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
++                    SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
+                     FreeSortClause($3);
+                     cl_free($5.name);
+                   }
+diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
+index ca316dd..73083b0 100644
+--- a/src/cwb/cqp/ranges.c
++++ b/src/cwb/cqp/ranges.c
+@@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**< alias to newly created sortidx, so it can b
+  * No parameters - the assumption is that everything is set up
+  * already by the SortSubCorpus function which calls this one.
+  */
++/*
+ int
+ SortExternally(void)
+ {
+-  /* uses settings from static srt_* variables */
+   char temporary_name[TEMP_FILENAME_BUFSIZE];
+   FILE *fd;
+   FILE *pipe;
+@@ -1051,14 +1051,13 @@ SortExternally(void)
+   if ((fd = open_temporary_file(temporary_name)) != NULL) {
+     int line, p1start, p1end, plen, step, token, l;
+ 
+-    line = -1;                  /* will indicate sort failure below if text_size == 0 */
++    line = -1;                 
+     if (text_size > 0) {
+ 
+       for (line = 0; line < srt_cl->size; line++) {
+         
+         Rprintf("%d ", line); 
+         
+-        /* determine start and end position of sort interval for this match */
+         switch (srt_anchor1) {
+         case MatchField:
+             p1start = srt_cl->range[line].start + srt_offset1;
+@@ -1095,7 +1094,6 @@ SortExternally(void)
+           break;
+         }
+         
+-        /* adjust sort boundaries at start and end of corpus */
+         if (p1start < 0)
+           p1start = 0;
+         else if (p1start >= text_size)
+@@ -1106,20 +1104,16 @@ SortExternally(void)
+         else if (p1end >= text_size)
+           p1end = text_size - 1;
+         
+-        /* swap start and end of interval for reverse sorting */
+         if (srt_reverse) {
+           int temp;
+           temp = p1start; p1start = p1end; p1end = temp;
+         }
+         
+-        /* determine sort direction */
+         step = (p1end >= p1start) ? 1 : -1;
+         
+-        /* how many tokens to print */
+         plen = abs(p1end - p1start) + 1;
+ 
+         
+-        /* when using flags, print normalised token sequence first (after applying cl_string_canonical) */
+         if (srt_flags) {
+           token = p1start;
+           for (l=1 ; l <= plen ; l++) {
+@@ -1129,13 +1123,6 @@ SortExternally(void)
+             if (value) {
+               int i, p = strlen((char *) value);
+               if (srt_flags) {
+-                // DELETE WHEN  NEW FORM OF CL_STRING_CANONICAL CONFIRMED FUNCTIONAL
+-//                /* allocate extra mem in case of UTF8 folding */
+-//                char *newvalue = cl_malloc( (p + 1) * (srt_cl->corpus->charset == utf8 ? 2 : 1) );
+-//                strcpy(newvalue, value);
+-//                cl_string_canonical(newvalue, srt_cl->corpus->charset, srt_flags);
+-//                del_value = 1;
+-//                value = newvalue;
+                 value = cl_string_canonical(value, srt_cl->corpus->charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
+                 del_value = 1;
+               }
+@@ -1147,11 +1134,6 @@ SortExternally(void)
+                 del_value = 1;
+               }
+ 
+-              /* old
+-              if (srt_reverse) {
+-                for (i = p-1 ; i >= 0; i--)
+-                  fputc(srt_maptable[value[i]], fd);
+-              }*/
+               for (i = 0; i < p; i++)
+                 fputc((unsigned char) value[i], fd);
+ 
+@@ -1164,7 +1146,6 @@ SortExternally(void)
+           Rprintf("\t");
+         }
+ 
+-        /* print sequence of tokens in sort interval */
+         token = p1start;
+         for (l = 1 ; l <= plen ; l++) {
+           char *value = cl_cpos2str(srt_attribute, token);
+@@ -1177,11 +1158,6 @@ SortExternally(void)
+               del_value = 1;
+               value = cl_string_reverse(value, srt_cl->corpus->charset);
+             }
+-            /*old version
+-             if (srt_reverse) {
+-              for (i = p-1 ; i >= 0; i--)
+-                fputc(value[i], fd);
+-            } */
+             for (i = 0; i < p; i++)
+               fputc((unsigned char) value[i], fd);
+             fputc(' ', fd);
+@@ -1189,19 +1165,17 @@ SortExternally(void)
+               cl_free(value);
+           }
+           token += step;
+-        } /* end for each token */
++        } 
+         Rprintf("\n");
+       }
+     
+       fclose(fd);
+ 
+-      /* now, execute the external sort command on the temporary file */
+       sprintf(sort_call, "%s %s %s | gawk '{print $1}'", ExternalSortingCommand, (srt_ascending ? "" : "-r"), temporary_name);
+       if (SORT_DEBUG)
+         Rprintf("Running sort: \n\t%s\n", sort_call);
+       
+-      /* run sort cmd and read from pipe */
+-      line = -1;                /* will indicate failure of external sort command  */
++      line = -1;                
+       if ((pipe = popen(sort_call, "r")) == NULL) {
+         perror("Failure opening sort pipe");
+         cqpmessage(Error, "Can't execute external sort:\n\t%s\n"
+@@ -1220,7 +1194,7 @@ SortExternally(void)
+             int num = atoi(sort_call);
+             if (num < 0 || num >= srt_cl->size) {
+               Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
+-              break;            /* abort */
++              break;          
+             }
+             srt_cl->sortidx[line] = num;
+             line++;
+@@ -1238,7 +1212,6 @@ SortExternally(void)
+                  "\tPlease remove the file manually.", temporary_name);
+     }      
+     
+-    /* now we should have read exactly cl->size lines; otherwise something went wrong */
+     if (line == srt_cl->size) 
+       return 1;
+     else {
+@@ -1253,6 +1226,8 @@ SortExternally(void)
+       return 0;
+   }
+ }
++*/
++ 
+   
+ /**
+  * Defined if a sort cache is to be used in sorting concordance lines.
+@@ -1673,7 +1648,7 @@ SortSubcorpus(CorpusList *cl, SortClause sc, int count_mode, struct Redir *redir
+ 
+   ok = 1;
+   if (UseExternalSorting && !insecure && !count_mode) {
+-    ok = SortExternally();
++    /* ok = SortExternally(); */
+   }
+   else {
+     /* precompute tables for start and end position of sort interval */
+diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
+index 781129b..3c474ff 100644
+--- a/src/cwb/cqp/regex2dfa.c
++++ b/src/cwb/cqp/regex2dfa.c
+@@ -233,7 +233,7 @@ REGEX2DFA_ERROR(char *Format, ...)
+   va_list AP;
+   
+   Rprintf("[%d] ", LINE);
+-  va_start(AP, Format); vRprintf(Format, AP); va_end(AP);
++  va_start(AP, Format); Rprintf(Format, AP); va_end(AP);
+   fputc('\n', stderr);
+   if (++ERRORS == MAX_ERRORS) {
+     Rprintf("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
+@@ -541,7 +541,7 @@ Parse(void)
+   Symbol ID = NULL; 
+   int RHS; 
+   
+-  int ignore_value;             /* ignore value of POP() macro */
++  int ignore_value __attribute__((unused));             /* ignore value of POP() macro */
+ 
+   SP = Stack;
+  LHS:
+diff --git a/src/cwb/cqp/sgml-print.c b/src/cwb/cqp/sgml-print.c
+index da13cad..b006678 100644
+--- a/src/cwb/cqp/sgml-print.c
++++ b/src/cwb/cqp/sgml-print.c
+@@ -322,10 +322,10 @@ sgml_print_output(CorpusList *cl,
+ {
+   int line, real_line;
+   ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
+-  AttributeList *strucs;
++  /* AttributeList *strucs; */
+   PrintDescriptionRecord *pdr = &SGMLPrintDescriptionRecord;
+ 
+-  strucs = cd->printStructureTags;
++  /* strucs = cd->printStructureTags; */
+   
+   fputs(pdr->BeforeConcordance, stream);
+ 
+diff --git a/src/cwb/cqp/variables.c b/src/cwb/cqp/variables.c
+index ddc633e..1168894 100644
+--- a/src/cwb/cqp/variables.c
++++ b/src/cwb/cqp/variables.c
+@@ -282,7 +282,7 @@ NewVariable(char *varname)
+                                           nr_variables * sizeof(Variable));
+     /* no longer necessary: cl_malloc/_realloc checks for this.
+     if (VariableSpace == NULL) {
+-      Rprintf("Fatal Error: Variable space out of memory.\n");
++      RprintF("Fatal Error: Variable space out of memory.\n");
+       assert(0 && "Sorry, big problem here!");
+     } */
+     

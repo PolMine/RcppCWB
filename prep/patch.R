@@ -148,3 +148,133 @@ for (i in 1L:length(remove_lines)){
     writeLines(text = code, con = fname)
   }
 }
+
+extern <- list(
+  
+  "src/cwb/cqp/corpmanag.c" = c(
+    "CorpusList *corpuslist;"
+  ),
+  
+  "src/cwb/cqp/corpmanag.h" = c(
+    "CorpusList *current_corpus;",
+    "CorpusList *corpuslist;"
+  ),
+  
+  "src/cwb/cqp/cqp.h" = c(
+    "CYCtype LastExpression;",
+    "int exit_cqp;",
+    "char *cqp_input_string;",
+    "int cqp_input_string_position;",
+    "int initialize_cqp(int argc, char **argv);",
+    "int cqp_parse_file(FILE *fd, int exit_on_parse_errors);",
+    "int cqp_parse_string(char *s);",
+    "int EvaluationIsRunning;",
+    "int setInterruptCallback(InterruptCheckProc f);",
+    "void CheckForInterrupts(void);",
+    "int signal_handler_is_installed;",
+    "void install_signal_handler(void);"
+  ),
+  
+  "src/cwb/cqp/eval.h" = c(
+    "int eep;",
+    "EvalEnvironment Environment[MAXENVIRONMENT];",
+    "EEP CurEnv, evalenv;"
+  ),
+  
+  "src/cwb/cqp/options.h" = c(
+    "int insecure;",
+    "int inhibit_activation;",
+    "int parseonly;",
+    "int verbose_parser;",
+    "int show_symtab;",
+    "int show_gconstraints;",
+    "int show_evaltree;",
+    "int show_patlist;",
+    "int show_compdfa;",
+    "int show_dfa;",
+    "int symtab_debug;",
+    "int parser_debug;",
+    "int tree_debug;",
+    "int eval_debug;",
+    "int search_debug;",
+    "int initial_matchlist_debug;",
+    "int debug_simulation;",
+    "int activate_cl_debug;",
+    "int server_log;",
+    "int server_debug;",
+    "int snoop;",
+    "int private_server;",
+    "int server_port;",
+    "int localhost;",
+    "int server_quit;",
+    "int query_lock;",
+    "int query_lock_violation;",
+    "int enable_macros;",
+    "int macro_debug;",
+    "int hard_boundary;",
+    "int hard_cut;",
+    "int subquery;",
+    "char *def_unbr_attr;",
+    "int query_optimize;",
+    "enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;",
+    "char *matching_strategy_name;",
+    "int strict_regions;",
+    "int use_readline;",
+    "int highlighting;",
+    "int paging;",
+    "char *pager;",
+    "char *tested_pager;",
+    "char *less_charset_variable;",
+    "int use_colour;",
+    "int progress_bar;",
+    "int pretty_print;",
+    "int autoshow;",
+    "int timing;",
+    "int show_tag_attributes;",
+    "int show_targets;",
+    "char *printModeString;",
+    "char *printModeOptions;",
+    "int printNrMatches;",
+    "char *printStructure;",
+    "char *left_delimiter;",
+    "char *right_delimiter;",
+    "char *registry;",
+    "char *LOCAL_CORP_PATH;",
+    "int auto_save;",
+    "int save_on_exit;",
+    "char *cqp_init_file;",
+    "char *macro_init_file;",
+    "char *cqp_history_file;",
+    "int write_history_file;",
+    "int batchmode;",
+    "int silent;",
+    "char *default_corpus;",
+    "char *query_string;",
+    "int UseExternalSorting;",
+    "char *ExternalSortingCommand;",
+    "int UseExternalGrouping;",
+    "char *ExternalGroupingCommand;",
+    "int user_level;",
+    "int rangeoutput;",
+    "int child_process;",
+    "ContextDescriptor CD;",
+    "int handle_sigpipe;",
+    "char *progname;",
+    "char *licensee;",
+    "FILE *batchfd;"
+  )
+)
+
+lapply(
+  names(extern),
+  function(f){
+    fname <- path(repodir, f)
+    code <- readLines(fname)
+    for (ext in extern[[f]]){
+      for (position in which(startsWith(code, ext))){
+        code[position] <- paste("extern", code[position], sep = " ")
+      }
+    }
+    writeLines(text = code, con = fname)
+  }
+)
