@@ -192,6 +192,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
+<pre><code>## [ece4743] 2021-07-12: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -315,7 +316,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e80cddd] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [3e8f7f7] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -1514,7 +1515,9 @@ git_cmd &lt;- sprintf(
   &quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]]
 )
 result &lt;- system(git_cmd, intern = TRUE)
-cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
+output &lt;- paste(result, collapse = &quot;\n&quot;)
+cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqp.txt&quot;))
+cat(output)</code></pre>
 <pre><code>## diff --git a/src/cwb/CQi/auth.c b/src/cwb/CQi/auth.c
 ## index fd1201c..462ada7 100644
 ## --- a/src/cwb/CQi/auth.c

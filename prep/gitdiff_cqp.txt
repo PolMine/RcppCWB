@@ -1,0 +1,46 @@
+diff --git a/src/cwb/CQi/auth.c b/src/cwb/CQi/auth.c
+index fd1201c..462ada7 100644
+--- a/src/cwb/CQi/auth.c
++++ b/src/cwb/CQi/auth.c
+@@ -26,6 +26,8 @@
+ 
+ #include "../cl/macros.h"
+ 
++void Rprintf(const char *, ...);
++
+ /* data structures (internal use only) */
+ 
+ /** Internal data structure: name of a corpus to which access is granted */
+diff --git a/src/cwb/CQi/cqpserver.c b/src/cwb/CQi/cqpserver.c
+index 80060e7..20fdf48 100644
+--- a/src/cwb/CQi/cqpserver.c
++++ b/src/cwb/CQi/cqpserver.c
+@@ -31,6 +31,7 @@
+ #include "../cqp/corpmanag.h"
+ #include "../cqp/groups.h"
+ 
++void Rprintf(const char *, ...);
+ 
+ /** String containing the username sent by the currently-connect CQi client */
+ char *user = "";
+diff --git a/src/cwb/CQi/server.c b/src/cwb/CQi/server.c
+index 5aac73d..451d016 100644
+--- a/src/cwb/CQi/server.c
++++ b/src/cwb/CQi/server.c
+@@ -45,6 +45,7 @@
+ #include "../cqp/corpmanag.h"
+ #include "../cqp/parse_actions.h"
+ #include "../cqp/hash.h"
++#include "../cl/lexhash.h" /* inserted by AB */
+ 
+ #define NETBUFSIZE 512
+ #define ATTHASHSIZE 16384
+@@ -57,6 +58,8 @@
+ #define MSG_WAITALL 0
+ #endif
+ 
++void Rprintf(const char *, ...);
++
+ /*
+  *
+  * Global variables for CQPSERVER

@@ -85,7 +85,9 @@ git_cmd <- sprintf(
   "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h' ':!*lex.yy.c'"
 )
 result <- system(git_cmd, intern = TRUE)
-cat(paste(result, collapse = "\n"))
+output <- paste(result, collapse = "\n")
+cat(output, file = path(repodir, "prep", "gitdiff_cqp.txt"))
+cat(output)
 ```
 
 
@@ -98,7 +100,7 @@ git_cmd <- sprintf(
 )
 result <- system(git_cmd, intern = TRUE)
 output <- paste(result, collapse = "\n")
-cat(output, file = path(repodir, "prep", "gitdiff_cqp.txt"))
+cat(output, file = path(repodir, "prep", "gitdiff_cqi.txt"))
 cat(output)
 ```
 
