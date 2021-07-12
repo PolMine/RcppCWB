@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e280982] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [073f46a] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,19 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/registry.y b/src/cwb/cl/registry.y
-## index 5f34794..f4be7bc 100644
-## --- a/src/cwb/cl/registry.y
-## +++ b/src/cwb/cl/registry.y
-## @@ -16,6 +16,7 @@
-##   */
-##  %{
-##  
-## +void Rprintf(const char *, ...);
-##  #include &lt;ctype.h&gt;
-##  
-##  #include &quot;globals.h&quot;
-## diff --git a/src/cwb/cl/regopt.c b/src/cwb/cl/regopt.c
+<pre><code>## diff --git a/src/cwb/cl/regopt.c b/src/cwb/cl/regopt.c
 ## index 3fb93ce..d48ff28 100644
 ## --- a/src/cwb/cl/regopt.c
 ## +++ b/src/cwb/cl/regopt.c

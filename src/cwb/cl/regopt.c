@@ -23,7 +23,6 @@
 
 #include "globals.h"
 #include "regopt.h"
-
 void Rprintf(const char *, ...);
 
 /**

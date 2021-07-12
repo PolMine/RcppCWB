@@ -63,7 +63,8 @@ insert_after <- list(
   "src/cwb/cl/cdaccess.c" = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/globals.c" = list('^#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/lexhash.c" = list('^#include\\s"lexhash\\.h"', "#include <unistd.h>"),
-  "src/cwb/cl/ngram-hash.c" = list("^#include\\s<math\\.h>", "void Rprintf(const char *, ...);")
+  "src/cwb/cl/ngram-hash.c" = list("^#include\\s<math\\.h>", "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/regopt.c" = list('^#include\\s"regopt\\.h"', "void Rprintf(const char *, ...);")
 )
 
 for (i in 1L:length(insert_after)){
@@ -111,7 +112,8 @@ replace <- list(
   "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
   "src/cwb/cl/makecomps.c" = list("^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1),
   "src/cwb/cl/ngram-hash.c" = list("^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;", "\\1cl_ngram_hash_entry entry;", 1),
-  "src/cwb/cl/ngram-hash.c" = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1)
+  "src/cwb/cl/ngram-hash.c" = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1),
+  "src/cwb/cl/regopt.c" = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
 )
 
 for (i in 1L:length(replace)){
