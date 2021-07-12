@@ -121,7 +121,7 @@ replace <- list(
   "src/cwb/cl/regopt.c" = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1),
   
   "src/cwb/cl/storage.c" = list("^(\\s+)write\\(fd,\\s&fd,\\ssizeof\\(int\\)\\);", "\\1ssize_t success = write(fd, &fd, sizeof(int));", 1),
-  "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->pa_ref.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1)
+  "src/cwb/cqp/eval.c" = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1)
 )
 
 for (i in 1L:length(replace)){
