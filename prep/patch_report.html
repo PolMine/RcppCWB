@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [4193fbf] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [de2acc9] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,32 +345,14 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/latex-print.c b/src/cwb/cqp/latex-print.c
-## index 3a6916e..43c64e2 100644
+## index 0d30d31..43c64e2 100644
 ## --- a/src/cwb/cqp/latex-print.c
 ## +++ b/src/cwb/cqp/latex-print.c
-## @@ -233,7 +233,7 @@ latex_print_aligned_line(FILE *stream, char *attribute_name, char *line)
-##  
-##  void latex_print_context(ContextDescriptor *cd, FILE *stream)
-##  {
-## -  char *s;
-## +  /* char *s; */
-##  
-##    fputs(&quot;{\\em Left display context:\\/}  &amp; &quot;, stream);
-##  
 ## @@ -249,7 +249,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
 ##              cd-&gt;left_structure_name ? cd-&gt;left_structure_name : &quot;???&quot;);
 ##      break;
 ##    default:
-## -    s = &quot;error&quot;;
-## +    /* s = &quot;error&quot;; */
-##      break;
-##    }
-##  
-## @@ -269,7 +269,7 @@ void latex_print_context(ContextDescriptor *cd, FILE *stream)
-##              cd-&gt;right_structure_name ? cd-&gt;right_structure_name : &quot;???&quot;);
-##      break;
-##    default:
-## -    s = &quot;error&quot;;
+## -    /*s = &quot;error&quot;; */
 ## +    /* s = &quot;error&quot;; */
 ##      break;
 ##    }
