@@ -38,7 +38,7 @@ for (i in 1L:length(delete_line_before)){
   code <- readLines(fname)
   position <- grep(pattern = delete_line_before[[i]][[1]], code)[1]
   if (!is.na(position)){
-    code <- code[-position]
+    code <- code[- (position - 1L)]
     writeLines(text = code, con = fname)
   }
 }

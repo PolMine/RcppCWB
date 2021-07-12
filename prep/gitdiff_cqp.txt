@@ -2,7 +2,7 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
-index 35ef543..4441be0 100644
+index 145ed2b..4441be0 100644
 --- a/src/cwb/cqp/groups.c
 +++ b/src/cwb/cqp/groups.c
 @@ -253,7 +253,7 @@ ComputeGroupInternally(Group *group)
@@ -36,16 +36,18 @@ index 35ef543..4441be0 100644
    sprintf(sort_call, ExternalGroupingCommand, temporary_name);
    if (GROUP_DEBUG)
      Rprintf("Running grouping sort: \n\t%s\n",
-@@ -340,7 +337,7 @@ ComputeGroupExternally(Group *group)
+@@ -340,8 +337,9 @@ ComputeGroupExternally(Group *group)
    
    return group;
  }
--
 +*/
  
- Group *compute_grouping(CorpusList *cl,
+-
++Group *compute_grouping(CorpusList *cl,
                          FieldType source_field,
-@@ -489,11 +486,13 @@ Group *compute_grouping(CorpusList *cl,
+                         int source_offset,
+                         char *source_attr_name,
+@@ -488,11 +486,13 @@ ComputeGroupExternally(Group *group)
    group->cutoff_frequency = cutoff_freq;
    group->is_grouped = is_grouped;
  
