@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [7697a46] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [4c6e7ca] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,19 +345,17 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
-## index 5011a90..4441be0 100644
+## index 613b24d..4441be0 100644
 ## --- a/src/cwb/cqp/groups.c
 ## +++ b/src/cwb/cqp/groups.c
-## @@ -486,11 +486,13 @@ Group *compute_grouping(CorpusList *cl,
+## @@ -486,10 +486,13 @@ Group *compute_grouping(CorpusList *cl,
 ##    group-&gt;cutoff_frequency = cutoff_freq;
 ##    group-&gt;is_grouped = is_grouped;
 ##  
 ## -  if (UseExternalGrouping &amp;&amp; !insecure &amp;&amp; !(source_is_struc || target_is_struc || is_grouped))
-## -    /* external grouping doesn&#39;t support s-attributes and grouped counts */
-## -    return ComputeGroupExternally(group); /* modifies Group object in place and returns pointer */
 ## +
 ## +  /* if (UseExternalGrouping &amp;&amp; !insecure &amp;&amp; !(source_is_struc || target_is_struc || is_grouped))
-## +    return ComputeGroupExternally(group);
+##      return ComputeGroupExternally(group);
 ##    else
 ##      return ComputeGroupInternally(group);
 ## +   */
