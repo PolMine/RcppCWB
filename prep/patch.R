@@ -107,7 +107,7 @@ replace <- list(
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1),
   "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
   "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
-  "src/cwb/cl/makecomps.c" = list("^(\\s*)char ´\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1)
+  "src/cwb/cl/makecomps.c" = list("^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1)
 )
 
 for (i in 1L:length(replace)){

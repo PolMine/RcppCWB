@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [9a3d388] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [8df96dd] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,19 +330,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/makecomps.c b/src/cwb/cl/makecomps.c
-## index e5e737d..7556472 100644
+## index 565e883..7556472 100644
 ## --- a/src/cwb/cl/makecomps.c
 ## +++ b/src/cwb/cl/makecomps.c
-## @@ -25,6 +25,8 @@
-##   * (CompCorpus, CompLExicon, etc.)
-##   */
-##  
-## +void Rprintf(const char *, ...);
-## +
-##  #include &lt;ctype.h&gt;
-##  #include &lt;sys/types.h&gt;
-##  
-## @@ -45,7 +47,7 @@
+## @@ -47,7 +47,7 @@ void Rprintf(const char *, ...);
 ##  #define BUFSIZE 0x10000
 ##  
 ##  /* seems not ever to be used? */
