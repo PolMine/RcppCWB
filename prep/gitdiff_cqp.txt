@@ -2,10 +2,10 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-index 3035f15..0b2918c 100644
+index da6b562..0b2918c 100644
 --- a/src/cwb/cqp/output.c
 +++ b/src/cwb/cqp/output.c
-@@ -123,16 +123,17 @@ print_corpus_info_header(CorpusList *cl,
+@@ -123,15 +123,16 @@ print_corpus_info_header(CorpusList *cl,
   * @return                A stream (FILE *) to the opened temporary file, or NULL
   *                        if unsuccessful.
   */
@@ -20,12 +20,10 @@ index 3035f15..0b2918c 100644
  
    assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
 -  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); /* "cqpt.$$" */
--  tempfile_name = tempnam(TEMPDIR_PATH, prefix); /* string is allocated by tempnam(), needs to be free'd below */
 +  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); 
-+  tempfile_name = tempnam(TEMPDIR_PATH, prefix);
+   tempfile_name = tempnam(TEMPDIR_PATH, prefix);
    if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
      perror("open_temporary_file(): filename too long for buffer");
-     *tmp_name_buffer = '\0';
 @@ -154,7 +155,7 @@ open_temporary_file(char *tmp_name_buffer)
      return NULL;
    }
