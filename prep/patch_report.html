@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [4354264] 2021-07-10: CWB patched</code></pre>
+<pre><code>## [e503f28] 2021-07-10: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,29 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/cdaccess.c b/src/cwb/cl/cdaccess.c
-## index 07d04dc..5bac140 100644
-## --- a/src/cwb/cl/cdaccess.c
-## +++ b/src/cwb/cl/cdaccess.c
-## @@ -1081,7 +1081,7 @@ cl_read_stream(PositionStream ps,
-##  
-##      {
-##        /* convert network byte order to native integers */
-## -      /* int i; */
-## +      int i;
-##        for (i = 0; i &lt; items_to_read; i++)
-##          buffer[i] = ntohl(buffer[i]);
-##      }
-## @@ -1392,7 +1392,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
-##    for (idx = 0; idx &lt; lexsize; idx++) {
-##      int off_start;     /* start and end offset of current lexicon entry */
-##      /* char *p; */
-## -    int i;
-## +    /* int i; */
-##  
-##      /* compute start offset and length of current lexicon entry from lexidx, if possible)
-##       *  -- no longer necessary because we can&#39;t pass len to cl_regex_match
-## diff --git a/src/cwb/cl/class-mapping.c b/src/cwb/cl/class-mapping.c
+<pre><code>## diff --git a/src/cwb/cl/class-mapping.c b/src/cwb/cl/class-mapping.c
 ## index e0162ee..47114d4 100644
 ## --- a/src/cwb/cl/class-mapping.c
 ## +++ b/src/cwb/cl/class-mapping.c
