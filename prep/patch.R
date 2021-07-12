@@ -34,7 +34,8 @@ delete_line_before <- list(
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
   "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
   "src/cwb/cqp/groups.c" = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{"),
-  "src/cwb/cqp/groups.c" = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);")
+  "src/cwb/cqp/groups.c" = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);"),
+  "src/cwb/cqp/groups.c" = list("^\\s*return\\sComputeGroupExternally\\(group\\);")
 )
 
 for (i in 1L:length(delete_line_before)){
@@ -160,7 +161,8 @@ replace <- list(
   "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
   "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
   "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
-  "src/cwb/cqp/groups.c" = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1)
+  "src/cwb/cqp/groups.c" = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1),
+  "src/cwb/cqp/groups.c" = list("^(.*?)\\s*/\\*\\smodifies\\sGroup\\sobject\\sin\\splace\\sand\\sreturns\\spointer\\s\\*/", "\\1", 1)
 
   # "src/cwb/cqp/groups.c" = list("^(\\s*)-- a/src/cwb/cqp/groups.c", "\\1++ b/src/cwb/cqp/groups.c", 1),
   # "src/cwb/cqp/groups.c" = list("^(\\s*)", "\\1/*", 1),
