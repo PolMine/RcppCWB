@@ -43,7 +43,7 @@ insert_before <- list(
   "src/cwb/cl/registry.y" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/special-chars.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/storage.c" = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/storage.c" = list("^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);", 'if (success < 0) Rprintf("Operation not successful");')
+  "src/cwb/cl/storage.c" = list("^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);", '\\1if (success < 0) Rprintf("Operation not successful");')
 )
 
 for (i in 1L:length(insert_before)){
