@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [8df96dd] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [37a30b7] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,20 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/makecomps.c b/src/cwb/cl/makecomps.c
-## index 565e883..7556472 100644
-## --- a/src/cwb/cl/makecomps.c
-## +++ b/src/cwb/cl/makecomps.c
-## @@ -47,7 +47,7 @@ void Rprintf(const char *, ...);
-##  #define BUFSIZE 0x10000
-##  
-##  /* seems not ever to be used? */
-## -char errmsg[CL_MAX_LINE_LENGTH];
-## +/* char errmsg[CL_MAX_LINE_LENGTH]; */
-##  
-##  
-##  
-## diff --git a/src/cwb/cl/ngram-hash.c b/src/cwb/cl/ngram-hash.c
+<pre><code>## diff --git a/src/cwb/cl/ngram-hash.c b/src/cwb/cl/ngram-hash.c
 ## index b204f5d..48f933e 100644
 ## --- a/src/cwb/cl/ngram-hash.c
 ## +++ b/src/cwb/cl/ngram-hash.c

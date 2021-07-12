@@ -22,8 +22,8 @@
 #include "ngram-hash.h"
 
 #include <math.h>
-
 void Rprintf(const char *, ...);
+
 
 /** Defines the default number of buckets in an n-gram hash. */
 #define DEFAULT_NR_OF_BUCKETS 250000
