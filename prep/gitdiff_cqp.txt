@@ -2,19 +2,10 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
-index 22ebcf3..4441be0 100644
+index b75cd0c..4441be0 100644
 --- a/src/cwb/cqp/groups.c
 +++ b/src/cwb/cqp/groups.c
-@@ -266,8 +266,6 @@ ComputeGroupExternally(Group *group)
-   FILE *pipe;
-   char sort_call[CL_MAX_LINE_LENGTH];
- 
--  /* ---------------------------------------------------------------------- */
--
-   if ((fd = open_temporary_file(temporary_name)) == NULL) {
-     perror("Error while opening temporary file");
-     cqpmessage(Warning, "Can't open temporary file");
-@@ -275,11 +273,10 @@ ComputeGroupExternally(Group *group)
+@@ -273,11 +273,10 @@ ComputeGroupExternally(Group *group)
    }
  
    for (i = 0; i < size; i++) {
@@ -27,7 +18,7 @@ index 22ebcf3..4441be0 100644
    sprintf(sort_call, ExternalGroupingCommand, temporary_name);
    if (GROUP_DEBUG)
      Rprintf("Running grouping sort: \n\t%s\n",
-@@ -489,11 +486,13 @@ Group *compute_grouping(CorpusList *cl,
+@@ -487,11 +486,13 @@ Group *compute_grouping(CorpusList *cl,
    group->cutoff_frequency = cutoff_freq;
    group->is_grouped = is_grouped;
  

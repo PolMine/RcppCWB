@@ -158,7 +158,8 @@ replace <- list(
   "src/cwb/cqp/eval.c" = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1),
   "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
   "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
-  "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+  "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
+  "src/cwb/cqp/groups.c" = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1)
 
   # "src/cwb/cqp/groups.c" = list("^(\\s*)-- a/src/cwb/cqp/groups.c", "\\1++ b/src/cwb/cqp/groups.c", 1),
   # "src/cwb/cqp/groups.c" = list("^(\\s*)", "\\1/*", 1),
