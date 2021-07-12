@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [6544113] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [51b4194] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,27 +330,9 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/class-mapping.c b/src/cwb/cl/class-mapping.c
-## index f976c53..0a7564a 100644
+## index a2c9042..0a7564a 100644
 ## --- a/src/cwb/cl/class-mapping.c
 ## +++ b/src/cwb/cl/class-mapping.c
-## @@ -505,7 +505,7 @@ number_of_tokens(SingleMapping map)
-##   */
-##  int
-##  member_of_class_s(Mapping map, 
-## -                  SingleMapping class,
-## +                  SingleMapping obj,
-##                    char *token)
-##  {
-##    int id;
-## @@ -515,7 +515,7 @@ member_of_class_s(Mapping map,
-##    if (id &lt; 0 || cderrno != CDA_OK) 
-##      return 0;
-##    else
-## -    return member_of_class_i(map, class, id);
-## +    return member_of_class_i(map, obj, id);
-##  }
-##  
-##  /**
 ## @@ -523,17 +523,17 @@ member_of_class_s(Mapping map,
 ##   *
 ##   * @see member_of_class_s
