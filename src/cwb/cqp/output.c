@@ -572,7 +572,7 @@ catalog_corpus(CorpusList *cl,
       print_corpus_info_header(cl, rd->stream, mode, 1);
     }
     else if (printNrMatches && mode == PrintASCII)
-      Rprintf(rd->stream, "%d matches.\n", cl->size);
+      Rprintf("%d matches.\n", cl->size);
     
     print_output(cl, rd->stream, 
                  isatty(fileno(rd->stream)) || rd->is_paging, 
@@ -622,7 +622,7 @@ cqpmessage(MessageType type, char *format, ...)
 
     if (!silent || type == Error) {
       Rprintf("%s:\n\t", msg);
-      vRprintf(format, ap);
+      Rprintf(format, ap);
       Rprintf("\n");
     }
 
@@ -895,7 +895,7 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
         if (cpos >= 0 && cpos <= cl->mother_size) {
           /* valid cpos: print cpos or requested attribute */
           if (item->attribute_type == ATT_NONE) {
-            Rprintf(rd->stream, "%d", cpos);
+            Rprintf("%d", cpos);
           }
           else {
             char *string = NULL;
@@ -907,11 +907,11 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
               if (item->flags) {
                 /* get canonical string as newly alloc'ed duplicate, then print */
                 char *copy = cl_string_canonical(string, cl->corpus->charset, item->flags, CL_STRING_CANONICAL_STRDUP);
-                Rprintf(rd->stream, "%s", copy);
+                Rprintf("%s", copy);
                 cl_free(copy);
               }
               else {
-                Rprintf(rd->stream, "%s", string);
+                Rprintf("%s", string);
               }
             }
           }
@@ -919,16 +919,16 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *rd)
         else {
           /* cpos out of bounds: print -1 or empty string */
           if (item->attribute_type == ATT_NONE)
-            Rprintf(rd->stream, "-1");
+            Rprintf("-1");
         }
         if (cpos < end)         /* tokens in a range item are separated by blanks */
-          Rprintf(rd->stream, " "); 
+          Rprintf(" "); 
       }
       if (item->next)           /* multiple tabulation items are separated by TABs */
-        Rprintf(rd->stream, "\t");
+        Rprintf("\t");
       item = item->next;
     }
-    Rprintf(rd->stream, "\n");
+    Rprintf("\n");
   }
   
   close_stream(rd);
