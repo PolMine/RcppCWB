@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [1bd373b] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [a322548] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,7 +345,7 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-## index 86fd342..0b2918c 100644
+## index e77aaf1..0b2918c 100644
 ## --- a/src/cwb/cqp/output.c
 ## +++ b/src/cwb/cqp/output.c
 ## @@ -123,6 +123,7 @@ print_corpus_info_header(CorpusList *cl,
@@ -360,7 +360,7 @@ cat(gitdiff_cqp)</code></pre>
 ##    FILE *fd = NULL;
 ##  
 ##    assert((tmp_name_buffer != NULL) &amp;&amp; &quot;Invalid NULL argument in open_temporary_file().&quot;);
-## -  sprintf(prefix, &quot;cqpt.%d&quot;, (unsigned int)getpid()); /* &quot;cqpt.$$&quot; */
+## -  sprintf(prefix, &quot;cqpt.%d&quot;, (unsigned int)getpid());
 ## +  sprintf(prefix, &quot;cqpt.%d&quot;, (unsigned int)getpid()); 
 ##    tempfile_name = tempnam(TEMPDIR_PATH, prefix);
 ##    if (strlen(tempfile_name) &gt;= TEMP_FILENAME_BUFSIZE) {

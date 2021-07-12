@@ -2,7 +2,7 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-index 86fd342..0b2918c 100644
+index e77aaf1..0b2918c 100644
 --- a/src/cwb/cqp/output.c
 +++ b/src/cwb/cqp/output.c
 @@ -123,6 +123,7 @@ print_corpus_info_header(CorpusList *cl,
@@ -17,7 +17,7 @@ index 86fd342..0b2918c 100644
    FILE *fd = NULL;
  
    assert((tmp_name_buffer != NULL) && "Invalid NULL argument in open_temporary_file().");
--  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); /* "cqpt.$$" */
+-  sprintf(prefix, "cqpt.%d", (unsigned int)getpid());
 +  sprintf(prefix, "cqpt.%d", (unsigned int)getpid()); 
    tempfile_name = tempnam(TEMPDIR_PATH, prefix);
    if (strlen(tempfile_name) >= TEMP_FILENAME_BUFSIZE) {
