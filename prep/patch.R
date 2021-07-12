@@ -40,7 +40,8 @@ insert_before <- list(
   "src/cwb/cl/lexhash.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/macros.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/makecomps.c" = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", "")),
-  "src/cwb/cl/registry.y" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/registry.y" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/special-chars.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
 )
 
 for (i in 1L:length(insert_before)){

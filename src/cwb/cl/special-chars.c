@@ -20,7 +20,6 @@
  */
 
 void Rprintf(const char *, ...);
-
 #include <ctype.h>
 
 #include <glib.h>
