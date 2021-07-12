@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [39156de] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [099a86e] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,18 +345,9 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
-## index 93bc76a..0c5f5b3 100644
+## index 6a3cfdb..0c5f5b3 100644
 ## --- a/src/cwb/cqp/eval.c
 ## +++ b/src/cwb/cqp/eval.c
-## @@ -621,7 +621,7 @@ get_leaf_value(Constrainttree ctptr,
-##        else {
-##  
-##          referenced_position = get_label_referenced_position(ctptr-&gt;pa_ref.label, rt, corppos);
-## -        if (ctptr-&gt;pa_ref.delete) {
-## +        if (ctptr-&gt;pa_ref.del) {
-##            if (eval_debug)
-##              Rprintf(&quot;** AUTO-DELETING LABEL %s = %d\n&quot;,
-##                     ctptr-&gt;pa_ref.label-&gt;name, referenced_position);
 ## @@ -684,7 +684,7 @@ get_leaf_value(Constrainttree ctptr,
 ##        /* label reference to S-attribute -&gt; return value of containing region */
 ##        int referenced_position = get_label_referenced_position(ctptr-&gt;sa_ref.label, rt, corppos);
