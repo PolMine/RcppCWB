@@ -99,7 +99,7 @@ insert_after <- list(
   "src/cwb/cl/lexhash.c" = list('^#include\\s"lexhash\\.h"', "#include <unistd.h>"),
   "src/cwb/cl/ngram-hash.c" = list("^#include\\s<math\\.h>", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/regopt.c" = list('^#include\\s"regopt\\.h"', "void Rprintf(const char *, ...);"),
-  "src/cwb/cqp/groups.c" = list("return ComputeGroupInternally(group);", c("   */", "  return group;"))
+  "src/cwb/cqp/groups.c" = list("return\\sComputeGroupInternally\\(group\\);", c("   */", "  return group;"))
 )
 
 for (i in 1L:length(insert_after)){
