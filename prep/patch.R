@@ -76,7 +76,8 @@ insert_before <- list(
   "src/cwb/cqp/hash.c" = list("^\\s*int\\s*$", "/*", 1),
   "src/cwb/cqp/hash.c" = list("^\\s*int\\s*$", "/*", 2),
   "src/cwb/cqp/hash.c" = list("^unsigned\\sint\\s*$", "/*", 1),
-  "src/cwb/cqp/macro.c" = list('#include\\s"hash\\.h"', '#include "../cl/lexhash.h" /* newly added by AB */', 1)
+  "src/cwb/cqp/macro.c" = list('#include\\s"hash\\.h"', '#include "../cl/lexhash.h" /* newly added by AB */', 1),
+  "src/cwb/cqp/output.c" = list("^FILE\\s\\*\\s*", "/*", 1)
 )
 
 for (i in 1L:length(insert_before)){
