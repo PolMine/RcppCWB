@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [674af5d] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [c4cfba0] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,20 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/special-chars.c b/src/cwb/cl/special-chars.c
-## index 53eafe6..2f59443 100644
-## --- a/src/cwb/cl/special-chars.c
-## +++ b/src/cwb/cl/special-chars.c
-## @@ -19,6 +19,8 @@
-##   *  Copyright (C) 2010      by ANR Textométrie, ENS de Lyon
-##   */
-##  
-## +void Rprintf(const char *, ...);
-## +
-##  #include &lt;ctype.h&gt;
-##  
-##  #include &lt;glib.h&gt;
-## diff --git a/src/cwb/cl/storage.c b/src/cwb/cl/storage.c
+<pre><code>## diff --git a/src/cwb/cl/storage.c b/src/cwb/cl/storage.c
 ## index 509ca8d..984bcc8 100644
 ## --- a/src/cwb/cl/storage.c
 ## +++ b/src/cwb/cl/storage.c

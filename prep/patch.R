@@ -41,7 +41,9 @@ insert_before <- list(
   "src/cwb/cl/macros.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/makecomps.c" = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", "")),
   "src/cwb/cl/registry.y" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/special-chars.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/special-chars.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/storage.c" = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/storage.c" = list("^(\\s*)lseek(fd, 0, SEEK_SET);", 'if (success < 0) Rprintf("Operation not successful");')
 )
 
 for (i in 1L:length(insert_before)){
@@ -114,7 +116,9 @@ replace <- list(
   "src/cwb/cl/makecomps.c" = list("^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1),
   "src/cwb/cl/ngram-hash.c" = list("^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;", "\\1cl_ngram_hash_entry entry;", 1),
   "src/cwb/cl/ngram-hash.c" = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1),
-  "src/cwb/cl/regopt.c" = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
+  "src/cwb/cl/regopt.c" = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1),
+  
+  "src/cwb/cl/storage.c" = list("^(\\s+)write\\(fd,\\s&fd,\\ssizeof\\(int\\)\\);", "ssize_t success = write(fd, &fd, sizeof(int));", 1)
 )
 
 for (i in 1L:length(replace)){
