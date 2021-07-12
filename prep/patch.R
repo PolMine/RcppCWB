@@ -29,14 +29,16 @@ for (subdir in c("cl", "cqp", "CQi")){
 }
 
 delete_line_before <- list(
-  "src/cwb/cqp/groups.c" = "^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,",
-  "src/cwb/cqp/groups.c" = "^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*", "/*", 3),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,")
 )
 
 for (i in 1L:length(delete_line_before)){
   fname <- path(repodir, names(delete_line_before)[[i]])
   code <- readLines(fname)
-  position <- grep(pattern = delete_line_before[[i]][[1]], code)[1]
+  which_position <- if (length(delete_line_before[[i]]) > 1L) delete_line_before[[i]][[2]] else 1L
+  position <- grep(pattern = delete_line_before[[i]][[1]], code)[which_position]
   if (!is.na(position)){
     code <- code[- (position - 1L)]
     writeLines(text = code, con = fname)
