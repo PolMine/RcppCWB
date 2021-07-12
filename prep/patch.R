@@ -110,7 +110,8 @@ insert_after <- list(
   "src/cwb/cqp/groups.c" = list("return\\sComputeGroupInternally\\(group\\);", c("   */", "  return group;")),
   "src/cwb/cqp/hash.c" = list("^\\s*\\}\\s*$", "*/", 1),
   "src/cwb/cqp/hash.c" = list("^\\s*\\}\\s*$", "*/", 2),
-  "src/cwb/cqp/hash.c" = list("^\\s*\\}\\s*$", "*/", 3)
+  "src/cwb/cqp/hash.c" = list("^\\s*\\}\\s*$", "*/", 3),
+  "src/cwb/cqp/output.c" = list("^\\}\\s*$", "*/", 3)
 )
 
 for (i in 1L:length(insert_after)){
