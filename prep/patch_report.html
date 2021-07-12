@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [ec8fbe5] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [9f8ec2f] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,25 +345,19 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
-## index 2801586..584905a 100644
+## index 38d44d7..584905a 100644
 ## --- a/src/cwb/cqp/hash.c
 ## +++ b/src/cwb/cqp/hash.c
-## @@ -15,7 +15,7 @@
+## @@ -15,7 +15,6 @@
 ##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
 ##   */
 ##  
 ## -
-## +/*
+##  /*
 ##  int 
 ##  is_prime(int n) {
-##    int i;
-## @@ -24,15 +24,19 @@ is_prime(int n) {
-##        return 0;
-##    return 1;
-##  }
-## +*/
-##  
-## +/*
+## @@ -30,13 +29,14 @@ is_prime(int n) {
+##  /*
 ##  int 
 ##  find_prime(int n) {
 ## -  for( ; n &gt; 0 ; n++)       /* will exit on int overflow */
@@ -372,20 +366,12 @@ cat(gitdiff_cqp)</code></pre>
 ##        return n;
 ##    return 0;
 ##  }
-## +*/
+##  */
 ##  
 ## +/*
 ##  unsigned int 
 ##  hash_string(char *string) {
 ##    unsigned char *s = (unsigned char *)string;
-## @@ -41,6 +45,7 @@ hash_string(char *string) {
-##      result = (result * 33 ) ^ (result &gt;&gt; 27) ^ *s;
-##    return result;
-##  }
-## +*/
-##  
-##  unsigned int 
-##  hash_macro(char *macro_name, unsigned int args) {
 ## diff --git a/src/cwb/cqp/hash.h b/src/cwb/cqp/hash.h
 ## index 108f9d2..f5a59c3 100644
 ## --- a/src/cwb/cqp/hash.h

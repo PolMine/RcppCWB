@@ -171,7 +171,8 @@ replace <- list(
   "src/cwb/cqp/eval.h" = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
   "src/cwb/cqp/groups.c" = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1),
   "src/cwb/cqp/groups.c" = list("^(.*?)\\s*/\\*\\smodifies\\sGroup\\sobject\\sin\\splace\\sand\\sreturns\\spointer\\s\\*/", "\\1", 1),
-  "src/cwb/cqp/groups.c" = list("^(\\s*)(if\\s\\(UseExternalGrouping\\s&&\\s\\!insecure\\s&&\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))", "\\1/* \\2", 1)
+  "src/cwb/cqp/groups.c" = list("^(\\s*)(if\\s\\(UseExternalGrouping\\s&&\\s\\!insecure\\s&&\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))", "\\1/* \\2", 1),
+  "src/cwb/cqp/hash.c" = list("^(.*?)\\s*/\\*\\swill\\sexit\\son\\sint\\soverflow\\s\\*/", "\\1", 1)
 
   # "src/cwb/cqp/groups.c" = list("^(\\s*)-- a/src/cwb/cqp/groups.c", "\\1++ b/src/cwb/cqp/groups.c", 1),
   # "src/cwb/cqp/groups.c" = list("^(\\s*)", "\\1/*", 1),
