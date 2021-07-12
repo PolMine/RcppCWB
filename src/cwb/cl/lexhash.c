@@ -159,6 +159,7 @@ cl_lexhash
 cl_new_lexhash(int buckets)
 {
   cl_lexhash hash;
+  
   if (buckets <= 0)
     buckets = DEFAULT_NR_OF_BUCKETS;
   hash = (cl_lexhash) cl_malloc(sizeof(struct _cl_lexhash));
