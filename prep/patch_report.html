@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [71b6477] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [1bd373b] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,10 +345,10 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-## index da6b562..0b2918c 100644
+## index 86fd342..0b2918c 100644
 ## --- a/src/cwb/cqp/output.c
 ## +++ b/src/cwb/cqp/output.c
-## @@ -123,15 +123,16 @@ print_corpus_info_header(CorpusList *cl,
+## @@ -123,6 +123,7 @@ print_corpus_info_header(CorpusList *cl,
 ##   * @return                A stream (FILE *) to the opened temporary file, or NULL
 ##   *                        if unsuccessful.
 ##   */
@@ -356,9 +356,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  FILE *
 ##  open_temporary_file(char *tmp_name_buffer)
 ##  {
-##    char *tempfile_name;
-## -  char prefix[64]; /* holds &quot;cqpt.$$&quot;, so 64 chars is plenty of headroom */
-## +  char prefix[64];
+## @@ -131,7 +132,7 @@ open_temporary_file(char *tmp_name_buffer)
 ##    FILE *fd = NULL;
 ##  
 ##    assert((tmp_name_buffer != NULL) &amp;&amp; &quot;Invalid NULL argument in open_temporary_file().&quot;);
