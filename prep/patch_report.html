@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [fd47a75] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [4193fbf] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,52 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/html-print.c b/src/cwb/cqp/html-print.c
-## index a24ab17..eda7177 100644
-## --- a/src/cwb/cqp/html-print.c
-## +++ b/src/cwb/cqp/html-print.c
-## @@ -314,7 +314,7 @@ html_print_aligned_line(FILE *stream,
-##  
-##  void html_print_context(ContextDescriptor *cd, FILE *stream)
-##  {
-## -  char *s;
-## +  /* char *s; */
-##  
-##    fputs(&quot;&lt;tr&gt;&lt;td nowrap&gt;&lt;em&gt;Left display context:&lt;/em&gt;&lt;/td&gt;&lt;td nowrap&gt;&quot;, stream);
-##  
-## @@ -330,7 +330,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
-##              cd-&gt;left_structure_name ? cd-&gt;left_structure_name : &quot;???&quot;);
-##      break;
-##    default:
-## -    s = &quot;error&quot;;
-## +    /* s = &quot;error&quot;; */
-##      break;
-##    }
-##  
-## @@ -350,7 +350,7 @@ void html_print_context(ContextDescriptor *cd, FILE *stream)
-##              cd-&gt;right_structure_name ? cd-&gt;right_structure_name : &quot;???&quot;);
-##      break;
-##    default:
-## -    s = &quot;error&quot;;
-## +    /* s = &quot;error&quot;; */
-##      break;
-##    }
-##  
-## @@ -415,12 +415,12 @@ void html_print_output(CorpusList *cl,
-##  {
-##    int line, real_line;
-##    ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
-## -  AttributeList *strucs;
-## +  /* AttributeList *strucs; */
-##    PrintDescriptionRecord *pdr;
-##  
-##    ParsePrintOptions();
-##  
-## -  strucs = cd-&gt;printStructureTags;
-## +  /* strucs = cd-&gt;printStructureTags; */
-##  
-##    if (GlobalPrintOptions.print_tabular) {
-##  
 ## diff --git a/src/cwb/cqp/latex-print.c b/src/cwb/cqp/latex-print.c
 ## index 3a6916e..43c64e2 100644
 ## --- a/src/cwb/cqp/latex-print.c
