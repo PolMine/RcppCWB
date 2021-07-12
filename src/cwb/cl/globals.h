@@ -15,8 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...);
 
+void Rprintf(const char *, ...);
 #ifndef _globals_h_
 #define _globals_h_
 
