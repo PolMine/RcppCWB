@@ -15,8 +15,6 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-/* #include "../cl/lexhash.h" */  /* added by AB */
-
 /* int is_prime(int n); */
 /* int find_prime(int n); */		/* find next prime above <n> */
 /* unsigned int hash_string(char *s); */	/* get 32bit hash value for string */
