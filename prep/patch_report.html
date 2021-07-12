@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [9b58ded] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [ab2e13c] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -330,15 +330,13 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/storage.c b/src/cwb/cl/storage.c
-## index ecfad1f..2adbecf 100644
+## index c2495e0..2adbecf 100644
 ## --- a/src/cwb/cl/storage.c
 ## +++ b/src/cwb/cl/storage.c
-## @@ -333,7 +333,8 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
-##        /* scroll to the len_ptr&#39;th byte, then overwrite the last integer with a random integer (why? not sure  -- AH),
+## @@ -334,6 +334,7 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
 ##         * then rewind file */
 ##        lseek(fd, *len_ptr - sizeof(int), SEEK_SET);
-## -(      )ssize_t success = write(fd, &amp;fd, sizeof(int));
-## +      ssize_t success = write(fd, &amp;fd, sizeof(int));
+##        ssize_t success = write(fd, &amp;fd, sizeof(int));
 ## +      if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;);
 ##        lseek(fd, 0, SEEK_SET);
 ##        
