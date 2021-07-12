@@ -82,7 +82,7 @@ cat(paste(result, collapse = "\n"))
 setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
 git_cmd <- sprintf(
   "git diff %s..%s . %s", to_compare[["sha"]], last_devbranch_commit[["sha"]],
-  "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h' ':!*lex.yy.c'"
+  "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h' ':!*lex.yy.c' ':!*Makefile'"
 )
 result <- system(git_cmd, intern = TRUE)
 gitdiff_cqp <- paste(result, collapse = "\n")
