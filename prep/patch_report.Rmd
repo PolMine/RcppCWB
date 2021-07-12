@@ -85,9 +85,8 @@ git_cmd <- sprintf(
   "':!*_options.h' ':!*parser.tab.c' ':!*parser.tab.h' ':!*lex.yy.c'"
 )
 result <- system(git_cmd, intern = TRUE)
-output <- paste(result, collapse = "\n")
-cat(output, file = path(repodir, "prep", "gitdiff_cqp.txt"))
-cat(output)
+gitdiff_cqp <- paste(result, collapse = "\n")
+cat(gitdiff_cqp)
 ```
 
 
@@ -123,4 +122,8 @@ cat(paste(result, collapse = "\n"))
 ```{r}
 system("git reset --hard HEAD~1") # do not know which cmd would be R equivalent
 checkout(repo = repodir, branch = "dev")
+```
+
+```{r}
+cat(gitdiff_cqp, file = path(repodir, "prep", "gitdiff_cqp.txt"))
 ```
