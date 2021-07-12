@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [37a30b7] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [e280982] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,35 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/ngram-hash.c b/src/cwb/cl/ngram-hash.c
-## index b204f5d..48f933e 100644
-## --- a/src/cwb/cl/ngram-hash.c
-## +++ b/src/cwb/cl/ngram-hash.c
-## @@ -23,6 +23,7 @@
-##  
-##  #include &lt;math.h&gt;
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  /** Defines the default number of buckets in an n-gram hash. */
-##  #define DEFAULT_NR_OF_BUCKETS 250000
-## @@ -143,13 +144,13 @@ void
-##  cl_delete_ngram_hash(cl_ngram_hash hash)
-##  {
-##    int i;
-## -  cl_ngram_hash_entry entry, temp;
-## +  cl_ngram_hash_entry entry;
-##    
-##    if (hash != NULL &amp;&amp; hash-&gt;table != NULL) {
-##      for (i = 0; i &lt; hash-&gt;buckets; i++) {
-##        entry = hash-&gt;table[i];
-##        while (entry != NULL) {
-## -        temp = entry;
-## +        /* temp = entry; */
-##          entry = entry-&gt;next;
-##          cl_free(entry);
-##        }
-## diff --git a/src/cwb/cl/registry.y b/src/cwb/cl/registry.y
+<pre><code>## diff --git a/src/cwb/cl/registry.y b/src/cwb/cl/registry.y
 ## index 5f34794..f4be7bc 100644
 ## --- a/src/cwb/cl/registry.y
 ## +++ b/src/cwb/cl/registry.y
