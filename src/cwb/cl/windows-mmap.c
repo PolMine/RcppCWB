@@ -32,8 +32,8 @@
  *
  */
 
-void Rprintf(const char *, ...);
 
+void Rprintf(const char *, ...);
 #include "windows-mmap.h"
 
 /**
