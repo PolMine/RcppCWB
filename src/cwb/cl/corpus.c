@@ -16,7 +16,6 @@
  */
 
 void Rprintf(const char *, ...);
-
 #include <ctype.h>
 #include <sys/types.h>
 #ifndef __MINGW__
