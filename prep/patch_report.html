@@ -192,7 +192,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [edd125e] 2021-07-12: patch update</code></pre>
+<pre><code>## [8534c57] 2021-07-12: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -316,7 +316,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [b034ab2] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [c4e61f6] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -393,95 +393,6 @@ cat(gitdiff_cqp)</code></pre>
 ##      -$(RM) depend.mk
 ##  
 ##  # create parser C source, if necessary
-## diff --git a/src/cwb/cqp/corpmanag.c b/src/cwb/cqp/corpmanag.c
-## index e0bc17a..2ce8298 100644
-## --- a/src/cwb/cqp/corpmanag.c
-## +++ b/src/cwb/cqp/corpmanag.c
-## @@ -67,7 +67,7 @@ CorpusList *GetSystemCorpus(char *name, char *registry);
-##  /* -------------------------------------------------- */
-##  
-##  /** Global list of currently-loaded corpora */
-## -CorpusList *corpuslist;
-## +extern CorpusList *corpuslist;
-##  
-##  
-##  /**
-## diff --git a/src/cwb/cqp/corpmanag.h b/src/cwb/cqp/corpmanag.h
-## index 2a2d3f2..fc0dff5 100644
-## --- a/src/cwb/cqp/corpmanag.h
-## +++ b/src/cwb/cqp/corpmanag.h
-## @@ -119,12 +119,12 @@ typedef struct cl {
-##  /**
-##   * Global pointer to the &quot;current&quot; corpus.
-##   */
-## -CorpusList *current_corpus;
-## +extern CorpusList *current_corpus;
-##  
-##  /**
-##   * Global pointer to the head of CQP&#39;s linked list of corpora.
-##   */
-## -CorpusList *corpuslist;
-## +extern CorpusList *corpuslist;
-##  
-##  /* ---------------------------------------------------------------------- */
-##  
-## diff --git a/src/cwb/cqp/cqp.h b/src/cwb/cqp/cqp.h
-## index a3b7b54..96b03d8 100644
-## --- a/src/cwb/cqp/cqp.h
-## +++ b/src/cwb/cqp/cqp.h
-## @@ -52,7 +52,7 @@ typedef enum _cyctype {
-##  } CYCtype;
-##  
-##  /** Global variable indicating type (CYC) of last expression */
-## -CYCtype LastExpression;
-## +extern CYCtype LastExpression;
-##  
-##  extern int reading_cqprc;
-##  
-## @@ -70,16 +70,16 @@ extern int QueryBufferOverflow;
-##  /* ======================================== Other global variables */
-##  
-##  extern char *searchstr;         /* needs to be global, unfortunately */
-## -int exit_cqp;                   /**&lt; 1 iff exit-command was issued while parsing */
-## +extern int exit_cqp;                   /**&lt; 1 iff exit-command was issued while parsing */
-##  
-## -char *cqp_input_string;
-## -int cqp_input_string_position;
-## +extern char *cqp_input_string;
-## +extern int cqp_input_string_position;
-##  
-## -int initialize_cqp(int argc, char **argv);
-## +extern int initialize_cqp(int argc, char **argv);
-##  
-## -int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
-## +extern int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
-##  
-## -int cqp_parse_string(char *s);
-## +extern int cqp_parse_string(char *s);
-##  
-##  /* ====================================================================== */
-##  
-## @@ -96,15 +96,15 @@ typedef void (*InterruptCheckProc)(void);
-##   *
-##   * @see sigINT_signal_handler
-##   */
-## -int EvaluationIsRunning;
-## +extern int EvaluationIsRunning;
-##  
-## -int setInterruptCallback(InterruptCheckProc f);
-## +extern int setInterruptCallback(InterruptCheckProc f);
-##  
-## -void CheckForInterrupts(void);
-## +extern void CheckForInterrupts(void);
-##  
-## -int signal_handler_is_installed;
-## +extern int signal_handler_is_installed;
-##  
-## -void install_signal_handler(void);
-## +extern void install_signal_handler(void);
-##  
-##  
-##  /* ====================================================================== */
 ## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
@@ -549,7 +460,7 @@ cat(gitdiff_cqp)</code></pre>
 ##        cqpmessage(Error, &quot;matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n&quot;, nr_columns + 1);
 ##        init_matchlist(&amp;result);
 ## diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
-## index ac369dc..8b1a5cd 100644
+## index fa7e817..8b1a5cd 100644
 ## --- a/src/cwb/cqp/eval.h
 ## +++ b/src/cwb/cqp/eval.h
 ## @@ -1,4 +1,4 @@
@@ -585,28 +496,14 @@ cat(gitdiff_cqp)</code></pre>
 ##    }                idlist;
 ##  
 ##    /** constant (string, int, float, ...) */
-## @@ -371,7 +371,7 @@ typedef struct ctxtsp {
-##   * eep contains the index of the highest currently-occupied slot within Environment.
-##   * @see Environment
-##   */
-## -int eep;
-## +extern int eep;
-##  
-##  /**
-##   * The EvalEnvironment object: environment variables for the evaluation of
-## @@ -417,9 +417,10 @@ typedef struct evalenv {
+## @@ -417,6 +417,7 @@ typedef struct evalenv {
 ##  typedef EvalEnvironment *EEP;
 ##  
 ##  /** A global array of EvalEnvironment structures */
-## -EvalEnvironment Environment[MAXENVIRONMENT];
-##  
-## -EEP CurEnv, evalenv;
-## +extern EvalEnvironment Environment[MAXENVIRONMENT];
 ## +
-## +extern EEP CurEnv, evalenv;
+##  extern EvalEnvironment Environment[MAXENVIRONMENT];
 ##  
-##  /* ---------------------------------------------------------------------- */
-##  
+##  extern EEP CurEnv, evalenv;
 ## diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
 ## index 35ef543..4441be0 100644
 ## --- a/src/cwb/cqp/groups.c
@@ -817,7 +714,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  #include &quot;eval.h&quot;
 ##  #include &quot;ranges.h&quot;
 ## diff --git a/src/cwb/cqp/options.h b/src/cwb/cqp/options.h
-## index 6f1225e..fa60f11 100644
+## index 0689e80..fa60f11 100644
 ## --- a/src/cwb/cqp/options.h
 ## +++ b/src/cwb/cqp/options.h
 ## @@ -36,7 +36,7 @@
@@ -829,216 +726,6 @@ cat(gitdiff_cqp)</code></pre>
 ##  /* this variable is set in the binaries&#39; main() functions */
 ##  
 ##  
-## @@ -44,106 +44,106 @@ enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
-##   * CGI scripts should use the new query lock mode instead.
-##   * [ insecure and inhibit_activation are kept for compatibility; inhibit_interactives has been removed. ]
-##   */
-## -int insecure;                     /**&lt; Boolean: != 0 means we should not allow pipes etc. (For example, in CGI.) */
-## -int inhibit_activation;           /**&lt; Boolean: inhibit corpus activations in parser */
-## +extern int insecure;                     /**&lt; Boolean: != 0 means we should not allow pipes etc. (For example, in CGI.) */
-## +extern int inhibit_activation;           /**&lt; Boolean: inhibit corpus activations in parser */
-##  
-##  
-##  /* debugging options */
-## -int parseonly;                    /**&lt; if true, queries are only parsed, not evaluated. */
-## -int verbose_parser;               /**&lt; if true, absolutely all messages from the parser get printed (inc Message-level). */
-## -int show_symtab;                  /**&lt; Doesn&#39;t seem to be used anywhere; should show_environment use it? if not, remove? TODO  */
-## -int show_gconstraints;            /**&lt; if true, the tree of global contraints is printed when an EvalEnvironment is displayed */
-## -int show_evaltree;                /**&lt; if true, the evaluation tree is printed when an EvalEnvironment is displayed */
-## -int show_patlist;                 /**&lt; if true, the pattern list is printed when an EvalEnvironment is displayed */
-## -int show_compdfa;                 /**&lt; if true, the complete DFA is printed when an EvalEnvironment is displayed */
-## -int show_dfa;                     /**&lt; if true, the regex2dfa module will print out the states of the DFA after it is parsed. */
-## +extern int parseonly;                    /**&lt; if true, queries are only parsed, not evaluated. */
-## +extern int verbose_parser;               /**&lt; if true, absolutely all messages from the parser get printed (inc Message-level). */
-## +extern int show_symtab;                  /**&lt; Doesn&#39;t seem to be used anywhere; should show_environment use it? if not, remove? TODO  */
-## +extern int show_gconstraints;            /**&lt; if true, the tree of global contraints is printed when an EvalEnvironment is displayed */
-## +extern int show_evaltree;                /**&lt; if true, the evaluation tree is printed when an EvalEnvironment is displayed */
-## +extern int show_patlist;                 /**&lt; if true, the pattern list is printed when an EvalEnvironment is displayed */
-## +extern int show_compdfa;                 /**&lt; if true, the complete DFA is printed when an EvalEnvironment is displayed */
-## +extern int show_dfa;                     /**&lt; if true, the regex2dfa module will print out the states of the DFA after it is parsed. */
-##    /* TODO rename the above variable because it is NOT the same as the other show_* variables. regex2dfa_debug? dfa_debug? */
-## -int symtab_debug;                 /**&lt; if this AND debug_simulation are true, print extra messages relating to eval
-## +extern int symtab_debug;                 /**&lt; if this AND debug_simulation are true, print extra messages relating to eval
-##                                     *   environment labels when simulating an NFA. */
-## -int parser_debug;                 /**&lt; if true, the parser&#39;s internal Bison-generated debug setting is turned on. */
-## -int tree_debug;                   /**&lt; if true, extra messages are embedded when an evaluation tree is pretty-printed */
-## -int eval_debug;                   /**&lt; if true, assorted debug messages related to query evaluation are printed */
-## -int search_debug;                 /**&lt; if true, the evaltree of a pattern is pretty-printed before the DFA is created. */
-## -int initial_matchlist_debug;      /**&lt; if true, debug messages relating to the initial set of candidate matches are printed. */
-## -int debug_simulation;             /**&lt; if true, debug messages are printed when simulating an NFA. @see simulate */
-## -int activate_cl_debug;            /**&lt; if true, the CL&#39;s debug message setting is set to On. */
-## +extern int parser_debug;                 /**&lt; if true, the parser&#39;s internal Bison-generated debug setting is turned on. */
-## +extern int tree_debug;                   /**&lt; if true, extra messages are embedded when an evaluation tree is pretty-printed */
-## +extern int eval_debug;                   /**&lt; if true, assorted debug messages related to query evaluation are printed */
-## +extern int search_debug;                 /**&lt; if true, the evaltree of a pattern is pretty-printed before the DFA is created. */
-## +extern int initial_matchlist_debug;      /**&lt; if true, debug messages relating to the initial set of candidate matches are printed. */
-## +extern int debug_simulation;             /**&lt; if true, debug messages are printed when simulating an NFA. @see simulate */
-## +extern int activate_cl_debug;            /**&lt; if true, the CL&#39;s debug message setting is set to On. */
-##  
-##  /* CQPserver options */
-## -int server_log;                   /**&lt; cqpserver option: logging (print log messages to standard output) */
-## -int server_debug;                 /**&lt; cqpserver option: debugging output (print debug messages to standard error) */
-## -int snoop;                        /**&lt; cqpserver option: monitor CQi network communication */
-## -int private_server;               /**&lt; cqpserver option: makes CQPserver accept a single connection only */
-## -int server_port;                  /**&lt; cqpserver option: CQPserver&#39;s listening port (if 0, listens on CQI_PORT) */
-## -int localhost;                    /**&lt; cqpserver option: accept local connections (loopback) only */
-## -int server_quit;                  /**&lt; cqpserver option: spawn server and return to caller (for CQI::Server.pm) */
-## +extern int server_log;                   /**&lt; cqpserver option: logging (print log messages to standard output) */
-## +extern int server_debug;                 /**&lt; cqpserver option: debugging output (print debug messages to standard error) */
-## +extern int snoop;                        /**&lt; cqpserver option: monitor CQi network communication */
-## +extern int private_server;               /**&lt; cqpserver option: makes CQPserver accept a single connection only */
-## +extern int server_port;                  /**&lt; cqpserver option: CQPserver&#39;s listening port (if 0, listens on CQI_PORT) */
-## +extern int localhost;                    /**&lt; cqpserver option: accept local connections (loopback) only */
-## +extern int server_quit;                  /**&lt; cqpserver option: spawn server and return to caller (for CQI::Server.pm) */
-##  
-## -int query_lock;                   /**&lt; cqpserver option: safe mode for network/HTTP servers (allow query execution only) */
-## -int query_lock_violation;         /**&lt; cqpserver option: set for CQPserver&#39;s sake to detect attempted query lock violation */
-## +extern int query_lock;                   /**&lt; cqpserver option: safe mode for network/HTTP servers (allow query execution only) */
-## +extern int query_lock_violation;         /**&lt; cqpserver option: set for CQPserver&#39;s sake to detect attempted query lock violation */
-##  
-##  
-##  /* macro options */
-## -int enable_macros;                /**&lt; enable macros only at user request in case they introduce compatibility problems */
-## -int macro_debug;                  /**&lt; enable debugging of macros (and print macro hash stats on shutdown). */
-## +extern int enable_macros;                /**&lt; enable macros only at user request in case they introduce compatibility problems */
-## +extern int macro_debug;                  /**&lt; enable debugging of macros (and print macro hash stats on shutdown). */
-##  
-##  /* query options */
-## -int hard_boundary;                /**&lt; Query option: use implicit &#39;within&#39; clause (unless overridden by explicit spec) */
-## -int hard_cut;                     /**&lt; Query option: use hard cut value for all queries (cannot be changed) */
-## -int subquery;                     /**&lt; Query option: use auto-subquery mode (TODO rename to auto_subquery for clarity) */
-## -char *def_unbr_attr;              /**&lt; Query option: unbracketed attribute (attribute matched by &quot;...&quot; patterns) */
-## -int query_optimize;               /**&lt; Query option: use query optimisation (untested and expensive optimisations) */
-## +extern int hard_boundary;                /**&lt; Query option: use implicit &#39;within&#39; clause (unless overridden by explicit spec) */
-## +extern int hard_cut;                     /**&lt; Query option: use hard cut value for all queries (cannot be changed) */
-## +extern int subquery;                     /**&lt; Query option: use auto-subquery mode (TODO rename to auto_subquery for clarity) */
-## +extern char *def_unbr_attr;              /**&lt; Query option: unbracketed attribute (attribute matched by &quot;...&quot; patterns) */
-## +extern int query_optimize;               /**&lt; Query option: use query optimisation (untested and expensive optimisations) */
-##  
-##  /** matching strategy */
-## -enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
-## -char *matching_strategy_name;     /**&lt; The matching strategy option: which is implemented as a vstring option with side-effect */
-## -int strict_regions;               /**&lt; boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
-## +extern enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
-## +extern char *matching_strategy_name;     /**&lt; The matching strategy option: which is implemented as a vstring option with side-effect */
-## +extern int strict_regions;               /**&lt; boolean: expression between {s} ... {/s} tags is constrained to single {s} region  */
-##  
-##  /* CQP user interface options */
-## -int use_readline;                 /**&lt; UI option: use GNU Readline for input line editing if available */
-## -int highlighting;                 /**&lt; UI option: highlight match / fields in terminal output? (default = yes) */
-## -int paging;                       /**&lt; UI option: activate/deactivate paging of query results */
-## -char *pager;                      /**&lt; UI option: pager program to used for paged kwic display */
-## -char *tested_pager;               /**&lt; UI option: CQP tests if selected pager works &amp; will fall back to &quot;more&quot; if it doesn&#39;t */
-## -char *less_charset_variable;      /**&lt; UI option: name of environment variable for controlling less charset (usually LESSCHARSET) */
-## -int use_colour;                   /**&lt; UI option: use colours for terminal output (experimental) */
-## -int progress_bar;                 /**&lt; UI option: show progress bar during query execution */
-## -int pretty_print;                 /**&lt; UI option: pretty-print most of CQP&#39;s output (turn off to simplify parsing of CQP output) */
-## -int autoshow;                     /**&lt; UI option: show query results after evaluation (otherwise, just print number of matches) */
-## -int timing;                       /**&lt; UI option: time queries (printed after execution) */
-## +extern int use_readline;                 /**&lt; UI option: use GNU Readline for input line editing if available */
-## +extern int highlighting;                 /**&lt; UI option: highlight match / fields in terminal output? (default = yes) */
-## +extern int paging;                       /**&lt; UI option: activate/deactivate paging of query results */
-## +extern char *pager;                      /**&lt; UI option: pager program to used for paged kwic display */
-## +extern char *tested_pager;               /**&lt; UI option: CQP tests if selected pager works &amp; will fall back to &quot;more&quot; if it doesn&#39;t */
-## +extern char *less_charset_variable;      /**&lt; UI option: name of environment variable for controlling less charset (usually LESSCHARSET) */
-## +extern int use_colour;                   /**&lt; UI option: use colours for terminal output (experimental) */
-## +extern int progress_bar;                 /**&lt; UI option: show progress bar during query execution */
-## +extern int pretty_print;                 /**&lt; UI option: pretty-print most of CQP&#39;s output (turn off to simplify parsing of CQP output) */
-## +extern int autoshow;                     /**&lt; UI option: show query results after evaluation (otherwise, just print number of matches) */
-## +extern int timing;                       /**&lt; UI option: time queries (printed after execution) */
-##  
-##  /* kwic display options */ 
-## -int show_tag_attributes;          /**&lt; kwic option: show values of s-attributes as SGML tag attributes in kwic lines */
-## -int show_targets;                 /**&lt; kwic option: show numbers of target anchors in brackets */
-## -char *printModeString;            /**&lt; kwic option: string of current printmode */
-## -char *printModeOptions;           /**&lt; kwic option: some printing options */
-## -int printNrMatches;               /**&lt; kwic option: -&gt; &#39;cat&#39; prints number of matches in first line (do we need this?) */
-## -char *printStructure;             /**&lt; kwic option: show annotations of structures containing match */
-## -char *left_delimiter;             /**&lt; kwic option: the match start prefix (defaults to &#39;&lt;&#39;) */
-## -char *right_delimiter;            /**&lt; kwic option: the match end suffix   (defaults to &#39;&gt;&#39;) */
-## +extern int show_tag_attributes;          /**&lt; kwic option: show values of s-attributes as SGML tag attributes in kwic lines */
-## +extern int show_targets;                 /**&lt; kwic option: show numbers of target anchors in brackets */
-## +extern char *printModeString;            /**&lt; kwic option: string of current printmode */
-## +extern char *printModeOptions;           /**&lt; kwic option: some printing options */
-## +extern int printNrMatches;               /**&lt; kwic option: -&gt; &#39;cat&#39; prints number of matches in first line (do we need this?) */
-## +extern char *printStructure;             /**&lt; kwic option: show annotations of structures containing match */
-## +extern char *left_delimiter;             /**&lt; kwic option: the match start prefix (defaults to &#39;&lt;&#39;) */
-## +extern char *right_delimiter;            /**&lt; kwic option: the match end suffix   (defaults to &#39;&gt;&#39;) */
-##  
-##  /* files and directories */
-## -char *registry;                   /**&lt; registry directory */
-## -char *LOCAL_CORP_PATH;            /**&lt; directory where subcorpora are stored (saved &amp; loaded) */
-## -int auto_save;                    /**&lt; automatically save subcorpora */
-## -int save_on_exit;                 /**&lt; save unsaved subcorpora upon exit */
-## -char *cqp_init_file;              /**&lt; changed from &#39;init_file&#39; because of clash with a # define in {term.h} */
-## -char *macro_init_file;            /**&lt; secondary init file for loading macro definitions (not read if macros are disabled) */
-## -char *cqp_history_file;           /**&lt; filename where CQP command history will be saved */
-## -int write_history_file;           /**&lt; Controls whether CQP command history is written to file */
-## +extern char *registry;                   /**&lt; registry directory */
-## +extern char *LOCAL_CORP_PATH;            /**&lt; directory where subcorpora are stored (saved &amp; loaded) */
-## +extern int auto_save;                    /**&lt; automatically save subcorpora */
-## +extern int save_on_exit;                 /**&lt; save unsaved subcorpora upon exit */
-## +extern char *cqp_init_file;              /**&lt; changed from &#39;init_file&#39; because of clash with a # define in {term.h} */
-## +extern char *macro_init_file;            /**&lt; secondary init file for loading macro definitions (not read if macros are disabled) */
-## +extern char *cqp_history_file;           /**&lt; filename where CQP command history will be saved */
-## +extern int write_history_file;           /**&lt; Controls whether CQP command history is written to file */
-##  
-##  /* options for non-interactive use */
-## -int batchmode;                    /**&lt; set by -f {file} option (don&#39;t read ~/.cqprc, then process input from {file}) */
-## -int silent;                       /**&lt; Disables some messages &amp; warnings (used rather inconsistently).
-## +extern int batchmode;                    /**&lt; set by -f {file} option (don&#39;t read ~/.cqprc, then process input from {file}) */
-## +extern int silent;                       /**&lt; Disables some messages &amp; warnings (used rather inconsistently).
-##                                     *   NEW: suppresses cqpmessage() unless it is an error. */
-## -char *default_corpus;             /**&lt; corpus specified with -D {corpus} */
-## -char *query_string;               /**&lt; query specified on command line (-E {string}, cqpcl only) */
-## +extern char *default_corpus;             /**&lt; corpus specified with -D {corpus} */
-## +extern char *query_string;               /**&lt; query specified on command line (-E {string}, cqpcl only) */
-##  
-##  /* options which just shouldn&#39;t exist */
-## -int UseExternalSorting;           /**&lt; (option which should not exist) use external sorting algorithm */
-## -char *ExternalSortingCommand;     /**&lt; (option which should not exist) external sort command to use */
-## -int UseExternalGrouping;          /**&lt; (option which should not exist) use external grouping algorithm */
-## -char *ExternalGroupingCommand;    /**&lt; (option which should not exist) external group command to use */
-## -int user_level;                   /**&lt; (option which should not exist) user level: 0 == normal, 1 == advanced, 2 == expert) */
-## -int rangeoutput;                  /**&lt; (option which should not exist) */
-## +extern int UseExternalSorting;           /**&lt; (option which should not exist) use external sorting algorithm */
-## +extern char *ExternalSortingCommand;     /**&lt; (option which should not exist) external sort command to use */
-## +extern int UseExternalGrouping;          /**&lt; (option which should not exist) use external grouping algorithm */
-## +extern char *ExternalGroupingCommand;    /**&lt; (option which should not exist) external group command to use */
-## +extern int user_level;                   /**&lt; (option which should not exist) user level: 0 == normal, 1 == advanced, 2 == expert) */
-## +extern int rangeoutput;                  /**&lt; (option which should not exist) */
-##  
-##  
-##  /**
-## @@ -156,7 +156,7 @@ int rangeoutput;                  /**&lt; (option which should not exist) */
-##   *
-##   * This global variable is a Boolean: child process mode on or off.
-##   */
-## -int child_process;
-## +extern int child_process;
-##  
-##  
-##  
-## @@ -166,14 +166,14 @@ int child_process;
-##  /* some global variables */
-##  
-##  /** The global context descriptor. TODO: Is this the only place a hard-allocated, rather than malloc&#39;d, CD is used?*/
-## -ContextDescriptor CD;
-## +extern ContextDescriptor CD;
-##  
-## -int handle_sigpipe;
-## +extern int handle_sigpipe;
-##  
-## -char *progname;
-## -char *licensee;
-## +extern char *progname;
-## +extern char *licensee;
-##  
-## -FILE *batchfd;
-## +extern FILE *batchfd;
-##  
-##  /**
-##   * Labels for the types of CQP option.
 ## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
 ## index 4d6f542..0b2918c 100644
 ## --- a/src/cwb/cqp/output.c
@@ -1517,7 +1204,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 output &lt;- paste(result, collapse = &quot;\n&quot;)
-cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
+# cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
 cat(output)</code></pre>
 <pre><code>## diff --git a/src/cwb/CQi/auth.c b/src/cwb/CQi/auth.c
 ## index fd1201c..462ada7 100644
