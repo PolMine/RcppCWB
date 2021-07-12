@@ -28,6 +28,23 @@ for (subdir in c("cl", "cqp", "CQi")){
   }
 }
 
+delete_line_before <- list(
+  "src/cwb/cqp/groups.c" = "^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,",
+  "src/cwb/cqp/groups.c" = "^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,"
+)
+
+for (i in 1L:length(delete_before)){
+  fname <- path(repodir, names(delete_line_before)[[i]])
+  code <- readLines(fname)
+  position <- grep(pattern = delete_line_before[[i]][[1]], code)[1]
+  if (!is.na(position)){
+    code <- code[-position]
+    writeLines(text = code, con = fname)
+  }
+}
+
+
+
 insert_before <- list(
   "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
   "src/cwb/cl/bitio.c" = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);"),
@@ -44,8 +61,8 @@ insert_before <- list(
   "src/cwb/cl/special-chars.c" = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/storage.c" = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/storage.c" = list("^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);", '      if (success < 0) Rprintf("Operation not successful");'),
-  "src/cwb/cl/windows-mmap.c" = list('^#include\\s"windows-mmap\\.h"', "void Rprintf(const char *, ...);")
-  
+  "src/cwb/cl/windows-mmap.c" = list('^#include\\s"windows-mmap\\.h"', "void Rprintf(const char *, ...);"),
+  "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", c("*/", "")), # end of commenting out ComputeGroupExternally(Group *group)
 )
 
 for (i in 1L:length(insert_before)){
@@ -61,6 +78,10 @@ for (i in 1L:length(insert_before)){
     writeLines(text = code, con = fname)
   }
 }
+
+
+
+
 
 insert_after <- list(
   "src/cwb/cl/bitio.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),

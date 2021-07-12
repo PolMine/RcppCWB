@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [48f3fc6] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [d1286f0] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,24 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
-## index e032051..8b1a5cd 100644
-## --- a/src/cwb/cqp/eval.h
-## +++ b/src/cwb/cqp/eval.h
-## @@ -1,4 +1,4 @@
-## -/*
-## +#/*
-##   *  IMS Open Corpus Workbench (CWB)
-##   *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
-##   *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
-## @@ -417,6 +417,7 @@ typedef struct evalenv {
-##  typedef EvalEnvironment *EEP;
-##  
-##  /** A global array of EvalEnvironment structures */
-## +
-##  extern EvalEnvironment Environment[MAXENVIRONMENT];
-##  
-##  extern EEP CurEnv, evalenv;
 ## diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
 ## index 35ef543..4441be0 100644
 ## --- a/src/cwb/cqp/groups.c
