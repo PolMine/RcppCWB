@@ -157,6 +157,7 @@ open_temporary_file(char *tmp_name_buffer)
 }
 */
 
+
 /**
  * This function is a wrapper round fopen() which provides checks for
  * different shorthands for a "home" directory, such as ~ or $HOME.
