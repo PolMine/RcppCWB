@@ -1,19 +1,6 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
-index 16765ae..e095ed1 100644
---- a/src/cwb/cqp/groups.c
-+++ b/src/cwb/cqp/groups.c
-@@ -490,6 +490,8 @@ Group *compute_grouping(CorpusList *cl,
-     return ComputeGroupExternally(group);
-   else
-     return ComputeGroupInternally(group);
-+   */
-+  return group;
- }
- 
- void
 diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
 index 2801586..584905a 100644
 --- a/src/cwb/cqp/hash.c

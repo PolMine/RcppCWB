@@ -192,7 +192,6 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [23bc22c] 2021-07-12: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -316,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [c8768e7] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [ec8fbe5] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -345,19 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/groups.c b/src/cwb/cqp/groups.c
-## index 16765ae..e095ed1 100644
-## --- a/src/cwb/cqp/groups.c
-## +++ b/src/cwb/cqp/groups.c
-## @@ -490,6 +490,8 @@ Group *compute_grouping(CorpusList *cl,
-##      return ComputeGroupExternally(group);
-##    else
-##      return ComputeGroupInternally(group);
-## +   */
-## +  return group;
-##  }
-##  
-##  void
 ## diff --git a/src/cwb/cqp/hash.c b/src/cwb/cqp/hash.c
 ## index 2801586..584905a 100644
 ## --- a/src/cwb/cqp/hash.c
