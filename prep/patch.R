@@ -94,7 +94,7 @@ replace <- list(
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
   "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->tokens,", "\\1obj->tokens,", 1),
-  "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1)
+  "src/cwb/cl/class-mapping.c" = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1),
   "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
   "src/cwb/cl/class-mapping.h" = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1)
 )
