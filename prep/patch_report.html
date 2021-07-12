@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [64d0860] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [0f309ca] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,18 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-## index fa7251d..4cb2526 100644
-## --- a/src/cwb/cqp/output.c
-## +++ b/src/cwb/cqp/output.c
-## @@ -157,7 +157,6 @@ open_temporary_file(char *tmp_name_buffer)
-##  }
-##  */
-##  
-## -
-##  /**
-##   * This function is a wrapper round fopen() which provides checks for
-##   * different shorthands for a &quot;home&quot; directory, such as ~ or $HOME.
 ## diff --git a/src/cwb/cqp/output.h b/src/cwb/cqp/output.h
 ## index 9ca0607..3f9479d 100644
 ## --- a/src/cwb/cqp/output.h

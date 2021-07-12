@@ -1,18 +1,6 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-index fa7251d..4cb2526 100644
---- a/src/cwb/cqp/output.c
-+++ b/src/cwb/cqp/output.c
-@@ -157,7 +157,6 @@ open_temporary_file(char *tmp_name_buffer)
- }
- */
- 
--
- /**
-  * This function is a wrapper round fopen() which provides checks for
-  * different shorthands for a "home" directory, such as ~ or $HOME.
 diff --git a/src/cwb/cqp/output.h b/src/cwb/cqp/output.h
 index 9ca0607..3f9479d 100644
 --- a/src/cwb/cqp/output.h
