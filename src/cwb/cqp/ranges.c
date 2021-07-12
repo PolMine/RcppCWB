@@ -443,9 +443,9 @@ RangeSort(CorpusList *c, int mk_sortidx)
   _RS_range = c->range;         /* intialise global data for callback and run qsort()  */
   qsort(index, size, sizeof(int), _RS_compare_ranges);
 
-/*     printf("Resort index is:\n"); */
+/*     Rprintf("Resort index is:\n"); */
 /*     for (i = 0; i < size; i++) */
-/*       printf("\t%4d => [%d,%d]\n", index[i], c->range[index[i]].start, c->range[index[i]].end); */
+/*       Rprintf("\t%4d => [%d,%d]\n", index[i], c->range[index[i]].start, c->range[index[i]].end); */
 
   new_range = cl_malloc(size * sizeof(Range)); /* allocate new range vector and fill it with sorted ranges */
   for (i = 0; i < size; i++)

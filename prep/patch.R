@@ -37,7 +37,8 @@ insert_before <- list(
   "src/cwb/cl/fileutils.c" = list('^#include\\s<sys/stat\\.h>', "void Rprintf(const char *, ...);"),
   "src/cwb/cl/fileutils.c" = list('^#include\\s"globals\\.h"', c("#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "")),
   "src/cwb/cl/globals.h" = list('^#ifndef\\s_globals_h_', "void Rprintf(const char *, ...);"),
-  "src/cwb/cl/lexhash.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
+  "src/cwb/cl/lexhash.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
+  "src/cwb/cl/macros.c" = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
 )
 
 for (i in 1L:length(insert_before)){

@@ -2951,7 +2951,7 @@ cqp_run_tab_query()
                                 &lists[i], evalenv->query_corpus);
 
     /** useful for debugging:
-     * printf("TAB pattern #%d: %d hits %s %s\n", i + 1, lists[i].tabsize,
+     * Rprintf("TAB pattern #%d: %d hits %s %s\n", i + 1, lists[i].tabsize,
      *   (lists[i].is_inverted) ? "(inverted)" : "", (lists[i].matches_whole_corpus) ? "(whole corpus)" : "");
      */
     if (lists[smallest_col].tabsize > lists[i].tabsize)

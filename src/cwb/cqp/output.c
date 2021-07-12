@@ -587,7 +587,7 @@ catalog_corpus(CorpusList *cl,
  *
  * @see           MessageType
  * @param type    Specifies what type of message (messages of some types are not always printed)
- * @param format  Format string (and ...) are passed as arguments to vfprintf().
+ * @param format  Format string (and ...) are passed as arguments to vRprintf().
  */
 void 
 cqpmessage(MessageType type, char *format, ...)

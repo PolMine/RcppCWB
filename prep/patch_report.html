@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [247db33] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [31bdbc6] 2021-07-12: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -329,32 +329,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/lexhash.c b/src/cwb/cl/lexhash.c
-## index 3ab635e..ddfb04c 100644
-## --- a/src/cwb/cl/lexhash.c
-## +++ b/src/cwb/cl/lexhash.c
-## @@ -15,10 +15,12 @@
-##   *  WWW at http://www.gnu.org/copyleft/gpl.html).
-##   */
-##  
-## +void Rprintf(const char *, ...);
-##  
-##  #include &quot;globals.h&quot;
-##  #include &quot;macros.h&quot;
-##  #include &quot;lexhash.h&quot;
-## +#include &lt;unistd.h&gt;
-##  
-##  #include &lt;math.h&gt;
-##  
-## @@ -157,7 +159,6 @@ cl_lexhash
-##  cl_new_lexhash(int buckets)
-##  {
-##    cl_lexhash hash;
-## -  
-##    if (buckets &lt;= 0)
-##      buckets = DEFAULT_NR_OF_BUCKETS;
-##    hash = (cl_lexhash) cl_malloc(sizeof(struct _cl_lexhash));
-## diff --git a/src/cwb/cl/macros.c b/src/cwb/cl/macros.c
+<pre><code>## diff --git a/src/cwb/cl/macros.c b/src/cwb/cl/macros.c
 ## index ca2bedc..fbd9535 100644
 ## --- a/src/cwb/cl/macros.c
 ## +++ b/src/cwb/cl/macros.c

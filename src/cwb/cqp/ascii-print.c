@@ -239,7 +239,7 @@ get_screen_escapes(void)
 
   /* Linux terminfo bug? fix: tigetstr("sgr0") returns an extra ^O (\x0f) character appended to the escape sequence
      (this may be some code used internally by the ncurses library).
-     Since we printf() the escape sequences directly, we have to remove the extra character or 'less -R' will get confused. */
+     Since we Rprintf() the escape sequences directly, we have to remove the extra character or 'less -R' will get confused. */
   l = strlen(sc_all_out);
   if ((l > 0) && (sc_all_out[l-1] == '\x0f')) {
     sc_all_out = cl_strdup(sc_all_out);

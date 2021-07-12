@@ -440,7 +440,7 @@ InteractiveCommand:       Showing
 
 
 /* print special code ``-::-EOL-::-'' marking end-of-command in child mode */
-EOLCmd:           EOL_SYM               { printf("-::-EOL-::-\n"); fflush(stdout); }
+EOLCmd:           EOL_SYM               { Rprintf("-::-EOL-::-\n"); fflush(stdout); }
                 ;
 
 Cat:              CAT_SYM OptionalCID

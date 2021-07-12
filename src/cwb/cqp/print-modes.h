@@ -58,7 +58,7 @@ typedef struct _print_option_rec_ {
  */
 typedef struct _print_descr_rec_ {
 
-  char *CPOSPrintFormat;              /**< printf()-Formatting String for display of a corpus position
+  char *CPOSPrintFormat;              /**< Rprintf()-Formatting String for display of a corpus position
                                            (needs a %d or %x or similar in it somewhere)               */
 
   char *BeforePrintStructures;        /**< to print before PS */
