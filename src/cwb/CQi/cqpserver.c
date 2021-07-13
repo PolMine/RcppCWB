@@ -32,6 +32,7 @@
 #include "../cqp/groups.h"
 void Rprintf(const char *, ...);
 
+
 /** String containing the username sent by the currently-connect CQi client */
 char *user = "";
 /** String containing the password sent by the currently-connect CQi client */

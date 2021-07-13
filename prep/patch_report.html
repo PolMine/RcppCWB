@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [abf9eab] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [a8b0ff2] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -356,17 +356,17 @@ output &lt;- paste(result, collapse = &quot;\n&quot;)
 # cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
 cat(output)</code></pre>
 <pre><code>## diff --git a/src/cwb/CQi/cqpserver.c b/src/cwb/CQi/cqpserver.c
-## index 80060e7..20fdf48 100644
+## index 86e3eb4..f16abc1 100644
 ## --- a/src/cwb/CQi/cqpserver.c
 ## +++ b/src/cwb/CQi/cqpserver.c
-## @@ -31,6 +31,7 @@
-##  #include &quot;../cqp/corpmanag.h&quot;
+## @@ -32,7 +32,6 @@
 ##  #include &quot;../cqp/groups.h&quot;
+##  void Rprintf(const char *, ...);
 ##  
-## +void Rprintf(const char *, ...);
-##  
+## -
 ##  /** String containing the username sent by the currently-connect CQi client */
 ##  char *user = &quot;&quot;;
+##  /** String containing the password sent by the currently-connect CQi client */
 ## diff --git a/src/cwb/CQi/server.c b/src/cwb/CQi/server.c
 ## index 5aac73d..451d016 100644
 ## --- a/src/cwb/CQi/server.c
