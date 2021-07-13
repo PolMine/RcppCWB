@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [520e741] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [10d1bd2] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -357,19 +357,6 @@ cat(gitdiff_cqp)</code></pre>
 ##        Rprintf(&quot;\n&quot;);
 ##      }
 ##  
-## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
-## index 1af6732..53e4bcf 100644
-## --- a/src/cwb/cqp/parse_actions.c
-## +++ b/src/cwb/cqp/parse_actions.c
-## @@ -2039,7 +2039,7 @@ do_RelExpr(Constrainttree left,
-##          /* be careful: res might be of type cnode, when an empty id_list has been optimised away */
-##          if (res &amp;&amp; res-&gt;type == id_list &amp;&amp; generate_code) {
-##            res-&gt;idlist.label = left-&gt;pa_ref.label;
-## -          res-&gt;idlist.delete = left-&gt;pa_ref.delete;
-## +          res-&gt;idlist.del = left-&gt;pa_ref.del;
-##          }
-##        }
-##        else {
 ## diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
 ## index de87e37..666485b 100644
 ## --- a/src/cwb/cqp/parser.y

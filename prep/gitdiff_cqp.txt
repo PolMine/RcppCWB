@@ -14,19 +14,6 @@ index 19a2e2d..ecfb357 100644
        Rprintf("\n");
      }
  
-diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
-index 1af6732..53e4bcf 100644
---- a/src/cwb/cqp/parse_actions.c
-+++ b/src/cwb/cqp/parse_actions.c
-@@ -2039,7 +2039,7 @@ do_RelExpr(Constrainttree left,
-         /* be careful: res might be of type cnode, when an empty id_list has been optimised away */
-         if (res && res->type == id_list && generate_code) {
-           res->idlist.label = left->pa_ref.label;
--          res->idlist.delete = left->pa_ref.delete;
-+          res->idlist.del = left->pa_ref.del;
-         }
-       }
-       else {
 diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
 index de87e37..666485b 100644
 --- a/src/cwb/cqp/parser.y
