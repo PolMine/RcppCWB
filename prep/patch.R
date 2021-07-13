@@ -17,9 +17,7 @@ global_replacements <- list(
 
 for (subdir in c("cl", "cqp", "CQi")){
   files <- list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
-  message("#### Directory: ", subdir)
   for (f in files){
-    message("- ", basename(f))
     code <- readLines(f)
     for (i in 1:length(global_replacements)){
       code <- gsub(global_replacements[[i]][1], global_replacements[[i]][2], code)
@@ -86,7 +84,8 @@ insert_before <- list(
   "src/cwb/cqp/output.c" = list("^FILE\\s\\*\\s*", "/*", 1),
   "src/cwb/cqp/ranges.c" = list("^int", "/*", 9),
   "src/cwb/CQi/auth.c" = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
-  "src/cwb/CQi/server.c" = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L)
+  "src/cwb/CQi/server.c" = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
+  "src/cwb/utils/cwb-makeall.c" = list("/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/", c("#include <netinet/in.h>", ""), 1)
 )
 
 for (i in 1L:length(insert_before)){
