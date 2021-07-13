@@ -1,16 +1,3 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/variables.c b/src/cwb/cqp/variables.c
-index ddc633e..1168894 100644
---- a/src/cwb/cqp/variables.c
-+++ b/src/cwb/cqp/variables.c
-@@ -282,7 +282,7 @@ NewVariable(char *varname)
-                                           nr_variables * sizeof(Variable));
-     /* no longer necessary: cl_malloc/_realloc checks for this.
-     if (VariableSpace == NULL) {
--      Rprintf("Fatal Error: Variable space out of memory.\n");
-+      RprintF("Fatal Error: Variable space out of memory.\n");
-       assert(0 && "Sorry, big problem here!");
-     } */
-     
