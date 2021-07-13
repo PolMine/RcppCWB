@@ -39,8 +39,8 @@ delete_line_before <- list(
   "src/cwb/cqp/groups.c" = list("^\\s*return\\sComputeGroupExternally\\(group\\);", 1L),
   "src/cwb/cqp/output.c" = list('^\\s*sprintf\\(prefix,\\s"cqpt\\.%d",\\s\\(unsigned\\sint\\)getpid\\(\\)\\);', 1L, 8L),
   "src/cwb/cqp/parser.y" = list("^\\s*if\\s\\(\\$2\\s&&\\sgenerate_code\\)\\s\\{", 3L),
-  "src/cwb/cqp/output.c" = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si++\\)", 2L, 5L),
-  "src/cwb/cqp/output.c" = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si++\\)", 1L, 5L)
+  "src/cwb/cqp/output.c" = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 2L, 5L),
+  "src/cwb/cqp/output.c" = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 1L, 5L)
 )
 
 
