@@ -15,18 +15,18 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
-index de87e37..666485b 100644
+index 21c400e..666485b 100644
 --- a/src/cwb/cqp/parser.y
 +++ b/src/cwb/cqp/parser.y
-@@ -794,7 +794,7 @@ OptAttributeSpec:    ID OptionalFlag
+@@ -139,7 +139,7 @@ synchronize(void)
+   struct InputRedir  in_redir;
  
- SortCmd:        SORT_SYM OptionalCID OptionalSortClause
-                 { 
--                  int ok;
-+                  int ok __attribute__((unused));
-                   if ($2 && generate_code) {
-                     do_start_timer();
-                     ok = SortSubcorpus($2, $3, 0, NULL);
+   struct {
+-    int ok __attribute__((unused));
++    int ok;
+     int ival;
+     char *cval;
+   }                  varval;
 @@ -806,7 +806,7 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
                  }
                | SORT_SYM OptionalCID RANDOMIZE_SYM OptInteger
@@ -36,17 +36,14 @@ index de87e37..666485b 100644
                    if ($2 && generate_code) {
                      do_start_timer();
                      ok = SortSubcorpusRandomize($2, $4);
-@@ -817,9 +817,8 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
+@@ -817,7 +817,6 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
                  }
                | COUNT_SYM OptionalCID SortClause CutStatement OptionalRedir
                  { 
 -                  int ok;
                    if ($2 && generate_code) {
--                    ok = SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
-+                    SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
+                     SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));
                      FreeSortClause($3);
-                     cl_free($5.name);
-                   }
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
 index ca316dd..73083b0 100644
 --- a/src/cwb/cqp/ranges.c
