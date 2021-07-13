@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [794035e] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [da6b092] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -344,46 +344,6 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
-## index 19a2e2d..ecfb357 100644
-## --- a/src/cwb/cqp/output.c
-## +++ b/src/cwb/cqp/output.c
-## @@ -622,7 +622,7 @@ cqpmessage(MessageType type, char *format, ...)
-##  
-##      if (!silent || type == Error) {
-##        Rprintf(&quot;%s:\n\t&quot;, msg);
-## -      vRprintf(format, ap);
-## +      Rprintf(format, ap);
-##        Rprintf(&quot;\n&quot;);
-##      }
-##  
-## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index 91a1272..af4e570 100644
-## --- a/src/cwb/cqp/ranges.c
-## +++ b/src/cwb/cqp/ranges.c
-## @@ -1227,7 +1227,8 @@ SortExternally(void)
-##    }
-##  }
-##  */
-## -  
-## + 
-## +
-##  /**
-##   * Defined if a sort cache is to be used in sorting concordance lines.
-##   *
-## diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
-## index 95f07ce..3c474ff 100644
-## --- a/src/cwb/cqp/regex2dfa.c
-## +++ b/src/cwb/cqp/regex2dfa.c
-## @@ -233,7 +233,7 @@ REGEX2DFA_ERROR(char *Format, ...)
-##    va_list AP;
-##    
-##    Rprintf(&quot;[%d] &quot;, LINE);
-## -  va_start(AP, Format); vRprintf(Format, AP); va_end(AP);
-## +  va_start(AP, Format); Rprintf(Format, AP); va_end(AP);
-##    fputc(&#39;\n&#39;, stderr);
-##    if (++ERRORS == MAX_ERRORS) {
-##      Rprintf(&quot;regex2dfa: Reached the %d error limit.\n&quot;, MAX_ERRORS);
 ## diff --git a/src/cwb/cqp/variables.c b/src/cwb/cqp/variables.c
 ## index ddc633e..1168894 100644
 ## --- a/src/cwb/cqp/variables.c
