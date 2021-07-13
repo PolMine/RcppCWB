@@ -15,18 +15,9 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index 601a75e..73083b0 100644
+index 61935c3..2c413e7 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
-@@ -1194,7 +1194,7 @@ SortExternally(void)
-             int num = atoi(sort_call);
-             if (num < 0 || num >= srt_cl->size) {
-               Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
--              break;            
-+              break;          
-             }
-             srt_cl->sortidx[line] = num;
-             line++;
 @@ -1226,6 +1226,8 @@ SortExternally(void)
        return 0;
    }
