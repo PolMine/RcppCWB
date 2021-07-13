@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e89d6e3] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [e1fea30] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -356,18 +356,10 @@ output &lt;- paste(result, collapse = &quot;\n&quot;)
 # cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
 cat(output)</code></pre>
 <pre><code>## diff --git a/src/cwb/CQi/server.c b/src/cwb/CQi/server.c
-## index 5aac73d..451d016 100644
+## index 2fbd640..451d016 100644
 ## --- a/src/cwb/CQi/server.c
 ## +++ b/src/cwb/CQi/server.c
-## @@ -45,6 +45,7 @@
-##  #include &quot;../cqp/corpmanag.h&quot;
-##  #include &quot;../cqp/parse_actions.h&quot;
-##  #include &quot;../cqp/hash.h&quot;
-## +#include &quot;../cl/lexhash.h&quot; /* inserted by AB */
-##  
-##  #define NETBUFSIZE 512
-##  #define ATTHASHSIZE 16384
-## @@ -57,6 +58,8 @@
+## @@ -58,6 +58,8 @@
 ##  #define MSG_WAITALL 0
 ##  #endif
 ##  
