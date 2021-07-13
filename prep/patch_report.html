@@ -192,131 +192,14 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [d069444] 2021-07-13: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
-<pre><code>## #### Directory: cl</code></pre>
-<pre><code>## - attributes.c</code></pre>
-<pre><code>## - attributes.h</code></pre>
-<pre><code>## - binsert.c</code></pre>
-<pre><code>## - binsert.h</code></pre>
-<pre><code>## - bitfields.c</code></pre>
-<pre><code>## - bitfields.h</code></pre>
-<pre><code>## - bitio.c</code></pre>
-<pre><code>## - bitio.h</code></pre>
-<pre><code>## - cdaccess.c</code></pre>
-<pre><code>## - cdaccess.h</code></pre>
-<pre><code>## - cl.h</code></pre>
-<pre><code>## - class-mapping.c</code></pre>
-<pre><code>## - class-mapping.h</code></pre>
-<pre><code>## - compression.c</code></pre>
-<pre><code>## - compression.h</code></pre>
-<pre><code>## - corpus.c</code></pre>
-<pre><code>## - corpus.h</code></pre>
-<pre><code>## - dl_stub.c</code></pre>
-<pre><code>## - endian.c</code></pre>
-<pre><code>## - fileutils.c</code></pre>
-<pre><code>## - fileutils.h</code></pre>
-<pre><code>## - globals.c</code></pre>
-<pre><code>## - globals.h</code></pre>
-<pre><code>## - lexhash.c</code></pre>
-<pre><code>## - lexhash.h</code></pre>
-<pre><code>## - list.c</code></pre>
-<pre><code>## - list.h</code></pre>
-<pre><code>## - macros.c</code></pre>
-<pre><code>## - macros.h</code></pre>
-<pre><code>## - makecomps.c</code></pre>
-<pre><code>## - makecomps.h</code></pre>
-<pre><code>## - Makefile</code></pre>
-<pre><code>## - ngram-hash.c</code></pre>
-<pre><code>## - ngram-hash.h</code></pre>
-<pre><code>## - registry.l</code></pre>
-<pre><code>## - registry.y</code></pre>
-<pre><code>## - regopt.c</code></pre>
-<pre><code>## - regopt.h</code></pre>
-<pre><code>## - special-chars.c</code></pre>
-<pre><code>## - special-chars.h</code></pre>
-<pre><code>## - storage.c</code></pre>
-<pre><code>## - storage.h</code></pre>
-<pre><code>## - windows-mmap.c</code></pre>
-<pre><code>## - windows-mmap.h</code></pre>
-<pre><code>## #### Directory: cqp</code></pre>
-<pre><code>## - ascii-print.c</code></pre>
-<pre><code>## - ascii-print.h</code></pre>
-<pre><code>## - attlist.c</code></pre>
-<pre><code>## - attlist.h</code></pre>
-<pre><code>## - builtins.c</code></pre>
-<pre><code>## - builtins.h</code></pre>
-<pre><code>## - concordance.c</code></pre>
-<pre><code>## - concordance.h</code></pre>
-<pre><code>## - context_descriptor.c</code></pre>
-<pre><code>## - context_descriptor.h</code></pre>
-<pre><code>## - corpmanag.c</code></pre>
-<pre><code>## - corpmanag.h</code></pre>
-<pre><code>## - cqp.c</code></pre>
-<pre><code>## - cqp.h</code></pre>
-<pre><code>## - cqpcl.c</code></pre>
-<pre><code>## - dummy_auth.c</code></pre>
-<pre><code>## - eval.c</code></pre>
-<pre><code>## - eval.h</code></pre>
-<pre><code>## - groups.c</code></pre>
-<pre><code>## - groups.h</code></pre>
-<pre><code>## - hash.c</code></pre>
-<pre><code>## - hash.h</code></pre>
-<pre><code>## - html-print.c</code></pre>
-<pre><code>## - html-print.h</code></pre>
-<pre><code>## - latex-print.c</code></pre>
-<pre><code>## - latex-print.h</code></pre>
-<pre><code>## - llquery.c</code></pre>
-<pre><code>## - macro.c</code></pre>
-<pre><code>## - macro.h</code></pre>
-<pre><code>## - Makefile</code></pre>
-<pre><code>## - matchlist.c</code></pre>
-<pre><code>## - matchlist.h</code></pre>
-<pre><code>## - options.c</code></pre>
-<pre><code>## - options.h</code></pre>
-<pre><code>## - output.c</code></pre>
-<pre><code>## - output.h</code></pre>
-<pre><code>## - parse_actions.c</code></pre>
-<pre><code>## - parse_actions.h</code></pre>
-<pre><code>## - parser.l</code></pre>
-<pre><code>## - parser.tab.c</code></pre>
-<pre><code>## - parser.tab.h</code></pre>
-<pre><code>## - parser.y</code></pre>
-<pre><code>## - print_align.c</code></pre>
-<pre><code>## - print_align.h</code></pre>
-<pre><code>## - print-modes.c</code></pre>
-<pre><code>## - print-modes.h</code></pre>
-<pre><code>## - ranges.c</code></pre>
-<pre><code>## - ranges.h</code></pre>
-<pre><code>## - regex2dfa.c</code></pre>
-<pre><code>## - regex2dfa.h</code></pre>
-<pre><code>## - sgml-print.c</code></pre>
-<pre><code>## - sgml-print.h</code></pre>
-<pre><code>## - symtab.c</code></pre>
-<pre><code>## - symtab.h</code></pre>
-<pre><code>## - table.c</code></pre>
-<pre><code>## - table.h</code></pre>
-<pre><code>## - targets.c</code></pre>
-<pre><code>## - targets.h</code></pre>
-<pre><code>## - tree.c</code></pre>
-<pre><code>## - tree.h</code></pre>
-<pre><code>## - treemacros.h</code></pre>
-<pre><code>## - variables.c</code></pre>
-<pre><code>## - variables.h</code></pre>
-<pre><code>## #### Directory: CQi</code></pre>
-<pre><code>## - auth.c</code></pre>
-<pre><code>## - auth.h</code></pre>
-<pre><code>## - cqi.h</code></pre>
-<pre><code>## - cqpserver.c</code></pre>
-<pre><code>## - server.c</code></pre>
-<pre><code>## - server.h</code></pre>
 <p>Add and commit changes so that we can prepare diffs.</p>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [dd72e7e] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [7f7fa4a] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -366,19 +249,6 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/utils/cwb-makeall.c b/src/cwb/utils/cwb-makeall.c
-## index 523b003..6c5d201 100644
-## --- a/src/cwb/utils/cwb-makeall.c
-## +++ b/src/cwb/utils/cwb-makeall.c
-## @@ -22,6 +22,8 @@
-##  #include &quot;../cl/endian.h&quot;
-##  #include &quot;../cl/fileutils.h&quot;
-##  
-## +#include &lt;netinet/in.h&gt;
-## +
-##  /** The corpus we are working on */
-##  Corpus *corpus;
-##  /** Name of this program */</code></pre>
 </div>
 <div id="cleaning-up" class="section level3">
 <h3>Cleaning up</h3>
