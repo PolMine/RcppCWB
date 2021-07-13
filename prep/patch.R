@@ -213,7 +213,7 @@ replace <- list(
   "src/cwb/cqp/ranges.c" = list("^(\\s*)\\}(\\s)/\\*\\send\\sfor\\seach\\stoken\\s\\*/", "\\1}\\2", 1),
   "src/cwb/cqp/ranges.c" = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\sfailure\\sof\\sexternal\\ssort\\scommand\\s*\\*/", "\\1line = -1;\\2", 1),
   "src/cwb/cqp/ranges.c" = list("^(\\s*)break;(\\s*)/\\*\\sabort\\s\\*/", "\\1break;\\2", 1),
-  "src/cwb/cqp/ranges.c" = list("^(\\s*)ok\\s=\\sSortExternally\\(\\);", "\\1/* ok = SortExternally(); */", 1)
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)ok\\s=\\sSortExternally\\(\\);", "\\1/* ok = SortExternally(); */", 1),
   # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)va_start\\(AP,\\sFormat\\);\\vRprintf(Format, AP); va_end(AP);", "\\1va_start(AP, Format); Rprintf(Format, AP); va_end(AP);", 1),
   "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1),
   "src/cwb/cqp/sgml-print.c" = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
