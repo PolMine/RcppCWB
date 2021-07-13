@@ -1194,7 +1194,7 @@ SortExternally(void)
             int num = atoi(sort_call);
             if (num < 0 || num >= srt_cl->size) {
               Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
-              break;          
+              break;
             }
             srt_cl->sortidx[line] = num;
             line++;
