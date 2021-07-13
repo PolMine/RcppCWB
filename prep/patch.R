@@ -215,7 +215,7 @@ replace <- list(
   "src/cwb/cqp/ranges.c" = list("^(\\s*)break;(\\s*)/\\*\\sabort\\s\\*/", "\\1break;\\2", 1),
   "src/cwb/cqp/ranges.c" = list("^(\\s*)ok\\s=\\sSortExternally\\(\\);", "\\1/* ok = SortExternally(); */", 1)
   # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)va_start\\(AP,\\sFormat\\);\\vRprintf(Format, AP); va_end(AP);", "\\1va_start(AP, Format); Rprintf(Format, AP); va_end(AP);", 1),
-  # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)int ignore_value;             /* ignore value of POP() macro */", "\\1int ignore_value __attribute__((unused));             /* ignore value of POP() macro */", 1),
+  "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1),
   "src/cwb/cqp/sgml-print.c" = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
   "src/cwb/cqp/sgml-print.c" = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
 )
