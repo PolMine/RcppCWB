@@ -15,18 +15,10 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index 74c3386..73083b0 100644
+index 98551aa..73083b0 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
-@@ -1043,7 +1043,6 @@ static int *current_sortidx;    /**< alias to newly created sortidx, so it can b
- int
- SortExternally(void)
- {
--  /* uses settings from static srt_* variables */
-   char temporary_name[TEMP_FILENAME_BUFSIZE];
-   FILE *fd;
-   FILE *pipe;
-@@ -1052,14 +1051,13 @@ SortExternally(void)
+@@ -1051,7 +1051,7 @@ SortExternally(void)
    if ((fd = open_temporary_file(temporary_name)) != NULL) {
      int line, p1start, p1end, plen, step, token, l;
  
@@ -35,43 +27,7 @@ index 74c3386..73083b0 100644
      if (text_size > 0) {
  
        for (line = 0; line < srt_cl->size; line++) {
-         
-         Rprintf("%d ", line); 
-         
--        /* determine start and end position of sort interval for this match */
-         switch (srt_anchor1) {
-         case MatchField:
-             p1start = srt_cl->range[line].start + srt_offset1;
-@@ -1096,7 +1094,6 @@ SortExternally(void)
-           break;
-         }
-         
--        /* adjust sort boundaries at start and end of corpus */
-         if (p1start < 0)
-           p1start = 0;
-         else if (p1start >= text_size)
-@@ -1107,20 +1104,16 @@ SortExternally(void)
-         else if (p1end >= text_size)
-           p1end = text_size - 1;
-         
--        /* swap start and end of interval for reverse sorting */
-         if (srt_reverse) {
-           int temp;
-           temp = p1start; p1start = p1end; p1end = temp;
-         }
-         
--        /* determine sort direction */
-         step = (p1end >= p1start) ? 1 : -1;
-         
--        /* how many tokens to print */
-         plen = abs(p1end - p1start) + 1;
- 
-         
--        /* when using flags, print normalised token sequence first (after applying cl_string_canonical) */
-         if (srt_flags) {
-           token = p1start;
-           for (l=1 ; l <= plen ; l++) {
-@@ -1130,13 +1123,6 @@ SortExternally(void)
+@@ -1123,13 +1123,6 @@ SortExternally(void)
              if (value) {
                int i, p = strlen((char *) value);
                if (srt_flags) {
@@ -85,7 +41,7 @@ index 74c3386..73083b0 100644
                  value = cl_string_canonical(value, srt_cl->corpus->charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
                  del_value = 1;
                }
-@@ -1148,11 +1134,6 @@ SortExternally(void)
+@@ -1141,11 +1134,6 @@ SortExternally(void)
                  del_value = 1;
                }
  
@@ -97,15 +53,7 @@ index 74c3386..73083b0 100644
                for (i = 0; i < p; i++)
                  fputc((unsigned char) value[i], fd);
  
-@@ -1165,7 +1146,6 @@ SortExternally(void)
-           Rprintf("\t");
-         }
- 
--        /* print sequence of tokens in sort interval */
-         token = p1start;
-         for (l = 1 ; l <= plen ; l++) {
-           char *value = cl_cpos2str(srt_attribute, token);
-@@ -1178,11 +1158,6 @@ SortExternally(void)
+@@ -1170,11 +1158,6 @@ SortExternally(void)
                del_value = 1;
                value = cl_string_reverse(value, srt_cl->corpus->charset);
              }
@@ -117,20 +65,7 @@ index 74c3386..73083b0 100644
              for (i = 0; i < p; i++)
                fputc((unsigned char) value[i], fd);
              fputc(' ', fd);
-@@ -1196,12 +1171,10 @@ SortExternally(void)
-     
-       fclose(fd);
- 
--      /* now, execute the external sort command on the temporary file */
-       sprintf(sort_call, "%s %s %s | gawk '{print $1}'", ExternalSortingCommand, (srt_ascending ? "" : "-r"), temporary_name);
-       if (SORT_DEBUG)
-         Rprintf("Running sort: \n\t%s\n", sort_call);
-       
--      /* run sort cmd and read from pipe */
-       line = -1;                
-       if ((pipe = popen(sort_call, "r")) == NULL) {
-         perror("Failure opening sort pipe");
-@@ -1221,7 +1194,7 @@ SortExternally(void)
+@@ -1211,7 +1194,7 @@ SortExternally(void)
              int num = atoi(sort_call);
              if (num < 0 || num >= srt_cl->size) {
                Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
@@ -139,15 +74,7 @@ index 74c3386..73083b0 100644
              }
              srt_cl->sortidx[line] = num;
              line++;
-@@ -1239,7 +1212,6 @@ SortExternally(void)
-                  "\tPlease remove the file manually.", temporary_name);
-     }      
-     
--    /* now we should have read exactly cl->size lines; otherwise something went wrong */
-     if (line == srt_cl->size) 
-       return 1;
-     else {
-@@ -1254,6 +1226,8 @@ SortExternally(void)
+@@ -1243,6 +1226,8 @@ SortExternally(void)
        return 0;
    }
  }

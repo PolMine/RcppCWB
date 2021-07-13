@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [397ade8] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [abaea0a] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -358,18 +358,10 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index 74c3386..73083b0 100644
+## index 98551aa..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
-## @@ -1043,7 +1043,6 @@ static int *current_sortidx;    /**&lt; alias to newly created sortidx, so it can b
-##  int
-##  SortExternally(void)
-##  {
-## -  /* uses settings from static srt_* variables */
-##    char temporary_name[TEMP_FILENAME_BUFSIZE];
-##    FILE *fd;
-##    FILE *pipe;
-## @@ -1052,14 +1051,13 @@ SortExternally(void)
+## @@ -1051,7 +1051,7 @@ SortExternally(void)
 ##    if ((fd = open_temporary_file(temporary_name)) != NULL) {
 ##      int line, p1start, p1end, plen, step, token, l;
 ##  
@@ -378,43 +370,7 @@ cat(gitdiff_cqp)</code></pre>
 ##      if (text_size &gt; 0) {
 ##  
 ##        for (line = 0; line &lt; srt_cl-&gt;size; line++) {
-##          
-##          Rprintf(&quot;%d &quot;, line); 
-##          
-## -        /* determine start and end position of sort interval for this match */
-##          switch (srt_anchor1) {
-##          case MatchField:
-##              p1start = srt_cl-&gt;range[line].start + srt_offset1;
-## @@ -1096,7 +1094,6 @@ SortExternally(void)
-##            break;
-##          }
-##          
-## -        /* adjust sort boundaries at start and end of corpus */
-##          if (p1start &lt; 0)
-##            p1start = 0;
-##          else if (p1start &gt;= text_size)
-## @@ -1107,20 +1104,16 @@ SortExternally(void)
-##          else if (p1end &gt;= text_size)
-##            p1end = text_size - 1;
-##          
-## -        /* swap start and end of interval for reverse sorting */
-##          if (srt_reverse) {
-##            int temp;
-##            temp = p1start; p1start = p1end; p1end = temp;
-##          }
-##          
-## -        /* determine sort direction */
-##          step = (p1end &gt;= p1start) ? 1 : -1;
-##          
-## -        /* how many tokens to print */
-##          plen = abs(p1end - p1start) + 1;
-##  
-##          
-## -        /* when using flags, print normalised token sequence first (after applying cl_string_canonical) */
-##          if (srt_flags) {
-##            token = p1start;
-##            for (l=1 ; l &lt;= plen ; l++) {
-## @@ -1130,13 +1123,6 @@ SortExternally(void)
+## @@ -1123,13 +1123,6 @@ SortExternally(void)
 ##              if (value) {
 ##                int i, p = strlen((char *) value);
 ##                if (srt_flags) {
@@ -428,7 +384,7 @@ cat(gitdiff_cqp)</code></pre>
 ##                  value = cl_string_canonical(value, srt_cl-&gt;corpus-&gt;charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
 ##                  del_value = 1;
 ##                }
-## @@ -1148,11 +1134,6 @@ SortExternally(void)
+## @@ -1141,11 +1134,6 @@ SortExternally(void)
 ##                  del_value = 1;
 ##                }
 ##  
@@ -440,15 +396,7 @@ cat(gitdiff_cqp)</code></pre>
 ##                for (i = 0; i &lt; p; i++)
 ##                  fputc((unsigned char) value[i], fd);
 ##  
-## @@ -1165,7 +1146,6 @@ SortExternally(void)
-##            Rprintf(&quot;\t&quot;);
-##          }
-##  
-## -        /* print sequence of tokens in sort interval */
-##          token = p1start;
-##          for (l = 1 ; l &lt;= plen ; l++) {
-##            char *value = cl_cpos2str(srt_attribute, token);
-## @@ -1178,11 +1158,6 @@ SortExternally(void)
+## @@ -1170,11 +1158,6 @@ SortExternally(void)
 ##                del_value = 1;
 ##                value = cl_string_reverse(value, srt_cl-&gt;corpus-&gt;charset);
 ##              }
@@ -460,20 +408,7 @@ cat(gitdiff_cqp)</code></pre>
 ##              for (i = 0; i &lt; p; i++)
 ##                fputc((unsigned char) value[i], fd);
 ##              fputc(&#39; &#39;, fd);
-## @@ -1196,12 +1171,10 @@ SortExternally(void)
-##      
-##        fclose(fd);
-##  
-## -      /* now, execute the external sort command on the temporary file */
-##        sprintf(sort_call, &quot;%s %s %s | gawk &#39;{print $1}&#39;&quot;, ExternalSortingCommand, (srt_ascending ? &quot;&quot; : &quot;-r&quot;), temporary_name);
-##        if (SORT_DEBUG)
-##          Rprintf(&quot;Running sort: \n\t%s\n&quot;, sort_call);
-##        
-## -      /* run sort cmd and read from pipe */
-##        line = -1;                
-##        if ((pipe = popen(sort_call, &quot;r&quot;)) == NULL) {
-##          perror(&quot;Failure opening sort pipe&quot;);
-## @@ -1221,7 +1194,7 @@ SortExternally(void)
+## @@ -1211,7 +1194,7 @@ SortExternally(void)
 ##              int num = atoi(sort_call);
 ##              if (num &lt; 0 || num &gt;= srt_cl-&gt;size) {
 ##                Rprintf(&quot;Error in externally sorted file - line number #%d out of range\n&quot;, num);
@@ -482,15 +417,7 @@ cat(gitdiff_cqp)</code></pre>
 ##              }
 ##              srt_cl-&gt;sortidx[line] = num;
 ##              line++;
-## @@ -1239,7 +1212,6 @@ SortExternally(void)
-##                   &quot;\tPlease remove the file manually.&quot;, temporary_name);
-##      }      
-##      
-## -    /* now we should have read exactly cl-&gt;size lines; otherwise something went wrong */
-##      if (line == srt_cl-&gt;size) 
-##        return 1;
-##      else {
-## @@ -1254,6 +1226,8 @@ SortExternally(void)
+## @@ -1243,6 +1226,8 @@ SortExternally(void)
 ##        return 0;
 ##    }
 ##  }
