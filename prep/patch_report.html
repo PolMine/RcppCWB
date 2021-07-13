@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [c3109db] 2021-07-12: CWB patched</code></pre>
+<pre><code>## [520e741] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -358,36 +358,9 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
-## index a0f108f..53e4bcf 100644
+## index 1af6732..53e4bcf 100644
 ## --- a/src/cwb/cqp/parse_actions.c
 ## +++ b/src/cwb/cqp/parse_actions.c
-## @@ -1575,7 +1575,7 @@ OptimizeStringConstraint(Constrainttree left,
-##            c-&gt;type = id_list;
-##            c-&gt;idlist.attr = left-&gt;pa_ref.attr;
-##            c-&gt;idlist.label = left-&gt;pa_ref.label;
-## -          c-&gt;idlist.delete = left-&gt;pa_ref.delete;
-## +          c-&gt;idlist.del = left-&gt;pa_ref.del;
-##  
-##            c-&gt;idlist.nr_items = nr_items;
-##            c-&gt;idlist.items = items;
-## @@ -1729,7 +1729,7 @@ do_StringConstraint(char *s, int flags)
-##        left-&gt;type = pa_ref;
-##        left-&gt;pa_ref.attr = attr;
-##        left-&gt;pa_ref.label = NULL;
-## -      left-&gt;pa_ref.delete = 0;
-## +      left-&gt;pa_ref.del = 0;
-##  
-##        c = OptimizeStringConstraint(left, cmp_eq, right);
-##      }
-## @@ -1759,7 +1759,7 @@ Varref2IDList(Attribute *attr, enum b_ops op, char *varName)
-##        node-&gt;type = id_list;
-##        node-&gt;idlist.attr = attr;
-##        node-&gt;idlist.label = NULL;
-## -      node-&gt;idlist.delete = 0;
-## +      node-&gt;idlist.del = 0;
-##        node-&gt;idlist.negated = (op == cmp_eq ? 0 : 1);
-##        node-&gt;idlist.items = GetVariableItems(v, 
-##                                              query_corpus-&gt;corpus,
 ## @@ -2039,7 +2039,7 @@ do_RelExpr(Constrainttree left,
 ##          /* be careful: res might be of type cnode, when an empty id_list has been optimised away */
 ##          if (res &amp;&amp; res-&gt;type == id_list &amp;&amp; generate_code) {
@@ -397,51 +370,6 @@ cat(gitdiff_cqp)</code></pre>
 ##          }
 ##        }
 ##        else {
-## @@ -2150,7 +2150,7 @@ do_LabelReference(char *label_name, int auto_delete)
-##        res-&gt;type = pa_ref;
-##        res-&gt;pa_ref.attr = attr;
-##        res-&gt;pa_ref.label = lab;
-## -      res-&gt;pa_ref.delete = auto_delete;
-## +      res-&gt;pa_ref.del = auto_delete;
-##      }
-##      else if ((attr = find_attribute(query_corpus-&gt;corpus,
-##                                      hack,
-## @@ -2174,7 +2174,7 @@ do_LabelReference(char *label_name, int auto_delete)
-##          res-&gt;type = sa_ref;
-##          res-&gt;sa_ref.attr = attr;
-##          res-&gt;sa_ref.label = lab;
-## -        res-&gt;sa_ref.delete = auto_delete;
-## +        res-&gt;sa_ref.del = auto_delete;
-##        }
-##      }
-##    }
-## @@ -2207,7 +2207,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
-##        res-&gt;type = pa_ref;
-##        res-&gt;pa_ref.attr = attr;
-##        res-&gt;pa_ref.label = NULL;
-## -      res-&gt;pa_ref.delete = 0;
-## +      res-&gt;pa_ref.del = 0;
-##      }
-##      else if ((lab = labellookup(CurEnv-&gt;labels, id_name, LAB_USED, 0)) != NULL) {
-##        NEW_BNODE(res);
-## @@ -2218,7 +2218,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
-##          cqpmessage(Warning, &quot;Cannot auto-delete special label &#39;%s&#39; [ignored].&quot;, id_name);
-##          auto_delete = 0;
-##        }
-## -      res-&gt;pa_ref.delete = auto_delete;
-## +      res-&gt;pa_ref.del = auto_delete;
-##        auto_delete = 0;                /* we&#39;ll check that below */
-##      }
-##      else if ((attr = find_attribute(query_corpus-&gt;corpus,
-## @@ -2240,7 +2240,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
-##        /* Need to set label to NULL now that we put sa_ref&#39;s to better use.
-##           A label&#39;s sa_ref now returns the value of the enclosing region */
-##        res-&gt;sa_ref.label = NULL;
-## -      res-&gt;sa_ref.delete = 0;
-## +      res-&gt;sa_ref.del = 0;
-##      }
-##      else {
-##        if (within_gc) {
 ## diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
 ## index de87e37..666485b 100644
 ## --- a/src/cwb/cqp/parser.y
