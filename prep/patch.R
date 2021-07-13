@@ -207,7 +207,7 @@ replace <- list(
   "src/cwb/cqp/parse_actions.c" = list("^(\\s*)res->sa_ref\\.delete\\s=\\s0;", "\\1res->sa_ref.del = 0;", 1),
   "src/cwb/cqp/parser.y" = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 2),
   "src/cwb/cqp/parser.y" = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 1),
-  "src/cwb/cqp/parser.y" = list("^(\\s*)ok\\s=\\sSortSubcorpus(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1)
+  "src/cwb/cqp/parser.y" = list("^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1)
   # "src/cwb/cqp/ranges.c" = list("^(\\s*)line = -1;                  /* will indicate sort failure below if text_size == 0 */", "\\1line = -1;                 ", 1),
   # "src/cwb/cqp/ranges.c" = list("^(\\s*)} /* end for each token */", "\\1} ", 1),
   # "src/cwb/cqp/ranges.c" = list("^(\\s*)line = -1;                /* will indicate failure of external sort command  */", "\\1line = -1;                ", 1),
