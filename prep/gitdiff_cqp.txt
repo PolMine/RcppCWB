@@ -15,17 +15,19 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index 91a1272..2c413e7 100644
+index 91a1272..e1a7bfe 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
-@@ -1227,6 +1227,7 @@ SortExternally(void)
+@@ -1227,7 +1227,8 @@ SortExternally(void)
    }
  }
  */
+-  
++
 + 
-   
  /**
   * Defined if a sort cache is to be used in sorting concordance lines.
+  *
 diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
 index 95f07ce..3c474ff 100644
 --- a/src/cwb/cqp/regex2dfa.c

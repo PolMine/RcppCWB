@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [92f56ab] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [b0422d6] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -358,17 +358,19 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index 91a1272..2c413e7 100644
+## index 91a1272..e1a7bfe 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
-## @@ -1227,6 +1227,7 @@ SortExternally(void)
+## @@ -1227,7 +1227,8 @@ SortExternally(void)
 ##    }
 ##  }
 ##  */
+## -  
+## +
 ## + 
-##    
 ##  /**
 ##   * Defined if a sort cache is to be used in sorting concordance lines.
+##   *
 ## diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
 ## index 95f07ce..3c474ff 100644
 ## --- a/src/cwb/cqp/regex2dfa.c
