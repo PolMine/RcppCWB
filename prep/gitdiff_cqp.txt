@@ -15,7 +15,7 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index 98551aa..73083b0 100644
+index 55b3c06..73083b0 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
 @@ -1051,7 +1051,7 @@ SortExternally(void)
@@ -41,31 +41,7 @@ index 98551aa..73083b0 100644
                  value = cl_string_canonical(value, srt_cl->corpus->charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
                  del_value = 1;
                }
-@@ -1141,11 +1134,6 @@ SortExternally(void)
-                 del_value = 1;
-               }
- 
--              /* old
--              if (srt_reverse) {
--                for (i = p-1 ; i >= 0; i--)
--                  fputc(srt_maptable[value[i]], fd);
--              }*/
-               for (i = 0; i < p; i++)
-                 fputc((unsigned char) value[i], fd);
- 
-@@ -1170,11 +1158,6 @@ SortExternally(void)
-               del_value = 1;
-               value = cl_string_reverse(value, srt_cl->corpus->charset);
-             }
--            /*old version
--             if (srt_reverse) {
--              for (i = p-1 ; i >= 0; i--)
--                fputc(value[i], fd);
--            } */
-             for (i = 0; i < p; i++)
-               fputc((unsigned char) value[i], fd);
-             fputc(' ', fd);
-@@ -1211,7 +1194,7 @@ SortExternally(void)
+@@ -1201,7 +1194,7 @@ SortExternally(void)
              int num = atoi(sort_call);
              if (num < 0 || num >= srt_cl->size) {
                Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
@@ -74,7 +50,7 @@ index 98551aa..73083b0 100644
              }
              srt_cl->sortidx[line] = num;
              line++;
-@@ -1243,6 +1226,8 @@ SortExternally(void)
+@@ -1233,6 +1226,8 @@ SortExternally(void)
        return 0;
    }
  }

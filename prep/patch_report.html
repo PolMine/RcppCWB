@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [abaea0a] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [2af27b7] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -358,7 +358,7 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index 98551aa..73083b0 100644
+## index 55b3c06..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
 ## @@ -1051,7 +1051,7 @@ SortExternally(void)
@@ -384,31 +384,7 @@ cat(gitdiff_cqp)</code></pre>
 ##                  value = cl_string_canonical(value, srt_cl-&gt;corpus-&gt;charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
 ##                  del_value = 1;
 ##                }
-## @@ -1141,11 +1134,6 @@ SortExternally(void)
-##                  del_value = 1;
-##                }
-##  
-## -              /* old
-## -              if (srt_reverse) {
-## -                for (i = p-1 ; i &gt;= 0; i--)
-## -                  fputc(srt_maptable[value[i]], fd);
-## -              }*/
-##                for (i = 0; i &lt; p; i++)
-##                  fputc((unsigned char) value[i], fd);
-##  
-## @@ -1170,11 +1158,6 @@ SortExternally(void)
-##                del_value = 1;
-##                value = cl_string_reverse(value, srt_cl-&gt;corpus-&gt;charset);
-##              }
-## -            /*old version
-## -             if (srt_reverse) {
-## -              for (i = p-1 ; i &gt;= 0; i--)
-## -                fputc(value[i], fd);
-## -            } */
-##              for (i = 0; i &lt; p; i++)
-##                fputc((unsigned char) value[i], fd);
-##              fputc(&#39; &#39;, fd);
-## @@ -1211,7 +1194,7 @@ SortExternally(void)
+## @@ -1201,7 +1194,7 @@ SortExternally(void)
 ##              int num = atoi(sort_call);
 ##              if (num &lt; 0 || num &gt;= srt_cl-&gt;size) {
 ##                Rprintf(&quot;Error in externally sorted file - line number #%d out of range\n&quot;, num);
@@ -417,7 +393,7 @@ cat(gitdiff_cqp)</code></pre>
 ##              }
 ##              srt_cl-&gt;sortidx[line] = num;
 ##              line++;
-## @@ -1243,6 +1226,8 @@ SortExternally(void)
+## @@ -1233,6 +1226,8 @@ SortExternally(void)
 ##        return 0;
 ##    }
 ##  }
