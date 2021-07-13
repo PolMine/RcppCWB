@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e1fea30] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [8209386] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -356,10 +356,18 @@ output &lt;- paste(result, collapse = &quot;\n&quot;)
 # cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
 cat(output)</code></pre>
 <pre><code>## diff --git a/src/cwb/CQi/server.c b/src/cwb/CQi/server.c
-## index 2fbd640..451d016 100644
+## index c53a825..451d016 100644
 ## --- a/src/cwb/CQi/server.c
 ## +++ b/src/cwb/CQi/server.c
-## @@ -58,6 +58,8 @@
+## @@ -1,7 +1,5 @@
+##  /* 
+##   *  IMS Open Corpus Workbench (CWB)
+## -void Rprintf(const char *, ...);
+## -
+##   *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##   *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+##   * 
+## @@ -60,6 +58,8 @@ void Rprintf(const char *, ...);
 ##  #define MSG_WAITALL 0
 ##  #endif
 ##  
