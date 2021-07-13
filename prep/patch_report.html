@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [83d3eeb] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [f579b64] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -356,18 +356,18 @@ output &lt;- paste(result, collapse = &quot;\n&quot;)
 # cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
 cat(output)</code></pre>
 <pre><code>## diff --git a/src/cwb/CQi/auth.c b/src/cwb/CQi/auth.c
-## index fd1201c..462ada7 100644
+## index f72646f..462ada7 100644
 ## --- a/src/cwb/CQi/auth.c
 ## +++ b/src/cwb/CQi/auth.c
-## @@ -26,6 +26,8 @@
+## @@ -26,7 +26,7 @@
 ##  
 ##  #include &quot;../cl/macros.h&quot;
 ##  
+## -+void Rprintf(const char *, ...);
 ## +void Rprintf(const char *, ...);
-## +
+##  
 ##  /* data structures (internal use only) */
 ##  
-##  /** Internal data structure: name of a corpus to which access is granted */
 ## diff --git a/src/cwb/CQi/cqpserver.c b/src/cwb/CQi/cqpserver.c
 ## index 80060e7..20fdf48 100644
 ## --- a/src/cwb/CQi/cqpserver.c
