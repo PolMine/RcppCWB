@@ -15,7 +15,7 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index ca316dd..73083b0 100644
+index ec55cbe..73083b0 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
 @@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**< alias to newly created sortidx, so it can b
@@ -34,7 +34,7 @@ index ca316dd..73083b0 100644
    if ((fd = open_temporary_file(temporary_name)) != NULL) {
      int line, p1start, p1end, plen, step, token, l;
  
--    line = -1;                  /* will indicate sort failure below if text_size == 0 */
+-    line = -1;                  
 +    line = -1;                 
      if (text_size > 0) {
  
@@ -121,14 +121,7 @@ index ca316dd..73083b0 100644
              for (i = 0; i < p; i++)
                fputc((unsigned char) value[i], fd);
              fputc(' ', fd);
-@@ -1189,19 +1165,17 @@ SortExternally(void)
-               cl_free(value);
-           }
-           token += step;
--        } /* end for each token */
-+        } 
-         Rprintf("\n");
-       }
+@@ -1195,12 +1171,10 @@ SortExternally(void)
      
        fclose(fd);
  
@@ -138,16 +131,14 @@ index ca316dd..73083b0 100644
          Rprintf("Running sort: \n\t%s\n", sort_call);
        
 -      /* run sort cmd and read from pipe */
--      line = -1;                /* will indicate failure of external sort command  */
-+      line = -1;                
+       line = -1;                
        if ((pipe = popen(sort_call, "r")) == NULL) {
          perror("Failure opening sort pipe");
-         cqpmessage(Error, "Can't execute external sort:\n\t%s\n"
 @@ -1220,7 +1194,7 @@ SortExternally(void)
              int num = atoi(sort_call);
              if (num < 0 || num >= srt_cl->size) {
                Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
--              break;            /* abort */
+-              break;            
 +              break;          
              }
              srt_cl->sortidx[line] = num;
@@ -169,15 +160,6 @@ index ca316dd..73083b0 100644
    
  /**
   * Defined if a sort cache is to be used in sorting concordance lines.
-@@ -1673,7 +1648,7 @@ SortSubcorpus(CorpusList *cl, SortClause sc, int count_mode, struct Redir *redir
- 
-   ok = 1;
-   if (UseExternalSorting && !insecure && !count_mode) {
--    ok = SortExternally();
-+    /* ok = SortExternally(); */
-   }
-   else {
-     /* precompute tables for start and end position of sort interval */
 diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
 index 781129b..3c474ff 100644
 --- a/src/cwb/cqp/regex2dfa.c

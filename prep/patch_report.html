@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [fa2040f] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [5f0bbea] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -358,7 +358,7 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index ca316dd..73083b0 100644
+## index ec55cbe..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
 ## @@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**&lt; alias to newly created sortidx, so it can b
@@ -377,7 +377,7 @@ cat(gitdiff_cqp)</code></pre>
 ##    if ((fd = open_temporary_file(temporary_name)) != NULL) {
 ##      int line, p1start, p1end, plen, step, token, l;
 ##  
-## -    line = -1;                  /* will indicate sort failure below if text_size == 0 */
+## -    line = -1;                  
 ## +    line = -1;                 
 ##      if (text_size &gt; 0) {
 ##  
@@ -464,14 +464,7 @@ cat(gitdiff_cqp)</code></pre>
 ##              for (i = 0; i &lt; p; i++)
 ##                fputc((unsigned char) value[i], fd);
 ##              fputc(&#39; &#39;, fd);
-## @@ -1189,19 +1165,17 @@ SortExternally(void)
-##                cl_free(value);
-##            }
-##            token += step;
-## -        } /* end for each token */
-## +        } 
-##          Rprintf(&quot;\n&quot;);
-##        }
+## @@ -1195,12 +1171,10 @@ SortExternally(void)
 ##      
 ##        fclose(fd);
 ##  
@@ -481,16 +474,14 @@ cat(gitdiff_cqp)</code></pre>
 ##          Rprintf(&quot;Running sort: \n\t%s\n&quot;, sort_call);
 ##        
 ## -      /* run sort cmd and read from pipe */
-## -      line = -1;                /* will indicate failure of external sort command  */
-## +      line = -1;                
+##        line = -1;                
 ##        if ((pipe = popen(sort_call, &quot;r&quot;)) == NULL) {
 ##          perror(&quot;Failure opening sort pipe&quot;);
-##          cqpmessage(Error, &quot;Can&#39;t execute external sort:\n\t%s\n&quot;
 ## @@ -1220,7 +1194,7 @@ SortExternally(void)
 ##              int num = atoi(sort_call);
 ##              if (num &lt; 0 || num &gt;= srt_cl-&gt;size) {
 ##                Rprintf(&quot;Error in externally sorted file - line number #%d out of range\n&quot;, num);
-## -              break;            /* abort */
+## -              break;            
 ## +              break;          
 ##              }
 ##              srt_cl-&gt;sortidx[line] = num;
@@ -512,15 +503,6 @@ cat(gitdiff_cqp)</code></pre>
 ##    
 ##  /**
 ##   * Defined if a sort cache is to be used in sorting concordance lines.
-## @@ -1673,7 +1648,7 @@ SortSubcorpus(CorpusList *cl, SortClause sc, int count_mode, struct Redir *redir
-##  
-##    ok = 1;
-##    if (UseExternalSorting &amp;&amp; !insecure &amp;&amp; !count_mode) {
-## -    ok = SortExternally();
-## +    /* ok = SortExternally(); */
-##    }
-##    else {
-##      /* precompute tables for start and end position of sort interval */
 ## diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
 ## index 781129b..3c474ff 100644
 ## --- a/src/cwb/cqp/regex2dfa.c
