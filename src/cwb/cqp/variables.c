@@ -282,7 +282,7 @@ NewVariable(char *varname)
                                           nr_variables * sizeof(Variable));
     /* no longer necessary: cl_malloc/_realloc checks for this.
     if (VariableSpace == NULL) {
-      RprintF("Fatal Error: Variable space out of memory.\n");
+      Rprintf("Fatal Error: Variable space out of memory.\n");
       assert(0 && "Sorry, big problem here!");
     } */
     
