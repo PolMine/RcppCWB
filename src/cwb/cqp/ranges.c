@@ -1227,8 +1227,8 @@ SortExternally(void)
   }
 }
 */
+
  
-  
 /**
  * Defined if a sort cache is to be used in sorting concordance lines.
  *
