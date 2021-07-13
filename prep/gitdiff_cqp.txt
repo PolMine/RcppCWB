@@ -15,14 +15,13 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index 61935c3..2c413e7 100644
+index 91a1272..2c413e7 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
-@@ -1226,6 +1226,8 @@ SortExternally(void)
-       return 0;
+@@ -1227,6 +1227,7 @@ SortExternally(void)
    }
  }
-+*/
+ */
 + 
    
  /**
