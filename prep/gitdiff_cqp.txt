@@ -15,14 +15,14 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index 0432a17..73083b0 100644
+index 7b9fcb4..73083b0 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
 @@ -1051,7 +1051,7 @@ SortExternally(void)
    if ((fd = open_temporary_file(temporary_name)) != NULL) {
      int line, p1start, p1end, plen, step, token, l;
  
--    line = -1;                  
+-    line = -1;                   
 +    line = -1;                 
      if (text_size > 0) {
  

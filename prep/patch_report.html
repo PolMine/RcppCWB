@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [8112339] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [bc2f6a0] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -358,14 +358,14 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index 0432a17..73083b0 100644
+## index 7b9fcb4..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
 ## @@ -1051,7 +1051,7 @@ SortExternally(void)
 ##    if ((fd = open_temporary_file(temporary_name)) != NULL) {
 ##      int line, p1start, p1end, plen, step, token, l;
 ##  
-## -    line = -1;                  
+## -    line = -1;                   
 ## +    line = -1;                 
 ##      if (text_size &gt; 0) {
 ##  

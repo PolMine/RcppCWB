@@ -215,7 +215,7 @@ replace <- list(
   "src/cwb/cqp/parser.y" = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 3),
   "src/cwb/cqp/parser.y" = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 2),
   "src/cwb/cqp/parser.y" = list("^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1),
-  "src/cwb/cqp/ranges.c" = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\ssort\\sfailure\\sbelow\\sif\\stext_size\\s==\\s0\\s\\*/", "\\1line = -1;\\2 ", 1),
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)line\\s=\\s-1;(\\s*)\\s/\\*\\swill\\sindicate\\ssort\\sfailure\\sbelow\\sif\\stext_size\\s==\\s0\\s\\*/", "\\1line = -1;\\2", 1),
   "src/cwb/cqp/ranges.c" = list("^(\\s*)\\}(\\s)/\\*\\send\\sfor\\seach\\stoken\\s\\*/", "\\1}\\2", 1),
   "src/cwb/cqp/ranges.c" = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\sfailure\\sof\\sexternal\\ssort\\scommand\\s*\\*/", "\\1line = -1;\\2", 1),
   "src/cwb/cqp/ranges.c" = list("^(\\s*)break;(\\s*)/\\*\\sabort\\s\\*/", "\\1break;\\2", 1),
