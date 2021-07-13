@@ -120,7 +120,7 @@ insert_after <- list(
   "src/cwb/cqp/hash.c" = list("^\\s*\\}\\s*$", "*/", 2),
   "src/cwb/cqp/hash.c" = list("^\\s*\\}\\s*$", "*/", 3),
   "src/cwb/cqp/output.c" = list("^\\}\\s*$", "*/", 3),
-  "src/cwb/cqp/rages.c" = list("^\\}\\s*$", "*/", 11)
+  "src/cwb/cqp/ranges.c" = list("^\\}\\s*$", "*/", 11)
 )
 
 for (i in 1L:length(insert_after)){
@@ -253,11 +253,6 @@ remove_lines <- list(
   "src/cwb/cqp/ranges.c" = list("/\\*\\snow,\\sexecute\\sthe\\sexternal\\ssort\\scommand.*?\\*/", 1),
   "src/cwb/cqp/ranges.c" = list("/\\*\\srun\\ssort\\scmd\\sand\\sread\\sfrom\\spipe\\s\\*/", 1),
   "src/cwb/cqp/ranges.c" = list("/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/", 1)
-    
-    
-    
-    
-    
 )
 
 for (i in 1L:length(remove_lines)){
