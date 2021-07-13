@@ -234,7 +234,24 @@ for (i in 1L:length(replace)){
 remove_lines <- list(
   "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 3),
   "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 2),
-  "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 1)
+  "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 1),
+  "src/cwb/cqp/ranges.c" = list("^\\s*/\\*\\suses\\ssettings\\sfrom\\sstatic\\ssrt_\\*\\svariables\\s\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("^\\s*/\\*\\sdetermine\\sstart\\sand\\send\\sposition\\sof\\ssort\\sinterval\\sfor\\sthis\\smatch\\s\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\sadjust\\ssort\\sboundaries.*?\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/*\\sswap\\sstart\\sand\\send\\sof\\sinterval.*?\\*/", 1),
+  
+  "src/cwb/cqp/ranges.c" = list("/\\*\\sdetermine\\ssort\\sdirection\\s\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\show\\smany\\stokens\\sto\\sprint\\s\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\swhen\\susing\\sflags,\\sprint\\snormalised\\stoken\\ssequence.*?\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\sprint\\ssequence\\sof\\stokens\\sin\\ssort\\sinterval\\s\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\snow,\\sexecute\\sthe\\sexternal\\ssort\\scommand.*?\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\srun\\ssort\\scmd\\sand\\sread\\sfrom\\spipe\\s\\*/", 1),
+  "src/cwb/cqp/ranges.c" = list("/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/", 1)
+    
+    
+    
+    
+    
 )
 
 for (i in 1L:length(remove_lines)){

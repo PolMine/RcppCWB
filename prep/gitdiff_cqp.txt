@@ -15,14 +15,10 @@ index 19a2e2d..ecfb357 100644
      }
  
 diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-index ec55cbe..73083b0 100644
+index 74c3386..73083b0 100644
 --- a/src/cwb/cqp/ranges.c
 +++ b/src/cwb/cqp/ranges.c
-@@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**< alias to newly created sortidx, so it can b
-  * No parameters - the assumption is that everything is set up
-  * already by the SortSubCorpus function which calls this one.
-  */
-+/*
+@@ -1043,7 +1043,6 @@ static int *current_sortidx;    /**< alias to newly created sortidx, so it can b
  int
  SortExternally(void)
  {
@@ -30,7 +26,7 @@ index ec55cbe..73083b0 100644
    char temporary_name[TEMP_FILENAME_BUFSIZE];
    FILE *fd;
    FILE *pipe;
-@@ -1051,14 +1051,13 @@ SortExternally(void)
+@@ -1052,14 +1051,13 @@ SortExternally(void)
    if ((fd = open_temporary_file(temporary_name)) != NULL) {
      int line, p1start, p1end, plen, step, token, l;
  
@@ -46,7 +42,7 @@ index ec55cbe..73083b0 100644
          switch (srt_anchor1) {
          case MatchField:
              p1start = srt_cl->range[line].start + srt_offset1;
-@@ -1095,7 +1094,6 @@ SortExternally(void)
+@@ -1096,7 +1094,6 @@ SortExternally(void)
            break;
          }
          
@@ -54,7 +50,7 @@ index ec55cbe..73083b0 100644
          if (p1start < 0)
            p1start = 0;
          else if (p1start >= text_size)
-@@ -1106,20 +1104,16 @@ SortExternally(void)
+@@ -1107,20 +1104,16 @@ SortExternally(void)
          else if (p1end >= text_size)
            p1end = text_size - 1;
          
@@ -75,7 +71,7 @@ index ec55cbe..73083b0 100644
          if (srt_flags) {
            token = p1start;
            for (l=1 ; l <= plen ; l++) {
-@@ -1129,13 +1123,6 @@ SortExternally(void)
+@@ -1130,13 +1123,6 @@ SortExternally(void)
              if (value) {
                int i, p = strlen((char *) value);
                if (srt_flags) {
@@ -89,7 +85,7 @@ index ec55cbe..73083b0 100644
                  value = cl_string_canonical(value, srt_cl->corpus->charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
                  del_value = 1;
                }
-@@ -1147,11 +1134,6 @@ SortExternally(void)
+@@ -1148,11 +1134,6 @@ SortExternally(void)
                  del_value = 1;
                }
  
@@ -101,7 +97,7 @@ index ec55cbe..73083b0 100644
                for (i = 0; i < p; i++)
                  fputc((unsigned char) value[i], fd);
  
-@@ -1164,7 +1146,6 @@ SortExternally(void)
+@@ -1165,7 +1146,6 @@ SortExternally(void)
            Rprintf("\t");
          }
  
@@ -109,7 +105,7 @@ index ec55cbe..73083b0 100644
          token = p1start;
          for (l = 1 ; l <= plen ; l++) {
            char *value = cl_cpos2str(srt_attribute, token);
-@@ -1177,11 +1158,6 @@ SortExternally(void)
+@@ -1178,11 +1158,6 @@ SortExternally(void)
                del_value = 1;
                value = cl_string_reverse(value, srt_cl->corpus->charset);
              }
@@ -121,7 +117,7 @@ index ec55cbe..73083b0 100644
              for (i = 0; i < p; i++)
                fputc((unsigned char) value[i], fd);
              fputc(' ', fd);
-@@ -1195,12 +1171,10 @@ SortExternally(void)
+@@ -1196,12 +1171,10 @@ SortExternally(void)
      
        fclose(fd);
  
@@ -134,7 +130,7 @@ index ec55cbe..73083b0 100644
        line = -1;                
        if ((pipe = popen(sort_call, "r")) == NULL) {
          perror("Failure opening sort pipe");
-@@ -1220,7 +1194,7 @@ SortExternally(void)
+@@ -1221,7 +1194,7 @@ SortExternally(void)
              int num = atoi(sort_call);
              if (num < 0 || num >= srt_cl->size) {
                Rprintf("Error in externally sorted file - line number #%d out of range\n", num);
@@ -143,7 +139,7 @@ index ec55cbe..73083b0 100644
              }
              srt_cl->sortidx[line] = num;
              line++;
-@@ -1238,7 +1212,6 @@ SortExternally(void)
+@@ -1239,7 +1212,6 @@ SortExternally(void)
                   "\tPlease remove the file manually.", temporary_name);
      }      
      
@@ -151,7 +147,7 @@ index ec55cbe..73083b0 100644
      if (line == srt_cl->size) 
        return 1;
      else {
-@@ -1253,6 +1226,8 @@ SortExternally(void)
+@@ -1254,6 +1226,8 @@ SortExternally(void)
        return 0;
    }
  }

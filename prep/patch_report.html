@@ -192,7 +192,6 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [072cdc6] 2021-07-13: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -316,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [1c85416] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [397ade8] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -359,14 +358,10 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index ec55cbe..73083b0 100644
+## index 74c3386..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
-## @@ -1039,10 +1039,10 @@ static int *current_sortidx;    /**&lt; alias to newly created sortidx, so it can b
-##   * No parameters - the assumption is that everything is set up
-##   * already by the SortSubCorpus function which calls this one.
-##   */
-## +/*
+## @@ -1043,7 +1043,6 @@ static int *current_sortidx;    /**&lt; alias to newly created sortidx, so it can b
 ##  int
 ##  SortExternally(void)
 ##  {
@@ -374,7 +369,7 @@ cat(gitdiff_cqp)</code></pre>
 ##    char temporary_name[TEMP_FILENAME_BUFSIZE];
 ##    FILE *fd;
 ##    FILE *pipe;
-## @@ -1051,14 +1051,13 @@ SortExternally(void)
+## @@ -1052,14 +1051,13 @@ SortExternally(void)
 ##    if ((fd = open_temporary_file(temporary_name)) != NULL) {
 ##      int line, p1start, p1end, plen, step, token, l;
 ##  
@@ -390,7 +385,7 @@ cat(gitdiff_cqp)</code></pre>
 ##          switch (srt_anchor1) {
 ##          case MatchField:
 ##              p1start = srt_cl-&gt;range[line].start + srt_offset1;
-## @@ -1095,7 +1094,6 @@ SortExternally(void)
+## @@ -1096,7 +1094,6 @@ SortExternally(void)
 ##            break;
 ##          }
 ##          
@@ -398,7 +393,7 @@ cat(gitdiff_cqp)</code></pre>
 ##          if (p1start &lt; 0)
 ##            p1start = 0;
 ##          else if (p1start &gt;= text_size)
-## @@ -1106,20 +1104,16 @@ SortExternally(void)
+## @@ -1107,20 +1104,16 @@ SortExternally(void)
 ##          else if (p1end &gt;= text_size)
 ##            p1end = text_size - 1;
 ##          
@@ -419,7 +414,7 @@ cat(gitdiff_cqp)</code></pre>
 ##          if (srt_flags) {
 ##            token = p1start;
 ##            for (l=1 ; l &lt;= plen ; l++) {
-## @@ -1129,13 +1123,6 @@ SortExternally(void)
+## @@ -1130,13 +1123,6 @@ SortExternally(void)
 ##              if (value) {
 ##                int i, p = strlen((char *) value);
 ##                if (srt_flags) {
@@ -433,7 +428,7 @@ cat(gitdiff_cqp)</code></pre>
 ##                  value = cl_string_canonical(value, srt_cl-&gt;corpus-&gt;charset, srt_flags, CL_STRING_CANONICAL_STRDUP);
 ##                  del_value = 1;
 ##                }
-## @@ -1147,11 +1134,6 @@ SortExternally(void)
+## @@ -1148,11 +1134,6 @@ SortExternally(void)
 ##                  del_value = 1;
 ##                }
 ##  
@@ -445,7 +440,7 @@ cat(gitdiff_cqp)</code></pre>
 ##                for (i = 0; i &lt; p; i++)
 ##                  fputc((unsigned char) value[i], fd);
 ##  
-## @@ -1164,7 +1146,6 @@ SortExternally(void)
+## @@ -1165,7 +1146,6 @@ SortExternally(void)
 ##            Rprintf(&quot;\t&quot;);
 ##          }
 ##  
@@ -453,7 +448,7 @@ cat(gitdiff_cqp)</code></pre>
 ##          token = p1start;
 ##          for (l = 1 ; l &lt;= plen ; l++) {
 ##            char *value = cl_cpos2str(srt_attribute, token);
-## @@ -1177,11 +1158,6 @@ SortExternally(void)
+## @@ -1178,11 +1158,6 @@ SortExternally(void)
 ##                del_value = 1;
 ##                value = cl_string_reverse(value, srt_cl-&gt;corpus-&gt;charset);
 ##              }
@@ -465,7 +460,7 @@ cat(gitdiff_cqp)</code></pre>
 ##              for (i = 0; i &lt; p; i++)
 ##                fputc((unsigned char) value[i], fd);
 ##              fputc(&#39; &#39;, fd);
-## @@ -1195,12 +1171,10 @@ SortExternally(void)
+## @@ -1196,12 +1171,10 @@ SortExternally(void)
 ##      
 ##        fclose(fd);
 ##  
@@ -478,7 +473,7 @@ cat(gitdiff_cqp)</code></pre>
 ##        line = -1;                
 ##        if ((pipe = popen(sort_call, &quot;r&quot;)) == NULL) {
 ##          perror(&quot;Failure opening sort pipe&quot;);
-## @@ -1220,7 +1194,7 @@ SortExternally(void)
+## @@ -1221,7 +1194,7 @@ SortExternally(void)
 ##              int num = atoi(sort_call);
 ##              if (num &lt; 0 || num &gt;= srt_cl-&gt;size) {
 ##                Rprintf(&quot;Error in externally sorted file - line number #%d out of range\n&quot;, num);
@@ -487,7 +482,7 @@ cat(gitdiff_cqp)</code></pre>
 ##              }
 ##              srt_cl-&gt;sortidx[line] = num;
 ##              line++;
-## @@ -1238,7 +1212,6 @@ SortExternally(void)
+## @@ -1239,7 +1212,6 @@ SortExternally(void)
 ##                   &quot;\tPlease remove the file manually.&quot;, temporary_name);
 ##      }      
 ##      
@@ -495,7 +490,7 @@ cat(gitdiff_cqp)</code></pre>
 ##      if (line == srt_cl-&gt;size) 
 ##        return 1;
 ##      else {
-## @@ -1253,6 +1226,8 @@ SortExternally(void)
+## @@ -1254,6 +1226,8 @@ SortExternally(void)
 ##        return 0;
 ##    }
 ##  }
