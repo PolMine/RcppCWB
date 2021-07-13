@@ -110,7 +110,7 @@ cat(output)
 setwd("~/Lab/github/RcppCWB/src/cwb/utils")
 git_cmd <- sprintf(
   "git diff %s..%s . %s", to_compare[["sha"]], last_devbranch_commit[["sha"]],
-  "':!*_cwb_encode.c' ':!*_cwb_makeall.c' ':!*_cwb_huffcode.c' ':!*_cwb_compress_rdx.c'"
+  "':!*_cwb_encode.c' ':!*_cwb_makeall.c' ':!*_cwb_huffcode.c' ':!*_cwb_compress_rdx.c' ':!*Makefile'"
 )
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
