@@ -208,16 +208,14 @@ replace <- list(
   "src/cwb/cqp/parse_actions.c" = list("^(\\s*)res->sa_ref\\.delete\\s=\\s0;", "\\1res->sa_ref.del = 0;", 1),
   "src/cwb/cqp/parser.y" = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 3),
   "src/cwb/cqp/parser.y" = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 2),
-  "src/cwb/cqp/parser.y" = list("^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1)
-  # "src/cwb/cqp/ranges.c" = list("^(\\s*)line = -1;                  /* will indicate sort failure below if text_size == 0 */", "\\1line = -1;                 ", 1),
-  # "src/cwb/cqp/ranges.c" = list("^(\\s*)} /* end for each token */", "\\1} ", 1),
-  # "src/cwb/cqp/ranges.c" = list("^(\\s*)line = -1;                /* will indicate failure of external sort command  */", "\\1line = -1;                ", 1),
-  # "src/cwb/cqp/ranges.c" = list("^(\\s*)break;            /* abort */", "\\1break;          ", 1),
-  # "src/cwb/cqp/ranges.c" = list("^(\\s*)ok = SortExternally();", "\\1/* ok = SortExternally(); */", 1),
-  # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)-- a/src/cwb/cqp/regex2dfa.c", "\\1++ b/src/cwb/cqp/regex2dfa.c", 1),
+  "src/cwb/cqp/parser.y" = list("^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1),
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\ssort\\sfailure\\sbelow\\sif\\stext_size\\s==\\s0\\s\\*/", "\\1line = -1;\\2", 1),
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)\\}(\\s)/\\*\\send\\sfor\\seach\\stoken\\s\\*/", "\\1}\\2", 1),
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\sfailure\\sof\\sexternal\\ssort\\scommand\\s*\\*/", "\\1line = -1;\\2", 1),
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)break;(\\s*)/\\*\\sabort\\s\\*/", "\\1break;\\2", 1),
+  "src/cwb/cqp/ranges.c" = list("^(\\s*)ok\\s=\\sSortExternally\\(\\);", "\\1/* ok = SortExternally(); */", 1)
   # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)va_start(AP, Format); vRprintf(Format, AP); va_end(AP);", "\\1va_start(AP, Format); Rprintf(Format, AP); va_end(AP);", 1),
   # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)int ignore_value;             /* ignore value of POP() macro */", "\\1int ignore_value __attribute__((unused));             /* ignore value of POP() macro */", 1),
-  # "src/cwb/cqp/sgml-print.c" = list("^(\\s*)-- a/src/cwb/cqp/sgml-print.c", "\\1++ b/src/cwb/cqp/sgml-print.c", 1),
   # "src/cwb/cqp/sgml-print.c" = list("^(\\s*)AttributeList *strucs;", "\\1/* AttributeList *strucs; */", 1),
   # "src/cwb/cqp/sgml-print.c" = list("^(\\s*)strucs = cd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1),
 )

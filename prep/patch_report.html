@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [6aa2351] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [fa2040f] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -357,18 +357,6 @@ cat(gitdiff_cqp)</code></pre>
 ##        Rprintf(&quot;\n&quot;);
 ##      }
 ##  
-## diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
-## index 09f2119..666485b 100644
-## --- a/src/cwb/cqp/parser.y
-## +++ b/src/cwb/cqp/parser.y
-## @@ -817,7 +817,6 @@ SortCmd:        SORT_SYM OptionalCID OptionalSortClause
-##                  }
-##                | COUNT_SYM OptionalCID SortClause CutStatement OptionalRedir
-##                  { 
-## -                  int ok;
-##                    if ($2 &amp;&amp; generate_code) {
-##                      SortSubcorpus($2, $3, ($4 &gt;= 1) ? $4 : 1, &amp;($5));
-##                      FreeSortClause($3);
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
 ## index ca316dd..73083b0 100644
 ## --- a/src/cwb/cqp/ranges.c
