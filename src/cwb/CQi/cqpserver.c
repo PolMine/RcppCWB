@@ -30,7 +30,6 @@
 #include "../cqp/options.h"
 #include "../cqp/corpmanag.h"
 #include "../cqp/groups.h"
-
 void Rprintf(const char *, ...);
 
 /** String containing the username sent by the currently-connect CQi client */
