@@ -315,7 +315,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [5f0bbea] 2021-07-13: CWB patched</code></pre>
+<pre><code>## [ebbc624] 2021-07-13: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -504,7 +504,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  /**
 ##   * Defined if a sort cache is to be used in sorting concordance lines.
 ## diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
-## index 781129b..3c474ff 100644
+## index 95f07ce..3c474ff 100644
 ## --- a/src/cwb/cqp/regex2dfa.c
 ## +++ b/src/cwb/cqp/regex2dfa.c
 ## @@ -233,7 +233,7 @@ REGEX2DFA_ERROR(char *Format, ...)
@@ -516,32 +516,6 @@ cat(gitdiff_cqp)</code></pre>
 ##    fputc(&#39;\n&#39;, stderr);
 ##    if (++ERRORS == MAX_ERRORS) {
 ##      Rprintf(&quot;regex2dfa: Reached the %d error limit.\n&quot;, MAX_ERRORS);
-## @@ -541,7 +541,7 @@ Parse(void)
-##    Symbol ID = NULL; 
-##    int RHS; 
-##    
-## -  int ignore_value;             /* ignore value of POP() macro */
-## +  int ignore_value __attribute__((unused));             /* ignore value of POP() macro */
-##  
-##    SP = Stack;
-##   LHS:
-## diff --git a/src/cwb/cqp/sgml-print.c b/src/cwb/cqp/sgml-print.c
-## index da13cad..b006678 100644
-## --- a/src/cwb/cqp/sgml-print.c
-## +++ b/src/cwb/cqp/sgml-print.c
-## @@ -322,10 +322,10 @@ sgml_print_output(CorpusList *cl,
-##  {
-##    int line, real_line;
-##    ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
-## -  AttributeList *strucs;
-## +  /* AttributeList *strucs; */
-##    PrintDescriptionRecord *pdr = &amp;SGMLPrintDescriptionRecord;
-##  
-## -  strucs = cd-&gt;printStructureTags;
-## +  /* strucs = cd-&gt;printStructureTags; */
-##    
-##    fputs(pdr-&gt;BeforeConcordance, stream);
-##  
 ## diff --git a/src/cwb/cqp/variables.c b/src/cwb/cqp/variables.c
 ## index ddc633e..1168894 100644
 ## --- a/src/cwb/cqp/variables.c

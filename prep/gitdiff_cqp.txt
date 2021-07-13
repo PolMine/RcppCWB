@@ -161,7 +161,7 @@ index ec55cbe..73083b0 100644
  /**
   * Defined if a sort cache is to be used in sorting concordance lines.
 diff --git a/src/cwb/cqp/regex2dfa.c b/src/cwb/cqp/regex2dfa.c
-index 781129b..3c474ff 100644
+index 95f07ce..3c474ff 100644
 --- a/src/cwb/cqp/regex2dfa.c
 +++ b/src/cwb/cqp/regex2dfa.c
 @@ -233,7 +233,7 @@ REGEX2DFA_ERROR(char *Format, ...)
@@ -173,32 +173,6 @@ index 781129b..3c474ff 100644
    fputc('\n', stderr);
    if (++ERRORS == MAX_ERRORS) {
      Rprintf("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
-@@ -541,7 +541,7 @@ Parse(void)
-   Symbol ID = NULL; 
-   int RHS; 
-   
--  int ignore_value;             /* ignore value of POP() macro */
-+  int ignore_value __attribute__((unused));             /* ignore value of POP() macro */
- 
-   SP = Stack;
-  LHS:
-diff --git a/src/cwb/cqp/sgml-print.c b/src/cwb/cqp/sgml-print.c
-index da13cad..b006678 100644
---- a/src/cwb/cqp/sgml-print.c
-+++ b/src/cwb/cqp/sgml-print.c
-@@ -322,10 +322,10 @@ sgml_print_output(CorpusList *cl,
- {
-   int line, real_line;
-   ConcLineField clf[NoField];   /* NoField is largest field code (not used by us) */
--  AttributeList *strucs;
-+  /* AttributeList *strucs; */
-   PrintDescriptionRecord *pdr = &SGMLPrintDescriptionRecord;
- 
--  strucs = cd->printStructureTags;
-+  /* strucs = cd->printStructureTags; */
-   
-   fputs(pdr->BeforeConcordance, stream);
- 
 diff --git a/src/cwb/cqp/variables.c b/src/cwb/cqp/variables.c
 index ddc633e..1168894 100644
 --- a/src/cwb/cqp/variables.c
