@@ -146,25 +146,10 @@ index e5d6929..518cba4 100644
  /** Immediately switch to a different input stream.
   * @param input_file A readable stream.
 diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-index f99e353..71a988b 100644
+index 80b0608..71a988b 100644
 --- a/src/cwb/cqp/parser.tab.c
 +++ b/src/cwb/cqp/parser.tab.c
-@@ -58,14 +58,6 @@
- /* Using locations.  */
- #define YYLSP_NEEDED 0
- 
--/* Substitute the variable and function names.  */
--#define yyparse cregparse
--#define yylex   creglex
--#define yyerror cregerror
--#define yylval  creglval
--#define yychar  cregchar
--#define yydebug cregdebug
--#define yynerrs cregnerrs
- 
- 
- /* Tokens.  */
-@@ -348,7 +340,9 @@ extern int yylex(void);
+@@ -340,7 +340,9 @@ extern int yylex(void);
  
  void yyerror (char *s)
  {
@@ -175,25 +160,7 @@ index f99e353..71a988b 100644
    generate_code = 0;
  }
  
-@@ -489,7 +483,7 @@ typedef union YYSTYPE
-   TabulationItem     tabulation_item;
- }
- /* Line 193 of yacc.c.  */
--#line 493 "parser.tab.c"
-+#line 485 "parser.tab.c"
- 	YYSTYPE;
- # define yystype YYSTYPE /* obsolescent; will be withdrawn */
- # define YYSTYPE_IS_DECLARED 1
-@@ -502,7 +496,7 @@ typedef union YYSTYPE
- 
- 
- /* Line 216 of yacc.c.  */
--#line 506 "parser.tab.c"
-+#line 498 "parser.tab.c"
- 
- #ifdef short
- # undef short
-@@ -1523,7 +1517,7 @@ while (YYID (0))
+@@ -1515,7 +1517,7 @@ while (YYID (0))
  #ifndef YY_LOCATION_PRINT
  # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
  #  define YY_LOCATION_PRINT(File, Loc)			\
@@ -202,7 +169,7 @@ index f99e353..71a988b 100644
  	      (Loc).first_line, (Loc).first_column,	\
  	      (Loc).last_line,  (Loc).last_column)
  # else
-@@ -1545,7 +1539,7 @@ while (YYID (0))
+@@ -1537,7 +1539,7 @@ while (YYID (0))
  
  # ifndef YYFPRINTF
  #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
@@ -211,7 +178,7 @@ index f99e353..71a988b 100644
  # endif
  
  # define YYDPRINTF(Args)			\
-@@ -1558,10 +1552,10 @@ do {						\
+@@ -1550,10 +1552,10 @@ do {						\
  do {									  \
    if (yydebug)								  \
      {									  \
@@ -224,7 +191,7 @@ index f99e353..71a988b 100644
      }									  \
  } while (YYID (0))
  
-@@ -1616,12 +1610,12 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
+@@ -1608,12 +1610,12 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
  #endif
  {
    if (yytype < YYNTOKENS)
@@ -240,7 +207,7 @@ index f99e353..71a988b 100644
  }
  
  /*------------------------------------------------------------------.
-@@ -1640,10 +1634,10 @@ yy_stack_print (bottom, top)
+@@ -1632,10 +1634,10 @@ yy_stack_print (bottom, top)
      yytype_int16 *top;
  #endif
  {
@@ -254,7 +221,7 @@ index f99e353..71a988b 100644
  }
  
  # define YY_STACK_PRINT(Bottom, Top)				\
-@@ -1671,16 +1665,16 @@ yy_reduce_print (yyvsp, yyrule)
+@@ -1663,16 +1665,16 @@ yy_reduce_print (yyvsp, yyrule)
    int yynrhs = yyr2[yyrule];
    int yyi;
    unsigned long int yylno = yyrline[yyrule];
@@ -274,7 +241,7 @@ index f99e353..71a988b 100644
      }
  }
  
-@@ -2065,7 +2059,7 @@ yyparse ()
+@@ -2057,7 +2059,7 @@ yyparse ()
       Keep to zero when no symbol should be popped.  */
    int yylen = 0;
  
@@ -283,7 +250,7 @@ index f99e353..71a988b 100644
  
    yystate = 0;
    yyerrstatus = 0;
-@@ -2151,14 +2145,14 @@ yyparse ()
+@@ -2143,14 +2145,14 @@ yyparse ()
        yyvsp = yyvs + yysize - 1;
  
  
@@ -300,7 +267,7 @@ index f99e353..71a988b 100644
  
    goto yybackup;
  
-@@ -2180,14 +2174,14 @@ yybackup:
+@@ -2172,14 +2174,14 @@ yybackup:
    /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
    if (yychar == YYEMPTY)
      {
@@ -317,7 +284,7 @@ index f99e353..71a988b 100644
      }
    else
      {
-@@ -2951,7 +2945,7 @@ yyreduce:
+@@ -2943,7 +2945,7 @@ yyreduce:
    case 133:
  #line 819 "parser.y"
      { 
@@ -326,23 +293,3 @@ index f99e353..71a988b 100644
                    if ((yyvsp[(2) - (5)].cl) && generate_code) {
                      ok = SortSubcorpus((yyvsp[(2) - (5)].cl), (yyvsp[(3) - (5)].sortclause), ((yyvsp[(4) - (5)].ival) >= 1) ? (yyvsp[(4) - (5)].ival) : 1, &((yyvsp[(5) - (5)].redir)));
                      FreeSortClause((yyvsp[(3) - (5)].sortclause));
-@@ -4212,7 +4206,7 @@ yyreduce:
- 
- 
- /* Line 1267 of yacc.c.  */
--#line 4216 "parser.tab.c"
-+#line 4208 "parser.tab.c"
-       default: break;
-     }
-   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
-diff --git a/src/cwb/cqp/parser.tab.h b/src/cwb/cqp/parser.tab.h
-index 71857d1..2b1f3c7 100644
---- a/src/cwb/cqp/parser.tab.h
-+++ b/src/cwb/cqp/parser.tab.h
-@@ -324,5 +324,5 @@ typedef union YYSTYPE
- # define YYSTYPE_IS_TRIVIAL 1
- #endif
- 
--extern YYSTYPE creglval;
-+extern YYSTYPE yylval;
- 

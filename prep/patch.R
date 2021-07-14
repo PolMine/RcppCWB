@@ -8,7 +8,7 @@ cwb_pkg_dir <- "~/Lab/github/RcppCWB/src/cwb"
 setwd(path(cwb_pkg_dir, "cl"))
 # system("bison -d -t -p creg registry.y")
 system("bison -d -t registry.y")
-system("flex -8 registry.l")
+system("flex -8 -Pcreg registry.l")
 
 setwd(path(cwb_pkg_dir, "cqp"))
 # system("bison -d -t -p creg parser.y")
