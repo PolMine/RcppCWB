@@ -6,11 +6,13 @@ repodir <- "~/Lab/github/RcppCWB"
 cwb_pkg_dir <- "~/Lab/github/RcppCWB/src/cwb"
 
 setwd(path(cwb_pkg_dir, "cl"))
-system("bison -d -t -p creg registry.y")
+# system("bison -d -t -p creg registry.y")
+system("bison -d -t registry.y")
 system("flex -8 registry.l")
 
 setwd(path(cwb_pkg_dir, "cqp"))
-system("bison -d -t -p creg parser.y")
+# system("bison -d -t -p creg parser.y")
+system("bison -d -t parser.y")
 system("flex -8 parser.l")
 
 global_replacements <- list(
