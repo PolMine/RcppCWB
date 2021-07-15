@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [4e6675a] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [ac1f549] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -229,24 +229,19 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/lex.yy.c b/src/cwb/cqp/lex.yy.c
-## index bfb6db4..518cba4 100644
+## index bc442b8..518cba4 100644
 ## --- a/src/cwb/cqp/lex.yy.c
 ## +++ b/src/cwb/cqp/lex.yy.c
-## @@ -1277,11 +1277,13 @@ static int yy_flex_strlen (yyconst char * );
-##  
-##  #ifndef YY_NO_INPUT
-##  
-## +/*
-##  #ifdef __cplusplus
-##  static int yyinput (void );
+## @@ -1283,7 +1283,7 @@ static int yyinput (void );
 ##  #else
 ##  static int input (void );
 ##  #endif
+## -*/
 ## + */
 ##  
 ##  #endif
 ##  
-## @@ -2456,116 +2458,6 @@ static int yy_get_next_buffer (void)
+## @@ -2458,116 +2458,6 @@ static int yy_get_next_buffer (void)
 ##      return yy_is_jam ? 0 : yy_current_state;
 ##  }
 ##  

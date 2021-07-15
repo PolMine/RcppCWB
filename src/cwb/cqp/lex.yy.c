@@ -1283,7 +1283,7 @@ static int yyinput (void );
 #else
 static int input (void );
 #endif
- */
+*/
 
 #endif
 
