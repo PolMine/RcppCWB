@@ -96,7 +96,7 @@ insert_before <- list(
   "src/cwb/CQi/auth.c" = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
   "src/cwb/CQi/server.c" = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
   "src/cwb/utils/cwb-makeall.c" = list("/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/", c("#include <netinet/in.h>", ""), 1),
-  "lex.creg.c" = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
+  "src/cwb/cl/lex.creg.c" = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
 )
 
 for (i in 1L:length(insert_before)){
