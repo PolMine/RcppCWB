@@ -700,7 +700,6 @@ static int input (void );
 #endif
 */
 
- 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
 #define YY_READ_BUF_SIZE 8192
