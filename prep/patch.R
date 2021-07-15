@@ -104,7 +104,7 @@ insert_before <- list(
   "src/cwb/cl/lex.creg.c" = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "/*", 1L),
   "src/cwb/cl/lex.creg.c" = list("^#ifndef\\sYY_NO_INPUT", "/*", 2L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
-  "src/cwb/cl/lex.creg.c" = list("#define YYBISON 1", "void Rprintf(const char *, ...);", 1L)
+  "src/cwb/cl/registry.tab.c" = list("#define\\sYYBISON\\s1", "void Rprintf(const char *, ...);", 1L)
 )
 
 for (i in 1L:length(insert_before)){

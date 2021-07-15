@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [82fe9b3] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [f6af4d2] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,20 +214,18 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
-## index c58386a..5498694 100644
+## index c58386a..906468c 100644
 ## --- a/src/cwb/cl/registry.tab.c
 ## +++ b/src/cwb/cl/registry.tab.c
-## @@ -44,6 +44,9 @@
+## @@ -44,6 +44,7 @@
 ##     USER NAME SPACE&quot; below.  */
 ##  
 ##  /* Identify Bison output.  */
-## +
 ## +void Rprintf(const char *, ...);
-## +
 ##  #define YYBISON 1
 ##  
 ##  /* Bison version.  */
-## @@ -58,6 +61,14 @@
+## @@ -58,6 +59,14 @@
 ##  /* Using locations.  */
 ##  #define YYLSP_NEEDED 0
 ##  
@@ -242,7 +240,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##  
 ##  /* Tokens.  */
-## @@ -218,7 +229,7 @@ typedef union YYSTYPE
+## @@ -218,7 +227,7 @@ typedef union YYSTYPE
 ##    } storage;
 ##  }
 ##  /* Line 193 of yacc.c.  */
@@ -251,7 +249,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##      YYSTYPE;
 ##  # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 ##  # define YYSTYPE_IS_DECLARED 1
-## @@ -231,7 +242,7 @@ typedef union YYSTYPE
+## @@ -231,7 +240,7 @@ typedef union YYSTYPE
 ##  
 ##  
 ##  /* Line 216 of yacc.c.  */
@@ -260,7 +258,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##  #ifdef short
 ##  # undef short
-## @@ -804,7 +815,7 @@ while (YYID (0))
+## @@ -804,7 +813,7 @@ while (YYID (0))
 ##  
 ##  # ifndef YYFPRINTF
 ##  #  include &lt;stdio.h&gt; /* INFRINGES ON USER NAME SPACE */
@@ -269,7 +267,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  # endif
 ##  
 ##  # define YYDPRINTF(Args)            \
-## @@ -1901,7 +1912,7 @@ yyreduce:
+## @@ -1901,7 +1910,7 @@ yyreduce:
 ##  
 ##  
 ##  /* Line 1267 of yacc.c.  */
