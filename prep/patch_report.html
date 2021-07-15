@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [8fab7f1] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [5970e73] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -229,14 +229,14 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-## index a5adcff..656b91f 100644
+## index 8142a64..656b91f 100644
 ## --- a/src/cwb/cqp/parser.tab.c
 ## +++ b/src/cwb/cqp/parser.tab.c
 ## @@ -2943,7 +2943,7 @@ yyreduce:
 ##    case 133:
 ##  #line 819 &quot;parser.y&quot;
 ##      { 
-## -                  int ok;
+## -int ok __attribute__((unused));;
 ## +                  int ok __attribute__((unused));
 ##                    if ((yyvsp[(2) - (5)].cl) &amp;&amp; generate_code) {
 ##                      ok = SortSubcorpus((yyvsp[(2) - (5)].cl), (yyvsp[(3) - (5)].sortclause), ((yyvsp[(4) - (5)].ival) &gt;= 1) ? (yyvsp[(4) - (5)].ival) : 1, &amp;((yyvsp[(5) - (5)].redir)));
