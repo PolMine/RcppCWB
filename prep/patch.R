@@ -97,7 +97,8 @@ insert_before <- list(
   "src/cwb/CQi/server.c" = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
   "src/cwb/utils/cwb-makeall.c" = list("/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/", c("#include <netinet/in.h>", ""), 1),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
-  "src/cwb/cl/lex.creg.c" = list("#ifndef\\sYY_NO_INPUT", "/*", 1L)
+  "src/cwb/cl/lex.creg.c" = list("#ifndef\\sYY_NO_INPUT", "/*", 1L),
+  "src/cwb/cl/lex.creg.c" = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "/*", 1L)
 )
 
 for (i in 1L:length(insert_before)){
