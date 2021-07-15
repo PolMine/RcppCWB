@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [bc71a51] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [4e6675a] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -213,19 +213,6 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
-## index bc7be8c..906468c 100644
-## --- a/src/cwb/cl/registry.tab.c
-## +++ b/src/cwb/cl/registry.tab.c
-## @@ -813,7 +813,7 @@ while (YYID (0))
-##  
-##  # ifndef YYFPRINTF
-##  #  include &lt;stdio.h&gt; /* INFRINGES ON USER NAME SPACE */
-## -#sdefine YYFPRINTF Rprintf
-## +#  define YYFPRINTF Rprintf
-##  # endif
-##  
-##  # define YYDPRINTF(Args)            \</code></pre>
 <p>Finding: Modifications of the Makefile, nothing else</p>
 </div>
 <div id="cqp-directory" class="section level4">
@@ -242,18 +229,9 @@ cat(gitdiff_cqp)</code></pre>
 ## new file mode 100644
 ## index 0000000..e69de29
 ## diff --git a/src/cwb/cqp/lex.yy.c b/src/cwb/cqp/lex.yy.c
-## index e5d6929..518cba4 100644
+## index bfb6db4..518cba4 100644
 ## --- a/src/cwb/cqp/lex.yy.c
 ## +++ b/src/cwb/cqp/lex.yy.c
-## @@ -1265,7 +1265,7 @@ extern int yywrap (void );
-##  #endif
-##  #endif
-##  
-## -    static void yyunput (int c,char *buf_ptr  );
-## +  /*  static void yyunput (int c,char *buf_ptr  ); */
-##      
-##  #ifndef yytext_ptr
-##  static void yy_flex_strncpy (char *,yyconst char *,int );
 ## @@ -1277,11 +1277,13 @@ static int yy_flex_strlen (yyconst char * );
 ##  
 ##  #ifndef YY_NO_INPUT
@@ -386,7 +364,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  /** Immediately switch to a different input stream.
 ##   * @param input_file A readable stream.
 ## diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-## index f986445..71a988b 100644
+## index c18efef..71a988b 100644
 ## --- a/src/cwb/cqp/parser.tab.c
 ## +++ b/src/cwb/cqp/parser.tab.c
 ## @@ -340,7 +340,9 @@ extern int yylex(void);
@@ -409,15 +387,6 @@ cat(gitdiff_cqp)</code></pre>
 ##            (Loc).first_line, (Loc).first_column, \
 ##            (Loc).last_line,  (Loc).last_column)
 ##  # else
-## @@ -1537,7 +1539,7 @@ while (YYID (0))
-##  
-##  # ifndef YYFPRINTF
-##  #  include &lt;stdio.h&gt; /* INFRINGES ON USER NAME SPACE */
-## -#sdefine YYFPRINTF Rprintf
-## +#  define YYFPRINTF Rprintf
-##  # endif
-##  
-##  # define YYDPRINTF(Args)            \
 ## @@ -1668,11 +1670,11 @@ yy_reduce_print (yyvsp, yyrule)
 ##    /* The symbols being reduced.  */
 ##    for (yyi = 0; yyi &lt; yynrhs; yyi++)

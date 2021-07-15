@@ -2,18 +2,9 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/lex.yy.c b/src/cwb/cqp/lex.yy.c
-index e5d6929..518cba4 100644
+index bfb6db4..518cba4 100644
 --- a/src/cwb/cqp/lex.yy.c
 +++ b/src/cwb/cqp/lex.yy.c
-@@ -1265,7 +1265,7 @@ extern int yywrap (void );
- #endif
- #endif
- 
--    static void yyunput (int c,char *buf_ptr  );
-+  /*  static void yyunput (int c,char *buf_ptr  ); */
-     
- #ifndef yytext_ptr
- static void yy_flex_strncpy (char *,yyconst char *,int );
 @@ -1277,11 +1277,13 @@ static int yy_flex_strlen (yyconst char * );
  
  #ifndef YY_NO_INPUT
@@ -146,7 +137,7 @@ index e5d6929..518cba4 100644
  /** Immediately switch to a different input stream.
   * @param input_file A readable stream.
 diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-index f986445..71a988b 100644
+index c18efef..71a988b 100644
 --- a/src/cwb/cqp/parser.tab.c
 +++ b/src/cwb/cqp/parser.tab.c
 @@ -340,7 +340,9 @@ extern int yylex(void);
@@ -169,15 +160,6 @@ index f986445..71a988b 100644
  	      (Loc).first_line, (Loc).first_column,	\
  	      (Loc).last_line,  (Loc).last_column)
  # else
-@@ -1537,7 +1539,7 @@ while (YYID (0))
- 
- # ifndef YYFPRINTF
- #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
--#sdefine YYFPRINTF Rprintf
-+#  define YYFPRINTF Rprintf
- # endif
- 
- # define YYDPRINTF(Args)			\
 @@ -1668,11 +1670,11 @@ yy_reduce_print (yyvsp, yyrule)
    /* The symbols being reduced.  */
    for (yyi = 0; yyi < yynrhs; yyi++)

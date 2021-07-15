@@ -103,7 +103,8 @@ insert_before <- list(
   "src/cwb/cl/lex.creg.c" = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "/*", 1L),
   "src/cwb/cl/lex.creg.c" = list("^#ifndef\\sYY_NO_INPUT", "/*", 2L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
-  "src/cwb/cl/registry.tab.c" = list("#define\\sYYBISON\\s1", "void Rprintf(const char *, ...);", 1L)
+  "src/cwb/cl/registry.tab.c" = list("#define\\sYYBISON\\s1", "void Rprintf(const char *, ...);", 1L),
+  "src/cwb/cqp/lex.yy.c" = list("#ifdef __cplusplus", "/*", 3L)
 )
 
 for (i in 1L:length(insert_before)){
@@ -142,7 +143,8 @@ insert_after <- list(
   "src/cwb/CQi/cqpserver.c" = list('#include "\\.\\./cqp/groups\\.h"', "void Rprintf(const char *, ...);", 1),
   "src/cwb/CQi/server.c" = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1),
   "src/cwb/cl/lex.creg.c" = list("#endif", "*/", 28L),
-  "src/cwb/cl/lex.creg.c" = list("^\\}$", "*/", 5L)
+  "src/cwb/cl/lex.creg.c" = list("^\\}$", "*/", 5L),
+  "src/cwb/cqp/lex.yy.c" = list("#endif", "*/", 27L)
 )
 
 for (i in 1L:length(insert_after)){
