@@ -50,7 +50,8 @@ delete_line_before <- list(
   "src/cwb/cqp/ranges.c" = list("^\\s*value\\s=\\scl_string_canonical\\(value,\\ssrt_cl->corpus->charset,\\ssrt_flags,\\sCL_STRING_CANONICAL_STRDUP\\);", 1L, 7L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)", 4L, 4L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*cregrestart\\(cregin\\s*\\);", 2L, 11L),
-  "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L)
+  "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L),
+  "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L)
 )
 
 
@@ -104,7 +105,8 @@ insert_before <- list(
   "src/cwb/cl/lex.creg.c" = list("^#ifndef\\sYY_NO_INPUT", "/*", 2L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
   "src/cwb/cl/registry.tab.c" = list("#define\\sYYBISON\\s1", "void Rprintf(const char *, ...);", 1L),
-  "src/cwb/cqp/lex.yy.c" = list("#ifdef __cplusplus", "/*", 3L)
+  "src/cwb/cqp/lex.yy.c" = list("#ifdef __cplusplus", "/*", 3L),
+  "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L)
 )
 
 for (i in 1L:length(insert_before)){

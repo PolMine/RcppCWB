@@ -2,18 +2,9 @@ diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
 diff --git a/src/cwb/cqp/lex.yy.c b/src/cwb/cqp/lex.yy.c
-index bc442b8..518cba4 100644
+index bc442b8..671ff59 100644
 --- a/src/cwb/cqp/lex.yy.c
 +++ b/src/cwb/cqp/lex.yy.c
-@@ -1283,7 +1283,7 @@ static int yyinput (void );
- #else
- static int input (void );
- #endif
--*/
-+ */
- 
- #endif
- 
 @@ -2458,116 +2458,6 @@ static int yy_get_next_buffer (void)
  	return yy_is_jam ? 0 : yy_current_state;
  }
