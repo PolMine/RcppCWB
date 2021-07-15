@@ -146,7 +146,7 @@ index e5d6929..518cba4 100644
  /** Immediately switch to a different input stream.
   * @param input_file A readable stream.
 diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-index 7ddcf2d..71a988b 100644
+index f986445..71a988b 100644
 --- a/src/cwb/cqp/parser.tab.c
 +++ b/src/cwb/cqp/parser.tab.c
 @@ -340,7 +340,9 @@ extern int yylex(void);
@@ -173,7 +173,7 @@ index 7ddcf2d..71a988b 100644
  
  # ifndef YYFPRINTF
  #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
--#  define YYFPRINTF fprintf
+-#sdefine YYFPRINTF Rprintf
 +#  define YYFPRINTF Rprintf
  # endif
  
