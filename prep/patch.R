@@ -237,7 +237,8 @@ replace <- list(
   # "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)va_start\\(AP,\\sFormat\\);\\vRprintf(Format, AP); va_end(AP);", "\\1va_start(AP, Format); Rprintf(Format, AP); va_end(AP);", 1),
   "src/cwb/cqp/regex2dfa.c" = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1),
   "src/cwb/cqp/sgml-print.c" = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
-  "src/cwb/cqp/sgml-print.c" = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
+  "src/cwb/cqp/sgml-print.c" = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1),
+  "src/cwb/cl/lex.creg.c" = list("^\\s*\\(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s\\);)", "\\1/* \\2 */", 1)
 )
 
 for (i in 1L:length(replace)){
