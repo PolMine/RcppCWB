@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -114,6 +114,26 @@
       <small>Source: <a href='https://github.com/PolMine/RcppCWB/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="rcppcwb-042" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.2">
+<a href="#rcppcwb-042" class="anchor"></a>RcppCWB 0.4.2<small> 2021-07-13 </small>
+</h1>
+<ul>
+<li>Windows builds will be linked with a fresh and fully reproducible cross-compilation of CWB static libraries, see the PolMine/libcl repository. The consolidation of the workflow to prepare cross-compiled static libraries is a preparatory step to enable UCRT builds on Windows.</li>
+<li>The Range struc in the code for util functionality (encode and more, files utils.h, utils.cpp and _cwb_encode.c) has been renamed as SAttrEncoder to avoid a C++ One Definition Rule warning resulting for a struc with the same name in the CL context (<a href='https://github.com/PolMine/RcppCWB/issues/28'>#28</a>).</li>
+</ul>
+</div>
+    <div id="rcppcwb-041" class="section level1">
+<h1 class="page-header" data-toc-text="0.4.1">
+<a href="#rcppcwb-041" class="anchor"></a>RcppCWB 0.4.1<small> Unreleased </small>
+</h1>
+<ul>
+<li>A shortcoming when passing in variables into the format string to construct the PKG_LIBS variable resulted in a faulty call of the linker on Solaris and a compilation error. Fixed (<a href='https://github.com/PolMine/RcppCWB/issues/25'>#25</a>).</li>
+<li>A hacky and recently unnecessary LDFLAG “-Wl,–allow-multiple-definition” on Solaris has been dropped.</li>
+<li>Usage and evaluation of the pcretest utility is now in line with POSIX requirements, omitting an error on Solaris. A statement on the availability of the tool provides information whether it is available at all (<a href='https://github.com/PolMine/RcppCWB/issues/24'>#24</a>).</li>
+<li>The message on the findability of ncurses is more telling now, avoiding a “mission critial”-style alarm when ncurses may be present but is not findable by pkg-config (<a href='https://github.com/PolMine/RcppCWB/issues/26'>#26</a>).</li>
+</ul>
+</div>
     <div id="rcppcwb-040" class="section level1">
 <h1 class="page-header" data-toc-text="0.4.0">
 <a href="#rcppcwb-040" class="anchor"></a>RcppCWB 0.4.0<small> 2021-06-25 </small>

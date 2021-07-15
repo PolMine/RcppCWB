@@ -74,7 +74,7 @@ corresponds to the number of ids." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
       </span>
     </div>
 
@@ -153,7 +153,7 @@ corresponds to the number of ids.</p>
   corpus <span class='op'>=</span> <span class='st'>"REUTERS"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>,
   registry <span class='op'>=</span> <span class='va'>registry</span>
   <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Resetting registry directory from '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpmY98Iq/registry_tmp' to '/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpmY98Iq/registry_tmp'</span></div><div class='input'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>token_id <span class='op'>=</span> <span class='fl'>0</span><span class='op'>:</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span><span class='op'>)</span>, count <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Resetting registry directory from '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpzTlfAj/registry_tmp' to '/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpzTlfAj/registry_tmp'</span></div><div class='input'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>token_id <span class='op'>=</span> <span class='fl'>0</span><span class='op'>:</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span><span class='op'>)</span>, count <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 <span class='va'>df</span><span class='op'>[[</span><span class='st'>"token"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='CL: p_attributes.html'>cl_id2str</a></span><span class='op'>(</span>
   <span class='st'>"REUTERS"</span>, p_attribute <span class='op'>=</span> <span class='st'>"word"</span>,
   id <span class='op'>=</span> <span class='va'>df</span><span class='op'>[[</span><span class='st'>"token_id"</span><span class='op'>]</span><span class='op'>]</span>, registry <span class='op'>=</span> <span class='va'>registry</span>
