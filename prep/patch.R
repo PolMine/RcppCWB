@@ -136,7 +136,8 @@ insert_after <- list(
   "src/cwb/cqp/ranges.c" = list("^\\}\\s*$", "*/", 11),
   "src/cwb/CQi/cqpserver.c" = list('#include "\\.\\./cqp/groups\\.h"', "void Rprintf(const char *, ...);", 1),
   "src/cwb/CQi/server.c" = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1),
-  "src/cwb/cl/lex.creg.c" = list("#endif", "*/", 28L)
+  "src/cwb/cl/lex.creg.c" = list("#endif", "*/", 28L),
+  "src/cwb/cl/lex.creg.c" = list("^\\}$", "*/", 5L)
 )
 
 for (i in 1L:length(insert_after)){
