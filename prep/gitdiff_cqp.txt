@@ -1,35 +1,20 @@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/cwb/cqp/lex.yy.c b/src/cwb/cqp/lex.yy.c
-index 1b02aff..671ff59 100644
---- a/src/cwb/cqp/lex.yy.c
-+++ b/src/cwb/cqp/lex.yy.c
-@@ -2458,7 +2458,7 @@ static int yy_get_next_buffer (void)
- 	return yy_is_jam ? 0 : yy_current_state;
- }
- 
--1
-+
- /** Immediately switch to a different input stream.
-  * @param input_file A readable stream.
-  * 
 diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-index c18efef..71a988b 100644
+index b0a83c7..9c30986 100644
 --- a/src/cwb/cqp/parser.tab.c
 +++ b/src/cwb/cqp/parser.tab.c
-@@ -340,7 +340,9 @@ extern int yylex(void);
+@@ -340,7 +340,7 @@ extern int yylex(void);
  
  void yyerror (char *s)
  {
--  cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
-+  /* Commented out to avoid a crash */
-+  /* cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer); */
-+  cqpmessage(Error, "CQP Syntax Error: %s", s); /* slight modification */
+-cqpmessage(Error, "CQP Syntax Error: %s", s);
++  cqpmessage(Error, "CQP Syntax Error: %s", s);
    generate_code = 0;
  }
  
-@@ -1515,7 +1517,7 @@ while (YYID (0))
+@@ -1515,7 +1515,7 @@ while (YYID (0))
  #ifndef YY_LOCATION_PRINT
  # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
  #  define YY_LOCATION_PRINT(File, Loc)			\
@@ -38,7 +23,7 @@ index c18efef..71a988b 100644
  	      (Loc).first_line, (Loc).first_column,	\
  	      (Loc).last_line,  (Loc).last_column)
  # else
-@@ -1668,11 +1670,11 @@ yy_reduce_print (yyvsp, yyrule)
+@@ -1668,11 +1668,11 @@ yy_reduce_print (yyvsp, yyrule)
    /* The symbols being reduced.  */
    for (yyi = 0; yyi < yynrhs; yyi++)
      {
@@ -52,7 +37,7 @@ index c18efef..71a988b 100644
      }
  }
  
-@@ -2943,7 +2945,7 @@ yyreduce:
+@@ -2943,7 +2943,7 @@ yyreduce:
    case 133:
  #line 819 "parser.y"
      { 

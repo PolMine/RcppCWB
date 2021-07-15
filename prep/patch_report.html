@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [45d5691] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [e968a44] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -228,35 +228,20 @@ cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29
-## diff --git a/src/cwb/cqp/lex.yy.c b/src/cwb/cqp/lex.yy.c
-## index 1b02aff..671ff59 100644
-## --- a/src/cwb/cqp/lex.yy.c
-## +++ b/src/cwb/cqp/lex.yy.c
-## @@ -2458,7 +2458,7 @@ static int yy_get_next_buffer (void)
-##      return yy_is_jam ? 0 : yy_current_state;
-##  }
-##  
-## -1
-## +
-##  /** Immediately switch to a different input stream.
-##   * @param input_file A readable stream.
-##   * 
 ## diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-## index c18efef..71a988b 100644
+## index b0a83c7..9c30986 100644
 ## --- a/src/cwb/cqp/parser.tab.c
 ## +++ b/src/cwb/cqp/parser.tab.c
-## @@ -340,7 +340,9 @@ extern int yylex(void);
+## @@ -340,7 +340,7 @@ extern int yylex(void);
 ##  
 ##  void yyerror (char *s)
 ##  {
-## -  cqpmessage(Error, &quot;CQP Syntax Error: %s\n\t%s &lt;--&quot;, s, QueryBuffer);
-## +  /* Commented out to avoid a crash */
-## +  /* cqpmessage(Error, &quot;CQP Syntax Error: %s\n\t%s &lt;--&quot;, s, QueryBuffer); */
-## +  cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s); /* slight modification */
+## -cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s);
+## +  cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s);
 ##    generate_code = 0;
 ##  }
 ##  
-## @@ -1515,7 +1517,7 @@ while (YYID (0))
+## @@ -1515,7 +1515,7 @@ while (YYID (0))
 ##  #ifndef YY_LOCATION_PRINT
 ##  # if defined YYLTYPE_IS_TRIVIAL &amp;&amp; YYLTYPE_IS_TRIVIAL
 ##  #  define YY_LOCATION_PRINT(File, Loc)          \
@@ -265,7 +250,7 @@ cat(gitdiff_cqp)</code></pre>
 ##            (Loc).first_line, (Loc).first_column, \
 ##            (Loc).last_line,  (Loc).last_column)
 ##  # else
-## @@ -1668,11 +1670,11 @@ yy_reduce_print (yyvsp, yyrule)
+## @@ -1668,11 +1668,11 @@ yy_reduce_print (yyvsp, yyrule)
 ##    /* The symbols being reduced.  */
 ##    for (yyi = 0; yyi &lt; yynrhs; yyi++)
 ##      {
@@ -279,7 +264,7 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  }
 ##  
-## @@ -2943,7 +2945,7 @@ yyreduce:
+## @@ -2943,7 +2943,7 @@ yyreduce:
 ##    case 133:
 ##  #line 819 &quot;parser.y&quot;
 ##      { 
