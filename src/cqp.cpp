@@ -7,7 +7,6 @@ extern "C" {
   #include <pcre.h>
 /*  #include "globals.h" */
 /*  #include "context_descriptor.h" */
-/*  #include "_options.h" */
 /*  #include "cqp.h" */
 /*  #include "corpmanag.h" */
   #include "server.h"

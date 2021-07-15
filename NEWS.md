@@ -1,3 +1,7 @@
+# RcppCWB 0.4.2.9001
+
+* Unused file '_options.h' removed from src/cwb/cl/cqp 
+
 # RcppCWB 0.4.2
 
 * Windows builds will be linked with a fresh and fully reproducible cross-compilation of CWB static libraries, see the PolMine/libcl repository. The consolidation of the workflow to prepare cross-compiled static libraries is a preparatory step to enable UCRT builds on Windows.
