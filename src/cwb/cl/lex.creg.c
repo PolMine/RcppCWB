@@ -690,11 +690,13 @@ static int yy_flex_strlen (yyconst char * );
 
 /*
 #ifndef YY_NO_INPUT
+
 #ifdef __cplusplus
 static int yyinput (void );
 #else
 static int input (void );
 #endif
+
 #endif
 */
 

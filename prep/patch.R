@@ -96,7 +96,8 @@ insert_before <- list(
   "src/cwb/CQi/auth.c" = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
   "src/cwb/CQi/server.c" = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
   "src/cwb/utils/cwb-makeall.c" = list("/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/", c("#include <netinet/in.h>", ""), 1),
-  "src/cwb/cl/lex.creg.c" = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
+  "src/cwb/cl/lex.creg.c" = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
+  "src/cwb/cl/lex.creg.c" = list("#ifndef\\sYY_NO_INPUT", "/*", 1L)
 )
 
 for (i in 1L:length(insert_before)){
@@ -133,7 +134,8 @@ insert_after <- list(
   "src/cwb/cqp/output.c" = list("^\\}\\s*$", "*/", 3),
   "src/cwb/cqp/ranges.c" = list("^\\}\\s*$", "*/", 11),
   "src/cwb/CQi/cqpserver.c" = list('#include "\\.\\./cqp/groups\\.h"', "void Rprintf(const char *, ...);", 1),
-  "src/cwb/CQi/server.c" = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1)
+  "src/cwb/CQi/server.c" = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1),
+  "src/cwb/cl/lex.creg.c" = list("#endif", "*/", 28L)
 )
 
 for (i in 1L:length(insert_after)){
