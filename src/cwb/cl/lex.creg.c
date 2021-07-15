@@ -1412,7 +1412,7 @@ static int yy_get_next_buffer (void)
 }
 
 /*
- static void yyunput (int c, register char * yy_bp )
+static void yyunput (int c, register char * yy_bp )
 {
 	register char *yy_cp;
     
