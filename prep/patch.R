@@ -253,7 +253,8 @@ replace <- list(
   "src/cwb/cl/lex.creg.c" = list("^(\\s*)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\scast\\sfor\\s8-bit\\schar's\\s\\*/", "", 1L),
   "src/cwb/cl/lex.creg.c" = list("\\s*/\\*\\spreserve\\scregtext\\s\\*/", "", 1L),
-  "src/cwb/cl/lex.creg.c" = list("/\\*\\sifndef YY_NO_INPUT\\s\\*/", "", 1L)
+  "src/cwb/cl/lex.creg.c" = list("/\\*\\sifndef YY_NO_INPUT\\s\\*/", "", 1L),
+  "src/cwb/cqp/lex.yy.c" = list("^\\s+static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);", "  /*  static void yyunput (int c,char *buf_ptr  ); */", 1L)
 )
 
 for (i in 1L:length(replace)){
