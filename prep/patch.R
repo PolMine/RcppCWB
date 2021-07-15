@@ -15,8 +15,8 @@ system("bison -d -t parser.y")
 system("flex -8 parser.l")
 
 file.rename(
-  from = path(cwb_pkg_dir, "src", "cwb", "cl", "endian.h"),
-  to = path(cwb_pkg_dir, "src", "cwb", "cl", "endian2.h")
+  from = path(cwb_pkg_dir, "cl", "endian.h"),
+  to = path(cwb_pkg_dir, "cl", "endian2.h")
 )
 
 global_replacements <- list(
