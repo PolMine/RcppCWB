@@ -99,16 +99,6 @@ all: libcqp.a
 libcqp.a: $(OBJS) $(CQI_OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
-#	$(AR) -s $@
-
-
-# parser.tab.c parser.tab.h: parser.y
-# 	$(RM) parser.tab.* parser.output
-# 	$(YACC) $<
-
-# lex.yy.c: parser.l parser.y
-# 	$(RM) lex.yy.*
-#	$(LEX) $<
 
 cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 	$(RM) $@
@@ -143,18 +133,10 @@ release: $(PROGRAMS)
 	if [ ! -d "$(RELEASE_DIR)/include/cwb" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/include/cwb"; fi;
 	$(INSTALL) $(INST_FLAGS_DATA) ../CQi/cqi.h "$(RELEASE_DIR)/include/cwb"
 
-uninstall:
-	@$(ECHO) "ERROR: uninstall operation is currently not supported!"
-# 	for i in $(PROGRAMS) ;\
-# 	do \
-# 	$(RM) $(BININSTDIR)/$$i ; \
-# 	done
-
 clean:
 	-$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
 
 realclean:	clean
-#	-$(RM) lex.yy.c parser.tab.c parser.tab.h 
 	-$(RM) depend.mk
 
 # create parser C source, if necessary
