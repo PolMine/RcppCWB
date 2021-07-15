@@ -246,7 +246,8 @@ replace <- list(
   "src/cwb/cqp/sgml-print.c" = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1),
   "src/cwb/cl/lex.creg.c" = list("^(\\s*)(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);).*?$", "\\1/* \\2 */", 1),
   "src/cwb/cl/lex.creg.c" = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "static void yyunput (int c, register char * yy_bp )", 1L),
-  "src/cwb/cl/lex.creg.c" = list("^(\\s)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L)
+  "src/cwb/cl/lex.creg.c" = list("^(\\s)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
+  "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L)
 )
 
 for (i in 1L:length(replace)){
@@ -278,7 +279,7 @@ remove_lines <- list(
   "src/cwb/cl/lex.creg.c" = list("^\\s/\\*\\sundo\\seffects\\sof\\ssetting\\sup\\scregtext\\s\\*/", 1L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\sneed\\sto\\sshift\\sthings\\sup\\sto\\smake\\sroom\\s\\*/", 1L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/", 1L),
-  "src/cwb/cl/lex.creg.c" = list("/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L)
+  "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L)
   
 )
 
