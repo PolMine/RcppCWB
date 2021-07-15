@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [d428698] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [0d916b9] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -238,7 +238,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##   * @param input_file A readable stream.
 ##   * 
 ## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
-## index c58386a..fea8c80 100644
+## index c58386a..5498694 100644
 ## --- a/src/cwb/cl/registry.tab.c
 ## +++ b/src/cwb/cl/registry.tab.c
 ## @@ -44,6 +44,9 @@
@@ -284,15 +284,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##  #ifdef short
 ##  # undef short
-## @@ -782,7 +793,7 @@ while (YYID (0))
-##  #ifndef YY_LOCATION_PRINT
-##  # if defined YYLTYPE_IS_TRIVIAL &amp;&amp; YYLTYPE_IS_TRIVIAL
-##  #  define YY_LOCATION_PRINT(File, Loc)          \
-## -     Rprintf(&quot;%d.%d-%d.%d&quot;,         \
-## +     Rprintf (&quot;%d.%d-%d.%d&quot;,            \
-##            (Loc).first_line, (Loc).first_column, \
-##            (Loc).last_line,  (Loc).last_column)
-##  # else
 ## @@ -804,7 +815,7 @@ while (YYID (0))
 ##  
 ##  # ifndef YYFPRINTF
@@ -302,20 +293,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  # endif
 ##  
 ##  # define YYDPRINTF(Args)            \
-## @@ -935,11 +946,11 @@ yy_reduce_print (yyvsp, yyrule)
-##    /* The symbols being reduced.  */
-##    for (yyi = 0; yyi &lt; yynrhs; yyi++)
-##      {
-## -      Rprintf(&quot;   $%d = &quot;, yyi + 1);
-## +      Rprintf (&quot;   $%d = &quot;, yyi + 1);
-##        yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
-##                 &amp;(yyvsp[(yyi + 1) - (yynrhs)])
-##                             );
-## -      Rprintf(&quot;\n&quot;);
-## +      Rprintf (&quot;\n&quot;);
-##      }
-##  }
-##  
 ## @@ -1901,7 +1912,7 @@ yyreduce:
 ##  
 ##  
