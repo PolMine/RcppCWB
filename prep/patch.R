@@ -18,7 +18,7 @@ system("flex -8 parser.l")
 global_replacements <- list(
   c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
-  c("fprintf\\(", "Rprintf("),
+  c("fprintf\\s*\\(", "Rprintf("),
   c("(\\s+)printf\\(", "\\1Rprintf("),
   c("# define YYFPRINTF fprintf", "# define YYFPRINTF Rprintf"),
   
