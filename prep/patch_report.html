@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [0d916b9] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [d7476a9] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,18 +214,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/lex.creg.c b/src/cwb/cl/lex.creg.c
-## index bc39498..7e16ba6 100644
+## index dcf5599..7e16ba6 100644
 ## --- a/src/cwb/cl/lex.creg.c
 ## +++ b/src/cwb/cl/lex.creg.c
-## @@ -1497,14 +1497,15 @@ static void yyunput (int c, register char * yy_bp )
-##              }
-##          }
-##  
-## -    c = *(unsigned char *) (yy_c_buf_p);    /* cast for 8-bit char&#39;s */
-## -    *(yy_c_buf_p) = &#39;\0&#39;;   /* preserve cregtext */
-## +    c = *(unsigned char *) (yy_c_buf_p);    
-## +    *(yy_c_buf_p) = &#39;\0&#39;;
-##      (yy_hold_char) = *++(yy_c_buf_p);
+## @@ -1503,8 +1503,9 @@ static void yyunput (int c, register char * yy_bp )
 ##  
 ##      return c;
 ##  }
