@@ -1505,7 +1505,7 @@ static void yyunput (int c, register char * yy_bp )
 }
 #endif	
 */
- 
+
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
  * 
