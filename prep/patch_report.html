@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e98f1f4] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [82fe9b3] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -213,21 +213,7 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/lex.creg.c b/src/cwb/cl/lex.creg.c
-## index bf71974..7e16ba6 100644
-## --- a/src/cwb/cl/lex.creg.c
-## +++ b/src/cwb/cl/lex.creg.c
-## @@ -1504,7 +1504,8 @@ static void yyunput (int c, register char * yy_bp )
-##      return c;
-##  }
-##  #endif  
-## -
-## +*/
-## + 
-##  /** Immediately switch to a different input stream.
-##   * @param input_file A readable stream.
-##   * 
-## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
+<pre><code>## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
 ## index c58386a..5498694 100644
 ## --- a/src/cwb/cl/registry.tab.c
 ## +++ b/src/cwb/cl/registry.tab.c
