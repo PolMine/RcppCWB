@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [44bad37] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [d428698] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,18 +214,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/lex.creg.c b/src/cwb/cl/lex.creg.c
-## index 7f1d273..7e16ba6 100644
+## index bc39498..7e16ba6 100644
 ## --- a/src/cwb/cl/lex.creg.c
 ## +++ b/src/cwb/cl/lex.creg.c
-## @@ -1475,7 +1475,6 @@ static void yyunput (int c, register char * yy_bp )
-##                  case EOB_ACT_LAST_MATCH:
-##                      cregrestart(cregin );
-##  
-## -                    /*FALLTHROUGH*/
-##  
-##                  case EOB_ACT_END_OF_FILE:
-##                      {
-## @@ -1498,14 +1497,15 @@ static void yyunput (int c, register char * yy_bp )
+## @@ -1497,14 +1497,15 @@ static void yyunput (int c, register char * yy_bp )
 ##              }
 ##          }
 ##  
@@ -246,7 +238,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##   * @param input_file A readable stream.
 ##   * 
 ## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
-## index 00ae4d2..fea8c80 100644
+## index c58386a..fea8c80 100644
 ## --- a/src/cwb/cl/registry.tab.c
 ## +++ b/src/cwb/cl/registry.tab.c
 ## @@ -44,6 +44,9 @@
@@ -310,56 +302,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  # endif
 ##  
 ##  # define YYDPRINTF(Args)            \
-## @@ -817,10 +828,10 @@ do {                       \
-##  do {                                      \
-##    if (yydebug)                                \
-##      {                                     \
-## -      YYFPRINTF ( &quot;%s &quot;, Title);                      \
-## +      YYFPRINTF (&quot;%s &quot;, Title);                   \
-##        yy_symbol_print (stderr,                        \
-##            Type, Value); \
-## -      YYFPRINTF ( &quot;\n&quot;);                          \
-## +      YYFPRINTF (&quot;\n&quot;);                       \
-##      }                                     \
-##  } while (YYID (0))
-##  
-## @@ -875,12 +886,12 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
-##  #endif
-##  {
-##    if (yytype &lt; YYNTOKENS)
-## -    YYFPRINTF ( &quot;token %s (&quot;, yytname[yytype]);
-## +    YYFPRINTF (&quot;token %s (&quot;, yytname[yytype]);
-##    else
-## -    YYFPRINTF ( &quot;nterm %s (&quot;, yytname[yytype]);
-## +    YYFPRINTF (&quot;nterm %s (&quot;, yytname[yytype]);
-##  
-##    yy_symbol_value_print (yyoutput, yytype, yyvaluep);
-## -  YYFPRINTF ( &quot;)&quot;);
-## +  YYFPRINTF (&quot;)&quot;);
-##  }
-##  
-##  /*------------------------------------------------------------------.
-## @@ -899,10 +910,10 @@ yy_stack_print (bottom, top)
-##      yytype_int16 *top;
-##  #endif
-##  {
-## -  YYFPRINTF ( &quot;Stack now&quot;);
-## +  YYFPRINTF (&quot;Stack now&quot;);
-##    for (; bottom &lt;= top; ++bottom)
-## -    YYFPRINTF ( &quot; %d&quot;, *bottom);
-## -  YYFPRINTF ( &quot;\n&quot;);
-## +    YYFPRINTF (&quot; %d&quot;, *bottom);
-## +  YYFPRINTF (&quot;\n&quot;);
-##  }
-##  
-##  # define YY_STACK_PRINT(Bottom, Top)                \
-## @@ -930,16 +941,16 @@ yy_reduce_print (yyvsp, yyrule)
-##    int yynrhs = yyr2[yyrule];
-##    int yyi;
-##    unsigned long int yylno = yyrline[yyrule];
-## -  YYFPRINTF ( &quot;Reducing stack by rule %d (line %lu):\n&quot;,
-## +  YYFPRINTF (&quot;Reducing stack by rule %d (line %lu):\n&quot;,
-##           yyrule - 1, yylno);
+## @@ -935,11 +946,11 @@ yy_reduce_print (yyvsp, yyrule)
 ##    /* The symbols being reduced.  */
 ##    for (yyi = 0; yyi &lt; yynrhs; yyi++)
 ##      {
@@ -373,49 +316,6 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##      }
 ##  }
 ##  
-## @@ -1324,7 +1335,7 @@ yyparse ()
-##       Keep to zero when no symbol should be popped.  */
-##    int yylen = 0;
-##  
-## -  YYDPRINTF ((stderr, &quot;Starting parse\n&quot;));
-## +  YYDPRINTF ((&quot;Starting parse\n&quot;));
-##  
-##    yystate = 0;
-##    yyerrstatus = 0;
-## @@ -1410,14 +1421,14 @@ yyparse ()
-##        yyvsp = yyvs + yysize - 1;
-##  
-##  
-## -      YYDPRINTF ((stderr, &quot;Stack size increased to %lu\n&quot;,
-## +      YYDPRINTF ((&quot;Stack size increased to %lu\n&quot;,
-##            (unsigned long int) yystacksize));
-##  
-##        if (yyss + yystacksize - 1 &lt;= yyssp)
-##      YYABORT;
-##      }
-##  
-## -  YYDPRINTF ((stderr, &quot;Entering state %d\n&quot;, yystate));
-## +  YYDPRINTF ((&quot;Entering state %d\n&quot;, yystate));
-##  
-##    goto yybackup;
-##  
-## @@ -1439,14 +1450,14 @@ yybackup:
-##    /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
-##    if (yychar == YYEMPTY)
-##      {
-## -      YYDPRINTF ((stderr, &quot;Reading a token: &quot;));
-## +      YYDPRINTF ((&quot;Reading a token: &quot;));
-##        yychar = YYLEX;
-##      }
-##  
-##    if (yychar &lt;= YYEOF)
-##      {
-##        yychar = yytoken = YYEOF;
-## -      YYDPRINTF ((stderr, &quot;Now at end of input.\n&quot;));
-## +      YYDPRINTF ((&quot;Now at end of input.\n&quot;));
-##      }
-##    else
-##      {
 ## @@ -1901,7 +1912,7 @@ yyreduce:
 ##  
 ##  
@@ -596,7 +496,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  /** Immediately switch to a different input stream.
 ##   * @param input_file A readable stream.
 ## diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-## index d1190a7..71a988b 100644
+## index 7ddcf2d..71a988b 100644
 ## --- a/src/cwb/cqp/parser.tab.c
 ## +++ b/src/cwb/cqp/parser.tab.c
 ## @@ -340,7 +340,9 @@ extern int yylex(void);
@@ -628,56 +528,7 @@ cat(gitdiff_cqp)</code></pre>
 ##  # endif
 ##  
 ##  # define YYDPRINTF(Args)            \
-## @@ -1550,10 +1552,10 @@ do {                     \
-##  do {                                      \
-##    if (yydebug)                                \
-##      {                                     \
-## -      YYFPRINTF ( &quot;%s &quot;, Title);                      \
-## +      YYFPRINTF (&quot;%s &quot;, Title);                   \
-##        yy_symbol_print (stderr,                        \
-##            Type, Value); \
-## -      YYFPRINTF ( &quot;\n&quot;);                          \
-## +      YYFPRINTF (&quot;\n&quot;);                       \
-##      }                                     \
-##  } while (YYID (0))
-##  
-## @@ -1608,12 +1610,12 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
-##  #endif
-##  {
-##    if (yytype &lt; YYNTOKENS)
-## -    YYFPRINTF ( &quot;token %s (&quot;, yytname[yytype]);
-## +    YYFPRINTF (&quot;token %s (&quot;, yytname[yytype]);
-##    else
-## -    YYFPRINTF ( &quot;nterm %s (&quot;, yytname[yytype]);
-## +    YYFPRINTF (&quot;nterm %s (&quot;, yytname[yytype]);
-##  
-##    yy_symbol_value_print (yyoutput, yytype, yyvaluep);
-## -  YYFPRINTF ( &quot;)&quot;);
-## +  YYFPRINTF (&quot;)&quot;);
-##  }
-##  
-##  /*------------------------------------------------------------------.
-## @@ -1632,10 +1634,10 @@ yy_stack_print (bottom, top)
-##      yytype_int16 *top;
-##  #endif
-##  {
-## -  YYFPRINTF ( &quot;Stack now&quot;);
-## +  YYFPRINTF (&quot;Stack now&quot;);
-##    for (; bottom &lt;= top; ++bottom)
-## -    YYFPRINTF ( &quot; %d&quot;, *bottom);
-## -  YYFPRINTF ( &quot;\n&quot;);
-## +    YYFPRINTF (&quot; %d&quot;, *bottom);
-## +  YYFPRINTF (&quot;\n&quot;);
-##  }
-##  
-##  # define YY_STACK_PRINT(Bottom, Top)                \
-## @@ -1663,16 +1665,16 @@ yy_reduce_print (yyvsp, yyrule)
-##    int yynrhs = yyr2[yyrule];
-##    int yyi;
-##    unsigned long int yylno = yyrline[yyrule];
-## -  YYFPRINTF ( &quot;Reducing stack by rule %d (line %lu):\n&quot;,
-## +  YYFPRINTF (&quot;Reducing stack by rule %d (line %lu):\n&quot;,
-##           yyrule - 1, yylno);
+## @@ -1668,11 +1670,11 @@ yy_reduce_print (yyvsp, yyrule)
 ##    /* The symbols being reduced.  */
 ##    for (yyi = 0; yyi &lt; yynrhs; yyi++)
 ##      {
@@ -691,49 +542,6 @@ cat(gitdiff_cqp)</code></pre>
 ##      }
 ##  }
 ##  
-## @@ -2057,7 +2059,7 @@ yyparse ()
-##       Keep to zero when no symbol should be popped.  */
-##    int yylen = 0;
-##  
-## -  YYDPRINTF ((stderr, &quot;Starting parse\n&quot;));
-## +  YYDPRINTF ((&quot;Starting parse\n&quot;));
-##  
-##    yystate = 0;
-##    yyerrstatus = 0;
-## @@ -2143,14 +2145,14 @@ yyparse ()
-##        yyvsp = yyvs + yysize - 1;
-##  
-##  
-## -      YYDPRINTF ((stderr, &quot;Stack size increased to %lu\n&quot;,
-## +      YYDPRINTF ((&quot;Stack size increased to %lu\n&quot;,
-##            (unsigned long int) yystacksize));
-##  
-##        if (yyss + yystacksize - 1 &lt;= yyssp)
-##      YYABORT;
-##      }
-##  
-## -  YYDPRINTF ((stderr, &quot;Entering state %d\n&quot;, yystate));
-## +  YYDPRINTF ((&quot;Entering state %d\n&quot;, yystate));
-##  
-##    goto yybackup;
-##  
-## @@ -2172,14 +2174,14 @@ yybackup:
-##    /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
-##    if (yychar == YYEMPTY)
-##      {
-## -      YYDPRINTF ((stderr, &quot;Reading a token: &quot;));
-## +      YYDPRINTF ((&quot;Reading a token: &quot;));
-##        yychar = YYLEX;
-##      }
-##  
-##    if (yychar &lt;= YYEOF)
-##      {
-##        yychar = yytoken = YYEOF;
-## -      YYDPRINTF ((stderr, &quot;Now at end of input.\n&quot;));
-## +      YYDPRINTF ((&quot;Now at end of input.\n&quot;));
-##      }
-##    else
-##      {
 ## @@ -2943,7 +2945,7 @@ yyreduce:
 ##    case 133:
 ##  #line 819 &quot;parser.y&quot;
