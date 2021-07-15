@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [5f13b7a] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [8110418] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,10 +214,18 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/lex.creg.c b/src/cwb/cl/lex.creg.c
-## index 21af92b..7e16ba6 100644
+## index 8ee9626..7e16ba6 100644
 ## --- a/src/cwb/cl/lex.creg.c
 ## +++ b/src/cwb/cl/lex.creg.c
-## @@ -1447,6 +1447,7 @@ static void yyunput (int c, register char * yy_bp )
+## @@ -688,7 +688,6 @@ static void yy_flex_strncpy (char *,yyconst char *,int );
+##  static int yy_flex_strlen (yyconst char * );
+##  #endif
+##  
+## -/*
+##  /*
+##  #ifndef YY_NO_INPUT
+##  
+## @@ -1448,6 +1447,7 @@ static void yyunput (int c, register char * yy_bp )
 ##  }
 ##  */
 ##  
@@ -225,7 +233,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  #ifndef YY_NO_INPUT
 ##  #ifdef __cplusplus
 ##      static int yyinput (void)
-## @@ -1461,36 +1462,19 @@ static void yyunput (int c, register char * yy_bp )
+## @@ -1462,36 +1462,19 @@ static void yyunput (int c, register char * yy_bp )
 ##  
 ##      if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
 ##          {
@@ -263,7 +271,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##                  case EOB_ACT_END_OF_FILE:
 ##                      {
-## @@ -1513,14 +1497,15 @@ static void yyunput (int c, register char * yy_bp )
+## @@ -1514,14 +1497,15 @@ static void yyunput (int c, register char * yy_bp )
 ##              }
 ##          }
 ##  
