@@ -14,6 +14,11 @@ setwd(path(cwb_pkg_dir, "cqp"))
 system("bison -d -t parser.y")
 system("flex -8 parser.l")
 
+file.rename(
+  path(cwb_pkg_dir, "src", "cwb", "cl", "endian.h"),
+  path(cwb_pkg_dir, "src", "cwb", "cl", "endian2.h")
+)
+
 global_replacements <- list(
   c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
