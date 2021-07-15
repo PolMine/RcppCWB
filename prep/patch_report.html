@@ -192,18 +192,15 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
+<pre><code>## [3c3e8b8] 2021-07-15: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
-<pre><code>## Warning in file.rename(from = path(cwb_pkg_dir, &quot;src&quot;, &quot;cwb&quot;, &quot;cl&quot;,
-## &quot;endian.h&quot;), : kann Datei &#39;/Users/andreasblaette/Lab/github/RcppCWB/src/cwb/src/
-## cwb/cl/endian.h&#39; nicht in &#39;/Users/andreasblaette/Lab/github/RcppCWB/src/cwb/src/
-## cwb/cl/endian2.h&#39; umbenennen. Grund &#39;No such file or directory&#39;</code></pre>
 <p>Add and commit changes so that we can prepare diffs.</p>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [c53e7f7] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [e427677] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -217,12 +214,9 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/endian.h b/src/cwb/cl/endian2.h
-## similarity index 96%
-## rename from src/cwb/cl/endian.h
-## rename to src/cwb/cl/endian2.h
+<pre><code>## diff --git a/src/cwb/cl/endian2.h b/src/cwb/cl/endian2.h
 ## index a453549..91939d7 100644
-## --- a/src/cwb/cl/endian.h
+## --- a/src/cwb/cl/endian2.h
 ## +++ b/src/cwb/cl/endian2.h
 ## @@ -48,8 +48,8 @@
 ##  #include &lt;netinet/in.h&gt;

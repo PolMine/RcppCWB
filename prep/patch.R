@@ -56,7 +56,8 @@ delete_line_before <- list(
   "src/cwb/cl/lex.creg.c" = list("^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)", 4L, 4L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*cregrestart\\(cregin\\s*\\);", 2L, 11L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L),
-  "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L)
+  "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L),
+  "src/cwb/cl/endian2.h" = list("/* for consistency:", 1L, 1L)
 )
 
 
@@ -111,7 +112,8 @@ insert_before <- list(
   "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
   "src/cwb/cl/registry.tab.c" = list("#define\\sYYBISON\\s1", "void Rprintf(const char *, ...);", 1L),
   "src/cwb/cqp/lex.yy.c" = list("#ifdef __cplusplus", "/*", 3L),
-  "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", "", 1L)
+  "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", "", 1L),
+  "src/cwb/cl/endian2.h" = list("#include\\s<windows\\.h>" , "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */", 1L)
 )
 
 for (i in 1L:length(insert_before)){
