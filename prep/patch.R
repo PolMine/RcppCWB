@@ -270,7 +270,10 @@ remove_lines <- list(
   "src/cwb/cqp/ranges.c" = list("/\\*\\sprint\\ssequence\\sof\\stokens\\sin\\ssort\\sinterval\\s\\*/", 1),
   "src/cwb/cqp/ranges.c" = list("/\\*\\snow,\\sexecute\\sthe\\sexternal\\ssort\\scommand.*?\\*/", 1),
   "src/cwb/cqp/ranges.c" = list("/\\*\\srun\\ssort\\scmd\\sand\\sread\\sfrom\\spipe\\s\\*/", 1),
-  "src/cwb/cqp/ranges.c" = list("/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/", 1)
+  "src/cwb/cqp/ranges.c" = list("/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/", 1),
+  "src/cwb/cl/lex.creg.c" = list("^\\s/\\*\\sundo\\seffects\\sof\\ssetting\\sup\\scregtext\\s\\*/", 1L),
+  "src/cwb/cl/lex.creg.c" = list("/\\*\\sneed\\sto\\sshift\\sthings\\sup\\sto\\smake\\sroom\\s\\*/", 1L),
+  "src/cwb/cl/lex.creg.c" = list("/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/", 1L)
 )
 
 for (i in 1L:length(remove_lines)){

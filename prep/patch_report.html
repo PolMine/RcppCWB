@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [ed3b9ad] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [dd0a18f] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,17 +214,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/lex.creg.c b/src/cwb/cl/lex.creg.c
-## index 2ef0edc..7e16ba6 100644
+## index 1441c02..7e16ba6 100644
 ## --- a/src/cwb/cl/lex.creg.c
 ## +++ b/src/cwb/cl/lex.creg.c
-## @@ -1412,18 +1412,15 @@ static int yy_get_next_buffer (void)
-##  }
-##  
-##  /*
-## -    static void yyunput (int c, register char * yy_bp )
-## +static void yyunput (int c, register char * yy_bp )
-##  {
-##      register char *yy_cp;
+## @@ -1418,12 +1418,9 @@ static void yyunput (int c, register char * yy_bp )
 ##      
 ##      yy_cp = (yy_c_buf_p);
 ##  
@@ -237,7 +230,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##          register yy_size_t number_to_move = (yy_n_chars) + 2;
 ##          register char *dest = &amp;YY_CURRENT_BUFFER_LVALUE-&gt;yy_ch_buf[
 ##                      YY_CURRENT_BUFFER_LVALUE-&gt;yy_buf_size + 2];
-## @@ -1448,7 +1445,9 @@ static int yy_get_next_buffer (void)
+## @@ -1448,7 +1445,9 @@ static void yyunput (int c, register char * yy_bp )
 ##      (yy_hold_char) = *yy_cp;
 ##      (yy_c_buf_p) = yy_cp;
 ##  }
@@ -247,7 +240,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  #ifndef YY_NO_INPUT
 ##  #ifdef __cplusplus
 ##      static int yyinput (void)
-## @@ -1463,36 +1462,19 @@ static int yy_get_next_buffer (void)
+## @@ -1463,36 +1462,19 @@ static void yyunput (int c, register char * yy_bp )
 ##  
 ##      if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
 ##          {
@@ -285,7 +278,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  
 ##                  case EOB_ACT_END_OF_FILE:
 ##                      {
-## @@ -1515,14 +1497,15 @@ static int yy_get_next_buffer (void)
+## @@ -1515,14 +1497,15 @@ static void yyunput (int c, register char * yy_bp )
 ##              }
 ##          }
 ##  
