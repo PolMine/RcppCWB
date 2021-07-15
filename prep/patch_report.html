@@ -192,7 +192,6 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
-<pre><code>## [3c3e8b8] 2021-07-15: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -200,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e427677] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [38b067d] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,20 +213,6 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/endian2.h b/src/cwb/cl/endian2.h
-## index a453549..91939d7 100644
-## --- a/src/cwb/cl/endian2.h
-## +++ b/src/cwb/cl/endian2.h
-## @@ -48,8 +48,8 @@
-##  #include &lt;netinet/in.h&gt;
-##  #else
-##  /* but in windows we need to use winsock2.h (poss also windows.h?) from the Windows API instead */
-## +#include &lt;winsock2.h&gt; /* AB reversed order, in original CWB code windows.h is included first */
-##  #include &lt;windows.h&gt;
-## -#include &lt;winsock2.h&gt;
-##  /* for consistency: define the ntohl and htonl macros since they are functions (not macros) in winsock2.h */
-##  #define ntohl ntohl
-##  #define htonl htonl</code></pre>
 <p>Finding: Modifications of the Makefile, nothing else</p>
 </div>
 <div id="cqp-directory" class="section level4">
