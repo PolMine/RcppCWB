@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [08073ae] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [fbcc21d] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,14 +214,14 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/lex.creg.c b/src/cwb/cl/lex.creg.c
-## index f307c6d..725aa1e 100644
+## index 7e242ed..725aa1e 100644
 ## --- a/src/cwb/cl/lex.creg.c
 ## +++ b/src/cwb/cl/lex.creg.c
 ## @@ -678,7 +678,7 @@ extern int cregwrap (void );
 ##  #endif
 ##  #endif
 ##  
-## -    static void yyunput (int c,char *buf_ptr  );
+## -static void yyunput (int c,char *buf_ptr  );/*  */
 ## +    /* static void yyunput (int c,char *buf_ptr  ); */
 ##      
 ##  #ifndef yytext_ptr
