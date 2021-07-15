@@ -6,7 +6,6 @@ repodir <- "~/Lab/github/RcppCWB"
 cwb_pkg_dir <- "~/Lab/github/RcppCWB/src/cwb"
 
 setwd(path(cwb_pkg_dir, "cl"))
-# system("bison -d -t -p creg registry.y")
 system("bison -d -t -p creg registry.y")
 system("flex -8 -Pcreg registry.l")
 
@@ -20,7 +19,7 @@ global_replacements <- list(
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
   c("fprintf\\s*\\(", "Rprintf("),
   c("(\\s+)printf\\(", "\\1Rprintf("),
-  c("# define YYFPRINTF fprintf", "# define YYFPRINTF Rprintf"),
+#  c("# define YYFPRINTF fprintf", "# define YYFPRINTF Rprintf"),
   
   c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"') # only files in cl, maybe limit this
 )

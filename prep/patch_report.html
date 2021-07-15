@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [f6af4d2] 2021-07-15: CWB patched</code></pre>
+<pre><code>## [50dcb1c] 2021-07-15: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -214,51 +214,10 @@ git_cmd &lt;- sprintf(
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/registry.tab.c b/src/cwb/cl/registry.tab.c
-## index c58386a..906468c 100644
+## index 2c6a948..906468c 100644
 ## --- a/src/cwb/cl/registry.tab.c
 ## +++ b/src/cwb/cl/registry.tab.c
-## @@ -44,6 +44,7 @@
-##     USER NAME SPACE&quot; below.  */
-##  
-##  /* Identify Bison output.  */
-## +void Rprintf(const char *, ...);
-##  #define YYBISON 1
-##  
-##  /* Bison version.  */
-## @@ -58,6 +59,14 @@
-##  /* Using locations.  */
-##  #define YYLSP_NEEDED 0
-##  
-## +/* Substitute the variable and function names.  */
-## +#define yyparse cregparse
-## +#define yylex   creglex
-## +#define yyerror cregerror
-## +#define yylval  creglval
-## +#define yychar  cregchar
-## +#define yydebug cregdebug
-## +#define yynerrs cregnerrs
-##  
-##  
-##  /* Tokens.  */
-## @@ -218,7 +227,7 @@ typedef union YYSTYPE
-##    } storage;
-##  }
-##  /* Line 193 of yacc.c.  */
-## -#line 222 &quot;registry.tab.c&quot;
-## +#line 230 &quot;registry.tab.c&quot;
-##      YYSTYPE;
-##  # define yystype YYSTYPE /* obsolescent; will be withdrawn */
-##  # define YYSTYPE_IS_DECLARED 1
-## @@ -231,7 +240,7 @@ typedef union YYSTYPE
-##  
-##  
-##  /* Line 216 of yacc.c.  */
-## -#line 235 &quot;registry.tab.c&quot;
-## +#line 243 &quot;registry.tab.c&quot;
-##  
-##  #ifdef short
-##  # undef short
-## @@ -804,7 +813,7 @@ while (YYID (0))
+## @@ -813,7 +813,7 @@ while (YYID (0))
 ##  
 ##  # ifndef YYFPRINTF
 ##  #  include &lt;stdio.h&gt; /* INFRINGES ON USER NAME SPACE */
@@ -266,27 +225,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ## +#  define YYFPRINTF Rprintf
 ##  # endif
 ##  
-##  # define YYDPRINTF(Args)            \
-## @@ -1901,7 +1910,7 @@ yyreduce:
-##  
-##  
-##  /* Line 1267 of yacc.c.  */
-## -#line 1905 &quot;registry.tab.c&quot;
-## +#line 1913 &quot;registry.tab.c&quot;
-##        default: break;
-##      }
-##    YY_SYMBOL_PRINT (&quot;-&gt; $$ =&quot;, yyr1[yyn], &amp;yyval, &amp;yyloc);
-## diff --git a/src/cwb/cl/registry.tab.h b/src/cwb/cl/registry.tab.h
-## index 1460e0c..3ba3e4d 100644
-## --- a/src/cwb/cl/registry.tab.h
-## +++ b/src/cwb/cl/registry.tab.h
-## @@ -126,5 +126,5 @@ typedef union YYSTYPE
-##  # define YYSTYPE_IS_TRIVIAL 1
-##  #endif
-##  
-## -extern YYSTYPE yylval;
-## +extern YYSTYPE creglval;
-## </code></pre>
+##  # define YYDPRINTF(Args)            \</code></pre>
 <p>Finding: Modifications of the Makefile, nothing else</p>
 </div>
 <div id="cqp-directory" class="section level4">
