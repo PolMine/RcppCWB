@@ -50,7 +50,7 @@ delete_line_before <- list(
   "src/cwb/cqp/ranges.c" = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 1L, 5L),
   "src/cwb/cqp/ranges.c" = list("^\\s*value\\s=\\scl_string_canonical\\(value,\\ssrt_cl->corpus->charset,\\ssrt_flags,\\sCL_STRING_CANONICAL_STRDUP\\);", 1L, 7L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)", 4L, 4L),
-  "src/cwb/cl/lex.creg.c" = list("^\\s*cregrestart\\(cregin\\s*\\);", 1L, 11L)
+  "src/cwb/cl/lex.creg.c" = list("^\\s*cregrestart\\(cregin\\s*\\);", 2L, 11L)
 )
 
 
