@@ -1,6 +1,7 @@
-# RcppCWB 0.4.2.9001
+# RcppCWB 0.4.2.9001-0.4.2.9002
 
 * Unused file '_options.h' removed from src/cwb/cl/cqp 
+* Targets 'lex.creg.c', 'registry.tab.c' and 'registry.tab.h' removed from cl/Makefile to avoid an unwanted call of flex which is not necessarily present (#30).
 
 # RcppCWB 0.4.2
 
