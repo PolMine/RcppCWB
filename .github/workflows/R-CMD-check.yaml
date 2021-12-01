@@ -25,6 +25,7 @@ jobs:
       matrix:
         config:
           - {os: windows-latest, r: 'release'}
+          - {os: windows-2022, r: 'devel'}
           - {os: macOS-latest, r: 'release'}
           - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
           - {os: ubuntu-20.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
@@ -51,7 +52,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache R packages
-        if: runner.os != 'Windows'
+        if: matrix.os != 'windows-latest'
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
@@ -73,6 +74,7 @@ jobs:
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("covr")
           remotes::install_cran("pkgbuild")
+          remotes::install_cran("testthat")
         shell: Rscript {0}
 
       - name: Check
@@ -84,12 +86,12 @@ jobs:
         shell: Rscript {0}
       
       - name: Build Windows binary package
-        if: runner.os == 'Windows'
+        if: matrix.os == 'windows-latest'
         run: pkgbuild::build(binary = TRUE, dest_path = Sys.getenv("GITHUB_WORKSPACE"))
         shell: Rscript {0}
           
       - name: Upload Windows binary
-        if: runner.os == 'Windows'
+        if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
           name: RcppCWB-Windows-binary
