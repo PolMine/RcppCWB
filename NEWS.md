@@ -1,4 +1,8 @@
-# RcppCWB 0.4.2.9001-0.4.2.9002
+# RcppCWB 0.4.4
+
+* Fixed a mishandling of paths on Windows in `check_corpus()` that would trigger resetting the registry unintendendly and potentially falsely.
+
+# RcppCWB 0.4.3
 
 * Unused file '_options.h' removed from src/cwb/cl/cqp 
 * Targets 'lex.creg.c', 'registry.tab.c' and 'registry.tab.h' removed from cl/Makefile to avoid an unwanted call of flex which is not necessarily present (#30).
