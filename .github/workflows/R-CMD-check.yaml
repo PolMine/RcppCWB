@@ -36,7 +36,8 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Setup R
         if: matrix.os != "windows-2022"
@@ -61,7 +62,8 @@ jobs:
         if: matrix.os == "windows-2022"
         uses: kalibera/R-actions/pkg-check@master
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - name: Setup pandoc
+        uses: r-lib/actions/setup-pandoc@v1
         if: matrix.os != "windows-2022"
 
       - name: Query dependencies
