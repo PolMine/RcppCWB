@@ -44,6 +44,23 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
 
+      - name: Setup R (Windows UCRT)
+        if: matrix.config.os == 'windows-2022'
+        uses: kalibera/ucrt3/actions/r-install@main
+        
+      - name: Install UCRT toolchain
+        if: matrix.config.os == 'windows-2022'
+        uses: kalibera/ucrt3/actions/toolchain-install@main
+        with:
+          # base ... toolchain has the compilers and libraries to build R and recommended packages
+          # full ... additional libraries to build CRAN packages
+          # none ... no toolchain is needed (no native code) 
+          toolchain-type: full
+          
+      - name: Check package
+        if: matrix.config.os == 'windows-2022'
+        uses: kalibera/R-actions/pkg-check@master
+
       - name: Setup pandoc
         if: matrix.config.os != 'windows-2022'
         uses: r-lib/actions/setup-pandoc@v1
@@ -74,6 +91,7 @@ jobs:
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
       - name: Install dependencies
+        if: matrix.config.os != 'windows-2022'
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
@@ -125,21 +143,3 @@ jobs:
       - name: Test coverage
         run: covr::codecov()
         shell: Rscript {0}
-
-      - name: Setup R (Windows UCRT)
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/ucrt3/actions/r-install@main
-        
-      - name: Install UCRT toolchain
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/ucrt3/actions/toolchain-install@main
-        with:
-          # base ... toolchain has the compilers and libraries to build R and recommended packages
-          # full ... additional libraries to build CRAN packages
-          # none ... no toolchain is needed (no native code) 
-          toolchain-type: full
-          
-      - name: Check package
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/R-actions/pkg-check@master
-
