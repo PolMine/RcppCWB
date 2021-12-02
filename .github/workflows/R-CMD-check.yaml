@@ -36,21 +36,15 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Setup R
-        if: matrix.os != "windows-2022"
-        uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.config.r }}
-          
-      - name: Setup pandoc
-        uses: r-lib/actions/setup-pandoc@v1
-        if: matrix.os != "windows-2022"
+
+      - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Query dependencies
-        if: matrix.os != "windows-2022"
         run: |
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
@@ -58,7 +52,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache R packages
-        if: runner.os != 'Windows'
+        if: matrix.os != 'windows-latest'
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
@@ -75,7 +69,6 @@ jobs:
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
       - name: Install dependencies
-        if: matrix.os != "windows-2022"
         run: |
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
@@ -85,7 +78,6 @@ jobs:
         shell: Rscript {0}
 
       - name: Check
-        if: matrix.os != "windows-2022"
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         run: |
@@ -93,12 +85,12 @@ jobs:
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
       
-      - name: Build Windows binary package (non-UCRT)
+      - name: Build Windows binary package
         if: matrix.os == 'windows-latest'
         run: pkgbuild::build(binary = TRUE, dest_path = Sys.getenv("GITHUB_WORKSPACE"))
         shell: Rscript {0}
           
-      - name: Upload Windows binary (non-UCRT)
+      - name: Upload Windows binary
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
