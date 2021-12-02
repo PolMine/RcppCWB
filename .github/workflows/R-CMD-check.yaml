@@ -45,23 +45,6 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           
-      - name: Setup R (Windows UCRT)
-        if: matrix.os == "windows-2022"
-        uses: kalibera/ucrt3/actions/r-install@main
-        
-      - name: Install UCRT toolchain
-        if: matrix.os == "windows-2022"
-        uses: kalibera/ucrt3/actions/toolchain-install@main
-        with:
-          # base ... toolchain has the compilers and libraries to build R and recommended packages
-          # full ... additional libraries to build CRAN packages
-          # none ... no toolchain is needed (no native code) 
-          toolchain-type: full
-          
-      - name: Check package
-        if: matrix.os == "windows-2022"
-        uses: kalibera/R-actions/pkg-check@master
-
       - name: Setup pandoc
         uses: r-lib/actions/setup-pandoc@v1
         if: matrix.os != "windows-2022"
