@@ -127,11 +127,11 @@ jobs:
         shell: Rscript {0}
 
       - name: Setup R (Windows UCRT)
-        if: matrix.config.os == "windows-2022"
+        if: matrix.config.os == 'windows-2022'
         uses: kalibera/ucrt3/actions/r-install@main
         
       - name: Install UCRT toolchain
-        if: matrix.config.os == "windows-2022"
+        if: matrix.config.os == 'windows-2022'
         uses: kalibera/ucrt3/actions/toolchain-install@main
         with:
           # base ... toolchain has the compilers and libraries to build R and recommended packages
@@ -140,6 +140,6 @@ jobs:
           toolchain-type: full
           
       - name: Check package
-        if: matrix.config.os == "windows-2022"
+        if: matrix.config.os == 'windows-2022'
         uses: kalibera/R-actions/pkg-check@master
 
