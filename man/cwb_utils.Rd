@@ -96,9 +96,20 @@ tokens_sentence_1 <- cl_id2str(
   registry = tmp_regdir, id = ids_sentence_1
   )
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
-\dontrun{
+
+#' perform cwb_huffcode (equivalent to cwb-makeall command line utility)
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-}
+
+# see whether it works
+ids_sentence_1 <- cl_cpos2id(
+  corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
+  cpos = 0:83
+  )
+tokens_sentence_1 <- cl_id2str(
+  corpus = "UNGA", p_attribute = "word",
+  registry = tmp_regdir, id = ids_sentence_1
+  )
+sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 \dontrun{
 data_dir <- file.path(tempdir(), "tmp_data_dir")

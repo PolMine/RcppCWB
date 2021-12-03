@@ -54,6 +54,20 @@
 #'   registry = tmp_regdir, id = ids_sentence_1
 #'   )
 #' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
+#' 
+#' #' perform cwb_huffcode (equivalent to cwb-makeall command line utility)
+#' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+#' 
+#' # see whether it works
+#' ids_sentence_1 <- cl_cpos2id(
+#'   corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
+#'   cpos = 0:83
+#'   )
+#' tokens_sentence_1 <- cl_id2str(
+#'   corpus = "UNGA", p_attribute = "word",
+#'   registry = tmp_regdir, id = ids_sentence_1
+#'   )
+#' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
 #' @rdname cwb_utils
 #' @export cwb_makeall
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
@@ -63,10 +77,6 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
-#' @examples 
-#' \dontrun{
-#' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-#' }
 cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
@@ -93,6 +103,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples
+#' 
 #' \dontrun{
 #' data_dir <- file.path(tempdir(), "tmp_data_dir")
 #' dir.create(data_dir)
