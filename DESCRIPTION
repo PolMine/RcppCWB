@@ -44,7 +44,7 @@ SystemRequirements: GNU make, ncurses, pcre (>= 7 < 10), GLib (>= 2.0.0). On Win
   macOS, static libraries of Glib are downloaded (<https://github.com/PolMine/libglib>) if Glib is 
   not present.
 Imports:
-    Rcpp (>= 0.12.6)
+    Rcpp (>= 1.0.7)
 Suggests:
     knitr,
     testthat
