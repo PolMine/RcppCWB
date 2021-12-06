@@ -20,11 +20,10 @@
 #' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 #' 
-#' tmpdir <- normalizePath(tempdir())
-#' win <- if (Sys.info()[["sysname"]] == "Windows") TRUE else FALSE
-#' tmp_regdir <- file.path(tmpdir, "registry_tmp", fsep = if (win) "\\" else "/")
-#' tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = if (win) "\\" else "/")
-#' tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = if (win) "\\" else "/")
+#' tmpdir <- normalizePath(tempdir(), winslash = "/")
+#' tmp_regdir <- file.path(tmpdir, "registry_tmp", fsep = "/")
+#' tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = "/")
+#' tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = "/")
 #' if (!file.exists(tmp_regdir)) dir.create(tmp_regdir)
 #' if (!file.exists(tmp_data_dir)) dir.create(tmp_data_dir)
 #' if (!file.exists(tmp_unga_dir)){
@@ -55,18 +54,9 @@
 #' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
 #' 
 #' #' perform cwb_huffcode (equivalent to cwb-makeall command line utility)
+#' \dontrun{
 #' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-#' 
-#' # see whether it works
-#' ids_sentence_1 <- cl_cpos2id(
-#'   corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
-#'   cpos = 0:83
-#'   )
-#' tokens_sentence_1 <- cl_id2str(
-#'   corpus = "UNGA", p_attribute = "word",
-#'   registry = tmp_regdir, id = ids_sentence_1
-#'   )
-#' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
+#' }
 #' @rdname cwb_utils
 #' @export cwb_makeall
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
