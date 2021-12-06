@@ -2,6 +2,9 @@
 
 * Fixed a mishandling of paths on Windows in `check_corpus()` that would trigger resetting the registry unintendendly and potentially falsely.
 * To avoid a compiler warning (unused variable) issued by Rcpp solved by Rcpp v1.0.7, this version of Rcpp is now required (#22).
+* In `use_tmp_dir()`, `normalizePath()` is applied on the `tempdir()` result to avoid confusion with symbolic links on macOS.
+* New unit test for `cwb_encode()`.
+
 
 # RcppCWB 0.4.3
 

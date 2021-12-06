@@ -20,10 +20,9 @@
 #' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 #' 
-#' tmpdir <- tempdir()
+#' tmpdir <- normalizePath(tempdir())
 #' win <- if (Sys.info()[["sysname"]] == "Windows") TRUE else FALSE
-#' if (win) tmpdir <- normalizePath(tmpdir)
-#' tmp_regdir <- file.path(tmpdir, "registry", fsep = if (win) "\\" else "/")
+#' tmp_regdir <- file.path(tmpdir, "registry_tmp", fsep = if (win) "\\" else "/")
 #' tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = if (win) "\\" else "/")
 #' tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = if (win) "\\" else "/")
 #' if (!file.exists(tmp_regdir)) dir.create(tmp_regdir)
@@ -103,8 +102,6 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples
-#' 
-#' \dontrun{
 #' data_dir <- file.path(tempdir(), "tmp_data_dir")
 #' dir.create(data_dir)
 #' 
@@ -128,8 +125,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' )
 #' 
 #' unlink(data_dir)
-#' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "BTMIN"))
-#' }
+#' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
 cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
   
   s_attributes_noanno <- unlist(lapply(

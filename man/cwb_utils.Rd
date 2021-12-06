@@ -111,7 +111,6 @@ tokens_sentence_1 <- cl_id2str(
   )
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-\dontrun{
 data_dir <- file.path(tempdir(), "tmp_data_dir")
 dir.create(data_dir)
 
@@ -136,5 +135,4 @@ cwb_encode(
 
 unlink(data_dir)
 unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "BTMIN"))
-}
 }
