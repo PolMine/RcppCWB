@@ -7,27 +7,25 @@
 #' @rdname tmp_registry
 use_tmp_registry <- function(pkg = system.file(package = "RcppCWB")){
   
-  fsep <- if (Sys.info()[["sysname"]] == "Windows") "\\" else "/"
-  
-  tmp_registry_dir <- file.path(normalizePath(tempdir()), "registry_tmp", fsep = fsep)
+  tmp_registry_dir <- file.path(normalizePath(tempdir(), winslash = "/"), "registry_tmp", fsep = "/")
   if (!file.exists(tmp_registry_dir)) dir.create(tmp_registry_dir)
   
-  pkg_registry_dir <- file.path(pkg, "extdata", "cwb", "registry", fsep = fsep)
-  pkg_indexed_corpora_dir <- file.path(pkg, "extdata", "cwb", "indexed_corpora", fsep = fsep)
+  pkg_registry_dir <- file.path(pkg, "extdata", "cwb", "registry", fsep = "/")
+  pkg_indexed_corpora_dir <- file.path(pkg, "extdata", "cwb", "indexed_corpora", fsep = "/")
   
   for (corpus in list.files(pkg_registry_dir)){
     
     registry <- readLines(file.path(pkg_registry_dir, corpus))
     
     home_line_no <- grep("^HOME", registry)
-    registry[home_line_no] <- sprintf("HOME \"%s\"", file.path(pkg_indexed_corpora_dir, corpus, fsep = fsep))
+    registry[home_line_no] <- sprintf("HOME \"%s\"", file.path(pkg_indexed_corpora_dir, corpus, fsep = "/"))
     
     info_line_no <- grep("^INFO", registry)
     registry_info_file <- gsub("^INFO\\s+\"*(.*?)\"*\\s*$", "\\1", registry[info_line_no])
-    info_file_new <- file.path(pkg_indexed_corpora_dir, corpus, basename(registry_info_file), fsep = fsep)
+    info_file_new <- file.path(pkg_indexed_corpora_dir, corpus, basename(registry_info_file), fsep = "/")
     registry[info_line_no] <- sprintf("INFO \"%s\"", info_file_new)
     
-    writeLines(text = registry, con = file.path(tmp_registry_dir, corpus, fsep = fsep), sep = "\n")
+    writeLines(text = registry, con = file.path(tmp_registry_dir, corpus, fsep = "/"), sep = "\n")
   }
   
   Sys.setenv("CORPUS_REGISTRY" = tmp_registry_dir)
@@ -39,9 +37,9 @@ use_tmp_registry <- function(pkg = system.file(package = "RcppCWB")){
 #' @export get_tmp_registry
 get_tmp_registry <- function(){
   file.path(
-    normalizePath(tempdir()),
+    normalizePath(tempdir(), winslash = "/"),
     "registry_tmp",
-    fsep = if (Sys.info()[["sysname"]] == "Windows") "\\" else "/"
+    fsep = "/"
   )
 }
 
