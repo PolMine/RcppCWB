@@ -54,7 +54,7 @@
 #' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
 #' 
 #' #' perform cwb_huffcode (equivalent to cwb-makeall command line utility)
-#' \dontrun{
+#' if (.Platform$OS.type != "windows"){
 #' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 #' }
 #' @rdname cwb_utils

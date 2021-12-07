@@ -96,7 +96,7 @@ tokens_sentence_1 <- cl_id2str(
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
 
 #' perform cwb_huffcode (equivalent to cwb-makeall command line utility)
-\dontrun{
+if (.Platform$OS.type != "windows"){
 cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
 cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
