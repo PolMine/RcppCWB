@@ -334,9 +334,11 @@ int cqp_get_status(){
 
 // [[Rcpp::export(name=".cqp_set_registry")]]
 SEXP cqp_set_registry(SEXP registry_dir){
-  char * registry_new;
+  printf("%s\n", cl_standard_registry());
+  
   registry = strdup(Rcpp::as<std::string>(registry_dir).c_str());
   
+  printf("%s\n", registry);
   int		ac = 1;
   char *		av[1];
   av[0] = (char *)"RcppCWB";
@@ -344,6 +346,8 @@ SEXP cqp_set_registry(SEXP registry_dir){
   
   initialize_cqp(ac, av);
   make_attribute_hash(16384);
+  
+  printf("%s\n", registry);
   
   SEXP result = R_NilValue;
   return result;
