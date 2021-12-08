@@ -25,7 +25,7 @@ jobs:
       matrix:
         config:
           - {os: windows-latest, r: 'release'}
-          - {os: windows-2022, r: 'devel'}
+#          - {os: windows-2022, r: 'devel'}
           - {os: macOS-latest, r: 'release'}
           - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
           - {os: ubuntu-20.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
@@ -44,18 +44,18 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
 
-      - name: Setup R (Windows UCRT)
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/ucrt3/actions/r-install@main
+#      - name: Setup R (Windows UCRT)
+#        if: matrix.config.os == 'windows-2022'
+#        uses: kalibera/ucrt3/actions/r-install@main
         
-      - name: Install UCRT toolchain
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/ucrt3/actions/toolchain-install@main
-        with:
-          # base ... toolchain has the compilers and libraries to build R and recommended packages
-          # full ... additional libraries to build CRAN packages
-          # none ... no toolchain is needed (no native code) 
-          toolchain-type: full
+#      - name: Install UCRT toolchain
+#        if: matrix.config.os == 'windows-2022'
+#        uses: kalibera/ucrt3/actions/toolchain-install@main
+#        with:
+#          # base ... toolchain has the compilers and libraries to build R and recommended packages
+#          # full ... additional libraries to build CRAN packages
+#          # none ... no toolchain is needed (no native code) 
+#          toolchain-type: full
           
       - name: Check package
         if: matrix.config.os == 'windows-2022'
