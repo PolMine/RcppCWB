@@ -322,7 +322,8 @@ void init_cqp() {
 // [[Rcpp::export(name=".cqp_get_registry")]]
 Rcpp::StringVector cqp_get_registry(){
   Rcpp::StringVector result(1);
-  result(0) = cl_standard_registry();
+  /* result(0) = cl_standard_registry(); */
+  result(0) = registry;
   return result;
 }
 
@@ -334,7 +335,6 @@ int cqp_get_status(){
 
 // [[Rcpp::export(name=".cqp_set_registry")]]
 SEXP cqp_set_registry(SEXP registry_dir){
-  printf("%s\n", cl_standard_registry());
   
   registry = strdup(Rcpp::as<std::string>(registry_dir).c_str());
   
