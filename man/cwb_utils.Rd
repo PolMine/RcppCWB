@@ -80,9 +80,6 @@ for (x in list.files(home_dir, full.names = TRUE)){
   file.copy(from = x, to = tmp_unga_dir)
 }
 
-cl_delete_corpus("UNGA", registry = tmp_regdir)
-cqp_reset_registry(tmp_regdir)
-
 # perform cwb_makeall (equivalent to cwb-makeall command line utility)
 cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 
@@ -104,6 +101,7 @@ if (.Platform$OS.type != "windows"){
 if (.Platform$OS.type != "windows"){
   cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
+if (.Platform$OS.type != "windows"){
 data_dir <- file.path(tempdir(), "tmp_data_dir")
 dir.create(data_dir)
 
@@ -128,4 +126,5 @@ cwb_encode(
 
 unlink(data_dir)
 unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
+}
 }

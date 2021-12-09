@@ -38,9 +38,6 @@
 #'   file.copy(from = x, to = tmp_unga_dir)
 #' }
 #' 
-#' cl_delete_corpus("UNGA", registry = tmp_regdir)
-#' cqp_reset_registry(tmp_regdir)
-#' 
 #' # perform cwb_makeall (equivalent to cwb-makeall command line utility)
 #' cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 #' 
@@ -69,28 +66,10 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
   }
   
   # The registry directory provided is ignored if the corpus has already been loaded, resulting 
-  # in unexpected behavior. Therefore, we unload the corpus if we detect that the home directory
-  # defined in the registry file and the home directory potentially present in the C presentation
-  # of the corpus differ.
+  # in unexpected behavior. Therefore, we unload the corpus and force reloading corpora.
   if (toupper(corpus) %in% cqp_list_corpora()){
-    
-    reg <- readLines(regfile)
-    home_registry <- gsub('^HOME\\s+("|)(.*?)("|)\\s*$', "\\2", reg[grep("^HOME\\s", reg)])
-    home_registry <- normalizePath(home_registry, winslash = "/")
-    
-    home_c <- corpus_data_dir(corpus = corpus, registry = registry)
-    home_c <- normalizePath(home_c, winslash = "/")
-    if (home_registry != home_c){
-      message(
-        sprintf(paste("Corpus '%s' has already been loaded.",
-        "Home directory of the loaded corpus is '%s' but registry file defines home directory '%s':",
-        "Unloading corpus to refresh home directory.", sep = " "
-        ),
-        corpus, home_registry, home_c
-        )
-      )
-      cl_delete_corpus(corpus, registry = registry)
-    }
+    cl_delete_corpus(corpus, registry = registry)
+    cqp_reset_registry(registry = registry)
   }
   
   .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
@@ -127,6 +106,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @examples
+#' if (.Platform$OS.type != "windows"){
 #' data_dir <- file.path(tempdir(), "tmp_data_dir")
 #' dir.create(data_dir)
 #' 
@@ -151,6 +131,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' 
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
+#' }
 cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
   
   s_attributes_noanno <- unlist(lapply(
