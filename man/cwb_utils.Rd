@@ -102,7 +102,6 @@ if (.Platform$OS.type != "windows"){
 if (.Platform$OS.type != "windows"){
   cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 }
-if (.Platform$OS.type != "windows"){
 data_dir <- file.path(tempdir(), "tmp_data_dir")
 dir.create(data_dir)
 
@@ -127,5 +126,4 @@ cwb_encode(
 
 unlink(data_dir)
 unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
-}
 }
