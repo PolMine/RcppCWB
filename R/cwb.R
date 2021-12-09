@@ -76,7 +76,7 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
     home_registry <- normalizePath(home_registry, winslash = "/")
     
     home_c <- corpus_data_dir(corpus = corpus, registry = registry)
-    home_c <- normalizePath(home_c, winslash = "//")
+    home_c <- normalizePath(home_c, winslash = "/")
     if (home_registry != home_c){
       message(
         sprintf(paste("Corpus '%s' has already been loaded.",
