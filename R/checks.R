@@ -28,6 +28,7 @@ check_registry <- function(registry){
   return( TRUE )
 }
 
+
 #' @rdname checks
 #' @export check_corpus
 check_corpus <- function(corpus, registry){

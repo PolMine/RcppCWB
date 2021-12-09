@@ -298,8 +298,6 @@ Rcpp::StringVector _cl_charset_name(SEXP corpus, SEXP registry){
 }
 
 
-
-
 // [[Rcpp::export(name=".init_cqp")]]
 void init_cqp() {
 	int		ac = 1;

@@ -38,7 +38,6 @@
 #'   file.copy(from = x, to = tmp_unga_dir)
 #' }
 #' 
-#' cl_delete_corpus("UNGA")
 #' # perform cwb_makeall (equivalent to cwb-makeall command line utility)
 #' cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 #' 
@@ -60,6 +59,37 @@
 #' @rdname cwb_utils
 #' @export cwb_makeall
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_registry(registry)
+  regfile <- file.path(normalizePath(registry, winslash = "/"), tolower(corpus), fsep = "/")
+  if (!file.exists(regfile)){
+    stop(sprintf("No registry file for corpus '%s' in registry directory '%s'.", corpus, registry))
+  }
+  
+  # The registry directory provided is ignored if the corpus has already been loaded, resulting 
+  # in unexpected behavior. Therefore, we unload the corpus if we detect that the home directory
+  # defined in the registry file and the home directory potentially present in the C presentation
+  # of the corpus differ.
+  if (toupper(corpus) %in% cqp_list_corpora()){
+    
+    reg <- readLines(regfile)
+    home_registry <- gsub('^HOME\\s+("|)(.*?)("|)\\s*$', "\\2", reg[grep("^HOME\\s", reg)])
+    home_registry <- normalizePath(home_registry, winslash = "/")
+    
+    home_c <- corpus_data_dir(corpus = corpus, registry = registry)
+    home_c <- normalizePath(home_c, winslash = "//")
+    if (home_registry != home_c){
+      message(
+        sprintf(paste("Corpus '%s' has already been loaded.",
+        "Home directory of the loaded corpus is '%s' but registry file defines home directory '%s':",
+        "Unloading corpus to refresh home directory.", sep = " "
+        ),
+        corpus, home_registry, home_c
+        )
+      )
+      cl_delete_corpus(corpus, registry = registry)
+    }
+  }
+  
   .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
 

@@ -74,8 +74,7 @@ if (!file.exists(tmp_unga_dir)){
   file.remove(list.files(tmp_unga_dir, full.names = TRUE))
 }
 regfile <- readLines(file.path(registry, "unga"))
-homedir_line <- grep("^HOME", regfile)
-regfile[homedir_line] <- sprintf('HOME "\%s"', tmp_unga_dir)
+regfile[grep("^HOME", regfile)] <- sprintf('HOME "\%s"', tmp_unga_dir)
 writeLines(text = regfile, con = file.path(tmp_regdir, "unga"))
 for (x in list.files(home_dir, full.names = TRUE)){
   file.copy(from = x, to = tmp_unga_dir)
