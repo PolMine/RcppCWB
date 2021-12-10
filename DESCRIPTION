@@ -25,7 +25,7 @@ Authors@R: c(
   )
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
 Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query 
-  engine to efficiently analyze large corpora (<http://cwb.sourceforge.net>). 'RcppCWB' is licensed
+  engine to efficiently analyze large corpora (<https://cwb.sourceforge.io>). 'RcppCWB' is licensed
   under the GNU GPL-3, in line with the GPL-3 license of the 'CWB' (<https://www.r-project.org/Licenses/GPL-3>).
   The 'CWB' relies on 'pcre' (BSD license, see <http://www.pcre.org/licence.txt>)
   and 'GLib' (LGPL license, see <https://www.gnu.org/licenses/lgpl-3.0.en.html>).

@@ -23,8 +23,7 @@ importantly – to make it portable to Windows systems.
 
 ### Installation on Windows
 
-Pre-compiled binaries of the package ‘RcppCWB’ can be obtained from
-CRAN.
+Pre-compiled ‘RcppCWB’ binaries can be installed from CRAN.
 
 ``` r
 install.packages("RcppCWB")
@@ -43,8 +42,9 @@ devtools::install_github("PolMine/RcppCWB")
 
 During the installation, cross-compiled versions of the corpus library
 (CL) are downloaded from the GitHub repository
-[PolMine/libcl](https://github.com/PolMine/libcl). It is not necessary
-to install dependencies.
+[PolMine/libcl](https://github.com/PolMine/libcl). The libcl repository
+also includes a reproducible workflow using Docker to build static
+libraries from the CWB source code.
 
 ## Installation on Ubuntu
 
@@ -74,12 +74,12 @@ if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtool
 devtools::install_github("PolMine/RcppCWB")
 ```
 
-## Installation on MacOS
+## Installation on macOS
 
 On macOS, the [pcre](http://www.pcre.org/) and
-[Glib](https://developer.gnome.org/glib/) libraries need to be present.
-We recommend to use ‘Homebrew’ as a package manager for macOS. To
-install Homebrew, follow the instructions on the [Homebrew
+[Glib](https://docs.gtk.org/glib) libraries need to be present. We
+recommend to use ‘Homebrew’ as a package manager for macOS. To install
+Homebrew, follow the instructions on the [Homebrew
 Website](https://brew.sh/index_de.html). It may also be necessary to
 also install [Xcode](https://developer.apple.com/xcode/) and
 [XQuartz](https://www.xquartz.org).
@@ -212,17 +212,17 @@ cpos
 
 ## License
 
-The packge is licensed under the [GNU General Public
-License 3](https://www.gnu.org/licenses/gpl-3.0.de.html). For the
-copyrights for the ‘Corpus Workbench’ (CWB) and acknowledgement of
-authorship, see the file COPYRIGHTS.
+The packge is licensed under the [GNU General Public License
+3](https://www.gnu.org/licenses/gpl-3.0.de.html). For the copyrights for
+the ‘Corpus Workbench’ (CWB) and acknowledgement of authorship, see the
+file COPYRIGHTS.
 
 ## Acknowledgements
 
 There is a huge intellectual debt to the developers of the R-package
-‘rcqp’, Bernard Desgraupes and Sylvain Loiseau. Developing RcppCWB
-would have been unthinkable without their original work to wrap the CWB
-into an R package.
+‘rcqp’, Bernard Desgraupes and Sylvain Loiseau. Developing RcppCWB would
+have been unthinkable without their original work to wrap the CWB into
+an R package.
 
 The CWB is a classic and mature tool: The work of the CWB developers,
 Oliver Christ, Bruno Maximilian Schulze, Arne Fitschen and Stefan Evert

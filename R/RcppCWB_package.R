@@ -21,8 +21,8 @@
 #'   persisting advantage of the CWB is its mature, open source code base that
 #'   is actively maintained by a community of developers. It is used as a robust
 #'   and efficient backend for widely used tools such as TXM
-#'   (\url{http://textometrie.ens-lyon.fr}) or CQPweb
-#'   (\url{http://cwb.sourceforge.io/cqpweb.php}). Its uncompromising C
+#'   (\url{https://txm.gitpages.huma-num.fr/textometrie/}) or CQPweb
+#'   (\url{https://cwb.sourceforge.io/cqpweb.php}). Its uncompromising C
 #'   implementation guarantees speed and makes it well suited to be integrated
 #'   with R at the same time.
 #'
@@ -86,20 +86,20 @@
 #' @references 
 #' Christ, O. 1994. "A modular and flexible architecture for an integrated
 #' corpus query system", in: Proceedings of COMPLEX '94, pp. 23-32. Budapest.
-#' Available online at \url{http://cwb.sourceforge.io/files/Christ1994.pdf}
+#' Available online at \url{https://cwb.sourceforge.io/files/Christ1994.pdf}
 #' 
 #' Desgraupes, B.; Loiseau, S. 2012. Introduction to the rcqp package.
 #' Vignette of the rcqp package. Available at the CRAN archive at
 #' \url{https://cran.r-project.org/src/contrib/Archive/rcqp/}
 #' 
 #' Evert, S. 2005. The CQP Query Language Tutorial. Available online at
-#' \url{http://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
+#' \url{https://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
 #' 
 #' Evert, S. 2005. The IMS Open Corpus Workbench (CWB). Corpus Encoding
 #' Tutorial. Available online at
-#' \url{http://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
+#' \url{https://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
 #' 
-#' Open Corpus Workbench (\url{http://cwb.sourceforge.io})
+#' Open Corpus Workbench (\url{https://cwb.sourceforge.io})
 #' 
 #' Witten, I.H.; Moffat, A.; Bell, T.C. (1999). Managing Gigabytes. Morgan
 #' Kaufmann Publishing, San Francisco, 2nd edition.
