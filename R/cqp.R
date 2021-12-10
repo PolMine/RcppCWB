@@ -118,7 +118,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' @rdname cqp_query
 #' @references 
 #' Evert, S. 2005. The CQP Query Language Tutorial. Available online at
-#' \url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
+#' \url{http://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
 #' @examples 
 #' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' 

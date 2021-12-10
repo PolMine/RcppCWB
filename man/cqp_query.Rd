@@ -51,7 +51,7 @@ cqp_dump_subcorpus("REUTERS")
 }
 \references{
 Evert, S. 2005. The CQP Query Language Tutorial. Available online at
-\url{http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf}
+\url{http://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
 }
 \author{
 Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
