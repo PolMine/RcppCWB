@@ -4,7 +4,7 @@
 * To avoid a compiler warning (unused variable) issued by Rcpp solved by Rcpp v1.0.7, this version of Rcpp is now required (#22).
 * In `use_tmp_dir()`, `normalizePath()` is applied on the `tempdir()` result to avoid confusion with symbolic links on macOS.
 * New unit test for `cwb_encode()` (not yet run on Windows).
-* A C-level inconsistency in `cqp_get_registry()` that would sometimes result in a wrong return value (i.e. registry path) has been fixed.
+* A C-level inconsistency in `cqp_get_registry()` that would sometimes result in a wrong return value (i.e. registry path) has been fixed (#14).
 * To avoid an unintended behavior of `cwb_makeall()`, an internal check is performed whether the corpus has been loaded already and whether the home directory of the loaded corpus and defined in the registry file are identical (#31).
 
 
