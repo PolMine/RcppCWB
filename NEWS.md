@@ -6,6 +6,9 @@
 * New unit test for `cwb_encode()` (not yet run on Windows).
 * A C-level inconsistency in `cqp_get_registry()` that would sometimes result in a wrong return value (i.e. registry path) has been fixed (#14).
 * To avoid an unintended behavior of `cwb_makeall()`, an internal check is performed whether the corpus has been loaded already and whether the home directory of the loaded corpus and defined in the registry file are identical (#31).
+* The link to the TXM project has been removed from the documentation to avoid the error 'SSL certificate problem: unable to get local issuer certificate' (#32).
+* The `cl_delete_corpus()` function crashed when trying to delete a corpus that has not been loaded (#33). The function now aborts gracefully returning 0 when trying to delete a corpus that has not been loaded.
+* A new function `corpus_is_loaded()` can be used to check whether a corpus is loaded.
 
 
 # RcppCWB 0.4.3

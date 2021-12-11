@@ -258,6 +258,7 @@ int _cl_delete_corpus(SEXP corpus, SEXP registry){
   
   Corpus * c;
   static char *canonical_name = NULL;
+  int retval;
   
   char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
   char* registry_name  = strdup(Rcpp::as<std::string>(corpus).c_str());
@@ -270,17 +271,46 @@ int _cl_delete_corpus(SEXP corpus, SEXP registry){
     Rprintf("cl_new_corpus: <%s> is not a valid corpus name\n", registry_name);
   }
   
-  Rprintf("Corpus to delete (ID): %s\n", registry_name);
   c = find_corpus(registry_dir, canonical_name); 
-  Rprintf("Corpus name: %s\n", c->name);
-  Rprintf("Number of loads before reset: %d\n", c->nr_of_loads);
-  c->nr_of_loads = 1;
-  Rprintf("Number of loads resetted: %d\n", c->nr_of_loads);
-  cl_delete_corpus(c);
+  if (c){
+    c->nr_of_loads = 1;
+    cl_delete_corpus(c);
+    retval = 1;
+  } else {
+    retval = 0;
+  }
   
-  return( 0 );
+  return( retval );
 }
 
+
+// [[Rcpp::export(name=".corpus_is_loaded")]]
+int _corpus_is_loaded(SEXP corpus, SEXP registry){
+  
+  Corpus * c;
+  static char *canonical_name = NULL;
+  int retval;
+  
+  char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  char* registry_name  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  
+  /* code copied from cl_new_corpus in corpus.c */
+  cl_free(canonical_name);
+  canonical_name = cl_strdup(registry_name);
+  cl_id_tolower(canonical_name);
+  if (!cl_id_validate(canonical_name)) {
+    Rprintf("cl_new_corpus: <%s> is not a valid corpus name\n", registry_name);
+  }
+  
+  c = find_corpus(registry_dir, canonical_name); 
+  if (c){
+    retval = 1;
+  } else {
+    retval = 0;
+  }
+  
+  return( retval );
+}
 
 
 // [[Rcpp::export(name=".cl_charset_name")]]
@@ -572,8 +602,13 @@ Rcpp::StringVector _corpus_data_dir(SEXP corpus, SEXP registry){
   char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
   
   c = cl_new_corpus(registry_dir, corpus_id);
-
-  result(0) = c->path;
+  
+  if (c){
+    result(0) = c->path;
+  } else {
+    result(0) = NA_STRING;
+  }
+  
   return( result );
 
 }

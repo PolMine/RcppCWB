@@ -61,6 +61,10 @@
     .Call(`_RcppCWB__cl_delete_corpus`, corpus, registry)
 }
 
+.corpus_is_loaded <- function(corpus, registry) {
+    .Call(`_RcppCWB__corpus_is_loaded`, corpus, registry)
+}
+
 .cl_charset_name <- function(corpus, registry) {
     .Call(`_RcppCWB__cl_charset_name`, corpus, registry)
 }

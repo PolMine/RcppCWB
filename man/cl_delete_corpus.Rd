@@ -12,6 +12,11 @@ cl_delete_corpus(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
 }
+\value{
+An \code{integer} value 1 is returned invisibly if a previously loaded
+corpus has been deleted, or 0 if the corpus has not been loaded and has not
+been deleted.
+}
 \description{
 Remove a corpus from the list of loaded corpora of the corpus library (CL).
 }
@@ -23,4 +28,10 @@ added to the corpus, it will not yet be visible, because it is not part of
 the data that has been loaded. The \code{cl_delete_corpus} function exposes a
 CL function named identically, to force reloading the corpus (after it has
 been deleted), which will include parsing an updated registry file.
+}
+\examples{
+cl_attribute_size("UNGA", attribute = "word", attribute_type = "p")
+corpus_is_loaded("UNGA")
+cl_delete_corpus("UNGA")
+corpus_is_loaded("UNGA")
 }

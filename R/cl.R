@@ -278,9 +278,17 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
 #' @param corpus name of a CWB corpus (upper case) 
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
+#' @return An `integer` value 1 is returned invisibly if a previously loaded
+#'   corpus has been deleted, or 0 if the corpus has not been loaded and has not
+#'   been deleted.
 #' @export cl_delete_corpus
+#' @examples
+#' cl_attribute_size("UNGA", attribute = "word", attribute_type = "p")
+#' corpus_is_loaded("UNGA")
+#' cl_delete_corpus("UNGA")
+#' corpus_is_loaded("UNGA")
 cl_delete_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cl_delete_corpus(corpus = corpus, registry = registry)
+  invisible(.cl_delete_corpus(corpus = corpus, registry = registry))
 }
 
 #' Get charset of a corpus.
@@ -339,4 +347,13 @@ corpus_data_dir <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_corpus(corpus = corpus, registry = registry)
   registry <- normalizePath(path.expand(registry))
   .corpus_data_dir(corpus = corpus, registry = registry)
+}
+
+#' Check whether corpus is loaded
+#' 
+#' @inheritParams corpus_data_dir
+#' @return `TRUE` if corpus is loaded and `FALSE` if not.
+#' @export corpus_is_loaded
+corpus_is_loaded <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  as.logical(.corpus_is_loaded(corpus = corpus, registry = registry))
 }

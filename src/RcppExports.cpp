@@ -217,6 +217,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _corpus_is_loaded
+int _corpus_is_loaded(SEXP corpus, SEXP registry);
+RcppExport SEXP _RcppCWB__corpus_is_loaded(SEXP corpusSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(_corpus_is_loaded(corpus, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
 // _cl_charset_name
 Rcpp::StringVector _cl_charset_name(SEXP corpus, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_charset_name(SEXP corpusSEXP, SEXP registrySEXP) {
@@ -538,6 +550,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__cl_cpos2lbound", (DL_FUNC) &_RcppCWB__cl_cpos2lbound, 4},
     {"_RcppCWB__cl_cpos2rbound", (DL_FUNC) &_RcppCWB__cl_cpos2rbound, 4},
     {"_RcppCWB__cl_delete_corpus", (DL_FUNC) &_RcppCWB__cl_delete_corpus, 2},
+    {"_RcppCWB__corpus_is_loaded", (DL_FUNC) &_RcppCWB__corpus_is_loaded, 2},
     {"_RcppCWB__cl_charset_name", (DL_FUNC) &_RcppCWB__cl_charset_name, 2},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
     {"_RcppCWB_cqp_get_registry", (DL_FUNC) &_RcppCWB_cqp_get_registry, 0},
