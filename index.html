@@ -13,7 +13,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Rcpp Bindings for the Corpus Workbench (CWB)">
 <meta property="og:description" content="Rcpp Bindings for the C code of the Corpus Workbench (CWB), an indexing and query 
-  engine to efficiently analyze large corpora (&lt;http://cwb.sourceforge.net&gt;). RcppCWB is licensed
+  engine to efficiently analyze large corpora (&lt;https://cwb.sourceforge.io&gt;). RcppCWB is licensed
   under the GNU GPL-3, in line with the GPL-3 license of the CWB (&lt;https://www.r-project.org/Licenses/GPL-3&gt;).
   The CWB relies on pcre (BSD license, see &lt;http://www.pcre.org/licence.txt&gt;)
   and GLib (LGPL license, see &lt;https://www.gnu.org/licenses/lgpl-3.0.en.html&gt;).
@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,18 +42,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.4</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -61,7 +57,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/PolMine/RcppCWB/">
+  <a href="https://github.com/PolMine/RcppCWB/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -80,42 +76,41 @@
   <div class="contents col-md-9">
 
 
-<div id="rcpp-bindings-for-the-corpus-workbench-cwb" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#rcpp-bindings-for-the-corpus-workbench-cwb" class="anchor"></a>Rcpp bindings for the Corpus Workbench (CWB)</h1></div>
-<p>The package exposes functions of the Corpus Worbench (CWB) by way of Rcpp wrappers. Furthermore, the packages includes Rcpp code for performance critical operations. The main purpose of the package is to serve as an interface to the CWB for the package <a href="https://CRAN.R-project.org/package=RcppCWB">polmineR</a>.</p>
+<div class="section level1">
+<div class="page-header"><h1 id="rcpp-bindings-for-the-corpus-workbench-cwb">Rcpp bindings for the Corpus Workbench (CWB)<a class="anchor" aria-label="anchor" href="#rcpp-bindings-for-the-corpus-workbench-cwb"></a>
+</h1></div>
+<p>The package exposes functions of the Corpus Worbench (CWB) by way of Rcpp wrappers. Furthermore, the packages includes Rcpp code for performance critical operations. The main purpose of the package is to serve as an interface to the CWB for the package <a href="https://CRAN.R-project.org/package=RcppCWB" class="external-link">polmineR</a>.</p>
 <p>There is a huge intellectual debt to the developers of the R-package ‘rcqp’, Bernard Desgraupes and Sylvain Loiseau. The main impetus for developing RcppCWB is that using Rcpp decreases the pains to maintain the package, to expand the CWB functionality exposed, and – most importantly – to make it portable to Windows systems.</p>
-<div id="installation-on-windows" class="section level3">
-<h3 class="hasAnchor">
-<a href="#installation-on-windows" class="anchor"></a>Installation on Windows</h3>
-<p>Pre-compiled binaries of the package ‘RcppCWB’ can be obtained from CRAN.</p>
+<div class="section level3">
+<h3 id="installation-on-windows">Installation on Windows<a class="anchor" aria-label="anchor" href="#installation-on-windows"></a>
+</h3>
+<p>Pre-compiled ‘RcppCWB’ binaries can be installed from CRAN.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"RcppCWB"</span><span class="op">)</span></code></pre></div>
-<p>If you want to get the development version, you need to compile RcppCWB yourself. Having <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a> installed on your system is necessary. Using the mechanism offered by the devtools package, you can install RcppCWB from GitHub.</p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RcppCWB"</span><span class="op">)</span></code></pre></div>
+<p>If you want to get the development version, you need to compile RcppCWB yourself. Having <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a> installed on your system is necessary. Using the mechanism offered by the devtools package, you can install RcppCWB from GitHub.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"devtools"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"devtools"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"PolMine/RcppCWB"</span><span class="op">)</span></code></pre></div>
-<p>During the installation, cross-compiled versions of the corpus library</p>
-<p>(CL) are downloaded from the GitHub repository <a href="https://github.com/PolMine/libcl">PolMine/libcl</a>. It is not necessary to install dependencies.</p>
+<p>During the installation, cross-compiled versions of the corpus library (CL) are downloaded from the GitHub repository <a href="https://github.com/PolMine/libcl" class="external-link">PolMine/libcl</a>. The libcl repository also includes a reproducible workflow using Docker to build static libraries from the CWB source code.</p>
 </div>
-<div id="installation-on-ubuntu" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation-on-ubuntu" class="anchor"></a>Installation on Ubuntu</h2>
+<div class="section level2">
+<h2 id="installation-on-ubuntu">Installation on Ubuntu<a class="anchor" aria-label="anchor" href="#installation-on-ubuntu"></a>
+</h2>
 <p>The package includes the source code of the Corpus Workbench (CWB), slightly modified to make it compatible with R requirements. Compiling the CWB requires the pcre and glib libraries to be present. Using the Aptitude package manager (Ubuntu/Debian), running the following command from the shell will fulfill these dependencies.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">sudo</span> apt-get install libpcre3-dev libglib2.0-dev</span></code></pre></div>
 <p>Then, use the conventional R installation mechanism to install R dependencies, and the release of RcppCWB at CRAN.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span>pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Rcpp"</span>, <span class="st">"knitr"</span>, <span class="st">"testthat"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"RcppCWB"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span>pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rcpp"</span>, <span class="st">"knitr"</span>, <span class="st">"testthat"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RcppCWB"</span><span class="op">)</span></code></pre></div>
 <p>To install the development version, using the mechanism offered by the devtools package is recommended.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"devtools"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"devtools"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"PolMine/RcppCWB"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="installation-on-macos" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation-on-macos" class="anchor"></a>Installation on MacOS</h2>
-<p>On macOS, the <a href="http://www.pcre.org/">pcre</a> and <a href="https://developer.gnome.org/glib/">Glib</a> libraries need to be present. We recommend to use ‘Homebrew’ as a package manager for macOS. To install Homebrew, follow the instructions on the <a href="https://brew.sh/index_de.html">Homebrew Website</a>. It may also be necessary to also install <a href="https://developer.apple.com/xcode/">Xcode</a> and <a href="https://www.xquartz.org">XQuartz</a>.</p>
+<div class="section level2">
+<h2 id="installation-on-macos">Installation on macOS<a class="anchor" aria-label="anchor" href="#installation-on-macos"></a>
+</h2>
+<p>On macOS, the <a href="http://www.pcre.org/" class="external-link">pcre</a> and <a href="https://docs.gtk.org/glib" class="external-link">Glib</a> libraries need to be present. We recommend to use ‘Homebrew’ as a package manager for macOS. To install Homebrew, follow the instructions on the <a href="https://brew.sh/index_de.html" class="external-link">Homebrew Website</a>. It may also be necessary to also install <a href="https://developer.apple.com/xcode/" class="external-link">Xcode</a> and <a href="https://www.xquartz.org" class="external-link">XQuartz</a>.</p>
 <p>The following commands then need to be executed from a terminal window. They will install the C libraries the CWB relies on:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">brew</span> -v install pkg-config</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="ex">brew</span> -v install glib --universal</span>
@@ -123,22 +118,22 @@
 <span id="cb6-4"><a href="#cb6-4"></a><span class="ex">brew</span> -v install readline</span></code></pre></div>
 <p>Then open R and use the conventional R installation mechanism to install dependencies, and the release of RcppCWB at CRAN.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span>pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Rcpp"</span>, <span class="st">"knitr"</span>, <span class="st">"testthat"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"RcppCWB"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span>pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rcpp"</span>, <span class="st">"knitr"</span>, <span class="st">"testthat"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"RcppCWB"</span><span class="op">)</span></code></pre></div>
 <p>To install the development version, using the mechanism offered by the devtools package is recommended.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"devtools"</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"devtools"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"PolMine/RcppCWB"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h2>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
 <p>The package offers low-level access to CWB-indexed corpora. Using RcppCWB may not intuitive at the outset: It is designed to serve as a an efficient backend for packages offering higher-level functionality, such as polmineR. the</p>
 <p>RcppCWB includes a small sample corpus called (‘REUTERS’). After loading the package, we need to determine whether we can use the registry describing the corpus within the package, or whether we need to work with a temporary registry.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/PolMine/RcppCWB">RcppCWB</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/PolMine/RcppCWB" class="external-link">RcppCWB</a></span><span class="op">)</span>
 <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="reference/check_pkg_registry_files.html">check_pkg_registry_files</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-  <span class="va">registry</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/use_tmp_registry.html">use_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="va">registry</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tmp_registry.html">use_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>
 <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
   <span class="va">registry</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_pkg_registry.html">get_pkg_registry</a></span><span class="op">(</span><span class="op">)</span>
 <span class="op">}</span> </code></pre></div>
@@ -152,23 +147,23 @@
 <div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">## [1] 4050</span></span></code></pre></div>
 <p>To decode the token stream of the corpus.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">token_stream_str</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CL:%20p_attributes.html">cl_cpos2str</a></span><span class="op">(</span>
+<code class="sourceCode R"><span class="va">token_stream_str</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/p_attributes.html">cl_cpos2str</a></span><span class="op">(</span>
   corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,
-  cpos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq.int</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">cpos_total</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,
+  cpos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">cpos_total</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,
   registry <span class="op">=</span> <span class="va">registry</span>
   <span class="op">)</span></code></pre></div>
 <p>To get the corpus positions of a token.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">token_to_get</span> <span class="op">&lt;-</span> <span class="st">"oil"</span>
-<span class="va">id_oil</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CL:%20p_attributes.html">cl_str2id</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, str <span class="op">=</span> <span class="va">token_to_get</span><span class="op">)</span>
-<span class="va">cpos_oil</span> <span class="op">&lt;-</span> <span class="va">cl_id2cpos</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CL:%20p_attributes.html">cl_id2cpos</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">id_oil</span><span class="op">)</span></code></pre></div>
+<span class="va">id_oil</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/p_attributes.html">cl_str2id</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, str <span class="op">=</span> <span class="va">token_to_get</span><span class="op">)</span>
+<span class="va">cpos_oil</span> <span class="op">&lt;-</span> <span class="va">cl_id2cpos</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/p_attributes.html">cl_id2cpos</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">id_oil</span><span class="op">)</span></code></pre></div>
 <p>Get the frequency of token.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">oil_freq</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CL:%20p_attributes.html">cl_id2freq</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">id_oil</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">oil_freq</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/p_attributes.html">cl_id2freq</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">id_oil</span><span class="op">)</span></code></pre></div>
 <p>Using regular expressions.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CL:%20p_attributes.html">cl_regex2id</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, regex <span class="op">=</span> <span class="st">"M.*"</span><span class="op">)</span>
-<span class="va">m_words</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CL:%20p_attributes.html">cl_id2str</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">ids</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/p_attributes.html">cl_regex2id</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, regex <span class="op">=</span> <span class="st">"M.*"</span><span class="op">)</span>
+<span class="va">m_words</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/p_attributes.html">cl_id2str</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">ids</span><span class="op">)</span></code></pre></div>
 <p>To use the CQP syntax, we need to initialize CQP first.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/cqp_initialize.html">cqp_initialize</a></span><span class="op">(</span>registry <span class="op">=</span> <span class="va">registry</span><span class="op">)</span></code></pre></div>
@@ -196,14 +191,14 @@
 <span id="cb21-12"><a href="#cb21-12"></a><span class="co">## [11,] 3709 3710</span></span>
 <span id="cb21-13"><a href="#cb21-13"></a><span class="co">## [12,] 3998 3999</span></span></code></pre></div>
 </div>
-<div id="license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h2>
-<p>The packge is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.de.html">GNU General Public License 3</a>. For the copyrights for the ‘Corpus Workbench’ (CWB) and acknowledgement of authorship, see the file COPYRIGHTS.</p>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>The packge is licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.de.html" class="external-link">GNU General Public License 3</a>. For the copyrights for the ‘Corpus Workbench’ (CWB) and acknowledgement of authorship, see the file COPYRIGHTS.</p>
 </div>
-<div id="acknowledgements" class="section level2">
-<h2 class="hasAnchor">
-<a href="#acknowledgements" class="anchor"></a>Acknowledgements</h2>
+<div class="section level2">
+<h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
+</h2>
 <p>There is a huge intellectual debt to the developers of the R-package ‘rcqp’, Bernard Desgraupes and Sylvain Loiseau. Developing RcppCWB would have been unthinkable without their original work to wrap the CWB into an R package.</p>
 <p>The CWB is a classic and mature tool: The work of the CWB developers, Oliver Christ, Bruno Maximilian Schulze, Arne Fitschen and Stefan Evert is gratefully acknowledged.</p>
 </div>
@@ -213,52 +208,62 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=RcppCWB">https://​cloud.r-project.org/​package=RcppCWB</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/PolMine/RcppCWB/">https://​github.com/​PolMine/​RcppCWB/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/PolMine/RcppCWB/issues">https://​github.com/​PolMine/​RcppCWB/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=RcppCWB" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/PolMine/RcppCWB/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/PolMine/RcppCWB/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing RcppCWB</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Andreas Blaette <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Bernard Desgraupes <br><small class="roles"> Author </small>  </li>
 <li>Sylvain Loiseau <br><small class="roles"> Author </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://doi.org/10.5281/zenodo.4501838"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4501838.svg" alt="DOI"></a></li>
-<li><a href="https://www.gnu.org/licenses/gpl-3.0"><img src="http://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a></li>
-<li><a href="https://cran.r-project.org/package=RcppCWB"><img src="http://www.r-pkg.org/badges/version/RcppCWB" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://github.com/PolMine/RcppCWB/actions"><img src="https://github.com/PolMine/RcppCWB/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://codecov.io/gh/PolMine/RcppCWB/branch/master"><img src="https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg" alt="codecov"></a></li>
+<li><a href="https://doi.org/10.5281/zenodo.4501838" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4501838.svg" alt="DOI"></a></li>
+<li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="http://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a></li>
+<li><a href="https://cran.r-project.org/package=RcppCWB" class="external-link"><img src="http://www.r-pkg.org/badges/version/RcppCWB" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://github.com/PolMine/RcppCWB/actions" class="external-link"><img src="https://github.com/PolMine/RcppCWB/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://codecov.io/gh/PolMine/RcppCWB/branch/master" class="external-link"><img src="https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg" alt="codecov"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau.</p>
+  <p></p>
+<p>Developed by Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -266,6 +271,8 @@
 
   
 
+
+  
 
   </body>
 </html>
