@@ -44,7 +44,6 @@ PARSES  = registry.tab.c lex.creg.c
 PARSEG  = registry.l registry.y
 PARSEO  = registry.tab.o lex.creg.o
 
-
 ## cl.h header file will be installed in subdirectory cwb/
 REALINCINSTDIR = $(INCINSTDIR)/cwb
 

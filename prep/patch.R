@@ -58,7 +58,8 @@ delete_line_before <- list(
   "src/cwb/cl/lex.creg.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L),
   "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L),
   "src/cwb/cl/endian2.h" = list("/* for consistency:", 1L, 1L),
-  "src/cwb/cl/Makefile" = list("^libcl.a: \\$\\(OBJS\\)", 1L, 6L)
+  "src/cwb/cl/Makefile" = list("^libcl.a: \\$\\(OBJS\\)", 1L, 6L),
+  "src/cwb/cl/Makefile" = list("##\\scl\\.h\\sheader\\s", 1L, 11L)
   
 )
 

@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [3cb7b47] 2022-01-04: CWB patched</code></pre>
+<pre><code>## [9d7a5f0] 2022-01-04: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -207,25 +207,142 @@ commit(repo, message = &quot;CWB patched&quot;)</code></pre>
 <div id="cl-directory" class="section level4">
 <h4>cl directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/cl&quot;)
-git_cmd &lt;- sprintf(
-  &quot;git diff %s..%s . %s&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]],
-  &quot;&#39;:!*Makefile&#39;&quot; 
-)
+git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
+<pre><code>## diff --git a/src/cwb/cl/Makefile b/src/cwb/cl/Makefile
+## index afb34de..02f4645 100644
+## --- a/src/cwb/cl/Makefile
+## +++ b/src/cwb/cl/Makefile
+## @@ -21,7 +21,7 @@
+##  
+##  
+##  ## Read configuration settings and standard definitions
+## -TOP = $(shell pwd)/..
+## +TOP = $(R_PACKAGE_SOURCE)
+##  include $(TOP)/config.mk
+##  
+##  ## The following targets are available:
+## @@ -44,16 +44,6 @@ PARSES  = registry.tab.c lex.creg.c
+##  PARSEG  = registry.l registry.y
+##  PARSEO  = registry.tab.o lex.creg.o
+##  
+## -## Compile and link-in windows-mmap functions only if we are in MinGW
+## -ifdef __MINGW__
+## -MMAPH = windows-mmap.h
+## -MMAPS = windows-mmap.c
+## -MMAPO = windows-mmap.o
+## -else
+## -MMAPH =
+## -MMAPS =
+## -MMAPO =
+## -endif 
+##  
+##  ## cl.h header file will be installed in subdirectory cwb/
+##  REALINCINSTDIR = $(INCINSTDIR)/cwb
+## @@ -69,7 +59,7 @@ HDRS = globals.h macros.h \
+##         $(PARSEH) \
+##         cdaccess.h \
+##         bitio.h \
+## -       endian.h \
+## +       endian2.h \
+##         compression.h \
+##         binsert.h \
+##         class-mapping.h \
+## @@ -114,30 +104,7 @@ all: libcl.a $(EXTRA_OBJS)
+##  
+##  libcl.a: $(OBJS)
+##      $(RM) $@
+## -    $(AR) $@ $^
+## -    $(RANLIB) $@
+## -
+## -install: libcl.a
+## -ifndef __MINGW__
+## -    if [ ! -d &quot;$(LIBINSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(LIBINSTDIR)&quot; ; fi;
+## -    $(INSTALL) $(INST_FLAGS_DATA) libcl.a &quot;$(LIBINSTDIR)&quot;
+## -    if [ ! -d &quot;$(REALINCINSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(REALINCINSTDIR)&quot; ; fi;
+## -    $(INSTALL) $(INST_FLAGS_DATA) cl.h &quot;$(REALINCINSTDIR)&quot;
+## -else
+## -    @$(ECHO) &quot;ERROR: install operation is not supported for Windows binaries!&quot;
+## -endif
+## -
+## -release: libcl.a
+## -    if [ ! -d &quot;$(RELEASE_DIR)/lib&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/lib&quot;; fi;
+## -    $(INSTALL) $(INST_FLAGS_DATA) libcl.a &quot;$(RELEASE_DIR)/lib&quot;
+## -    if [ ! -d &quot;$(RELEASE_DIR)/include/cwb&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/include/cwb&quot;; fi;
+## -    $(INSTALL) $(INST_FLAGS_DATA) cl.h &quot;$(RELEASE_DIR)/include/cwb&quot;
+## -
+## -
+## -uninstall:
+## -    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
+## -#   $(RM) $(LIBINSTDIR)/libcl.a
+## -#   (cd $(REALINCINSTDIR); $(RM) cl.h)
+## +    $(AR) cq $@ $^
+##  
+##  depend:
+##      -$(RM) depend.mk</code></pre>
 <p>Finding: Modifications of the Makefile, nothing else</p>
 </div>
 <div id="cqp-directory" class="section level4">
 <h4>cqp directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/cqp&quot;)
-git_cmd &lt;- sprintf(
-  &quot;git diff %s..%s . %s&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]],
-  &quot;&#39;:!*Makefile&#39;&quot;
-)
+git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
-<pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
+<pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
+## index b17b9eb..cf7b289 100644
+## --- a/src/cwb/cqp/Makefile
+## +++ b/src/cwb/cqp/Makefile
+## @@ -21,7 +21,7 @@
+##  
+##  
+##  ## Read configuration settings and standard definitions
+## -TOP = $(shell pwd)/..
+## +TOP = $(R_PACKAGE_SOURCE)
+##  include $(TOP)/config.mk
+##  
+##  ## The following targets are available:
+## @@ -94,15 +94,11 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
+##  
+##  ## ----------------------------------------------------------------------
+##  
+## -all: $(PROGRAMS)
+## +all: libcqp.a
+##  
+## -parser.tab.c parser.tab.h: parser.y
+## -    $(RM) parser.tab.* parser.output
+## -    $(YACC) $&lt;
+## -
+## -lex.yy.c: parser.l parser.y
+## -    $(RM) lex.yy.*
+## -    $(LEX) $&lt;
+## +libcqp.a: $(OBJS) $(CQI_OBJS)
+## +    $(RM) $@
+## +    $(AR) cq $@ $^
+##  
+##  cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
+##      $(RM) $@
+## @@ -137,18 +133,10 @@ release: $(PROGRAMS)
+##      if [ ! -d &quot;$(RELEASE_DIR)/include/cwb&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/include/cwb&quot;; fi;
+##      $(INSTALL) $(INST_FLAGS_DATA) ../CQi/cqi.h &quot;$(RELEASE_DIR)/include/cwb&quot;
+##  
+## -uninstall:
+## -    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
+## -#   for i in $(PROGRAMS) ;\
+## -#   do \
+## -#   $(RM) $(BININSTDIR)/$$i ; \
+## -#   done
+## -
+##  clean:
+##      -$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
+##  
+##  realclean:  clean
+## -    -$(RM) lex.yy.c parser.tab.c parser.tab.h 
+##      -$(RM) depend.mk
+##  
+##  # create parser C source, if necessary
+## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29</code></pre>
 </div>
