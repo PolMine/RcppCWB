@@ -60,7 +60,6 @@ delete_line_before <- list(
   "src/cwb/cl/endian2.h" = list("/* for consistency:", 1L, 1L),
   "src/cwb/cl/Makefile" = list("^libcl.a: \\$\\(OBJS\\)", 1L, 6L),
   "src/cwb/cl/Makefile" = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
-  "src/cwb/cl/Makefile" = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
   "src/cwb/cl/Makefile" = list("^depend:$", 1L, 22L)
 )
 
