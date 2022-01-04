@@ -307,7 +307,8 @@ remove_lines <- list(
   "src/cwb/cl/lex.creg.c" = list("/\\*\\sneed\\sto\\sshift\\sthings\\sup\\sto\\smake\\sroom\\s\\*/", 1L),
   "src/cwb/cl/lex.creg.c" = list("/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/", 1L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L),
-  "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*FALLTHROUGH\\*/\\s*$", 1L)
+  "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*FALLTHROUGH\\*/\\s*$", 1L),
+  "src/cwb/cl/Makefile" = list("^\\s+\\$\\(RANLIB\\)\\$.", 1L)
   
 )
 

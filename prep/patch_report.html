@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [015fda2] 2022-01-04: CWB patched</code></pre>
+<pre><code>## [fa9b3f8] 2022-01-04: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -211,7 +211,7 @@ git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/Makefile b/src/cwb/cl/Makefile
-## index 309e745..3b33b22 100644
+## index 1679016..3b33b22 100644
 ## --- a/src/cwb/cl/Makefile
 ## +++ b/src/cwb/cl/Makefile
 ## @@ -33,6 +33,17 @@ include $(TOP)/config.mk
@@ -232,13 +232,11 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ##  ## cl.h header file will be installed in subdirectory cwb/
 ##  REALINCINSTDIR = $(INCINSTDIR)/cwb
 ##  
-## @@ -92,8 +103,7 @@ all: libcl.a $(EXTRA_OBJS)
-##  
+## @@ -93,7 +104,6 @@ all: libcl.a $(EXTRA_OBJS)
 ##  libcl.a: $(OBJS)
 ##      $(RM) $@
-## -    $(AR) cq$@ $^
+##      $(AR) cq $@ $^
 ## -    $(RANLIB) $@
-## +    $(AR) cq $@ $^
 ##  
 ##  depend:
 ##      -$(RM) depend.mk</code></pre>
