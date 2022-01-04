@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [298463a] 2022-01-04: CWB patched</code></pre>
+<pre><code>## [f5510fa] 2022-01-04: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -211,27 +211,9 @@ git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/Makefile b/src/cwb/cl/Makefile
-## index 22b4294..3b33b22 100644
+## index 28f0248..3b33b22 100644
 ## --- a/src/cwb/cl/Makefile
 ## +++ b/src/cwb/cl/Makefile
-## @@ -21,7 +21,7 @@
-##  
-##  
-##  ## Read configuration settings and standard definitions
-## -TOP = $(shell pwd)/..
-## +TOP = $(R_PACKAGE_SOURCE)
-##  include $(TOP)/config.mk
-##  
-##  ## The following targets are available:
-## @@ -58,7 +58,7 @@ HDRS = globals.h macros.h \
-##         $(PARSEH) \
-##         cdaccess.h \
-##         bitio.h \
-## -       endian.h \
-## +       endian2.h \
-##         compression.h \
-##         binsert.h \
-##         class-mapping.h \
 ## @@ -103,30 +103,7 @@ all: libcl.a $(EXTRA_OBJS)
 ##  
 ##  libcl.a: $(OBJS)
