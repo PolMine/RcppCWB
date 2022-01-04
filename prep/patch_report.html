@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [f5510fa] 2022-01-04: CWB patched</code></pre>
+<pre><code>## [19932c6] 2022-01-04: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -211,37 +211,33 @@ git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/Makefile b/src/cwb/cl/Makefile
-## index 28f0248..3b33b22 100644
+## index 647c73a..3b33b22 100644
 ## --- a/src/cwb/cl/Makefile
 ## +++ b/src/cwb/cl/Makefile
-## @@ -103,30 +103,7 @@ all: libcl.a $(EXTRA_OBJS)
+## @@ -33,6 +33,17 @@ include $(TOP)/config.mk
+##  #  install      install libcl.a and CL headers
+##  #  uninstall    uninstall libcl.a and headers from chosen locations (currently not supported)
+##  #  release      install to binary release dir
+## +#  size         print size of source code (line counts)
+## +#
+## +
+## +.PHONY: all clean realclean depend install uninstall size
+## +
+## +## Use bison/flex to compile parser for registry entries
+## +PARSEH  = registry.tab.h
+## +PARSES  = registry.tab.c lex.creg.c
+## +PARSEG  = registry.l registry.y
+## +PARSEO  = registry.tab.o lex.creg.o
+## +
+##  ## cl.h header file will be installed in subdirectory cwb/
+##  REALINCINSTDIR = $(INCINSTDIR)/cwb
+##  
+## @@ -92,8 +103,7 @@ all: libcl.a $(EXTRA_OBJS)
 ##  
 ##  libcl.a: $(OBJS)
 ##      $(RM) $@
 ## -    $(AR) $@ $^
 ## -    $(RANLIB) $@
-## -
-## -install: libcl.a
-## -ifndef __MINGW__
-## -    if [ ! -d &quot;$(LIBINSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(LIBINSTDIR)&quot; ; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) libcl.a &quot;$(LIBINSTDIR)&quot;
-## -    if [ ! -d &quot;$(REALINCINSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(REALINCINSTDIR)&quot; ; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) cl.h &quot;$(REALINCINSTDIR)&quot;
-## -else
-## -    @$(ECHO) &quot;ERROR: install operation is not supported for Windows binaries!&quot;
-## -endif
-## -
-## -release: libcl.a
-## -    if [ ! -d &quot;$(RELEASE_DIR)/lib&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/lib&quot;; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) libcl.a &quot;$(RELEASE_DIR)/lib&quot;
-## -    if [ ! -d &quot;$(RELEASE_DIR)/include/cwb&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/include/cwb&quot;; fi;
-## -    $(INSTALL) $(INST_FLAGS_DATA) cl.h &quot;$(RELEASE_DIR)/include/cwb&quot;
-## -
-## -
-## -uninstall:
-## -    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
-## -#   $(RM) $(LIBINSTDIR)/libcl.a
-## -#   (cd $(REALINCINSTDIR); $(RM) cl.h)
 ## +    $(AR) cq $@ $^
 ##  
 ##  depend:
