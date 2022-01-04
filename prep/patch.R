@@ -274,7 +274,7 @@ replace <- list(
   "src/cwb/cqp/parser.tab.c" = list("^(\\s+)int\\sok;", "\\1int ok __attribute__((unused));", 4L),
   "src/cwb/cl/Makefile" = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
   "src/cwb/cl/Makefile" = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
-  "src/cwb/cl/Makefile" = list("^(\\s+)\\$\\(AR\\)\\s\\$\\@\\$\\^", "\\1$(AR) cq $@ $^", 1L)
+  "src/cwb/cl/Makefile" = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq", 1L)
 )
 
 for (i in 1L:length(replace)){
