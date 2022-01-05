@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [197d4ba] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [10bbae1] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -414,13 +414,13 @@ for (i in 1L:length(delete_line_before)){
   
   message(
      sprintf(
-       &quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;,
+       &quot;file: %s | regex: %s | match: %d | lines: %d ... &quot;,
        names(delete_line_before)[[i]],
        delete_line_before[[i]][[1]],
        which_position,
-       times,
-       appendLF = FALSE
-      )
+       times
+      ),
+     appendLF = FALSE
   )
   fname &lt;- path(repodir, names(delete_line_before)[[i]])
   if (file.exists(fname)){
@@ -439,94 +439,28 @@ for (i in 1L:length(delete_line_before)){
     message(&quot;FAIL - no match&quot;)
   }
 }</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^Group\s\* | match: 3, | lines: 1 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^(\s*)sprintf\(sort_call,\sExternalGroupingCommand,\stemporary_name\); | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^\s*return\sComputeGroupExternally\(group\); | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/output.c | regex: ^\s*sprintf\(prefix,\s&quot;cqpt\.%d&quot;,\s\(unsigned\sint\)getpid\(\)\); | match: 1, | lines: 8 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/parser.y | regex: ^\s*if\s\(\$2\s&amp;&amp;\sgenerate_code\)\s\{ | match: 3, | lines: 1 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/ranges.c | regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 2, | lines: 5 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/ranges.c | regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 1, | lines: 5 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/ranges.c | regex: ^\s*value\s=\scl_string_canonical\(value,\ssrt_cl-&gt;corpus-&gt;charset,\ssrt_flags,\sCL_STRING_CANONICAL_STRDUP\); | match: 1, | lines: 7 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/lex.creg.c | regex: ^\s*if\s\(\s\(yy_c_buf_p\) | match: 4, | lines: 4 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/lex.creg.c | regex: ^\s*cregrestart\(cregin\s*\); | match: 2, | lines: 11 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/lex.creg.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1, | lines: 1 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/lex.yy.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1, | lines: 111 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/endian2.h | regex: /* for consistency: | match: 1, | lines: 1 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/Makefile | regex: ^libcl.a: \$\(OBJS\) | match: 1, | lines: 6 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/Makefile | regex: ##\scl\.h\sheader\s | match: 1, | lines: 11 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cl/Makefile | regex: ^depend:$ | match: 1, | lines: 22 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/Makefile | regex: ^clean:$ | match: 1, | lines: 7 ...</code></pre>
-<pre><code>## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile does not exist</code></pre>
-<pre><code>## Warning in sprintf(&quot;file: %s | regex: %s | match: %d, | lines: %d ... &quot;, : one
-## argument not used by format &#39;file: %s | regex: %s | match: %d, | lines: %d ... &#39;</code></pre>
-<pre><code>## file: src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\): | match: 1, | lines: 8 ... 
-## skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile does not exist</code></pre>
+<pre><code>## file: src/cwb/cqp/groups.c | regex: ^Group\s\* | match: 3 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/groups.c | regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/groups.c | regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/groups.c | regex: ^(\s*)sprintf\(sort_call,\sExternalGroupingCommand,\stemporary_name\); | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/groups.c | regex: ^\s*return\sComputeGroupExternally\(group\); | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c does not exist
+## file: src/cwb/cqp/output.c | regex: ^\s*sprintf\(prefix,\s&quot;cqpt\.%d&quot;,\s\(unsigned\sint\)getpid\(\)\); | match: 1 | lines: 8 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c does not exist
+## file: src/cwb/cqp/parser.y | regex: ^\s*if\s\(\$2\s&amp;&amp;\sgenerate_code\)\s\{ | match: 3 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y does not exist
+## file: src/cwb/cqp/ranges.c | regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 2 | lines: 5 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c does not exist
+## file: src/cwb/cqp/ranges.c | regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 1 | lines: 5 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c does not exist
+## file: src/cwb/cqp/ranges.c | regex: ^\s*value\s=\scl_string_canonical\(value,\ssrt_cl-&gt;corpus-&gt;charset,\ssrt_flags,\sCL_STRING_CANONICAL_STRDUP\); | match: 1 | lines: 7 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c does not exist
+## file: src/cwb/cl/lex.creg.c | regex: ^\s*if\s\(\s\(yy_c_buf_p\) | match: 4 | lines: 4 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c does not exist
+## file: src/cwb/cl/lex.creg.c | regex: ^\s*cregrestart\(cregin\s*\); | match: 2 | lines: 11 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c does not exist
+## file: src/cwb/cl/lex.creg.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c does not exist
+## file: src/cwb/cqp/lex.yy.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | lines: 111 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c does not exist
+## file: src/cwb/cl/endian2.h | regex: /* for consistency: | match: 1 | lines: 1 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h does not exist
+## file: src/cwb/cl/Makefile | regex: ^libcl.a: \$\(OBJS\) | match: 1 | lines: 6 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile does not exist
+## file: src/cwb/cl/Makefile | regex: ##\scl\.h\sheader\s | match: 1 | lines: 11 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile does not exist
+## file: src/cwb/cl/Makefile | regex: ^depend:$ | match: 1 | lines: 22 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile does not exist
+## file: src/cwb/cqp/Makefile | regex: ^clean:$ | match: 1 | lines: 7 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile does not exist
+## file: src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\): | match: 1 | lines: 8 ... skipping operation - file /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile does not exist</code></pre>
 <pre class="r"><code>insert_before &lt;- list(
   &quot;src/cwb/cl/attributes.c&quot; = list(&quot;^#include\\s&lt;ctype\\.h&gt;&quot;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;)),
   &quot;src/cwb/cl/bitio.c&quot; = list(&quot;^#include\\s&lt;sys/types\\.h&gt;&quot;, &quot;void Rprintf(const char *, ...);&quot;),
@@ -920,7 +854,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [dee972d] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [5261ce7] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 </div>

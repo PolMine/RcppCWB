@@ -253,7 +253,7 @@ for (i in 1L:length(delete_line_before)){
      appendLF = FALSE
   )
   fname <- path(repodir, names(delete_line_before)[[i]])
-  if (file.exists(fname)){
+  if (!file.exists(fname)){
     message("skipping operation - file ", fname, " does not exist")
     next
   }
