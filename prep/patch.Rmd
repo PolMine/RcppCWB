@@ -182,8 +182,10 @@ for (fname in new_files){
 ```{r}
 cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cl", "depend.mk"))
 cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cqp", "depend.mk"))
+```
 
 
+```{r}
 global_replacements <- list(
   c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
@@ -198,13 +200,18 @@ for (subdir in c("cl", "cqp", "CQi")){
   files <- list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
   for (f in files){
     code <- readLines(f)
-    for (i in 1:length(global_replacements)){
+    for (i in 1L:length(global_replacements)){
       code <- gsub(global_replacements[[i]][1], global_replacements[[i]][2], code)
     }
     writeLines(text = code, con = f)
   }
 }
+```
 
+
+### Delete lines before match
+
+```{r}
 delete_line_before <- list(
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*", 3L),
   "src/cwb/cqp/groups.c" = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
@@ -227,14 +234,25 @@ delete_line_before <- list(
   "src/cwb/cl/Makefile" = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
   "src/cwb/cl/Makefile" = list("^depend:$", 1L, 22L),
   "src/cwb/cqp/Makefile" = list("^clean:$", 1L, 7L),
-  
   "src/cwb/cqp/Makefile" = list("^cqp\\$\\(EXEC_SUFFIX\\):", 1L, 8L)
 )
 
-
-
 for (i in 1L:length(delete_line_before)){
+  message(
+     sprintf(
+       "file: %s | regex: %s | match: %d, | lines: %d ... ",
+       names(delete_line_before)[[i]],
+       delete_line_before[[i]][[1]],
+       delete_line_before[[i]][[2]],
+       delete_line_before[[i]][[3]],
+       appendLF = FALSE
+      )
+  )
   fname <- path(repodir, names(delete_line_before)[[i]])
+  if (file.exists(fname)){
+    message("skipping operation - file ", fname, " does not exist")
+    next
+  }
   code <- readLines(fname)
   which_position <- if (length(delete_line_before[[i]]) > 1L) delete_line_before[[i]][[2]] else 1L
   position <- grep(pattern = delete_line_before[[i]][[1]], code)[which_position]
@@ -242,11 +260,15 @@ for (i in 1L:length(delete_line_before)){
   if (!is.na(position)){
     code <- code[-(position - 1L:times)]
     writeLines(text = code, con = fname)
+    message("OK")
+  } else {
+    message("FAIL - no match")
   }
 }
+```
 
 
-
+```{r}
 insert_before <- list(
   "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
   "src/cwb/cl/bitio.c" = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);"),
@@ -302,11 +324,10 @@ for (i in 1L:length(insert_before)){
     writeLines(text = code, con = fname)
   }
 }
+```
 
 
-
-
-
+```{r}
 insert_after <- list(
   "src/cwb/cl/bitio.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),
   "src/cwb/cl/bitfields.c" = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);"),
@@ -342,8 +363,10 @@ for (i in 1L:length(insert_after)){
     writeLines(text = code, con = fname)
   }
 }
+```
 
 
+```{r}
 replace <- list(
   "src/cwb/cl/attributes.c" = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
   "src/cwb/cl/attributes.c" = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
@@ -464,7 +487,9 @@ for (i in 1L:length(replace)){
     writeLines(text = code, con = fname)
   }
 }
+```
 
+```{r}
 remove_lines <- list(
   "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 3),
   "src/cwb/cl/corpus.c" = list("(\\s+)stderr,", 2),
@@ -501,7 +526,9 @@ for (i in 1L:length(remove_lines)){
     writeLines(text = code, con = fname)
   }
 }
+```
 
+```{r}
 extern <- list(
   
   "src/cwb/cqp/corpmanag.c" = c(
