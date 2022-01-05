@@ -177,7 +177,7 @@ to_compare <- last_commit(repo)
   
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/cl")
-git_cmd <- sprintf("git diff %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]])
+git_cmd <- sprintf("git diff %s..%s .", last_devbranch_commit[["sha"]], to_compare[["sha"]])
 result <- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = "\n"))
 ```
@@ -187,7 +187,7 @@ cat(paste(result, collapse = "\n"))
 
 ```{r}  
 setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
-git_cmd <- sprintf("git diff --ignore-space-at-eol %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]])
+git_cmd <- sprintf("git diff --ignore-space-at-eol %s..%s .", last_devbranch_commit[["sha"]], to_compare[["sha"]])
 result <- system(git_cmd, intern = TRUE)
 gitdiff_cqp <- paste(result, collapse = "\n")
 cat(gitdiff_cqp)
@@ -199,7 +199,7 @@ cat(gitdiff_cqp)
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/CQi")
 git_cmd <- sprintf(
-  "git diff %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]]
+  "git diff %s..%s .", last_devbranch_commit[["sha"]], to_compare[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
 output <- paste(result, collapse = "\n")
@@ -212,7 +212,7 @@ cat(output)
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/utils")
 git_cmd <- sprintf(
-  "git diff %s..%s . %s", to_compare[["sha"]], last_devbranch_commit[["sha"]],
+  "git diff %s..%s . %s", last_devbranch_commit[["sha"]], to_compare[["sha"]], 
   "':!*_cwb_encode.c' ':!*_cwb_makeall.c' ':!*_cwb_huffcode.c' ':!*_cwb_compress_rdx.c' ':!*Makefile'"
 )
 result <- system(git_cmd, intern = TRUE)
