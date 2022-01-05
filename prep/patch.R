@@ -120,7 +120,7 @@ insert_before <- list(
   "src/cwb/cqp/lex.yy.c" = list("#ifdef __cplusplus", "/*", 3L),
   "src/cwb/cqp/lex.yy.c" = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", "", 1L),
   "src/cwb/cl/endian2.h" = list("#include\\s<windows\\.h>" , "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */", 1L),
-  "src/cwb/cqp/Makefile" = list("^cqp\\$\\(EXEC_SUFFIX\\):", "libcqp.a: $(OBJS) $(CQI_OBJS)\n    $(RM) $@\n    $(AR) cq $@ $^\n", 8L)
+  "src/cwb/cqp/Makefile" = list("^cqp\\$\\(EXEC_SUFFIX\\):.*", "libcqp.a: $(OBJS) $(CQI_OBJS)\n    $(RM) $@\n    $(AR) cq $@ $^\n", 8L)
 )
 
 for (i in 1L:length(insert_before)){
