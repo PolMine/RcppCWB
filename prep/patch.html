@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [37860ee] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [6abd355] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -349,11 +349,19 @@ file.rename(
 <pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>new_files &lt;- list.files(path = file.path(repodir, &quot;prep&quot;, &quot;cwb&quot;), full.names = TRUE, recursive = TRUE)
 for (fname in new_files){
+  message(&quot;... copying: &quot;, fname)
   file.copy(from = fname, to = gsub(&quot;/prep/&quot;, &quot;/src/&quot;, fname))
-}
-
-
-cat(&quot;dummy file\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cl&quot;, &quot;depend.mk&quot;))
+}</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/darwin-arm64</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_spark</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_x86</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/Makefile</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_compress_rdx.c</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_encode.c</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_huffcode.c</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_makeall.c</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/Makefile</code></pre>
+<pre class="r"><code>cat(&quot;dummy file\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cl&quot;, &quot;depend.mk&quot;))
 cat(&quot;dummy file\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cqp&quot;, &quot;depend.mk&quot;))
 
 
@@ -815,7 +823,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [2150001] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [fa3d4e8] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -1032,7 +1040,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 </div>
 <div id="cleaning-up" class="section level3">
 <h3>Cleaning up</h3>
-<pre class="r"><code>system(&quot;git reset --hard HEAD~1&quot;) # do not know which cmd would be R equivalent
+<pre class="r"><code># system(&quot;git reset --hard HEAD~1&quot;) # do not know which cmd would be R equivalent
 checkout(repo = repodir, branch = &quot;dev&quot;)</code></pre>
 </div>
 </div>

@@ -183,7 +183,7 @@ file.rename(
 new_files <- list.files(path = file.path(repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
 for (fname in new_files){
   message("... copying: ", fname)
-  file.copy(from = fname, to = gsub("/prep/", "/src/", fname))
+  file.copy(from = fname, to = gsub("/prep/", "/src/", fname), overwrite = TRUE)
 }
 ```
 
