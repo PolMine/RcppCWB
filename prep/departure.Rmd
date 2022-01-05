@@ -100,6 +100,7 @@ cwb_files_repo_truncated <- gsub(cwb_dir_repo, "", cwb_files_repo)
 added_files <-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_files_svn_truncated]
 added_files_full_path <- path(cwb_dir_repo, added_files)
 added_files_existing <- added_files_full_path[file.exists(added_files_full_path)]
+file.exists(added_files_existing)
 rm_file(repo = repodir, path = added_files_existing)
 added_files_existing
 ```

@@ -259,8 +259,11 @@ file.copy(
   unname() %&gt;%
   grep(&quot;^src/cwb&quot;, ., value = TRUE) %&gt;%
   path(repodir, .)
-file.remove(removed_files)
-removed_files</code></pre>
+file.remove(removed_files)</code></pre>
+<pre><code>## [1] TRUE TRUE</code></pre>
+<pre class="r"><code>removed_files</code></pre>
+<pre><code>## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian.h
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/Makefile</code></pre>
 </div>
 <div id="remove-files-that-have-been-added-and-that-need-to-be-added-explicitly" class="section level3">
 <h3>Remove files that have been added (and that need to be added explicitly)</h3>
@@ -271,13 +274,28 @@ cwb_files_repo_truncated &lt;- gsub(cwb_dir_repo, &quot;&quot;, cwb_files_repo)
 added_files &lt;-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_files_svn_truncated]
 added_files_full_path &lt;- path(cwb_dir_repo, added_files)
 added_files_existing &lt;- added_files_full_path[file.exists(added_files_full_path)]
-rm_file(repo = repodir, path = added_files_existing)</code></pre>
+rm_file(repo = repodir, path = added_files_existing)
+added_files_existing</code></pre>
+<pre><code>## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.h
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-arm64
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_spark
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_x86
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/depend.mk
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/_Makefile
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_compress_rdx.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_encode.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_huffcode.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_makeall.c</code></pre>
 </div>
 <div id="git-addcommit-so-that-we-can-perform-diffs" class="section level3">
 <h3>git add/commit so that we can perform diffs</h3>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB r1069 restored&quot;)</code></pre>
-<pre><code>## [78138da] 2022-01-05: CWB r1069 restored</code></pre>
+<pre><code>## [20cc994] 2022-01-05: CWB r1069 restored</code></pre>
 </div>
 <div id="inspect-diffs" class="section level3">
 <h3>Inspect diffs</h3>
