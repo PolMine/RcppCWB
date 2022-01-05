@@ -180,8 +180,8 @@ for (fname in new_files){
 ```
 
 ```{r}
-cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cl", "depend.mk"))
-cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cqp", "depend.mk"))
+cat("\n", file = file.path(repodir, "src", "cwb", "cl", "depend.mk"))
+cat("\n", file = file.path(repodir, "src", "cwb", "cqp", "depend.mk"))
 ```
 
 

@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [a5fb69a] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [7032a1a] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -1088,15 +1088,125 @@ lapply(
   names(extern),
   function(f){
     fname &lt;- path(repodir, f)
+    
+    if (!file.exists(fname)){
+      message(sprintf(&quot;FAIL - file %s does not exist&quot;, f))
+      next
+    }
+    
     code &lt;- readLines(fname)
     for (ext in extern[[f]]){
-      for (position in which(startsWith(code, ext))){
-        code[position] &lt;- paste(&quot;extern&quot;, code[position], sep = &quot; &quot;)
+      matches &lt;- which(startsWith(code, ext))
+      if (length(matches) &gt; 0L){
+        for (position in matches){
+          code[position] &lt;- paste(&quot;extern&quot;, code[position], sep = &quot; &quot;)
+        }
+        message(sprintf(&quot;var to extern: %s | n_matches: %d&quot;, ext, length(matches)))
+      } else {
+        message(&quot;FAIL - no matches for var: &quot;, ext)
       }
     }
     writeLines(text = code, con = fname)
   }
 )</code></pre>
+<pre><code>## var to extern: CorpusList *corpuslist; | n_matches: 1</code></pre>
+<pre><code>## var to extern: CorpusList *current_corpus; | n_matches: 1</code></pre>
+<pre><code>## var to extern: CorpusList *corpuslist; | n_matches: 1</code></pre>
+<pre><code>## var to extern: CYCtype LastExpression; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int exit_cqp; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *cqp_input_string; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int cqp_input_string_position; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int initialize_cqp(int argc, char **argv); | n_matches: 1</code></pre>
+<pre><code>## var to extern: int cqp_parse_file(FILE *fd, int exit_on_parse_errors); | n_matches: 1</code></pre>
+<pre><code>## var to extern: int cqp_parse_string(char *s); | n_matches: 1</code></pre>
+<pre><code>## var to extern: int EvaluationIsRunning; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int setInterruptCallback(InterruptCheckProc f); | n_matches: 1</code></pre>
+<pre><code>## var to extern: void CheckForInterrupts(void); | n_matches: 1</code></pre>
+<pre><code>## var to extern: int signal_handler_is_installed; | n_matches: 1</code></pre>
+<pre><code>## var to extern: void install_signal_handler(void); | n_matches: 1</code></pre>
+<pre><code>## var to extern: int eep; | n_matches: 1</code></pre>
+<pre><code>## var to extern: EvalEnvironment Environment[MAXENVIRONMENT]; | n_matches: 1</code></pre>
+<pre><code>## var to extern: EEP CurEnv, evalenv; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int insecure; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int inhibit_activation; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int parseonly; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int verbose_parser; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_symtab; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_gconstraints; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_evaltree; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_patlist; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_compdfa; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_dfa; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int symtab_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int parser_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int tree_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int eval_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int search_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int initial_matchlist_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int debug_simulation; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int activate_cl_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int server_log; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int server_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int snoop; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int private_server; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int server_port; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int localhost; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int server_quit; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int query_lock; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int query_lock_violation; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int enable_macros; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int macro_debug; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int hard_boundary; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int hard_cut; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int subquery; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *def_unbr_attr; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int query_optimize; | n_matches: 1</code></pre>
+<pre><code>## var to extern: enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *matching_strategy_name; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int strict_regions; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int use_readline; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int highlighting; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int paging; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *pager; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *tested_pager; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *less_charset_variable; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int use_colour; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int progress_bar; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int pretty_print; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int autoshow; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int timing; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_tag_attributes; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int show_targets; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *printModeString; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *printModeOptions; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int printNrMatches; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *printStructure; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *left_delimiter; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *right_delimiter; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *registry; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *LOCAL_CORP_PATH; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int auto_save; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int save_on_exit; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *cqp_init_file; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *macro_init_file; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *cqp_history_file; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int write_history_file; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int batchmode; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int silent; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *default_corpus; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *query_string; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int UseExternalSorting; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *ExternalSortingCommand; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int UseExternalGrouping; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *ExternalGroupingCommand; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int user_level; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int rangeoutput; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int child_process; | n_matches: 1</code></pre>
+<pre><code>## var to extern: ContextDescriptor CD; | n_matches: 1</code></pre>
+<pre><code>## var to extern: int handle_sigpipe; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *progname; | n_matches: 1</code></pre>
+<pre><code>## var to extern: char *licensee; | n_matches: 1</code></pre>
+<pre><code>## var to extern: FILE *batchfd; | n_matches: 1</code></pre>
 <pre><code>## [[1]]
 ## NULL
 ## 
@@ -1115,7 +1225,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [26473de] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [f057a9f] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 </div>
