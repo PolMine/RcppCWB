@@ -30,6 +30,10 @@ for (fname in new_files){
 }
 
 
+cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cl", "depend.mk"))
+cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cqp", "depend.mk"))
+
+
 global_replacements <- list(
   c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
