@@ -61,7 +61,9 @@ delete_line_before <- list(
   "src/cwb/cl/Makefile" = list("^libcl.a: \\$\\(OBJS\\)", 1L, 6L),
   "src/cwb/cl/Makefile" = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
   "src/cwb/cl/Makefile" = list("^depend:$", 1L, 22L),
-  "src/cwb/cqp/Makefile" = list("^clean:$", 1L, 7L)
+  "src/cwb/cqp/Makefile" = list("^clean:$", 1L, 7L),
+  
+  "src/cwb/cqp/Makefile" = list("^cqp\\$\\(EXEC_SUFFIX\\):", 1L, 8L)
 )
 
 

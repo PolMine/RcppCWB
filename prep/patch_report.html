@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [caace48] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [2b79617] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -220,7 +220,7 @@ result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-## index 0678240..cf7b289 100644
+## index 868e1b0..cf7b289 100644
 ## --- a/src/cwb/cqp/Makefile
 ## +++ b/src/cwb/cqp/Makefile
 ## @@ -94,15 +94,11 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
@@ -243,25 +243,6 @@ cat(gitdiff_cqp)</code></pre>
 ##  
 ##  cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 ##      $(RM) $@
-## @@ -137,18 +133,10 @@ release: $(PROGRAMS)
-##      if [ ! -d &quot;$(RELEASE_DIR)/include/cwb&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/include/cwb&quot;; fi;
-##      $(INSTALL) $(INST_FLAGS_DATA) ../CQi/cqi.h &quot;$(RELEASE_DIR)/include/cwb&quot;
-##  
-## -uninstall:
-## -    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
-## -#   for i in $(PROGRAMS) ;\
-## -#   do \
-## -#   $(RM) $(BININSTDIR)/$$i ; \
-## -#   done
-## -
-##  clean:
-##      -$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
-##  
-##  realclean:  clean
-## -    -$(RM) lex.yy.c parser.tab.c parser.tab.h 
-##      -$(RM) depend.mk
-##  
-##  # create parser C source, if necessary
 ## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29</code></pre>
