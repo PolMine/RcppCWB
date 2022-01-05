@@ -36,5 +36,3 @@ DEPEND_CFLAGS = -Wall -O3
 RELEASE_ARCH = x86_64
 RELEASE_OS = osx-10.7
 
-
-LDFLAGS = -foo
