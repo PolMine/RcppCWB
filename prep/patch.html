@@ -194,6 +194,9 @@ library(magrittr)</code></pre>
 
 # A copy of the SVN repo of the CWB is assumed to be present here ...
 cwb_dir_svn &lt;- path.expand(&quot;~/Lab/tmp/cwb/trunk&quot;) # r1069</code></pre>
+<pre class="r"><code>setwd(&quot;~/Lab/tmp/cwb/trunk&quot;)
+system(&quot;svn info --show-item revision&quot;)</code></pre>
+<pre class="r"><code>setwd(repodir)</code></pre>
 <p>We create new branch r1069 if not yet present.</p>
 <pre class="r"><code>git2r::checkout(repodir, branch = &quot;dev&quot;)
 if (&quot;r1069&quot; %in% names(branches(repodir))){
@@ -289,7 +292,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB r1069 restored&quot;)</code></pre>
-<pre><code>## [9070ca5] 2022-01-05: CWB r1069 restored</code></pre>
+<pre><code>## [16bced5] 2022-01-05: CWB r1069 restored</code></pre>
 <p>Note that we are still on the r1069 branch now!</p>
 </div>
 </div>
@@ -316,7 +319,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [37449b5] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [1c34e82] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">

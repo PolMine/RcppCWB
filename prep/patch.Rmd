@@ -48,7 +48,8 @@ cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk") # r1069
 
 ```{r}
 setwd("~/Lab/tmp/cwb/trunk")
-system("svn info --show-item revision")
+rev <- system("svn info --show-item revision", intern = TRUE)
+rev
 ```
 
 ```{r}
