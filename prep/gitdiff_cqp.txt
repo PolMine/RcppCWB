@@ -1,21 +1,14 @@
 diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-index 868e1b0..cf7b289 100644
+index 89bf5ac..cf7b289 100644
 --- a/src/cwb/cqp/Makefile
 +++ b/src/cwb/cqp/Makefile
-@@ -94,15 +94,11 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
+@@ -94,7 +94,11 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
  
  ## ----------------------------------------------------------------------
  
 -all: libcqp.aall: libcqp.a
 +all: libcqp.a
- 
--parser.tab.c parser.tab.h: parser.y
--	$(RM) parser.tab.* parser.output
--	$(YACC) $<
--
--lex.yy.c: parser.l parser.y
--	$(RM) lex.yy.*
--	$(LEX) $<
++
 +libcqp.a: $(OBJS) $(CQI_OBJS)
 +	$(RM) $@
 +	$(AR) cq $@ $^
