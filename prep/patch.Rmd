@@ -733,10 +733,22 @@ lapply(
   names(extern),
   function(f){
     fname <- path(repodir, f)
+    
+    if (!file.exists(fname)){
+      message(sprintf("FAIL - file %s does not exist", f))
+      next
+    }
+    
     code <- readLines(fname)
     for (ext in extern[[f]]){
-      for (position in which(startsWith(code, ext))){
-        code[position] <- paste("extern", code[position], sep = " ")
+      matches <- which(startsWith(code, ext))
+      if (length(matches) > 0L){
+        for (position in matches){
+          code[position] <- paste("extern", code[position], sep = " ")
+        }
+        message(sprintf("var to extern: %s | n_matches: %d", ext, length(matches)))
+      } else {
+        message("FAIL - no matches for var: ", ext)
       }
     }
     writeLines(text = code, con = fname)

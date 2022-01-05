@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [2d309ae] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [a5fb69a] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -609,9 +609,9 @@ for (i in 1L:length(insert_after)){
     sprintf(
       &quot;file: %s | regex: %s | match: %d | insertion: %s ... &quot;,
       fname,
-      insert_before[[i]][[1]],
+      insert_after[[i]][[1]],
       which_position,
-      paste(insert_before[[i]][[2]], collapse = &quot;///&quot;)
+      paste(insert_after[[i]][[2]], collapse = &quot;///&quot;)
     ),
     appendLF = FALSE
   )
@@ -637,24 +637,24 @@ for (i in 1L:length(insert_after)){
     message(&quot;FAIL - no match&quot;)
   }
 }</code></pre>
-<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitio.c | regex: ^#include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... FAIL - no match
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitfields.c | regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/globals.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lexhash.c | regex: ^#include\s&lt;sys/stat\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: #include &lt;signal.h&gt; /* added by Andreas Blaette  *////#include &lt;sys/socket.h&gt; /* added by Andreas Blaette *//// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/regopt.c | regex: ^#ifndef\s_globals_h_ | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: #include\s&lt;ctype\.h&gt; | match: 2 | insertion: void Rprintf(const char *, ...);/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: #include\s&lt;ctype\.h&gt; | match: 3 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: #include\s&lt;ctype\.h&gt; | match: 3 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^#include\s&lt;sys/types\.h&gt; | match: 11 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/cqpserver.c | regex: ^(\s*)lseek\(fd,\s0,\sSEEK_SET\); | match: 1 | insertion:       if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/server.c | regex: ^#include\s&quot;windows-mmap\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^Group\s\* | match: 28 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 5 | insertion: *//// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: ^\s*int\s*$ | match: 27 | insertion: /* ... OK</code></pre>
+<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitio.c | regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...); ... FAIL - no match
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitfields.c | regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^#include\s&quot;cdaccess\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/globals.c | regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lexhash.c | regex: ^#include\s&quot;lexhash\.h&quot; | match: 1 | insertion: #include &lt;unistd.h&gt; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^#include\s&lt;math\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/regopt.c | regex: ^#include\s&quot;regopt\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: return\sComputeGroupInternally\(group\); | match: 1 | insertion:    *////  return group; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*\}\s*$ | match: 1 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*\}\s*$ | match: 2 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*\}\s*$ | match: 3 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^\}\s*$ | match: 3 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^\}\s*$ | match: 11 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/cqpserver.c | regex: #include &quot;\.\./cqp/groups\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/server.c | regex: #include &quot;\.\./cqp/hash\.h&quot; | match: 1 | insertion: #include &quot;../cl/lexhash.h&quot; /* inserted by AB */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: #endif | match: 28 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\}$ | match: 5 | insertion: */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: #endif | match: 27 | insertion: */ ... OK</code></pre>
 <pre class="r"><code>replace &lt;- list(
   &quot;src/cwb/cl/attributes.c&quot; = list(&quot;(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;&quot;, &quot;\\1int ppos, bpos, rpos;&quot;, 1),
   &quot;src/cwb/cl/attributes.c&quot; = list(&quot;^(\\s+)dollar = 0;&quot;, &quot;\\1/* dollar = 0; */&quot;, 1),
@@ -768,13 +768,135 @@ for (i in 1L:length(insert_after)){
 
 for (i in 1L:length(replace)){
   fname &lt;- path(repodir, names(replace)[[i]])
+  
+  message(
+    sprintf(
+      &quot;file: %s | regex: %s | match: %d | replacement: %s ... &quot;,
+      fname,
+      replace[[i]][[1]],
+      replace[[i]][[3]],
+      paste(replace[[i]][[2]], collapse = &quot;///&quot;)
+    ),
+    appendLF = FALSE
+  )
+  
+  if (!file.exists(fname)){
+    message(&quot;FAIL - file does not exist&quot;)
+    next
+  }
+  
   code &lt;- readLines(fname)
   position &lt;- grep(pattern = replace[[i]][[1]], code)[ replace[[i]][[3]] ]
   if (!is.na(position)){
     code[position] &lt;- gsub(replace[[i]][1], replace[[i]][2], code[position])
     writeLines(text = code, con = fname)
+    message(&quot;OK&quot;)
+  } else {
+    message(&quot;FAIL - no match&quot;)
   }
 }</code></pre>
+<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: (\s+)int\sppos,\sbpos,\sdollar,\srpos; | match: 1 | replacement: \1int ppos, bpos, rpos; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)dollar = 0; | match: 1 | replacement: \1/* dollar = 0; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)dollar = ppos;\s | match: 1 | replacement: \1/* dollar = ppos; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)if\s\(STREQ\(rname,\s&quot;HOME&quot;\)\) | match: 1 | replacement: \1if (strcmp(rname, &quot;HOME&quot;) == 0) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;APATH&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;APATH&quot;) == 0) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;ANAME&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;ANAME&quot;) == 0) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\sregex_result,\sidx,\si,\slen,\slexsize; | match: 1 | replacement: \1int idx, i, lexsize; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\soptimised,\sgrain_match; | match: 1 | replacement: \1int optimised; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)char\s\*word,\s\*preprocessed_string; | match: 1 | replacement: \1char *word; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\soff_start,\soff_end; | match: 1 | replacement: \1int off_start; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)char\s\*p; | match: 1 | replacement: \1/* char *p; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\si; | match: 3 | replacement: \1/* int i; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)DynCallResult\sarg; | match: 1 | replacement: \1/* DynCallResult arg; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)arg\s=\sargs\[argnum\]; | match: 1 | replacement: \1/* arg = args[argnum]; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)fgets\(call,\sCL_MAX_LINE_LENGTH,\spipe\); | match: 1 | replacement: \1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf(&quot;fgets failure&quot;); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)off_end\s=\sntohl\(lexidx_data\[idx\s\+\s1\]\)\s-\s1; | match: 1 | replacement: \1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: (\s*)\*\s@param\sclass\s+The\sclass\s+to\scheck\. | match: 2 | replacement: \1* @param obj  The class to check. ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: (\s*)\*\s@param\sclass\s+The\sclass\s+to\scheck\. | match: 1 | replacement: \1* @param obj  The class to check. ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)return\smember_of_class_i\(map,\sclass,\sid\); | match: 1 | replacement: \1return member_of_class_i(map, obj, id); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)SingleMapping\sclass, | match: 2 | replacement: \1SingleMapping obj, ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)SingleMapping\sclass, | match: 1 | replacement: \1SingleMapping obj, ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)class-&gt;tokens, | match: 1 | replacement: \1obj-&gt;tokens, ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)class-&gt;nr_tokens, | match: 1 | replacement: \1obj-&gt;nr_tokens, ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.h | regex: ^(\s+)SingleMapping\sclass, | match: 2 | replacement: \1SingleMapping obj, ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.h | regex: ^(\s+)SingleMapping\sclass, | match: 1 | replacement: \1SingleMapping obj, ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/makecomps.c | regex: ^(\s*)char\serrmsg\[CL_MAX_LINE_LENGTH\]; | match: 1 | replacement: /* char errmsg[CL_MAX_LINE_LENGTH]; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^(\s*)cl_ngram_hash_entry\sentry,\stemp; | match: 1 | replacement: \1cl_ngram_hash_entry entry; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^(\s*)temp\s=\sentry; | match: 1 | replacement: \1/* temp = entry; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/regopt.c | regex: ^(\s*)if\s\(ch\s&gt;=\s32\s&amp;\sch\s&lt;\s127\) | match: 1 | replacement: \1if ((ch &gt;= 32) &amp; (ch &lt; 127)) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/storage.c | regex: ^(\s+)write\(fd,\s&amp;fd,\ssizeof\(int\)\); | match: 1 | replacement: \1ssize_t success = write(fd, &amp;fd, sizeof(int)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;pa_ref\.delete\)\s\{ | match: 2 | replacement: \1if (ctptr-&gt;pa_ref.del) { ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;pa_ref\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;pa_ref.del) { ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;sa_ref\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;sa_ref.del) { ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;idlist\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;idlist.del) { ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)int\ssmallest_col,\scorpus_size; | match: 1 | replacement: \1int smallest_col; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)corpus_size\s=\sevalenv-&gt;query_corpus-&gt;mother_size; | match: 1 | replacement: \1/* corpus_size = evalenv-&gt;query_corpus-&gt;mother_size; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)assert\(col-&gt;type\s=\stabular\); | match: 1 | replacement: \1assert((col-&gt;type = tabular)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.h | regex: ^(\s*)int(\s+)delete; | match: 3 | replacement: \1int\2del; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.h | regex: ^(\s*)int(\s+)delete; | match: 2 | replacement: \1int\2del; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.h | regex: ^(\s*)int(\s+)delete; | match: 1 | replacement: \1int\2del; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^(.*?)\s*/\*\s\(source\sID,\starget\sID)\s*\*/ | match: 1 | replacement: \1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^(.*?)\s*/\*\smodifies\sGroup\sobject\sin\splace\sand\sreturns\spointer\s\*/ | match: 1 | replacement: \1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^(\s*)(if\s\(UseExternalGrouping\s&amp;&amp;\s\!insecure\s&amp;&amp;\s\!\(source_is_struc\s\|\|\starget_is_struc\s\|\|\sis_grouped\)\)) | match: 1 | replacement: \1/* \2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^(.*?)\s*/\*\swill\sexit\son\sint\soverflow\s\*/ | match: 1 | replacement: \1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.h | regex: (\s*int\sis_prime\(int\sn\);) | match: 1 | replacement: /* \1 */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.h | regex: ^(\s*int\sfind_prime\(int\sn\);) | match: 1 | replacement: /* \1 */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.h | regex: ^(\s*unsigned\sint\shash_string\(char\s\*s\);) | match: 1 | replacement: /* \1 */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)char\s\*s; | match: 1 | replacement: \1/* char *s; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)AttributeList\s\*strucs; | match: 1 | replacement: \1/* AttributeList *strucs; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)strucs\s=\scd-&gt;printStructureTags; | match: 1 | replacement: \1/* strucs = cd-&gt;printStructureTags; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/latex-print.c | regex: ^(\s*)char\s\*s; | match: 1 | replacement: \1/* char *s; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/latex-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/latex-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/options.h | regex: ^(\s*)enum\s_which_app\s\{\sundef,\scqp,\scqpcl,\scqpserver}\swhich_app; | match: 1 | replacement: \1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^(.*?)\s*/\*\sholds\s&quot;cqpt\.\$\$&quot;,\sso\s64\schars\sis\splenty\sof\sheadroom\s\*/ | match: 1 | replacement: \1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^(.*?)(\s*)/\*\s&quot;cqpt\.\$\$&quot;\s\*/ | match: 1 | replacement: \1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^(.*?)\s/\*\sstring\sis\sallocated\sby\stempnam\(\),\sneeds\sto\sbe\sfree&#39;d\sbelow\s\*/ | match: 1 | replacement: \1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.h | regex: ^(\s*)FILE\s\*open_temporary_file\(char\s\*tmp_name_buffer); | match: 1 | replacement: \1/* FILE *open_temporary_file(char *tmp_name_buffer); */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)c-&gt;idlist\.delete\s=\sleft-&gt;pa_ref\.delete; | match: 1 | replacement: \1c-&gt;idlist.del = left-&gt;pa_ref.del; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)left-&gt;pa_ref\.delete\s=\s0; | match: 1 | replacement: \1left-&gt;pa_ref.del = 0; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)node-&gt;idlist\.delete\s=\s0; | match: 1 | replacement: \1node-&gt;idlist.del = 0; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;idlist\.delete\s=\sleft-&gt;pa_ref\.delete; | match: 1 | replacement: \1res-&gt;idlist.del = left-&gt;pa_ref.del; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;pa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;pa_ref.del = auto_delete; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;sa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;sa_ref.del = auto_delete; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;pa_ref\.delete\s=\s0; | match: 1 | replacement: \1res-&gt;pa_ref.del = 0; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;pa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;pa_ref.del = auto_delete; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;sa_ref\.delete\s=\s0; | match: 1 | replacement: \1res-&gt;sa_ref.del = 0; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y | regex: ^(\s*)int\sok; | match: 3 | replacement: \1int ok __attribute__((unused)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y | regex: ^(\s*)int\sok; | match: 2 | replacement: \1int ok __attribute__((unused)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y | regex: ^(\s*)ok\s=\sSortSubcorpus\(\$2,\s\$3,\s\(\$4\s&gt;=\s1\)\s\?\s\$4\s:\s1,\s&amp;\(\$5\)\); | match: 1 | replacement: \1SortSubcorpus($2, $3, ($4 &gt;= 1) ? $4 : 1, &amp;($5)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)line\s=\s-1;(\s*)\s/\*\swill\sindicate\ssort\sfailure\sbelow\sif\stext_size\s==\s0\s\*/ | match: 1 | replacement: \1line = -1;\2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)\}(\s)/\*\send\sfor\seach\stoken\s\*/ | match: 1 | replacement: \1}\2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)line\s=\s-1;(\s*)/\*\swill\sindicate\sfailure\sof\sexternal\ssort\scommand\s*\*/ | match: 1 | replacement: \1line = -1;\2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)break;\s*/\*\sabort\s\*/ | match: 1 | replacement: \1break; ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)ok\s=\sSortExternally\(\); | match: 1 | replacement: \1/* ok = SortExternally(); */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/regex2dfa.c | regex: ^(\s*)int\signore_value; | match: 1 | replacement: \1int ignore_value __attribute__((unused)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/sgml-print.c | regex: ^(\s*)AttributeList\s\*strucs; | match: 1 | replacement: \1/* AttributeList *strucs; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/sgml-print.c | regex: ^(\s*)strucs\s=\scd-&gt;printStructureTags; | match: 1 | replacement: \1/* strucs = cd-&gt;printStructureTags; */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^(\s*)(static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\);).*?$ | match: 1 | replacement: \1/* \2 */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | replacement: static void yyunput (int c, register char * yy_bp ) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^(\s)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2 ... FAIL - no match
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^(\s*)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\scast\sfor\s8-bit\schar&#39;s\s\*/ | match: 1 | replacement:  ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: \s*/\*\spreserve\scregtext\s\*/ | match: 1 | replacement:  ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\sifndef YY_NO_INPUT\s\*/ | match: 1 | replacement:  ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: ^\s+static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\); | match: 1 | replacement:   /*  static void yyunput (int c,char *buf_ptr  ); */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.tab.c | regex: ^(\s*)cqpmessage\(Error,\s&quot;CQP\sSyntax\sError:.*?&quot;,\ss,\sQueryBuffer\); | match: 1 | replacement: \1cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.tab.c | regex: ^(\s+)int\sok; | match: 4 | replacement: \1int ok __attribute__((unused)); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^TOP\s=\s\$\(shell\spwd\)/\.\. | match: 1 | replacement: TOP = $(R_PACKAGE_SOURCE) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^(\s+)endian.h | match: 1 | replacement: \1endian2.h ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^(\s+)\$\(AR\)\s | match: 1 | replacement: \1$(AR) cq  ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: ^TOP\s=\s\$\(shell\spwd\)/\.\. | match: 1 | replacement: TOP = $(R_PACKAGE_SOURCE) ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: all:\s\$\(PROGRAMS\) | match: 1 | replacement: all: libcqp.a ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-64 | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-port-core2 | regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-universal | regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-brew | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux-opteron | regex: ^(CFLAGS\s*=.*?)\s+-march=opteron\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match</code></pre>
 <pre class="r"><code>remove_lines &lt;- list(
   &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 3),
   &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 2),
@@ -804,13 +926,48 @@ for (i in 1L:length(replace)){
 
 for (i in 1L:length(remove_lines)){
   fname &lt;- path(repodir, names(remove_lines)[[i]])
+  
+  message(
+    sprintf(
+      &quot;file: %s | regex: %s | match: %d ... &quot;,
+      fname,
+      remove_lines[[i]][[1]],
+      remove_lines[[i]][[2]]
+    ),
+    appendLF = FALSE
+  )
+  
   code &lt;- readLines(fname)
   position &lt;- grep(pattern = remove_lines[[i]][[1]], code)[ remove_lines[[i]][[2]] ]
   if (!is.na(position)){
     code &lt;- code[-position]
     writeLines(text = code, con = fname)
+    message(&quot;OK&quot;)
+  } else {
+    message(&quot;FAIL - no match&quot;)
   }
 }</code></pre>
+<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: (\s+)stderr, | match: 3 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: (\s+)stderr, | match: 2 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: (\s+)stderr, | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^\s*/\*\suses\ssettings\sfrom\sstatic\ssrt_\*\svariables\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^\s*/\*\sdetermine\sstart\sand\send\sposition\sof\ssort\sinterval\sfor\sthis\smatch\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\sadjust\ssort\sboundaries.*?\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /*\sswap\sstart\sand\send\sof\sinterval.*?\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\sdetermine\ssort\sdirection\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\show\smany\stokens\sto\sprint\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\swhen\susing\sflags,\sprint\snormalised\stoken\ssequence.*?\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\sprint\ssequence\sof\stokens\sin\ssort\sinterval\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\snow,\sexecute\sthe\sexternal\ssort\scommand.*?\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\srun\ssort\scmd\sand\sread\sfrom\spipe\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\snow\swe\sshould\shave\sread\sexactly.*?\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s/\*\sundo\seffects\sof\ssetting\sup\scregtext\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\sneed\sto\sshift\sthings\sup\sto\smake\sroom\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\s\+2\sfor\sEOB\schars\.\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*/\*\sThis\swas\sreally\sa\sNUL\.\s\*/ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*/\*FALLTHROUGH\*/\s*$ | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^\s+\$\(RANLIB\) | match: 1 ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: \s+-\$\(RM\)\slex\.yy\.c\sparser\.tab\.c\sparser\.tab\.h | match: 1 ... OK</code></pre>
 <pre class="r"><code>extern &lt;- list(
   
   &quot;src/cwb/cqp/corpmanag.c&quot; = c(
@@ -958,7 +1115,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [3bb2a09] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [26473de] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 </div>
