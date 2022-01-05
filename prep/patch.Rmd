@@ -132,14 +132,6 @@ repo <- repository(repodir) # needed later on
 last_devbranch_commit <- last_commit(repo = repodir)
 ```
 
-We need a temporary copy of (the most recent version of) patch.R. It may not be available once we are on the revision branch.
-
-```{r}
-patchfile <- path(repodir, "prep", "patch.R")
-tmp_patchfile <- path(tempdir(), "path.R")
-file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)
-```
-
 This intermediate step is a matter of caution to avoid that changes are lost.
 
 ```{r}
