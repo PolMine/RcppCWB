@@ -78,7 +78,7 @@ file.copy(
 Use git to detect files that were deleted from the original CWB code. These files have been copied but 
 are untracked.
 
-```{r root.dir = path.expand("~/Lab/github/RcppCWB")}
+```{r root.dir = path.expand("~/Lab/github/RcppCWB"), eval = FALSE}
 removed_files <- status(repo = repodir, staged = FALSE, unstaged = FALSE, untracked = TRUE) %>%
   unlist() %>%
   unname() %>%
