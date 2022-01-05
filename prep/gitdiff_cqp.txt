@@ -1,21 +1,12 @@
 diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-index b17b9eb..cf7b289 100644
+index 0678240..cf7b289 100644
 --- a/src/cwb/cqp/Makefile
 +++ b/src/cwb/cqp/Makefile
-@@ -21,7 +21,7 @@
- 
- 
- ## Read configuration settings and standard definitions
--TOP = $(shell pwd)/..
-+TOP = $(R_PACKAGE_SOURCE)
- include $(TOP)/config.mk
- 
- ## The following targets are available:
 @@ -94,15 +94,11 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
  
  ## ----------------------------------------------------------------------
  
--all: $(PROGRAMS)
+-all: libcqp.aall: libcqp.a
 +all: libcqp.a
  
 -parser.tab.c parser.tab.h: parser.y

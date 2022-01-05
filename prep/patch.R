@@ -60,7 +60,8 @@ delete_line_before <- list(
   "src/cwb/cl/endian2.h" = list("/* for consistency:", 1L, 1L),
   "src/cwb/cl/Makefile" = list("^libcl.a: \\$\\(OBJS\\)", 1L, 6L),
   "src/cwb/cl/Makefile" = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
-  "src/cwb/cl/Makefile" = list("^depend:$", 1L, 22L)
+  "src/cwb/cl/Makefile" = list("^depend:$", 1L, 22L),
+  "src/cwb/cqp/Makefile" = list("^clean:$", 1L, 7L)
 )
 
 
@@ -310,7 +311,9 @@ remove_lines <- list(
   "src/cwb/cl/lex.creg.c" = list("/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/", 1L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L),
   "src/cwb/cl/lex.creg.c" = list("^\\s*/\\*FALLTHROUGH\\*/\\s*$", 1L),
-  "src/cwb/cl/Makefile" = list("^\\s+\\$\\(RANLIB\\)", 1L)
+  "src/cwb/cl/Makefile" = list("^\\s+\\$\\(RANLIB\\)", 1L),
+  
+  "src/cwb/cqp/Makefile" = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L)
   
 )
 
