@@ -272,6 +272,8 @@ for (i in 1L:length(delete_line_before)){
 ```
 
 
+### Insert code before match
+
 ```{r}
 insert_before <- list(
   "src/cwb/cl/attributes.c" = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
@@ -315,9 +317,28 @@ insert_before <- list(
 )
 
 for (i in 1L:length(insert_before)){
+  
   fname <- path(repodir, names(insert_before)[[i]])
-  code <- readLines(fname)
   which_position <- if (length(insert_before[[i]]) > 2L) insert_before[[i]][[3]] else 1
+  
+  message(
+    sprintf(
+      "file: %s | regex: %s | match: %d | lines: %d ... ",
+      fname,
+      insert_before[[i]][[1]],
+      which_position,
+      paste(insert_before[[i]][[2]], collapse = "///")
+    ),
+    appendLF = FALSE
+  )
+  
+  if (!file.exists(fname)){
+    message("FAIL - file does not exist")
+    next
+  }
+  
+  code <- readLines(fname)
+  
   position <- grep(pattern = insert_before[[i]][[1]], code)[which_position]
   if (!is.na(position)){
     code <- c(
@@ -326,6 +347,9 @@ for (i in 1L:length(insert_before)){
       code[position:length(code)]
     )
     writeLines(text = code, con = fname)
+    message("OK")
+  } else {
+    message("FAIL - no matches for regex")
   }
 }
 ```
