@@ -195,11 +195,12 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
+<pre><code>## Warning in readLines(fname): Zeile 281 scheint ein nul Zeichen zu enthalten</code></pre>
 <p>Add and commit changes so that we can prepare diffs.</p>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [da7fd7c] 2022-01-04: CWB patched</code></pre>
+<pre><code>## [3b591f9] 2022-01-04: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -210,36 +211,6 @@ commit(repo, message = &quot;CWB patched&quot;)</code></pre>
 git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/Makefile b/src/cwb/cl/Makefile
-## index 1679016..3b33b22 100644
-## --- a/src/cwb/cl/Makefile
-## +++ b/src/cwb/cl/Makefile
-## @@ -33,6 +33,17 @@ include $(TOP)/config.mk
-##  #  install      install libcl.a and CL headers
-##  #  uninstall    uninstall libcl.a and headers from chosen locations (currently not supported)
-##  #  release      install to binary release dir
-## +#  size         print size of source code (line counts)
-## +#
-## +
-## +.PHONY: all clean realclean depend install uninstall size
-## +
-## +## Use bison/flex to compile parser for registry entries
-## +PARSEH  = registry.tab.h
-## +PARSES  = registry.tab.c lex.creg.c
-## +PARSEG  = registry.l registry.y
-## +PARSEO  = registry.tab.o lex.creg.o
-## +
-##  ## cl.h header file will be installed in subdirectory cwb/
-##  REALINCINSTDIR = $(INCINSTDIR)/cwb
-##  
-## @@ -93,7 +104,6 @@ all: libcl.a $(EXTRA_OBJS)
-##  libcl.a: $(OBJS)
-##      $(RM) $@
-##      $(AR) cq $@ $^
-## -    $(RANLIB) $@
-##  
-##  depend:
-##      -$(RM) depend.mk</code></pre>
 <p>Finding: Modifications of the Makefile, nothing else</p>
 </div>
 <div id="cqp-directory" class="section level4">
@@ -315,6 +286,158 @@ result &lt;- system(git_cmd, intern = TRUE)
 output &lt;- paste(result, collapse = &quot;\n&quot;)
 # cat(output, file = path(repodir, &quot;prep&quot;, &quot;gitdiff_cqi.txt&quot;))
 cat(output)</code></pre>
+<pre><code>## diff --git a/src/cwb/CQi/server.c b/src/cwb/CQi/server.c
+## index 859d1ec..451d016 100644
+## --- a/src/cwb/CQi/server.c
+## +++ b/src/cwb/CQi/server.c
+## @@ -279,7 +279,146 @@ accept_connection(int port)
+##        
+##        if ((select(sockfd+1, &amp;read_fd, NULL, NULL, &amp;tv) &lt;= 0)
+##            || (!FD_ISSET(sockfd, &amp;read_fd))) {
+## -       
+## +        Rprintf(&quot;Port #%d timed out in private server mode. Aborting.\n&quot;, port);
+## +        exit(1);
+## +      }
+## +    }
+## +
+## +    connfd = accept(sockfd, (struct sockaddr *)&amp;client_addr, &amp;sin_size);
+## +    if (connfd &lt; 0) {
+## +      perror(&quot;ERROR Can&#39;t establish connection&quot;);
+## +      return -1;
+## +    }
+## +    
+## +    if (server_debug) 
+## +      Rprintf(&quot;CQi: Connection established. Looking up client&#39;s name.\n&quot;);
+## +    remote_address = inet_ntoa(client_addr.sin_addr);
+## +    remote_host = gethostbyaddr((void *)&amp;(client_addr.sin_addr), 4, AF_INET);
+## +    if (server_log) {
+## +      Rprintf(&quot;Connection established with %s &quot;, remote_address);
+## +      if (remote_host != NULL) 
+## +        Rprintf(&quot;(%s)&quot;, remote_host-&gt;h_name);
+## +      Rprintf(&quot;\n&quot;);
+## +    }
+## +    
+## +#ifndef __MINGW__
+## +    /* spawn a server to handle the request */
+## +    child_pid = fork();
+## +    if (child_pid &lt; 0) {
+## +      perror(&quot;ERROR can&#39;t fork() server&quot;);
+## +      return -1;
+## +    }
+## +    
+## +    if (child_pid == 0)
+## +      break;                    /* the child exits the listen() loop */
+## +
+## +    /* this is the listening &#39;parent&#39;, which exits immediately */
+## +    Rprintf(&quot;Spawned CQPserver, pid = %d.\n&quot;, (int)child_pid);
+## +    close(connfd);              /* this is the child&#39;s connection */
+## +
+## +    if (private_server) {
+## +      Rprintf(&quot;Accepting no more connections (private server).\n&quot;);
+## +      close(sockfd);
+## +      exit(0);                  /* SIGCHLD should be reaped by calling process */
+## +    }
+## +#else
+## +    /* no forking in Windows!
+## +     * So all we can do here is break the loop, assuming we are a child.
+## +     *
+## +     * Note this means: the Windows version of cqpserver accepts only one client!
+## +     * (see here for some discussion:
+## +     *      http://www.gamedev.net/community/forums/topic.asp?topic_id=360290
+## +     *      http://stackoverflow.com/questions/985281/what-is-the-closest-thing-windows-has-to-fork
+## +     *      )
+## +     * We print the &quot;private server&quot; message automatically.
+## +     */
+## +    Rprintf(&quot;Accepting no more connections (private server).\n&quot;);
+## +    break;
+## +#endif
+## +  }/* endwhile 42 */
+## +
+## +  /* this is the child serving the new CQi connection */
+## +  if (server_debug) 
+## +    Rprintf(&quot;CQi: ** new CQPserver created, initiating CQi session\n&quot;);
+## +  close(sockfd);
+## +
+## +  /* check if remote host is in validation list */
+## +  if (!check_host(client_addr.sin_addr)) {
+## +    Rprintf(&quot;WARNING %s not in list, connection refused!\n&quot;, remote_address);
+## +    Rprintf(&quot;Exit. (pid = %d)\n&quot;, (int)getpid());
+## +    close(connfd);
+## +    exit(1);
+## +  }
+## +
+## +#ifndef __MINGW__
+## +  /* create a buffered stream to the outgoing connection */
+## +  conn_out = fdopen(connfd, &quot;w&quot;);
+## +  if (conn_out == NULL) {
+## +    perror(&quot;ERROR Can&#39;t switch CQi connection to buffered output&quot;);
+## +    close(connfd);
+## +    return -1;
+## +  }
+## +#endif
+## +
+## +  if (server_debug) 
+## +    Rprintf(&quot;CQi: creating attribute hash (size = %d)\n&quot;, ATTHASHSIZE);
+## +  make_attribute_hash(ATTHASHSIZE);
+## +
+## +  return connfd;
+## +}
+## +
+## +
+## +
+## +/* 
+## + *
+## + *  Server -&gt; Client communication
+## + *
+## + */
+## +
+## +/* communication primitives (no auto-flush; use cqi_flush()) */
+## +
+## +/**
+## + * Flushes the stream from the CQP server to the client program,
+## + * emptying its buffer.
+## + *
+## + * Note that under windows, buffered output is not possible, so
+## + * this function does nothing.
+## + *
+## + * @return  Boolean: true if everything OK, otherwise false.
+## + */
+## +int 
+## +cqi_flush(void)
+## +{
+## +#ifdef __MINGW__
+## +  return 1;
+## +#else
+## +  if (snoop) {
+## +    Rprintf(&quot;CQi FLUSH\n&quot;);
+## +  }
+## +  if (EOF == fflush(conn_out)) {
+## +    perror(&quot;ERROR cqi_flush()&quot;);
+## +    return 0;
+## +  }
+## +  else {
+## +    return 1;
+## +  }
+## +#endif
+## +}
+## +
+## +/**
+## + * Sends a BYTE to the client.
+## + *
+## + * This function should be called via one of the cqi_data_* functions
+## + * and not on its own.
+## + *
+## + * This is the fundamental &quot;sending&quot; function, and the only one that calls the underlying
+## + * OS-specific file stream/socket functions.
+## + *
+## + * @param n        The byte to send. NOTE that as the parameter is an int, numbers bigger than
+## + *                 0xff can be passed. BUT all content except the lowest-order 8-bits are discarded
+## + *                 (0xff is used as a mask with bitwise-and).
+## + * @param nosnoop  Boolean: if true, snoop functionality is overridden (to allow for non-repetition
+## + *                 of messages when called from a function that has already printed a message)
+##   */
+##  int 
+##  cqi_send_byte(int n, int nosnoop)</code></pre>
 </div>
 <div id="utils-directory" class="section level4">
 <h4>utils directory</h4>
