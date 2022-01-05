@@ -11,6 +11,13 @@ editor_options:
 knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
 ```
 
+## Global Settings
+
+The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from `definitions.mk`.
+
+```{r}
+cwb_svn_revision <- 1069L
+```
 
 ## Step 1: Create branch with unaltered CWB code
 
@@ -48,8 +55,13 @@ cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk") # r1069
 
 ```{r}
 setwd("~/Lab/tmp/cwb/trunk")
-rev <- system("svn info --show-item revision", intern = TRUE)
-rev
+revision_active <- system("svn info --show-item revision", intern = TRUE)
+if (as.integer(revision_active) != cwb_svn_revision){
+  system(sprintf("svn up -r %d", cwb_svn_revision), intern = TRUE)
+  revision_active <- system("svn info --show-item revision", intern = TRUE)
+}
+setwd(repodir)
+revision_active
 ```
 
 ```{r}
