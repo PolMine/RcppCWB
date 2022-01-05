@@ -528,7 +528,8 @@ replace <- list(
   "src/cwb/config/platform/linux" = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L),
   "src/cwb/config/platform/darwin" = list("^READLINE_DEFINES\\s:=.*?", "READLINE_DEFINES =", 1L),
   "src/cwb/config/platform/darwin" = list("^READLINE_LIBS\\s:=.*?", "READLINE_LIBS =", 1L),
-  "src/cwb/config/platform/unix" = list("^AR\\s+=\\s+ar$", "AR = ar cq", 1L)
+  "src/cwb/config/platform/unix" = list("^AR\\s+=\\s+ar$", "AR = ar cq", 1L),
+  "src/cwb/definitions.mk" = list("(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)", "# \\1", 1L)
 )
 
 for (i in 1L:length(replace)){
