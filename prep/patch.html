@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [baad2b3] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [51c1059] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -628,7 +628,8 @@ replace &lt;- list(
   &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
   &quot;src/cwb/config/platform/darwin-port-core2&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
   &quot;src/cwb/config/platform/darwin-universal&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/linux-opteron&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L)
+  &quot;src/cwb/config/platform/linux-opteron&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
+  &quot;src/cwb/config/platform/linux&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L)
 )
 
 for (i in 1L:length(replace)){
@@ -825,7 +826,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e4d5c41] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [a273a88] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
