@@ -24,10 +24,10 @@ file.rename(
   to = path(cwb_pkg_dir, "instutils", "_Makefile")
 )
 
-new_files <- list.files(path = file.path(repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
-for (fname in new_files){
-  file.copy(from = fname, to = gsub("/prep/", "/src/", fname))
-}
+# new_files <- list.files(path = file.path(repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
+# for (fname in new_files){
+#   file.copy(from = fname, to = gsub("/prep/", "/src/", fname))
+# }
 
 
 global_replacements <- list(
