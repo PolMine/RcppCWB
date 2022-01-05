@@ -19,6 +19,13 @@ file.rename(
   to = path(cwb_pkg_dir, "cl", "endian2.h")
 )
 
+file.rename(
+  from = path(cwb_pkg_dir, "instutils", "Makefile"),
+  to = path(cwb_pkg_dir, "instutils", "_Makefile")
+)
+
+
+
 global_replacements <- list(
   c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
@@ -460,20 +467,10 @@ lapply(
   }
 )
 
-# Files to be removed
 
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian.h
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/Makefile
-
-
-# Files to be renamed
-
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/Makefile
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/_Makefile
 
 # Files to be added
 
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.h
