@@ -174,7 +174,7 @@ pre code {
 <div id="global-settings" class="section level2">
 <h2>Global Settings</h2>
 <p>The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from <code>definitions.mk</code>.</p>
-<pre class="r"><code>cwb_svn_revision &lt;- 1071L</code></pre>
+<pre class="r"><code>cwb_svn_revision &lt;- 1100L</code></pre>
 </div>
 <div id="step-1-create-branch-with-unaltered-cwb-code" class="section level2">
 <h2>Step 1: Create branch with unaltered CWB code</h2>
@@ -207,7 +207,7 @@ if (as.integer(revision_active) != cwb_svn_revision){
 }
 setwd(repodir)
 revision_active</code></pre>
-<pre><code>## [1] &quot;1071&quot;</code></pre>
+<pre><code>## [1] &quot;1100&quot;</code></pre>
 <pre class="r"><code>setwd(repodir)</code></pre>
 <p>We create new branch r1069 if not yet present.</p>
 <pre class="r"><code>cwb_revision_branch &lt;- sprintf(&quot;r%d&quot;, cwb_svn_revision)
@@ -312,7 +312,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [163fabf] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [d6b5ff5] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -339,7 +339,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [53a9368] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [67fa2be] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -350,7 +350,157 @@ commit(repo, message = &quot;CWB patched&quot;)</code></pre>
 git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/cl/special-chars.c b/src/cwb/cl/special-chars.c
+<pre><code>## diff --git a/src/cwb/cl/macros.c b/src/cwb/cl/macros.c
+## index 8549850..34de633 100644
+## --- a/src/cwb/cl/macros.c
+## +++ b/src/cwb/cl/macros.c
+## @@ -1,13 +1,13 @@
+## -/* 
+## +/*
+##   *  IMS Open Corpus Workbench (CWB)
+##   *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##   *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## - * 
+## + *
+##   *  This program is free software; you can redistribute it and/or modify it
+##   *  under the terms of the GNU General Public License as published by the
+##   *  Free Software Foundation; either version 2, or (at your option) any later
+##   *  version.
+## - * 
+## + *
+##   *  This program is distributed in the hope that it will be useful, but
+##   *  WITHOUT ANY WARRANTY; without even the implied warranty of
+##   *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+## @@ -23,13 +23,25 @@ void Rprintf(const char *, ...);
+##  #include &lt;time.h&gt;
+##  
+##  
+## +/**
+## + * @file
+## + *
+## + * This file contains a number of generally handy functyions:
+## + *
+## + * - memory  management (better malloc, free, etc.)
+## + * - printing of indented lists
+## + * - progress bar printing.
+## + *
+## + * NB. The latter two things probably ought to be in CQP rather than here.
+## + */
+## +
+##  
+##  
+##  
+##  
+##  /*
+## - * memory allocation functions with integrate success test 
+## - * (this functions will be used as hooks for the CL MMU)
+## + * memory allocation functions with integrated success test
+## + * (to be used as hooks for the CL MMU)
+##   */
+##  
+##  /**
+## @@ -95,7 +107,7 @@ cl_realloc(void *block, size_t bytes)
+##  {
+##    void *new_block;
+##  
+## -  if (block == NULL) 
+## +  if (block == NULL)
+##      new_block = malloc(bytes);  /* some OSs don&#39;t fall back to malloc() if block == NULL */
+##    else
+##      new_block = realloc(block, bytes);
+## @@ -104,7 +116,7 @@ cl_realloc(void *block, size_t bytes)
+##      if (bytes == 0) {
+##        /* don&#39;t warn any more, reallocating to 0 bytes should create no problems, at least on Linux and Solaris */
+##        /* (the message was probably shown on Linux only, because Solaris doesn&#39;t return NULL in this case) */
+## -      /* Rprintf(&quot;CL: WARNING realloc() to 0 bytes!\n&quot;); */      
+## +      /* Rprintf(&quot;CL: WARNING realloc() to 0 bytes!\n&quot;); */
+##      }
+##      else {
+##        Rprintf(&quot;CL: Out of memory. (killed)\n&quot;);
+## @@ -171,10 +183,10 @@ cl_set_rng_state(unsigned int i1, unsigned int i2)
+##   * @param i1  Target location for the value of RNG_I1
+##   * @param i2  Target location for the value of RNG_I2
+##   */
+## -void 
+## +void
+##  cl_get_rng_state(unsigned int *i1, unsigned int *i2)
+##  {
+## -  *i1 = RNG_I1; 
+## +  *i1 = RNG_I1;
+##    *i2 = RNG_I2;
+##  }
+##  
+## @@ -191,6 +203,7 @@ cl_set_seed(unsigned int seed)
+##  
+##  /**
+##   *  Initialises the CL-internal random number generator from the current system time.
+## + *  TODO, maybe this name would be bbetter as &quot;cl_seed_time&quot;?
+##   */
+##  void
+##  cl_randomize(void)
+## @@ -219,8 +232,10 @@ cl_random(void)
+##   * Part of the CL-internal random number generator.
+##   *
+##   * @return  The generated random number.
+## + * TODO runif sounds a bit too much like &quot;run if&quot;. I (AH) keep getting xconfused.
+## + *       .... maybe cl_random_fraction?
+##   */
+## -double 
+## +double
+##  cl_runif(void)
+##  {
+##    return cl_random() * 2.328306437080797e-10; /* = cl_random / (2^32 - 1) */
+## @@ -234,6 +249,7 @@ cl_runif(void)
+##  
+##  /*
+##   *  display progress bar in terminal window
+## + *  TODO: put in another file maybe??
+##   */
+##  
+##  /* non-exported global variables for progress bar */
+## @@ -329,7 +345,9 @@ progress_bar_percentage(int pass, int total, int percentage)
+##  
+##  
+##  /*
+## - *  print indented &#39;tabularised&#39; lists
+## + *  print indented &#39;tabularised&#39; lists.
+## + *
+## + *  Note that use of global variables makes this non-reentrant
+##   */
+##  
+##  /* status variables (non-exported globals) */
+## @@ -369,7 +387,7 @@ start_indented_list(int linewidth, int tabsize, int indent)
+##    ilist_cursor = 0;
+##    /* indent from left margin */
+##    ilist_print_blanks(ilist_indent);
+## -} 
+## +}
+##  
+##  /**
+##   * Starts a new line in an indented &#39;tabularised&#39; list.
+## @@ -384,7 +402,7 @@ void
+##  print_indented_list_br(char *label)
+##  {
+##    int llen = (label != NULL) ? strlen(label) : 0;
+## -  
+## +
+##    if (ilist_cursor != 0) {
+##      Rprintf(&quot;\n&quot;);
+##    }
+## diff --git a/src/cwb/cl/macros.h b/src/cwb/cl/macros.h
+## index 87ef9c3..d5368f5 100644
+## --- a/src/cwb/cl/macros.h
+## +++ b/src/cwb/cl/macros.h
+## @@ -53,7 +53,7 @@
+##   * they are considered non-equal when one of both is NULL.
+##   * @param a  the first string
+##   * @param b  the second string
+## - * @return   a Boolean
+## + * @return   Boolean
+##   */
+##  #define STREQ(a,b) (((a) == (b)) || \
+##                      ((a) &amp;&amp; (b) &amp;&amp; (strcmp((a), (b)) == 0)))
+## diff --git a/src/cwb/cl/special-chars.c b/src/cwb/cl/special-chars.c
 ## index 0012017..2e89b9a 100644
 ## --- a/src/cwb/cl/special-chars.c
 ## +++ b/src/cwb/cl/special-chars.c
@@ -386,8 +536,907 @@ git_cmd &lt;- sprintf(&quot;git diff --ignore-space-at-eol %s..%s .&quot;, last_
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
-<pre><code>## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
-## index 53e4bcf..30ba538 100644
+<pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
+## index cf7b289..cac41f1 100644
+## --- a/src/cwb/cqp/Makefile
+## +++ b/src/cwb/cqp/Makefile
+## @@ -18,12 +18,6 @@
+##  
+##  ##  This is the Makefile for the CWB Corpus Query Processor programs. 
+##  
+## -
+## -
+## -## Read configuration settings and standard definitions
+## -TOP = $(R_PACKAGE_SOURCE)
+## -include $(TOP)/config.mk
+## -
+##  ## The following targets are available:
+##  #
+##  #  all          create binaries cqp, cqpcl, and cqpserver
+## @@ -36,6 +30,18 @@ include $(TOP)/config.mk
+##  #  size         print size of source code (line counts)
+##  #
+##  
+## +
+## +## Read configuration settings and standard definitions
+## +TOP = $(R_PACKAGE_SOURCE)
+## +include $(TOP)/config.mk
+## +
+## +## This is an extra flag for this folder. It is used in the CQP parser; 
+## +## normally it is not defined, but if it is, the synchronize#() function 
+## +## becomes a no-op.
+## +ifdef CQP_COMPILE_WITHOUT_SYNCHRONIZE
+## +CFLAGS_ALL := -DCQP_COMPILE_WITHOUT_SYNCHRONIZE $(CFLAGS_ALL) 
+## +endif
+## +
+##  .PHONY: all clean realclean depend install uninstall size
+##  
+##  ## Use bison/flex to compile parser for registry entries
+## diff --git a/src/cwb/cqp/ascii-print.c b/src/cwb/cqp/ascii-print.c
+## index b2ea93a..b8241ca 100644
+## --- a/src/cwb/cqp/ascii-print.c
+## +++ b/src/cwb/cqp/ascii-print.c
+## @@ -577,10 +577,13 @@ print_concordance_line(FILE *outfd,
+##  }
+##  
+##  
+## -
+## +/**
+## + * Prints a header for a &quot;cat&quot; command.
+## + *
+## + * Note that the &quot;corpus&quot; here refers to a subcorpus IE query result.
+## + */
+##  void
+## -ascii_print_corpus_header(CorpusList *cl, 
+## -                          FILE *stream)
+## +ascii_print_corpus_header(CorpusList *cl, FILE *stream)
+##  {
+##    time_t now;
+##  
+## diff --git a/src/cwb/cqp/context_descriptor.c b/src/cwb/cqp/context_descriptor.c
+## index 0f3bcbf..2a50baa 100644
+## --- a/src/cwb/cqp/context_descriptor.c
+## +++ b/src/cwb/cqp/context_descriptor.c
+## @@ -362,6 +362,8 @@ PrintAttributesSimple(FILE *fd, char *type, AttributeList *al, int show_if_annot
+##  /**
+##   * Prints the contents of a ContextDescriptor either to stdout or a pager
+##   * (NB this uses its own internal stream).
+## + *
+## + * @param cdp       Context descriptor to print.
+##   */
+##  void
+##  PrintContextDescriptor(ContextDescriptor *cdp)
+## @@ -378,29 +380,36 @@ PrintContextDescriptor(ContextDescriptor *cdp)
+##        Rprintf(&quot;===Context Descriptor=======================================\n&quot;);
+##        Rprintf(&quot;\n&quot;);
+##        Rprintf(&quot;left context:     %d &quot;, cdp-&gt;left_width);
+## +
+##        switch (cdp-&gt;left_type) {
+## -      case CHAR_CONTEXT: 
+## -        Rprintf(&quot;characters\n&quot;); break;
+## -      case WORD_CONTEXT: 
+## -        Rprintf(&quot;tokens\n&quot;); break;
+## -      case STRUC_CONTEXT: 
+## -      case ALIGN_CONTEXT:
+## -        Rprintf(&quot;%s\n&quot;,
+## -                cdp-&gt;left_structure_name ? cdp-&gt;left_structure_name : &quot;???&quot;);
+## +      case char_context:
+## +        Rprintf(&quot;characters\n&quot;);
+## +        break;
+## +      case word_context:
+## +        Rprintf(&quot;tokens\n&quot;);
+## +        break;
+## +      case s_att_context:
+## +      case a_att_context:
+## +        Rprintf(&quot;%s\n&quot;, cdp-&gt;left_structure_name ? cdp-&gt;left_structure_name : &quot;???&quot;);
+## +        break;
+##        }
+## +
+##        Rprintf(&quot;right context:    %d &quot;, cdp-&gt;right_width);
+## +
+##        switch (cdp-&gt;right_type) {
+## -      case CHAR_CONTEXT: 
+## -        Rprintf(&quot;characters\n&quot;); break;
+## -      case WORD_CONTEXT: 
+## -        Rprintf(&quot;tokens\n&quot;); break;
+## -      case STRUC_CONTEXT: 
+## -      case ALIGN_CONTEXT:
+## -        Rprintf(&quot;%s\n&quot;,
+## -                cdp-&gt;right_structure_name ? cdp-&gt;right_structure_name : &quot;???&quot;);
+## +      case char_context:
+## +        Rprintf(&quot;characters\n&quot;);
+## +        break;
+## +      case word_context:
+## +        Rprintf(&quot;tokens\n&quot;);
+## +        break;
+## +      case s_att_context:
+## +      case a_att_context:
+## +        Rprintf(&quot;%s\n&quot;, cdp-&gt;right_structure_name ? cdp-&gt;right_structure_name : &quot;???&quot;);
+## +        break;
+##        }
+##        Rprintf(&quot;corpus position:  %s\n&quot;, cdp-&gt;print_cpos ? &quot;shown&quot; : &quot;not shown&quot;);
+## -      Rprintf(&quot;target anchors:   %s\n&quot;, show_targets ? &quot;shown&quot; : &quot;not shown&quot;);
+## +      Rprintf(&quot;target anchors:   %s\n&quot;, show_targets    ? &quot;shown&quot; : &quot;not shown&quot;);
+##        Rprintf(&quot;\n&quot;);
+##        PrintAttributes(fd, &quot;Positional Attributes:&quot;, cdp-&gt;attributes, 0);
+##        Rprintf(&quot;\n&quot;);
+## diff --git a/src/cwb/cqp/context_descriptor.h b/src/cwb/cqp/context_descriptor.h
+## index cb10a7d..34005e2 100644
+## --- a/src/cwb/cqp/context_descriptor.h
+## +++ b/src/cwb/cqp/context_descriptor.h
+## @@ -21,17 +21,26 @@
+##  
+##  #include &quot;attlist.h&quot;
+##  
+## -/* The following constant define flags for the four different ways of measuring context-width: */
+## +/* The following constant define flags for the four different ways of measuring context-width:
+## + * we now have an enum, but we haven&#39;t yet removed thesemacros ; so, TODO */
+##  
+## -/** Context width measured in characters */
+##  #define CHAR_CONTEXT  -1
+## -/** Context width measured in tokens */
+##  #define WORD_CONTEXT  -2
+## -/** Context width measured in terms of an s-attribute */
+##  #define STRUC_CONTEXT -3
+## -/** Context width measured in terms of an a-attribute - that is, alignment blocks as the unit of context */
+##  #define ALIGN_CONTEXT -4
+##  
+## +typedef enum _context_type {
+## +  /** Context width measured in characters */
+## +  char_context = CHAR_CONTEXT,
+## +  /** Context width measured in tokens */
+## +  word_context = WORD_CONTEXT,
+## +  /** Context width measured in terms of an s-attribute */
+## +  s_att_context = STRUC_CONTEXT,
+## +  /** Context width measured in terms of an a-attribute - that is, alignment blocks as the unit of context */
+## +  a_att_context = ALIGN_CONTEXT
+## +
+## +} context_type;
+## +
+##  /**
+##   * ContextDescriptor object: a bundle of CQP options
+##   * describing how a list of corpus positions is to be
+## @@ -65,8 +74,9 @@ typedef struct _context_description_block {
+##    /* ==================== left context scope description variables */
+##  
+##    int left_width;                    /**&lt; Amount of context to show before the match, in units specified by left_type */
+## -  int left_type;                     /**&lt; Unit in which context is measured;
+## +  context_type left_type;            /**&lt; Unit in which context is measured;
+##                                            Set to one of the constants: CHAR_CONTEXT, WORD_CONTEXT, STRUC_CONTEXT, ALIGN_CONTEXT */
+## +  /* TODO use an enum instead (change so far partially implemented) */
+##    /* TODO Is being able to have the left co-text measured in words and the right context in (say) paragraphs something we really are bovvered about? */
+##  
+##    char *left_structure_name;
+## @@ -75,7 +85,7 @@ typedef struct _context_description_block {
+##    /* ==================== right context scope description variables */
+##  
+##    int right_width;                   /**&lt; Amount of context to show after the match, in units specified by right_type */
+## -  int right_type;                    /**&lt; Unit in which context is measured;
+## +  context_type right_type;           /**&lt; Unit in which context is measured;
+##                                            Set to one of the constants: CHAR_CONTEXT, WORD_CONTEXT, STRUC_CONTEXT, ALIGN_CONTEXT */
+##    char *right_structure_name;
+##    Attribute *right_structure;
+## diff --git a/src/cwb/cqp/corpmanag.c b/src/cwb/cqp/corpmanag.c
+## index 2ce8298..bfced5a 100644
+## --- a/src/cwb/cqp/corpmanag.c
+## +++ b/src/cwb/cqp/corpmanag.c
+## @@ -81,10 +81,10 @@ init_corpuslist(void)
+##  }
+##  
+##  /**
+## - * Resets to empty a CorpusList object.
+## + * Resets a CorpusList object to empty.
+##   *
+##   * This is done, largely, by freeing all its members
+## - * (and setting nonfreeable members to 0 or NULL)...
+## + * (and setting other members to 0 or NULL)...
+##   *
+##   * @param cl         The corpus list to initialise.
+##   * @param free_name  Boolean: the name, mother_name and mother_sizemembers
+## @@ -181,7 +181,7 @@ NewCL(void)
+##  
+##  /**
+##   * Returns a FieldType enumeration corresponding to the field name
+## - * indicated by its stirng argument.
+## + * indicated by its string argument.
+##   */
+##  FieldType
+##  field_name_to_type(char *name)
+## @@ -190,8 +190,7 @@ field_name_to_type(char *name)
+##      return NoField;
+##    else if (strcasecmp(name, &quot;keyword&quot;) == 0)
+##      return KeywordField;
+## -  else if ((strcasecmp(name, &quot;target&quot;) == 0) ||
+## -           (strcasecmp(name, &quot;collocate&quot;) == 0))
+## +  else if ((strcasecmp(name, &quot;target&quot;) == 0) || (strcasecmp(name, &quot;collocate&quot;) == 0))
+##      return TargetField;
+##    else if (strcasecmp(name, &quot;match&quot;) == 0)
+##      return MatchField;
+## @@ -284,7 +283,7 @@ SystemCorpusSize(Corpus *corpus)
+##    if ((attr = find_attribute(corpus,
+##                               DEFAULT_ATT_NAME,
+##                               ATT_POS, NULL)) != NULL)
+## -    return get_attribute_size(attr);
+## +    return cl_max_cpos(attr);
+##    else
+##      return -1;
+##  }
+## @@ -388,29 +387,23 @@ ensure_corpus_size(CorpusList *cl)
+##   * loaded corpora. In case of subcorpora, qualifier is the mother&#39;s
+##   * name. in case of system corpora, qualifier is the registry. If
+##   * qualifier is NULL, it is neglected and the first matching corpus is
+## - * returned. If type is not UNDEF, only corpora of that type are
+## + * returned. If type is not UNDEF, only a corpus of that type can be
+##   * returned. No side effects take place.
+##   *
+## - * @param name       The corpus we are lookign for.
+## + * @param name       The corpus we are looking for.
+##   * @param qualifier  An extra &quot;bit&quot; of the corpus name (see function description).
+## - * @param type       Which type of corpus is wanted (may be UNDEF).
+## - * @return           Pointer to the CorpusList of the corpus that was found.
+## + * @param type       Which type of corpus is wanted (may be UNDEF, which finds any except TEMP).
+## + * @return           Pointer to the CorpusList of the corpus that was found, or NULL if not found.
+##   */
+##  CorpusList *
+## -LoadedCorpus(char *name,
+## -             char *qualifier,
+## -             CorpusType type)
+## +LoadedCorpus(char *name, char *qualifier, CorpusType type)
+##  {
+## -  CorpusList *sp;
+## -
+## -  for (sp  = corpuslist; sp; sp = sp-&gt;next)
+## -
+## -    if ((sp-&gt;type == type) ||
+## -        ((type == UNDEF) &amp;&amp; (sp-&gt;type != TEMP)))
+## +  CorpusList *corp;
+##  
+## +  for (corp = corpuslist; corp; corp = corp-&gt;next) {
+## +    if (corp-&gt;type == type || (type == UNDEF &amp;&amp; corp-&gt;type != TEMP)) {
+##        /* the type is ok. Check the name. */
+## -
+## -      if (STREQ(sp-&gt;name, name)) {
+## +      if (STREQ(corp-&gt;name, name)) {
+##  
+##          /* ignoring the qualifier is OK for system corpora (although its behaviour is not very well defined if there are
+##             multiple corpora with the same name in different registry directories), but it can get really messy with subcorpora;
+## @@ -423,29 +416,39 @@ LoadedCorpus(char *name,
+##          /* the name is also ok. Check the qualifier */
+##  
+##          if (qualifier == NULL) {
+## -          if (sp-&gt;type == SUB) {
+## +          /* no qualifier was specified.... so TRY TO GUESS. */
+## +          if (corp-&gt;type == SUB) {
+##              if (current_corpus) {
+## -              if (current_corpus-&gt;type == SUB) {
+## +              /* use a qualifier guessed from current_corpus to compare */
+## +              if (current_corpus-&gt;type == SUB)
+##                  qualifier = current_corpus-&gt;mother_name;
+## -              }
+## -              else {
+## +              else
+##                  qualifier = current_corpus-&gt;name;
+## -              }
+## -              if (STREQ(sp-&gt;mother_name, qualifier))
+## -                return sp;
+## +              if (STREQ(corp-&gt;mother_name, qualifier))
+## +                return corp;
+##              }
+##              else {
+## -              return sp;
+## +              /* no current corpus - no guesswork possible. */
+## +              return corp;
+##              }
+##            }
+##            else {
+## -            return sp;
+## +            /* the candidate is not a subcorpus - guesswork possible. */
+## +            return corp;
+##            }
+##          }
+## -        else if (((sp-&gt;type == SYSTEM) &amp;&amp; STREQ(sp-&gt;registry, qualifier)) ||
+## -                 ((sp-&gt;type == SUB) &amp;&amp; STREQ(sp-&gt;mother_name, qualifier)))
+## -          return sp;
+## +        else {
+## +          /* we DO have a qualifier */
+## +          return (
+## +              (corp-&gt;type == SYSTEM &amp;&amp; STREQ(corp-&gt;registry, qualifier))
+## +              ||
+## +              (corp-&gt;type == SUB    &amp;&amp; STREQ(corp-&gt;mother_name, qualifier))
+## +              )
+## +              ? corp : NULL;
+## +        }
+##        }
+## +    }
+## +  }
+##  
+##    return NULL;
+##  }
+## @@ -549,7 +552,7 @@ findcorpus(char *s, CorpusType type, int try_recursive_search)
+##                     expansion+1, sp-&gt;mother_name);
+##          return NULL;
+##        }
+## -      ctx.direction = leftright;
+## +      ctx.direction = ctxtdir_leftright;
+##        ctx.type = structure;
+##        ctx.size = 1;
+##  
+## @@ -635,12 +638,12 @@ dropcorpus(CorpusList *cl)
+##  }
+##  
+##  /**
+## - * Duplicate a corpus via its CorpusList object.
+## + * Duplicate a CorpusList object.
+##   *
+##   * duplicate_corpus creates a copy of an existing corpus
+##   * and casts its type to SUB. The new corpus is given the
+##   * name &quot;new_name&quot;. If a subcorpus of that name is already
+## - * present, NULL is retured if force_overwrite is False. If
+## + * present, NULL is returned if force_overwrite is False. If
+##   * force_overwrite is True, the old corpus is discarded.
+##   *
+##   * @param cl               The corpus to duplicate
+## @@ -683,8 +686,8 @@ duplicate_corpus(CorpusList *cl,
+##        return cl;
+##      }
+##      else
+## -      /* we are not allowed to overwrite myself, so say
+## -       * that we did not succeed.
+## +      /* we are not allowed to overwrite myself,
+## +       * so say that we did not succeed.
+##         */
+##        return NULL;
+##    }
+## @@ -1013,20 +1016,13 @@ drop_temp_corpora(void)
+##  
+##  /**
+##   * Creates a copy of the string with the given mode (LOWER/UPPER)
+## - * enforced on it.
+## + * enforced on it. Return is a pointer to newly-allocated string.
+##   */
+##  static char *
+##  changecase_string(const char *str, enum case_mode mode)
+##  {
+## -  char *str_new;
+## -  /*int i, len = strlen(str);*/
+## -
+## -  str_new = cl_strdup(str);
+## +  char *str_new = cl_strdup(str);
+##  
+## -  /*
+## -   for (i = 0; i &lt;= len; i++)
+## -    str_new[i] = (mode == LOWER) ? tolower(str[i]) : toupper(str[i]);
+## -  */
+##    if (mode == LOWER)
+##      cl_id_tolower(str_new);
+##    else
+## @@ -1037,16 +1033,11 @@ changecase_string(const char *str, enum case_mode mode)
+##  
+##  /**
+##   * Like changecase_string(), but modifies the string in situ.
+## + * The return value is identical to the first argument.
+##   */
+##  static char *
+##  changecase_string_no_copy(char *str, enum case_mode mode)
+##  {
+## -  /*int i;*/
+## -
+## -  /*
+## -  for (i = 0; str[i]; i++)
+## -    str[i] = (mode == LOWER) ? tolower(str[i]) : toupper(str[i]);
+## -  */
+##    if (mode == LOWER)
+##      cl_id_tolower(str);
+##    else
+## @@ -1065,7 +1056,7 @@ get_fulllocalpath(CorpusList *cl, int qualify)
+##      upname = cl-&gt;mother_name ? changecase_string(cl-&gt;mother_name, UPPER) : cl_strdup(&quot;NONE&quot;);
+##  
+##      sprintf(fullname, &quot;%s%s%s:%s&quot;, LOCAL_CORP_PATH,
+## -            LOCAL_CORP_PATH[strlen(LOCAL_CORP_PATH)-1] == &#39;/&#39; ? &quot;&quot; : &quot;/&quot;,
+## +            LOCAL_CORP_PATH[strlen(LOCAL_CORP_PATH)-1] == SUBDIR_SEPARATOR ? &quot;&quot; : SUBDIR_SEP_STRING,
+##              cl-&gt;mother_name ? cl-&gt;mother_name : &quot;NONE&quot;,
+##              cl-&gt;name);
+##  
+## @@ -1073,7 +1064,7 @@ get_fulllocalpath(CorpusList *cl, int qualify)
+##    }
+##    else
+##      sprintf(fullname, &quot;%s%s%s&quot;, LOCAL_CORP_PATH,
+## -            LOCAL_CORP_PATH[strlen(LOCAL_CORP_PATH)-1] == &#39;/&#39; ? &quot;&quot; : &quot;/&quot;,
+## +            LOCAL_CORP_PATH[strlen(LOCAL_CORP_PATH)-1] == SUBDIR_SEPARATOR ? &quot;&quot; : SUBDIR_SEP_STRING,
+##              cl-&gt;name);
+##  
+##    return cl_strdup(fullname);
+## @@ -1082,7 +1073,6 @@ get_fulllocalpath(CorpusList *cl, int qualify)
+##  /* ---------------------------------------------------------------------- */
+##  
+##  
+## -/* TODO change function name. &quot;accessible&quot; is ri-bloody-diculous */
+##  /**
+##   * Tests whether a file is accessible.
+##   *
+## @@ -1096,7 +1086,7 @@ get_fulllocalpath(CorpusList *cl, int qualify)
+##   * @return      Boolean: true iff file is accessible.
+##   */
+##  static Boolean
+## -accessible(char *dir, char *file)
+## +is_readable_file(char *dir, char *file)
+##  {
+##  
+##    /* fullname is allocated: lenth of string dir and length of string file */
+## @@ -1108,24 +1098,22 @@ accessible(char *dir, char *file)
+##  
+##    fullname[0] = &#39;\0&#39;;
+##    strcat(fullname, dir);
+## -  if (fullname[strlen(fullname)-1] != &#39;/&#39;)
+## -    strcat(fullname, &quot;/&quot;);
+## +  if (fullname[strlen(fullname)-1] != SUBDIR_SEPARATOR)
+## +    strcat(fullname, SUBDIR_SEP_STRING);
+##    strcat(fullname, file);
+##  
+##    success = False;
+## -  if ((0 == stat(fullname, &amp;filestat)) &amp;&amp;
+## -      (! S_ISDIR(filestat.st_mode)) &amp;&amp;
+## -      (access(fullname, R_OK) == 0)) {
+## +  if (0 == stat(fullname, &amp;filestat) &amp;&amp; !(S_ISDIR(filestat.st_mode)) &amp;&amp; access(fullname, R_OK) == 0) {
+##      success = True;
+##    }
+##  
+## -  free(fullname);
+## +  cl_free(fullname);
+##  
+##    return(success);
+##  }
+##  
+## -/* THIS FUNCTION IS CURRENTLY UNUSED */
+## -/* Its previous purpose was to check the magic number of potential saved query files in the data directory,
+## +/* THIS FUNCTION IS CURRENTLY UNUSED
+## +   Its previous purpose was to check the magic number of potential saved query files in the data directory,
+##     but this caused enormous delays when there were lots of files in this directory (e.g. in BNCweb).  So now
+##     every file whose name looks right will be inserted into the internal list, but accessing it will fail
+##     if it turns out to be bogus (which shouldn&#39;t happen anyway if the directory is handled by a sane person). */
+## @@ -1203,7 +1191,7 @@ load_corpusnames(enum corpus_type ct)
+##        while ((ep = readdir(dp))) {
+##          if ((strchr(ep-&gt;d_name, &#39;.&#39;) == NULL) &amp;&amp;   /* ignore files with &#39;.&#39; char in registry (such as hidden files) */
+##              (strchr(ep-&gt;d_name, &#39;~&#39;) == NULL) &amp;&amp;   /* ignore files with &#39;~&#39; char in registry (such as emacs backup files) */
+## -            (accessible(dirname, ep-&gt;d_name))) {   /* ignore directories &amp; files user can&#39;t access (hidden from user) */
+## +            (is_readable_file(dirname, ep-&gt;d_name))) {   /* ignore directories &amp; files user can&#39;t access (hidden from user) */
+##  
+##            if (ct == SUB) {
+##              char *colon;
+## @@ -1293,6 +1281,11 @@ check_available_corpora(enum corpus_type ct)
+##  
+##  /* ---------------------------------------------------------------------- */
+##  
+## +/**
+## + * Creates a CorpusList object for a named saystem corpus in a specific registry directory.
+## + *
+## + * @return  Either a pointer to the CorpusList OR NULL if the corpus could not be loaded.
+## + */
+##  CorpusList *
+##  GetSystemCorpus(char *name, char *registry)
+##  {
+## @@ -1302,7 +1295,7 @@ GetSystemCorpus(char *name, char *registry)
+##    char *cname;
+##  
+##    cname = changecase_string(name, LOWER);
+## -  this_corpus = setup_corpus(registry, cname);
+## +  this_corpus = cl_new_corpus(registry, cname);
+##    free(cname);
+##  
+##    if (this_corpus) {
+## @@ -1424,8 +1417,8 @@ attach_subcorpus(CorpusList *cl,
+##        char sname[CL_MAX_FILENAME_LENGTH];
+##  
+##        strcpy(sname, advertised_directory);
+## -      if (sname[strlen(sname)-1] != &#39;/&#39;)
+## -        strcat(sname, &quot;/&quot;);
+## +      if (sname[strlen(sname)-1] != SUBDIR_SEPARATOR)
+## +        strcat(sname, SUBDIR_SEP_STRING);
+##        strcat(sname, advertised_filename);
+##  
+##        fullname = cl_strdup(sname);
+## @@ -1941,7 +1934,6 @@ touch_corpus(CorpusList *cp)
+##    else {
+##      cp-&gt;saved = 0;
+##      cp-&gt;needs_update = 1;
+## -
+##      return 1;
+##    }
+##  }
+## @@ -2030,9 +2022,12 @@ show_corpora_files_sort(const void *p1, const void *p2)
+##   * Function that does the work for show_corpora_files
+##   *
+##   * @see show_corpora_files
+## + * @param ct                  Which type of corpus to show. Must be SUB or SYSTEM.
+## + * @param only_active_corpus  If true, and ct is SYSTEM,
+## + *                            then only that corpus&#39;s info is printed.
+##   */
+## -void 
+## -show_corpora_files1(enum corpus_type ct)
+## +static void
+## +show_corpora_files_backend(CorpusType ct, int only_active_corpus)
+##  {
+##    CorpusList *cl;
+##    char **list;                  /* list of corpus names (for qsort) */
+## @@ -2043,21 +2038,31 @@ show_corpora_files1(enum corpus_type ct)
+##    char label[4];
+##  
+##    if (ct == SYSTEM) {
+## -    /* make list of corpus names, then qsort() and print */
+## -    /* count nr of system corpora before allocating list */
+## -    for (cl = corpuslist, N = 0; cl; cl = cl-&gt;next)
+## -      if (cl-&gt;type == SYSTEM)
+## -        N++;
+## -    list = (char **) cl_malloc(N * sizeof(char *)); /* allocate list */
+## -    for (cl = corpuslist, i = 0; cl; cl = cl-&gt;next) /* compile list of corpus names */
+## -      if (cl-&gt;type == SYSTEM)
+## -        list[i++] = cl-&gt;name;
+## -    qsort(list, N, sizeof(char *), show_corpora_files_sort);
+## +    if (only_active_corpus) {
+## +      if (!current_corpus)
+## +        return;
+## +      N = 1;
+## +      list = (char **) cl_malloc(sizeof(char *));
+## +      list[0] = current_corpus-&gt;name;
+## +    }
+## +    else {
+## +      /* make list of corpus names, then qsort() and print */
+## +      /* count nr of system corpora before allocating list */
+## +      for (cl = corpuslist, N = 0; cl; cl = cl-&gt;next)
+## +        if (cl-&gt;type == SYSTEM)
+## +          N++;
+## +      list = (char **) cl_malloc(N * sizeof(char *)); /* allocate list */
+## +      for (cl = corpuslist, i = 0; cl; cl = cl-&gt;next) /* compile list of corpus names */
+## +        if (cl-&gt;type == SYSTEM)
+## +          list[i++] = cl-&gt;name;
+## +      qsort(list, N, sizeof(char *), show_corpora_files_sort);
+## +    }
+##  
+##      if (pretty_print) {
+##        Rprintf(&quot;System corpora:\n&quot;);
+## -      start_indented_list(0,0,0);       /* now print sorted list */
+## +      start_indented_list(0,0,0);
+##      }
+## +    /* now print sorted list */
+##      for (i = 0; i &lt; N; i++) {
+##        if (pretty_print) {
+##          if (list[i][0] != initial) {
+## @@ -2074,24 +2079,24 @@ show_corpora_files1(enum corpus_type ct)
+##      if (pretty_print)
+##        end_indented_list();
+##  
+## -    free(list);
+## +    cl_free(list);
+##    }
+##    else if (ct == SUB) {
+##      if (pretty_print)
+##        Rprintf(&quot;Named Query Results:\n&quot;);
+##      for (cl = corpuslist; cl; cl = cl-&gt;next)
+##        if (cl-&gt;type == SUB)
+## -          Rprintf(pretty_print ? &quot;   %c%c%c  %s:%s [%d]\n&quot; : &quot;%c%c%c\t%s:%s\t%d\n&quot;,
+## -                 cl-&gt;loaded ? &#39;m&#39; : &#39;-&#39;,
+## -                 cl-&gt;saved ? &#39;d&#39; : &#39;-&#39;,
+## -                 cl-&gt;needs_update ? &#39;*&#39; : &#39;-&#39;,
+## -                 cl-&gt;mother_name ? cl-&gt;mother_name : &quot;???&quot;,
+## -                 cl-&gt;name,
+## -                 cl-&gt;size);
+## +        Rprintf(pretty_print ? &quot;   %c%c%c  %s:%s [%d]\n&quot; : &quot;%c%c%c\t%s:%s\t%d\n&quot;,
+## +               cl-&gt;loaded       ? &#39;m&#39; : &#39;-&#39;,
+## +               cl-&gt;saved        ? &#39;d&#39; : &#39;-&#39;,
+## +               cl-&gt;needs_update ? &#39;*&#39; : &#39;-&#39;,
+## +               cl-&gt;mother_name  ? cl-&gt;mother_name : &quot;???&quot;,
+## +               cl-&gt;name,
+## +               cl-&gt;size
+## +               );
+##    }
+## -  else {
+## +  else
+##      assert(0 &amp;&amp; &quot;Invalid argument in show_corpora_files()&lt;corpmanag.c&gt;.&quot;);
+## -  }
+##  }
+##  
+##  /**
+## @@ -2105,16 +2110,28 @@ show_corpora_files1(enum corpus_type ct)
+##   *
+##   * For subcorpora, a bundle of other information is shown too.
+##   *
+## - * @param ct  Type of corpus to show (SUB, SYSTEM or UNDEF).
+## + * @param type  Type of corpus to show (SUB, SYSTEM or UNDEF).
+##   */
+##  void
+## -show_corpora_files(enum corpus_type ct)
+## +show_corpora_files(CorpusType type)
+##  {
+## -  if (ct == UNDEF) {
+## -    show_corpora_files1(SYSTEM);
+## -    show_corpora_files1(SUB);
+## +  if (type == UNDEF) {
+## +    show_corpora_files_backend(SYSTEM, 0);
+## +    show_corpora_files_backend(SUB   , 0);
+##    }
+##    else
+## -    show_corpora_files1(ct);
+## +    show_corpora_files_backend(type  , 0);
+##  }
+##  
+## +/**
+## + * Does the same as show_corpora_files(),
+## + * but only prints the ID of the active corpus.
+## + * (Added for child mode mostly)
+## + */
+## +void
+## +show_corpus_active(void)
+## +{
+## +  show_corpora_files_backend(SYSTEM, 1);
+## +}
+## +
+## +
+## diff --git a/src/cwb/cqp/corpmanag.h b/src/cwb/cqp/corpmanag.h
+## index fc0dff5..47466ef 100644
+## --- a/src/cwb/cqp/corpmanag.h
+## +++ b/src/cwb/cqp/corpmanag.h
+## @@ -47,7 +47,7 @@ enum corpus_type { UNDEF,    /**&lt; undefined status                         */
+##                     SYSTEM,   /**&lt; system corpus, ie registered corpus      */
+##                     SUB,      /**&lt; subcorpus which was generated by a query */
+##                     TEMP,     /**&lt; temporary subcorpus, deleted after query */
+## -                   ALL
+## +                   ALL       /**&lt; any type of corpus                       */
+##                   };
+##  
+##  /**
+## @@ -88,7 +88,7 @@ typedef struct cl {
+##    int              mother_size;  /**&lt; size (nr tokens) of mother                 */
+##    char            *registry;     /**&lt; registry directory of the original corpus. */
+##    char            *abs_fn;       /**&lt; absolute file name                         */
+## -  enum corpus_type type;         /**&lt; type of the corpus                         */
+## +  CorpusType       type;         /**&lt; type of the corpus                         */
+##  
+##    char            *local_dir;    /**&lt; for unloaded subcorpora, this is the directory
+##                                        where the subcorpus is stored on disk; required
+## @@ -140,7 +140,7 @@ void init_corpuslist(void);
+##  
+##  void free_corpuslist(void);
+##  
+## -CorpusList *findcorpus(char *s, enum corpus_type type, int try_recursive_search);
+## +CorpusList *findcorpus(char *s, CorpusType type, int try_recursive_search);
+##  
+##  void dropcorpus(CorpusList *cl);
+##  
+## @@ -186,6 +186,8 @@ int touch_corpus(CorpusList *cp);
+##  
+##  /* IO Functions */
+##  
+## -void show_corpora_files(enum corpus_type type);
+## +void show_corpora_files(CorpusType type);
+## +
+## +void show_corpus_active(void);
+##  
+##  #endif
+## diff --git a/src/cwb/cqp/cqp.c b/src/cwb/cqp/cqp.c
+## index 801d95d..1e338a7 100644
+## --- a/src/cwb/cqp/cqp.c
+## +++ b/src/cwb/cqp/cqp.c
+## @@ -42,12 +42,17 @@
+##  
+##  /** File handle used by the CQP-query-language parser. */
+##  extern FILE *yyin;
+## -/** Activates the CQP-query-language parser. */
+## +/** Activates the CQP-query-language parser. Returns a boolean. */
+##  extern int yyparse (void);
+##  /** restarts the CQP-query-language parser. */
+##  extern void yyrestart(FILE *input_file);
+##  
+##  
+## +/** Pointer that stores the address of strings read form the CLI by CQP. */
+## +char *cqp_input_string;
+## +/** index into the CQP input string; used for character-by-character read. */
+## +int cqp_input_string_position;
+## +
+##  /** Array of file handles. Allows nested execution of &quot;included&quot; text files full of commands. */
+##  FILE *cqp_files[MAXCQPFILES];
+##  /** index into cqp_files. @see cqp_files */
+## @@ -308,8 +313,14 @@ initialize_cqp(int argc, char **argv)
+##  /**
+##   * Parses a stream for CQP query syntax.
+##   *
+## + * We&#39;re assuming that this is a normal pipe, IE, no interactive
+## + * shenanigans need to be accounted for (either Readline is unavailable,
+## + * or the cqp program was started without -e.).
+## + *
+##   * Note that cqp_parse_file() fclose()s fd unless it is STDOUT.
+##   *
+## + * @see cqp_parse string
+## + *
+##   * @param fd                    File handle of the file to parse.
+##   * @param exit_on_parse_errors  Boolean: should CQP exit on parse errors?
+##   * @return                      Boolean: true = all ok, false = a problem.
+## @@ -324,10 +335,13 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
+##    quiet = silent || (fd != stdin);
+##  
+##    if (cqp_file_p &lt; MAXCQPFILES) {
+## -
+## +    /* pile the current yyin file handle into the file stack array. */
+##      cqp_files[cqp_file_p] = yyin;
+##      cqp_file_p++;
+## +    /* this is because if we&#39;ve come from do_exec(), we need to process the current stream,
+## +     * then return to the one from which do_exec() was raised! */
+##  
+## +    /* pass the stream handle into the parser and re-set the parser state. */
+##      yyin = fd;
+##      yyrestart(yyin);
+##  
+## @@ -340,6 +354,7 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
+##        }
+##  
+##        if (!quiet) {
+## +        /* print the prompt with the active corpus displayed. */
+##          if (current_corpus != NULL)
+##            if (STREQ(current_corpus-&gt;name, current_corpus-&gt;mother_name))
+##              Rprintf(&quot;%s&gt; &quot;, current_corpus-&gt;name);
+## @@ -352,18 +367,15 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
+##            Rprintf(&quot;[no corpus]&gt; &quot;);
+##        }
+##  
+## +      /* call the parser! This will read, interpret, and implement a command. */
+##        cqp_status = yyparse();
+## -      if ((cqp_status != 0) &amp;&amp; exit_on_parse_errors)
+## +      if (cqp_status &amp;&amp; exit_on_parse_errors)
+##          ok = 0;
+##  
+## -      if (child_process &amp;&amp; (cqp_status != 0) &amp;&amp; !reading_cqprc) {
+## -        Rprintf(&quot;PARSE ERROR\n&quot;); /*  */
+## +      if (child_process &amp;&amp; cqp_status != 0 &amp;&amp; !reading_cqprc) {
+## +        Rprintf(&quot;PARSE ERROR\n&quot;);
+##        }
+##        if (child_process &amp;&amp; !reading_cqprc) {
+## -#if 0
+## -        /* empty lines after commands in child mode have been disabled as of version 2.2.b94 */
+## -        Rprintf(&quot;\n&quot;);                /* print empty line as separator in child mode */
+## -#endif
+##          fflush(stdout);
+##          fflush(stderr);
+##        }
+## @@ -373,6 +385,7 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
+##      if (fd != stdin)
+##        fclose(fd);
+##  
+## +    /* we can now revert back to whatever the YY stream was when we began this function. */
+##      cqp_file_p--;
+##      yyin = cqp_files[cqp_file_p];
+##  
+## @@ -388,10 +401,14 @@ cqp_parse_file(FILE *fd, int exit_on_parse_errors)
+##  }
+##  
+##  /**
+## - * Parses a string for CQP query syntax.
+## + * Parses a string for CQP query syntax. The string is assumed to have
+## + * been provided by the Readline library or similar. IE, we are
+## + * running with &quot;cqp -e&quot;.
+## + *
+## + * @see       USE_READLINE
+##   *
+## - * @param s  The string to parse.
+## - * @return   Boolean: true = all ok, false = a problem.
+## + * @param  s  The string to parse.
+## + * @return    Boolean: true = all ok, false = a problem.
+##   */
+##  int
+##  cqp_parse_string(char *s)
+## diff --git a/src/cwb/cqp/cqp.h b/src/cwb/cqp/cqp.h
+## index 96b03d8..289b025 100644
+## --- a/src/cwb/cqp/cqp.h
+## +++ b/src/cwb/cqp/cqp.h
+## @@ -72,6 +72,7 @@ extern int QueryBufferOverflow;
+##  extern char *searchstr;         /* needs to be global, unfortunately */
+##  extern int exit_cqp;                   /**&lt; 1 iff exit-command was issued while parsing */
+##  
+## +
+##  extern char *cqp_input_string;
+##  extern int cqp_input_string_position;
+##  
+## diff --git a/src/cwb/cqp/eval.c b/src/cwb/cqp/eval.c
+## index 0c5f5b3..4b9e510 100644
+## --- a/src/cwb/cqp/eval.c
+## +++ b/src/cwb/cqp/eval.c
+## @@ -3300,7 +3300,7 @@ next_environment(void)
+##  
+##      init_dfa(&amp;Environment[eep].dfa);
+##  
+## -    Environment[eep].search_context.direction = leftright;
+## +    Environment[eep].search_context.direction = ctxtdir_leftright;
+##      Environment[eep].search_context.type = word;
+##      Environment[eep].search_context.attrib = NULL;
+##      Environment[eep].search_context.size = 0;
+## @@ -3390,7 +3390,7 @@ free_environment(int thisenv)
+##      if (Environment[thisenv].dfa.TransTable)
+##        free_dfa(&amp;Environment[thisenv].dfa);
+##  
+## -    Environment[thisenv].search_context.direction = leftright;
+## +    Environment[thisenv].search_context.direction = ctxtdir_leftright;
+##      Environment[thisenv].search_context.type = word;
+##      Environment[thisenv].search_context.attrib = NULL;
+##      Environment[thisenv].search_context.size = 0;
+## diff --git a/src/cwb/cqp/eval.h b/src/cwb/cqp/eval.h
+## index e032051..e02e448 100644
+## --- a/src/cwb/cqp/eval.h
+## +++ b/src/cwb/cqp/eval.h
+## @@ -342,7 +342,7 @@ typedef AVStructure Patternlist[MAXPATTERNS];
+##  
+##  /* ====================================================================== */
+##  
+## -enum ctxtdir { leftright, left, right };
+## +enum ctxtdir { ctxtdir_leftright, ctxtdir_left, ctxtdir_right };
+##  enum spacet { word, structure };
+##  
+##  /**
+## diff --git a/src/cwb/cqp/macro.c b/src/cwb/cqp/macro.c
+## index 7615a46..9819c9d 100644
+## --- a/src/cwb/cqp/macro.c
+## +++ b/src/cwb/cqp/macro.c
+## @@ -288,7 +288,9 @@ MacroAddSegment(MacroEntry macro)
+##   *
+##   * Used by the lexer to get its characters; see parser.l where YY_INPUT() is redefined
+##   * to a macro calling this function.
+## - * (Not clear why it&#39;s in macro.c when it is not specific to just macros.)
+## + *
+## + * ( TODO Not clear why it&#39;s in macro.c when it is not specific to just macros.
+## + * (      Why not put this in cqp.c?
+##   */
+##  int
+##  yy_input_char(void)
+## diff --git a/src/cwb/cqp/output.c b/src/cwb/cqp/output.c
+## index ecfb357..aee9a72 100644
+## --- a/src/cwb/cqp/output.c
+## +++ b/src/cwb/cqp/output.c
+## @@ -484,7 +484,10 @@ print_output(CorpusList *cl,
+##  }
+##  
+##  /**
+## - * Prints a corpus, typically (some of) the matches of a query.
+## + * Prints a &quot;corpus&quot;, typically (some of) the matches of a query.
+## + *
+## + * This function supports the &quot;cat&quot; command, i.e. it is the main
+## + * &quot;please print concordance&quot; function.
+##   *
+##   * (Not sure why it&#39;s called &quot;catalog&quot;; is this a pun on the cat keyword? -- AH 2012-07-17)
+##   * (I suspect that it&#39;s a misinterpretation of what &quot;cat&quot; stands for. -- SE 2016-07-20)
+## @@ -501,7 +504,8 @@ print_output(CorpusList *cl,
+##  void
+##  catalog_corpus(CorpusList *cl,
+##                 struct Redir *rd,
+## -               int first, int last,
+## +               int first,
+## +               int last,
+##                 PrintMode mode)
+##  {
+##    int i;
+## @@ -650,6 +654,10 @@ corpus_info(CorpusList *cl)
+##  
+##      stream_ok = open_stream(&amp;rd, ascii);
+##      outfd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
+## +
+## +    /* print name for child mode (added v3.4.15)  */
+## +    if (child_process)
+## +      Rprintf(&quot;Name:    %s\n&quot;, cl-&gt;name);
+##      /* print size (should be the mother_size entry) */
+##      Rprintf(&quot;Size:    %d\n&quot;, cl-&gt;mother_size);
+##      /* print charset */
+## @@ -675,9 +683,13 @@ corpus_info(CorpusList *cl)
+##      if (cl-&gt;corpus-&gt;info_file == NULL)
+##        Rprintf(&quot;No further information available about %s\n&quot;, cl-&gt;name);
+##      else if ((fd = open_file(cl-&gt;corpus-&gt;info_file, &quot;rb&quot;)) == NULL)
+## +      Rprintf(&quot;No further information available about %s\n&quot;, cl-&gt;name);
+## +      /* most of the time this is NOT a problem - it jkust means thwe
+## +       * default HOME/.info has not been created. So, no need for a warning.
+##        cqpmessage(Warning,
+##                   &quot;Can&#39;t open info file %s for reading&quot;,
+##                   cl-&gt;corpus-&gt;info_file);
+## +       */
+##      else {
+##        ok = 1;
+##        do {
+## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
+## index 53e4bcf..9fea838 100644
 ## --- a/src/cwb/cqp/parse_actions.c
 ## +++ b/src/cwb/cqp/parse_actions.c
 ## @@ -316,7 +316,7 @@ in_UnnamedCorpusCommand(CorpusList *cl)
@@ -399,7 +1448,18 @@ cat(gitdiff_cqp)</code></pre>
 ##            res = cl;
 ##          }
 ##          else {
-## @@ -2917,7 +2917,7 @@ expand_dataspace(CorpusList *cl)
+## @@ -960,8 +960,8 @@ do_reduce(CorpusList *cl, int number, int percent) {
+##        size--;
+##      }
+##  
+## -    (void) delete_intervals(cl, lines, UNSELECTED_LINES);
+## -    (void) destroy_bitfield(&amp;lines);
+## +    delete_intervals(cl, lines, UNSELECTED_LINES);
+## +    destroy_bitfield(&amp;lines);
+##    }
+##  }
+##  
+## @@ -2917,11 +2917,11 @@ expand_dataspace(CorpusList *cl)
 ##    if (cl == NULL)
 ##      cqpmessage(Warning, &quot;The selected corpus is empty.&quot;);
 ##    else if (cl-&gt;type == SYSTEM)
@@ -408,14 +1468,22 @@ cat(gitdiff_cqp)</code></pre>
 ##    else if (expansion.size &gt; 0) {
 ##  
 ##      for (i = 0; i &lt; cl-&gt;size; i++) {
-## @@ -2929,6 +2929,7 @@ expand_dataspace(CorpusList *cl)
+## -      if (expansion.direction == left || expansion.direction == leftright) {
+## +      if (expansion.direction == ctxtdir_left || expansion.direction == ctxtdir_leftright) {
+##          res = calculate_leftboundary(cl,
+##                                       cl-&gt;range[i].start,
+##                                       expansion);
+## @@ -2929,8 +2929,9 @@ expand_dataspace(CorpusList *cl)
 ##            cl-&gt;range[i].start = res;
 ##          else
 ##            cqpmessage(Warning, &quot;&#39;expand&#39; statement failed (while expanding corpus interval leftwards).\n&quot;);
 ## +        /* when the expansion fails, the interval in the subcorpus is left as-is. */
 ##        }
-##        if (expansion.direction == right || expansion.direction == leftright) {
+## -      if (expansion.direction == right || expansion.direction == leftright) {
+## +      if (expansion.direction == ctxtdir_right || expansion.direction == ctxtdir_leftright) {
 ##          res = calculate_rightboundary(cl,
+##                                        cl-&gt;range[i].end,
+##                                        expansion);
 ## @@ -2938,11 +2939,13 @@ expand_dataspace(CorpusList *cl)
 ##            cl-&gt;range[i].end = res;
 ##          else
@@ -431,31 +1499,2297 @@ cat(gitdiff_cqp)</code></pre>
 ##      cl-&gt;saved = False;
 ##    }
 ## diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-## index 656b91f..a76a273 100644
+## index 656b91f..f9f7ac5 100644
 ## --- a/src/cwb/cqp/parser.tab.c
 ## +++ b/src/cwb/cqp/parser.tab.c
-## @@ -352,7 +352,7 @@ void warn_query_lock_violation(void) {
+## @@ -352,23 +352,27 @@ void warn_query_lock_violation(void) {
 ##  
 ##  /* ============================================================ */
 ##  
 ## -/* note: SYCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
-## +/* note: SYNCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
-##  necessary here - it is just defined, then tested.
-##  So: commented out. AH 2/4/2010
-##  #define SYNCHRONIZE
+## -necessary here - it is just defined, then tested.
+## -So: commented out. AH 2/4/2010
+## -#define SYNCHRONIZE
+## -*/
+##  
+## +/**
+## + * Deletes any still-pending input to the CQP parser, to the next
+## + * semi-colon or end of line.
+## + */ 
+##  void
+##  synchronize(void)
+##  {
+## -/*#if defined(SYNCHRONIZE)*/
+## -  int macro_status;
+## +/* function may be left uncompiled by defining this constant
+## + * in the make-configuration file. See the Makefile.         */
+## +#ifdef CQP_COMPILE_WITHOUT_SYNCHRONIZE
+## +
+## +  int macro_status; /*  stores enable_macros status */
+##  
+##    /* delete macro buffers &amp; disable macro expansion while sync&#39;ing */
+##    delete_macro_buffers(1); /* print stack trace on STDERR */
+##    macro_status = enable_macros;
+##    enable_macros = 0;
+##  
+## +  /* read and throw away characters till we have cleared away 
+## +   * the rest of what&#39;s pending. */
+##    if (cqp_input_string != NULL) {
+##      Rprintf(&quot;Synchronizing to end of line ... \n&quot;);
+##      while (!(yychar &lt;= 0))
+## @@ -380,8 +384,10 @@ synchronize(void)
+##        yychar = yylex();
+##    }
+##  
+## -  enable_macros = macro_status; /* reset enable_macros to previous value */
+## -/*#endif*/
+## +  /* restore enable_macros to previous value */
+## +  enable_macros = macro_status; 
+## +
+## +#endif /* defined CQP_COMPILE_WITHOUT_SYNCHRONIZE */
+##  }
+##  
+##  #define YYERROR_VERBOSE
+## @@ -408,7 +414,7 @@ synchronize(void)
+##  
+##  #if ! defined YYSTYPE &amp;&amp; ! defined YYSTYPE_IS_DECLARED
+##  typedef union YYSTYPE
+## -#line 118 &quot;parser.y&quot;
+## +#line 124 &quot;parser.y&quot;
+##  {
+##    Evaltree           evalt;
+##    Constrainttree     boolt;
+## @@ -481,7 +487,7 @@ typedef union YYSTYPE
+##    TabulationItem     tabulation_item;
+##  }
+##  /* Line 193 of yacc.c.  */
+## -#line 485 &quot;parser.tab.c&quot;
+## +#line 491 &quot;parser.tab.c&quot;
+##      YYSTYPE;
+##  # define yystype YYSTYPE /* obsolescent; will be withdrawn */
+##  # define YYSTYPE_IS_DECLARED 1
+## @@ -494,7 +500,7 @@ typedef union YYSTYPE
+##  
+##  
+##  /* Line 216 of yacc.c.  */
+## -#line 498 &quot;parser.tab.c&quot;
+## +#line 504 &quot;parser.tab.c&quot;
+##  
+##  #ifdef short
+##  # undef short
+## @@ -914,41 +920,41 @@ static const yytype_int16 yyrhs[] =
+##  /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
+##  static const yytype_uint16 yyrline[] =
+##  {
+## -       0,   364,   364,   364,   369,   370,   373,   373,   376,   375,
+## -     386,   387,   387,   389,   389,   391,   400,   401,   403,   407,
+## -     410,   411,   412,   412,   416,   417,   418,   419,   420,   421,
+## -     422,   423,   424,   425,   426,   427,   428,   429,   430,   431,
+## -     432,   433,   434,   435,   436,   437,   438,   443,   446,   449,
+## -     452,   458,   462,   466,   467,   473,   477,   484,   485,   490,
+## -     495,   498,   512,   514,   519,   521,   525,   526,   529,   532,
+## -     533,   536,   537,   538,   539,   545,   542,   561,   564,   567,
+## -     572,   577,   586,   592,   598,   609,   610,   611,   612,   615,
+## -     641,   649,   652,   653,   654,   654,   671,   676,   682,   683,
+## -     684,   687,   691,   695,   700,   701,   702,   703,   704,   711,
+## -     714,   715,   718,   724,   732,   733,   734,   735,   740,   741,
+## -     749,   748,   753,   752,   758,   760,   764,   776,   778,   783,
+## -     786,   795,   807,   818,   830,   831,   834,   852,   853,   857,
+## -     861,   862,   863,   866,   867,   872,   876,   880,   884,   890,
+## -     891,   894,   900,   906,   914,   915,   920,   924,   925,   929,
+## -     931,   935,   939,   940,   944,   945,   950,   961,   962,   972,
+## -     973,   974,   977,   983,   984,   987,   991,   992,   995,   996,
+## -     998,   995,  1002,  1004,  1007,  1009,  1012,  1020,  1025,  1030,
+## -    1035,  1038,  1039,  1044,  1049,  1056,  1061,  1066,  1079,  1080,
+## -    1083,  1084,  1086,  1089,  1090,  1091,  1092,  1095,  1101,  1102,
+## -    1105,  1106,  1109,  1110,  1113,  1114,  1126,  1127,  1135,  1136,
+## -    1144,  1175,  1178,  1179,  1184,  1183,  1189,  1192,  1193,  1196,
+## -    1204,  1212,  1213,  1216,  1217,  1220,  1221,  1225,  1233,  1234,
+## -    1237,  1243,  1250,  1251,  1252,  1255,  1256,  1259,  1260,  1264,
+## -    1284,  1285,  1288,  1289,  1290,  1291,  1292,  1293,  1296,  1297,
+## -    1306,  1309,  1310,  1313,  1314,  1317,  1318,  1319,  1320,  1321,
+## -    1322,  1325,  1326,  1327,  1331,  1348,  1356,  1366,  1367,  1368,
+## -    1369,  1370,  1371,  1374,  1377,  1379,  1396,  1407,  1410,  1411,
+## -    1412,  1420,  1427,  1433,  1434,  1442,  1448,  1454,  1458,  1462,
+## -    1465,  1466,  1477,  1478,  1479,  1480,  1481,  1485,  1485,  1487,
+## -    1488,  1489,  1492,  1493,  1497,  1499,  1503,  1512,  1522,  1528,
+## -    1529,  1533,  1536,  1540,  1549,  1559,  1563,  1564,  1567,  1572,
+## -    1573,  1575,  1576,  1578,  1579,  1581,  1582,  1584,  1585,  1589,
+## -    1590
+## +       0,   370,   370,   370,   375,   376,   379,   379,   382,   381,
+## +     392,   393,   393,   395,   395,   397,   406,   407,   409,   413,
+## +     416,   417,   418,   418,   422,   423,   424,   425,   426,   427,
+## +     428,   429,   430,   431,   432,   433,   434,   435,   436,   437,
+## +     438,   439,   440,   441,   442,   443,   444,   449,   452,   455,
+## +     458,   464,   468,   472,   473,   479,   483,   490,   491,   496,
+## +     501,   504,   521,   523,   528,   530,   534,   535,   538,   541,
+## +     542,   545,   546,   547,   548,   554,   551,   570,   573,   576,
+## +     581,   586,   595,   601,   607,   618,   619,   620,   621,   624,
+## +     650,   658,   661,   662,   663,   663,   680,   685,   691,   692,
+## +     693,   696,   700,   704,   709,   710,   711,   712,   713,   720,
+## +     723,   724,   727,   733,   741,   742,   743,   744,   749,   750,
+## +     758,   757,   762,   761,   767,   769,   773,   785,   787,   792,
+## +     795,   804,   816,   827,   839,   840,   843,   861,   862,   866,
+## +     870,   871,   872,   875,   876,   881,   885,   889,   893,   899,
+## +     900,   903,   909,   915,   923,   924,   929,   933,   934,   938,
+## +     940,   944,   948,   949,   953,   954,   959,   970,   971,   981,
+## +     982,   983,   986,   992,   993,   996,  1000,  1001,  1004,  1005,
+## +    1007,  1004,  1011,  1013,  1016,  1018,  1021,  1029,  1034,  1039,
+## +    1044,  1047,  1048,  1053,  1058,  1065,  1070,  1075,  1088,  1089,
+## +    1092,  1093,  1095,  1098,  1099,  1100,  1101,  1104,  1110,  1111,
+## +    1114,  1115,  1118,  1119,  1122,  1123,  1135,  1136,  1144,  1145,
+## +    1153,  1184,  1187,  1188,  1193,  1192,  1198,  1201,  1202,  1205,
+## +    1213,  1221,  1222,  1225,  1226,  1229,  1230,  1234,  1242,  1243,
+## +    1246,  1252,  1259,  1260,  1261,  1264,  1265,  1268,  1269,  1273,
+## +    1293,  1294,  1297,  1298,  1299,  1300,  1301,  1302,  1305,  1306,
+## +    1315,  1318,  1319,  1322,  1323,  1326,  1327,  1328,  1329,  1330,
+## +    1331,  1334,  1335,  1336,  1340,  1357,  1365,  1375,  1376,  1377,
+## +    1378,  1379,  1380,  1383,  1386,  1388,  1405,  1416,  1419,  1420,
+## +    1421,  1429,  1436,  1442,  1443,  1451,  1457,  1463,  1467,  1471,
+## +    1474,  1475,  1486,  1487,  1488,  1489,  1490,  1494,  1494,  1496,
+## +    1497,  1498,  1501,  1502,  1506,  1508,  1512,  1521,  1531,  1537,
+## +    1538,  1542,  1545,  1549,  1558,  1568,  1572,  1573,  1576,  1581,
+## +    1582,  1584,  1585,  1587,  1588,  1590,  1591,  1593,  1594,  1598,
+## +    1599
+##  };
+##  #endif
+##  
+## @@ -2254,12 +2260,12 @@ yyreduce:
+##    switch (yyn)
+##      {
+##          case 2:
+## -#line 364 &quot;parser.y&quot;
+## +#line 370 &quot;parser.y&quot;
+##      { prepare_parse(); ;}
+##      break;
+##  
+##    case 3:
+## -#line 365 &quot;parser.y&quot;
+## +#line 371 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                             addHistoryLine();
+##                                           resetQueryBuffer();
+## @@ -2267,27 +2273,27 @@ yyreduce:
+##      break;
+##  
+##    case 4:
+## -#line 369 &quot;parser.y&quot;
+## +#line 375 &quot;parser.y&quot;
+##      { YYACCEPT; ;}
+##      break;
+##  
+##    case 5:
+## -#line 370 &quot;parser.y&quot;
+## +#line 376 &quot;parser.y&quot;
+##      { YYACCEPT; ;}
+##      break;
+##  
+##    case 6:
+## -#line 373 &quot;parser.y&quot;
+## +#line 379 &quot;parser.y&quot;
+##      { prepare_input(); ;}
+##      break;
+##  
+##    case 7:
+## -#line 374 &quot;parser.y&quot;
+## +#line 380 &quot;parser.y&quot;
+##      { after_CorpusCommand((yyvsp[(2) - (3)].cl)); ;}
+##      break;
+##  
+##    case 8:
+## -#line 376 &quot;parser.y&quot;
+## +#line 382 &quot;parser.y&quot;
+##      { 
+##                        if ((yyvsp[(2) - (2)].ival) == query_lock) {
+##                          query_lock = 0;
+## @@ -2301,27 +2307,27 @@ yyreduce:
+##      break;
+##  
+##    case 11:
+## -#line 387 &quot;parser.y&quot;
+## +#line 393 &quot;parser.y&quot;
+##      {if (query_lock) {warn_query_lock_violation(); YYABORT;} ;}
+##      break;
+##  
+##    case 12:
+## -#line 388 &quot;parser.y&quot;
+## +#line 394 &quot;parser.y&quot;
+##      { ;}
+##      break;
+##  
+##    case 13:
+## -#line 389 &quot;parser.y&quot;
+## +#line 395 &quot;parser.y&quot;
+##      {if (query_lock) {warn_query_lock_violation(); YYABORT;} ;}
+##      break;
+##  
+##    case 14:
+## -#line 390 &quot;parser.y&quot;
+## +#line 396 &quot;parser.y&quot;
+##      { exit_cqp++; ;}
+##      break;
+##  
+##    case 15:
+## -#line 391 &quot;parser.y&quot;
+## +#line 397 &quot;parser.y&quot;
+##      { if (yychar == YYEMPTY) yychar = yylex(); /* so synchronize works if lookahead yychar is empty */
+##                                             synchronize();
+##                                             /* in case of syntax errors, don&#39;t save history file */
+## @@ -2332,62 +2338,62 @@ yyreduce:
+##      break;
+##  
+##    case 16:
+## -#line 400 &quot;parser.y&quot;
+## +#line 406 &quot;parser.y&quot;
+##      { (yyval.cl) = (yyvsp[(1) - (1)].cl); ;}
+##      break;
+##  
+##    case 17:
+## -#line 402 &quot;parser.y&quot;
+## +#line 408 &quot;parser.y&quot;
+##      { (yyval.cl) = in_CorpusCommand((yyvsp[(1) - (3)].strval), (yyvsp[(3) - (3)].cl)); ;}
+##      break;
+##  
+##    case 18:
+## -#line 403 &quot;parser.y&quot;
+## +#line 409 &quot;parser.y&quot;
+##      { (yyval.cl) = in_CorpusCommand((yyvsp[(1) - (3)].strval), after_CorpusSetExpr((yyvsp[(3) - (3)].cl))); ;}
+##      break;
+##  
+##    case 19:
+## -#line 407 &quot;parser.y&quot;
+## +#line 413 &quot;parser.y&quot;
+##      { (yyval.cl) = in_UnnamedCorpusCommand((yyvsp[(1) - (2)].cl)); ;}
+##      break;
+##  
+##    case 20:
+## -#line 410 &quot;parser.y&quot;
+## +#line 416 &quot;parser.y&quot;
+##      { if (query_lock) {warn_query_lock_violation(); YYABORT;} (yyval.cl) = ActivateCorpus((yyvsp[(1) - (1)].cl)); ;}
+##      break;
+##  
+##    case 21:
+## -#line 411 &quot;parser.y&quot;
+## +#line 417 &quot;parser.y&quot;
+##      { (yyval.cl) = after_CorpusSetExpr((yyvsp[(1) - (1)].cl)); ;}
+##      break;
+##  
+##    case 22:
+## -#line 412 &quot;parser.y&quot;
+## +#line 418 &quot;parser.y&quot;
+##      { prepare_Query(); ;}
+##      break;
+##  
+##    case 23:
+## -#line 413 &quot;parser.y&quot;
+## +#line 419 &quot;parser.y&quot;
+##      { (yyval.cl) = after_Query((yyvsp[(2) - (2)].cl)); ;}
+##      break;
+##  
+##    case 47:
+## -#line 443 &quot;parser.y&quot;
+## +#line 449 &quot;parser.y&quot;
+##      { Rprintf(&quot;-::-EOL-::-\n&quot;); fflush(stdout); ;}
+##      break;
+##  
+##    case 48:
+## -#line 447 &quot;parser.y&quot;
+## +#line 453 &quot;parser.y&quot;
+##      { do_cat((yyvsp[(2) - (3)].cl), &amp;((yyvsp[(3) - (3)].redir)), 0, -1); cl_free((yyvsp[(3) - (3)].redir).name); ;}
+##      break;
+##  
+##    case 49:
+## -#line 450 &quot;parser.y&quot;
+## +#line 456 &quot;parser.y&quot;
+##      { do_cat((yyvsp[(2) - (7)].cl), &amp;((yyvsp[(7) - (7)].redir)), (yyvsp[(4) - (7)].ival), (yyvsp[(6) - (7)].ival)); cl_free((yyvsp[(7) - (7)].redir).name); ;}
+##      break;
+##  
+##    case 50:
+## -#line 453 &quot;parser.y&quot;
+## +#line 459 &quot;parser.y&quot;
+##      { if (generate_code) 
+##                                do_cat((yyvsp[(2) - (3)].cl), &amp;((yyvsp[(3) - (3)].redir)), 0, -1);
+##                              cl_free((yyvsp[(3) - (3)].redir).name);
+## @@ -2396,17 +2402,17 @@ yyreduce:
+##      break;
+##  
+##    case 51:
+## -#line 459 &quot;parser.y&quot;
+## +#line 465 &quot;parser.y&quot;
+##      { do_echo((yyvsp[(2) - (3)].strval), &amp;((yyvsp[(3) - (3)].redir))); cl_free((yyvsp[(3) - (3)].redir).name); cl_free((yyvsp[(2) - (3)].strval)); ;}
+##      break;
+##  
+##    case 52:
+## -#line 463 &quot;parser.y&quot;
+## +#line 469 &quot;parser.y&quot;
+##      { do_save((yyvsp[(2) - (3)].cl), &amp;((yyvsp[(3) - (3)].redir))); cl_free((yyvsp[(3) - (3)].redir).name); ;}
+##      break;
+##  
+##    case 54:
+## -#line 467 &quot;parser.y&quot;
+## +#line 473 &quot;parser.y&quot;
+##      { (yyval.redir).name = NULL; /* will open STDOUT */
+##                                            (yyval.redir).mode = &quot;w&quot;;
+##                                            (yyval.redir).stream = NULL;
+## @@ -2414,7 +2420,7 @@ yyreduce:
+##      break;
+##  
+##    case 55:
+## -#line 473 &quot;parser.y&quot;
+## +#line 479 &quot;parser.y&quot;
+##      { (yyval.redir).name = (yyvsp[(2) - (2)].strval);
+##                                            (yyval.redir).mode = &quot;w&quot;;
+##                                            (yyval.redir).stream = NULL;
+## @@ -2422,7 +2428,7 @@ yyreduce:
+##      break;
+##  
+##    case 56:
+## -#line 477 &quot;parser.y&quot;
+## +#line 483 &quot;parser.y&quot;
+##      { (yyval.redir).name = (yyvsp[(2) - (2)].strval);
+##                                            (yyval.redir).mode = &quot;a&quot;;
+##                                            (yyval.redir).stream = NULL;
+## @@ -2430,36 +2436,39 @@ yyreduce:
+##      break;
+##  
+##    case 58:
+## -#line 485 &quot;parser.y&quot;
+## +#line 491 &quot;parser.y&quot;
+##      { (yyval.in_redir).name = NULL; /* will open STDIN */
+##                                            (yyval.in_redir).stream = NULL;
+##                                          ;}
+##      break;
+##  
+##    case 59:
+## -#line 490 &quot;parser.y&quot;
+## +#line 496 &quot;parser.y&quot;
+##      { (yyval.in_redir).name = (yyvsp[(2) - (2)].strval);
+##                                            (yyval.in_redir).stream = NULL;
+##                                          ;}
+##      break;
+##  
+##    case 60:
+## -#line 495 &quot;parser.y&quot;
+## +#line 501 &quot;parser.y&quot;
+##      { 
+##                                            show_corpora_files(UNDEF);
+##                                          ;}
+##      break;
+##  
+##    case 61:
+## -#line 498 &quot;parser.y&quot;
+## +#line 504 &quot;parser.y&quot;
+##      { 
+##                                            if (strncasecmp((yyvsp[(2) - (2)].strval), &quot;var&quot;, 3) == 0) {
+##                                              do_PrintAllVariables();
+##                                            }
+## -                                          else if ((strncasecmp((yyvsp[(2) - (2)].strval), &quot;sys&quot;, 3) == 0) || (strncasecmp((yyvsp[(2) - (2)].strval), &quot;corp&quot;, 4) == 0)) {
+## +                                          else if (strncasecmp((yyvsp[(2) - (2)].strval), &quot;active&quot;, 6) == 0 || strncasecmp((yyvsp[(2) - (2)].strval), &quot;current&quot;, 7) == 0) {
+## +                                            show_corpus_active();
+## +                                          }
+## +                                          else if (strncasecmp((yyvsp[(2) - (2)].strval), &quot;sys&quot;, 3) == 0 || strncasecmp((yyvsp[(2) - (2)].strval), &quot;corp&quot;, 4) == 0) {
+##                                              show_corpora_files(SYSTEM);
+##                                            }
+## -                                          else if ((strncasecmp((yyvsp[(2) - (2)].strval), &quot;sub&quot;, 3) == 0) || (strcasecmp((yyvsp[(2) - (2)].strval), &quot;named&quot;) == 0) || (strcasecmp((yyvsp[(2) - (2)].strval), &quot;queries&quot;) == 0)) {
+## +                                          else if (strncasecmp((yyvsp[(2) - (2)].strval), &quot;sub&quot;, 3) == 0 || strcasecmp((yyvsp[(2) - (2)].strval), &quot;named&quot;) == 0 || strcasecmp((yyvsp[(2) - (2)].strval), &quot;queries&quot;) == 0) {
+##                                              show_corpora_files(SUB);
+##                                            }
+##                                            else {
+## @@ -2469,52 +2478,52 @@ yyreduce:
+##      break;
+##  
+##    case 63:
+## -#line 515 &quot;parser.y&quot;
+## +#line 524 &quot;parser.y&quot;
+##      { PrintContextDescriptor(&amp;CD); ;}
+##      break;
+##  
+##    case 66:
+## -#line 525 &quot;parser.y&quot;
+## +#line 534 &quot;parser.y&quot;
+##      { do_attribute_show((yyvsp[(2) - (2)].strval), 1); ;}
+##      break;
+##  
+##    case 67:
+## -#line 526 &quot;parser.y&quot;
+## +#line 535 &quot;parser.y&quot;
+##      { do_attribute_show((yyvsp[(2) - (2)].strval), 0); ;}
+##      break;
+##  
+##    case 68:
+## -#line 529 &quot;parser.y&quot;
+## +#line 538 &quot;parser.y&quot;
+##      { if (query_lock) {warn_query_lock_violation(); YYABORT;} (yyval.cl) = do_translate((yyvsp[(2) - (4)].cl), (yyvsp[(4) - (4)].strval)); ;}
+##      break;
+##  
+##    case 69:
+## -#line 532 &quot;parser.y&quot;
+## +#line 541 &quot;parser.y&quot;
+##      { if (query_lock) {warn_query_lock_violation(); YYABORT;} (yyval.cl) = do_setop((yyvsp[(1) - (3)].rngsetop), (yyvsp[(2) - (3)].cl), (yyvsp[(3) - (3)].cl)); ;}
+##      break;
+##  
+##    case 71:
+## -#line 536 &quot;parser.y&quot;
+## +#line 545 &quot;parser.y&quot;
+##      { (yyval.rngsetop) = RUnion; ;}
+##      break;
+##  
+##    case 72:
+## -#line 537 &quot;parser.y&quot;
+## +#line 546 &quot;parser.y&quot;
+##      { (yyval.rngsetop) = RUnion; ;}
+##      break;
+##  
+##    case 73:
+## -#line 538 &quot;parser.y&quot;
+## +#line 547 &quot;parser.y&quot;
+##      { (yyval.rngsetop) = RIntersection; ;}
+##      break;
+##  
+##    case 74:
+## -#line 539 &quot;parser.y&quot;
+## +#line 548 &quot;parser.y&quot;
+##      { (yyval.rngsetop) = RDiff; ;}
+##      break;
+##  
+##    case 75:
+## -#line 545 &quot;parser.y&quot;
+## +#line 554 &quot;parser.y&quot;
+##      { 
+##                                            do_start_timer();
+##                                            prepare_do_subset((yyvsp[(2) - (4)].cl), (yyvsp[(4) - (4)].field));  
+## @@ -2523,7 +2532,7 @@ yyreduce:
+##      break;
+##  
+##    case 76:
+## -#line 550 &quot;parser.y&quot;
+## +#line 559 &quot;parser.y&quot;
+##      { 
+##                                            if (generate_code) {
+##                                              (yyval.cl) = do_subset((yyvsp[(4) - (6)].field), (yyvsp[(6) - (6)].boolt));
+## @@ -2535,33 +2544,33 @@ yyreduce:
+##      break;
+##  
+##    case 77:
+## -#line 561 &quot;parser.y&quot;
+## +#line 570 &quot;parser.y&quot;
+##      {  ;}
+##      break;
+##  
+##    case 78:
+## -#line 564 &quot;parser.y&quot;
+## +#line 573 &quot;parser.y&quot;
+##      { if ((yyvsp[(2) - (2)].cl))
+##                                              dropcorpus((yyvsp[(2) - (2)].cl));
+##                                          ;}
+##      break;
+##  
+##    case 79:
+## -#line 567 &quot;parser.y&quot;
+## +#line 576 &quot;parser.y&quot;
+##      { if ((yyvsp[(1) - (1)].cl))
+##                                              dropcorpus((yyvsp[(1) - (1)].cl));
+##                                          ;}
+##      break;
+##  
+##    case 80:
+## -#line 572 &quot;parser.y&quot;
+## +#line 581 &quot;parser.y&quot;
+##      { do_PrintVariableValue((yyvsp[(2) - (2)].strval)); 
+##                                      free((yyvsp[(2) - (2)].strval));
+##                                    ;}
+##      break;
+##  
+##    case 81:
+## -#line 579 &quot;parser.y&quot;
+## +#line 588 &quot;parser.y&quot;
+##      { do_SetVariableValue((yyvsp[(2) - (3)].strval), 
+##                                                          (yyvsp[(3) - (3)].varsetting).operator, 
+##                                                          (yyvsp[(3) - (3)].varsetting).variableValue); 
+## @@ -2571,7 +2580,7 @@ yyreduce:
+##      break;
+##  
+##    case 82:
+## -#line 586 &quot;parser.y&quot;
+## +#line 595 &quot;parser.y&quot;
+##      {
+##                                      do_AddSubVariables((yyvsp[(2) - (4)].strval), /*add*/1, (yyvsp[(4) - (4)].strval));
+##                                      free((yyvsp[(2) - (4)].strval));
+## @@ -2580,7 +2589,7 @@ yyreduce:
+##      break;
+##  
+##    case 83:
+## -#line 592 &quot;parser.y&quot;
+## +#line 601 &quot;parser.y&quot;
+##      {
+##                                      do_AddSubVariables((yyvsp[(2) - (4)].strval), /*sub*/0, (yyvsp[(4) - (4)].strval));
+##                                      free((yyvsp[(2) - (4)].strval));
+## @@ -2589,7 +2598,7 @@ yyreduce:
+##      break;
+##  
+##    case 84:
+## -#line 598 &quot;parser.y&quot;
+## +#line 607 &quot;parser.y&quot;
+##      {
+##                                      char *temp = cl_strdup(&quot;&quot;);
+##                                      do_SetVariableValue((yyvsp[(2) - (4)].strval), &#39;=&#39;, temp);         /* cheap trick, this is :o) */
+## @@ -2601,27 +2610,27 @@ yyreduce:
+##      break;
+##  
+##    case 85:
+## -#line 609 &quot;parser.y&quot;
+## +#line 618 &quot;parser.y&quot;
+##      { (yyval.varsetting).variableValue = (yyvsp[(2) - (2)].strval); (yyval.varsetting).operator = &#39;&lt;&#39;; ;}
+##      break;
+##  
+##    case 86:
+## -#line 610 &quot;parser.y&quot;
+## +#line 619 &quot;parser.y&quot;
+##      { (yyval.varsetting).variableValue = (yyvsp[(2) - (2)].strval); (yyval.varsetting).operator = &#39;=&#39;; ;}
+##      break;
+##  
+##    case 87:
+## -#line 611 &quot;parser.y&quot;
+## +#line 620 &quot;parser.y&quot;
+##      { (yyval.varsetting).variableValue = (yyvsp[(2) - (2)].strval); (yyval.varsetting).operator = &#39;+&#39;; ;}
+##      break;
+##  
+##    case 88:
+## -#line 612 &quot;parser.y&quot;
+## +#line 621 &quot;parser.y&quot;
+##      { (yyval.varsetting).variableValue = (yyvsp[(2) - (2)].strval); (yyval.varsetting).operator = &#39;-&#39;; ;}
+##      break;
+##  
+##    case 89:
+## -#line 615 &quot;parser.y&quot;
+## +#line 624 &quot;parser.y&quot;
+##      { char *msg;
+##  
+##                                            if ((yyvsp[(3) - (3)].varval).cval != NULL &amp;&amp; (yyvsp[(3) - (3)].varval).ival &gt;= 0) {
+## @@ -2651,7 +2660,7 @@ yyreduce:
+##      break;
+##  
+##    case 90:
+## -#line 641 &quot;parser.y&quot;
+## +#line 650 &quot;parser.y&quot;
+##      { int opt;
+##  
+##                                            if ((opt = find_option((yyvsp[(2) - (2)].strval))) &gt;= 0)
+## @@ -2663,24 +2672,24 @@ yyreduce:
+##      break;
+##  
+##    case 91:
+## -#line 649 &quot;parser.y&quot;
+## +#line 658 &quot;parser.y&quot;
+##      {
+##                                            print_option_values();
+##                                          ;}
+##      break;
+##  
+##    case 92:
+## -#line 652 &quot;parser.y&quot;
+## +#line 661 &quot;parser.y&quot;
+##      { do_set_target((yyvsp[(2) - (4)].cl), (yyvsp[(3) - (4)].field), (yyvsp[(4) - (4)].field)); ;}
+##      break;
+##  
+##    case 93:
+## -#line 653 &quot;parser.y&quot;
+## +#line 662 &quot;parser.y&quot;
+##      { do_set_target((yyvsp[(2) - (4)].cl), (yyvsp[(3) - (4)].field), NoField); ;}
+##      break;
+##  
+##    case 94:
+## -#line 654 &quot;parser.y&quot;
+## +#line 663 &quot;parser.y&quot;
+##      {
+##                                            if (generate_code) {
+##                                              old_query_corpus = query_corpus;
+## @@ -2692,7 +2701,7 @@ yyreduce:
+##      break;
+##  
+##    case 95:
+## -#line 664 &quot;parser.y&quot;
+## +#line 673 &quot;parser.y&quot;
+##      {
+##                                            do_set_complex_target((yyvsp[(2) - (11)].cl), (yyvsp[(3) - (11)].field), (yyvsp[(4) - (11)].search_strategy), (yyvsp[(6) - (11)].boolt), (yyvsp[(8) - (11)].direction), (yyvsp[(9) - (11)].ival), (yyvsp[(10) - (11)].strval), (yyvsp[(11) - (11)].base).field, (yyvsp[(11) - (11)].base).inclusive);
+##                                            if (generate_code) 
+## @@ -2701,7 +2710,7 @@ yyreduce:
+##      break;
+##  
+##    case 96:
+## -#line 671 &quot;parser.y&quot;
+## +#line 680 &quot;parser.y&quot;
+##      {
+##                                            /* from (match|keyword|target) [inclusive|exclusive] */
+##                                            (yyval.base).field = (yyvsp[(2) - (3)].field);
+## @@ -2710,7 +2719,7 @@ yyreduce:
+##      break;
+##  
+##    case 97:
+## -#line 676 &quot;parser.y&quot;
+## +#line 685 &quot;parser.y&quot;
+##      { 
+##                                            (yyval.base).field = MatchField;
+##                                            (yyval.base).inclusive = 0;
+## @@ -2718,22 +2727,22 @@ yyreduce:
+##      break;
+##  
+##    case 98:
+## -#line 682 &quot;parser.y&quot;
+## +#line 691 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 99:
+## -#line 683 &quot;parser.y&quot;
+## +#line 692 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 100:
+## -#line 684 &quot;parser.y&quot;
+## +#line 693 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; /* default is exclusive */ ;}
+##      break;
+##  
+##    case 101:
+## -#line 687 &quot;parser.y&quot;
+## +#line 696 &quot;parser.y&quot;
+##      { (yyval.varval).ival = (yyvsp[(1) - (1)].ival);
+##                                            (yyval.varval).cval = NULL;
+##                                            (yyval.varval).ok = 1;
+## @@ -2741,7 +2750,7 @@ yyreduce:
+##      break;
+##  
+##    case 102:
+## -#line 691 &quot;parser.y&quot;
+## +#line 700 &quot;parser.y&quot;
+##      { (yyval.varval).ival = -1;
+##                                            (yyval.varval).cval = (yyvsp[(1) - (1)].strval);
+##                                            (yyval.varval).ok = 1;
+## @@ -2749,7 +2758,7 @@ yyreduce:
+##      break;
+##  
+##    case 103:
+## -#line 695 &quot;parser.y&quot;
+## +#line 704 &quot;parser.y&quot;
+##      {
+##                                            (yyval.varval).ival = -1;
+##                                            (yyval.varval).cval = (yyvsp[(1) - (1)].strval);
+## @@ -2758,27 +2767,27 @@ yyreduce:
+##      break;
+##  
+##    case 104:
+## -#line 700 &quot;parser.y&quot;
+## +#line 709 &quot;parser.y&quot;
+##      { (yyval.varval).ival = 1; (yyval.varval).cval = NULL; (yyval.varval).ok = 1; ;}
+##      break;
+##  
+##    case 105:
+## -#line 701 &quot;parser.y&quot;
+## +#line 710 &quot;parser.y&quot;
+##      { (yyval.varval).ival = 1; (yyval.varval).cval = NULL; (yyval.varval).ok = 1; ;}
+##      break;
+##  
+##    case 106:
+## -#line 702 &quot;parser.y&quot;
+## +#line 711 &quot;parser.y&quot;
+##      { (yyval.varval).ival = 0; (yyval.varval).cval = NULL; (yyval.varval).ok = 1; ;}
+##      break;
+##  
+##    case 107:
+## -#line 703 &quot;parser.y&quot;
+## +#line 712 &quot;parser.y&quot;
+##      { (yyval.varval).ival = 0; (yyval.varval).cval = NULL; (yyval.varval).ok = 1; ;}
+##      break;
+##  
+##    case 108:
+## -#line 704 &quot;parser.y&quot;
+## +#line 713 &quot;parser.y&quot;
+##      {
+##                                            (yyval.varval).ival = (yyvsp[(1) - (2)].ival);
+##                                            (yyval.varval).cval = (yyvsp[(2) - (2)].strval);
+## @@ -2787,22 +2796,22 @@ yyreduce:
+##      break;
+##  
+##    case 109:
+## -#line 711 &quot;parser.y&quot;
+## +#line 720 &quot;parser.y&quot;
+##      { do_exec((yyvsp[(2) - (2)].strval)); ;}
+##      break;
+##  
+##    case 110:
+## -#line 714 &quot;parser.y&quot;
+## +#line 723 &quot;parser.y&quot;
+##      { do_info((yyvsp[(2) - (2)].cl)); ;}
+##      break;
+##  
+##    case 111:
+## -#line 715 &quot;parser.y&quot;
+## +#line 724 &quot;parser.y&quot;
+##      { do_info(current_corpus); ;}
+##      break;
+##  
+##    case 112:
+## -#line 720 &quot;parser.y&quot;
+## +#line 729 &quot;parser.y&quot;
+##      { 
+##                                    do_group((yyvsp[(2) - (10)].cl), (yyvsp[(3) - (10)].Anchor).anchor, (yyvsp[(3) - (10)].Anchor).offset, (yyvsp[(4) - (10)].strval), (yyvsp[(6) - (10)].Anchor).anchor, (yyvsp[(6) - (10)].Anchor).offset, (yyvsp[(7) - (10)].strval), (yyvsp[(8) - (10)].ival), (yyvsp[(9) - (10)].ival), (yyvsp[(5) - (10)].ival), &amp;((yyvsp[(10) - (10)].redir))); 
+##                                    cl_free((yyvsp[(10) - (10)].redir).name);
+## @@ -2810,7 +2819,7 @@ yyreduce:
+##      break;
+##  
+##    case 113:
+## -#line 726 &quot;parser.y&quot;
+## +#line 735 &quot;parser.y&quot;
+##      { 
+##                                    do_group2((yyvsp[(2) - (7)].cl), (yyvsp[(3) - (7)].Anchor).anchor, (yyvsp[(3) - (7)].Anchor).offset, (yyvsp[(4) - (7)].strval), (yyvsp[(5) - (7)].ival), (yyvsp[(6) - (7)].ival), &amp;((yyvsp[(7) - (7)].redir)));
+##                                    cl_free((yyvsp[(7) - (7)].redir).name);
+## @@ -2818,67 +2827,67 @@ yyreduce:
+##      break;
+##  
+##    case 114:
+## -#line 732 &quot;parser.y&quot;
+## +#line 741 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 115:
+## -#line 733 &quot;parser.y&quot;
+## +#line 742 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 116:
+## -#line 734 &quot;parser.y&quot;
+## +#line 743 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 117:
+## -#line 735 &quot;parser.y&quot;
+## +#line 744 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 118:
+## -#line 740 &quot;parser.y&quot;
+## +#line 749 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 119:
+## -#line 741 &quot;parser.y&quot;
+## +#line 750 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 120:
+## -#line 749 &quot;parser.y&quot;
+## +#line 758 &quot;parser.y&quot;
+##      { free_tabulation_list(); ;}
+##      break;
+##  
+##    case 121:
+## -#line 751 &quot;parser.y&quot;
+## +#line 760 &quot;parser.y&quot;
+##      { print_tabulation((yyvsp[(2) - (5)].cl), 0, INT_MAX, &amp;((yyvsp[(5) - (5)].redir))); cl_free((yyvsp[(5) - (5)].redir).name); ;}
+##      break;
+##  
+##    case 122:
+## -#line 753 &quot;parser.y&quot;
+## +#line 762 &quot;parser.y&quot;
+##      { free_tabulation_list(); ;}
+##      break;
+##  
+##    case 123:
+## -#line 755 &quot;parser.y&quot;
+## +#line 764 &quot;parser.y&quot;
+##      { print_tabulation((yyvsp[(2) - (9)].cl), (yyvsp[(5) - (9)].ival), (yyvsp[(7) - (9)].ival), &amp;((yyvsp[(9) - (9)].redir))); cl_free((yyvsp[(9) - (9)].redir).name); ;}
+##      break;
+##  
+##    case 124:
+## -#line 759 &quot;parser.y&quot;
+## +#line 768 &quot;parser.y&quot;
+##      { append_tabulation_item((yyvsp[(1) - (1)].tabulation_item)); ;}
+##      break;
+##  
+##    case 125:
+## -#line 761 &quot;parser.y&quot;
+## +#line 770 &quot;parser.y&quot;
+##      { append_tabulation_item((yyvsp[(3) - (3)].tabulation_item)); ;}
+##      break;
+##  
+##    case 126:
+## -#line 765 &quot;parser.y&quot;
+## +#line 774 &quot;parser.y&quot;
+##      {
+##                       (yyval.tabulation_item) = new_tabulation_item();
+##                       (yyval.tabulation_item)-&gt;attribute_name = (yyvsp[(2) - (2)].AttributeSpecification).name;
+## @@ -2891,28 +2900,28 @@ yyreduce:
+##      break;
+##  
+##    case 127:
+## -#line 777 &quot;parser.y&quot;
+## +#line 786 &quot;parser.y&quot;
+##      { (yyval.AnchorPair).anchor1 = (yyval.AnchorPair).anchor2 = (yyvsp[(1) - (1)].Anchor).anchor; (yyval.AnchorPair).offset1 = (yyval.AnchorPair).offset2 = (yyvsp[(1) - (1)].Anchor).offset; ;}
+##      break;
+##  
+##    case 128:
+## -#line 779 &quot;parser.y&quot;
+## +#line 788 &quot;parser.y&quot;
+##      { (yyval.AnchorPair).anchor1 = (yyvsp[(1) - (3)].Anchor).anchor; (yyval.AnchorPair).offset1 = (yyvsp[(1) - (3)].Anchor).offset;
+##                         (yyval.AnchorPair).anchor2 = (yyvsp[(3) - (3)].Anchor).anchor; (yyval.AnchorPair).offset2 = (yyvsp[(3) - (3)].Anchor).offset; ;}
+##      break;
+##  
+##    case 129:
+## -#line 784 &quot;parser.y&quot;
+## +#line 793 &quot;parser.y&quot;
+##      { (yyval.AttributeSpecification).name = (yyvsp[(1) - (2)].strval); (yyval.AttributeSpecification).flags = (yyvsp[(2) - (2)].ival); ;}
+##      break;
+##  
+##    case 130:
+## -#line 786 &quot;parser.y&quot;
+## +#line 795 &quot;parser.y&quot;
+##      { (yyval.AttributeSpecification).name = NULL; (yyval.AttributeSpecification).flags = 0; ;}
+##      break;
+##  
+##    case 131:
+## -#line 796 &quot;parser.y&quot;
+## +#line 805 &quot;parser.y&quot;
+##      { 
+##                    int ok;
+##                    if ((yyvsp[(2) - (3)].cl) &amp;&amp; generate_code) {
+## @@ -2927,7 +2936,7 @@ yyreduce:
+##      break;
+##  
+##    case 132:
+## -#line 808 &quot;parser.y&quot;
+## +#line 817 &quot;parser.y&quot;
+##      {
+##                    int ok;
+##                    if ((yyvsp[(2) - (4)].cl) &amp;&amp; generate_code) {
+## @@ -2941,7 +2950,7 @@ yyreduce:
+##      break;
+##  
+##    case 133:
+## -#line 819 &quot;parser.y&quot;
+## +#line 828 &quot;parser.y&quot;
+##      { 
+##                    int ok __attribute__((unused));
+##                    if ((yyvsp[(2) - (5)].cl) &amp;&amp; generate_code) {
+## @@ -2953,17 +2962,17 @@ yyreduce:
+##      break;
+##  
+##    case 134:
+## -#line 830 &quot;parser.y&quot;
+## +#line 839 &quot;parser.y&quot;
+##      { (yyval.sortclause) = (yyvsp[(1) - (1)].sortclause); ;}
+##      break;
+##  
+##    case 135:
+## -#line 831 &quot;parser.y&quot;
+## +#line 840 &quot;parser.y&quot;
+##      { (yyval.sortclause) = NULL; ;}
+##      break;
+##  
+##    case 136:
+## -#line 835 &quot;parser.y&quot;
+## +#line 844 &quot;parser.y&quot;
+##      {
+##                    if (generate_code) {
+##                      (yyval.sortclause) = cl_malloc(sizeof(SortClauseBuffer));
+## @@ -2982,87 +2991,87 @@ yyreduce:
+##      break;
+##  
+##    case 137:
+## -#line 852 &quot;parser.y&quot;
+## +#line 861 &quot;parser.y&quot;
+##      { (yyval.AnchorPair).anchor1 = (yyval.AnchorPair).anchor2 = (yyvsp[(2) - (2)].Anchor).anchor; (yyval.AnchorPair).offset1 = (yyval.AnchorPair).offset2 = (yyvsp[(2) - (2)].Anchor).offset; ;}
+##      break;
+##  
+##    case 138:
+## -#line 854 &quot;parser.y&quot;
+## +#line 863 &quot;parser.y&quot;
+##      { (yyval.AnchorPair).anchor1 = (yyvsp[(2) - (4)].Anchor).anchor; (yyval.AnchorPair).offset1 = (yyvsp[(2) - (4)].Anchor).offset;
+##                                (yyval.AnchorPair).anchor2 = (yyvsp[(4) - (4)].Anchor).anchor; (yyval.AnchorPair).offset2 = (yyvsp[(4) - (4)].Anchor).offset; ;}
+##      break;
+##  
+##    case 139:
+## -#line 857 &quot;parser.y&quot;
+## +#line 866 &quot;parser.y&quot;
+##      { (yyval.AnchorPair).anchor1 = MatchField;    (yyval.AnchorPair).offset1 = 0;
+##                                (yyval.AnchorPair).anchor2 = MatchEndField; (yyval.AnchorPair).offset2 = 0; ;}
+##      break;
+##  
+##    case 140:
+## -#line 861 &quot;parser.y&quot;
+## +#line 870 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 141:
+## -#line 862 &quot;parser.y&quot;
+## +#line 871 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 142:
+## -#line 863 &quot;parser.y&quot;
+## +#line 872 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 143:
+## -#line 866 &quot;parser.y&quot;
+## +#line 875 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 144:
+## -#line 867 &quot;parser.y&quot;
+## +#line 876 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 145:
+## -#line 873 &quot;parser.y&quot;
+## +#line 882 &quot;parser.y&quot;
+##      {
+##                                            do_reduce((yyvsp[(2) - (5)].cl), (yyvsp[(4) - (5)].ival), (yyvsp[(5) - (5)].ival));
+##                                          ;}
+##      break;
+##  
+##    case 146:
+## -#line 877 &quot;parser.y&quot;
+## +#line 886 &quot;parser.y&quot;
+##      {
+##                                            RangeSetop((yyvsp[(2) - (5)].cl), RMaximalMatches, NULL, NULL);
+##                                          ;}
+##      break;
+##  
+##    case 147:
+## -#line 881 &quot;parser.y&quot;
+## +#line 890 &quot;parser.y&quot;
+##      {
+##                                            do_cut((yyvsp[(2) - (3)].cl), 0, (yyvsp[(3) - (3)].ival)-1);
+##                                          ;}
+##      break;
+##  
+##    case 148:
+## -#line 885 &quot;parser.y&quot;
+## +#line 894 &quot;parser.y&quot;
+##      {
+##                                            do_cut((yyvsp[(2) - (4)].cl), (yyvsp[(3) - (4)].ival), (yyvsp[(4) - (4)].ival));
+##                                          ;}
+##      break;
+##  
+##    case 149:
+## -#line 890 &quot;parser.y&quot;
+## +#line 899 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 150:
+## -#line 891 &quot;parser.y&quot;
+## +#line 900 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 151:
+## -#line 895 &quot;parser.y&quot;
+## +#line 904 &quot;parser.y&quot;
+##      {
+##                                            if ((yyvsp[(2) - (4)].cl) &amp;&amp; generate_code) {
+##                                              do_delete_lines((yyvsp[(2) - (4)].cl), (yyvsp[(4) - (4)].field), SELECTED_LINES); 
+## @@ -3071,7 +3080,7 @@ yyreduce:
+##      break;
+##  
+##    case 152:
+## -#line 901 &quot;parser.y&quot;
+## +#line 910 &quot;parser.y&quot;
+##      { 
+##                                            if ((yyvsp[(2) - (4)].cl) &amp;&amp; generate_code) {
+##                                              do_delete_lines((yyvsp[(2) - (4)].cl), (yyvsp[(4) - (4)].field), UNSELECTED_LINES); 
+## @@ -3080,7 +3089,7 @@ yyreduce:
+##      break;
+##  
+##    case 153:
+## -#line 907 &quot;parser.y&quot;
+## +#line 916 &quot;parser.y&quot;
+##      { 
+##                                            if ((yyvsp[(2) - (3)].cl) &amp;&amp; generate_code) {
+##                                               do_delete_lines_num((yyvsp[(2) - (3)].cl), (yyvsp[(3) - (3)].Distance).mindist, (yyvsp[(3) - (3)].Distance).maxdist);
+## @@ -3089,62 +3098,62 @@ yyreduce:
+##      break;
+##  
+##    case 154:
+## -#line 914 &quot;parser.y&quot;
+## +#line 923 &quot;parser.y&quot;
+##      { (yyval.Distance).mindist = (yyvsp[(1) - (1)].ival); (yyval.Distance).maxdist = (yyvsp[(1) - (1)].ival); ;}
+##      break;
+##  
+##    case 155:
+## -#line 915 &quot;parser.y&quot;
+## +#line 924 &quot;parser.y&quot;
+##      { (yyval.Distance).mindist = (yyvsp[(1) - (3)].ival); (yyval.Distance).maxdist = (yyvsp[(3) - (3)].ival); ;}
+##      break;
+##  
+##    case 156:
+## -#line 920 &quot;parser.y&quot;
+## +#line 929 &quot;parser.y&quot;
+##      { do_sleep((yyvsp[(2) - (2)].ival)); ;}
+##      break;
+##  
+##    case 157:
+## -#line 924 &quot;parser.y&quot;
+## +#line 933 &quot;parser.y&quot;
+##      { do_size((yyvsp[(2) - (3)].cl), (yyvsp[(3) - (3)].field)); ;}
+##      break;
+##  
+##    case 158:
+## -#line 925 &quot;parser.y&quot;
+## +#line 934 &quot;parser.y&quot;
+##      { do_printVariableSize((yyvsp[(2) - (2)].strval)); free((yyvsp[(2) - (2)].strval)); ;}
+##      break;
+##  
+##    case 159:
+## -#line 930 &quot;parser.y&quot;
+## +#line 939 &quot;parser.y&quot;
+##      { do_dump((yyvsp[(2) - (3)].cl), 0, INT_MAX, &amp;((yyvsp[(3) - (3)].redir))); cl_free((yyvsp[(3) - (3)].redir).name); ;}
+##      break;
+##  
+##    case 160:
+## -#line 932 &quot;parser.y&quot;
+## +#line 941 &quot;parser.y&quot;
+##      { do_dump((yyvsp[(2) - (7)].cl), (yyvsp[(4) - (7)].ival), (yyvsp[(6) - (7)].ival), &amp;((yyvsp[(7) - (7)].redir))); cl_free((yyvsp[(7) - (7)].redir).name); ;}
+##      break;
+##  
+##    case 161:
+## -#line 936 &quot;parser.y&quot;
+## +#line 945 &quot;parser.y&quot;
+##      { do_undump((yyvsp[(2) - (5)].strval), (yyvsp[(3) - (5)].ival), !(yyvsp[(4) - (5)].ival), &amp;((yyvsp[(5) - (5)].in_redir))); cl_free((yyvsp[(5) - (5)].in_redir).name); ;}
+##      break;
+##  
+##    case 162:
+## -#line 939 &quot;parser.y&quot;
+## +#line 948 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 163:
+## -#line 940 &quot;parser.y&quot;
+## +#line 949 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 164:
+## -#line 944 &quot;parser.y&quot;
+## +#line 953 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 165:
+## -#line 946 &quot;parser.y&quot;
+## +#line 955 &quot;parser.y&quot;
+##      { 
+##              if ((yyvsp[(2) - (2)].field) == TargetField) { (yyval.ival) = 1; }
+##              else { yyerror(&quot;Invalid extension anchor in undump command&quot;); YYABORT; } 
+## @@ -3152,7 +3161,7 @@ yyreduce:
+##      break;
+##  
+##    case 166:
+## -#line 951 &quot;parser.y&quot;
+## +#line 960 &quot;parser.y&quot;
+##      { 
+##              if ( (((yyvsp[(2) - (3)].field) == TargetField) &amp;&amp; ((yyvsp[(3) - (3)].field) == KeywordField))
+##                   || (((yyvsp[(3) - (3)].field) == TargetField) &amp;&amp; ((yyvsp[(2) - (3)].field) == KeywordField))
+## @@ -3162,7 +3171,7 @@ yyreduce:
+##      break;
+##  
+##    case 168:
+## -#line 963 &quot;parser.y&quot;
+## +#line 972 &quot;parser.y&quot;
+##      {
+##                    if ((yyvsp[(1) - (3)].cl) &amp;&amp; (yyvsp[(3) - (3)].sortclause) &amp;&amp; (yyvsp[(1) - (3)].cl)-&gt;size &gt; 0) {
+##                      SortSubcorpus((yyvsp[(1) - (3)].cl), (yyvsp[(3) - (3)].sortclause), 0, NULL);
+## @@ -3173,78 +3182,78 @@ yyreduce:
+##      break;
+##  
+##    case 172:
+## -#line 980 &quot;parser.y&quot;
+## +#line 989 &quot;parser.y&quot;
+##      { (yyval.cl) = do_StandardQuery((yyvsp[(4) - (5)].ival), (yyvsp[(5) - (5)].ival), (yyvsp[(1) - (5)].strval)); ;}
+##      break;
+##  
+##    case 173:
+## -#line 983 &quot;parser.y&quot;
+## +#line 992 &quot;parser.y&quot;
+##      { (yyval.strval) = (yyvsp[(2) - (3)].strval); ;}
+##      break;
+##  
+##    case 174:
+## -#line 984 &quot;parser.y&quot;
+## +#line 993 &quot;parser.y&quot;
+##      { (yyval.strval) = NULL; ;}
+##      break;
+##  
+##    case 175:
+## -#line 988 &quot;parser.y&quot;
+## +#line 997 &quot;parser.y&quot;
+##      { (yyval.cl) = do_MUQuery((yyvsp[(2) - (4)].evalt), (yyvsp[(3) - (4)].ival), (yyvsp[(4) - (4)].ival)); ;}
+##      break;
+##  
+##    case 176:
+## -#line 991 &quot;parser.y&quot;
+## +#line 1000 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 177:
+## -#line 992 &quot;parser.y&quot;
+## +#line 1001 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 178:
+## -#line 995 &quot;parser.y&quot;
+## +#line 1004 &quot;parser.y&quot;
+##      { if (generate_code) { CurEnv-&gt;match_label = labellookup(CurEnv-&gt;labels, &quot;match&quot;, LAB_DEFINED, 1); } ;}
+##      break;
+##  
+##    case 179:
+## -#line 996 &quot;parser.y&quot;
+## +#line 1005 &quot;parser.y&quot;
+##      { within_gc = 1; 
+##                                            if (generate_code) { CurEnv-&gt;matchend_label = labellookup(CurEnv-&gt;labels, &quot;matchend&quot;, LAB_DEFINED, 1); } ;}
+##      break;
+##  
+##    case 180:
+## -#line 998 &quot;parser.y&quot;
+## +#line 1007 &quot;parser.y&quot;
+##      { within_gc = 0; ;}
+##      break;
+##  
+##    case 181:
+## -#line 999 &quot;parser.y&quot;
+## +#line 1008 &quot;parser.y&quot;
+##      { do_SearchPattern((yyvsp[(2) - (6)].evalt), (yyvsp[(4) - (6)].boolt)); ;}
+##      break;
+##  
+##    case 182:
+## -#line 1003 &quot;parser.y&quot;
+## +#line 1012 &quot;parser.y&quot;
+##      { (yyval.evalt) = reg_disj((yyvsp[(1) - (3)].evalt), (yyvsp[(3) - (3)].evalt)); ;}
+##      break;
+##  
+##    case 183:
+## -#line 1004 &quot;parser.y&quot;
+## +#line 1013 &quot;parser.y&quot;
+##      { (yyval.evalt) = (yyvsp[(1) - (1)].evalt); ;}
+##      break;
+##  
+##    case 184:
+## -#line 1008 &quot;parser.y&quot;
+## +#line 1017 &quot;parser.y&quot;
+##      { (yyval.evalt) = reg_seq((yyvsp[(1) - (2)].evalt), (yyvsp[(2) - (2)].evalt)); ;}
+##      break;
+##  
+##    case 185:
+## -#line 1009 &quot;parser.y&quot;
+## +#line 1018 &quot;parser.y&quot;
+##      { (yyval.evalt) = (yyvsp[(1) - (1)].evalt); ;}
+##      break;
+##  
+##    case 186:
+## -#line 1012 &quot;parser.y&quot;
+## +#line 1021 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                             (yyval.evalt) = (yyvsp[(2) - (2)].evalt);
+##                                             (yyval.evalt)-&gt;node.left = (yyvsp[(1) - (2)].evalt);
+## @@ -3256,7 +3265,7 @@ yyreduce:
+##      break;
+##  
+##    case 187:
+## -#line 1020 &quot;parser.y&quot;
+## +#line 1029 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                             NEW_EVALNODE((yyval.evalt), re_repeat, (yyvsp[(1) - (2)].evalt), NULL, 0, repeat_inf);
+##                                           else
+## @@ -3265,7 +3274,7 @@ yyreduce:
+##      break;
+##  
+##    case 188:
+## -#line 1025 &quot;parser.y&quot;
+## +#line 1034 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                             NEW_EVALNODE((yyval.evalt), re_repeat, (yyvsp[(1) - (2)].evalt), NULL, 1, repeat_inf);
+##                                           else
+## @@ -3274,7 +3283,7 @@ yyreduce:
+##      break;
+##  
+##    case 189:
+## -#line 1030 &quot;parser.y&quot;
+## +#line 1039 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                             NEW_EVALNODE((yyval.evalt), re_repeat, (yyvsp[(1) - (2)].evalt), NULL, 0, 1);
+##                                           else
+## @@ -3283,17 +3292,17 @@ yyreduce:
+##      break;
+##  
+##    case 190:
+## -#line 1035 &quot;parser.y&quot;
+## +#line 1044 &quot;parser.y&quot;
+##      { (yyval.evalt) = (yyvsp[(1) - (1)].evalt); ;}
+##      break;
+##  
+##    case 191:
+## -#line 1038 &quot;parser.y&quot;
+## +#line 1047 &quot;parser.y&quot;
+##      { (yyval.evalt) = (yyvsp[(2) - (3)].evalt); ;}
+##      break;
+##  
+##    case 192:
+## -#line 1039 &quot;parser.y&quot;
+## +#line 1048 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                              NEW_EVALLEAF((yyval.evalt), (yyvsp[(1) - (1)].index));
+##                                            else
+## @@ -3302,7 +3311,7 @@ yyreduce:
+##      break;
+##  
+##    case 193:
+## -#line 1044 &quot;parser.y&quot;
+## +#line 1053 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                              NEW_EVALLEAF((yyval.evalt), (yyvsp[(1) - (1)].index));
+##                                            else
+## @@ -3311,7 +3320,7 @@ yyreduce:
+##      break;
+##  
+##    case 194:
+## -#line 1049 &quot;parser.y&quot;
+## +#line 1058 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                              NEW_EVALLEAF((yyval.evalt), (yyvsp[(1) - (1)].index));
+##                                            else
+## @@ -3320,7 +3329,7 @@ yyreduce:
+##      break;
+##  
+##    case 195:
+## -#line 1056 &quot;parser.y&quot;
+## +#line 1065 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                              NEW_EVALNODE((yyval.evalt), re_repeat, NULL, NULL, (yyvsp[(2) - (3)].ival), (yyvsp[(2) - (3)].ival));
+##                                            else
+## @@ -3329,7 +3338,7 @@ yyreduce:
+##      break;
+##  
+##    case 196:
+## -#line 1061 &quot;parser.y&quot;
+## +#line 1070 &quot;parser.y&quot;
+##      { if (generate_code) /* new syntax for consistency with TAB queries */
+##                                              NEW_EVALNODE((yyval.evalt), re_repeat, NULL, NULL, 0, (yyvsp[(3) - (4)].ival));
+##                                            else
+## @@ -3338,7 +3347,7 @@ yyreduce:
+##      break;
+##  
+##    case 197:
+## -#line 1067 &quot;parser.y&quot;
+## +#line 1076 &quot;parser.y&quot;
+##      { if ((yyvsp[(4) - (5)].ival) != repeat_inf &amp;&amp; (yyvsp[(4) - (5)].ival) &lt; (yyvsp[(2) - (5)].ival)) {
+##                                              yyerror(&quot;invalid repetition range (maximum &lt; minimum)&quot;);
+##                                              YYERROR;
+## @@ -3351,92 +3360,92 @@ yyreduce:
+##      break;
+##  
+##    case 198:
+## -#line 1079 &quot;parser.y&quot;
+## +#line 1088 &quot;parser.y&quot;
+##      { (yyval.index) = do_AnchorPoint((yyvsp[(1) - (1)].field), 0); ;}
+##      break;
+##  
+##    case 199:
+## -#line 1080 &quot;parser.y&quot;
+## +#line 1089 &quot;parser.y&quot;
+##      { (yyval.index) = do_AnchorPoint((yyvsp[(1) - (1)].field), 1); ;}
+##      break;
+##  
+##    case 200:
+## -#line 1083 &quot;parser.y&quot;
+## +#line 1092 &quot;parser.y&quot;
+##      { (yyval.index) = do_XMLTag((yyvsp[(1) - (2)].strval), 0, 0, NULL, 0); ;}
+##      break;
+##  
+##    case 201:
+## -#line 1085 &quot;parser.y&quot;
+## +#line 1094 &quot;parser.y&quot;
+##      { (yyval.index) = do_XMLTag((yyvsp[(1) - (5)].strval), 0, (yyvsp[(2) - (5)].ival), (yyvsp[(3) - (5)].strval), (yyvsp[(4) - (5)].ival)); ;}
+##      break;
+##  
+##    case 202:
+## -#line 1086 &quot;parser.y&quot;
+## +#line 1095 &quot;parser.y&quot;
+##      { (yyval.index) = do_XMLTag((yyvsp[(1) - (1)].strval), 1, 0, NULL, 0); ;}
+##      break;
+##  
+##    case 203:
+## -#line 1089 &quot;parser.y&quot;
+## +#line 1098 &quot;parser.y&quot;
+##      { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
+##      break;
+##  
+##    case 204:
+## -#line 1090 &quot;parser.y&quot;
+## +#line 1099 &quot;parser.y&quot;
+##      { (yyval.ival) = OP_EQUAL | OP_NOT; ;}
+##      break;
+##  
+##    case 205:
+## -#line 1091 &quot;parser.y&quot;
+## +#line 1100 &quot;parser.y&quot;
+##      { (yyval.ival) = OP_EQUAL; ;}
+##      break;
+##  
+##    case 206:
+## -#line 1092 &quot;parser.y&quot;
+## +#line 1101 &quot;parser.y&quot;
+##      { (yyval.ival) = OP_EQUAL; ;}
+##      break;
+##  
+##    case 207:
+## -#line 1097 &quot;parser.y&quot;
+## +#line 1106 &quot;parser.y&quot;
+##      { (yyval.index) = do_NamedWfPattern((yyvsp[(1) - (3)].ival), (yyvsp[(2) - (3)].strval), (yyvsp[(3) - (3)].index)); ;}
+##      break;
+##  
+##    case 208:
+## -#line 1101 &quot;parser.y&quot;
+## +#line 1110 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 209:
+## -#line 1102 &quot;parser.y&quot;
+## +#line 1111 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 210:
+## -#line 1105 &quot;parser.y&quot;
+## +#line 1114 &quot;parser.y&quot;
+##      { (yyval.strval) = (yyvsp[(1) - (1)].strval); ;}
+##      break;
+##  
+##    case 211:
+## -#line 1106 &quot;parser.y&quot;
+## +#line 1115 &quot;parser.y&quot;
+##      { (yyval.strval) = NULL; ;}
+##      break;
+##  
+##    case 212:
+## -#line 1109 &quot;parser.y&quot;
+## +#line 1118 &quot;parser.y&quot;
+##      { (yyval.index) = do_WordformPattern((yyvsp[(1) - (1)].boolt), 0); ;}
+##      break;
+##  
+##    case 213:
+## -#line 1110 &quot;parser.y&quot;
+## +#line 1119 &quot;parser.y&quot;
+##      { (yyval.index) = do_WordformPattern((yyvsp[(1) - (1)].boolt), 1); ;}
+##      break;
+##  
+##    case 214:
+## -#line 1113 &quot;parser.y&quot;
+## +#line 1122 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_StringConstraint((yyvsp[(1) - (2)].strval), (yyvsp[(2) - (2)].ival)); ;}
+##      break;
+##  
+##    case 215:
+## -#line 1114 &quot;parser.y&quot;
+## +#line 1123 &quot;parser.y&quot;
+##      { (yyval.boolt) = NULL;
+##                                          if (!FindVariable((yyvsp[(1) - (1)].strval))) {
+##                                            cqpmessage(Error, 
+## @@ -3452,12 +3461,12 @@ yyreduce:
+##      break;
+##  
+##    case 216:
+## -#line 1126 &quot;parser.y&quot;
+## +#line 1135 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(2) - (3)].boolt); ;}
+##      break;
+##  
+##    case 217:
+## -#line 1127 &quot;parser.y&quot;
+## +#line 1136 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                            NEW_BNODE((yyval.boolt));
+##                                            (yyval.boolt)-&gt;constnode.type = cnode;
+## @@ -3467,12 +3476,12 @@ yyreduce:
+##      break;
+##  
+##    case 218:
+## -#line 1135 &quot;parser.y&quot;
+## +#line 1144 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(2) - (3)].boolt); ;}
+##      break;
+##  
+##    case 219:
+## -#line 1136 &quot;parser.y&quot;
+## +#line 1145 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                            NEW_BNODE((yyval.boolt));
+##                                            (yyval.boolt)-&gt;constnode.type = cnode;
+## @@ -3482,7 +3491,7 @@ yyreduce:
+##      break;
+##  
+##    case 220:
+## -#line 1144 &quot;parser.y&quot;
+## +#line 1153 &quot;parser.y&quot;
+##      { int flags, i;
+##                                            flags = 0;
+##  
+## @@ -3517,49 +3526,49 @@ yyreduce:
+##      break;
+##  
+##    case 221:
+## -#line 1175 &quot;parser.y&quot;
+## +#line 1184 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 222:
+## -#line 1178 &quot;parser.y&quot;
+## +#line 1187 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(2) - (2)].boolt); ;}
+##      break;
+##  
+##    case 223:
+## -#line 1179 &quot;parser.y&quot;
+## +#line 1188 &quot;parser.y&quot;
+##      { (yyval.boolt) = NULL; ;}
+##      break;
+##  
+##    case 224:
+## -#line 1184 &quot;parser.y&quot;
+## +#line 1193 &quot;parser.y&quot;
+##      { prepare_AlignmentConstraints((yyvsp[(3) - (3)].strval)); ;}
+##      break;
+##  
+##    case 225:
+## -#line 1186 &quot;parser.y&quot;
+## +#line 1195 &quot;parser.y&quot;
+##      { if (generate_code)
+##                                             CurEnv-&gt;negated = (yyvsp[(5) - (6)].ival);
+##                                         ;}
+##      break;
+##  
+##    case 226:
+## -#line 1189 &quot;parser.y&quot;
+## +#line 1198 &quot;parser.y&quot;
+##      { ;}
+##      break;
+##  
+##    case 227:
+## -#line 1192 &quot;parser.y&quot;
+## +#line 1201 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 228:
+## -#line 1193 &quot;parser.y&quot;
+## +#line 1202 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 229:
+## -#line 1197 &quot;parser.y&quot;
+## +#line 1206 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                      CurEnv-&gt;search_context.direction = (yyvsp[(2) - (3)].direction);
+##                      CurEnv-&gt;search_context.type = (yyvsp[(3) - (3)].context).type;
+## @@ -3570,7 +3579,7 @@ yyreduce:
+##      break;
+##  
+##    case 230:
+## -#line 1204 &quot;parser.y&quot;
+## +#line 1213 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                              CurEnv-&gt;search_context.type  = word;
+##                                              CurEnv-&gt;search_context.size  = hard_boundary;
+## @@ -3580,37 +3589,37 @@ yyreduce:
+##      break;
+##  
+##    case 231:
+## -#line 1212 &quot;parser.y&quot;
+## +#line 1221 &quot;parser.y&quot;
+##      { (yyval.ival) = (yyvsp[(2) - (2)].ival); ;}
+##      break;
+##  
+##    case 232:
+## -#line 1213 &quot;parser.y&quot;
+## +#line 1222 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 233:
+## -#line 1216 &quot;parser.y&quot;
+## +#line 1225 &quot;parser.y&quot;
+##      { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
+##      break;
+##  
+##    case 234:
+## -#line 1217 &quot;parser.y&quot;
+## +#line 1226 &quot;parser.y&quot;
+##      { (yyval.ival) = 1; ;}
+##      break;
+##  
+##    case 235:
+## -#line 1220 &quot;parser.y&quot;
+## +#line 1229 &quot;parser.y&quot;
+##      { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
+##      break;
+##  
+##    case 236:
+## -#line 1221 &quot;parser.y&quot;
+## +#line 1230 &quot;parser.y&quot;
+##      { (yyval.ival) = 0; ;}
+##      break;
+##  
+##    case 237:
+## -#line 1225 &quot;parser.y&quot;
+## +#line 1234 &quot;parser.y&quot;
+##      { if ((yyvsp[(1) - (1)].ival) &lt; 0) {
+##                                              yyerror(&quot;expected a non-negative integer value&quot;);
+##                                              YYERROR;
+## @@ -3620,17 +3629,17 @@ yyreduce:
+##      break;
+##  
+##    case 238:
+## -#line 1233 &quot;parser.y&quot;
+## +#line 1242 &quot;parser.y&quot;
+##      { (yyval.ival) = (yyvsp[(1) - (1)].ival); ;}
+##      break;
+##  
+##    case 239:
+## -#line 1234 &quot;parser.y&quot;
+## +#line 1243 &quot;parser.y&quot;
+##      { (yyval.ival) = repeat_inf; ;}
+##      break;
+##  
+##    case 240:
+## -#line 1238 &quot;parser.y&quot;
+## +#line 1247 &quot;parser.y&quot;
+##      { expansion.direction = (yyvsp[(2) - (4)].direction);
+##                                            expansion.type = (yyvsp[(4) - (4)].context).type;
+##                                            expansion.size = (yyvsp[(4) - (4)].context).size;
+## @@ -3639,8 +3648,8 @@ yyreduce:
+##      break;
+##  
+##    case 241:
+## -#line 1243 &quot;parser.y&quot;
+## -    { expansion.direction = leftright;
+## +#line 1252 &quot;parser.y&quot;
+## +    { expansion.direction = ctxtdir_leftright;
+##                                            expansion.type = word;
+##                                            expansion.size = 0;
+##                                            expansion.attrib = NULL;
+## @@ -3648,42 +3657,42 @@ yyreduce:
+##      break;
+##  
+##    case 242:
+## -#line 1250 &quot;parser.y&quot;
+## -    { (yyval.direction) = left; ;}
+## +#line 1259 &quot;parser.y&quot;
+## +    { (yyval.direction) = ctxtdir_left; ;}
+##      break;
+##  
+##    case 243:
+## -#line 1251 &quot;parser.y&quot;
+## -    { (yyval.direction) = right; ;}
+## +#line 1260 &quot;parser.y&quot;
+## +    { (yyval.direction) = ctxtdir_right; ;}
+##      break;
+##  
+##    case 244:
+## -#line 1252 &quot;parser.y&quot;
+## -    { (yyval.direction) = leftright; ;}
+## +#line 1261 &quot;parser.y&quot;
+## +    { (yyval.direction) = ctxtdir_leftright; ;}
+##      break;
+##  
+##    case 245:
+## -#line 1255 &quot;parser.y&quot;
+## +#line 1264 &quot;parser.y&quot;
+##      { do_Description(&amp;((yyval.context)), (yyvsp[(1) - (2)].ival), (yyvsp[(2) - (2)].strval)); ;}
+##      break;
+##  
+##    case 246:
+## -#line 1256 &quot;parser.y&quot;
+## +#line 1265 &quot;parser.y&quot;
+##      { do_Description(&amp;((yyval.context)), (yyvsp[(1) - (1)].ival), NULL); ;}
+##      break;
+##  
+##    case 247:
+## -#line 1259 &quot;parser.y&quot;
+## +#line 1268 &quot;parser.y&quot;
+##      { (yyval.cl) = (yyvsp[(1) - (1)].cl); ;}
+##      break;
+##  
+##    case 248:
+## -#line 1260 &quot;parser.y&quot;
+## +#line 1269 &quot;parser.y&quot;
+##      { (yyval.cl) = findcorpus(&quot;Last&quot;, UNDEF, 0); ;}
+##      break;
+##  
+##    case 249:
+## -#line 1264 &quot;parser.y&quot;
+## +#line 1273 &quot;parser.y&quot;
+##      { CorpusList *cl;
+##  
+##                                            cqpmessage(Message, &quot;CID: %s&quot;, (yyvsp[(1) - (1)].strval));
+## @@ -3705,52 +3714,52 @@ yyreduce:
+##      break;
+##  
+##    case 250:
+## -#line 1284 &quot;parser.y&quot;
+## +#line 1293 &quot;parser.y&quot;
+##      { (yyval.strval) = (yyvsp[(1) - (1)].strval); ;}
+##      break;
+##  
+##    case 251:
+## -#line 1285 &quot;parser.y&quot;
+## +#line 1294 &quot;parser.y&quot;
+##      { (yyval.strval) = (yyvsp[(1) - (1)].strval); ;}
+##      break;
+##  
+##    case 252:
+## -#line 1288 &quot;parser.y&quot;
+## +#line 1297 &quot;parser.y&quot;
+##      { (yyval.boolt) = bool_implies((yyvsp[(1) - (3)].boolt), (yyvsp[(3) - (3)].boolt)); ;}
+##      break;
+##  
+##    case 253:
+## -#line 1289 &quot;parser.y&quot;
+## +#line 1298 &quot;parser.y&quot;
+##      { (yyval.boolt) = bool_or((yyvsp[(1) - (3)].boolt), (yyvsp[(3) - (3)].boolt)); ;}
+##      break;
+##  
+##    case 254:
+## -#line 1290 &quot;parser.y&quot;
+## +#line 1299 &quot;parser.y&quot;
+##      { (yyval.boolt) = bool_and((yyvsp[(1) - (3)].boolt), (yyvsp[(3) - (3)].boolt)); ;}
+##      break;
+##  
+##    case 255:
+## -#line 1291 &quot;parser.y&quot;
+## +#line 1300 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(2) - (3)].boolt); ;}
+##      break;
+##  
+##    case 256:
+## -#line 1292 &quot;parser.y&quot;
+## +#line 1301 &quot;parser.y&quot;
+##      { (yyval.boolt) = bool_not((yyvsp[(2) - (2)].boolt)); ;}
+##      break;
+##  
+##    case 257:
+## -#line 1293 &quot;parser.y&quot;
+## +#line 1302 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(1) - (1)].boolt); ;}
+##      break;
+##  
+##    case 258:
+## -#line 1296 &quot;parser.y&quot;
+## +#line 1305 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_RelExpr((yyvsp[(1) - (3)].boolt), (yyvsp[(2) - (3)].boolo), (yyvsp[(3) - (3)].boolt)); ;}
+##      break;
+##  
+##    case 259:
+## -#line 1298 &quot;parser.y&quot;
+## +#line 1307 &quot;parser.y&quot;
+##      {
+##                   if ((yyvsp[(2) - (4)].ival) &amp; OP_NOT) {
+##                     (yyval.boolt) = do_RelExpr((yyvsp[(1) - (4)].boolt), cmp_neq, do_mval_string((yyvsp[(3) - (4)].strval), (yyvsp[(2) - (4)].ival), (yyvsp[(4) - (4)].ival)));
+## @@ -3762,79 +3771,79 @@ yyreduce:
+##      break;
+##  
+##    case 260:
+## -#line 1306 &quot;parser.y&quot;
+## +#line 1315 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_RelExExpr((yyvsp[(1) - (1)].boolt)); ;}
+##      break;
+##  
+##    case 261:
+## -#line 1309 &quot;parser.y&quot;
+## +#line 1318 &quot;parser.y&quot;
+##      {(yyval.ival) = OP_CONTAINS | (yyvsp[(1) - (2)].ival);;}
+##      break;
+##  
+##    case 262:
+## -#line 1310 &quot;parser.y&quot;
+## +#line 1319 &quot;parser.y&quot;
+##      {(yyval.ival) = OP_MATCHES  | (yyvsp[(1) - (2)].ival);;}
+##      break;
+##  
+##    case 263:
+## -#line 1313 &quot;parser.y&quot;
+## +#line 1322 &quot;parser.y&quot;
+##      {(yyval.ival) = OP_NOT;;}
+##      break;
+##  
+##    case 264:
+## -#line 1314 &quot;parser.y&quot;
+## +#line 1323 &quot;parser.y&quot;
+##      {(yyval.ival) = 0;;}
+##      break;
+##  
+##    case 265:
+## -#line 1317 &quot;parser.y&quot;
+## +#line 1326 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_LabelReference((yyvsp[(1) - (1)].strval), 0); ;}
+##      break;
+##  
+##    case 266:
+## -#line 1318 &quot;parser.y&quot;
+## +#line 1327 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_LabelReference((yyvsp[(2) - (2)].strval), 1); ;}
+##      break;
+##  
+##    case 267:
+## -#line 1319 &quot;parser.y&quot;
+## +#line 1328 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_IDReference((yyvsp[(1) - (1)].strval), 0); ;}
+##      break;
+##  
+##    case 268:
+## -#line 1320 &quot;parser.y&quot;
+## +#line 1329 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_IDReference((yyvsp[(2) - (2)].strval), 1); ;}
+##      break;
+##  
+##    case 269:
+## -#line 1321 &quot;parser.y&quot;
+## +#line 1330 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_IDReference(cl_strdup(field_type_to_name((yyvsp[(1) - (1)].field))), 0); ;}
+##      break;
+##  
+##    case 270:
+## -#line 1322 &quot;parser.y&quot;
+## +#line 1331 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(1) - (1)].boolt); ;}
+##      break;
+##  
+##    case 271:
+## -#line 1325 &quot;parser.y&quot;
+## +#line 1334 &quot;parser.y&quot;
+##      { (yyval.boolt) = (yyvsp[(1) - (1)].boolt); ;}
+##      break;
+##  
+##    case 272:
+## -#line 1326 &quot;parser.y&quot;
+## +#line 1335 &quot;parser.y&quot;
+##      { (yyval.boolt) = do_flagged_string((yyvsp[(1) - (2)].strval), (yyvsp[(2) - (2)].ival)); ;}
+##      break;
+##  
+##    case 273:
+## -#line 1328 &quot;parser.y&quot;
+## +#line 1337 &quot;parser.y&quot;
+##      { 
+##                                            (yyval.boolt) = do_flagged_re_variable((yyvsp[(2) - (4)].strval), (yyvsp[(4) - (4)].ival)); 
+##                                          ;}
+##      break;
+##  
+##    case 274:
+## -#line 1331 &quot;parser.y&quot;
+## +#line 1340 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                              if (!FindVariable((yyvsp[(1) - (1)].strval))) {
+##                                                cqpmessage(Error, 
+## @@ -3855,7 +3864,7 @@ yyreduce:
+##      break;
+##  
+##    case 275:
+## -#line 1348 &quot;parser.y&quot;
+## +#line 1357 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                              NEW_BNODE((yyval.boolt));
+##                                              (yyval.boolt)-&gt;type = int_leaf;
+## @@ -3867,7 +3876,7 @@ yyreduce:
+##      break;
+##  
+##    case 276:
+## -#line 1356 &quot;parser.y&quot;
+## +#line 1365 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                              NEW_BNODE((yyval.boolt));
+##                                              (yyval.boolt)-&gt;type = float_leaf;
+## @@ -3879,48 +3888,48 @@ yyreduce:
+##      break;
+##  
+##    case 277:
+## -#line 1366 &quot;parser.y&quot;
+## +#line 1375 &quot;parser.y&quot;
+##      { (yyval.boolo) = cmp_lt; ;}
+##      break;
+##  
+##    case 278:
+## -#line 1367 &quot;parser.y&quot;
+## +#line 1376 &quot;parser.y&quot;
+##      { (yyval.boolo) = cmp_gt; ;}
+##      break;
+##  
+##    case 279:
+## -#line 1368 &quot;parser.y&quot;
+## +#line 1377 &quot;parser.y&quot;
+##      { (yyval.boolo) = cmp_eq; ;}
+##      break;
+##  
+##    case 280:
+## -#line 1369 &quot;parser.y&quot;
+## +#line 1378 &quot;parser.y&quot;
+##      { (yyval.boolo) = cmp_neq; ;}
+##      break;
+##  
+##    case 281:
+## -#line 1370 &quot;parser.y&quot;
+## +#line 1379 &quot;parser.y&quot;
+##      { (yyval.boolo) = cmp_let; ;}
+##      break;
+##  
+##    case 282:
+## -#line 1371 &quot;parser.y&quot;
+## +#line 1380 &quot;parser.y&quot;
+##      { (yyval.boolo) = cmp_get; ;}
+##      break;
+##  
+##    case 283:
+## -#line 1374 &quot;parser.y&quot;
+## +#line 1383 &quot;parser.y&quot;
+##      { (yyval.boolt) = FunctionCall((yyvsp[(1) - (4)].strval), (yyvsp[(3) - (4)].apl)); ;}
+##      break;
+##  
+##    case 284:
+## -#line 1377 &quot;parser.y&quot;
+## +#line 1386 &quot;parser.y&quot;
+##      { (yyval.apl) = (yyvsp[(1) - (1)].apl);
+##                                              ;}
+##      break;
+##  
+##    case 285:
+## -#line 1380 &quot;parser.y&quot;
+## +#line 1389 &quot;parser.y&quot;
+##      { ActualParamList *last;
+##  
+##                                                if (generate_code) {
+## @@ -3938,7 +3947,7 @@ yyreduce:
+##      break;
+##  
+##    case 286:
+## -#line 1396 &quot;parser.y&quot;
+## +#line 1405 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                               New((yyval.apl), ActualParamList);
+##  
+## @@ -3951,22 +3960,22 @@ yyreduce:
+##      break;
+##  
+##    case 287:
+## -#line 1407 &quot;parser.y&quot;
+## +#line 1416 &quot;parser.y&quot;
+##      { (yyval.strval) = (yyvsp[(1) - (1)].strval); ;}
+##      break;
+##  
+##    case 288:
+## -#line 1410 &quot;parser.y&quot;
+## +#line 1419 &quot;parser.y&quot;
+##      { (yyval.evalt) = (yyvsp[(1) - (1)].evalt); ;}
+##      break;
+##  
+##    case 289:
+## -#line 1411 &quot;parser.y&quot;
+## +#line 1420 &quot;parser.y&quot;
+##      { (yyval.evalt) = (yyvsp[(1) - (1)].evalt); ;}
+##      break;
+##  
+##    case 290:
+## -#line 1412 &quot;parser.y&quot;
+## +#line 1421 &quot;parser.y&quot;
+##      { if (generate_code) {
+##                                              NEW_EVALLEAF((yyval.evalt), (yyvsp[(1) - (1)].index));
+##                                            }
+## @@ -3976,12 +3985,12 @@ yyreduce:
+##      break;
+##  
+##    case 291:
+## -#line 1424 &quot;parser.y&quot;
+## +#line 1433 &quot;parser.y&quot;
+##      { (yyval.evalt) = do_MeetStatement((yyvsp[(3) - (6)].evalt), (yyvsp[(4) - (6)].evalt), &amp;((yyvsp[(5) - (6)].context))); ;}
+##      break;
+##  
+##    case 292:
+## -#line 1428 &quot;parser.y&quot;
+## +#line 1437 &quot;parser.y&quot;
+##      { (yyval.context).type = word;
+##                                            (yyval.context).size = (yyvsp[(1) - (2)].ival);
+##                                            (yyval.context).size2 = (yyvsp[(2) - (2)].ival);
+## @@ -3990,12 +3999,12 @@ yyreduce:
+##      break;
+##  
+##    case 293:
+## -#line 1433 &quot;parser.y&quot;
+## +#line 1442 &quot;parser.y&quot;
+##      { do_StructuralContext(&amp;((yyval.context)), (yyvsp[(1) - (1)].strval)); ;}
+##      break;
+##  
+##    case 294:
+## -#line 1434 &quot;parser.y&quot;
+## +#line 1443 &quot;parser.y&quot;
+##      { (yyval.context).type = word;
+##                                            (yyval.context).size = 1;
+##                                            (yyval.context).size2 = 1;
+## @@ -4004,37 +4013,37 @@ yyreduce:
+##      break;
+##  
+##    case 295:
+## -#line 1445 &quot;parser.y&quot;
+## +#line 1454 &quot;parser.y&quot;
+##      { (yyval.evalt) = do_UnionStatement((yyvsp[(3) - (5)].evalt), (yyvsp[(4) - (5)].evalt)); ;}
+##      break;
+##  
+##    case 296:
+## -#line 1450 &quot;parser.y&quot;
+## +#line 1459 &quot;parser.y&quot;
+##      { (yyval.cl) = do_TABQuery((yyvsp[(2) - (3)].evalt)); ;}
+##      break;
+##  
+##    case 297:
+## -#line 1455 &quot;parser.y&quot;
+## +#line 1464 &quot;parser.y&quot;
+##      { (yyval.evalt) = make_first_tabular_pattern((yyvsp[(1) - (2)].index), (yyvsp[(2) - (2)].evalt)); ;}
+##      break;
+##  
+##    case 298:
+## -#line 1460 &quot;parser.y&quot;
+## +#line 1469 &quot;parser.y&quot;
+##      { (yyval.evalt) = add_tabular_pattern((yyvsp[(1) - (3)].evalt), &amp;((yyvsp[(2) - (3)].context)), (yyvsp[(3) - (3)].index)); ;}
+##      break;
+##  
+##    case 299:
+## -#line 1462 &quot;parser.y&quot;
+## +#line 1471 &quot;parser.y&quot;
+##      { (yyval.evalt) = NULL; ;}
+##      break;
+##  
+##    case 300:
+## -#line 1465 &quot;parser.y&quot;
+## +#line 1474 &quot;parser.y&quot;
+##      { do_OptDistance(&amp;((yyval.context)), (yyvsp[(2) - (3)].ival) + 1, (yyvsp[(2) - (3)].ival) + 1); ;}
+##      break;
+##  
+##    case 301:
+## -#line 1467 &quot;parser.y&quot;
+## +#line 1476 &quot;parser.y&quot;
+##      { if ((yyvsp[(4) - (5)].ival) == repeat_inf)
+##                                              do_OptDistance(&amp;((yyval.context)), (yyvsp[(2) - (5)].ival) + 1, repeat_inf);
+##                                            else {
+## @@ -4048,57 +4057,57 @@ yyreduce:
+##      break;
+##  
+##    case 302:
+## -#line 1477 &quot;parser.y&quot;
+## +#line 1486 &quot;parser.y&quot;
+##      { do_OptDistance(&amp;((yyval.context)), 1, (yyvsp[(3) - (4)].ival) + 1); ;}
+##      break;
+##  
+##    case 303:
+## -#line 1478 &quot;parser.y&quot;
+## +#line 1487 &quot;parser.y&quot;
+##      { do_OptDistance(&amp;((yyval.context)), 1, repeat_inf); ;}
+##      break;
+##  
+##    case 304:
+## -#line 1479 &quot;parser.y&quot;
+## +#line 1488 &quot;parser.y&quot;
+##      { do_OptDistance(&amp;((yyval.context)), 2, repeat_inf); ;}
+##      break;
+##  
+##    case 305:
+## -#line 1480 &quot;parser.y&quot;
+## +#line 1489 &quot;parser.y&quot;
+##      { do_OptDistance(&amp;((yyval.context)), 1, 2); ;}
+##      break;
+##  
+##    case 306:
+## -#line 1481 &quot;parser.y&quot;
+## +#line 1490 &quot;parser.y&quot;
+##      { do_OptDistance(&amp;((yyval.context)), 1, 1); ;}
+##      break;
+##  
+##    case 307:
+## -#line 1485 &quot;parser.y&quot;
+## +#line 1494 &quot;parser.y&quot;
+##      { add_user_to_list((yyvsp[(2) - (3)].strval), (yyvsp[(3) - (3)].strval)); ;}
+##      break;
+##  
+##    case 309:
+## -#line 1487 &quot;parser.y&quot;
+## +#line 1496 &quot;parser.y&quot;
+##      { add_host_to_list((yyvsp[(2) - (2)].strval)); ;}
+##      break;
+##  
+##    case 310:
+## -#line 1488 &quot;parser.y&quot;
+## +#line 1497 &quot;parser.y&quot;
+##      { add_hosts_in_subnet_to_list((yyvsp[(2) - (2)].strval)); ;}
+##      break;
+##  
+##    case 311:
+## -#line 1489 &quot;parser.y&quot;
+## +#line 1498 &quot;parser.y&quot;
+##      { add_host_to_list(NULL); ;}
+##      break;
+##  
+##    case 314:
+## -#line 1498 &quot;parser.y&quot;
+## +#line 1507 &quot;parser.y&quot;
+##      { add_grant_to_last_user((yyvsp[(2) - (2)].strval)); ;}
+##      break;
+##  
+##    case 316:
+## -#line 1504 &quot;parser.y&quot;
+## +#line 1513 &quot;parser.y&quot;
+##      {
+##                                                  if (enable_macros) 
+##                                                    define_macro((yyvsp[(3) - (7)].strval), (yyvsp[(5) - (7)].ival), NULL, (yyvsp[(7) - (7)].strval));  /* &lt;macro.c&gt; */
+## @@ -4110,7 +4119,7 @@ yyreduce:
+##      break;
+##  
+##    case 317:
+## -#line 1513 &quot;parser.y&quot;
+## +#line 1522 &quot;parser.y&quot;
+##      {
+##                                                  if (enable_macros) 
+##                                                    define_macro((yyvsp[(3) - (7)].strval), 0, (yyvsp[(5) - (7)].strval), (yyvsp[(7) - (7)].strval));  /* &lt;macro.c&gt; */
+## @@ -4123,7 +4132,7 @@ yyreduce:
+##      break;
+##  
+##    case 318:
+## -#line 1522 &quot;parser.y&quot;
+## +#line 1531 &quot;parser.y&quot;
+##      {
+##                                                  load_macro_file((yyvsp[(4) - (4)].strval));
+##                                                  free((yyvsp[(4) - (4)].strval));  /* don&#39;t forget to free the allocated string */
+## @@ -4131,14 +4140,14 @@ yyreduce:
+##      break;
+##  
+##    case 321:
+## -#line 1533 &quot;parser.y&quot;
+## +#line 1542 &quot;parser.y&quot;
+##      {
+##                                            list_macros(NULL);
+##                                          ;}
+##      break;
+##  
+##    case 322:
+## -#line 1536 &quot;parser.y&quot;
+## +#line 1545 &quot;parser.y&quot;
+##      {
+##                                            list_macros((yyvsp[(3) - (3)].strval));
+##                                            free((yyvsp[(3) - (3)].strval));
+## @@ -4146,7 +4155,7 @@ yyreduce:
+##      break;
+##  
+##    case 323:
+## -#line 1541 &quot;parser.y&quot;
+## +#line 1550 &quot;parser.y&quot;
+##      {
+##                                            print_macro_definition((yyvsp[(3) - (6)].strval), (yyvsp[(5) - (6)].ival));
+##                                            free((yyvsp[(3) - (6)].strval));
+## @@ -4154,7 +4163,7 @@ yyreduce:
+##      break;
+##  
+##    case 324:
+## -#line 1549 &quot;parser.y&quot;
+## +#line 1558 &quot;parser.y&quot;
+##      {
+##                                            int l1 = strlen((yyvsp[(1) - (2)].strval)), l2 = strlen((yyvsp[(2) - (2)].strval));
+##                                            char *s = (char *) cl_malloc(l1 + l2 + 2);
+## @@ -4168,43 +4177,43 @@ yyreduce:
+##      break;
+##  
+##    case 325:
+## -#line 1559 &quot;parser.y&quot;
+## +#line 1568 &quot;parser.y&quot;
+##      { (yyval.strval) = (yyvsp[(1) - (1)].strval); ;}
+##      break;
+##  
+##    case 326:
+## -#line 1563 &quot;parser.y&quot;
+## +#line 1572 &quot;parser.y&quot;
+##      { cl_randomize(); ;}
+##      break;
+##  
+##    case 327:
+## -#line 1564 &quot;parser.y&quot;
+## +#line 1573 &quot;parser.y&quot;
+##      { cl_set_seed((yyvsp[(2) - (2)].ival)); ;}
+##      break;
+##  
+##    case 329:
+## -#line 1572 &quot;parser.y&quot;
+## +#line 1581 &quot;parser.y&quot;
+##      { (yyval.field) = (yyvsp[(1) - (1)].field); ;}
+##      break;
+##  
+##    case 330:
+## -#line 1573 &quot;parser.y&quot;
+## +#line 1582 &quot;parser.y&quot;
+##      { (yyval.field) = NoField; ;}
+##      break;
+##  
+##    case 339:
+## -#line 1589 &quot;parser.y&quot;
+## +#line 1598 &quot;parser.y&quot;
+##      { (yyval.Anchor).anchor = (yyvsp[(1) - (1)].field); (yyval.Anchor).offset = 0; ;}
+##      break;
+##  
+##    case 340:
+## -#line 1590 &quot;parser.y&quot;
+## +#line 1599 &quot;parser.y&quot;
+##      { (yyval.Anchor).anchor = (yyvsp[(1) - (4)].field); (yyval.Anchor).offset = (yyvsp[(3) - (4)].ival); ;}
+##      break;
+##  
+##  
+##  /* Line 1267 of yacc.c.  */
+## -#line 4208 &quot;parser.tab.c&quot;
+## +#line 4217 &quot;parser.tab.c&quot;
+##        default: break;
+##      }
+##    YY_SYMBOL_PRINT (&quot;-&gt; $$ =&quot;, yyr1[yyn], &amp;yyval, &amp;yyloc);
+## @@ -4418,7 +4427,7 @@ yyreturn:
+##  }
+##  
+##  
+## -#line 1593 &quot;parser.y&quot;
+## +#line 1602 &quot;parser.y&quot;
+##  
+##  
+##  
+## diff --git a/src/cwb/cqp/parser.tab.h b/src/cwb/cqp/parser.tab.h
+## index 2b1f3c7..eff6610 100644
+## --- a/src/cwb/cqp/parser.tab.h
+## +++ b/src/cwb/cqp/parser.tab.h
+## @@ -244,7 +244,7 @@
+##  
+##  #if ! defined YYSTYPE &amp;&amp; ! defined YYSTYPE_IS_DECLARED
+##  typedef union YYSTYPE
+## -#line 118 &quot;parser.y&quot;
+## +#line 124 &quot;parser.y&quot;
+##  {
+##    Evaltree           evalt;
+##    Constrainttree     boolt;
 ## diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
-## index 666485b..25f602f 100644
+## index 666485b..3e82036 100644
 ## --- a/src/cwb/cqp/parser.y
 ## +++ b/src/cwb/cqp/parser.y
-## @@ -79,7 +79,7 @@ void warn_query_lock_violation(void) {
+## @@ -79,23 +79,27 @@ void warn_query_lock_violation(void) {
 ##  
 ##  /* ============================================================ */
 ##  
 ## -/* note: SYCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
-## +/* note: SYNCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
-##  necessary here - it is just defined, then tested.
-##  So: commented out. AH 2/4/2010
-##  #define SYNCHRONIZE
+## -necessary here - it is just defined, then tested.
+## -So: commented out. AH 2/4/2010
+## -#define SYNCHRONIZE
+## -*/
+##  
+## +/**
+## + * Deletes any still-pending input to the CQP parser, to the next
+## + * semi-colon or end of line.
+## + */ 
+##  void
+##  synchronize(void)
+##  {
+## -/*#if defined(SYNCHRONIZE)*/
+## -  int macro_status;
+## +/* function may be left uncompiled by defining this constant
+## + * in the make-configuration file. See the Makefile.         */
+## +#ifdef CQP_COMPILE_WITHOUT_SYNCHRONIZE
+## +
+## +  int macro_status; /*  stores enable_macros status */
+##  
+##    /* delete macro buffers &amp; disable macro expansion while sync&#39;ing */
+##    delete_macro_buffers(1); /* print stack trace on STDERR */
+##    macro_status = enable_macros;
+##    enable_macros = 0;
+##  
+## +  /* read and throw away characters till we have cleared away 
+## +   * the rest of what&#39;s pending. */
+##    if (cqp_input_string != NULL) {
+##      Rprintf(&quot;Synchronizing to end of line ... \n&quot;);
+##      while (!(yychar &lt;= 0))
+## @@ -107,8 +111,10 @@ synchronize(void)
+##        yychar = yylex();
+##    }
+##  
+## -  enable_macros = macro_status; /* reset enable_macros to previous value */
+## -/*#endif*/
+## +  /* restore enable_macros to previous value */
+## +  enable_macros = macro_status; 
+## +
+## +#endif /* defined CQP_COMPILE_WITHOUT_SYNCHRONIZE */
+##  }
+##  
+##  #define YYERROR_VERBOSE
+## @@ -499,10 +505,13 @@ Showing:          SHOW_SYM              {
+##                                            if (strncasecmp($2, &quot;var&quot;, 3) == 0) {
+##                                              do_PrintAllVariables();
+##                                            }
+## -                                          else if ((strncasecmp($2, &quot;sys&quot;, 3) == 0) || (strncasecmp($2, &quot;corp&quot;, 4) == 0)) {
+## +                                          else if (strncasecmp($2, &quot;active&quot;, 6) == 0 || strncasecmp($2, &quot;current&quot;, 7) == 0) {
+## +                                            show_corpus_active();
+## +                                          }
+## +                                          else if (strncasecmp($2, &quot;sys&quot;, 3) == 0 || strncasecmp($2, &quot;corp&quot;, 4) == 0) {
+##                                              show_corpora_files(SYSTEM);
+##                                            }
+## -                                          else if ((strncasecmp($2, &quot;sub&quot;, 3) == 0) || (strcasecmp($2, &quot;named&quot;) == 0) || (strcasecmp($2, &quot;queries&quot;) == 0)) {
+## +                                          else if (strncasecmp($2, &quot;sub&quot;, 3) == 0 || strcasecmp($2, &quot;named&quot;) == 0 || strcasecmp($2, &quot;queries&quot;) == 0) {
+##                                              show_corpora_files(SUB);
+##                                            }
+##                                            else {
+## @@ -1239,16 +1248,16 @@ ReStructure:    EXPAND_SYM OptDirection
+##                                            expansion.size = $4.size;
+##                                            expansion.attrib = $4.attrib;
+##                                          }
+## -              | /* epsilon */           { expansion.direction = leftright;
+## +              | /* epsilon */           { expansion.direction = ctxtdir_leftright;
+##                                            expansion.type = word;
+##                                            expansion.size = 0;
+##                                            expansion.attrib = NULL;
+##                                          }
+##                  ;
+##  
+## -OptDirection:   LEFT_SYM               { $$ = left; }
+## -              | RIGHT_SYM              { $$ = right; }
+## -              | /* epsilon */          { $$ = leftright; }
+## +OptDirection:   LEFT_SYM               { $$ = ctxtdir_left; }
+## +              | RIGHT_SYM              { $$ = ctxtdir_right; }
+## +              | /* epsilon */          { $$ = ctxtdir_leftright; }
+##                  ;
+##  
+##  Description:    OptNumber ID           { do_Description(&amp;($$), $1, $2); }
+## @@ -1543,8 +1552,8 @@ ShowMacro:        SHOW_SYM MACRO_SYM    {
+##                                          }
+##                  ;
+##  
+## -/* a list of strings is concatenated into a single string, in order */
+## -/* to allow multi-line macro definitions with comments */
+## +/* a list of strings is concatenated into a single string, in order *
+## + * to allow multi-line macro definitions with comments */
+##  MultiString:      MultiString STRING    {
+##                                            int l1 = strlen($1), l2 = strlen($2);
+##                                            char *s = (char *) cl_malloc(l1 + l2 + 2);
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
 ## index 91a1272..311008b 100644
 ## --- a/src/cwb/cqp/ranges.c
@@ -479,7 +3813,28 @@ cat(gitdiff_cqp)</code></pre>
 ## + */
 ##  int
 ##  calculate_leftboundary(CorpusList *cl, int cpos, Context spc)
-##  {</code></pre>
+##  {
+## diff --git a/src/cwb/cqp/targets.c b/src/cwb/cqp/targets.c
+## index 4a37510..d1e484b 100644
+## --- a/src/cwb/cqp/targets.c
+## +++ b/src/cwb/cqp/targets.c
+## @@ -487,14 +487,14 @@ int evaluate_target(CorpusList *corp,          /* the corpus */
+##  
+##        int dist, maxdist;
+##  
+## -      if (direction == left) {
+## +      if (direction == ctxtdir_left) {
+##          rbound = excl_start;
+##          if (strategy == SearchNearest)
+##            strategy = SearchRightmost;
+##          else if (strategy == SearchFarthest)
+##            strategy = SearchLeftmost;
+##        }
+## -      else if (direction == right) {
+## +      else if (direction == ctxtdir_right) {
+##          lbound = excl_start;
+##          if (strategy == SearchNearest)
+##            strategy = SearchLeftmost;</code></pre>
 </div>
 <div id="cqi-directory" class="section level4">
 <h4>CQi directory</h4>
@@ -494,186 +3849,13 @@ cat(output)</code></pre>
 <div id="utils-directory" class="section level4">
 <h4>utils directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/utils&quot;)
-git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]])
+git_cmd &lt;- sprintf(
+  &quot;git diff %s..%s . %s&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]], 
+  &quot;&#39;:!*_cwb_encode.c&#39; &#39;:!*_cwb_makeall.c&#39; &#39;:!*_cwb_huffcode.c&#39; &#39;:!*_cwb_compress_rdx.c&#39; &#39;:!*Makefile&#39;&quot;
+)
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/utils/Makefile b/src/cwb/utils/Makefile
-## index 0086552..11162a1 100644
-## --- a/src/cwb/utils/Makefile
-## +++ b/src/cwb/utils/Makefile
-## @@ -15,20 +15,26 @@
-##  ##  Public License for more details (in the file &quot;COPYING&quot;, or available via
-##  ##  WWW at http://www.gnu.org/copyleft/gpl.html).
-##  
-## +
-## +
-## +##  This is the Makefile for the CWB &quot;utils&quot; programs. 
-## +
-## +
-## +
-##  ## Read configuration settings and standard definitions
-## -TOP = $(R_PACKAGE_SOURCE)
-## +TOP = $(shell pwd)/..
-##  include $(TOP)/config.mk
-##  
-##  # the following targets are available
-##  #
-## -#  all      compile tools
-## +#  all          compile tools
-##  #  clean        delete object files and binaries
-##  #  realclean    also deleted automatically generated parsers and dependencies
-## -#  depend   update dependencies
-## -#  install  install tool binaries
-## -#  uninstall    uninstall tools from chosen location (currently not supported)
-## -#  relase       install to binary release dir
-## -#  size     print size of source code (line counts)
-## +#  depend       update dependencies
-## +#  install      install tool binaries
-## +#  uninstall    uninstall tools from chosen location (currently not supported)
-## +#  release      install to binary release dir
-## +#  size         print size of source code (line counts)
-##  #
-##  
-##  .PHONY: all clean realclean depend install uninstall size
-## @@ -36,37 +42,116 @@ include $(TOP)/config.mk
-##  ## ----------------------------------------------------------------------
-##  ## CWB command-line utilities  headers / sources / binaries 
-##  
-## -SRCS =  _cwb_encode.c _cwb_makeall.c \
-## -    _cwb_huffcode.c _cwb_compress_rdx.c \
-## -
-## -OBJS =  _cwb_encode.o _cwb_makeall.o \
-## -    _cwb_huffcode.o _cwb_compress_rdx.o \
-## +SRCS =  cwb-atoi.c cwb-itoa.c \
-## +    cwb-makeall.c \
-## +    cwb-encode.c cwb-decode.c cwb-lexdecode.c \
-## +    cwb-huffcode.c cwb-compress-rdx.c \
-## +    cwb-s-encode.c cwb-s-decode.c \
-## +    cwb-describe-corpus.c cwb-decode-nqrfile.c \
-## +    cwb-scan-corpus.c \
-## +    barlib.c feature_maps.c \
-## +    cwb-align.c cwb-align-show.c cwb-align-encode.c cwb-align-decode.c \
-## +#   cwb-check-input.c
-## +
-## +HDRS = barlib.h feature_maps.h
-## +
-## +## PROGRAMS: the utils which form an essential part of the CWB (plus some useful helper tools)
-## +#       cwb-atoi, cwb-itoa  convert ascii to CWB integers and vice versa
-## +#       cwb-encode          encode corpus (position stream &amp; lexicon)
-## +#       cwb-makeall         create index &amp; sorted index components (using Corpus Library)
-## +#       cwb-huffcode        compress token stream of p-attribute
-## +#       cwb-compress-rdx    compress index of p-attribute
-## +#       cwb-decode          decode corpus (output corpus in text format)
-## +#       cwb-lexdecode       decode corpus lexicon
-## +#       cwb-s-encode        add s-attribute to encoded corpus
-## +#       cwb-s-decode        decode s-attribute (output: &lt;reg.start&gt; TAB &lt;reg.end&gt; TAB &lt;annotation&gt;)
-## +#       cwb-describe-corpus prints some corpus info and/or statistics
-## +#       cwb-decode-nqrfile  decode named query result file (prints information on STDOUT)
-## +#       cwb-scan-corpus     scan corpus for n-grams of adjacent tokens or different p-attributes
-## +#       cwb-align           EasyAlign sentence aligner (operates on CWB-encoded corpora)
-## +#       cwb-align-show      simple terminal-based viewer for EasyAlign alignment files (.align)
-## +#       cwb-align-encode    encode .align file into CWB format (.alx, and .alg for backward compatibility)
-## +#       cwb-align-decode    decode alignment attribute from binary representation into .align format
-## +#       cwb-check-input     program for checking wellformedness of vertical files
-## +
-## +PROGRAMS = cwb-atoi$(EXEC_SUFFIX) cwb-itoa$(EXEC_SUFFIX) \
-## +    cwb-makeall$(EXEC_SUFFIX) \
-## +    cwb-encode$(EXEC_SUFFIX) cwb-decode$(EXEC_SUFFIX) cwb-lexdecode$(EXEC_SUFFIX) \
-## +    cwb-huffcode$(EXEC_SUFFIX) cwb-compress-rdx$(EXEC_SUFFIX) \
-## +    cwb-s-encode$(EXEC_SUFFIX) cwb-s-decode$(EXEC_SUFFIX) \
-## +    cwb-describe-corpus$(EXEC_SUFFIX) cwb-decode-nqrfile$(EXEC_SUFFIX) \
-## +    cwb-scan-corpus$(EXEC_SUFFIX) \
-## +    cwb-align$(EXEC_SUFFIX) cwb-align-show$(EXEC_SUFFIX) cwb-align-encode$(EXEC_SUFFIX) cwb-align-decode$(EXEC_SUFFIX) \
-## +#   cwb-check-input$(EXEC_SUFFIX)
-##  
-## +## ----------------------------------------------------------------------
-##  
-## -all: libcwb.a
-## +all: $(PROGRAMS)
-##  
-## -libcwb.a: $(OBJS)
-## -    @$(ECHO) &quot;--------------------------------- CREATING ARCHIVE&quot;
-## +## general linking rule for all utility programs
-## +cwb-%$(EXEC_SUFFIX): cwb-%.o
-##      $(RM) $@
-## -    $(AR) cq $@ $^
-## -#   $(AR) -s $@
-## -
-## -_cwb_encode.o: _cwb_encode.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_encode.o _cwb_encode.c
-## -
-## -_cwb_makeall.o: _cwb_makeall.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_makeall.o _cwb_makeall.c
-## +    $(CC) $(CFLAGS) -o $@ $&lt; $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL)
-##  
-## -_cwb_huffcode.o: _cwb_huffcode.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_huffcode.o _cwb_huffcode.c
-## +## special rule for align program, which requires barlib.o and feature_maps.o libraries
-## +cwb-align$(EXEC_SUFFIX): cwb-align.o barlib.o feature_maps.o
-## +    $(RM) $@
-## +    $(CC) $(CFLAGS) -o $@ $^ $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL)
-## +
-## +## special rules for cwb-check-input, which requires Glib
-## +# temporary before use of Glib made general
-## +#cwb-check-input.o:
-## +#   $(RM) $@
-## +#   $(CC) -c cwb-check-input.c -o cwb-check-input.o $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --cflags gobject-2.0` 
-## +#cwb-check-input$(EXEC_SUFFIX): cwb-check-input.o
-## +## note that the pkg-config calls are needed to be in definitions.mk instead of here, and also in any makefile rule
-## +## that calls ${DEPEND}
-## +#ifndef __MINGW__
-## +#   $(RM) $@
-## +#   $(CC) $(CFLAGS) -o $@ $&lt; $(CL_LIBS) $(LIB_REGEX) `pkg-config --libs glib-2.0` `pkg-config --libs gobject-2.0` $(LDFLAGS_ALL)
-## +#else
-## +#   @$(ECHO) &quot;--------------------- can&#39;t yet build progs that need glib under mingw....&quot;
-## +## we need a Glib built for Win32 cross-compiling to do this
-## +## http://library.gnome.org/devel/glib/stable/glib-cross-compiling.html
-## +## http://library.gnome.org/devel/glib/stable/glib-building.html
-## +#endif  
-## +
-## +depend:
-## +    -$(RM) depend.mk
-## +    $(MAKE) depend.mk
-##  
-## -_cwb_compress_rdx.o: _cwb_compress_rdx.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_compress_rdx.o _cwb_compress_rdx.c
-## +depend.mk:
-## +    -$(RM) depend.mk
-## +    $(DEPEND) $(DEPEND_CFLAGS_ALL) $(SRCS) &gt; depend.mk
-## +
-## +install: $(PROGRAMS)
-## +    if [ ! -d &quot;$(BININSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(BININSTDIR)&quot;; fi;
-## +    for i in $(PROGRAMS); do $(INSTALL) $(INST_FLAGS_BIN) $$i &quot;$(BININSTDIR)&quot;; done
-## +
-## +release: $(PROGRAMS)
-## +    if [ ! -d &quot;$(RELEASE_DIR)/bin&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/bin&quot;; fi;
-## +    for i in $(PROGRAMS); do $(INSTALL) $(INST_FLAGS_BIN) $$i &quot;$(RELEASE_DIR)/bin&quot;; done
-## +ifdef __MINGW__
-## +    # Do not include cwb-atoi and cwb-atoi in Windows release as they trigger malware alerts in much antivirus software
-## +    for i in cwb-atoi$(EXEC_SUFFIX) cwb-itoa$(EXEC_SUFFIX) ; do $(RM) &quot;$(RELEASE_DIR)/bin/$$i&quot;; done
-## +endif
-## +
-## +uninstall:
-## +    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
-## +#   for i in $(PROGRAMS) ;\
-## +#   do \
-## +#   $(RM) $(BININSTDIR)/$$i ; \
-## +#   done
-## +
-## +size:
-## +    $(WC) $(SRCS) $(HDRS)
-##  
-##  clean:
-## -    $(RM) *.o *~
-## +    $(RM) $(PROGRAMS) *.o *~
-##  
-##  realclean:  clean
-##      -$(RM) depend.mk
-##  
-## +# -------- dependencies --------
-## +include depend.mk
-##  
-## diff --git a/src/cwb/utils/cwb-decode.c b/src/cwb/utils/cwb-decode.c
+<pre><code>## diff --git a/src/cwb/utils/cwb-decode.c b/src/cwb/utils/cwb-decode.c
 ## index 7143dd3..ecebff5 100644
 ## --- a/src/cwb/utils/cwb-decode.c
 ## +++ b/src/cwb/utils/cwb-decode.c
@@ -699,7 +3881,20 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 ## + * This function only lists files with .vrt or .vrt.(gz|bz2) extensions,
 ##   * and only files identified  by POSIX stat() as &quot;regular&quot;.
 ##   *
-##   * (Note that .vrt is dependent on DEFAULT_INFILE_EXTENSION.)</code></pre>
+##   * (Note that .vrt is dependent on DEFAULT_INFILE_EXTENSION.)
+## diff --git a/src/cwb/utils/cwb-s-encode.c b/src/cwb/utils/cwb-s-encode.c
+## index 19950ce..db0951e 100644
+## --- a/src/cwb/utils/cwb-s-encode.c
+## +++ b/src/cwb/utils/cwb-s-encode.c
+## @@ -763,7 +763,7 @@ sencode_write_region(int start, int end, char *annot)
+##          exit(1);
+##        }
+##      }
+## -    id = entry-&gt;id;
+## +    id = entry-&gt;id;  /* TODO the value stored in id is never used ... should it be?? */
+##      offset = entry-&gt;data.integer;
+##  
+##      NwriteInt(new_satt.num, new_satt.avx);</code></pre>
 </div>
 <div id="cleaning-up" class="section level3">
 <h3>Cleaning up</h3>
