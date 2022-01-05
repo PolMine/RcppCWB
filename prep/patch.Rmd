@@ -16,7 +16,7 @@ knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
 The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from `definitions.mk`.
 
 ```{r}
-cwb_svn_revision <- 1069L
+cwb_svn_revision <- 1071L
 ```
 
 ## Step 1: Create branch with unaltered CWB code
@@ -187,7 +187,7 @@ cat(paste(result, collapse = "\n"))
 
 ```{r}  
 setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
-git_cmd <- sprintf("git diff %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]])
+git_cmd <- sprintf("git diff --ignore-space-at-eol %s..%s .", to_compare[["sha"]], last_devbranch_commit[["sha"]])
 result <- system(git_cmd, intern = TRUE)
 gitdiff_cqp <- paste(result, collapse = "\n")
 cat(gitdiff_cqp)
