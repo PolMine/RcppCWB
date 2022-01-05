@@ -385,9 +385,9 @@ for (i in 1L:length(insert_after)){
     sprintf(
       "file: %s | regex: %s | match: %d | insertion: %s ... ",
       fname,
-      insert_before[[i]][[1]],
+      insert_after[[i]][[1]],
       which_position,
-      paste(insert_before[[i]][[2]], collapse = "///")
+      paste(insert_after[[i]][[2]], collapse = "///")
     ),
     appendLF = FALSE
   )
@@ -530,11 +530,31 @@ replace <- list(
 
 for (i in 1L:length(replace)){
   fname <- path(repodir, names(replace)[[i]])
+  
+  message(
+    sprintf(
+      "file: %s | regex: %s | match: %d | replacement: %s ... ",
+      fname,
+      replace[[i]][[1]],
+      replace[[i]][[3]],
+      paste(replace[[i]][[2]], collapse = "///")
+    ),
+    appendLF = FALSE
+  )
+  
+  if (!file.exists(fname)){
+    message("FAIL - file does not exist")
+    next
+  }
+  
   code <- readLines(fname)
   position <- grep(pattern = replace[[i]][[1]], code)[ replace[[i]][[3]] ]
   if (!is.na(position)){
     code[position] <- gsub(replace[[i]][1], replace[[i]][2], code[position])
     writeLines(text = code, con = fname)
+    message("OK")
+  } else {
+    message("FAIL - no match")
   }
 }
 ```
@@ -569,11 +589,25 @@ remove_lines <- list(
 
 for (i in 1L:length(remove_lines)){
   fname <- path(repodir, names(remove_lines)[[i]])
+  
+  message(
+    sprintf(
+      "file: %s | regex: %s | match: %d ... ",
+      fname,
+      remove_lines[[i]][[1]],
+      remove_lines[[i]][[2]]
+    ),
+    appendLF = FALSE
+  )
+  
   code <- readLines(fname)
   position <- grep(pattern = remove_lines[[i]][[1]], code)[ remove_lines[[i]][[2]] ]
   if (!is.na(position)){
     code <- code[-position]
     writeLines(text = code, con = fname)
+    message("OK")
+  } else {
+    message("FAIL - no match")
   }
 }
 ```
