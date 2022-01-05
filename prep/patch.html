@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [24e66ed] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [565f898] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -461,6 +461,9 @@ for (i in 1L:length(delete_line_before)){
 ## file: src/cwb/cl/Makefile | regex: ^depend:$ | match: 1 | lines: 22 ... OK
 ## file: src/cwb/cqp/Makefile | regex: ^clean:$ | match: 1 | lines: 7 ... OK
 ## file: src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\): | match: 1 | lines: 8 ... OK</code></pre>
+</div>
+<div id="insert-code-before-match" class="section level3">
+<h3>Insert code before match</h3>
 <pre class="r"><code>insert_before &lt;- list(
   &quot;src/cwb/cl/attributes.c&quot; = list(&quot;^#include\\s&lt;ctype\\.h&gt;&quot;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;)),
   &quot;src/cwb/cl/bitio.c&quot; = list(&quot;^#include\\s&lt;sys/types\\.h&gt;&quot;, &quot;void Rprintf(const char *, ...);&quot;),
@@ -503,9 +506,28 @@ for (i in 1L:length(delete_line_before)){
 )
 
 for (i in 1L:length(insert_before)){
+  
   fname &lt;- path(repodir, names(insert_before)[[i]])
-  code &lt;- readLines(fname)
   which_position &lt;- if (length(insert_before[[i]]) &gt; 2L) insert_before[[i]][[3]] else 1
+  
+  message(
+    sprintf(
+      &quot;file: %s | regex: %s | match: %d | insertion: %s ... &quot;,
+      fname,
+      insert_before[[i]][[1]],
+      which_position,
+      paste(insert_before[[i]][[2]], collapse = &quot;///&quot;)
+    ),
+    appendLF = FALSE
+  )
+  
+  if (!file.exists(fname)){
+    message(&quot;FAIL - file does not exist&quot;)
+    next
+  }
+  
+  code &lt;- readLines(fname)
+  
   position &lt;- grep(pattern = insert_before[[i]][[1]], code)[which_position]
   if (!is.na(position)){
     code &lt;- c(
@@ -514,8 +536,50 @@ for (i in 1L:length(insert_before)){
       code[position:length(code)]
     )
     writeLines(text = code, con = fname)
+    message(&quot;OK&quot;)
+  } else {
+    message(&quot;FAIL - no matches for regex&quot;)
   }
 }</code></pre>
+<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^#include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitio.c | regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/fileutils.c | regex: ^#include\s&lt;sys/stat\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/fileutils.c | regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: #include &lt;signal.h&gt; /* added by Andreas Blaette  *////#include &lt;sys/socket.h&gt; /* added by Andreas Blaette *//// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/globals.h | regex: ^#ifndef\s_globals_h_ | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lexhash.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/macros.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/makecomps.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.y | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/special-chars.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/storage.c | regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/storage.c | regex: ^(\s*)lseek\(fd,\s0,\sSEEK_SET\); | match: 1 | insertion:       if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/windows-mmap.c | regex: ^#include\s&quot;windows-mmap\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^Group\s\* | match: 3 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | insertion: *//// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*int\s*$ | match: 1 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*int\s*$ | match: 2 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^unsigned\sint\s*$ | match: 1 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/macro.c | regex: #include\s&quot;hash\.h&quot; | match: 1 | insertion: #include &quot;../cl/lexhash.h&quot; /* newly added by AB */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^FILE\s\*\s* | match: 1 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^int | match: 9 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/auth.c | regex: /\*\sdata\sstructures\s\(internal\suse\sonly\)\s\*/ | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/server.c | regex: ^\/\* | match: 3 | insertion: void Rprintf(const char *, ...);/// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/cwb-makeall.c | regex: /\*\*\sThe\scorpus\swe\sare\sworking\son\s\*/ | match: 1 | insertion: #include &lt;netinet/in.h&gt;/// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\send\sstandard\sC\sheaders\.\s\*/ | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: #ifndef\sYY_NO_INPUT | match: 1 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^#ifndef\sYY_NO_INPUT | match: 2 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | insertion: *//// ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c | regex: #define\sYYBISON\s1 | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: #ifdef __cplusplus | match: 3 | insertion: /* ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | insertion:  ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h | regex: #include\s&lt;windows\.h&gt; | match: 1 | insertion: #include &lt;winsock2.h&gt; /* AB reversed order, in original CWB code windows.h is included first */ ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\):.* | match: 1 | insertion: libcqp.a: $(OBJS) $(CQI_OBJS)
+##  $(RM) $@
+##  $(AR) cq $@ $^
+##  ... OK</code></pre>
 <pre class="r"><code>insert_after &lt;- list(
   &quot;src/cwb/cl/bitio.c&quot; = list(&quot;^static\\sint\\sBaseTypeBits&quot;, &quot;void Rprintf(const char *, ...);&quot;),
   &quot;src/cwb/cl/bitfields.c&quot; = list(&quot;^static\\sint\\sBaseTypeBits&quot;, &quot;void Rprintf(const char *, ...);&quot;),
@@ -854,7 +918,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [3249902] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [9226b88] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 </div>

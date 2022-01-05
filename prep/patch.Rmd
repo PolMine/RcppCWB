@@ -379,8 +379,27 @@ insert_after <- list(
 
 for (i in 1L:length(insert_after)){
   fname <- path(repodir, names(insert_after)[[i]])
-  code <- readLines(fname)
   which_position <- if (length(insert_after[[i]]) > 2L) insert_after[[i]][[3]] else 1L
+  
+  message(
+    sprintf(
+      "file: %s | regex: %s | match: %d | insertion: %s ... ",
+      fname,
+      insert_before[[i]][[1]],
+      which_position,
+      paste(insert_before[[i]][[2]], collapse = "///")
+    ),
+    appendLF = FALSE
+  )
+  
+  if (!file.exists(fname)){
+    message("FAIL - file does not exist")
+    next
+  }
+
+  
+  code <- readLines(fname)
+  
   position <- grep(pattern = insert_after[[i]][[1]], code)[which_position]
   if (!is.na(position)){
     code <- c(
@@ -389,6 +408,9 @@ for (i in 1L:length(insert_after)){
       code[(position + 1L):length(code)]
     )
     writeLines(text = code, con = fname)
+    message("OK")
+  } else {
+    message("FAIL - no match")
   }
 }
 ```
