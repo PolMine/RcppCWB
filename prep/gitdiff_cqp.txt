@@ -1,18 +1,3 @@
-diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-index 5c87f7e..cf7b289 100644
---- a/src/cwb/cqp/Makefile
-+++ b/src/cwb/cqp/Makefile
-@@ -97,8 +97,8 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
- all: libcqp.a
- 
- libcqp.a: $(OBJS) $(CQI_OBJS)
--    $(RM) $@
--    $(AR) cq $@ $^
-+	$(RM) $@
-+	$(AR) cq $@ $^
- 
- cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
- 	$(RM) $@
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29

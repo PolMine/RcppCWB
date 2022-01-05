@@ -192,6 +192,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
   git2r::add(repo, path = &quot;prep/*&quot;)
   git2r::commit(repo, message = &quot;patch update&quot;)
 }</code></pre>
+<pre><code>## [c87947d] 2022-01-05: patch update</code></pre>
 <p>Checkout the r1069 branch and apply patches.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;r1069&quot;)
 source(tmp_patchfile)</code></pre>
@@ -199,7 +200,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [8d19ab3] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [bb0029e] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -219,22 +220,7 @@ git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
-<pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-## index 5c87f7e..cf7b289 100644
-## --- a/src/cwb/cqp/Makefile
-## +++ b/src/cwb/cqp/Makefile
-## @@ -97,8 +97,8 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
-##  all: libcqp.a
-##  
-##  libcqp.a: $(OBJS) $(CQI_OBJS)
-## -    $(RM) $@
-## -    $(AR) cq $@ $^
-## +    $(RM) $@
-## +    $(AR) cq $@ $^
-##  
-##  cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
-##      $(RM) $@
-## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
+<pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29</code></pre>
 </div>
