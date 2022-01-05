@@ -450,7 +450,8 @@ replace <- list(
   "src/cwb/config/platform/darwin" = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L),
   "src/cwb/config/platform/darwin-port-core2" = list("^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$", "\\1 \\2", 1L),
   "src/cwb/config/platform/darwin-universal" = list("^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$", "\\1 \\2", 1L),
-  "src/cwb/config/platform/linux-opteron" = list("^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$", "\\1 \\2", 1L)
+  "src/cwb/config/platform/linux-opteron" = list("^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$", "\\1 \\2", 1L),
+  "src/cwb/config/platform/linux" = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L)
 )
 
 for (i in 1L:length(replace)){

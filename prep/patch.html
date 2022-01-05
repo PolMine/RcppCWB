@@ -305,7 +305,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [6abd355] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [baad2b3] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -315,10 +315,6 @@ git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
 <pre class="r"><code>checkout(repodir, branch = &quot;dev&quot;)
 repo &lt;- repository(repodir) # needed later on
 last_devbranch_commit &lt;- last_commit(repo = repodir)</code></pre>
-<p>We need a temporary copy of (the most recent version of) patch.R. It may not be available once we are on the revision branch.</p>
-<pre class="r"><code>patchfile &lt;- path(repodir, &quot;prep&quot;, &quot;patch.R&quot;)
-tmp_patchfile &lt;- path(tempdir(), &quot;path.R&quot;)
-file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></pre>
 <p>This intermediate step is a matter of caution to avoid that changes are lost.</p>
 <pre class="r"><code>if (!is.null(unlist(status(repo)))){
   git2r::add(repo, path = &quot;prep/*&quot;)
@@ -350,8 +346,9 @@ file.rename(
 <pre class="r"><code>new_files &lt;- list.files(path = file.path(repodir, &quot;prep&quot;, &quot;cwb&quot;), full.names = TRUE, recursive = TRUE)
 for (fname in new_files){
   message(&quot;... copying: &quot;, fname)
-  file.copy(from = fname, to = gsub(&quot;/prep/&quot;, &quot;/src/&quot;, fname))
+  file.copy(from = fname, to = gsub(&quot;/prep/&quot;, &quot;/src/&quot;, fname), overwrite = TRUE)
 }</code></pre>
+<pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config.mk</code></pre>
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/darwin-arm64</code></pre>
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_spark</code></pre>
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_x86</code></pre>
@@ -626,7 +623,12 @@ replace &lt;- list(
   &quot;src/cwb/cl/Makefile&quot; = list(&quot;^(\\s+)\\$\\(AR\\)\\s&quot;, &quot;\\1$(AR) cq &quot;, 1L),
   
   &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.&quot;, &quot;TOP = $(R_PACKAGE_SOURCE)&quot;, 1L),
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;all:\\s\\$\\(PROGRAMS\\)&quot;, &quot;all: libcqp.a&quot;, 1L)
+  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;all:\\s\\$\\(PROGRAMS\\)&quot;, &quot;all: libcqp.a&quot;, 1L),
+  &quot;src/cwb/config/platform/darwin-64&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
+  &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
+  &quot;src/cwb/config/platform/darwin-port-core2&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
+  &quot;src/cwb/config/platform/darwin-universal&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
+  &quot;src/cwb/config/platform/linux-opteron&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L)
 )
 
 for (i in 1L:length(replace)){
@@ -823,7 +825,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [fa3d4e8] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [e4d5c41] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -862,181 +864,6 @@ git_cmd &lt;- sprintf(
 )
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/utils/Makefile b/src/cwb/utils/Makefile
-## index 0086552..1ebfb6c 100644
-## --- a/src/cwb/utils/Makefile
-## +++ b/src/cwb/utils/Makefile
-## @@ -15,20 +15,26 @@
-##  ##  Public License for more details (in the file &quot;COPYING&quot;, or available via
-##  ##  WWW at http://www.gnu.org/copyleft/gpl.html).
-##  
-## +
-## +
-## +##  This is the Makefile for the CWB &quot;utils&quot; programs. 
-## +
-## +
-## +
-##  ## Read configuration settings and standard definitions
-## -TOP = $(R_PACKAGE_SOURCE)
-## +TOP = $(shell pwd)/..
-##  include $(TOP)/config.mk
-##  
-##  # the following targets are available
-##  #
-## -#  all      compile tools
-## +#  all          compile tools
-##  #  clean        delete object files and binaries
-##  #  realclean    also deleted automatically generated parsers and dependencies
-## -#  depend   update dependencies
-## -#  install  install tool binaries
-## -#  uninstall    uninstall tools from chosen location (currently not supported)
-## +#  depend       update dependencies
-## +#  install      install tool binaries
-## +#  uninstall    uninstall tools from chosen location (currently not supported)
-##  #  relase       install to binary release dir
-## -#  size     print size of source code (line counts)
-## +#  size         print size of source code (line counts)
-##  #
-##  
-##  .PHONY: all clean realclean depend install uninstall size
-## @@ -36,37 +42,116 @@ include $(TOP)/config.mk
-##  ## ----------------------------------------------------------------------
-##  ## CWB command-line utilities  headers / sources / binaries 
-##  
-## -SRCS =  _cwb_encode.c _cwb_makeall.c \
-## -    _cwb_huffcode.c _cwb_compress_rdx.c \
-## -
-## -OBJS =  _cwb_encode.o _cwb_makeall.o \
-## -    _cwb_huffcode.o _cwb_compress_rdx.o \
-## +SRCS =  cwb-atoi.c cwb-itoa.c \
-## +    cwb-makeall.c \
-## +    cwb-encode.c cwb-decode.c cwb-lexdecode.c \
-## +    cwb-huffcode.c cwb-compress-rdx.c \
-## +    cwb-s-encode.c cwb-s-decode.c \
-## +    cwb-describe-corpus.c cwb-decode-nqrfile.c \
-## +    cwb-scan-corpus.c \
-## +    barlib.c feature_maps.c \
-## +    cwb-align.c cwb-align-show.c cwb-align-encode.c cwb-align-decode.c \
-## +#   cwb-check-input.c
-## +
-## +HDRS = barlib.h feature_maps.h
-## +
-## +## PROGRAMS: the utils which form an essential part of the CWB (plus some useful helper tools)
-## +#       cwb-atoi, cwb-itoa  convert ascii to CWB integers and vice versa
-## +#       cwb-encode          encode corpus (position stream &amp; lexicon)
-## +#       cwb-makeall         create index &amp; sorted index components (using Corpus Library)
-## +#       cwb-huffcode        compress token stream of p-attribute
-## +#       cwb-compress-rdx    compress index of p-attribute
-## +#       cwb-decode          decode corpus (output corpus in text format)
-## +#       cwb-lexdecode       decode corpus lexicon
-## +#       cwb-s-encode        add s-attribute to encoded corpus
-## +#       cwb-s-decode        decode s-attribute (output: &lt;reg.start&gt; TAB &lt;reg.end&gt; TAB &lt;annotation&gt;)
-## +#       cwb-describe-corpus prints some corpus info and/or statistics
-## +#       cwb-decode-nqrfile  decode named query result file (prints information on STDOUT)
-## +#       cwb-scan-corpus     scan corpus for n-grams of adjacent tokens or different p-attributes
-## +#       cwb-align           EasyAlign sentence aligner (operates on CWB-encoded corpora)
-## +#       cwb-align-show      simple terminal-based viewer for EasyAlign alignment files (.align)
-## +#       cwb-align-encode    encode .align file into CWB format (.alx, and .alg for backward compatibility)
-## +#       cwb-align-decode    decode alignment attribute from binary representation into .align format
-## +#       cwb-check-input     program for checking wellformedness of vertical files
-## +
-## +PROGRAMS = cwb-atoi$(EXEC_SUFFIX) cwb-itoa$(EXEC_SUFFIX) \
-## +    cwb-makeall$(EXEC_SUFFIX) \
-## +    cwb-encode$(EXEC_SUFFIX) cwb-decode$(EXEC_SUFFIX) cwb-lexdecode$(EXEC_SUFFIX) \
-## +    cwb-huffcode$(EXEC_SUFFIX) cwb-compress-rdx$(EXEC_SUFFIX) \
-## +    cwb-s-encode$(EXEC_SUFFIX) cwb-s-decode$(EXEC_SUFFIX) \
-## +    cwb-describe-corpus$(EXEC_SUFFIX) cwb-decode-nqrfile$(EXEC_SUFFIX) \
-## +    cwb-scan-corpus$(EXEC_SUFFIX) \
-## +    cwb-align$(EXEC_SUFFIX) cwb-align-show$(EXEC_SUFFIX) cwb-align-encode$(EXEC_SUFFIX) cwb-align-decode$(EXEC_SUFFIX) \
-## +#   cwb-check-input$(EXEC_SUFFIX)
-##  
-## +## ----------------------------------------------------------------------
-##  
-## -all: libcwb.a
-## +all: $(PROGRAMS)
-##  
-## -libcwb.a: $(OBJS)
-## -    @$(ECHO) &quot;--------------------------------- CREATING ARCHIVE&quot;
-## +## general linking rule for all utility programs
-## +cwb-%$(EXEC_SUFFIX): cwb-%.o
-##      $(RM) $@
-## -    $(AR) cq $@ $^
-## -#   $(AR) -s $@
-## -
-## -_cwb_encode.o: _cwb_encode.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_encode.o _cwb_encode.c
-## -
-## -_cwb_makeall.o: _cwb_makeall.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_makeall.o _cwb_makeall.c
-## +    $(CC) $(CFLAGS) -o $@ $&lt; $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL)
-##  
-## -_cwb_huffcode.o: _cwb_huffcode.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_huffcode.o _cwb_huffcode.c
-## +## special rule for align program, which requires barlib.o and feature_maps.o libraries
-## +cwb-align$(EXEC_SUFFIX): cwb-align.o barlib.o feature_maps.o
-## +    $(RM) $@
-## +    $(CC) $(CFLAGS) -o $@ $^ $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL)
-## +
-## +## special rules for cwb-check-input, which requires Glib
-## +# temporary before use of Glib made general
-## +#cwb-check-input.o:
-## +#   $(RM) $@
-## +#   $(CC) -c cwb-check-input.c -o cwb-check-input.o $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --cflags gobject-2.0` 
-## +#cwb-check-input$(EXEC_SUFFIX): cwb-check-input.o
-## +## note that the pkg-config calls are needed to be in definitions.mk instead of here, and also in any makefile rule
-## +## that calls ${DEPEND}
-## +#ifndef __MINGW__
-## +#   $(RM) $@
-## +#   $(CC) $(CFLAGS) -o $@ $&lt; $(CL_LIBS) $(LIB_REGEX) `pkg-config --libs glib-2.0` `pkg-config --libs gobject-2.0` $(LDFLAGS_ALL)
-## +#else
-## +#   @$(ECHO) &quot;--------------------- can&#39;t yet build progs that need glib under mingw....&quot;
-## +## we need a Glib built for Win32 cross-compiling to do this
-## +## http://library.gnome.org/devel/glib/stable/glib-cross-compiling.html
-## +## http://library.gnome.org/devel/glib/stable/glib-building.html
-## +#endif  
-## +
-## +depend:
-## +    -$(RM) depend.mk
-## +    $(MAKE) depend.mk
-##  
-## -_cwb_compress_rdx.o: _cwb_compress_rdx.c
-## -    ${CC} -c ${CFLAGS} -o _cwb_compress_rdx.o _cwb_compress_rdx.c
-## +depend.mk:
-## +    -$(RM) depend.mk
-## +    $(DEPEND) $(DEPEND_CFLAGS_ALL) $(SRCS) &gt; depend.mk
-## +
-## +install: $(PROGRAMS)
-## +    if [ ! -d &quot;$(BININSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(BININSTDIR)&quot;; fi;
-## +    for i in $(PROGRAMS); do $(INSTALL) $(INST_FLAGS_BIN) $$i &quot;$(BININSTDIR)&quot;; done
-## +
-## +release: $(PROGRAMS)
-## +    if [ ! -d &quot;$(RELEASE_DIR)/bin&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/bin&quot;; fi;
-## +    for i in $(PROGRAMS); do $(INSTALL) $(INST_FLAGS_BIN) $$i &quot;$(RELEASE_DIR)/bin&quot;; done
-## +ifdef __MINGW__
-## +    # Do not include cwb-atoi and cwb-atoi in Windows release as they trigger malware alerts in much antivirus software
-## +    for i in cwb-atoi$(EXEC_SUFFIX) cwb-itoa$(EXEC_SUFFIX) ; do $(RM) &quot;$(RELEASE_DIR)/bin/$$i&quot;; done
-## +endif
-## +
-## +uninstall:
-## +    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
-## +#   for i in $(PROGRAMS) ;\
-## +#   do \
-## +#   $(RM) $(BININSTDIR)/$$i ; \
-## +#   done
-## +
-## +size:
-## +    $(WC) $(SRCS) $(HDRS)
-##  
-##  clean:
-## -    $(RM) *.o *~
-## +    $(RM) $(PROGRAMS) *.o *~
-##  
-##  realclean:  clean
-##      -$(RM) depend.mk
-##  
-## +# -------- dependencies --------
-## +include depend.mk
-## </code></pre>
 </div>
 <div id="cleaning-up" class="section level3">
 <h3>Cleaning up</h3>
