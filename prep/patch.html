@@ -171,10 +171,10 @@ pre code {
 </div>
 
 
-<div id="general-settings" class="section level2">
-<h2>General Settings</h2>
-<p>The CWB version initially incorporated in the RcppCWB is v3.4.14 (see defintion of <code>VERSION</code> in definitions.mk). This is SVN revision 1069.</p>
-<pre class="r"><code>cwb_svn_revision &lt;- 1069L</code></pre>
+<div id="global-settings" class="section level2">
+<h2>Global Settings</h2>
+<p>The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from <code>definitions.mk</code>.</p>
+<pre class="r"><code>cwb_svn_revision &lt;- 1070L</code></pre>
 </div>
 <div id="step-1-create-branch-with-unaltered-cwb-code" class="section level2">
 <h2>Step 1: Create branch with unaltered CWB code</h2>
@@ -202,17 +202,12 @@ cwb_dir_svn &lt;- path.expand(&quot;~/Lab/tmp/cwb/trunk&quot;) # r1069</code></p
 <pre class="r"><code>setwd(&quot;~/Lab/tmp/cwb/trunk&quot;)
 revision_active &lt;- system(&quot;svn info --show-item revision&quot;, intern = TRUE)
 if (as.integer(revision_active) != cwb_svn_revision){
-  system(
-    sprintf(&quot;svn update -r %d&quot;, cwb_svn_revision),
-    intern = TRUE
-  )
+  system(sprintf(&quot;svn up -r %d&quot;, cwb_svn_revision), intern = TRUE)
   revision_active &lt;- system(&quot;svn info --show-item revision&quot;, intern = TRUE)
 }
-rev</code></pre>
-<pre><code>## function (x) 
-## UseMethod(&quot;rev&quot;)
-## &lt;bytecode: 0x7fb8472a0c58&gt;
-## &lt;environment: namespace:base&gt;</code></pre>
+setwd(repodir)
+revision_active</code></pre>
+<pre><code>## [1] &quot;1070&quot;</code></pre>
 <pre class="r"><code>setwd(repodir)</code></pre>
 <p>We create new branch r1069 if not yet present.</p>
 <pre class="r"><code>git2r::checkout(repodir, branch = &quot;dev&quot;)
@@ -309,7 +304,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB r1069 restored&quot;)</code></pre>
-<pre><code>## [96b0d6d] 2022-01-05: CWB r1069 restored</code></pre>
+<pre><code>## [9a6831d] 2022-01-05: CWB r1069 restored</code></pre>
 <p>Note that we are still on the r1069 branch now!</p>
 </div>
 </div>
@@ -336,7 +331,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [1beebea] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [c8ba483] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
