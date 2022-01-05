@@ -177,13 +177,17 @@ file.rename(
   from = path(cwb_pkg_dir, "instutils", "Makefile"),
   to = path(cwb_pkg_dir, "instutils", "_Makefile")
 )
+```
 
+```{r}
 new_files <- list.files(path = file.path(repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
 for (fname in new_files){
+  message("... copying: ", fname)
   file.copy(from = fname, to = gsub("/prep/", "/src/", fname))
 }
+```
 
-
+```{r}
 cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cl", "depend.mk"))
 cat("dummy file\n", file = file.path(repodir, "src", "cwb", "cqp", "depend.mk"))
 
