@@ -696,7 +696,7 @@ cat(paste(result, collapse = "\n"))
 ### Cleaning up
 
 ```{r}
-system("git reset --hard HEAD~1") # do not know which cmd would be R equivalent
+# system("git reset --hard HEAD~1") # do not know which cmd would be R equivalent
 checkout(repo = repodir, branch = "dev")
 ```
 
