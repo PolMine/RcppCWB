@@ -1,18 +1,18 @@
 diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-index f0f4c96..cf7b289 100644
+index 5c87f7e..cf7b289 100644
 --- a/src/cwb/cqp/Makefile
 +++ b/src/cwb/cqp/Makefile
-@@ -96,6 +96,10 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
- 
+@@ -97,8 +97,8 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
  all: libcqp.a
  
-+libcqp.a: $(OBJS) $(CQI_OBJS)
+ libcqp.a: $(OBJS) $(CQI_OBJS)
+-    $(RM) $@
+-    $(AR) cq $@ $^
 +	$(RM) $@
 +	$(AR) cq $@ $^
-+
+ 
  cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
  	$(RM) $@
- 	$(CC) $(CFLAGS_ALL) -o $@ llquery.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
 diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 new file mode 100644
 index 0000000..e69de29

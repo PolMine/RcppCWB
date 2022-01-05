@@ -199,7 +199,7 @@ source(tmp_patchfile)</code></pre>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e7e7fa6] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [8d19ab3] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -220,20 +220,20 @@ result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
-## index f0f4c96..cf7b289 100644
+## index 5c87f7e..cf7b289 100644
 ## --- a/src/cwb/cqp/Makefile
 ## +++ b/src/cwb/cqp/Makefile
-## @@ -96,6 +96,10 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
-##  
+## @@ -97,8 +97,8 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
 ##  all: libcqp.a
 ##  
-## +libcqp.a: $(OBJS) $(CQI_OBJS)
+##  libcqp.a: $(OBJS) $(CQI_OBJS)
+## -    $(RM) $@
+## -    $(AR) cq $@ $^
 ## +    $(RM) $@
 ## +    $(AR) cq $@ $^
-## +
+##  
 ##  cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 ##      $(RM) $@
-##      $(CC) $(CFLAGS_ALL) -o $@ llquery.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
 ## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
 ## new file mode 100644
 ## index 0000000..e69de29</code></pre>
