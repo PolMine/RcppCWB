@@ -312,7 +312,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [17eab2f] 2022-01-05: CWB restored</code></pre>
+<pre><code>## [163fabf] 2022-01-05: CWB restored</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
@@ -339,7 +339,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [5d54f76] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [53a9368] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -347,34 +347,34 @@ commit(repo, message = &quot;CWB patched&quot;)</code></pre>
 <div id="cl-directory" class="section level4">
 <h4>cl directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/cl&quot;)
-git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]])
+git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <pre><code>## diff --git a/src/cwb/cl/special-chars.c b/src/cwb/cl/special-chars.c
-## index 2e89b9a..0012017 100644
+## index 0012017..2e89b9a 100644
 ## --- a/src/cwb/cl/special-chars.c
 ## +++ b/src/cwb/cl/special-chars.c
 ## @@ -3068,7 +3068,7 @@ cl_autostring_ptr(ClAutoString string)
 ##  }
 ##  
 ##  /**
-## - * Get the length of the currently-stored string (or 0 in case NULL object is passed).
-## + * Get the length of the currently-stored string (or negative value in case NULL object is passed).
+## - * Get the length of the currently-stored string (or negative value in case NULL object is passed).
+## + * Get the length of the currently-stored string (or 0 in case NULL object is passed).
 ##   *
 ##   * Equivalent to reading the -&gt;len member, except this function checks for a NULL!
 ##   */
-## @@ -3086,13 +3086,9 @@ cl_autostring_len(ClAutoString string)
+## @@ -3086,9 +3086,13 @@ cl_autostring_len(ClAutoString string)
 ##  void
 ##  cl_autostring_reclaim_mem(ClAutoString string)
 ##  {
-## -  size_t new_bytes;
+## +  size_t new_bytes;
 ##    if (NULL == string)
 ##      return;
-## -  new_bytes = 1 + ( (string-&gt;len + 1) / string-&gt;increment );
-## -  string-&gt;data = cl_realloc(string-&gt;data, new_bytes);
-## -  string-&gt;bytes_allocated = new_bytes;
-## -
-## +  string-&gt;data = cl_realloc(string-&gt;data, 1 + ( (string-&gt;len + 1) / string-&gt;increment ));
+## -  string-&gt;data = cl_realloc(string-&gt;data, 1 + ( (string-&gt;len + 1) / string-&gt;increment ));
+## +  new_bytes = 1 + ( (string-&gt;len + 1) / string-&gt;increment );
+## +  string-&gt;data = cl_realloc(string-&gt;data, new_bytes);
+## +  string-&gt;bytes_allocated = new_bytes;
+## +
 ##  }
 ##  
 ##  /**</code></pre>
@@ -382,20 +382,20 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <div id="cqp-directory" class="section level4">
 <h4>cqp directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/cqp&quot;)
-git_cmd &lt;- sprintf(&quot;git diff --ignore-space-at-eol %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]])
+git_cmd &lt;- sprintf(&quot;git diff --ignore-space-at-eol %s..%s .&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
 <pre><code>## diff --git a/src/cwb/cqp/parse_actions.c b/src/cwb/cqp/parse_actions.c
-## index 30ba538..53e4bcf 100644
+## index 53e4bcf..30ba538 100644
 ## --- a/src/cwb/cqp/parse_actions.c
 ## +++ b/src/cwb/cqp/parse_actions.c
 ## @@ -316,7 +316,7 @@ in_UnnamedCorpusCommand(CorpusList *cl)
 ##        if (expansion.size &gt; 0) {
 ##  
 ##          if (cl-&gt;type == SYSTEM) {
-## -          cqpmessage(Warning, &quot;System corpora can&#39;t be expanded (only subcorpora)&quot;);
-## +          cqpmessage(Warning, &quot;System corpora can&#39;t be expanded&quot;);
+## -          cqpmessage(Warning, &quot;System corpora can&#39;t be expanded&quot;);
+## +          cqpmessage(Warning, &quot;System corpora can&#39;t be expanded (only subcorpora)&quot;);
 ##            res = cl;
 ##          }
 ##          else {
@@ -403,80 +403,80 @@ cat(gitdiff_cqp)</code></pre>
 ##    if (cl == NULL)
 ##      cqpmessage(Warning, &quot;The selected corpus is empty.&quot;);
 ##    else if (cl-&gt;type == SYSTEM)
-## -    cqpmessage(Warning, &quot;You can only expand subcorpora, not system corpora (unchanged)&quot;);
-## +    cqpmessage(Warning, &quot;You can only expand subcorpora, no system corpora (unchanged)&quot;);
+## -    cqpmessage(Warning, &quot;You can only expand subcorpora, no system corpora (unchanged)&quot;);
+## +    cqpmessage(Warning, &quot;You can only expand subcorpora, not system corpora (unchanged)&quot;);
 ##    else if (expansion.size &gt; 0) {
 ##  
 ##      for (i = 0; i &lt; cl-&gt;size; i++) {
-## @@ -2929,7 +2929,6 @@ expand_dataspace(CorpusList *cl)
+## @@ -2929,6 +2929,7 @@ expand_dataspace(CorpusList *cl)
 ##            cl-&gt;range[i].start = res;
 ##          else
 ##            cqpmessage(Warning, &quot;&#39;expand&#39; statement failed (while expanding corpus interval leftwards).\n&quot;);
-## -        /* when the expansion fails, the interval in the subcorpus is left as-is. */
+## +        /* when the expansion fails, the interval in the subcorpus is left as-is. */
 ##        }
 ##        if (expansion.direction == right || expansion.direction == leftright) {
 ##          res = calculate_rightboundary(cl,
-## @@ -2939,13 +2938,11 @@ expand_dataspace(CorpusList *cl)
+## @@ -2938,11 +2939,13 @@ expand_dataspace(CorpusList *cl)
 ##            cl-&gt;range[i].end = res;
 ##          else
 ##            cqpmessage(Warning, &quot;&#39;expand&#39; statement failed (while expanding corpus interval rightwards).\n&quot;);
-## -        /* as per above: when the expansion fails, the interval in the subcorpus is left as-is. */
+## +        /* as per above: when the expansion fails, the interval in the subcorpus is left as-is. */
 ##        }
 ##      }
 ##  
 ##      RangeSetop(cl, RUniq, NULL, NULL);
 ##  
-## -    /* the subcorpus is now unsaved, even if it previously was saved */
+## +    /* the subcorpus is now unsaved, even if it previously was saved */
 ##      cl-&gt;needs_update = True;
 ##      cl-&gt;saved = False;
 ##    }
 ## diff --git a/src/cwb/cqp/parser.tab.c b/src/cwb/cqp/parser.tab.c
-## index a76a273..656b91f 100644
+## index 656b91f..a76a273 100644
 ## --- a/src/cwb/cqp/parser.tab.c
 ## +++ b/src/cwb/cqp/parser.tab.c
 ## @@ -352,7 +352,7 @@ void warn_query_lock_violation(void) {
 ##  
 ##  /* ============================================================ */
 ##  
-## -/* note: SYNCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
-## +/* note: SYCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
+## -/* note: SYCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
+## +/* note: SYNCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
 ##  necessary here - it is just defined, then tested.
 ##  So: commented out. AH 2/4/2010
 ##  #define SYNCHRONIZE
 ## diff --git a/src/cwb/cqp/parser.y b/src/cwb/cqp/parser.y
-## index 25f602f..666485b 100644
+## index 666485b..25f602f 100644
 ## --- a/src/cwb/cqp/parser.y
 ## +++ b/src/cwb/cqp/parser.y
 ## @@ -79,7 +79,7 @@ void warn_query_lock_violation(void) {
 ##  
 ##  /* ============================================================ */
 ##  
-## -/* note: SYNCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
-## +/* note: SYCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
+## -/* note: SYCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
+## +/* note: SYNCHRONIZE is a windows API identifier, and it doesn&#39;t seem at all
 ##  necessary here - it is just defined, then tested.
 ##  So: commented out. AH 2/4/2010
 ##  #define SYNCHRONIZE
 ## diff --git a/src/cwb/cqp/ranges.c b/src/cwb/cqp/ranges.c
-## index 311008b..91a1272 100644
+## index 91a1272..311008b 100644
 ## --- a/src/cwb/cqp/ranges.c
 ## +++ b/src/cwb/cqp/ranges.c
-## @@ -340,9 +340,6 @@ calculate_ranges(CorpusList *cl, int cpos, Context spc, int *left, int *right)
+## @@ -340,6 +340,9 @@ calculate_ranges(CorpusList *cl, int cpos, Context spc, int *left, int *right)
 ##    return 1;
 ##  }
 ##  
-## -/**
-## - * Returns -1 if there is no rightboundary found.
-## - */
+## +/**
+## + * Returns -1 if there is no rightboundary found.
+## + */
 ##  int
 ##  calculate_rightboundary(CorpusList *cl, int cpos, Context spc)
 ##  {
-## @@ -351,9 +348,6 @@ calculate_rightboundary(CorpusList *cl, int cpos, Context spc)
+## @@ -348,6 +351,9 @@ calculate_rightboundary(CorpusList *cl, int cpos, Context spc)
 ##    return (calculate_ranges(cl, cpos, spc, &amp;left, &amp;right)? right : -1);
 ##  }
 ##  
-## -/**
-## - * Returns -1 if there is no leftboudnary found.
-## - */
+## +/**
+## + * Returns -1 if there is no leftboudnary found.
+## + */
 ##  int
 ##  calculate_leftboundary(CorpusList *cl, int cpos, Context spc)
 ##  {</code></pre>
@@ -485,7 +485,7 @@ cat(gitdiff_cqp)</code></pre>
 <h4>CQi directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/CQi&quot;)
 git_cmd &lt;- sprintf(
-  &quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]]
+  &quot;git diff %s..%s .&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]]
 )
 result &lt;- system(git_cmd, intern = TRUE)
 output &lt;- paste(result, collapse = &quot;\n&quot;)
@@ -494,36 +494,209 @@ cat(output)</code></pre>
 <div id="utils-directory" class="section level4">
 <h4>utils directory</h4>
 <pre class="r"><code>setwd(&quot;~/Lab/github/RcppCWB/src/cwb/utils&quot;)
-git_cmd &lt;- sprintf(
-  &quot;git diff %s..%s . %s&quot;, to_compare[[&quot;sha&quot;]], last_devbranch_commit[[&quot;sha&quot;]],
-  &quot;&#39;:!*_cwb_encode.c&#39; &#39;:!*_cwb_makeall.c&#39; &#39;:!*_cwb_huffcode.c&#39; &#39;:!*_cwb_compress_rdx.c&#39; &#39;:!*Makefile&#39;&quot;
-)
+git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, last_devbranch_commit[[&quot;sha&quot;]], to_compare[[&quot;sha&quot;]])
 result &lt;- system(git_cmd, intern = TRUE)
 cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
-<pre><code>## diff --git a/src/cwb/utils/cwb-decode.c b/src/cwb/utils/cwb-decode.c
-## index ecebff5..7143dd3 100644
+<pre><code>## diff --git a/src/cwb/utils/Makefile b/src/cwb/utils/Makefile
+## index 0086552..11162a1 100644
+## --- a/src/cwb/utils/Makefile
+## +++ b/src/cwb/utils/Makefile
+## @@ -15,20 +15,26 @@
+##  ##  Public License for more details (in the file &quot;COPYING&quot;, or available via
+##  ##  WWW at http://www.gnu.org/copyleft/gpl.html).
+##  
+## +
+## +
+## +##  This is the Makefile for the CWB &quot;utils&quot; programs. 
+## +
+## +
+## +
+##  ## Read configuration settings and standard definitions
+## -TOP = $(R_PACKAGE_SOURCE)
+## +TOP = $(shell pwd)/..
+##  include $(TOP)/config.mk
+##  
+##  # the following targets are available
+##  #
+## -#  all      compile tools
+## +#  all          compile tools
+##  #  clean        delete object files and binaries
+##  #  realclean    also deleted automatically generated parsers and dependencies
+## -#  depend   update dependencies
+## -#  install  install tool binaries
+## -#  uninstall    uninstall tools from chosen location (currently not supported)
+## -#  relase       install to binary release dir
+## -#  size     print size of source code (line counts)
+## +#  depend       update dependencies
+## +#  install      install tool binaries
+## +#  uninstall    uninstall tools from chosen location (currently not supported)
+## +#  release      install to binary release dir
+## +#  size         print size of source code (line counts)
+##  #
+##  
+##  .PHONY: all clean realclean depend install uninstall size
+## @@ -36,37 +42,116 @@ include $(TOP)/config.mk
+##  ## ----------------------------------------------------------------------
+##  ## CWB command-line utilities  headers / sources / binaries 
+##  
+## -SRCS =  _cwb_encode.c _cwb_makeall.c \
+## -    _cwb_huffcode.c _cwb_compress_rdx.c \
+## -
+## -OBJS =  _cwb_encode.o _cwb_makeall.o \
+## -    _cwb_huffcode.o _cwb_compress_rdx.o \
+## +SRCS =  cwb-atoi.c cwb-itoa.c \
+## +    cwb-makeall.c \
+## +    cwb-encode.c cwb-decode.c cwb-lexdecode.c \
+## +    cwb-huffcode.c cwb-compress-rdx.c \
+## +    cwb-s-encode.c cwb-s-decode.c \
+## +    cwb-describe-corpus.c cwb-decode-nqrfile.c \
+## +    cwb-scan-corpus.c \
+## +    barlib.c feature_maps.c \
+## +    cwb-align.c cwb-align-show.c cwb-align-encode.c cwb-align-decode.c \
+## +#   cwb-check-input.c
+## +
+## +HDRS = barlib.h feature_maps.h
+## +
+## +## PROGRAMS: the utils which form an essential part of the CWB (plus some useful helper tools)
+## +#       cwb-atoi, cwb-itoa  convert ascii to CWB integers and vice versa
+## +#       cwb-encode          encode corpus (position stream &amp; lexicon)
+## +#       cwb-makeall         create index &amp; sorted index components (using Corpus Library)
+## +#       cwb-huffcode        compress token stream of p-attribute
+## +#       cwb-compress-rdx    compress index of p-attribute
+## +#       cwb-decode          decode corpus (output corpus in text format)
+## +#       cwb-lexdecode       decode corpus lexicon
+## +#       cwb-s-encode        add s-attribute to encoded corpus
+## +#       cwb-s-decode        decode s-attribute (output: &lt;reg.start&gt; TAB &lt;reg.end&gt; TAB &lt;annotation&gt;)
+## +#       cwb-describe-corpus prints some corpus info and/or statistics
+## +#       cwb-decode-nqrfile  decode named query result file (prints information on STDOUT)
+## +#       cwb-scan-corpus     scan corpus for n-grams of adjacent tokens or different p-attributes
+## +#       cwb-align           EasyAlign sentence aligner (operates on CWB-encoded corpora)
+## +#       cwb-align-show      simple terminal-based viewer for EasyAlign alignment files (.align)
+## +#       cwb-align-encode    encode .align file into CWB format (.alx, and .alg for backward compatibility)
+## +#       cwb-align-decode    decode alignment attribute from binary representation into .align format
+## +#       cwb-check-input     program for checking wellformedness of vertical files
+## +
+## +PROGRAMS = cwb-atoi$(EXEC_SUFFIX) cwb-itoa$(EXEC_SUFFIX) \
+## +    cwb-makeall$(EXEC_SUFFIX) \
+## +    cwb-encode$(EXEC_SUFFIX) cwb-decode$(EXEC_SUFFIX) cwb-lexdecode$(EXEC_SUFFIX) \
+## +    cwb-huffcode$(EXEC_SUFFIX) cwb-compress-rdx$(EXEC_SUFFIX) \
+## +    cwb-s-encode$(EXEC_SUFFIX) cwb-s-decode$(EXEC_SUFFIX) \
+## +    cwb-describe-corpus$(EXEC_SUFFIX) cwb-decode-nqrfile$(EXEC_SUFFIX) \
+## +    cwb-scan-corpus$(EXEC_SUFFIX) \
+## +    cwb-align$(EXEC_SUFFIX) cwb-align-show$(EXEC_SUFFIX) cwb-align-encode$(EXEC_SUFFIX) cwb-align-decode$(EXEC_SUFFIX) \
+## +#   cwb-check-input$(EXEC_SUFFIX)
+##  
+## +## ----------------------------------------------------------------------
+##  
+## -all: libcwb.a
+## +all: $(PROGRAMS)
+##  
+## -libcwb.a: $(OBJS)
+## -    @$(ECHO) &quot;--------------------------------- CREATING ARCHIVE&quot;
+## +## general linking rule for all utility programs
+## +cwb-%$(EXEC_SUFFIX): cwb-%.o
+##      $(RM) $@
+## -    $(AR) cq $@ $^
+## -#   $(AR) -s $@
+## -
+## -_cwb_encode.o: _cwb_encode.c
+## -    ${CC} -c ${CFLAGS} -o _cwb_encode.o _cwb_encode.c
+## -
+## -_cwb_makeall.o: _cwb_makeall.c
+## -    ${CC} -c ${CFLAGS} -o _cwb_makeall.o _cwb_makeall.c
+## +    $(CC) $(CFLAGS) -o $@ $&lt; $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL)
+##  
+## -_cwb_huffcode.o: _cwb_huffcode.c
+## -    ${CC} -c ${CFLAGS} -o _cwb_huffcode.o _cwb_huffcode.c
+## +## special rule for align program, which requires barlib.o and feature_maps.o libraries
+## +cwb-align$(EXEC_SUFFIX): cwb-align.o barlib.o feature_maps.o
+## +    $(RM) $@
+## +    $(CC) $(CFLAGS) -o $@ $^ $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL)
+## +
+## +## special rules for cwb-check-input, which requires Glib
+## +# temporary before use of Glib made general
+## +#cwb-check-input.o:
+## +#   $(RM) $@
+## +#   $(CC) -c cwb-check-input.c -o cwb-check-input.o $(CFLAGS) `pkg-config --cflags glib-2.0` `pkg-config --cflags gobject-2.0` 
+## +#cwb-check-input$(EXEC_SUFFIX): cwb-check-input.o
+## +## note that the pkg-config calls are needed to be in definitions.mk instead of here, and also in any makefile rule
+## +## that calls ${DEPEND}
+## +#ifndef __MINGW__
+## +#   $(RM) $@
+## +#   $(CC) $(CFLAGS) -o $@ $&lt; $(CL_LIBS) $(LIB_REGEX) `pkg-config --libs glib-2.0` `pkg-config --libs gobject-2.0` $(LDFLAGS_ALL)
+## +#else
+## +#   @$(ECHO) &quot;--------------------- can&#39;t yet build progs that need glib under mingw....&quot;
+## +## we need a Glib built for Win32 cross-compiling to do this
+## +## http://library.gnome.org/devel/glib/stable/glib-cross-compiling.html
+## +## http://library.gnome.org/devel/glib/stable/glib-building.html
+## +#endif  
+## +
+## +depend:
+## +    -$(RM) depend.mk
+## +    $(MAKE) depend.mk
+##  
+## -_cwb_compress_rdx.o: _cwb_compress_rdx.c
+## -    ${CC} -c ${CFLAGS} -o _cwb_compress_rdx.o _cwb_compress_rdx.c
+## +depend.mk:
+## +    -$(RM) depend.mk
+## +    $(DEPEND) $(DEPEND_CFLAGS_ALL) $(SRCS) &gt; depend.mk
+## +
+## +install: $(PROGRAMS)
+## +    if [ ! -d &quot;$(BININSTDIR)&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(BININSTDIR)&quot;; fi;
+## +    for i in $(PROGRAMS); do $(INSTALL) $(INST_FLAGS_BIN) $$i &quot;$(BININSTDIR)&quot;; done
+## +
+## +release: $(PROGRAMS)
+## +    if [ ! -d &quot;$(RELEASE_DIR)/bin&quot; ]; then $(INSTALL) $(INST_FLAGS_DIR) &quot;$(RELEASE_DIR)/bin&quot;; fi;
+## +    for i in $(PROGRAMS); do $(INSTALL) $(INST_FLAGS_BIN) $$i &quot;$(RELEASE_DIR)/bin&quot;; done
+## +ifdef __MINGW__
+## +    # Do not include cwb-atoi and cwb-atoi in Windows release as they trigger malware alerts in much antivirus software
+## +    for i in cwb-atoi$(EXEC_SUFFIX) cwb-itoa$(EXEC_SUFFIX) ; do $(RM) &quot;$(RELEASE_DIR)/bin/$$i&quot;; done
+## +endif
+## +
+## +uninstall:
+## +    @$(ECHO) &quot;ERROR: uninstall operation is currently not supported!&quot;
+## +#   for i in $(PROGRAMS) ;\
+## +#   do \
+## +#   $(RM) $(BININSTDIR)/$$i ; \
+## +#   done
+## +
+## +size:
+## +    $(WC) $(SRCS) $(HDRS)
+##  
+##  clean:
+## -    $(RM) *.o *~
+## +    $(RM) $(PROGRAMS) *.o *~
+##  
+##  realclean:  clean
+##      -$(RM) depend.mk
+##  
+## +# -------- dependencies --------
+## +include depend.mk
+##  
+## diff --git a/src/cwb/utils/cwb-decode.c b/src/cwb/utils/cwb-decode.c
+## index 7143dd3..ecebff5 100644
 ## --- a/src/cwb/utils/cwb-decode.c
 ## +++ b/src/cwb/utils/cwb-decode.c
-## @@ -1067,8 +1067,7 @@ main(int argc, char **argv)
+## @@ -1067,7 +1067,8 @@ main(int argc, char **argv)
 ##    /* ---- end of parse attribute declarations ---- */
 ##  
 ##    if (read_pos_from_file) {
-## -    if (input_filename == NULL)
-## -      input_filename = &quot;-&quot;; /* -p: use STDIN */
-## +    if (input_filename == NULL) input_filename = &quot;-&quot;; /* -p: use STDIN */
+## -    if (input_filename == NULL) input_filename = &quot;-&quot;; /* -p: use STDIN */
+## +    if (input_filename == NULL)
+## +      input_filename = &quot;-&quot;; /* -p: use STDIN */
 ##      input_file = cl_open_stream(input_filename, CL_STREAM_READ, CL_STREAM_MAGIC);
 ##      if (input_file == NULL) {
 ##        cl_error(&quot;Can&#39;t read matchlist file (-f)&quot;);
 ## diff --git a/src/cwb/utils/cwb-encode.c b/src/cwb/utils/cwb-encode.c
-## index 9916fc9..e06a3f1 100644
+## index e06a3f1..9916fc9 100644
 ## --- a/src/cwb/utils/cwb-encode.c
 ## +++ b/src/cwb/utils/cwb-encode.c
 ## @@ -388,7 +388,7 @@ encode_error(char *format, ...)
 ##  /**
 ##   * Get a list of files in a given directory.
 ##   *
-## - * This function only lists files with .vrt or .vrt.(gz|bz2) extensions,
-## + * This function only lists files with .vrt or .vrt.gz extensions,
+## - * This function only lists files with .vrt or .vrt.gz extensions,
+## + * This function only lists files with .vrt or .vrt.(gz|bz2) extensions,
 ##   * and only files identified  by POSIX stat() as &quot;regular&quot;.
 ##   *
 ##   * (Note that .vrt is dependent on DEFAULT_INFILE_EXTENSION.)</code></pre>
