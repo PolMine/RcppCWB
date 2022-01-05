@@ -244,13 +244,13 @@ for (i in 1L:length(delete_line_before)){
   
   message(
      sprintf(
-       "file: %s | regex: %s | match: %d, | lines: %d ... ",
+       "file: %s | regex: %s | match: %d | lines: %d ... ",
        names(delete_line_before)[[i]],
        delete_line_before[[i]][[1]],
        which_position,
-       times,
-       appendLF = FALSE
-      )
+       times
+      ),
+     appendLF = FALSE
   )
   fname <- path(repodir, names(delete_line_before)[[i]])
   if (file.exists(fname)){
