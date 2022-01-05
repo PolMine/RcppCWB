@@ -471,15 +471,10 @@ lapply(
 
 # Files to be added
 
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.h
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-arm64
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_spark
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_x86
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/depend.mk
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/_Makefile
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_compress_rdx.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_encode.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_huffcode.c
