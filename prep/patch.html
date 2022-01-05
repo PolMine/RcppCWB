@@ -263,10 +263,11 @@ added_files &lt;-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_f
 added_files_full_path &lt;- path(cwb_dir_repo, added_files)
 added_files_existing &lt;- added_files_full_path[file.exists(added_files_full_path)]
 file.exists(added_files_existing)</code></pre>
-<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
 <pre class="r"><code>rm_file(repo = repodir, path = added_files_existing)
 added_files_existing</code></pre>
-<pre><code>## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h
+<pre><code>## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/depend.mk
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.h
@@ -288,7 +289,7 @@ added_files_existing</code></pre>
 <p>Now we perform a commit so that we can perform diffs.</p>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB r1069 restored&quot;)</code></pre>
-<pre><code>## [90033cf] 2022-01-05: CWB r1069 restored</code></pre>
+<pre><code>## [9070ca5] 2022-01-05: CWB r1069 restored</code></pre>
 <p>Note that we are still on the r1069 branch now!</p>
 </div>
 </div>
@@ -315,7 +316,7 @@ file_copy(path = patchfile, new_path = tmp_patchfile, overwrite = TRUE)</code></
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [e41e3b0] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [37449b5] 2022-01-05: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 <div id="inspect-diffs" class="section level2">
@@ -334,9 +335,6 @@ git_cmd &lt;- sprintf(&quot;git diff %s..%s .&quot;, to_compare[[&quot;sha&quot;
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
-<pre><code>## diff --git a/src/cwb/cqp/depend.mk b/src/cwb/cqp/depend.mk
-## new file mode 100644
-## index 0000000..e69de29</code></pre>
 </div>
 <div id="cqi-directory" class="section level4">
 <h4>CQi directory</h4>

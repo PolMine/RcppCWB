@@ -11,6 +11,7 @@ editor_options:
 knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
 ```
 
+
 ## Step 1: Create branch with unaltered CWB code
 
 The aim is to reconstruct all changes to the CWB code so that we know which patches are necessary for adapting a fresh copy of the CWB such that it conforms R package requirements.
@@ -44,6 +45,16 @@ repodir <- path.expand("~/Lab/github/RcppCWB")
 cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk") # r1069
 ```
   
+
+```{r}
+setwd("~/Lab/tmp/cwb/trunk")
+system("svn info --show-item revision")
+```
+
+```{r}
+setwd(repodir)
+```
+
 We create new branch r1069 if not yet present.
 
 ```{r}
