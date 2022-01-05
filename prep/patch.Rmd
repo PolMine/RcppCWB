@@ -212,7 +212,7 @@ cat(output)
 ```{r}
 setwd("~/Lab/github/RcppCWB/src/cwb/utils")
 git_cmd <- sprintf(
-  "git diff --ignore-space-at-eol %s..%s . %s",
+  "git diff --ignore-space-at-eol %s..%s .",
   last_devbranch_commit[["sha"]], to_compare[["sha"]]
 )
 result <- system(git_cmd, intern = TRUE)
