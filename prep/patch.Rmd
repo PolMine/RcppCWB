@@ -323,7 +323,7 @@ for (i in 1L:length(insert_before)){
   
   message(
     sprintf(
-      "file: %s | regex: %s | match: %d | lines: %d ... ",
+      "file: %s | regex: %s | match: %d | insertion: %s ... ",
       fname,
       insert_before[[i]][[1]],
       which_position,
