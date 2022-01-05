@@ -26,6 +26,16 @@ file.rename(
 
 
 
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-arm64
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_spark
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_x86
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_compress_rdx.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_encode.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_huffcode.c
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_makeall.c
+
+
+
 global_replacements <- list(
   c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
   c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
@@ -469,13 +479,3 @@ lapply(
 
 
 
-# Files to be added
-
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-arm64
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_spark
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_x86
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/depend.mk
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_compress_rdx.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_encode.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_huffcode.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_makeall.c
