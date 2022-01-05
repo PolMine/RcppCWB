@@ -24,16 +24,10 @@ file.rename(
   to = path(cwb_pkg_dir, "instutils", "_Makefile")
 )
 
-
-
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-arm64
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_spark
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/solaris_x86
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_compress_rdx.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_encode.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_huffcode.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_makeall.c
-
+new_files <- list.files(path = file.path(repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
+for (fname in new_files){
+  file.copy(from = fname, to = gsub("/prep/", "/src/", fname))
+}
 
 
 global_replacements <- list(
