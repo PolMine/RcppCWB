@@ -16,7 +16,7 @@ knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
 The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from `definitions.mk`.
 
 ```{r}
-cwb_svn_revision <- 1071L
+cwb_svn_revision <- 1069L
 ```
 
 ## Step 1: Create branch with unaltered CWB code
