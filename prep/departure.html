@@ -259,11 +259,8 @@ file.copy(
   unname() %&gt;%
   grep(&quot;^src/cwb&quot;, ., value = TRUE) %&gt;%
   path(repodir, .)
-file.remove(removed_files)</code></pre>
-<pre><code>## [1] TRUE TRUE</code></pre>
-<pre class="r"><code>removed_files</code></pre>
-<pre><code>## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian.h
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/instutils/Makefile</code></pre>
+file.remove(removed_files)
+removed_files</code></pre>
 </div>
 <div id="remove-files-that-have-been-added-and-that-need-to-be-added-explicitly" class="section level3">
 <h3>Remove files that have been added (and that need to be added explicitly)</h3>
@@ -297,7 +294,7 @@ added_files_existing</code></pre>
 <h3>git add/commit so that we can perform diffs</h3>
 <pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
 git2r::commit(repodir, message = &quot;CWB r1069 restored&quot;)</code></pre>
-<pre><code>## [70452cd] 2022-01-05: CWB r1069 restored</code></pre>
+<pre><code>## [1cf6f20] 2022-01-05: CWB r1069 restored</code></pre>
 </div>
 <div id="inspect-diffs" class="section level3">
 <h3>Inspect diffs</h3>
