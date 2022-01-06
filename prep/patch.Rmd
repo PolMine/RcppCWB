@@ -17,6 +17,10 @@ The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revisi
 
 ```{r}
 cwb_svn_revision <- 1069L
+
+for (fname in list.files("~/Lab/github/RcppCWB/prep/autopatch/R", full.names = TRUE)){
+  source(fname)
+}
 ```
 
 ## Step 1: Create branch with unaltered CWB code
@@ -47,82 +51,30 @@ library(magrittr)
 
 ```{r}
 repodir <- path.expand("~/Lab/github/RcppCWB")
+```
 
-# A copy of the SVN repo of the CWB is assumed to be present here ...
+A copy of the SVN repo of the CWB is assumed to be present.
+
+```{r}
 cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk")
 ```
   
+Check whether the desired revision is active and set it accordingly, if necessary.
 
 ```{r}
-setwd("~/Lab/tmp/cwb/trunk")
-revision_active <- system("svn info --show-item revision", intern = TRUE)
-if (as.integer(revision_active) != cwb_svn_revision){
-  system(sprintf("svn up -r %d", cwb_svn_revision), intern = TRUE)
-  revision_active <- system("svn info --show-item revision", intern = TRUE)
-}
-setwd(repodir)
-revision_active
+svn_set_revision(svn_dir = cwb_dir_svn, revision = cwb_svn_revision)
 ```
 
-```{r}
-setwd(repodir)
-```
-
-We create new branch r1069 if not yet present.
+We create a new branch of the RcppCWB repo for the desired CWB revision if not yet present.
 
 ```{r}
-cwb_revision_branch <- sprintf("r%d", cwb_svn_revision)
-git2r::checkout(repodir, branch = "dev")
-if (cwb_revision_branch %in% names(branches(repodir))){
-  git2r::branch_delete(branch = branches(repodir)[[cwb_revision_branch]])
-}
-git2r::branch_create(commit = last_commit(repo = repodir), name = cwb_revision_branch)
-git2r::checkout(repodir, branch = cwb_revision_branch)
-```
-
-Copy files from SVN copy of CWB to RcppCWB repo.
-
-```{r}
-cwb_dir_repo <- path(repodir, "src", "cwb")
-cwb_files_svn <- list.files(cwb_dir_svn, recursive = TRUE, full.names = TRUE)
-file.copy(
-  from = cwb_files_svn,
-  to = gsub(paste("^", cwb_dir_svn, sep = ""), cwb_dir_repo, cwb_files_svn),
-  overwrite = TRUE
-)
-```  
-
-
-Remove files that have been added (and that need to be added explicitly): To restore the state of RcppCWB development, these files need to be re-added or generated later on
-
-```{r}
-cwb_files_svn_truncated <- gsub(cwb_dir_svn, "", cwb_files_svn)
-cwb_files_repo <- list.files(cwb_dir_repo, recursive = TRUE, full.names = TRUE)
-cwb_files_repo_truncated <- gsub(cwb_dir_repo, "", cwb_files_repo)
-added_files <-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_files_svn_truncated]
-added_files_full_path <- path(cwb_dir_repo, added_files)
-added_files_existing <- added_files_full_path[file.exists(added_files_full_path)]
-file.exists(added_files_existing)
-rm_file(repo = repodir, path = added_files_existing)
-added_files_existing
-```
-
-To explain:
-
-- The platform-files and the _cwb_* files are in the ./cwb/config/platform folder and will be copied by patch.R.
-- No idea yet why depend.mk is there.
-  
-Now we perform a commit so that we can perform diffs.
-
-```{r}
-git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
-git2r::commit(repodir, message = "CWB restored")
+cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = "dev")
 ```
 
 Note that we are still on the revision branch now! 
 
 
-## Step 2: Check diffs
+## Step 2: Patches
 
 We assume that the branch with the desired CWB revision has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.
 
