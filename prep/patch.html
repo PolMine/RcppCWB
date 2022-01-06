@@ -174,7 +174,11 @@ pre code {
 <div id="global-settings" class="section level2">
 <h2>Global Settings</h2>
 <p>The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from <code>definitions.mk</code>.</p>
-<pre class="r"><code>cwb_svn_revision &lt;- 1069L</code></pre>
+<pre class="r"><code>cwb_svn_revision &lt;- 1069L
+
+for (fname in list.files(&quot;~/Lab/github/RcppCWB/prep/autopatch/R&quot;, full.names = TRUE)){
+  source(fname)
+}</code></pre>
 </div>
 <div id="step-1-create-branch-with-unaltered-cwb-code" class="section level2">
 <h2>Step 1: Create branch with unaltered CWB code</h2>
@@ -195,94 +199,17 @@ library(magrittr)</code></pre>
 </div>
 <div id="getting-started-directories" class="section level3">
 <h3>Getting started: Directories</h3>
-<pre class="r"><code>repodir &lt;- path.expand(&quot;~/Lab/github/RcppCWB&quot;)
-
-# A copy of the SVN repo of the CWB is assumed to be present here ...
-cwb_dir_svn &lt;- path.expand(&quot;~/Lab/tmp/cwb/trunk&quot;)</code></pre>
-<pre class="r"><code>setwd(&quot;~/Lab/tmp/cwb/trunk&quot;)
-revision_active &lt;- system(&quot;svn info --show-item revision&quot;, intern = TRUE)
-if (as.integer(revision_active) != cwb_svn_revision){
-  system(sprintf(&quot;svn up -r %d&quot;, cwb_svn_revision), intern = TRUE)
-  revision_active &lt;- system(&quot;svn info --show-item revision&quot;, intern = TRUE)
-}
-setwd(repodir)
-revision_active</code></pre>
-<pre><code>## [1] &quot;1069&quot;</code></pre>
-<pre class="r"><code>setwd(repodir)</code></pre>
-<p>We create new branch r1069 if not yet present.</p>
-<pre class="r"><code>cwb_revision_branch &lt;- sprintf(&quot;r%d&quot;, cwb_svn_revision)
-git2r::checkout(repodir, branch = &quot;dev&quot;)
-if (cwb_revision_branch %in% names(branches(repodir))){
-  git2r::branch_delete(branch = branches(repodir)[[cwb_revision_branch]])
-}
-git2r::branch_create(commit = last_commit(repo = repodir), name = cwb_revision_branch)
-git2r::checkout(repodir, branch = cwb_revision_branch)</code></pre>
-<p>Copy files from SVN copy of CWB to RcppCWB repo.</p>
-<pre class="r"><code>cwb_dir_repo &lt;- path(repodir, &quot;src&quot;, &quot;cwb&quot;)
-cwb_files_svn &lt;- list.files(cwb_dir_svn, recursive = TRUE, full.names = TRUE)
-file.copy(
-  from = cwb_files_svn,
-  to = gsub(paste(&quot;^&quot;, cwb_dir_svn, sep = &quot;&quot;), cwb_dir_repo, cwb_files_svn),
-  overwrite = TRUE
-)</code></pre>
-<pre><code>##   [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-##  [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-##  [31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-##  [46] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-##  [61] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-##  [76] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-##  [91] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [106] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [121] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [136] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [151] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [166] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [181] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [196] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [211] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [226] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [241] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [256] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [271] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [286] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [301] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [316] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [331] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [346] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [361] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [376] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [391] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [406] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [421] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [436] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [451] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [466] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [481] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [496] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [511] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [526] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [541] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [556] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [571] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [586] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [601] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [616] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [631] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [646] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [661] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [676] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
-<p>Remove files that have been added (and that need to be added explicitly): To restore the state of RcppCWB development, these files need to be re-added or generated later on</p>
-<pre class="r"><code>cwb_files_svn_truncated &lt;- gsub(cwb_dir_svn, &quot;&quot;, cwb_files_svn)
-cwb_files_repo &lt;- list.files(cwb_dir_repo, recursive = TRUE, full.names = TRUE)
-cwb_files_repo_truncated &lt;- gsub(cwb_dir_repo, &quot;&quot;, cwb_files_repo)
-added_files &lt;-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_files_svn_truncated]
-added_files_full_path &lt;- path(cwb_dir_repo, added_files)
-added_files_existing &lt;- added_files_full_path[file.exists(added_files_full_path)]
-file.exists(added_files_existing)</code></pre>
-<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
-<pre class="r"><code>rm_file(repo = repodir, path = added_files_existing)
-added_files_existing</code></pre>
-<pre><code>## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/depend.mk
+<pre class="r"><code>repodir &lt;- path.expand(&quot;~/Lab/github/RcppCWB&quot;)</code></pre>
+<p>A copy of the SVN repo of the CWB is assumed to be present.</p>
+<pre class="r"><code>cwb_dir_svn &lt;- path.expand(&quot;~/Lab/tmp/cwb/trunk&quot;)</code></pre>
+<p>Check whether the desired revision is active and set it accordingly, if necessary.</p>
+<pre class="r"><code>svn_set_revision(svn_dir = cwb_dir_svn, revision = cwb_svn_revision)</code></pre>
+<pre><code>## [1] 1069</code></pre>
+<p>We create a new branch of the RcppCWB repo for the desired CWB revision if not yet present.</p>
+<pre class="r"><code>cwb_copy_report &lt;- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = &quot;dev&quot;)
+cwb_copy_report</code></pre>
+<pre><code>## $removed_files
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/depend.mk
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c
@@ -296,21 +223,16 @@ added_files_existing</code></pre>
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_compress_rdx.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_encode.c
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_huffcode.c
-## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_makeall.c</code></pre>
-<p>To explain:</p>
-<ul>
-<li>The platform-files and the <em>cwb</em>* files are in the ./cwb/config/platform folder and will be copied by patch.R.</li>
-<li>No idea yet why depend.mk is there.</li>
-</ul>
-<p>Now we perform a commit so that we can perform diffs.</p>
-<pre class="r"><code>git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
-git2r::commit(repodir, message = &quot;CWB restored&quot;)</code></pre>
-<pre><code>## [7032a1a] 2022-01-05: CWB restored</code></pre>
+## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/_cwb_makeall.c
+## 
+## $branch
+## [1] &quot;r1069&quot;</code></pre>
+<pre class="r"><code>cwb_revision_branch &lt;- cwb_copy_report[[&quot;branch&quot;]]</code></pre>
 <p>Note that we are still on the revision branch now!</p>
 </div>
 </div>
-<div id="step-2-check-diffs" class="section level2">
-<h2>Step 2: Check diffs</h2>
+<div id="step-2-patches" class="section level2">
+<h2>Step 2: Patches</h2>
 <p>We assume that the branch with the desired CWB revision has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.</p>
 <pre class="r"><code>checkout(repodir, branch = &quot;dev&quot;)
 repo &lt;- repository(repodir) # needed later on
@@ -358,8 +280,8 @@ for (fname in new_files){
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_huffcode.c</code></pre>
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_makeall.c</code></pre>
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/Makefile</code></pre>
-<pre class="r"><code>cat(&quot;dummy file\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cl&quot;, &quot;depend.mk&quot;))
-cat(&quot;dummy file\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cqp&quot;, &quot;depend.mk&quot;))</code></pre>
+<pre class="r"><code>cat(&quot;\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cl&quot;, &quot;depend.mk&quot;))
+cat(&quot;\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cqp&quot;, &quot;depend.mk&quot;))</code></pre>
 <pre class="r"><code>global_replacements &lt;- list(
   c(&quot;(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd-&gt;stream|redir-&gt;stream),\\s*&quot;, &quot;Rprintf(&quot;),
   c(&quot;YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*&quot; , &quot;YY\\1PRINTF \\2&quot;),
@@ -502,7 +424,8 @@ for (i in 1L:length(delete_line_before)){
   &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;#ifdef __cplusplus&quot;, &quot;/*&quot;, 3L),
   &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.&quot;, &quot;&quot;, 1L),
   &quot;src/cwb/cl/endian2.h&quot; = list(&quot;#include\\s&lt;windows\\.h&gt;&quot; , &quot;#include &lt;winsock2.h&gt; /* AB reversed order, in original CWB code windows.h is included first */&quot;, 1L),
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^cqp\\$\\(EXEC_SUFFIX\\):.*&quot;, &quot;libcqp.a: $(OBJS) $(CQI_OBJS)\n\t$(RM) $@\n\t$(AR) cq $@ $^\n&quot;, 1L)
+  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^cqp\\$\\(EXEC_SUFFIX\\):.*&quot;, &quot;libcqp.a: $(OBJS) $(CQI_OBJS)\n\t$(RM) $@\n\t$(AR) cq $@ $^\n&quot;, 1L),
+  &quot;src/cwb/config/platform/linux&quot; = list(&quot;##\\sCPU\\sarchitecture&quot;, c(&quot;## require position-independent code&quot;, &quot;CFLAGS += -fPIC&quot;, &quot;&quot;), 1L)
 )
 
 for (i in 1L:length(insert_before)){
@@ -579,7 +502,8 @@ for (i in 1L:length(insert_before)){
 ## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\):.* | match: 1 | insertion: libcqp.a: $(OBJS) $(CQI_OBJS)
 ##  $(RM) $@
 ##  $(AR) cq $@ $^
-##  ... OK</code></pre>
+##  ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux | regex: ##\sCPU\sarchitecture | match: 1 | insertion: ## require position-independent code///CFLAGS += -fPIC/// ... OK</code></pre>
 <pre class="r"><code>insert_after &lt;- list(
   &quot;src/cwb/cl/bitio.c&quot; = list(&quot;^static\\sint\\sBaseTypeBits&quot;, &quot;void Rprintf(const char *, ...);&quot;),
   &quot;src/cwb/cl/bitfields.c&quot; = list(&quot;^static\\sint\\sBaseTypeBits&quot;, &quot;void Rprintf(const char *, ...);&quot;),
@@ -763,7 +687,11 @@ for (i in 1L:length(insert_after)){
   &quot;src/cwb/config/platform/darwin-universal&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
   &quot;src/cwb/config/platform/darwin-brew&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
   &quot;src/cwb/config/platform/linux-opteron&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/linux&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L)
+  &quot;src/cwb/config/platform/linux&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
+  &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^READLINE_DEFINES\\s:=.*?$&quot;, &quot;READLINE_DEFINES =&quot;, 1L),
+  &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^READLINE_LIBS\\s:=.*?$&quot;, &quot;READLINE_LIBS =&quot;, 1L),
+  &quot;src/cwb/config/platform/unix&quot; = list(&quot;^AR\\s+=\\s+ar\\scq\\s*$&quot;, &quot;AR = ar&quot;, 1L),
+  &quot;src/cwb/definitions.mk&quot; = list(&quot;(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)&quot;, &quot;# \\1&quot;, 1L)
 )
 
 for (i in 1L:length(replace)){
@@ -896,7 +824,11 @@ for (i in 1L:length(replace)){
 ## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-universal | regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
 ## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-brew | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
 ## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux-opteron | regex: ^(CFLAGS\s*=.*?)\s+-march=opteron\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match</code></pre>
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin | regex: ^READLINE_DEFINES\s:=.*?$ | match: 1 | replacement: READLINE_DEFINES = ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin | regex: ^READLINE_LIBS\s:=.*?$ | match: 1 | replacement: READLINE_LIBS = ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/unix | regex: ^AR\s+=\s+ar\scq\s*$ | match: 1 | replacement: AR = ar ... OK
+## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/definitions.mk | regex: (\$\(error\sConfiguration\svariable\sRANLIB) | match: 1 | replacement: # \1 ... OK</code></pre>
 <pre class="r"><code>remove_lines &lt;- list(
   &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 3),
   &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 2),
@@ -1225,7 +1157,7 @@ lapply(
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [f057a9f] 2022-01-05: CWB patched</code></pre>
+<pre><code>## [372e0b4] 2022-01-06: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
 </div>
 </div>
