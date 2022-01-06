@@ -70,7 +70,7 @@ We create a new branch of the RcppCWB repo for the desired CWB revision if not y
 ```{r}
 cwb_copy_report <- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = "dev")
 cwb_copy_report
-cwb_revision_branch <- cwb_copy_report[["bracnh"]]
+cwb_revision_branch <- cwb_copy_report[["branch"]]
 ```
 
 Note that we are still on the revision branch now! 
