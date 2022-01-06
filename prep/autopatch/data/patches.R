@@ -5,7 +5,6 @@
 # - replace
 # - remove_lines
 
-
 file_patches <- list(
   
   "src/cwb/cl/lex.creg.c" = list(
@@ -267,7 +266,12 @@ file_patches <- list(
   "src/cwb/cqp/eval.h" = list(
     replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
     replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
-    replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+    replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
+    extern = list(
+      "int eep;",
+      "EvalEnvironment Environment[MAXENVIRONMENT];",
+      "EEP CurEnv, evalenv;"
+    )
   ),
   
   "src/cwb/cqp/hash.h" = list(
@@ -291,7 +295,89 @@ file_patches <- list(
   ),
   
   "src/cwb/cqp/options.h" = list(
-    replace = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1)
+    replace = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
+    extern = list(
+      "int insecure;",
+      "int inhibit_activation;",
+      "int parseonly;",
+      "int verbose_parser;",
+      "int show_symtab;",
+      "int show_gconstraints;",
+      "int show_evaltree;",
+      "int show_patlist;",
+      "int show_compdfa;",
+      "int show_dfa;",
+      "int symtab_debug;",
+      "int parser_debug;",
+      "int tree_debug;",
+      "int eval_debug;",
+      "int search_debug;",
+      "int initial_matchlist_debug;",
+      "int debug_simulation;",
+      "int activate_cl_debug;",
+      "int server_log;",
+      "int server_debug;",
+      "int snoop;",
+      "int private_server;",
+      "int server_port;",
+      "int localhost;",
+      "int server_quit;",
+      "int query_lock;",
+      "int query_lock_violation;",
+      "int enable_macros;",
+      "int macro_debug;",
+      "int hard_boundary;",
+      "int hard_cut;",
+      "int subquery;",
+      "char *def_unbr_attr;",
+      "int query_optimize;",
+      "enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;",
+      "char *matching_strategy_name;",
+      "int strict_regions;",
+      "int use_readline;",
+      "int highlighting;",
+      "int paging;",
+      "char *pager;",
+      "char *tested_pager;",
+      "char *less_charset_variable;",
+      "int use_colour;",
+      "int progress_bar;",
+      "int pretty_print;",
+      "int autoshow;",
+      "int timing;",
+      "int show_tag_attributes;",
+      "int show_targets;",
+      "char *printModeString;",
+      "char *printModeOptions;",
+      "int printNrMatches;",
+      "char *printStructure;",
+      "char *left_delimiter;",
+      "char *right_delimiter;",
+      "char *registry;",
+      "char *LOCAL_CORP_PATH;",
+      "int auto_save;",
+      "int save_on_exit;",
+      "char *cqp_init_file;",
+      "char *macro_init_file;",
+      "char *cqp_history_file;",
+      "int write_history_file;",
+      "int batchmode;",
+      "int silent;",
+      "char *default_corpus;",
+      "char *query_string;",
+      "int UseExternalSorting;",
+      "char *ExternalSortingCommand;",
+      "int UseExternalGrouping;",
+      "char *ExternalGroupingCommand;",
+      "int user_level;",
+      "int rangeoutput;",
+      "int child_process;",
+      "ContextDescriptor CD;",
+      "int handle_sigpipe;",
+      "char *progname;",
+      "char *licensee;",
+      "FILE *batchfd;"
+    )
   ),
   
   "src/cwb/cqp/output.h" = list(
@@ -310,6 +396,14 @@ file_patches <- list(
     replace = list("^(\\s*)res->sa_ref\\.delete\\s=\\s0;", "\\1res->sa_ref.del = 0;", 1)
   ),
   
+  "src/cwb/cqp/corpmanag.c" = list(
+    extern = list("CorpusList *corpuslist;")
+  ),
+
+  "src/cwb/cqp/corpmanag.h" = list(
+    extern = list("CorpusList *current_corpus;", "CorpusList *corpuslist;")
+  ),
+
   "src/cwb/cqp/regex2dfa.c" = list(
     replace = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1)
   ),
@@ -323,6 +417,24 @@ file_patches <- list(
     replace = list('^(\\s*)cqpmessage\\(Error,\\s"CQP\\sSyntax\\sError:.*?",\\ss,\\sQueryBuffer\\);', '\\1cqpmessage(Error, "CQP Syntax Error: %s", s);', 1L),
     replace = list("^(\\s+)int\\sok;", "\\1int ok __attribute__((unused));", 4L)
   ),
+  
+  "src/cwb/cqp/cqp.h" = list(
+    extern = list(
+      "CYCtype LastExpression;",
+      "int exit_cqp;",
+      "char *cqp_input_string;",
+      "int cqp_input_string_position;",
+      "int initialize_cqp(int argc, char **argv);",
+      "int cqp_parse_file(FILE *fd, int exit_on_parse_errors);",
+      "int cqp_parse_string(char *s);",
+      "int EvaluationIsRunning;",
+      "int setInterruptCallback(InterruptCheckProc f);",
+      "void CheckForInterrupts(void);",
+      "int signal_handler_is_installed;",
+      "void install_signal_handler(void);"
+    )
+  ),
+  
   
   "src/cwb/CQi/auth.c" = list(
     insert_before = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
