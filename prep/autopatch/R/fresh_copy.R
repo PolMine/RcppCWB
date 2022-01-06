@@ -38,5 +38,5 @@ cwb_fresh_copy <- function(cwb_dir, repodir, source_branch){
   # add & commit
   git2r::add(repo = repodir, path = unname(unlist(git2r::status(repo = repodir))))
   git2r::commit(repodir, message = "CWB restored")
-  list(removed_files = added_files_existing)
+  list(removed_files = added_files_existing, branch = branch)
 }
