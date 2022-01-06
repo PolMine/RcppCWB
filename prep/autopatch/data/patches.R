@@ -44,7 +44,6 @@ file_patches <- list(
     replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
     replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
     replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
-    replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
     remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L)
   ),
   
@@ -236,6 +235,7 @@ file_patches <- list(
     delete_line_before = list("^cqp\\$\\(EXEC_SUFFIX\\):", 1L, 8L),
     insert_before = list("^cqp\\$\\(EXEC_SUFFIX\\):.*", "libcqp.a: $(OBJS) $(CQI_OBJS)\n\t$(RM) $@\n\t$(AR) cq $@ $^\n", 1L),
     replace = list("all:\\s\\$\\(PROGRAMS\\)", "all: libcqp.a", 1L),
+    replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
     remove_lines = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L)
   ),
   

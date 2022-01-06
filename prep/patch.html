@@ -178,6 +178,10 @@ pre code {
 
 for (fname in list.files(&quot;~/Lab/github/RcppCWB/prep/autopatch/R&quot;, full.names = TRUE)){
   source(fname)
+}
+
+for (fname in list.files(&quot;~/Lab/github/RcppCWB/prep/autopatch/data&quot;, full.names = TRUE)){
+  source(fname)
 }</code></pre>
 </div>
 <div id="step-1-create-branch-with-unaltered-cwb-code" class="section level2">
@@ -199,14 +203,15 @@ library(magrittr)</code></pre>
 </div>
 <div id="getting-started-directories" class="section level3">
 <h3>Getting started: Directories</h3>
-<pre class="r"><code>repodir &lt;- path.expand(&quot;~/Lab/github/RcppCWB&quot;)</code></pre>
 <p>A copy of the SVN repo of the CWB is assumed to be present.</p>
-<pre class="r"><code>cwb_dir_svn &lt;- path.expand(&quot;~/Lab/tmp/cwb/trunk&quot;)</code></pre>
+<pre class="r"><code>repodir &lt;- path.expand(&quot;~/Lab/github/RcppCWB&quot;)
+cwb_dir_svn &lt;- path.expand(&quot;~/Lab/tmp/cwb/trunk&quot;)</code></pre>
+<pre class="r"><code>branch_of_departure &lt;- branches(repodir)[sapply(branches(repodir), is_head)][[1]][[&quot;name&quot;]]</code></pre>
 <p>Check whether the desired revision is active and set it accordingly, if necessary.</p>
 <pre class="r"><code>svn_set_revision(svn_dir = cwb_dir_svn, revision = cwb_svn_revision)</code></pre>
 <pre><code>## [1] 1069</code></pre>
 <p>We create a new branch of the RcppCWB repo for the desired CWB revision if not yet present.</p>
-<pre class="r"><code>cwb_copy_report &lt;- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = &quot;dev&quot;)
+<pre class="r"><code>cwb_copy_report &lt;- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = branch_of_departure)
 cwb_copy_report</code></pre>
 <pre><code>## $removed_files
 ## /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/depend.mk
@@ -234,7 +239,7 @@ cwb_copy_report</code></pre>
 <div id="step-2-patches" class="section level2">
 <h2>Step 2: Patches</h2>
 <p>We assume that the branch with the desired CWB revision has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.</p>
-<pre class="r"><code>checkout(repodir, branch = &quot;dev&quot;)
+<pre class="r"><code>checkout(repodir, branch = branch_of_departure)
 repo &lt;- repository(repodir) # needed later on
 last_devbranch_commit &lt;- last_commit(repo = repodir)</code></pre>
 <p>This intermediate step is a matter of caution to avoid that changes are lost.</p>
@@ -245,17 +250,15 @@ last_devbranch_commit &lt;- last_commit(repo = repodir)</code></pre>
 <p>Checkout the revision branch …</p>
 <pre class="r"><code>checkout(repodir, branch = cwb_revision_branch)</code></pre>
 <p>… and apply patches.</p>
-<pre class="r"><code>cwb_pkg_dir &lt;- &quot;~/Lab/github/RcppCWB/src/cwb&quot;
-
-setwd(path(cwb_pkg_dir, &quot;cl&quot;))
+<pre class="r"><code>cwb_pkg_dir &lt;- &quot;~/Lab/github/RcppCWB/src/cwb&quot;</code></pre>
+<pre class="r"><code>setwd(path(cwb_pkg_dir, &quot;cl&quot;))
 system(&quot;bison -d -t -p creg registry.y&quot;)
 system(&quot;flex -8 -Pcreg registry.l&quot;)
 
 setwd(path(cwb_pkg_dir, &quot;cqp&quot;))
 system(&quot;bison -d -t parser.y&quot;)
-system(&quot;flex -8 parser.l&quot;)
-
-file.rename(
+system(&quot;flex -8 parser.l&quot;)</code></pre>
+<pre class="r"><code>file.rename(
   from = path(cwb_pkg_dir, &quot;cl&quot;, &quot;endian.h&quot;),
   to = path(cwb_pkg_dir, &quot;cl&quot;, &quot;endian2.h&quot;)
 )</code></pre>
@@ -282,17 +285,7 @@ for (fname in new_files){
 <pre><code>## ... copying: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/Makefile</code></pre>
 <pre class="r"><code>cat(&quot;\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cl&quot;, &quot;depend.mk&quot;))
 cat(&quot;\n&quot;, file = file.path(repodir, &quot;src&quot;, &quot;cwb&quot;, &quot;cqp&quot;, &quot;depend.mk&quot;))</code></pre>
-<pre class="r"><code>global_replacements &lt;- list(
-  c(&quot;(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd-&gt;stream|redir-&gt;stream),\\s*&quot;, &quot;Rprintf(&quot;),
-  c(&quot;YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*&quot; , &quot;YY\\1PRINTF \\2&quot;),
-  c(&quot;fprintf\\s*\\(&quot;, &quot;Rprintf(&quot;),
-  c(&quot;(\\s+)printf\\(&quot;, &quot;\\1Rprintf(&quot;),
-  c(&quot;#(\\s*)define\\sYYFPRINTF\\sfprintf&quot;, &quot;#\\1define YYFPRINTF Rprintf&quot;),
-  
-  c(&#39;^\\s*#include\\s+&quot;endian\\.h&quot;\\s*$&#39;, &#39;#include &quot;endian2.h&quot;&#39;) # only files in cl, maybe limit this
-)
-
-for (subdir in c(&quot;cl&quot;, &quot;cqp&quot;, &quot;CQi&quot;)){
+<pre class="r"><code>for (subdir in c(&quot;cl&quot;, &quot;cqp&quot;, &quot;CQi&quot;)){
   files &lt;- list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
   for (f in files){
     code &lt;- readLines(f)
@@ -302,864 +295,589 @@ for (subdir in c(&quot;cl&quot;, &quot;cqp&quot;, &quot;CQi&quot;)){
     writeLines(text = code, con = f)
   }
 }</code></pre>
-<div id="delete-lines-before-match" class="section level3">
-<h3>Delete lines before match</h3>
-<pre class="r"><code>delete_line_before &lt;- list(
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^Group\\s\\*&quot;, 3L),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,&quot;, 1L),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,&quot;, 1L),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{&quot;, 1L),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{&quot;, 1L),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);&quot;, 1L),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^\\s*return\\sComputeGroupExternally\\(group\\);&quot;, 1L),
-  &quot;src/cwb/cqp/output.c&quot; = list(&#39;^\\s*sprintf\\(prefix,\\s&quot;cqpt\\.%d&quot;,\\s\\(unsigned\\sint\\)getpid\\(\\)\\);&#39;, 1L, 8L),
-  &quot;src/cwb/cqp/parser.y&quot; = list(&quot;^\\s*if\\s\\(\\$2\\s&amp;&amp;\\sgenerate_code\\)\\s\\{&quot;, 3L),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^\\s*for\\s\\(i\\s=\\s0;\\si\\s&lt;\\sp;\\si\\+\\+\\)&quot;, 2L, 5L),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^\\s*for\\s\\(i\\s=\\s0;\\si\\s&lt;\\sp;\\si\\+\\+\\)&quot;, 1L, 5L),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^\\s*value\\s=\\scl_string_canonical\\(value,\\ssrt_cl-&gt;corpus-&gt;charset,\\ssrt_flags,\\sCL_STRING_CANONICAL_STRDUP\\);&quot;, 1L, 7L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)&quot;, 4L, 4L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s*cregrestart\\(cregin\\s*\\);&quot;, 2L, 11L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.&quot;, 1L, 1L),
-  &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.&quot;, 1L, 111L),
-  &quot;src/cwb/cl/endian2.h&quot; = list(&quot;/* for consistency:&quot;, 1L, 1L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;^libcl.a: \\$\\(OBJS\\)&quot;, 1L, 6L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;##\\scl\\.h\\sheader\\s&quot;, 1L, 11L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;^depend:$&quot;, 1L, 22L),
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^clean:$&quot;, 1L, 7L),
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^cqp\\$\\(EXEC_SUFFIX\\):&quot;, 1L, 8L)
-)
-
-for (i in 1L:length(delete_line_before)){
-  
-  which_position &lt;- if (length(delete_line_before[[i]]) &gt; 1L) delete_line_before[[i]][[2]] else 1L
-  times &lt;- if (length(delete_line_before[[i]]) == 3L) delete_line_before[[i]][[3]] else 1L
-  
-  message(
-     sprintf(
-       &quot;file: %s | regex: %s | match: %d | lines: %d ... &quot;,
-       names(delete_line_before)[[i]],
-       delete_line_before[[i]][[1]],
-       which_position,
-       times
-      ),
-     appendLF = FALSE
-  )
-  fname &lt;- path(repodir, names(delete_line_before)[[i]])
-  if (!file.exists(fname)){
-    message(&quot;skipping operation - file &quot;, fname, &quot; does not exist&quot;)
-    next
-  }
-  code &lt;- readLines(fname)
-  
-  position &lt;- grep(pattern = delete_line_before[[i]][[1]], code)[which_position]
-  
-  if (!is.na(position)){
-    code &lt;- code[-(position - 1L:times)]
-    writeLines(text = code, con = fname)
-    message(&quot;OK&quot;)
-  } else {
-    message(&quot;FAIL - no match&quot;)
-  }
+<pre class="r"><code>for (fname in names(file_patches)){
+  fname_full &lt;- fs::path(repodir, fname)
+  message(&quot;File: &quot;, fname)
+  patch_file(file = fname_full, actions = file_patches[[fname]])
 }</code></pre>
-<pre><code>## file: src/cwb/cqp/groups.c | regex: ^Group\s\* | match: 3 | lines: 1 ... OK
-## file: src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/groups.c | regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/groups.c | regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/groups.c | regex: ^(\s*)sprintf\(sort_call,\sExternalGroupingCommand,\stemporary_name\); | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/groups.c | regex: ^\s*return\sComputeGroupExternally\(group\); | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/output.c | regex: ^\s*sprintf\(prefix,\s&quot;cqpt\.%d&quot;,\s\(unsigned\sint\)getpid\(\)\); | match: 1 | lines: 8 ... OK
-## file: src/cwb/cqp/parser.y | regex: ^\s*if\s\(\$2\s&amp;&amp;\sgenerate_code\)\s\{ | match: 3 | lines: 1 ... OK
-## file: src/cwb/cqp/ranges.c | regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 2 | lines: 5 ... OK
-## file: src/cwb/cqp/ranges.c | regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 1 | lines: 5 ... OK
-## file: src/cwb/cqp/ranges.c | regex: ^\s*value\s=\scl_string_canonical\(value,\ssrt_cl-&gt;corpus-&gt;charset,\ssrt_flags,\sCL_STRING_CANONICAL_STRDUP\); | match: 1 | lines: 7 ... OK
-## file: src/cwb/cl/lex.creg.c | regex: ^\s*if\s\(\s\(yy_c_buf_p\) | match: 4 | lines: 4 ... OK
-## file: src/cwb/cl/lex.creg.c | regex: ^\s*cregrestart\(cregin\s*\); | match: 2 | lines: 11 ... OK
-## file: src/cwb/cl/lex.creg.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | lines: 1 ... OK
-## file: src/cwb/cqp/lex.yy.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | lines: 111 ... OK
-## file: src/cwb/cl/endian2.h | regex: /* for consistency: | match: 1 | lines: 1 ... OK
-## file: src/cwb/cl/Makefile | regex: ^libcl.a: \$\(OBJS\) | match: 1 | lines: 6 ... OK
-## file: src/cwb/cl/Makefile | regex: ##\scl\.h\sheader\s | match: 1 | lines: 11 ... OK
-## file: src/cwb/cl/Makefile | regex: ^depend:$ | match: 1 | lines: 22 ... OK
-## file: src/cwb/cqp/Makefile | regex: ^clean:$ | match: 1 | lines: 7 ... OK
-## file: src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\): | match: 1 | lines: 8 ... OK</code></pre>
-</div>
-<div id="insert-code-before-match" class="section level3">
-<h3>Insert code before match</h3>
-<pre class="r"><code>insert_before &lt;- list(
-  &quot;src/cwb/cl/attributes.c&quot; = list(&quot;^#include\\s&lt;ctype\\.h&gt;&quot;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;)),
-  &quot;src/cwb/cl/bitio.c&quot; = list(&quot;^#include\\s&lt;sys/types\\.h&gt;&quot;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&#39;#include\\s&quot;globals\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/corpus.c&quot; = list(&#39;#include\\s&lt;ctype\\.h&gt;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  
-  &quot;src/cwb/cl/fileutils.c&quot; = list(&#39;^#include\\s&lt;sys/stat\\.h&gt;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/fileutils.c&quot; = list(&#39;^#include\\s&quot;globals\\.h&quot;&#39;, c(&quot;#include &lt;signal.h&gt; /* added by Andreas Blaette  */&quot;, &quot;#include &lt;sys/socket.h&gt; /* added by Andreas Blaette */&quot;, &quot;&quot;)),
-  &quot;src/cwb/cl/globals.h&quot; = list(&#39;^#ifndef\\s_globals_h_&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/lexhash.c&quot; = list(&#39;#include\\s&quot;globals\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/macros.c&quot; = list(&#39;#include\\s&quot;globals\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/makecomps.c&quot; = list(&#39;#include\\s&lt;ctype\\.h&gt;&#39;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;)),
-  &quot;src/cwb/cl/registry.y&quot; = list(&#39;#include\\s&lt;ctype\\.h&gt;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/special-chars.c&quot; = list(&#39;#include\\s&lt;ctype\\.h&gt;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/storage.c&quot; = list(&#39;^#include\\s&lt;sys/types\\.h&gt;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/storage.c&quot; = list(&quot;^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);&quot;, &#39;      if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;);&#39;),
-  &quot;src/cwb/cl/windows-mmap.c&quot; = list(&#39;^#include\\s&quot;windows-mmap\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^Group\\s\\*&quot;, &quot;/*&quot;, 3), # begin of commenting out ComputeGroupExternally(Group *group)
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,&quot;, c(&quot;*/&quot;, &quot;&quot;)), # end of commenting out ComputeGroupExternally(Group *group)
-  
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^\\s*int\\s*$&quot;, &quot;/*&quot;, 1),
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^\\s*int\\s*$&quot;, &quot;/*&quot;, 2),
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^unsigned\\sint\\s*$&quot;, &quot;/*&quot;, 1),
-  &quot;src/cwb/cqp/macro.c&quot; = list(&#39;#include\\s&quot;hash\\.h&quot;&#39;, &#39;#include &quot;../cl/lexhash.h&quot; /* newly added by AB */&#39;, 1),
-  &quot;src/cwb/cqp/output.c&quot; = list(&quot;^FILE\\s\\*\\s*&quot;, &quot;/*&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^int&quot;, &quot;/*&quot;, 9),
-  &quot;src/cwb/CQi/auth.c&quot; = list(&quot;/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/&quot;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;), 1),
-  &quot;src/cwb/CQi/server.c&quot; = list(&quot;^\\/\\*&quot;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;), 3L),
-  &quot;src/cwb/utils/cwb-makeall.c&quot; = list(&quot;/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/&quot;, c(&quot;#include &lt;netinet/in.h&gt;&quot;, &quot;&quot;), 1),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/&quot;, c(&quot;void Rprintf(const char *, ...);&quot;, &quot;&quot;), 1),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;#ifndef\\sYY_NO_INPUT&quot;, &quot;/*&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)&quot;, &quot;/*&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^#ifndef\\sYY_NO_INPUT&quot;, &quot;/*&quot;, 2L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.&quot;, c(&quot;*/&quot;, &quot;&quot;), 1L),
-  &quot;src/cwb/cl/registry.tab.c&quot; = list(&quot;#define\\sYYBISON\\s1&quot;, &quot;void Rprintf(const char *, ...);&quot;, 1L),
-  &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;#ifdef __cplusplus&quot;, &quot;/*&quot;, 3L),
-  &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.&quot;, &quot;&quot;, 1L),
-  &quot;src/cwb/cl/endian2.h&quot; = list(&quot;#include\\s&lt;windows\\.h&gt;&quot; , &quot;#include &lt;winsock2.h&gt; /* AB reversed order, in original CWB code windows.h is included first */&quot;, 1L),
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^cqp\\$\\(EXEC_SUFFIX\\):.*&quot;, &quot;libcqp.a: $(OBJS) $(CQI_OBJS)\n\t$(RM) $@\n\t$(AR) cq $@ $^\n&quot;, 1L),
-  &quot;src/cwb/config/platform/linux&quot; = list(&quot;##\\sCPU\\sarchitecture&quot;, c(&quot;## require position-independent code&quot;, &quot;CFLAGS += -fPIC&quot;, &quot;&quot;), 1L)
-)
-
-for (i in 1L:length(insert_before)){
-  
-  fname &lt;- path(repodir, names(insert_before)[[i]])
-  which_position &lt;- if (length(insert_before[[i]]) &gt; 2L) insert_before[[i]][[3]] else 1
-  
-  message(
-    sprintf(
-      &quot;file: %s | regex: %s | match: %d | insertion: %s ... &quot;,
-      fname,
-      insert_before[[i]][[1]],
-      which_position,
-      paste(insert_before[[i]][[2]], collapse = &quot;///&quot;)
-    ),
-    appendLF = FALSE
-  )
-  
-  if (!file.exists(fname)){
-    message(&quot;FAIL - file does not exist&quot;)
-    next
-  }
-  
-  code &lt;- readLines(fname)
-  
-  position &lt;- grep(pattern = insert_before[[i]][[1]], code)[which_position]
-  if (!is.na(position)){
-    code &lt;- c(
-      code[1L:(position - 1L)],
-      insert_before[[i]][[2]],
-      code[position:length(code)]
-    )
-    writeLines(text = code, con = fname)
-    message(&quot;OK&quot;)
-  } else {
-    message(&quot;FAIL - no matches for regex&quot;)
-  }
-}</code></pre>
-<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^#include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitio.c | regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/fileutils.c | regex: ^#include\s&lt;sys/stat\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/fileutils.c | regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: #include &lt;signal.h&gt; /* added by Andreas Blaette  *////#include &lt;sys/socket.h&gt; /* added by Andreas Blaette *//// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/globals.h | regex: ^#ifndef\s_globals_h_ | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lexhash.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/macros.c | regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/makecomps.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.y | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/special-chars.c | regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/storage.c | regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/storage.c | regex: ^(\s*)lseek\(fd,\s0,\sSEEK_SET\); | match: 1 | insertion:       if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/windows-mmap.c | regex: ^#include\s&quot;windows-mmap\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^Group\s\* | match: 3 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | insertion: *//// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*int\s*$ | match: 1 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*int\s*$ | match: 2 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^unsigned\sint\s*$ | match: 1 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/macro.c | regex: #include\s&quot;hash\.h&quot; | match: 1 | insertion: #include &quot;../cl/lexhash.h&quot; /* newly added by AB */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^FILE\s\*\s* | match: 1 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^int | match: 9 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/auth.c | regex: /\*\sdata\sstructures\s\(internal\suse\sonly\)\s\*/ | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/server.c | regex: ^\/\* | match: 3 | insertion: void Rprintf(const char *, ...);/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/utils/cwb-makeall.c | regex: /\*\*\sThe\scorpus\swe\sare\sworking\son\s\*/ | match: 1 | insertion: #include &lt;netinet/in.h&gt;/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\send\sstandard\sC\sheaders\.\s\*/ | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: #ifndef\sYY_NO_INPUT | match: 1 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^#ifndef\sYY_NO_INPUT | match: 2 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | insertion: *//// ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/registry.tab.c | regex: #define\sYYBISON\s1 | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: #ifdef __cplusplus | match: 3 | insertion: /* ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | insertion:  ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/endian2.h | regex: #include\s&lt;windows\.h&gt; | match: 1 | insertion: #include &lt;winsock2.h&gt; /* AB reversed order, in original CWB code windows.h is included first */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: ^cqp\$\(EXEC_SUFFIX\):.* | match: 1 | insertion: libcqp.a: $(OBJS) $(CQI_OBJS)
+<pre><code>## File: src/cwb/cl/lex.creg.c</code></pre>
+<pre><code>## Action to perform: delete_line_before</code></pre>
+<pre><code>## regex: ^\s*if\s\(\s\(yy_c_buf_p\) | match: 4 | lines: 4 ... OK
+## Action to perform: delete_line_before
+## regex: ^\s*cregrestart\(cregin\s*\); | match: 2 | lines: 11 ... OK
+## Action to perform: delete_line_before
+## regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | lines: 1 ... OK
+## Action to perform: insert_before
+## regex: /\*\send\sstandard\sC\sheaders\.\s\*/ | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## Action to perform: insert_before
+## regex: #ifndef\sYY_NO_INPUT | match: 1 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: ^#ifndef\sYY_NO_INPUT | match: 2 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | insertion: *//// ... OK
+## Action to perform: insert_after
+## regex: #endif | match: 28 | insertion: */ ... OK
+## Action to perform: insert_after
+## regex: ^\}$ | match: 5 | insertion: */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)(static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\);).*?$ | match: 1 | replacement: \1/* \2 */ ... OK
+## Action to perform: replace
+## regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | replacement: static void yyunput (int c, register char * yy_bp ) ... OK
+## Action to perform: replace
+## regex: ^(\s)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2 ... FAIL - no match
+## Action to perform: replace
+## regex: ^(\s*)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2 ... OK
+## Action to perform: replace
+## regex: /\*\scast\sfor\s8-bit\schar&#39;s\s\*/ | match: 1 | replacement:  ... OK
+## Action to perform: replace
+## regex: \s*/\*\spreserve\scregtext\s\*/ | match: 1 | replacement:  ... OK
+## Action to perform: replace
+## regex: /\*\sifndef YY_NO_INPUT\s\*/ | match: 1 | replacement:  ... OK
+## Action to perform: remove_lines
+## regex: ^\s/\*\sundo\seffects\sof\ssetting\sup\scregtext\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\sneed\sto\sshift\sthings\sup\sto\smake\sroom\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\s\+2\sfor\sEOB\schars\.\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: ^\s*/\*\sThis\swas\sreally\sa\sNUL\.\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: ^\s*/\*FALLTHROUGH\*/\s*$ | match: 1 ... OK
+## File: src/cwb/cl/endian2.h
+## Action to perform: delete_line_before
+## regex: /* for consistency: | match: 1 | lines: 1 ... OK
+## Action to perform: insert_before
+## regex: #include\s&lt;windows\.h&gt; | match: 1 | insertion: #include &lt;winsock2.h&gt; /* AB reversed order, in original CWB code windows.h is included first */ ... OK
+## File: src/cwb/cl/Makefile
+## Action to perform: delete_line_before
+## regex: ^libcl.a: \$\(OBJS\) | match: 1 | lines: 6 ... OK
+## Action to perform: delete_line_before
+## regex: ##\scl\.h\sheader\s | match: 1 | lines: 11 ... OK
+## Action to perform: delete_line_before
+## regex: ^depend:$ | match: 1 | lines: 22 ... OK
+## Action to perform: replace
+## regex: ^TOP\s=\s\$\(shell\spwd\)/\.\. | match: 1 | replacement: TOP = $(R_PACKAGE_SOURCE) ... OK
+## Action to perform: replace
+## regex: ^(\s+)endian.h | match: 1 | replacement: \1endian2.h ... OK
+## Action to perform: replace
+## regex: ^(\s+)\$\(AR\)\s | match: 1 | replacement: \1$(AR) cq  ... OK
+## Action to perform: replace
+## regex: ^TOP\s=\s\$\(shell\spwd\)/\.\. | match: 1 | replacement: TOP = $(R_PACKAGE_SOURCE) ... FAIL - no match
+## Action to perform: remove_lines
+## regex: ^\s+\$\(RANLIB\) | match: 1 ... OK
+## File: src/cwb/cl/attributes.c
+## Action to perform: insert_before
+## regex: ^#include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## Action to perform: replace
+## regex: (\s+)int\sppos,\sbpos,\sdollar,\srpos; | match: 1 | replacement: \1int ppos, bpos, rpos; ... OK
+## Action to perform: replace
+## regex: ^(\s+)dollar = 0; | match: 1 | replacement: \1/* dollar = 0; */ ... OK
+## Action to perform: replace
+## regex: ^(\s+)dollar = ppos;\s | match: 1 | replacement: \1/* dollar = ppos; */ ... OK
+## Action to perform: replace
+## regex: ^(\s+)if\s\(STREQ\(rname,\s&quot;HOME&quot;\)\) | match: 1 | replacement: \1if (strcmp(rname, &quot;HOME&quot;) == 0) ... OK
+## Action to perform: replace
+## regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;APATH&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;APATH&quot;) == 0) ... OK
+## Action to perform: replace
+## regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;ANAME&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;ANAME&quot;) == 0) ... OK
+## File: src/cwb/cl/bitio.c
+## Action to perform: insert_before
+## regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: insert_after
+## regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...); ... FAIL - no match
+## File: src/cwb/cl/class-mapping.c
+## Action to perform: insert_before
+## regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: replace
+## regex: (\s*)\*\s@param\sclass\s+The\sclass\s+to\scheck\. | match: 2 | replacement: \1* @param obj  The class to check. ... OK
+## Action to perform: replace
+## regex: (\s*)\*\s@param\sclass\s+The\sclass\s+to\scheck\. | match: 1 | replacement: \1* @param obj  The class to check. ... OK
+## Action to perform: replace
+## regex: ^(\s+)return\smember_of_class_i\(map,\sclass,\sid\); | match: 1 | replacement: \1return member_of_class_i(map, obj, id); ... OK
+## Action to perform: replace
+## regex: ^(\s+)SingleMapping\sclass, | match: 2 | replacement: \1SingleMapping obj, ... OK
+## Action to perform: replace
+## regex: ^(\s+)SingleMapping\sclass, | match: 1 | replacement: \1SingleMapping obj, ... OK
+## Action to perform: replace
+## regex: ^(\s+)class-&gt;tokens, | match: 1 | replacement: \1obj-&gt;tokens, ... OK
+## Action to perform: replace
+## regex: ^(\s+)class-&gt;nr_tokens, | match: 1 | replacement: \1obj-&gt;nr_tokens, ... OK
+## File: src/cwb/cl/corpus.c
+## Action to perform: insert_before
+## regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: remove_lines
+## regex: (\s+)stderr, | match: 3 ... OK
+## Action to perform: remove_lines
+## regex: (\s+)stderr, | match: 2 ... OK
+## Action to perform: remove_lines
+## regex: (\s+)stderr, | match: 1 ... OK
+## File: src/cwb/cl/fileutils.c
+## Action to perform: insert_before
+## regex: ^#include\s&lt;sys/stat\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: insert_before
+## regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: #include &lt;signal.h&gt; /* added by Andreas Blaette  *////#include &lt;sys/socket.h&gt; /* added by Andreas Blaette *//// ... OK
+## File: src/cwb/cl/globals.h
+## Action to perform: insert_before
+## regex: ^#ifndef\s_globals_h_ | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/lexhash.c
+## Action to perform: insert_before
+## regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: insert_after
+## regex: ^#include\s&quot;lexhash\.h&quot; | match: 1 | insertion: #include &lt;unistd.h&gt; ... OK
+## File: src/cwb/cl/macros.c
+## Action to perform: insert_before
+## regex: #include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/makecomps.c
+## Action to perform: insert_before
+## regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## Action to perform: replace
+## regex: ^(\s*)char\serrmsg\[CL_MAX_LINE_LENGTH\]; | match: 1 | replacement: /* char errmsg[CL_MAX_LINE_LENGTH]; */ ... OK
+## File: src/cwb/cl/registry.y
+## Action to perform: insert_before
+## regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/special-chars.c
+## Action to perform: insert_before
+## regex: #include\s&lt;ctype\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/storage.c
+## Action to perform: insert_before
+## regex: ^#include\s&lt;sys/types\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: insert_before
+## regex: ^(\s*)lseek\(fd,\s0,\sSEEK_SET\); | match: 1 | insertion:       if (success &lt; 0) Rprintf(&quot;Operation not successful&quot;); ... OK
+## Action to perform: replace
+## regex: ^(\s+)write\(fd,\s&amp;fd,\ssizeof\(int\)\); | match: 1 | replacement: \1ssize_t success = write(fd, &amp;fd, sizeof(int)); ... OK
+## File: src/cwb/cl/windows-mmap.c
+## Action to perform: insert_before
+## regex: ^#include\s&quot;windows-mmap\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/registry.tab.c
+## Action to perform: insert_before
+## regex: #define\sYYBISON\s1 | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/bitfields.c
+## Action to perform: insert_after
+## regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/cdaccess.c
+## Action to perform: insert_after
+## regex: ^#include\s&quot;cdaccess\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\sregex_result,\sidx,\si,\slen,\slexsize; | match: 1 | replacement: \1int idx, i, lexsize; ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\soptimised,\sgrain_match; | match: 1 | replacement: \1int optimised; ... OK
+## Action to perform: replace
+## regex: ^(\s*)char\s\*word,\s\*preprocessed_string; | match: 1 | replacement: \1char *word; ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\soff_start,\soff_end; | match: 1 | replacement: \1int off_start; ... OK
+## Action to perform: replace
+## regex: ^(\s*)char\s\*p; | match: 1 | replacement: \1/* char *p; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\si; | match: 3 | replacement: \1/* int i; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)DynCallResult\sarg; | match: 1 | replacement: \1/* DynCallResult arg; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)arg\s=\sargs\[argnum\]; | match: 1 | replacement: \1/* arg = args[argnum]; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)fgets\(call,\sCL_MAX_LINE_LENGTH,\spipe\); | match: 1 | replacement: \1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf(&quot;fgets failure&quot;); ... OK
+## Action to perform: replace
+## regex: ^(\s*)off_end\s=\sntohl\(lexidx_data\[idx\s\+\s1\]\)\s-\s1; | match: 1 | replacement: \1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */ ... OK
+## File: src/cwb/cl/globals.c
+## Action to perform: insert_after
+## regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/cl/ngram-hash.c
+## Action to perform: insert_after
+## regex: ^#include\s&lt;math\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: replace
+## regex: ^(\s*)cl_ngram_hash_entry\sentry,\stemp; | match: 1 | replacement: \1cl_ngram_hash_entry entry; ... OK
+## Action to perform: replace
+## regex: ^(\s*)temp\s=\sentry; | match: 1 | replacement: \1/* temp = entry; */ ... OK
+## File: src/cwb/cl/regopt.c
+## Action to perform: insert_after
+## regex: ^#include\s&quot;regopt\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## Action to perform: replace
+## regex: ^(\s*)if\s\(ch\s&gt;=\s32\s&amp;\sch\s&lt;\s127\) | match: 1 | replacement: \1if ((ch &gt;= 32) &amp; (ch &lt; 127)) ... OK
+## File: src/cwb/cl/class-mapping.h
+## Action to perform: replace
+## regex: ^(\s+)SingleMapping\sclass, | match: 2 | replacement: \1SingleMapping obj, ... OK
+## Action to perform: replace
+## regex: ^(\s+)SingleMapping\sclass, | match: 1 | replacement: \1SingleMapping obj, ... OK
+## File: src/cwb/cqp/groups.c
+## Action to perform: delete_line_before
+## regex: ^Group\s\* | match: 3 | lines: 1 ... OK
+## Action to perform: delete_line_before
+## regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | lines: 1 ... OK
+## Action to perform: delete_line_before
+## regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | lines: 1 ... OK
+## Action to perform: delete_line_before
+## regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1 | lines: 1 ... OK
+## Action to perform: delete_line_before
+## regex: ^\s*if\s\(\(fd\s=\sopen_temporary_file\(temporary_name\)\)\s==\sNULL\)\s\{ | match: 1 | lines: 1 ... OK
+## Action to perform: delete_line_before
+## regex: ^(\s*)sprintf\(sort_call,\sExternalGroupingCommand,\stemporary_name\); | match: 1 | lines: 1 ... OK
+## Action to perform: delete_line_before
+## regex: ^\s*return\sComputeGroupExternally\(group\); | match: 1 | lines: 1 ... OK
+## Action to perform: insert_before
+## regex: ^Group\s\* | match: 3 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: ^Group\s\*compute_grouping\(CorpusList\s\*cl, | match: 1 | insertion: *//// ... OK
+## Action to perform: insert_after
+## regex: return\sComputeGroupInternally\(group\); | match: 1 | insertion:    *////  return group; ... OK
+## Action to perform: replace
+## regex: ^(.*?)\s*/\*\s\(source\sID,\starget\sID)\s*\*/ | match: 1 | replacement: \1 ... OK
+## Action to perform: replace
+## regex: ^(.*?)\s*/\*\smodifies\sGroup\sobject\sin\splace\sand\sreturns\spointer\s\*/ | match: 1 | replacement: \1 ... OK
+## Action to perform: replace
+## regex: ^(\s*)(if\s\(UseExternalGrouping\s&amp;&amp;\s\!insecure\s&amp;&amp;\s\!\(source_is_struc\s\|\|\starget_is_struc\s\|\|\sis_grouped\)\)) | match: 1 | replacement: \1/* \2 ... OK
+## File: src/cwb/cqp/output.c
+## Action to perform: delete_line_before
+## regex: ^\s*sprintf\(prefix,\s&quot;cqpt\.%d&quot;,\s\(unsigned\sint\)getpid\(\)\); | match: 1 | lines: 8 ... OK
+## Action to perform: insert_before
+## regex: ^FILE\s\*\s* | match: 1 | insertion: /* ... OK
+## Action to perform: insert_after
+## regex: ^\}\s*$ | match: 3 | insertion: */ ... OK
+## Action to perform: replace
+## regex: ^(.*?)\s*/\*\sholds\s&quot;cqpt\.\$\$&quot;,\sso\s64\schars\sis\splenty\sof\sheadroom\s\*/ | match: 1 | replacement: \1 ... OK
+## Action to perform: replace
+## regex: ^(.*?)(\s*)/\*\s&quot;cqpt\.\$\$&quot;\s\*/ | match: 1 | replacement: \1 ... OK
+## Action to perform: replace
+## regex: ^(.*?)\s/\*\sstring\sis\sallocated\sby\stempnam\(\),\sneeds\sto\sbe\sfree&#39;d\sbelow\s\*/ | match: 1 | replacement: \1 ... OK
+## File: src/cwb/cqp/parser.y
+## Action to perform: delete_line_before
+## regex: ^\s*if\s\(\$2\s&amp;&amp;\sgenerate_code\)\s\{ | match: 3 | lines: 1 ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\sok; | match: 3 | replacement: \1int ok __attribute__((unused)); ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\sok; | match: 2 | replacement: \1int ok __attribute__((unused)); ... OK
+## Action to perform: replace
+## regex: ^(\s*)ok\s=\sSortSubcorpus\(\$2,\s\$3,\s\(\$4\s&gt;=\s1\)\s\?\s\$4\s:\s1,\s&amp;\(\$5\)\); | match: 1 | replacement: \1SortSubcorpus($2, $3, ($4 &gt;= 1) ? $4 : 1, &amp;($5)); ... OK
+## File: src/cwb/cqp/ranges.c
+## Action to perform: delete_line_before
+## regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 2 | lines: 5 ... OK
+## Action to perform: delete_line_before
+## regex: ^\s*for\s\(i\s=\s0;\si\s&lt;\sp;\si\+\+\) | match: 1 | lines: 5 ... OK
+## Action to perform: delete_line_before
+## regex: ^\s*value\s=\scl_string_canonical\(value,\ssrt_cl-&gt;corpus-&gt;charset,\ssrt_flags,\sCL_STRING_CANONICAL_STRDUP\); | match: 1 | lines: 7 ... OK
+## Action to perform: insert_before
+## regex: ^int | match: 9 | insertion: /* ... OK
+## Action to perform: insert_after
+## regex: ^\}\s*$ | match: 11 | insertion: */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)line\s=\s-1;(\s*)\s/\*\swill\sindicate\ssort\sfailure\sbelow\sif\stext_size\s==\s0\s\*/ | match: 1 | replacement: \1line = -1;\2 ... OK
+## Action to perform: replace
+## regex: ^(\s*)\}(\s)/\*\send\sfor\seach\stoken\s\*/ | match: 1 | replacement: \1}\2 ... OK
+## Action to perform: replace
+## regex: ^(\s*)line\s=\s-1;(\s*)/\*\swill\sindicate\sfailure\sof\sexternal\ssort\scommand\s*\*/ | match: 1 | replacement: \1line = -1;\2 ... OK
+## Action to perform: replace
+## regex: ^(\s*)break;\s*/\*\sabort\s\*/ | match: 1 | replacement: \1break; ... OK
+## Action to perform: replace
+## regex: ^(\s*)ok\s=\sSortExternally\(\); | match: 1 | replacement: \1/* ok = SortExternally(); */ ... OK
+## Action to perform: remove_lines
+## regex: ^\s*/\*\suses\ssettings\sfrom\sstatic\ssrt_\*\svariables\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: ^\s*/\*\sdetermine\sstart\sand\send\sposition\sof\ssort\sinterval\sfor\sthis\smatch\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\sadjust\ssort\sboundaries.*?\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /*\sswap\sstart\sand\send\sof\sinterval.*?\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\sdetermine\ssort\sdirection\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\show\smany\stokens\sto\sprint\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\swhen\susing\sflags,\sprint\snormalised\stoken\ssequence.*?\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\sprint\ssequence\sof\stokens\sin\ssort\sinterval\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\snow,\sexecute\sthe\sexternal\ssort\scommand.*?\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\srun\ssort\scmd\sand\sread\sfrom\spipe\s\*/ | match: 1 ... OK
+## Action to perform: remove_lines
+## regex: /\*\snow\swe\sshould\shave\sread\sexactly.*?\*/ | match: 1 ... OK
+## File: src/cwb/cqp/lex.yy.c
+## Action to perform: delete_line_before
+## regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | lines: 111 ... OK
+## Action to perform: insert_before
+## regex: #ifdef __cplusplus | match: 3 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: /\*\*\sImmediately\sswitch\sto\sa\sdifferent\sinput\sstream\. | match: 1 | insertion:  ... OK
+## Action to perform: insert_after
+## regex: #endif | match: 27 | insertion: */ ... OK
+## Action to perform: replace
+## regex: ^\s+static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\); | match: 1 | replacement:   /*  static void yyunput (int c,char *buf_ptr  ); */ ... OK
+## File: src/cwb/cqp/Makefile
+## Action to perform: delete_line_before
+## regex: ^clean:$ | match: 1 | lines: 7 ... OK
+## Action to perform: delete_line_before
+## regex: ^cqp\$\(EXEC_SUFFIX\): | match: 1 | lines: 8 ... OK
+## Action to perform: insert_before
+## regex: ^cqp\$\(EXEC_SUFFIX\):.* | match: 1 | insertion: libcqp.a: $(OBJS) $(CQI_OBJS)
 ##  $(RM) $@
 ##  $(AR) cq $@ $^
 ##  ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux | regex: ##\sCPU\sarchitecture | match: 1 | insertion: ## require position-independent code///CFLAGS += -fPIC/// ... OK</code></pre>
-<pre class="r"><code>insert_after &lt;- list(
-  &quot;src/cwb/cl/bitio.c&quot; = list(&quot;^static\\sint\\sBaseTypeBits&quot;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/bitfields.c&quot; = list(&quot;^static\\sint\\sBaseTypeBits&quot;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&#39;^#include\\s&quot;cdaccess\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/globals.c&quot; = list(&#39;^#include\\s&quot;globals\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/lexhash.c&quot; = list(&#39;^#include\\s&quot;lexhash\\.h&quot;&#39;, &quot;#include &lt;unistd.h&gt;&quot;),
-  &quot;src/cwb/cl/ngram-hash.c&quot; = list(&quot;^#include\\s&lt;math\\.h&gt;&quot;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cl/regopt.c&quot; = list(&#39;^#include\\s&quot;regopt\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;return\\sComputeGroupInternally\\(group\\);&quot;, c(&quot;   */&quot;, &quot;  return group;&quot;)),
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^\\s*\\}\\s*$&quot;, &quot;*/&quot;, 1),
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^\\s*\\}\\s*$&quot;, &quot;*/&quot;, 2),
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^\\s*\\}\\s*$&quot;, &quot;*/&quot;, 3),
-  &quot;src/cwb/cqp/output.c&quot; = list(&quot;^\\}\\s*$&quot;, &quot;*/&quot;, 3),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^\\}\\s*$&quot;, &quot;*/&quot;, 11),
-  &quot;src/cwb/CQi/cqpserver.c&quot; = list(&#39;#include &quot;\\.\\./cqp/groups\\.h&quot;&#39;, &quot;void Rprintf(const char *, ...);&quot;, 1),
-  &quot;src/cwb/CQi/server.c&quot; = list(&#39;#include &quot;\\.\\./cqp/hash\\.h&quot;&#39;, &#39;#include &quot;../cl/lexhash.h&quot; /* inserted by AB */&#39;, 1),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;#endif&quot;, &quot;*/&quot;, 28L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\}$&quot;, &quot;*/&quot;, 5L),
-  &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;#endif&quot;, &quot;*/&quot;, 27L)
-)
-
-for (i in 1L:length(insert_after)){
-  fname &lt;- path(repodir, names(insert_after)[[i]])
-  which_position &lt;- if (length(insert_after[[i]]) &gt; 2L) insert_after[[i]][[3]] else 1L
-  
-  message(
-    sprintf(
-      &quot;file: %s | regex: %s | match: %d | insertion: %s ... &quot;,
-      fname,
-      insert_after[[i]][[1]],
-      which_position,
-      paste(insert_after[[i]][[2]], collapse = &quot;///&quot;)
-    ),
-    appendLF = FALSE
-  )
-  
-  if (!file.exists(fname)){
-    message(&quot;FAIL - file does not exist&quot;)
-    next
-  }
-
-  
-  code &lt;- readLines(fname)
-  
-  position &lt;- grep(pattern = insert_after[[i]][[1]], code)[which_position]
-  if (!is.na(position)){
-    code &lt;- c(
-      code[1L:position],
-      insert_after[[i]][[2]],
-      code[(position + 1L):length(code)]
-    )
-    writeLines(text = code, con = fname)
-    message(&quot;OK&quot;)
-  } else {
-    message(&quot;FAIL - no match&quot;)
-  }
-}</code></pre>
-<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitio.c | regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...); ... FAIL - no match
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/bitfields.c | regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^#include\s&quot;cdaccess\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/globals.c | regex: ^#include\s&quot;globals\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lexhash.c | regex: ^#include\s&quot;lexhash\.h&quot; | match: 1 | insertion: #include &lt;unistd.h&gt; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^#include\s&lt;math\.h&gt; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/regopt.c | regex: ^#include\s&quot;regopt\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: return\sComputeGroupInternally\(group\); | match: 1 | insertion:    *////  return group; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*\}\s*$ | match: 1 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*\}\s*$ | match: 2 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^\s*\}\s*$ | match: 3 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^\}\s*$ | match: 3 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^\}\s*$ | match: 11 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/cqpserver.c | regex: #include &quot;\.\./cqp/groups\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/CQi/server.c | regex: #include &quot;\.\./cqp/hash\.h&quot; | match: 1 | insertion: #include &quot;../cl/lexhash.h&quot; /* inserted by AB */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: #endif | match: 28 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\}$ | match: 5 | insertion: */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: #endif | match: 27 | insertion: */ ... OK</code></pre>
-<pre class="r"><code>replace &lt;- list(
-  &quot;src/cwb/cl/attributes.c&quot; = list(&quot;(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;&quot;, &quot;\\1int ppos, bpos, rpos;&quot;, 1),
-  &quot;src/cwb/cl/attributes.c&quot; = list(&quot;^(\\s+)dollar = 0;&quot;, &quot;\\1/* dollar = 0; */&quot;, 1),
-  &quot;src/cwb/cl/attributes.c&quot; = list(&quot;^(\\s+)dollar = ppos;\\s&quot;, &quot;\\1/* dollar = ppos; */&quot;, 1),
-  
-  &quot;src/cwb/cl/attributes.c&quot; = list(&#39;^(\\s+)if\\s\\(STREQ\\(rname,\\s&quot;HOME&quot;\\)\\)&#39;, &#39;\\1if (strcmp(rname, &quot;HOME&quot;) == 0)&#39;, 1),
-  &quot;src/cwb/cl/attributes.c&quot; = list(&#39;^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s&quot;APATH&quot;\\)\\)&#39;, &#39;\\1else if (strcmp(rname, &quot;APATH&quot;) == 0)&#39;, 1),
-  &quot;src/cwb/cl/attributes.c&quot; = list(&#39;^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s&quot;ANAME&quot;\\)\\)&#39;, &#39;\\1else if (strcmp(rname, &quot;ANAME&quot;) == 0)&#39;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;&quot;, &quot;\\1int idx, i, lexsize;&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)int\\soptimised,\\sgrain_match;&quot;, &quot;\\1int optimised;&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;&quot;, &quot;\\1char *word;&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)int\\soff_start,\\soff_end;&quot;, &quot;\\1int off_start;&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)char\\s\\*p;&quot;, &quot;\\1/* char *p; */&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)int\\si;&quot;, &quot;\\1/* int i; */&quot;, 3),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)DynCallResult\\sarg;&quot;, &quot;\\1/* DynCallResult arg; */&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)arg\\s=\\sargs\\[argnum\\];&quot;, &quot;\\1/* arg = args[argnum]; */&quot;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);&quot;, &#39;\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf(&quot;fgets failure&quot;);&#39;, 1),
-  &quot;src/cwb/cl/cdaccess.c&quot; = list(&quot;^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;&quot;, &quot;\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */&quot;, 1),
-  
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.&quot;, &quot;\\1* @param obj  The class to check.&quot;, 2),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.&quot;, &quot;\\1* @param obj  The class to check.&quot;, 1),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;^(\\s+)return\\smember_of_class_i\\(map,\\sclass,\\sid\\);&quot;, &quot;\\1return member_of_class_i(map, obj, id);&quot;, 1),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;^(\\s+)SingleMapping\\sclass,&quot;, &quot;\\1SingleMapping obj,&quot;, 2),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;^(\\s+)SingleMapping\\sclass,&quot;, &quot;\\1SingleMapping obj,&quot;, 1),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;^(\\s+)class-&gt;tokens,&quot;, &quot;\\1obj-&gt;tokens,&quot;, 1),
-  &quot;src/cwb/cl/class-mapping.c&quot; = list(&quot;^(\\s+)class-&gt;nr_tokens,&quot;, &quot;\\1obj-&gt;nr_tokens,&quot;, 1),
-  &quot;src/cwb/cl/class-mapping.h&quot; = list(&quot;^(\\s+)SingleMapping\\sclass,&quot;, &quot;\\1SingleMapping obj,&quot;, 2),
-  &quot;src/cwb/cl/class-mapping.h&quot; = list(&quot;^(\\s+)SingleMapping\\sclass,&quot;, &quot;\\1SingleMapping obj,&quot;, 1),
-  &quot;src/cwb/cl/makecomps.c&quot; = list(&quot;^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];&quot;, &quot;/* char errmsg[CL_MAX_LINE_LENGTH]; */&quot;, 1),
-  &quot;src/cwb/cl/ngram-hash.c&quot; = list(&quot;^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;&quot;, &quot;\\1cl_ngram_hash_entry entry;&quot;, 1),
-  &quot;src/cwb/cl/ngram-hash.c&quot; = list(&quot;^(\\s*)temp\\s=\\sentry;&quot;, &quot;\\1/* temp = entry; */&quot;, 1),
-  &quot;src/cwb/cl/regopt.c&quot; = list(&quot;^(\\s*)if\\s\\(ch\\s&gt;=\\s32\\s&amp;\\sch\\s&lt;\\s127\\)&quot;, &quot;\\1if ((ch &gt;= 32) &amp; (ch &lt; 127))&quot;, 1),
-  
-  &quot;src/cwb/cl/storage.c&quot; = list(&quot;^(\\s+)write\\(fd,\\s&amp;fd,\\ssizeof\\(int\\)\\);&quot;, &quot;\\1ssize_t success = write(fd, &amp;fd, sizeof(int));&quot;, 1),
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)if\\s\\(ctptr-&gt;pa_ref\\.delete\\)\\s\\{&quot;, &quot;\\1if (ctptr-&gt;pa_ref.del) {&quot;, 2),
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)if\\s\\(ctptr-&gt;pa_ref\\.delete\\)\\s\\{&quot;, &quot;\\1if (ctptr-&gt;pa_ref.del) {&quot;, 1),
-  
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)if\\s\\(ctptr-&gt;sa_ref\\.delete\\)\\s\\{&quot;, &quot;\\1if (ctptr-&gt;sa_ref.del) {&quot;, 1),
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)if\\s\\(ctptr-&gt;idlist\\.delete\\)\\s\\{&quot;, &quot;\\1if (ctptr-&gt;idlist.del) {&quot;, 1),
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)int\\ssmallest_col,\\scorpus_size;&quot;, &quot;\\1int smallest_col;&quot;, 1),
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)corpus_size\\s=\\sevalenv-&gt;query_corpus-&gt;mother_size;&quot;, &quot;\\1/* corpus_size = evalenv-&gt;query_corpus-&gt;mother_size; */&quot;, 1),
-  &quot;src/cwb/cqp/eval.c&quot; = list(&quot;^(\\s*)assert\\(col-&gt;type\\s=\\stabular\\);&quot;, &quot;\\1assert((col-&gt;type = tabular));&quot;, 1),
-  &quot;src/cwb/cqp/eval.h&quot; = list(&quot;^(\\s*)int(\\s+)delete;&quot;, &quot;\\1int\\2del;&quot;, 3),
-  &quot;src/cwb/cqp/eval.h&quot; = list(&quot;^(\\s*)int(\\s+)delete;&quot;, &quot;\\1int\\2del;&quot;, 2),
-  &quot;src/cwb/cqp/eval.h&quot; = list(&quot;^(\\s*)int(\\s+)delete;&quot;, &quot;\\1int\\2del;&quot;, 1),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/&quot;, &quot;\\1&quot;, 1),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^(.*?)\\s*/\\*\\smodifies\\sGroup\\sobject\\sin\\splace\\sand\\sreturns\\spointer\\s\\*/&quot;, &quot;\\1&quot;, 1),
-  &quot;src/cwb/cqp/groups.c&quot; = list(&quot;^(\\s*)(if\\s\\(UseExternalGrouping\\s&amp;&amp;\\s\\!insecure\\s&amp;&amp;\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))&quot;, &quot;\\1/* \\2&quot;, 1),
-  &quot;src/cwb/cqp/hash.c&quot; = list(&quot;^(.*?)\\s*/\\*\\swill\\sexit\\son\\sint\\soverflow\\s\\*/&quot;, &quot;\\1&quot;, 1),
-  &quot;src/cwb/cqp/hash.h&quot; = list(&quot;(\\s*int\\sis_prime\\(int\\sn\\);)&quot;, &quot;/* \\1 */&quot;, 1),
-  &quot;src/cwb/cqp/hash.h&quot; = list(&quot;^(\\s*int\\sfind_prime\\(int\\sn\\);)&quot;, &quot;/* \\1 */&quot;, 1),
-  &quot;src/cwb/cqp/hash.h&quot; = list(&quot;^(\\s*unsigned\\sint\\shash_string\\(char\\s\\*s\\);)&quot;, &quot;/* \\1 */&quot;, 1),
-  &quot;src/cwb/cqp/html-print.c&quot; = list(&quot;^(\\s*)char\\s\\*s;&quot;, &quot;\\1/* char *s; */&quot;, 1),
-  &quot;src/cwb/cqp/html-print.c&quot; = list(&#39;^(\\s*)s\\s=\\s&quot;error&quot;;&#39;, &#39;\\1/* s = &quot;error&quot;; */&#39;, 1),
-  &quot;src/cwb/cqp/html-print.c&quot; = list(&#39;^(\\s*)s\\s=\\s&quot;error&quot;;&#39;, &#39;\\1/* s = &quot;error&quot;; */&#39;, 1),
-  &quot;src/cwb/cqp/html-print.c&quot; = list(&quot;^(\\s*)AttributeList\\s\\*strucs;&quot;, &quot;\\1/* AttributeList *strucs; */&quot;, 1),
-  &quot;src/cwb/cqp/html-print.c&quot; = list(&quot;^(\\s*)strucs\\s=\\scd-&gt;printStructureTags;&quot;, &quot;\\1/* strucs = cd-&gt;printStructureTags; */&quot;, 1),
-  &quot;src/cwb/cqp/latex-print.c&quot; = list(&quot;^(\\s*)char\\s\\*s;&quot;, &quot;\\1/* char *s; */&quot;, 1),
-  &quot;src/cwb/cqp/latex-print.c&quot; = list(&#39;^(\\s*)s\\s=\\s&quot;error&quot;;&#39;, &#39;\\1/* s = &quot;error&quot;; */&#39;, 1),
-  &quot;src/cwb/cqp/latex-print.c&quot; = list(&#39;^(\\s*)s\\s=\\s&quot;error&quot;;&#39;, &#39;\\1/* s = &quot;error&quot;; */&#39;, 1),
-  &quot;src/cwb/cqp/options.h&quot; = list(&quot;^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;&quot;, &quot;\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;&quot;, 1),
-  &quot;src/cwb/cqp/output.c&quot; = list(&#39;^(.*?)\\s*/\\*\\sholds\\s&quot;cqpt\\.\\$\\$&quot;,\\sso\\s64\\schars\\sis\\splenty\\sof\\sheadroom\\s\\*/&#39;, &quot;\\1&quot;, 1),
-  &quot;src/cwb/cqp/output.c&quot; = list(&#39;^(.*?)(\\s*)/\\*\\s&quot;cqpt\\.\\$\\$&quot;\\s\\*/&#39;, &quot;\\1&quot;, 1),
-  &quot;src/cwb/cqp/output.c&quot; = list(&quot;^(.*?)\\s/\\*\\sstring\\sis\\sallocated\\sby\\stempnam\\(\\),\\sneeds\\sto\\sbe\\sfree&#39;d\\sbelow\\s\\*/&quot;, &quot;\\1&quot;, 1),
-  &quot;src/cwb/cqp/output.h&quot; = list(&quot;^(\\s*)FILE\\s\\*open_temporary_file\\(char\\s\\*tmp_name_buffer);&quot;, &quot;\\1/* FILE *open_temporary_file(char *tmp_name_buffer); */&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)c-&gt;idlist\\.delete\\s=\\sleft-&gt;pa_ref\\.delete;&quot;, &quot;\\1c-&gt;idlist.del = left-&gt;pa_ref.del;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)left-&gt;pa_ref\\.delete\\s=\\s0;&quot;, &quot;\\1left-&gt;pa_ref.del = 0;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)node-&gt;idlist\\.delete\\s=\\s0;&quot;, &quot;\\1node-&gt;idlist.del = 0;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)res-&gt;idlist\\.delete\\s=\\sleft-&gt;pa_ref\\.delete;&quot;, &quot;\\1res-&gt;idlist.del = left-&gt;pa_ref.del;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)res-&gt;pa_ref\\.delete\\s=\\sauto_delete;&quot;, &quot;\\1res-&gt;pa_ref.del = auto_delete;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)res-&gt;sa_ref\\.delete\\s=\\sauto_delete;&quot;, &quot;\\1res-&gt;sa_ref.del = auto_delete;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)res-&gt;pa_ref\\.delete\\s=\\s0;&quot;, &quot;\\1res-&gt;pa_ref.del = 0;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)res-&gt;pa_ref\\.delete\\s=\\sauto_delete;&quot;, &quot;\\1res-&gt;pa_ref.del = auto_delete;&quot;, 1),
-  &quot;src/cwb/cqp/parse_actions.c&quot; = list(&quot;^(\\s*)res-&gt;sa_ref\\.delete\\s=\\s0;&quot;, &quot;\\1res-&gt;sa_ref.del = 0;&quot;, 1),
-  &quot;src/cwb/cqp/parser.y&quot; = list(&quot;^(\\s*)int\\sok;&quot;, &quot;\\1int ok __attribute__((unused));&quot;, 3),
-  &quot;src/cwb/cqp/parser.y&quot; = list(&quot;^(\\s*)int\\sok;&quot;, &quot;\\1int ok __attribute__((unused));&quot;, 2),
-  &quot;src/cwb/cqp/parser.y&quot; = list(&quot;^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s&gt;=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&amp;\\(\\$5\\)\\);&quot;, &quot;\\1SortSubcorpus($2, $3, ($4 &gt;= 1) ? $4 : 1, &amp;($5));&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^(\\s*)line\\s=\\s-1;(\\s*)\\s/\\*\\swill\\sindicate\\ssort\\sfailure\\sbelow\\sif\\stext_size\\s==\\s0\\s\\*/&quot;, &quot;\\1line = -1;\\2&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^(\\s*)\\}(\\s)/\\*\\send\\sfor\\seach\\stoken\\s\\*/&quot;, &quot;\\1}\\2&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\sfailure\\sof\\sexternal\\ssort\\scommand\\s*\\*/&quot;, &quot;\\1line = -1;\\2&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^(\\s*)break;\\s*/\\*\\sabort\\s\\*/&quot;, &quot;\\1break;&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^(\\s*)ok\\s=\\sSortExternally\\(\\);&quot;, &quot;\\1/* ok = SortExternally(); */&quot;, 1),
-  # &quot;src/cwb/cqp/regex2dfa.c&quot; = list(&quot;^(\\s*)va_start\\(AP,\\sFormat\\);\\vRprintf(Format, AP); va_end(AP);&quot;, &quot;\\1va_start(AP, Format); Rprintf(Format, AP); va_end(AP);&quot;, 1),
-  &quot;src/cwb/cqp/regex2dfa.c&quot; = list(&quot;^(\\s*)int\\signore_value;&quot;, &quot;\\1int ignore_value __attribute__((unused));&quot;, 1),
-  &quot;src/cwb/cqp/sgml-print.c&quot; = list(&quot;^(\\s*)AttributeList\\s\\*strucs;&quot;, &quot;\\1/* AttributeList *strucs; */&quot;, 1),
-  &quot;src/cwb/cqp/sgml-print.c&quot; = list(&quot;^(\\s*)strucs\\s=\\scd-&gt;printStructureTags;&quot;, &quot;\\1/* strucs = cd-&gt;printStructureTags; */&quot;, 1),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^(\\s*)(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);).*?$&quot;, &quot;\\1/* \\2 */&quot;, 1),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)&quot;, &quot;static void yyunput (int c, register char * yy_bp )&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^(\\s)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/&quot;, &quot;\\1{\\2&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^(\\s*)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/&quot;, &quot;\\1{\\2&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\scast\\sfor\\s8-bit\\schar&#39;s\\s\\*/&quot;, &quot;&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;\\s*/\\*\\spreserve\\scregtext\\s\\*/&quot;, &quot;&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\sifndef YY_NO_INPUT\\s\\*/&quot;, &quot;&quot;, 1L),
-  &quot;src/cwb/cqp/lex.yy.c&quot; = list(&quot;^\\s+static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);&quot;, &quot;  /*  static void yyunput (int c,char *buf_ptr  ); */&quot;, 1L),
-  &quot;src/cwb/cqp/parser.tab.c&quot; = list(&#39;^(\\s*)cqpmessage\\(Error,\\s&quot;CQP\\sSyntax\\sError:.*?&quot;,\\ss,\\sQueryBuffer\\);&#39;, &#39;\\1cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s);&#39;, 1L),
-  &quot;src/cwb/cqp/parser.tab.c&quot; = list(&quot;^(\\s+)int\\sok;&quot;, &quot;\\1int ok __attribute__((unused));&quot;, 4L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.&quot;, &quot;TOP = $(R_PACKAGE_SOURCE)&quot;, 1L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;^(\\s+)endian.h&quot;, &quot;\\1endian2.h&quot;, 1L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;^(\\s+)\\$\\(AR\\)\\s&quot;, &quot;\\1$(AR) cq &quot;, 1L),
-  
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.&quot;, &quot;TOP = $(R_PACKAGE_SOURCE)&quot;, 1L),
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;all:\\s\\$\\(PROGRAMS\\)&quot;, &quot;all: libcqp.a&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin-64&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin-port-core2&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin-universal&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin-brew&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/linux-opteron&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/linux&quot; = list(&quot;^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$&quot;, &quot;\\1 \\2&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^READLINE_DEFINES\\s:=.*?$&quot;, &quot;READLINE_DEFINES =&quot;, 1L),
-  &quot;src/cwb/config/platform/darwin&quot; = list(&quot;^READLINE_LIBS\\s:=.*?$&quot;, &quot;READLINE_LIBS =&quot;, 1L),
-  &quot;src/cwb/config/platform/unix&quot; = list(&quot;^AR\\s+=\\s+ar\\scq\\s*$&quot;, &quot;AR = ar&quot;, 1L),
-  &quot;src/cwb/definitions.mk&quot; = list(&quot;(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)&quot;, &quot;# \\1&quot;, 1L)
-)
-
-for (i in 1L:length(replace)){
-  fname &lt;- path(repodir, names(replace)[[i]])
-  
-  message(
-    sprintf(
-      &quot;file: %s | regex: %s | match: %d | replacement: %s ... &quot;,
-      fname,
-      replace[[i]][[1]],
-      replace[[i]][[3]],
-      paste(replace[[i]][[2]], collapse = &quot;///&quot;)
-    ),
-    appendLF = FALSE
-  )
-  
-  if (!file.exists(fname)){
-    message(&quot;FAIL - file does not exist&quot;)
-    next
-  }
-  
-  code &lt;- readLines(fname)
-  position &lt;- grep(pattern = replace[[i]][[1]], code)[ replace[[i]][[3]] ]
-  if (!is.na(position)){
-    code[position] &lt;- gsub(replace[[i]][1], replace[[i]][2], code[position])
-    writeLines(text = code, con = fname)
-    message(&quot;OK&quot;)
-  } else {
-    message(&quot;FAIL - no match&quot;)
-  }
-}</code></pre>
-<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: (\s+)int\sppos,\sbpos,\sdollar,\srpos; | match: 1 | replacement: \1int ppos, bpos, rpos; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)dollar = 0; | match: 1 | replacement: \1/* dollar = 0; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)dollar = ppos;\s | match: 1 | replacement: \1/* dollar = ppos; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)if\s\(STREQ\(rname,\s&quot;HOME&quot;\)\) | match: 1 | replacement: \1if (strcmp(rname, &quot;HOME&quot;) == 0) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;APATH&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;APATH&quot;) == 0) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/attributes.c | regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;ANAME&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;ANAME&quot;) == 0) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\sregex_result,\sidx,\si,\slen,\slexsize; | match: 1 | replacement: \1int idx, i, lexsize; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\soptimised,\sgrain_match; | match: 1 | replacement: \1int optimised; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)char\s\*word,\s\*preprocessed_string; | match: 1 | replacement: \1char *word; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\soff_start,\soff_end; | match: 1 | replacement: \1int off_start; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)char\s\*p; | match: 1 | replacement: \1/* char *p; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)int\si; | match: 3 | replacement: \1/* int i; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)DynCallResult\sarg; | match: 1 | replacement: \1/* DynCallResult arg; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)arg\s=\sargs\[argnum\]; | match: 1 | replacement: \1/* arg = args[argnum]; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)fgets\(call,\sCL_MAX_LINE_LENGTH,\spipe\); | match: 1 | replacement: \1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf(&quot;fgets failure&quot;); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cdaccess.c | regex: ^(\s*)off_end\s=\sntohl\(lexidx_data\[idx\s\+\s1\]\)\s-\s1; | match: 1 | replacement: \1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: (\s*)\*\s@param\sclass\s+The\sclass\s+to\scheck\. | match: 2 | replacement: \1* @param obj  The class to check. ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: (\s*)\*\s@param\sclass\s+The\sclass\s+to\scheck\. | match: 1 | replacement: \1* @param obj  The class to check. ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)return\smember_of_class_i\(map,\sclass,\sid\); | match: 1 | replacement: \1return member_of_class_i(map, obj, id); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)SingleMapping\sclass, | match: 2 | replacement: \1SingleMapping obj, ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)SingleMapping\sclass, | match: 1 | replacement: \1SingleMapping obj, ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)class-&gt;tokens, | match: 1 | replacement: \1obj-&gt;tokens, ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c | regex: ^(\s+)class-&gt;nr_tokens, | match: 1 | replacement: \1obj-&gt;nr_tokens, ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.h | regex: ^(\s+)SingleMapping\sclass, | match: 2 | replacement: \1SingleMapping obj, ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.h | regex: ^(\s+)SingleMapping\sclass, | match: 1 | replacement: \1SingleMapping obj, ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/makecomps.c | regex: ^(\s*)char\serrmsg\[CL_MAX_LINE_LENGTH\]; | match: 1 | replacement: /* char errmsg[CL_MAX_LINE_LENGTH]; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^(\s*)cl_ngram_hash_entry\sentry,\stemp; | match: 1 | replacement: \1cl_ngram_hash_entry entry; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ngram-hash.c | regex: ^(\s*)temp\s=\sentry; | match: 1 | replacement: \1/* temp = entry; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/regopt.c | regex: ^(\s*)if\s\(ch\s&gt;=\s32\s&amp;\sch\s&lt;\s127\) | match: 1 | replacement: \1if ((ch &gt;= 32) &amp; (ch &lt; 127)) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/storage.c | regex: ^(\s+)write\(fd,\s&amp;fd,\ssizeof\(int\)\); | match: 1 | replacement: \1ssize_t success = write(fd, &amp;fd, sizeof(int)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;pa_ref\.delete\)\s\{ | match: 2 | replacement: \1if (ctptr-&gt;pa_ref.del) { ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;pa_ref\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;pa_ref.del) { ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;sa_ref\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;sa_ref.del) { ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)if\s\(ctptr-&gt;idlist\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;idlist.del) { ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)int\ssmallest_col,\scorpus_size; | match: 1 | replacement: \1int smallest_col; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)corpus_size\s=\sevalenv-&gt;query_corpus-&gt;mother_size; | match: 1 | replacement: \1/* corpus_size = evalenv-&gt;query_corpus-&gt;mother_size; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.c | regex: ^(\s*)assert\(col-&gt;type\s=\stabular\); | match: 1 | replacement: \1assert((col-&gt;type = tabular)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.h | regex: ^(\s*)int(\s+)delete; | match: 3 | replacement: \1int\2del; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.h | regex: ^(\s*)int(\s+)delete; | match: 2 | replacement: \1int\2del; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/eval.h | regex: ^(\s*)int(\s+)delete; | match: 1 | replacement: \1int\2del; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^(.*?)\s*/\*\s\(source\sID,\starget\sID)\s*\*/ | match: 1 | replacement: \1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^(.*?)\s*/\*\smodifies\sGroup\sobject\sin\splace\sand\sreturns\spointer\s\*/ | match: 1 | replacement: \1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/groups.c | regex: ^(\s*)(if\s\(UseExternalGrouping\s&amp;&amp;\s\!insecure\s&amp;&amp;\s\!\(source_is_struc\s\|\|\starget_is_struc\s\|\|\sis_grouped\)\)) | match: 1 | replacement: \1/* \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.c | regex: ^(.*?)\s*/\*\swill\sexit\son\sint\soverflow\s\*/ | match: 1 | replacement: \1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.h | regex: (\s*int\sis_prime\(int\sn\);) | match: 1 | replacement: /* \1 */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.h | regex: ^(\s*int\sfind_prime\(int\sn\);) | match: 1 | replacement: /* \1 */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/hash.h | regex: ^(\s*unsigned\sint\shash_string\(char\s\*s\);) | match: 1 | replacement: /* \1 */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)char\s\*s; | match: 1 | replacement: \1/* char *s; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)AttributeList\s\*strucs; | match: 1 | replacement: \1/* AttributeList *strucs; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/html-print.c | regex: ^(\s*)strucs\s=\scd-&gt;printStructureTags; | match: 1 | replacement: \1/* strucs = cd-&gt;printStructureTags; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/latex-print.c | regex: ^(\s*)char\s\*s; | match: 1 | replacement: \1/* char *s; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/latex-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/latex-print.c | regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/options.h | regex: ^(\s*)enum\s_which_app\s\{\sundef,\scqp,\scqpcl,\scqpserver}\swhich_app; | match: 1 | replacement: \1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^(.*?)\s*/\*\sholds\s&quot;cqpt\.\$\$&quot;,\sso\s64\schars\sis\splenty\sof\sheadroom\s\*/ | match: 1 | replacement: \1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^(.*?)(\s*)/\*\s&quot;cqpt\.\$\$&quot;\s\*/ | match: 1 | replacement: \1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.c | regex: ^(.*?)\s/\*\sstring\sis\sallocated\sby\stempnam\(\),\sneeds\sto\sbe\sfree&#39;d\sbelow\s\*/ | match: 1 | replacement: \1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/output.h | regex: ^(\s*)FILE\s\*open_temporary_file\(char\s\*tmp_name_buffer); | match: 1 | replacement: \1/* FILE *open_temporary_file(char *tmp_name_buffer); */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)c-&gt;idlist\.delete\s=\sleft-&gt;pa_ref\.delete; | match: 1 | replacement: \1c-&gt;idlist.del = left-&gt;pa_ref.del; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)left-&gt;pa_ref\.delete\s=\s0; | match: 1 | replacement: \1left-&gt;pa_ref.del = 0; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)node-&gt;idlist\.delete\s=\s0; | match: 1 | replacement: \1node-&gt;idlist.del = 0; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;idlist\.delete\s=\sleft-&gt;pa_ref\.delete; | match: 1 | replacement: \1res-&gt;idlist.del = left-&gt;pa_ref.del; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;pa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;pa_ref.del = auto_delete; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;sa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;sa_ref.del = auto_delete; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;pa_ref\.delete\s=\s0; | match: 1 | replacement: \1res-&gt;pa_ref.del = 0; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;pa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;pa_ref.del = auto_delete; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parse_actions.c | regex: ^(\s*)res-&gt;sa_ref\.delete\s=\s0; | match: 1 | replacement: \1res-&gt;sa_ref.del = 0; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y | regex: ^(\s*)int\sok; | match: 3 | replacement: \1int ok __attribute__((unused)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y | regex: ^(\s*)int\sok; | match: 2 | replacement: \1int ok __attribute__((unused)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.y | regex: ^(\s*)ok\s=\sSortSubcorpus\(\$2,\s\$3,\s\(\$4\s&gt;=\s1\)\s\?\s\$4\s:\s1,\s&amp;\(\$5\)\); | match: 1 | replacement: \1SortSubcorpus($2, $3, ($4 &gt;= 1) ? $4 : 1, &amp;($5)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)line\s=\s-1;(\s*)\s/\*\swill\sindicate\ssort\sfailure\sbelow\sif\stext_size\s==\s0\s\*/ | match: 1 | replacement: \1line = -1;\2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)\}(\s)/\*\send\sfor\seach\stoken\s\*/ | match: 1 | replacement: \1}\2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)line\s=\s-1;(\s*)/\*\swill\sindicate\sfailure\sof\sexternal\ssort\scommand\s*\*/ | match: 1 | replacement: \1line = -1;\2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)break;\s*/\*\sabort\s\*/ | match: 1 | replacement: \1break; ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^(\s*)ok\s=\sSortExternally\(\); | match: 1 | replacement: \1/* ok = SortExternally(); */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/regex2dfa.c | regex: ^(\s*)int\signore_value; | match: 1 | replacement: \1int ignore_value __attribute__((unused)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/sgml-print.c | regex: ^(\s*)AttributeList\s\*strucs; | match: 1 | replacement: \1/* AttributeList *strucs; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/sgml-print.c | regex: ^(\s*)strucs\s=\scd-&gt;printStructureTags; | match: 1 | replacement: \1/* strucs = cd-&gt;printStructureTags; */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^(\s*)(static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\);).*?$ | match: 1 | replacement: \1/* \2 */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | replacement: static void yyunput (int c, register char * yy_bp ) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^(\s)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2 ... FAIL - no match
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^(\s*)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\scast\sfor\s8-bit\schar&#39;s\s\*/ | match: 1 | replacement:  ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: \s*/\*\spreserve\scregtext\s\*/ | match: 1 | replacement:  ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\sifndef YY_NO_INPUT\s\*/ | match: 1 | replacement:  ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/lex.yy.c | regex: ^\s+static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\); | match: 1 | replacement:   /*  static void yyunput (int c,char *buf_ptr  ); */ ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.tab.c | regex: ^(\s*)cqpmessage\(Error,\s&quot;CQP\sSyntax\sError:.*?&quot;,\ss,\sQueryBuffer\); | match: 1 | replacement: \1cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/parser.tab.c | regex: ^(\s+)int\sok; | match: 4 | replacement: \1int ok __attribute__((unused)); ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^TOP\s=\s\$\(shell\spwd\)/\.\. | match: 1 | replacement: TOP = $(R_PACKAGE_SOURCE) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^(\s+)endian.h | match: 1 | replacement: \1endian2.h ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^(\s+)\$\(AR\)\s | match: 1 | replacement: \1$(AR) cq  ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: ^TOP\s=\s\$\(shell\spwd\)/\.\. | match: 1 | replacement: TOP = $(R_PACKAGE_SOURCE) ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: all:\s\$\(PROGRAMS\) | match: 1 | replacement: all: libcqp.a ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-64 | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-port-core2 | regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-universal | regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin-brew | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux-opteron | regex: ^(CFLAGS\s*=.*?)\s+-march=opteron\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/linux | regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin | regex: ^READLINE_DEFINES\s:=.*?$ | match: 1 | replacement: READLINE_DEFINES = ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/darwin | regex: ^READLINE_LIBS\s:=.*?$ | match: 1 | replacement: READLINE_LIBS = ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/config/platform/unix | regex: ^AR\s+=\s+ar\scq\s*$ | match: 1 | replacement: AR = ar ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/definitions.mk | regex: (\$\(error\sConfiguration\svariable\sRANLIB) | match: 1 | replacement: # \1 ... OK</code></pre>
-<pre class="r"><code>remove_lines &lt;- list(
-  &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 3),
-  &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 2),
-  &quot;src/cwb/cl/corpus.c&quot; = list(&quot;(\\s+)stderr,&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^\\s*/\\*\\suses\\ssettings\\sfrom\\sstatic\\ssrt_\\*\\svariables\\s\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;^\\s*/\\*\\sdetermine\\sstart\\sand\\send\\sposition\\sof\\ssort\\sinterval\\sfor\\sthis\\smatch\\s\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\sadjust\\ssort\\sboundaries.*?\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/*\\sswap\\sstart\\sand\\send\\sof\\sinterval.*?\\*/&quot;, 1),
-  
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\sdetermine\\ssort\\sdirection\\s\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\show\\smany\\stokens\\sto\\sprint\\s\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\swhen\\susing\\sflags,\\sprint\\snormalised\\stoken\\ssequence.*?\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\sprint\\ssequence\\sof\\stokens\\sin\\ssort\\sinterval\\s\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\snow,\\sexecute\\sthe\\sexternal\\ssort\\scommand.*?\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\srun\\ssort\\scmd\\sand\\sread\\sfrom\\spipe\\s\\*/&quot;, 1),
-  &quot;src/cwb/cqp/ranges.c&quot; = list(&quot;/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/&quot;, 1),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s/\\*\\sundo\\seffects\\sof\\ssetting\\sup\\scregtext\\s\\*/&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\sneed\\sto\\sshift\\sthings\\sup\\sto\\smake\\sroom\\s\\*/&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/&quot;, 1L),
-  &quot;src/cwb/cl/lex.creg.c&quot; = list(&quot;^\\s*/\\*FALLTHROUGH\\*/\\s*$&quot;, 1L),
-  &quot;src/cwb/cl/Makefile&quot; = list(&quot;^\\s+\\$\\(RANLIB\\)&quot;, 1L),
-  
-  &quot;src/cwb/cqp/Makefile&quot; = list(&quot;\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h&quot;, 1L)
-  
-)
-
-for (i in 1L:length(remove_lines)){
-  fname &lt;- path(repodir, names(remove_lines)[[i]])
-  
-  message(
-    sprintf(
-      &quot;file: %s | regex: %s | match: %d ... &quot;,
-      fname,
-      remove_lines[[i]][[1]],
-      remove_lines[[i]][[2]]
-    ),
-    appendLF = FALSE
-  )
-  
-  code &lt;- readLines(fname)
-  position &lt;- grep(pattern = remove_lines[[i]][[1]], code)[ remove_lines[[i]][[2]] ]
-  if (!is.na(position)){
-    code &lt;- code[-position]
-    writeLines(text = code, con = fname)
-    message(&quot;OK&quot;)
-  } else {
-    message(&quot;FAIL - no match&quot;)
-  }
-}</code></pre>
-<pre><code>## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: (\s+)stderr, | match: 3 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: (\s+)stderr, | match: 2 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/corpus.c | regex: (\s+)stderr, | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^\s*/\*\suses\ssettings\sfrom\sstatic\ssrt_\*\svariables\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: ^\s*/\*\sdetermine\sstart\sand\send\sposition\sof\ssort\sinterval\sfor\sthis\smatch\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\sadjust\ssort\sboundaries.*?\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /*\sswap\sstart\sand\send\sof\sinterval.*?\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\sdetermine\ssort\sdirection\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\show\smany\stokens\sto\sprint\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\swhen\susing\sflags,\sprint\snormalised\stoken\ssequence.*?\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\sprint\ssequence\sof\stokens\sin\ssort\sinterval\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\snow,\sexecute\sthe\sexternal\ssort\scommand.*?\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\srun\ssort\scmd\sand\sread\sfrom\spipe\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/ranges.c | regex: /\*\snow\swe\sshould\shave\sread\sexactly.*?\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s/\*\sundo\seffects\sof\ssetting\sup\scregtext\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\sneed\sto\sshift\sthings\sup\sto\smake\sroom\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: /\*\s\+2\sfor\sEOB\schars\.\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*/\*\sThis\swas\sreally\sa\sNUL\.\s\*/ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/lex.creg.c | regex: ^\s*/\*FALLTHROUGH\*/\s*$ | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/Makefile | regex: ^\s+\$\(RANLIB\) | match: 1 ... OK
-## file: /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cqp/Makefile | regex: \s+-\$\(RM\)\slex\.yy\.c\sparser\.tab\.c\sparser\.tab\.h | match: 1 ... OK</code></pre>
-<pre class="r"><code>extern &lt;- list(
-  
-  &quot;src/cwb/cqp/corpmanag.c&quot; = c(
-    &quot;CorpusList *corpuslist;&quot;
-  ),
-  
-  &quot;src/cwb/cqp/corpmanag.h&quot; = c(
-    &quot;CorpusList *current_corpus;&quot;,
-    &quot;CorpusList *corpuslist;&quot;
-  ),
-  
-  &quot;src/cwb/cqp/cqp.h&quot; = c(
-    &quot;CYCtype LastExpression;&quot;,
-    &quot;int exit_cqp;&quot;,
-    &quot;char *cqp_input_string;&quot;,
-    &quot;int cqp_input_string_position;&quot;,
-    &quot;int initialize_cqp(int argc, char **argv);&quot;,
-    &quot;int cqp_parse_file(FILE *fd, int exit_on_parse_errors);&quot;,
-    &quot;int cqp_parse_string(char *s);&quot;,
-    &quot;int EvaluationIsRunning;&quot;,
-    &quot;int setInterruptCallback(InterruptCheckProc f);&quot;,
-    &quot;void CheckForInterrupts(void);&quot;,
-    &quot;int signal_handler_is_installed;&quot;,
-    &quot;void install_signal_handler(void);&quot;
-  ),
-  
-  &quot;src/cwb/cqp/eval.h&quot; = c(
-    &quot;int eep;&quot;,
-    &quot;EvalEnvironment Environment[MAXENVIRONMENT];&quot;,
-    &quot;EEP CurEnv, evalenv;&quot;
-  ),
-  
-  &quot;src/cwb/cqp/options.h&quot; = c(
-    &quot;int insecure;&quot;,
-    &quot;int inhibit_activation;&quot;,
-    &quot;int parseonly;&quot;,
-    &quot;int verbose_parser;&quot;,
-    &quot;int show_symtab;&quot;,
-    &quot;int show_gconstraints;&quot;,
-    &quot;int show_evaltree;&quot;,
-    &quot;int show_patlist;&quot;,
-    &quot;int show_compdfa;&quot;,
-    &quot;int show_dfa;&quot;,
-    &quot;int symtab_debug;&quot;,
-    &quot;int parser_debug;&quot;,
-    &quot;int tree_debug;&quot;,
-    &quot;int eval_debug;&quot;,
-    &quot;int search_debug;&quot;,
-    &quot;int initial_matchlist_debug;&quot;,
-    &quot;int debug_simulation;&quot;,
-    &quot;int activate_cl_debug;&quot;,
-    &quot;int server_log;&quot;,
-    &quot;int server_debug;&quot;,
-    &quot;int snoop;&quot;,
-    &quot;int private_server;&quot;,
-    &quot;int server_port;&quot;,
-    &quot;int localhost;&quot;,
-    &quot;int server_quit;&quot;,
-    &quot;int query_lock;&quot;,
-    &quot;int query_lock_violation;&quot;,
-    &quot;int enable_macros;&quot;,
-    &quot;int macro_debug;&quot;,
-    &quot;int hard_boundary;&quot;,
-    &quot;int hard_cut;&quot;,
-    &quot;int subquery;&quot;,
-    &quot;char *def_unbr_attr;&quot;,
-    &quot;int query_optimize;&quot;,
-    &quot;enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;&quot;,
-    &quot;char *matching_strategy_name;&quot;,
-    &quot;int strict_regions;&quot;,
-    &quot;int use_readline;&quot;,
-    &quot;int highlighting;&quot;,
-    &quot;int paging;&quot;,
-    &quot;char *pager;&quot;,
-    &quot;char *tested_pager;&quot;,
-    &quot;char *less_charset_variable;&quot;,
-    &quot;int use_colour;&quot;,
-    &quot;int progress_bar;&quot;,
-    &quot;int pretty_print;&quot;,
-    &quot;int autoshow;&quot;,
-    &quot;int timing;&quot;,
-    &quot;int show_tag_attributes;&quot;,
-    &quot;int show_targets;&quot;,
-    &quot;char *printModeString;&quot;,
-    &quot;char *printModeOptions;&quot;,
-    &quot;int printNrMatches;&quot;,
-    &quot;char *printStructure;&quot;,
-    &quot;char *left_delimiter;&quot;,
-    &quot;char *right_delimiter;&quot;,
-    &quot;char *registry;&quot;,
-    &quot;char *LOCAL_CORP_PATH;&quot;,
-    &quot;int auto_save;&quot;,
-    &quot;int save_on_exit;&quot;,
-    &quot;char *cqp_init_file;&quot;,
-    &quot;char *macro_init_file;&quot;,
-    &quot;char *cqp_history_file;&quot;,
-    &quot;int write_history_file;&quot;,
-    &quot;int batchmode;&quot;,
-    &quot;int silent;&quot;,
-    &quot;char *default_corpus;&quot;,
-    &quot;char *query_string;&quot;,
-    &quot;int UseExternalSorting;&quot;,
-    &quot;char *ExternalSortingCommand;&quot;,
-    &quot;int UseExternalGrouping;&quot;,
-    &quot;char *ExternalGroupingCommand;&quot;,
-    &quot;int user_level;&quot;,
-    &quot;int rangeoutput;&quot;,
-    &quot;int child_process;&quot;,
-    &quot;ContextDescriptor CD;&quot;,
-    &quot;int handle_sigpipe;&quot;,
-    &quot;char *progname;&quot;,
-    &quot;char *licensee;&quot;,
-    &quot;FILE *batchfd;&quot;
-  )
-)
-
-lapply(
-  names(extern),
-  function(f){
-    fname &lt;- path(repodir, f)
-    
-    if (!file.exists(fname)){
-      message(sprintf(&quot;FAIL - file %s does not exist&quot;, f))
-      next
-    }
-    
-    code &lt;- readLines(fname)
-    for (ext in extern[[f]]){
-      matches &lt;- which(startsWith(code, ext))
-      if (length(matches) &gt; 0L){
-        for (position in matches){
-          code[position] &lt;- paste(&quot;extern&quot;, code[position], sep = &quot; &quot;)
-        }
-        message(sprintf(&quot;var to extern: %s | n_matches: %d&quot;, ext, length(matches)))
-      } else {
-        message(&quot;FAIL - no matches for var: &quot;, ext)
-      }
-    }
-    writeLines(text = code, con = fname)
-  }
-)</code></pre>
-<pre><code>## var to extern: CorpusList *corpuslist; | n_matches: 1</code></pre>
-<pre><code>## var to extern: CorpusList *current_corpus; | n_matches: 1</code></pre>
-<pre><code>## var to extern: CorpusList *corpuslist; | n_matches: 1</code></pre>
-<pre><code>## var to extern: CYCtype LastExpression; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int exit_cqp; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *cqp_input_string; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int cqp_input_string_position; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int initialize_cqp(int argc, char **argv); | n_matches: 1</code></pre>
-<pre><code>## var to extern: int cqp_parse_file(FILE *fd, int exit_on_parse_errors); | n_matches: 1</code></pre>
-<pre><code>## var to extern: int cqp_parse_string(char *s); | n_matches: 1</code></pre>
-<pre><code>## var to extern: int EvaluationIsRunning; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int setInterruptCallback(InterruptCheckProc f); | n_matches: 1</code></pre>
-<pre><code>## var to extern: void CheckForInterrupts(void); | n_matches: 1</code></pre>
-<pre><code>## var to extern: int signal_handler_is_installed; | n_matches: 1</code></pre>
-<pre><code>## var to extern: void install_signal_handler(void); | n_matches: 1</code></pre>
-<pre><code>## var to extern: int eep; | n_matches: 1</code></pre>
-<pre><code>## var to extern: EvalEnvironment Environment[MAXENVIRONMENT]; | n_matches: 1</code></pre>
-<pre><code>## var to extern: EEP CurEnv, evalenv; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int insecure; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int inhibit_activation; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int parseonly; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int verbose_parser; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_symtab; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_gconstraints; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_evaltree; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_patlist; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_compdfa; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_dfa; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int symtab_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int parser_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int tree_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int eval_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int search_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int initial_matchlist_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int debug_simulation; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int activate_cl_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int server_log; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int server_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int snoop; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int private_server; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int server_port; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int localhost; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int server_quit; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int query_lock; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int query_lock_violation; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int enable_macros; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int macro_debug; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int hard_boundary; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int hard_cut; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int subquery; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *def_unbr_attr; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int query_optimize; | n_matches: 1</code></pre>
-<pre><code>## var to extern: enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *matching_strategy_name; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int strict_regions; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int use_readline; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int highlighting; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int paging; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *pager; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *tested_pager; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *less_charset_variable; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int use_colour; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int progress_bar; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int pretty_print; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int autoshow; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int timing; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_tag_attributes; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int show_targets; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *printModeString; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *printModeOptions; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int printNrMatches; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *printStructure; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *left_delimiter; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *right_delimiter; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *registry; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *LOCAL_CORP_PATH; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int auto_save; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int save_on_exit; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *cqp_init_file; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *macro_init_file; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *cqp_history_file; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int write_history_file; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int batchmode; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int silent; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *default_corpus; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *query_string; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int UseExternalSorting; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *ExternalSortingCommand; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int UseExternalGrouping; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *ExternalGroupingCommand; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int user_level; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int rangeoutput; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int child_process; | n_matches: 1</code></pre>
-<pre><code>## var to extern: ContextDescriptor CD; | n_matches: 1</code></pre>
-<pre><code>## var to extern: int handle_sigpipe; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *progname; | n_matches: 1</code></pre>
-<pre><code>## var to extern: char *licensee; | n_matches: 1</code></pre>
-<pre><code>## var to extern: FILE *batchfd; | n_matches: 1</code></pre>
-<pre><code>## [[1]]
-## NULL
-## 
-## [[2]]
-## NULL
-## 
-## [[3]]
-## NULL
-## 
-## [[4]]
-## NULL
-## 
-## [[5]]
-## NULL</code></pre>
+## Action to perform: replace
+## regex: all:\s\$\(PROGRAMS\) | match: 1 | replacement: all: libcqp.a ... OK
+## Action to perform: remove_lines
+## regex: \s+-\$\(RM\)\slex\.yy\.c\sparser\.tab\.c\sparser\.tab\.h | match: 1 ... OK
+## File: src/cwb/cqp/hash.c
+## Action to perform: insert_before
+## regex: ^\s*int\s*$ | match: 1 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: ^\s*int\s*$ | match: 2 | insertion: /* ... OK
+## Action to perform: insert_before
+## regex: ^unsigned\sint\s*$ | match: 1 | insertion: /* ... OK
+## Action to perform: insert_after
+## regex: ^\s*\}\s*$ | match: 1 | insertion: */ ... OK
+## Action to perform: insert_after
+## regex: ^\s*\}\s*$ | match: 2 | insertion: */ ... OK
+## Action to perform: insert_after
+## regex: ^\s*\}\s*$ | match: 3 | insertion: */ ... OK
+## Action to perform: replace
+## regex: ^(.*?)\s*/\*\swill\sexit\son\sint\soverflow\s\*/ | match: 1 | replacement: \1 ... OK
+## File: src/cwb/cqp/macro.c
+## Action to perform: insert_before
+## regex: #include\s&quot;hash\.h&quot; | match: 1 | insertion: #include &quot;../cl/lexhash.h&quot; /* newly added by AB */ ... OK
+## File: src/cwb/cqp/eval.c
+## Action to perform: replace
+## regex: ^(\s*)if\s\(ctptr-&gt;pa_ref\.delete\)\s\{ | match: 2 | replacement: \1if (ctptr-&gt;pa_ref.del) { ... OK
+## Action to perform: replace
+## regex: ^(\s*)if\s\(ctptr-&gt;pa_ref\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;pa_ref.del) { ... OK
+## Action to perform: replace
+## regex: ^(\s*)if\s\(ctptr-&gt;sa_ref\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;sa_ref.del) { ... OK
+## Action to perform: replace
+## regex: ^(\s*)if\s\(ctptr-&gt;idlist\.delete\)\s\{ | match: 1 | replacement: \1if (ctptr-&gt;idlist.del) { ... OK
+## Action to perform: replace
+## regex: ^(\s*)int\ssmallest_col,\scorpus_size; | match: 1 | replacement: \1int smallest_col; ... OK
+## Action to perform: replace
+## regex: ^(\s*)corpus_size\s=\sevalenv-&gt;query_corpus-&gt;mother_size; | match: 1 | replacement: \1/* corpus_size = evalenv-&gt;query_corpus-&gt;mother_size; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)assert\(col-&gt;type\s=\stabular\); | match: 1 | replacement: \1assert((col-&gt;type = tabular)); ... OK
+## File: src/cwb/cqp/eval.h
+## Action to perform: replace
+## regex: ^(\s*)int(\s+)delete; | match: 3 | replacement: \1int\2del; ... OK
+## Action to perform: replace
+## regex: ^(\s*)int(\s+)delete; | match: 2 | replacement: \1int\2del; ... OK
+## Action to perform: replace
+## regex: ^(\s*)int(\s+)delete; | match: 1 | replacement: \1int\2del; ... OK
+## Action to perform: extern
+## var to extern: int eep; | n_matches: 1
+## var to extern: EvalEnvironment Environment[MAXENVIRONMENT]; | n_matches: 1
+## var to extern: EEP CurEnv, evalenv; | n_matches: 1
+## File: src/cwb/cqp/hash.h
+## Action to perform: replace
+## regex: (\s*int\sis_prime\(int\sn\);) | match: 1 | replacement: /* \1 */ ... OK
+## Action to perform: replace
+## regex: ^(\s*int\sfind_prime\(int\sn\);) | match: 1 | replacement: /* \1 */ ... OK
+## Action to perform: replace
+## regex: ^(\s*unsigned\sint\shash_string\(char\s\*s\);) | match: 1 | replacement: /* \1 */ ... OK
+## File: src/cwb/cqp/html-print.c
+## Action to perform: replace
+## regex: ^(\s*)char\s\*s; | match: 1 | replacement: \1/* char *s; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)AttributeList\s\*strucs; | match: 1 | replacement: \1/* AttributeList *strucs; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)strucs\s=\scd-&gt;printStructureTags; | match: 1 | replacement: \1/* strucs = cd-&gt;printStructureTags; */ ... OK
+## File: src/cwb/cqp/latex-print.c
+## Action to perform: replace
+## regex: ^(\s*)char\s\*s; | match: 1 | replacement: \1/* char *s; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)s\s=\s&quot;error&quot;; | match: 1 | replacement: \1/* s = &quot;error&quot;; */ ... OK
+## File: src/cwb/cqp/options.h
+## Action to perform: replace
+## regex: ^(\s*)enum\s_which_app\s\{\sundef,\scqp,\scqpcl,\scqpserver}\swhich_app; | match: 1 | replacement: \1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app; ... OK
+## Action to perform: extern
+## var to extern: int insecure; | n_matches: 1
+## var to extern: int inhibit_activation; | n_matches: 1
+## var to extern: int parseonly; | n_matches: 1
+## var to extern: int verbose_parser; | n_matches: 1
+## var to extern: int show_symtab; | n_matches: 1
+## var to extern: int show_gconstraints; | n_matches: 1
+## var to extern: int show_evaltree; | n_matches: 1
+## var to extern: int show_patlist; | n_matches: 1
+## var to extern: int show_compdfa; | n_matches: 1
+## var to extern: int show_dfa; | n_matches: 1
+## var to extern: int symtab_debug; | n_matches: 1
+## var to extern: int parser_debug; | n_matches: 1
+## var to extern: int tree_debug; | n_matches: 1
+## var to extern: int eval_debug; | n_matches: 1
+## var to extern: int search_debug; | n_matches: 1
+## var to extern: int initial_matchlist_debug; | n_matches: 1
+## var to extern: int debug_simulation; | n_matches: 1
+## var to extern: int activate_cl_debug; | n_matches: 1
+## var to extern: int server_log; | n_matches: 1
+## var to extern: int server_debug; | n_matches: 1
+## var to extern: int snoop; | n_matches: 1
+## var to extern: int private_server; | n_matches: 1
+## var to extern: int server_port; | n_matches: 1
+## var to extern: int localhost; | n_matches: 1
+## var to extern: int server_quit; | n_matches: 1
+## var to extern: int query_lock; | n_matches: 1
+## var to extern: int query_lock_violation; | n_matches: 1
+## var to extern: int enable_macros; | n_matches: 1
+## var to extern: int macro_debug; | n_matches: 1
+## var to extern: int hard_boundary; | n_matches: 1
+## var to extern: int hard_cut; | n_matches: 1
+## var to extern: int subquery; | n_matches: 1
+## var to extern: char *def_unbr_attr; | n_matches: 1
+## var to extern: int query_optimize; | n_matches: 1
+## var to extern: enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy; | n_matches: 1
+## var to extern: char *matching_strategy_name; | n_matches: 1
+## var to extern: int strict_regions; | n_matches: 1
+## var to extern: int use_readline; | n_matches: 1
+## var to extern: int highlighting; | n_matches: 1
+## var to extern: int paging; | n_matches: 1
+## var to extern: char *pager; | n_matches: 1
+## var to extern: char *tested_pager; | n_matches: 1
+## var to extern: char *less_charset_variable; | n_matches: 1
+## var to extern: int use_colour; | n_matches: 1
+## var to extern: int progress_bar; | n_matches: 1
+## var to extern: int pretty_print; | n_matches: 1
+## var to extern: int autoshow; | n_matches: 1
+## var to extern: int timing; | n_matches: 1
+## var to extern: int show_tag_attributes; | n_matches: 1
+## var to extern: int show_targets; | n_matches: 1
+## var to extern: char *printModeString; | n_matches: 1
+## var to extern: char *printModeOptions; | n_matches: 1
+## var to extern: int printNrMatches; | n_matches: 1
+## var to extern: char *printStructure; | n_matches: 1
+## var to extern: char *left_delimiter; | n_matches: 1
+## var to extern: char *right_delimiter; | n_matches: 1
+## var to extern: char *registry; | n_matches: 1
+## var to extern: char *LOCAL_CORP_PATH; | n_matches: 1
+## var to extern: int auto_save; | n_matches: 1
+## var to extern: int save_on_exit; | n_matches: 1
+## var to extern: char *cqp_init_file; | n_matches: 1
+## var to extern: char *macro_init_file; | n_matches: 1
+## var to extern: char *cqp_history_file; | n_matches: 1
+## var to extern: int write_history_file; | n_matches: 1
+## var to extern: int batchmode; | n_matches: 1
+## var to extern: int silent; | n_matches: 1
+## var to extern: char *default_corpus; | n_matches: 1
+## var to extern: char *query_string; | n_matches: 1
+## var to extern: int UseExternalSorting; | n_matches: 1
+## var to extern: char *ExternalSortingCommand; | n_matches: 1
+## var to extern: int UseExternalGrouping; | n_matches: 1
+## var to extern: char *ExternalGroupingCommand; | n_matches: 1
+## var to extern: int user_level; | n_matches: 1
+## var to extern: int rangeoutput; | n_matches: 1
+## var to extern: int child_process; | n_matches: 1
+## var to extern: ContextDescriptor CD; | n_matches: 1
+## var to extern: int handle_sigpipe; | n_matches: 1
+## var to extern: char *progname; | n_matches: 1
+## var to extern: char *licensee; | n_matches: 1
+## var to extern: FILE *batchfd; | n_matches: 1
+## File: src/cwb/cqp/output.h
+## Action to perform: replace
+## regex: ^(\s*)FILE\s\*open_temporary_file\(char\s\*tmp_name_buffer); | match: 1 | replacement: \1/* FILE *open_temporary_file(char *tmp_name_buffer); */ ... OK
+## File: src/cwb/cqp/parse_actions.c
+## Action to perform: replace
+## regex: ^(\s*)c-&gt;idlist\.delete\s=\sleft-&gt;pa_ref\.delete; | match: 1 | replacement: \1c-&gt;idlist.del = left-&gt;pa_ref.del; ... OK
+## Action to perform: replace
+## regex: ^(\s*)left-&gt;pa_ref\.delete\s=\s0; | match: 1 | replacement: \1left-&gt;pa_ref.del = 0; ... OK
+## Action to perform: replace
+## regex: ^(\s*)node-&gt;idlist\.delete\s=\s0; | match: 1 | replacement: \1node-&gt;idlist.del = 0; ... OK
+## Action to perform: replace
+## regex: ^(\s*)res-&gt;idlist\.delete\s=\sleft-&gt;pa_ref\.delete; | match: 1 | replacement: \1res-&gt;idlist.del = left-&gt;pa_ref.del; ... OK
+## Action to perform: replace
+## regex: ^(\s*)res-&gt;pa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;pa_ref.del = auto_delete; ... OK
+## Action to perform: replace
+## regex: ^(\s*)res-&gt;sa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;sa_ref.del = auto_delete; ... OK
+## Action to perform: replace
+## regex: ^(\s*)res-&gt;pa_ref\.delete\s=\s0; | match: 1 | replacement: \1res-&gt;pa_ref.del = 0; ... OK
+## Action to perform: replace
+## regex: ^(\s*)res-&gt;pa_ref\.delete\s=\sauto_delete; | match: 1 | replacement: \1res-&gt;pa_ref.del = auto_delete; ... OK
+## Action to perform: replace
+## regex: ^(\s*)res-&gt;sa_ref\.delete\s=\s0; | match: 1 | replacement: \1res-&gt;sa_ref.del = 0; ... OK
+## File: src/cwb/cqp/corpmanag.c
+## Action to perform: extern
+## var to extern: CorpusList *corpuslist; | n_matches: 1
+## File: src/cwb/cqp/corpmanag.h
+## Action to perform: extern
+## var to extern: CorpusList *current_corpus; | n_matches: 1
+## var to extern: CorpusList *corpuslist; | n_matches: 1
+## File: src/cwb/cqp/regex2dfa.c
+## Action to perform: replace
+## regex: ^(\s*)int\signore_value; | match: 1 | replacement: \1int ignore_value __attribute__((unused)); ... OK
+## File: src/cwb/cqp/sgml-print.c
+## Action to perform: replace
+## regex: ^(\s*)AttributeList\s\*strucs; | match: 1 | replacement: \1/* AttributeList *strucs; */ ... OK
+## Action to perform: replace
+## regex: ^(\s*)strucs\s=\scd-&gt;printStructureTags; | match: 1 | replacement: \1/* strucs = cd-&gt;printStructureTags; */ ... OK
+## File: src/cwb/cqp/parser.tab.c
+## Action to perform: replace
+## regex: ^(\s*)cqpmessage\(Error,\s&quot;CQP\sSyntax\sError:.*?&quot;,\ss,\sQueryBuffer\); | match: 1 | replacement: \1cqpmessage(Error, &quot;CQP Syntax Error: %s&quot;, s); ... OK
+## Action to perform: replace
+## regex: ^(\s+)int\sok; | match: 4 | replacement: \1int ok __attribute__((unused)); ... OK
+## File: src/cwb/cqp/cqp.h
+## Action to perform: extern
+## var to extern: CYCtype LastExpression; | n_matches: 1
+## var to extern: int exit_cqp; | n_matches: 1
+## var to extern: char *cqp_input_string; | n_matches: 1
+## var to extern: int cqp_input_string_position; | n_matches: 1
+## var to extern: int initialize_cqp(int argc, char **argv); | n_matches: 1
+## var to extern: int cqp_parse_file(FILE *fd, int exit_on_parse_errors); | n_matches: 1
+## var to extern: int cqp_parse_string(char *s); | n_matches: 1
+## var to extern: int EvaluationIsRunning; | n_matches: 1
+## var to extern: int setInterruptCallback(InterruptCheckProc f); | n_matches: 1
+## var to extern: void CheckForInterrupts(void); | n_matches: 1
+## var to extern: int signal_handler_is_installed; | n_matches: 1
+## var to extern: void install_signal_handler(void); | n_matches: 1
+## File: src/cwb/CQi/auth.c
+## Action to perform: insert_before
+## regex: /\*\sdata\sstructures\s\(internal\suse\sonly\)\s\*/ | match: 1 | insertion: void Rprintf(const char *, ...);/// ... OK
+## File: src/cwb/CQi/server.c
+## Action to perform: insert_before
+## regex: ^\/\* | match: 3 | insertion: void Rprintf(const char *, ...);/// ... OK
+## Action to perform: insert_after
+## regex: #include &quot;\.\./cqp/hash\.h&quot; | match: 1 | insertion: #include &quot;../cl/lexhash.h&quot; /* inserted by AB */ ... OK
+## File: src/cwb/CQi/cqpserver.c
+## Action to perform: insert_after
+## regex: #include &quot;\.\./cqp/groups\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...); ... OK
+## File: src/cwb/utils/cwb-makeall.c
+## Action to perform: insert_before
+## regex: /\*\*\sThe\scorpus\swe\sare\sworking\son\s\*/ | match: 1 | insertion: #include &lt;netinet/in.h&gt;/// ... OK
+## File: src/cwb/definitions.mk
+## Action to perform: replace
+## regex: (\$\(error\sConfiguration\svariable\sRANLIB) | match: 1 | replacement: # \1 ... OK
+## File: src/cwb/config/platform/darwin-64
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## File: src/cwb/config/platform/darwin
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match
+## Action to perform: replace
+## regex: ^READLINE_DEFINES\s:=.*?$ | match: 1 | replacement: READLINE_DEFINES = ... OK
+## Action to perform: replace
+## regex: ^READLINE_LIBS\s:=.*?$ | match: 1 | replacement: READLINE_LIBS = ... OK
+## File: src/cwb/config/platform/darwin-port-core2
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## File: src/cwb/config/platform/darwin-universal
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=core2\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## File: src/cwb/config/platform/darwin-brew
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## File: src/cwb/config/platform/linux-opteron
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=opteron\s+(.*?)$ | match: 1 | replacement: \1 \2 ... OK
+## File: src/cwb/config/platform/unix
+## Action to perform: replace
+## regex: ^AR\s+=\s+ar\scq\s*$ | match: 1 | replacement: AR = ar ... OK
+## File: src/cwb/config/platform/linux
+## Action to perform: insert_before
+## regex: ##\sCPU\sarchitecture | match: 1 | insertion: ## require position-independent code///CFLAGS += -fPIC/// ... OK
+## Action to perform: replace
+## regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2 ... FAIL - no match</code></pre>
 <p>Add and commit changes so that we can prepare diffs.</p>
 <pre class="r"><code>point_of_departure &lt;- last_commit(repo)
 git2r::add(repo = repodir, path = &quot;src/cwb/*&quot;)
 commit(repo, message = &quot;CWB patched&quot;)</code></pre>
-<pre><code>## [372e0b4] 2022-01-06: CWB patched</code></pre>
+<pre><code>## [d787b3f] 2022-01-06: CWB patched</code></pre>
 <pre class="r"><code>to_compare &lt;- last_commit(repo)</code></pre>
-</div>
 </div>
 <div id="inspect-diffs" class="section level2">
 <h2>Inspect diffs</h2>
@@ -1177,6 +895,19 @@ git_cmd &lt;- sprintf(&quot;git diff --ignore-space-at-eol %s..%s .&quot;, last_
 result &lt;- system(git_cmd, intern = TRUE)
 gitdiff_cqp &lt;- paste(result, collapse = &quot;\n&quot;)
 cat(gitdiff_cqp)</code></pre>
+<pre><code>## diff --git a/src/cwb/cqp/Makefile b/src/cwb/cqp/Makefile
+## index cf7b289..20e97f7 100644
+## --- a/src/cwb/cqp/Makefile
+## +++ b/src/cwb/cqp/Makefile
+## @@ -21,7 +21,7 @@
+##  
+##  
+##  ## Read configuration settings and standard definitions
+## -TOP = $(R_PACKAGE_SOURCE)
+## +TOP = $(shell pwd)/..
+##  include $(TOP)/config.mk
+##  
+##  ## The following targets are available:</code></pre>
 </div>
 <div id="cqi-directory" class="section level4">
 <h4>CQi directory</h4>
@@ -1201,7 +932,7 @@ cat(paste(result, collapse = &quot;\n&quot;))</code></pre>
 <div id="cleaning-up" class="section level3">
 <h3>Cleaning up</h3>
 <pre class="r"><code># system(&quot;git reset --hard HEAD~1&quot;) # do not know which cmd would be R equivalent
-checkout(repo = repodir, branch = &quot;dev&quot;)</code></pre>
+checkout(repo = repodir, branch = branch_of_departure)</code></pre>
 </div>
 </div>
 

@@ -5,7 +5,7 @@ patch_functions <- list(
     times <- if (length(action) == 3L) action[[3]] else 1L
     
     message(
-      sprintf("regex: %s | match: %d | lines: %d ... ", action[[1]], which_position, times),
+      sprintf("action: delete_line_before | regex: %s | match: %d | lines: %d ... ", action[[1]], which_position, times),
       appendLF = FALSE
     )
     
@@ -25,7 +25,7 @@ patch_functions <- list(
     
     message(
       sprintf(
-        "regex: %s | match: %d | insertion: %s ... ", action[[1]], which_position, paste(action[[2]], collapse = "///")
+        "action: insert_before | regex: %s | match: %d | insertion: %s ... ", action[[1]], which_position, paste(action[[2]], collapse = "///")
       ),
       appendLF = FALSE
     )
@@ -48,7 +48,7 @@ patch_functions <- list(
     which_position <- if (length(action) > 2L) action[[3]] else 1L
     
     message(
-      sprintf("regex: %s | match: %d | insertion: %s ... ", action[[1]], which_position, paste(action[[2]], collapse = "///")),
+      sprintf("action: insert_after | regex: %s | match: %d | insertion: %s ... ", action[[1]], which_position, paste(action[[2]], collapse = "///")),
       appendLF = FALSE
     )
     
@@ -68,7 +68,7 @@ patch_functions <- list(
   
   replace = function(code, action){
     message(
-      sprintf("regex: %s | match: %d | replacement: %s ... ", action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
+      sprintf("action: replace | regex: %s | match: %d | replacement: %s ... ", action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
       appendLF = FALSE
     )
     position <- grep(pattern = action[[1]], code)[ action[[3]] ]
@@ -83,7 +83,7 @@ patch_functions <- list(
   
   remove_lines = function(code, action){
     message(
-      sprintf("regex: %s | match: %d ... ", action[[1]], action[[2]]),
+      sprintf("action: remove_lines | regex: %s | match: %d ... ", action[[1]], action[[2]]),
       appendLF = FALSE
     )
     
@@ -104,7 +104,7 @@ patch_functions <- list(
         for (position in matches){
           code[position] <- paste("extern", code[position], sep = " ")
         }
-        message(sprintf("var to extern: %s | n_matches: %d", ext, length(matches)))
+        message(sprintf("action: extern | var to extern: %s | n_matches: %d", ext, length(matches)))
       } else {
         message("FAIL - no matches for var: ", ext)
       }
@@ -122,7 +122,6 @@ patch_file <- function(file, actions){
   } else {
     code <- readLines(file)
     for (i in 1L:length(actions)){
-      message("Action to perform: ", names(actions)[i])
       code <- patch_functions[[ names(actions)[i] ]](code = code, action = actions[[i]])
     }
     writeLines(code, file)
