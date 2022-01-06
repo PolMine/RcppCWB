@@ -53,26 +53,27 @@ library(magrittr)
 
 ### Getting started: Directories
 
-```{r}
-repodir <- path.expand("~/Lab/github/RcppCWB")
-```
-
 A copy of the SVN repo of the CWB is assumed to be present.
 
-```{r}
+```{r define_dirs}
+repodir <- path.expand("~/Lab/github/RcppCWB")
 cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk")
 ```
-  
+
+```{r source_branch}
+branch_of_departure <- branches(repodir)[sapply(branches(repodir), is_head)][[1]][["name"]]
+```
+
 Check whether the desired revision is active and set it accordingly, if necessary.
 
-```{r}
+```{r svn_set_revision}
 svn_set_revision(svn_dir = cwb_dir_svn, revision = cwb_svn_revision)
 ```
 
 We create a new branch of the RcppCWB repo for the desired CWB revision if not yet present.
 
-```{r}
-cwb_copy_report <- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = "patch")
+```{r get_fresh_cwb_copy}
+cwb_copy_report <- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = branch_of_departure)
 cwb_copy_report
 cwb_revision_branch <- cwb_copy_report[["branch"]]
 ```
@@ -85,7 +86,7 @@ Note that we are still on the revision branch now!
 We assume that the branch with the desired CWB revision has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.
 
 ```{r}
-checkout(repodir, branch = "dev")
+checkout(repodir, branch = branch_of_departure)
 repo <- repository(repodir) # needed later on
 last_devbranch_commit <- last_commit(repo = repodir)
 ```
@@ -232,6 +233,6 @@ cat(paste(result, collapse = "\n"))
 
 ```{r}
 # system("git reset --hard HEAD~1") # do not know which cmd would be R equivalent
-checkout(repo = repodir, branch = "dev")
+checkout(repo = repodir, branch = branch_of_departure)
 ```
 
