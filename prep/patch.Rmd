@@ -72,7 +72,7 @@ svn_set_revision(svn_dir = cwb_dir_svn, revision = cwb_svn_revision)
 We create a new branch of the RcppCWB repo for the desired CWB revision if not yet present.
 
 ```{r}
-cwb_copy_report <- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = "dev")
+cwb_copy_report <- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = "patch")
 cwb_copy_report
 cwb_revision_branch <- cwb_copy_report[["branch"]]
 ```
