@@ -5,6 +5,8 @@ date: "January 7, 2022"
 output: html_document
 editor_options: 
   chunk_output_type: console
+params:
+  revision: 1069
 ---
 
 ```{r setup, include=FALSE}
@@ -36,7 +38,7 @@ for (fname in data_files) source(fname)
 P <- PatchEngine$new(
   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
   repodir = "~/Lab/github/RcppCWB",
-  revision = 1069L, # see explanation below
+  revision = params$revision, # see explanation below
   global_replacements = global_replacements,
   file_patches = file_patches
 )
