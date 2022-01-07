@@ -1,4 +1,7 @@
 #' @examples 
+#' data_files <- list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)
+#' for (fname in data_files) source(fname)
+#' 
 #' P <- PatchEngine$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
