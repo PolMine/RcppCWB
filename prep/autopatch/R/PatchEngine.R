@@ -332,7 +332,18 @@ PatchEngine <- R6Class(
     get_difflist = function(){
       diff <- git2r::diff(self$repository, context_lines = 0)
       setNames(
-        lapply(diff$files, function(f) lapply(f$hunks, function(h) sapply(h$lines, `[[`, "content"))),
+        lapply(
+          diff$files,
+          function(f){
+            lapply(
+              f$hunks,
+              function(h) setNames(
+                sapply(h$lines, `[[`, "content"),
+                ifelse(sapply(h$lines, `[[`, "old_lineno") == -1, "new", "old")
+                )
+            )
+          }
+        ),
         sapply(diff$files, `[[`, "old_file")
       )
     },
