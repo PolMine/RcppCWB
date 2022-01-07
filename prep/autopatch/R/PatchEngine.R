@@ -297,12 +297,12 @@ PatchEngine <- R6Class(
       if (!file.exists(fname_full)){
         return(FALSE)
       } else {
-        if (self$verbose) message("... patching file: ", file, appendLF = FALSE)
+        if (self$verbose) message("... patching file: ", file)
         code <- readLines(fname_full)
         for (i in 1L:length(self$file_patches[[file]])){
           new_code <- self[[ names(self$file_patches[[file]])[i] ]](code = code, action = self$file_patches[[file]][[i]])
           if (identical(code, new_code)){
-            warning(sprintf("Patch #%d for file '%s' does not change code", i, file))
+            message(sprintf("Patch #%d for file '%s' does not change code", i, file))
           } else {
             code <- new_code
           }
