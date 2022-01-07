@@ -196,32 +196,20 @@ PatchEngine <- R6Class(
     delete_line_before = function(code, action){
       which_position <- if (length(action) > 1L) action[[2]] else 1L
       times <- if (length(action) == 3L) action[[3]] else 1L
-      
-      message(
-        sprintf("action: delete_line_before | regex: %s | match: %d | lines: %d ... ", action[[1]], which_position, times),
-        appendLF = FALSE
-      )
-      
+
       position <- grep(pattern = action[[1]], code)[which_position]
-      
       if (!is.na(position)){
         code <- code[-(position - 1L:times)]
-        message("OK")
       } else {
-        message("FAIL - no match")
+        message(
+          sprintf("No match for action 'delete_line_before' (regex: %s | match: %d | lines: %d) ", action[[1]], which_position, times)
+        )
       }
       code
     },
     
     insert_before = function(code, action){
       which_position <- if (length(action) > 2L) action[[3]] else 1
-      
-      message(
-        sprintf(
-          "action: insert_before | regex: %s | match: %d | insertion: %s ... ", action[[1]], which_position, paste(action[[2]], collapse = "///")
-        ),
-        appendLF = FALSE
-      )
       
       position <- grep(pattern = action[[1]], code)[which_position]
       if (!is.na(position)){
@@ -230,20 +218,19 @@ PatchEngine <- R6Class(
           action[[2]],
           code[position:length(code)]
         )
-        message("OK")
       } else {
-        message("FAIL - no matches for regex")
+        message(
+          sprintf(
+            "No match for action 'insert_before' (regex: %s | match: %d | insertion: %s)",
+            action[[1]], which_position, paste(action[[2]], collapse = "///")
+          )
+        )
       }
       code
     },
     
     insert_after = function(code, action){
       which_position <- if (length(action) > 2L) action[[3]] else 1L
-      
-      message(
-        sprintf("action: insert_after | regex: %s | match: %d | insertion: %s ... ", action[[1]], which_position, paste(action[[2]], collapse = "///")),
-        appendLF = FALSE
-      )
       
       position <- grep(pattern = action[[1]], code)[which_position]
       if (!is.na(position)){
@@ -252,40 +239,40 @@ PatchEngine <- R6Class(
           action[[2]],
           code[(position + 1L):length(code)]
         )
-        message("OK")
       } else {
-        message("FAIL - no match")
+        message(
+          sprintf(
+            "no match for action 'insert_after' (regex: %s | match: %d | insertion: %s)",
+            action[[1]], which_position, paste(action[[2]], collapse = "///")
+          )
+        )
       }
       code
     },
     
     replace = function(code, action){
-      message(
-        sprintf("action: replace | regex: %s | match: %d | replacement: %s ... ", action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
-        appendLF = FALSE
-      )
       position <- grep(pattern = action[[1]], code)[ action[[3]] ]
       if (!is.na(position)){
         code[position] <- gsub(action[1], action[2], code[position])
-        message("OK")
       } else {
-        message("FAIL - no match")
+        message(
+          sprintf("No match for action 'replace' (regex: %s | match: %d | replacement: %s)", action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
+          appendLF = FALSE
+        )
       }
       code
     },
     
     remove_lines = function(code, action){
-      message(
-        sprintf("action: remove_lines | regex: %s | match: %d ... ", action[[1]], action[[2]]),
-        appendLF = FALSE
-      )
       
       position <- grep(pattern = action[[1]], code)[ action[[2]] ]
       if (!is.na(position)){
         code <- code[-position]
-        message("OK")
       } else {
-        message("FAIL - no match")
+        message(
+          sprintf("No match for action 'remove_lines' (regex: %s | match: %d)", action[[1]], action[[2]]),
+          appendLF = FALSE
+        )
       }
       code
     },
@@ -297,9 +284,8 @@ PatchEngine <- R6Class(
           for (position in matches){
             code[position] <- paste("extern", code[position], sep = " ")
           }
-          message(sprintf("action: extern | var to extern: %s | n_matches: %d", ext, length(matches)))
         } else {
-          message("FAIL - no matches for var: ", ext)
+          message(sprintf("No match for action 'extern' (var to extern: %s | n_matches: %d", ext, length(matches)))
         }
       }
       code
