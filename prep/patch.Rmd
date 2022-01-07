@@ -50,3 +50,8 @@ The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revisi
 ```{r run_patch_engine}
 P$patch_all()
 ```
+
+## Notes
+
+- We do not patch the general Makefile but copy a manually patched version of r1069: The diffs between r1069 and r1690 show differences with new targets, but not relevant here.
+- The Makefile utils/Makefile is copied in - r1690 has better verbosity but does not change substantially anything
