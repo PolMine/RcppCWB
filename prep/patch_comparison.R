@@ -4,21 +4,14 @@ library(magrittr)
 library(R6)
 
 
-source("~/Lab/github/RcppCWB/prep/autopatch/R/PatchEngine.R")
-
-data_files <- list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)
-for (fname in data_files) source(fname)
-
-
+source("~/Lab/github/RcppCWB/prep/PatchEngine.R")
 
 PE <- list()
 
 PE[["1069"]] <- PatchEngine$new(
       cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
       repodir = "~/Lab/github/RcppCWB",
-      revision = 1069,
-      global_replacements = global_replacements,
-      file_patches = file_patches
+      revision = 1069
 )
 PE[["1069"]]$patch_all()
     
@@ -26,12 +19,10 @@ update <- "1200"
 PE[[update]] <- PatchEngine$new(
   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
   repodir = "~/Lab/github/RcppCWB",
-  revision = as.integer(update),
-  global_replacements = global_replacements,
-  file_patches = file_patches
+  revision = as.integer(update)
+
 )
 PE[[update]]$patch_all()
-
 
 names(PE[[1]]$diff_file_patches) %in% names(PE[[2]]$diff_file_patches)
 
