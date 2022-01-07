@@ -486,6 +486,10 @@ file_patches <- list(
   
   "src/cwb/config/platform/linux" = list(
     insert_before = list("##\\sCPU\\sarchitecture", c("## require position-independent code", "CFLAGS += -fPIC", ""), 1L)
+  ),
+  
+  "src/cwb/config.mk" = list(
+    replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
   )
 )
 
