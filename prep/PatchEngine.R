@@ -456,7 +456,6 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
         ),
         
-        
         "src/cwb/cl/class-mapping.h" = list(
           replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
           replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1)
@@ -579,7 +578,6 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*unsigned\\sint\\shash_string\\(char\\s\\*s\\);)", "/* \\1 */", 1)
         ),
         
-        # not available with r1400
         "src/cwb/cqp/html-print.c" = list(
           replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
@@ -588,21 +586,11 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
         ),
         
-        
-        # not available with r1400
         "src/cwb/cqp/latex-print.c" = list(
           replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1)
         ),
-        
-        # not available with r1400
-        "src/cwb/cqp/sgml-print.c" = list(
-          replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
-          replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
-        ),
-        
-        
         
         "src/cwb/cqp/options.h" = list(
           replace = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
@@ -630,6 +618,7 @@ PatchEngine <- R6Class(
             "char *progname;",
             "char *licensee;",
             "FILE *batchfd;",
+            
 
             if (revision < 1500)
               c(
@@ -693,7 +682,9 @@ PatchEngine <- R6Class(
                 "int child_process;",
                 "ContextDescriptor CD;",
                 "int handle_sigpipe;",
-                if (revision >= 1291) "char *attribute_separator;"
+                if (revision >= 1291) "char *attribute_separator;",
+                if (revision >= 1330) "MatchingStrategy matching_strategy;",
+                if (revision >= 1330) "char *matching_strategy_name;"
               )
             )
           )
@@ -723,9 +714,13 @@ PatchEngine <- R6Class(
           extern = list("CorpusList *current_corpus;", "CorpusList *corpuslist;")
         ),
         
-        # not available with r1400
         "src/cwb/cqp/regex2dfa.c" = list(
           replace = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1)
+        ),
+        
+        "src/cwb/cqp/sgml-print.c" = list(
+          replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
+          replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
         ),
         
         "src/cwb/cqp/parser.tab.c" = list(
@@ -807,6 +802,10 @@ PatchEngine <- R6Class(
         
         "src/cwb/config.mk" = list(
           replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
+        ),
+        
+        "src/cwb/globalvars.h" = list(
+          if (revision > 1330) replace("^enum\\s_matching_strategy.*?\\smatching_strategy;\\s*", "MatchingStrategy matching_strategy;", 1L)
         )
       )
     },
