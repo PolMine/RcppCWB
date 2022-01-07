@@ -1,7 +1,7 @@
 ---
-title: "Patching the CWB: Diff report"
+title: "Patching the CWB"
 author: "Andreas Blaette"
-date: "7/9/2021"
+date: "January 7, 2022"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -11,38 +11,8 @@ editor_options:
 knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
 ```
 
-## Global Settings
 
-The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from `definitions.mk`.
-
-```{r}
-cwb_svn_revision <- 1069L
-
-for (fname in list.files("~/Lab/github/RcppCWB/prep/autopatch/R", full.names = TRUE)){
-  source(fname)
-}
-
-for (fname in list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)){
-  source(fname)
-}
-```
-
-## Step 1: Create branch with unaltered CWB code
-
-The aim is to reconstruct all changes to the CWB code so that we know which patches are necessary for adapting a fresh copy of the CWB such that it conforms R package requirements.
-
-The approach taken here is
-  (a) to create a branch with the original CWB code in the ./src/cwb directory
-  (b) to apply patches to this branch
-  (c) to check differences between the revision-branch (with patches) and the 'dev'-branch
-
-As a result, we should have a precise understanding which changes led from CWB 3.4.14 (r1069) to the modified CWB code we have on the current 'dev'-branch. We should also have a reproducible workflow that can also be applied to the copy of a recent version of the CWB. This is the basis for integrating upstream CWB code into RcppCWB.
-
-The first step (a) is to create a fresh copy of CWB 3.4.14 (r1069) on a branch
-named after the revision. The 'dev' branch is the point of departure and we refrain from  removing the src/cwb directory: This gives us a much better understanding which files  have been added during the development of RcppCWB and which ones have been deleted.
-
-
-### Required libraries
+## Required libraries
 
 ```{r}
 library(git2r)
@@ -51,188 +21,31 @@ library(magrittr)
 ```
 
 
-### Getting started: Directories
+## Loading and configuring the PatchEngine
 
-A copy of the SVN repo of the CWB is assumed to be present.
+```{r load_code_and_data}
+source("~/Lab/github/RcppCWB/prep/autopatch/R/PatchEngine.R")
 
-```{r define_dirs}
-repodir <- path.expand("~/Lab/github/RcppCWB")
-cwb_dir_svn <- path.expand("~/Lab/tmp/cwb/trunk")
+data_files <- list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)
+for (fname in data_files) source(fname)
 ```
 
-```{r source_branch}
-branch_of_departure <- branches(repodir)[sapply(branches(repodir), is_head)][[1]][["name"]]
-```
 
-Check whether the desired revision is active and set it accordingly, if necessary.
-
-```{r svn_set_revision}
-svn_set_revision(svn_dir = cwb_dir_svn, revision = cwb_svn_revision)
-```
-
-We create a new branch of the RcppCWB repo for the desired CWB revision if not yet present.
-
-```{r get_fresh_cwb_copy}
-cwb_copy_report <- cwb_fresh_copy(cwb_dir = cwb_dir_svn, repodir = repodir, source_branch = branch_of_departure)
-cwb_copy_report
-cwb_revision_branch <- cwb_copy_report[["branch"]]
-```
-
-Note that we are still on the revision branch now! 
-
-
-## Step 2: Patches
-
-We assume that the branch with the desired CWB revision has been created with a clean CWB v3.4.14 and that patches have been applied using the patch.R script. The purpose of this document is to identify the remaining differences to the latest commit of the dev branch of RcppCWB.
-
-```{r}
-checkout(repodir, branch = branch_of_departure)
-repo <- repository(repodir) # needed later on
-last_devbranch_commit <- last_commit(repo = repodir)
-```
-
-This intermediate step is a matter of caution to avoid that changes are lost.
-
-```{r}
-if (!is.null(unlist(status(repo)))){
-  git2r::add(repo, path = "prep/*")
-  git2r::commit(repo, message = "patch update")
-}
-```
-
-Checkout the revision branch ... 
-
-```{r checkout_revision_branch}
-checkout(repodir, branch = cwb_revision_branch)
-```
-
-... and apply patches.
-
-```{r}
-cwb_pkg_dir <- "~/Lab/github/RcppCWB/src/cwb"
-```
-
-```{r run_bison_flex}
-setwd(path(cwb_pkg_dir, "cl"))
-system("bison -d -t -p creg registry.y")
-system("flex -8 -Pcreg registry.l")
-
-setwd(path(cwb_pkg_dir, "cqp"))
-system("bison -d -t parser.y")
-system("flex -8 parser.l")
-```
-
-```{r rename_files}
-file.rename(
-  from = path(cwb_pkg_dir, "cl", "endian.h"),
-  to = path(cwb_pkg_dir, "cl", "endian2.h")
-)
-
-file.rename(
-  from = path(cwb_pkg_dir, "instutils", "Makefile"),
-  to = path(cwb_pkg_dir, "instutils", "_Makefile")
+```{r configure_patch_engine}
+P <- PatchEngine$new(
+  cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
+  repodir = "~/Lab/github/RcppCWB",
+  revision = 1069L, # see explanation below
+  global_replacements = global_replacements,
+  file_patches = file_patches
 )
 ```
 
-```{r copy_files_into_cwb}
-new_files <- list.files(path = file.path(repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
-for (fname in new_files){
-  message("... copying: ", fname)
-  file.copy(from = fname, to = gsub("/prep/", "/src/", fname), overwrite = TRUE)
-}
+The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from the file `definitions.mk`.
+
+
+## Run the PatchEngine
+
+```{r run_patch_engine}
+P$patch_all()
 ```
-
-```{r create_dummy_depend_files}
-cat("\n", file = file.path(repodir, "src", "cwb", "cl", "depend.mk"))
-cat("\n", file = file.path(repodir, "src", "cwb", "cqp", "depend.mk"))
-```
-
-
-```{r apply_global_replacements}
-for (subdir in c("cl", "cqp", "CQi")){
-  files <- list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
-  for (f in files){
-    code <- readLines(f)
-    for (i in 1L:length(global_replacements)){
-      code <- gsub(global_replacements[[i]][1], global_replacements[[i]][2], code)
-    }
-    writeLines(text = code, con = f)
-  }
-}
-```
-
-```{r}
-for (fname in names(file_patches)){
-  fname_full <- fs::path(repodir, fname)
-  message("File: ", fname)
-  patch_file(file = fname_full, actions = file_patches[[fname]])
-}
-```
-
-
-Add and commit changes so that we can prepare diffs.
-
-```{r}
-point_of_departure <- last_commit(repo)
-git2r::add(repo = repodir, path = "src/cwb/*")
-commit(repo, message = "CWB patched")
-to_compare <- last_commit(repo)
-```
-
-
-## Inspect diffs
-
-#### cl directory
-  
-```{r}
-setwd("~/Lab/github/RcppCWB/src/cwb/cl")
-git_cmd <- sprintf("git diff --ignore-space-at-eol %s..%s .", last_devbranch_commit[["sha"]], to_compare[["sha"]])
-result <- system(git_cmd, intern = TRUE)
-cat(paste(result, collapse = "\n"))
-```
-
-
-#### cqp directory
-
-```{r}  
-setwd("~/Lab/github/RcppCWB/src/cwb/cqp")
-git_cmd <- sprintf("git diff --ignore-space-at-eol %s..%s .", last_devbranch_commit[["sha"]], to_compare[["sha"]])
-result <- system(git_cmd, intern = TRUE)
-gitdiff_cqp <- paste(result, collapse = "\n")
-cat(gitdiff_cqp)
-```
-
-
-#### CQi directory
-
-```{r}
-setwd("~/Lab/github/RcppCWB/src/cwb/CQi")
-git_cmd <- sprintf(
-  "git diff --ignore-space-at-eol %s..%s .", last_devbranch_commit[["sha"]], to_compare[["sha"]]
-)
-result <- system(git_cmd, intern = TRUE)
-output <- paste(result, collapse = "\n")
-cat(output)
-```
-
-
-#### utils directory
-  
-```{r}
-setwd("~/Lab/github/RcppCWB/src/cwb/utils")
-git_cmd <- sprintf(
-  "git diff --ignore-space-at-eol %s..%s .",
-  last_devbranch_commit[["sha"]], to_compare[["sha"]]
-)
-result <- system(git_cmd, intern = TRUE)
-cat(paste(result, collapse = "\n"))
-```
-
-
-### Cleaning up
-
-```{r}
-# system("git reset --hard HEAD~1") # do not know which cmd would be R equivalent
-checkout(repo = repodir, branch = branch_of_departure)
-```
-
