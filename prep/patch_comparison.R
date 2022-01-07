@@ -15,7 +15,7 @@ PE[["1069"]] <- PatchEngine$new(
 )
 PE[["1069"]]$patch_all()
     
-update <- "1300"
+update <- "1400"
 PE[[update]] <- PatchEngine$new(
   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
   repodir = "~/Lab/github/RcppCWB",
@@ -24,7 +24,8 @@ PE[[update]] <- PatchEngine$new(
 )
 PE[[update]]$patch_all()
 
-names(PE[[1]]$diff_file_patches) %in% names(PE[[2]]$diff_file_patches)
+names(PE[[1]]$diff_file_patches)[!names(PE[[1]]$diff_file_patches) %in% names(PE[[2]]$diff_file_patches)]
+
 
 patch_success <- sapply(
   names(PE[[1]]$diff_file_patches),
