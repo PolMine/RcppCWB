@@ -51,6 +51,9 @@ PatchEngine <- R6Class(
       self$global_replacements <- global_replacements
       self$file_patches <- file_patches 
       
+      message("flex version: ", system("flex --version", intern = TRUE))
+      message("bison version: ", system("bison --version", intern = TRUE)[1])
+      
       invisible(self)
     },
     
@@ -125,6 +128,9 @@ PatchEngine <- R6Class(
     },
     
     run_bison_flex = function(){
+      
+      if (self$verbose) message("Run bison and flex parsers")
+      
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
       old_wd <- setwd(path(cwb_pkg_dir, "cl"))
       system("bison -d -t -p creg registry.y")
@@ -138,6 +144,9 @@ PatchEngine <- R6Class(
     },
     
     rename_files = function(){
+      
+      if (self$verbose) message("Rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)")
+      
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
       file.rename(
         from = path(cwb_pkg_dir, "cl", "endian.h"),
@@ -152,7 +161,7 @@ PatchEngine <- R6Class(
     },
     
     copy_files = function(){
-      if (self$verbose) message("Add newly created files to CWB code (overwriting existing files ...")
+      if (self$verbose) message("Add newly created files to CWB code (overwriting existing files)")
       new_files <- list.files(path = file.path(self$repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
       for (fname in new_files){
         if (self$verbose) message("... copy file: ", fname)
@@ -362,9 +371,9 @@ PatchEngine <- R6Class(
       }
       
       checkout(self$repodir, branch = self$patchbranch)
+      self$copy_files()
       self$run_bison_flex()
       self$rename_files()
-      self$copy_files()
       self$create_dummy_depend_files()
       self$replace_globally()
       self$patch_files()
