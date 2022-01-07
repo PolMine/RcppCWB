@@ -61,14 +61,17 @@ PatchEngine <- R6Class(
     
     #' @return An `integer` value with the active SVN revision number.
     svn_set_revision = function(){
+      
       old_wd <- setwd(self$cwb_dir_svn)
       rev <- self$svn_get_revision()
+      if (self$verbose) message("Active revision of CWB SVN repository: ", rev)
       if (rev != as.integer(self$revision)){
         system(
           sprintf("svn up -r %d", self$revision),
           intern = TRUE
         )
         rev <- self$svn_get_revision()
+        if (self$verbose) message("Updated revision of CWB SVN repository: ", rev)
       }
       setwd(old_wd)
       rev
@@ -76,7 +79,7 @@ PatchEngine <- R6Class(
     
     cwb_fresh_copy = function(){
       
-      if (self$verbose) message("Copy unaltered CWB code into RcppCWB repository ...")
+      if (self$verbose) message("Copy unaltered CWB code into RcppCWB repository ...", appendLF = FALSE)
       
       self$patchbranch <- sprintf("r%d", self$svn_get_revision()) # name of new branch
       
@@ -95,6 +98,8 @@ PatchEngine <- R6Class(
         to = gsub(paste("^", self$cwb_dir_svn, sep = ""), repo_cwb_dir, cwb_files),
         overwrite = TRUE
       )
+      
+      if (self$verbose) message(sprintf("%d files copied", length(cwb_files)))
       
       # Remove files that have been added (and that need to be added explicitly)
       # To restore the state of RcppCWB development, these files need to be re-added or generated later on
