@@ -1,3 +1,5 @@
+#' Workflow to patch CWB
+#'
 #' @examples 
 #' data_files <- list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)
 #' for (fname in data_files) source(fname)
@@ -357,7 +359,7 @@ PatchEngine <- R6Class(
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       if (self$verbose) message("Commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
-      self$patch_commit <- last_commit(repo)
+      self$patch_commit <- last_commit(self$repository)
       if (self$verbose) message("Story to be told")
       
       if (self$verbose) message("Return to branch of departure: ", self$branch_of_departure)
