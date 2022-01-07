@@ -804,7 +804,7 @@ PatchEngine <- R6Class(
           replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
         ),
         
-        "src/cwb/globalvars.h" = list(
+        "src/globalvars.h" = list(
           if (revision > 1330) replace("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L)
         )
       )
