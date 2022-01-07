@@ -25,11 +25,21 @@ PatchEngine <- R6Class(
     file_patches = NULL,
     verbose = TRUE,
     
-    initialize = function(cwb_dir_svn, revision, repodir, global_replacements, file_patches){
-      self$cwb_dir_svn <- path.expand(cwb_dir_svn)
-      self$revision <- as.integer(revision)
+    initialize = function(cwb_dir_svn, revision, repodir, global_replacements, file_patches, verbose = TRUE){
+      self$verbose <- verbose
+      
       self$repodir <- path.expand(repodir)
+      if (self$verbose) message("RcppCWB repository path: ", self$repodir)
+      
+      self$cwb_dir_svn <- path.expand(cwb_dir_svn)
+      if (self$verbose) message("SVN directory with CWB code: ", self$cwb_dir_svn)
+      
+      self$revision <- as.integer(revision)
+      if (self$revision) message("SVN revision to use: ", self$revision)
+      
+      
       self$branch_of_departure <- self$get_branch_of_departure()
+      if (self$verbose) message("The branch of departure is: ", self$branch_of_departure)
       
       self$repository <- repository(repodir)
       self$last_commit <- last_commit(repo = repodir)
