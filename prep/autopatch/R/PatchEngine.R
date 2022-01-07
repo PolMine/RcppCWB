@@ -29,6 +29,7 @@ PatchEngine <- R6Class(
     global_replacements = NULL,
     file_patches = NULL,
     verbose = TRUE,
+    diff = NULL,
     
     initialize = function(cwb_dir_svn, revision, repodir, global_replacements, file_patches, verbose = TRUE){
       self$verbose <- verbose
@@ -362,6 +363,9 @@ PatchEngine <- R6Class(
       self$create_dummy_depend_files()
       self$replace_globally()
       self$patch_files()
+      
+      if (self$verbose) message("* add diff to class")
+      self$diff <- git2r::diff(self$repository, context_lines = 0)
       
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
