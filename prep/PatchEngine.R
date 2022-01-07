@@ -728,7 +728,7 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/cqp.h" = list(
-          extern = list(
+          extern = as.list(c(
             "CYCtype LastExpression;",
             "int exit_cqp;",
             if (revision < 1075) "char *cqp_input_string;", # starting from r1075 externed anyway
@@ -741,7 +741,7 @@ PatchEngine <- R6Class(
             "void CheckForInterrupts(void);",
             "int signal_handler_is_installed;",
             "void install_signal_handler(void);"
-          )
+          ))
         ),
         
         
