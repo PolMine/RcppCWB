@@ -314,7 +314,7 @@ PatchEngine <- R6Class(
         if (self$verbose) message("... patching file: ", file, appendLF = FALSE)
         code <- readLines(fname_full)
         for (i in 1L:length(self$file_patches[[file]])){
-          new_code <- self[[ names(actions)[i] ]](code = code, action = self$file_patches[[file]][[i]])
+          new_code <- self[[ names(self$file_patches[[file]])[i] ]](code = code, action = self$file_patches[[file]][[i]])
           if (identical(code, new_code)){
             warning(sprintf("Patch #%d for file '%s' does not change code", i, file))
           } else {
@@ -328,7 +328,6 @@ PatchEngine <- R6Class(
     
     patch_files = function(){
       
-      fname_full <- fs::path(self$repodir, file)
       files_with_actions <- fs::path(path.expand(self$repodir), names(self$file_patches))
       cwb_files <- list.files(path = path(self$repodir, "src", "cwb"), full.names = TRUE, recursive = TRUE)
       missing_files_with_actions <- files_with_actions[!files_with_actions %in% cwb_files]
