@@ -76,6 +76,8 @@ PatchEngine <- R6Class(
     
     cwb_fresh_copy = function(){
       
+      if (self$verbose) message("Copy unaltered CWB code into RcppCWB repository ...")
+      
       self$patchbranch <- sprintf("r%d", self$svn_get_revision()) # name of new branch
       
       git2r::checkout(self$repodir, branch = self$branch_of_departure)
@@ -93,8 +95,6 @@ PatchEngine <- R6Class(
         to = gsub(paste("^", self$cwb_dir_svn, sep = ""), repo_cwb_dir, cwb_files),
         overwrite = TRUE
       )
-      
-      for (f in cwb_files) message("file copied: ", f)
       
       # Remove files that have been added (and that need to be added explicitly)
       # To restore the state of RcppCWB development, these files need to be re-added or generated later on
@@ -286,10 +286,13 @@ PatchEngine <- R6Class(
     },
     
     patch_file = function(file){
+      
+      if (self$verbose) message("... patching file: ", file, appendLF = FALSE)
+      
       actions <- self$file_patches[[file]]
       fname_full <- fs::path(self$repodir, file)
       if (!file.exists(file)){
-        warning(sprintf("FAIL - file %s does not exist", file))
+        message(sprintf("FAIL (file does not exist)", file))
         return(FALSE)
       } else {
         code <- readLines(file)
@@ -297,6 +300,7 @@ PatchEngine <- R6Class(
           code <- self[[ names(actions)[i] ]](code = code, action = actions[[i]])
         }
         writeLines(code, file)
+        message("OK")
         return(TRUE)
       }
     },
@@ -337,10 +341,14 @@ PatchEngine <- R6Class(
         self$patch_file(file = fname)
       }
       
+      if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
+      if (self$verbose) message("Commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
       self$patch_commit <- last_commit(repo)
+      if (self$verbose) message("Story to be told")
       
+      if (self$verbose) message("Return to branch of departure: ", self$branch_of_departure)
       checkout(repo = self$repodir, branch = self$branch_of_departure)
       invisible(self)
     }
