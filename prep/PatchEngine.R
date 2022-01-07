@@ -805,7 +805,7 @@ PatchEngine <- R6Class(
         ),
         
         "src/globalvars.h" = list(
-          if (revision > 1330) replace("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L)
+          if (revision > 1330) replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L)
         )
       )
     },
