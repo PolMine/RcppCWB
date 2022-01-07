@@ -44,6 +44,7 @@ PatchEngine <- R6Class(
       self$repository <- repository(repodir)
       self$last_commit <- last_commit(repo = repodir)
       self$global_replacements <- global_replacements
+      self$file_patches <- file_patches 
       
       invisible(self)
     },
@@ -328,6 +329,9 @@ PatchEngine <- R6Class(
     },
     
     patch_all = function(){
+      
+      setwd(self$repodir)
+      
       self$svn_set_revision()
       self$cwb_fresh_copy()
       
