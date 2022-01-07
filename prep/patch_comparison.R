@@ -33,10 +33,11 @@ PE[[update]] <- PatchEngine$new(
 PE[[update]]$patch_all()
 
 
-
 names(PE[[1]]$diff_file_patches) %in% names(PE[[2]]$diff_file_patches)
 
-sapply(
+patch_success <- sapply(
   names(PE[[1]]$diff_file_patches),
-  function(x) identical(PE[[1]]$diff_file_patches[[x]], PE[[2]]$diff_file_patches[[x]])
+  function(x) identical(PE[[1]]$diff_file_patches[[x]], PE[[update]]$diff_file_patches[[x]])
 )
+names(patch_success)[which(patch_success == FALSE)]
+

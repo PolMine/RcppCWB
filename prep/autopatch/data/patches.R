@@ -420,8 +420,8 @@ file_patches <- list(
     extern = list(
       "CYCtype LastExpression;",
       "int exit_cqp;",
-      "char *cqp_input_string;",
-      "int cqp_input_string_position;",
+      "char *cqp_input_string;", # starting from r1075 externed anyway
+      "int cqp_input_string_position;", # starting from r1075 externed anyway
       "int initialize_cqp(int argc, char **argv);",
       "int cqp_parse_file(FILE *fd, int exit_on_parse_errors);",
       "int cqp_parse_string(char *s);",
