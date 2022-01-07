@@ -18,6 +18,7 @@ knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
 library(git2r)
 library(fs)
 library(magrittr)
+library(R6)
 ```
 
 
