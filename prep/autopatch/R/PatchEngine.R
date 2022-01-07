@@ -193,7 +193,7 @@ PatchEngine <- R6Class(
       
     },
     
-    delete_line_before = function(code, action){
+    delete_line_before = function(code, action, file){
       which_position <- if (length(action) > 1L) action[[2]] else 1L
       times <- if (length(action) == 3L) action[[3]] else 1L
 
@@ -202,13 +202,13 @@ PatchEngine <- R6Class(
         code <- code[-(position - 1L:times)]
       } else {
         message(
-          sprintf("No match for action 'delete_line_before' (regex: %s | match: %d | lines: %d) ", action[[1]], which_position, times)
+          sprintf("Trying to patch file '%s' - no match for action 'delete_line_before' (regex: %s | match: %d | lines: %d) ", file, action[[1]], which_position, times)
         )
       }
       code
     },
     
-    insert_before = function(code, action){
+    insert_before = function(code, action, file){
       which_position <- if (length(action) > 2L) action[[3]] else 1
       
       position <- grep(pattern = action[[1]], code)[which_position]
@@ -221,15 +221,15 @@ PatchEngine <- R6Class(
       } else {
         message(
           sprintf(
-            "No match for action 'insert_before' (regex: %s | match: %d | insertion: %s)",
-            action[[1]], which_position, paste(action[[2]], collapse = "///")
+            "Trying to patch file '%s' - no match for action 'insert_before' (regex: %s | match: %d | insertion: %s)",
+            file, action[[1]], which_position, paste(action[[2]], collapse = "///")
           )
         )
       }
       code
     },
     
-    insert_after = function(code, action){
+    insert_after = function(code, action, file){
       which_position <- if (length(action) > 2L) action[[3]] else 1L
       
       position <- grep(pattern = action[[1]], code)[which_position]
@@ -242,42 +242,43 @@ PatchEngine <- R6Class(
       } else {
         message(
           sprintf(
-            "no match for action 'insert_after' (regex: %s | match: %d | insertion: %s)",
-            action[[1]], which_position, paste(action[[2]], collapse = "///")
+            "Trying to patch file '%s' - no match for action 'insert_after' (regex: %s | match: %d | insertion: %s)",
+            file, action[[1]], which_position, paste(action[[2]], collapse = "///")
           )
         )
       }
       code
     },
     
-    replace = function(code, action){
+    replace = function(code, action, file){
       position <- grep(pattern = action[[1]], code)[ action[[3]] ]
       if (!is.na(position)){
         code[position] <- gsub(action[1], action[2], code[position])
       } else {
         message(
-          sprintf("No match for action 'replace' (regex: %s | match: %d | replacement: %s)", action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
+          sprintf("Trying to patch file '%s' - no match for action 'replace' (regex: %s | match: %d | replacement: %s)",
+                  file, action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
           appendLF = FALSE
         )
       }
       code
     },
     
-    remove_lines = function(code, action){
+    remove_lines = function(code, action, file){
       
       position <- grep(pattern = action[[1]], code)[ action[[2]] ]
       if (!is.na(position)){
         code <- code[-position]
       } else {
         message(
-          sprintf("No match for action 'remove_lines' (regex: %s | match: %d)", action[[1]], action[[2]]),
+          sprintf("Trying to patch file '%s' - no match for action 'remove_lines' (regex: %s | match: %d)", file, action[[1]], action[[2]]),
           appendLF = FALSE
         )
       }
       code
     },
     
-    extern = function(code, action){
+    extern = function(code, action, file){
       for (ext in action){
         matches <- which(startsWith(code, ext))
         if (length(matches) > 0L){
@@ -285,7 +286,7 @@ PatchEngine <- R6Class(
             code[position] <- paste("extern", code[position], sep = " ")
           }
         } else {
-          message(sprintf("No match for action 'extern' (var to extern: %s | n_matches: %d", ext, length(matches)))
+          message(sprintf("Trying to patch file '%s' - no match for action 'extern' (var to extern: %s | n_matches: %d", file, ext, length(matches)))
         }
       }
       code
@@ -297,10 +298,9 @@ PatchEngine <- R6Class(
       if (!file.exists(fname_full)){
         return(FALSE)
       } else {
-        if (self$verbose) message("... patching file: ", file)
         code <- readLines(fname_full)
         for (i in 1L:length(self$file_patches[[file]])){
-          new_code <- self[[ names(self$file_patches[[file]])[i] ]](code = code, action = self$file_patches[[file]][[i]])
+          new_code <- self[[ names(self$file_patches[[file]])[i] ]](code = code, action = self$file_patches[[file]][[i]], file = file)
           if (identical(code, new_code)){
             message(sprintf("Patch #%d for file '%s' does not change code", i, file))
           } else {
