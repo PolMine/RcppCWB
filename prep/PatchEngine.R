@@ -55,7 +55,6 @@ PatchEngine <- R6Class(
       
       self$repository <- repository(self$repodir)
       self$last_commit <- last_commit(repo = self$repodir)
-      self$global_replacements <- global_replacements
       self$file_patches <- self$patches(revision)
       
       message("flex version: ", system("flex --version", intern = TRUE))
