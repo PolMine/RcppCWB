@@ -298,22 +298,37 @@ PatchEngine <- R6Class(
     
     patch_file = function(file){
       
-      if (self$verbose) message("... patching file: ", file, appendLF = FALSE)
-      
-      actions <- self$file_patches[[file]]
       fname_full <- fs::path(self$repodir, file)
-      if (!file.exists(file)){
-        message(sprintf("FAIL (file does not exist)", file))
+      if (!file.exists(fname_full)){
         return(FALSE)
       } else {
-        code <- readLines(file)
-        for (i in 1L:length(actions)){
-          code <- self[[ names(actions)[i] ]](code = code, action = actions[[i]])
+        if (self$verbose) message("... patching file: ", file, appendLF = FALSE)
+        code <- readLines(fname_full)
+        for (i in 1L:length(self$file_patches[[file]])){
+          new_code <- self[[ names(actions)[i] ]](code = code, action = self$file_patches[[file]][[i]])
+          if (identical(code, new_code)){
+            warning(sprintf("Patch #%d for file '%s' does not change code", i, file))
+          }
         }
-        writeLines(code, file)
-        message("OK")
+        writeLines(code, fname_full)
         return(TRUE)
       }
+    },
+    
+    patch_files = function(){
+      
+      fname_full <- fs::path(self$repodir, file)
+      files_with_actions <- fs::path(path.expand(self$repodir), names(self$file_patches))
+      cwb_files <- list.files(path = path(self$repodir, "src", "cwb"), full.names = TRUE, recursive = TRUE)
+      missing_files_with_actions <- files_with_actions[!files_with_actions %in% cwb_files]
+      
+      if (length(missing_files_with_actions) > 0L){
+        message("Actions defined for the following files, but file not present:")
+        for (f in missing_files_with_actions) message("- ", f)
+      }
+      
+      results <- sapply(names(self$file_patches), self$patch_file)
+      if (self$verbose) message("Number of files successfully patched: ", table(results)[["TRUE"]])
     },
     
     get_diffs = function(dirs = c("cl", "cqp", "CQi", "utils")){
@@ -350,10 +365,7 @@ PatchEngine <- R6Class(
       self$copy_files()
       self$create_dummy_depend_files()
       self$replace_globally()
-      for (fname in names(self$file_patches)){
-        message("File: ", fname)
-        self$patch_file(file = fname)
-      }
+      self$patch_files()
       
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
