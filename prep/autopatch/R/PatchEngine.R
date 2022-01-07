@@ -23,6 +23,7 @@ PatchEngine <- R6Class(
     patchbranch = NULL,
     global_replacements = NULL,
     file_patches = NULL,
+    verbose = TRUE,
     
     initialize = function(cwb_dir_svn, revision, repodir, global_replacements, file_patches){
       self$cwb_dir_svn <- path.expand(cwb_dir_svn)
@@ -130,21 +131,24 @@ PatchEngine <- R6Class(
     },
     
     copy_files = function(){
+      if (self$verbose) message("Add newly created files to CWB code (overwriting existing files ...")
       new_files <- list.files(path = file.path(self$repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
       for (fname in new_files){
-        message("... copying: ", fname)
+        if (self$verbose) message("... copy file: ", fname)
         file.copy(from = fname, to = gsub("/prep/", "/src/", fname), overwrite = TRUE)
       }
       invisible(self)
     },
     
     create_dummy_depend_files = function(){
+      if (self$verbose) message("Create dummy depend.mk files ...")
       cat("\n", file = file.path(self$repodir, "src", "cwb", "cl", "depend.mk"))
       cat("\n", file = file.path(self$repodir, "src", "cwb", "cqp", "depend.mk"))
       invisible(self)
     },
     
-    global_replacements = function(){
+    replace_globally = function(){
+      if (self$verbose) message("Perform global replacements ...")
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
       for (subdir in c("cl", "cqp", "CQi")){
         files <- list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
@@ -157,7 +161,7 @@ PatchEngine <- R6Class(
         }
       }
       
-    }
+    },
     
     delete_line_before = function(code, action){
       which_position <- if (length(action) > 1L) action[[2]] else 1L
@@ -317,7 +321,7 @@ PatchEngine <- R6Class(
       self$rename_files()
       self$copy_files()
       self$create_dummy_depend_files()
-      self$global_replacements()
+      self$replace_globally()
       for (fname in names(self$file_patches)){
         message("File: ", fname)
         self$patch_file(file = fname)
