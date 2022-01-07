@@ -44,8 +44,8 @@ PatchEngine <- R6Class(
       self$branch_of_departure <- self$get_branch_of_departure()
       if (self$verbose) message("The branch of departure is: ", self$branch_of_departure)
       
-      self$repository <- repository(repodir)
-      self$last_commit <- last_commit(repo = repodir)
+      self$repository <- repository(self$repodir)
+      self$last_commit <- last_commit(repo = self$repodir)
       self$global_replacements <- global_replacements
       self$file_patches <- file_patches 
       
@@ -53,7 +53,7 @@ PatchEngine <- R6Class(
     },
     
     get_branch_of_departure = function(){
-      branches(repodir)[sapply(branches(self$repodir), is_head)][[1]][["name"]]
+      branches(self$repodir)[sapply(branches(self$repodir), is_head)][[1]][["name"]]
     },
     
     svn_get_revision = function(){
