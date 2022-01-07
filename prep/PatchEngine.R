@@ -337,9 +337,9 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cl/Makefile" = list(
-          delete_line_before = list("^libcl.a: \\$\\(OBJS\\)", 1L, 6L),
+          delete_line_before = list("^libcl.a: \\$\\(OBJS\\)", 1L, if (revision >= 1400) 9L else 6L),
           delete_line_before = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
-          delete_line_before = list("^depend:$", 1L, if (revision > 1400) 14 else 22L),
+          delete_line_before = list("^depend:$", 1L, if (revision >= 1400) 14L else 22L),
           replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
           replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
           replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
