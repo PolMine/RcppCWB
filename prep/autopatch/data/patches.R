@@ -20,7 +20,6 @@ file_patches <- list(
     insert_after = list("^\\}$", "*/", 5L),
     replace = list("^(\\s*)(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);).*?$", "\\1/* \\2 */", 1),
     replace = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "static void yyunput (int c, register char * yy_bp )", 1L),
-    replace = list("^(\\s)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
     replace = list("^(\\s*)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
     replace = list("/\\*\\scast\\sfor\\s8-bit\\schar's\\s\\*/", "", 1L),
     replace = list("\\s*/\\*\\spreserve\\scregtext\\s\\*/", "", 1L),
@@ -58,8 +57,7 @@ file_patches <- list(
   ),
   
   "src/cwb/cl/bitio.c" = list(
-    insert_before = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);"),
-    insert_after = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);")
+    insert_before = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);")
   ),
   
   "src/cwb/cl/class-mapping.c" = list(
@@ -462,7 +460,6 @@ file_patches <- list(
   ),
   
   "src/cwb/config/platform/darwin" = list(
-    replace = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L),
     replace = list("^READLINE_DEFINES\\s:=.*?$", "READLINE_DEFINES =", 1L),
     replace = list("^READLINE_LIBS\\s:=.*?$", "READLINE_LIBS =", 1L)
   ),
@@ -488,8 +485,7 @@ file_patches <- list(
   ),
   
   "src/cwb/config/platform/linux" = list(
-    insert_before = list("##\\sCPU\\sarchitecture", c("## require position-independent code", "CFLAGS += -fPIC", ""), 1L),
-    replace = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L)
+    insert_before = list("##\\sCPU\\sarchitecture", c("## require position-independent code", "CFLAGS += -fPIC", ""), 1L)
   )
 )
 
