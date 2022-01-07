@@ -308,6 +308,8 @@ PatchEngine <- R6Class(
           new_code <- self[[ names(actions)[i] ]](code = code, action = self$file_patches[[file]][[i]])
           if (identical(code, new_code)){
             warning(sprintf("Patch #%d for file '%s' does not change code", i, file))
+          } else {
+            code <- new_code
           }
         }
         writeLines(code, fname_full)
