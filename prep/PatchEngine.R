@@ -819,6 +819,8 @@ PatchEngine <- R6Class(
       fname_full <- fs::path(self$repodir, file)
       if (!file.exists(fname_full)){
         return(FALSE)
+      } else if (length(self$file_patches[[file]]) == 0L){
+        return(FALSE)
       } else {
         code <- readLines(fname_full)
         for (i in 1L:length(self$file_patches[[file]])){
