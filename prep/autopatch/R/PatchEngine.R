@@ -29,7 +29,8 @@ PatchEngine <- R6Class(
     global_replacements = NULL,
     file_patches = NULL,
     verbose = TRUE,
-    diff = NULL,
+    diff_global_replacements = NULL,
+    diff_file_patches = NULL,
     
     initialize = function(cwb_dir_svn, revision, repodir, global_replacements, file_patches, verbose = TRUE){
       self$verbose <- verbose
@@ -328,6 +329,14 @@ PatchEngine <- R6Class(
       if (self$verbose) message("Number of files successfully patched: ", table(results)[["TRUE"]])
     },
     
+    get_difflist = function(){
+      diff <- git2r::diff(self$repository, context_lines = 0)
+      setNames(
+        lapply(diff$files, function(f) lapply(f$hunks, function(h) sapply(h$lines, `[[`, "content"))),
+        sapply(diff$files, `[[`, "old_file")
+      )
+    },
+    
     get_diffs = function(dirs = c("cl", "cqp", "CQi", "utils")){
       
       lapply(
@@ -361,12 +370,18 @@ PatchEngine <- R6Class(
       self$run_bison_flex()
       self$rename_files()
       self$create_dummy_depend_files()
+      
+      git2r::add(repo = self$repodir, path = "src/cwb/*")
+      commit(self$repository, message = "before global replacements")
+      
       self$replace_globally()
+      self$diff_global_replacements <- self$get_difflist()
+      git2r::add(repo = self$repodir, path = "src/cwb/*")
+      commit(self$repository, message = "global replacements applied")
+      
       self$patch_files()
-      
-      if (self$verbose) message("* add diff to class")
-      self$diff <- git2r::diff(self$repository, context_lines = 0)
-      
+      self$diff_file_patches <- self$get_difflist()
+
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       if (self$verbose) message("Commit: ", self$repodir)
