@@ -7,7 +7,7 @@
 #' P <- PatchEngine$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
-#'   revision = 1200
+#'   revision = 1400
 #' )
 #' P$patch_all()
 PatchEngine <- R6Class(
@@ -804,8 +804,9 @@ PatchEngine <- R6Class(
           replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
         ),
         
-        "src/globalvars.h" = list(
-          if (revision > 1330) replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L)
+        "src/globalvars.h" = c(
+          list(),
+          if (revision > 1330) list(replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L))
         )
       )
     },
