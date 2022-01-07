@@ -22,7 +22,7 @@ PE[["1069"]] <- PatchEngine$new(
 )
 PE[["1069"]]$patch_all()
     
-update <- "1100"
+update <- "1200"
 PE[[update]] <- PatchEngine$new(
   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
   repodir = "~/Lab/github/RcppCWB",
