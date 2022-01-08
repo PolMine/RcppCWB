@@ -1,5 +1,6 @@
 #' Workflow to patch CWB
 #'
+#' Flag -fcommon removed from config and config/platform/linux again
 #' @examples 
 #' data_files <- list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)
 #' for (fname in data_files) source(fname)
@@ -30,6 +31,11 @@ PatchEngine <- R6Class(
       c("fprintf\\s*\\(", "Rprintf("),
       c("(\\s+)printf\\(", "\\1Rprintf("),
       c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
+      
+      # The CWB file 'endian.h' causes issues with the endian.h system file. The
+      # best solution I could come up with is to rename endian.h into endian2.h.
+      # In addition - turn 'endian.h' into 'endian2.h' in the Makefile - change
+      # include statements to 'include "endian2.h"'
       c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"') # only files in cl, maybe limit this
     ),
     file_patches = NULL,
@@ -123,6 +129,7 @@ PatchEngine <- R6Class(
       cwb_files_repo <- list.files(repo_cwb_dir, recursive = TRUE, full.names = TRUE)
       cwb_files_repo_truncated <- gsub(repo_cwb_dir, "", cwb_files_repo)
       
+      # config dir copy of platform-file 'solaris': 'solaris_x86', with modification 'CFLAGS = -Wall -O3 -fPIC'
       added_files <-  cwb_files_repo_truncated[!cwb_files_repo_truncated %in% cwb_files_svn_truncated]
       added_files_full_path <- fs::path(repo_cwb_dir, added_files)
       added_files_existing <- added_files_full_path[file.exists(added_files_full_path)]
@@ -133,6 +140,10 @@ PatchEngine <- R6Class(
       git2r::commit(self$repodir, message = "CWB restored")
     },
     
+    #' @description 
+    #' The flex and bison parsers may be missing on CRAN build machines. To
+    #' avoid errors, parsed files files are generated (registry.tab.c,
+    #' registry.tab.h, registry.y)
     run_bison_flex = function(){
       
       if (self$verbose) message("Run bison and flex parsers")
@@ -308,6 +319,7 @@ PatchEngine <- R6Class(
       list(
         
         "src/cwb/cl/lex.creg.c" = list(
+          
           delete_line_before = list("^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)", 4L, 4L),
           delete_line_before = list("^\\s*cregrestart\\(cregin\\s*\\);", 2L, 11L),
           delete_line_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L),
@@ -318,6 +330,11 @@ PatchEngine <- R6Class(
           insert_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
           insert_after = list("#endif", "*/", 28L),
           insert_after = list("^\\}$", "*/", 5L),
+          
+          # Funktion 'static void yyunput (int c, register char * yy_bp )'
+          # auskommentiert, zur Vermeidung Nachricht: lex.creg.c:1410:17:
+          # warning: unused function 'yyunput' [-Wunused-function]
+
           replace = list("^(\\s*)(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);).*?$", "\\1/* \\2 */", 1),
           replace = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "static void yyunput (int c, register char * yy_bp )", 1L),
           replace = list("^(\\s*)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
@@ -347,12 +364,29 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cl/attributes.c" = list(
+
           insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
+          
+          # attributes.c:755:19: warning: variable ‘dollar’ set but not used [-Wunused-but-set-variable]
+          # int ppos, bpos, dollar, rpos;
           replace = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
           replace = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
           replace = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */", 1),
+          
+          # attributes.c: In function ‘component_full_name’:
+          #   macros.h:59:22: warning: the address of ‘rname’ will always evaluate as ‘true’ [-Waddress]
+          # ((a) && (b) && (strcmp((a), (b)) == 0)))
+          # attributes.c:807:11: note: in expansion of macro ‘STREQ’
+          # if (STREQ(rname, "HOME"))
           replace = list('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
+          
+          # attributes.c:809:16: note: in expansion of macro ‘STREQ’
+          # else if (STREQ(rname, "APATH"))
           replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
+          
+          # attributes.c:812:16: note: in expansion of macro ‘STREQ’
+          # STREQ macro dissolved to avoid warnings in attributes.c
+          # else if (STREQ(rname, "ANAME"))
           replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)', 1)
         ),
         
@@ -362,6 +396,8 @@ PatchEngine <- R6Class(
         
         "src/cwb/cl/class-mapping.c" = list(
           insert_before = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
+          
+          # argumet names class renamed to obj
           replace = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 2),
           replace = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 1),
           replace = list("^(\\s+)return\\smember_of_class_i\\(map,\\sclass,\\sid\\);", "\\1return member_of_class_i(map, obj, id);", 1),
@@ -380,6 +416,10 @@ PatchEngine <- R6Class(
         
         "src/cwb/cl/fileutils.c" = list(
           insert_before = list('^#include\\s<sys/stat\\.h>', "void Rprintf(const char *, ...);"),
+          
+          # to satisfy solaris
+          # #include <signal.h> /* added by Andreas Blaette  */
+          # #include <sys/socket.h> /* added by Andreas Blaette */
           insert_before = list('^#include\\s"globals\\.h"', c("#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", ""))
         ),
         
@@ -398,6 +438,8 @@ PatchEngine <- R6Class(
         
         "src/cwb/cl/makecomps.c" = list(
           insert_before = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", "")),
+          
+          # commented out: char errmsg[CL_MAX_LINE_LENGTH] because also defined elsewhere
           replace = list("^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1)
         ),
         
@@ -411,6 +453,10 @@ PatchEngine <- R6Class(
         
         "src/cwb/cl/storage.c" = list(
           insert_before = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
+          
+          # storage.c: In function ‘mmapfile’:
+          #   storage.c:335:12: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+          # write(fd, &fd, sizeof(int));
           insert_before = list("^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);", '      if (success < 0) Rprintf("Operation not successful");'),
           replace = list("^(\\s+)write\\(fd,\\s&fd,\\ssizeof\\(int\\)\\);", "\\1ssize_t success = write(fd, &fd, sizeof(int));", 1)
         ),
@@ -428,16 +474,31 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cl/cdaccess.c" = list(
+
           insert_after = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);"),
+          
           replace = list("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;", 1),
           replace = list("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
           replace = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
+          
+          # cdaccess.c: In function ‘cl_regex2id’:
+          #   cdaccess.c:1392:20: warning: variable ‘off_end’ set but not used [-Wunused-but-set-variable]
+          # int off_start, off_end;     /* start and end offset of current lexicon entry */
           replace = list("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
+          
           replace = list("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
           replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 3),
+          
+          # cdaccess.c: In function ‘cl_dynamic_call’:
+          #   cdaccess.c:2533:17: warning: variable ‘arg’ set but not used [-Wunused-but-set-variable]
+          # DynCallResult arg;
           replace = list("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
           replace = list("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1),
+          
+          # cdaccess.c:2697:12: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+          # fgets(call, CL_MAX_LINE_LENGTH, pipe);
           replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
+          
           replace = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1)
         ),
         
@@ -448,11 +509,19 @@ PatchEngine <- R6Class(
         "src/cwb/cl/ngram-hash.c" = list(
           insert_after = list("^#include\\s<math\\.h>", "void Rprintf(const char *, ...);"),
           replace = list("^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;", "\\1cl_ngram_hash_entry entry;", 1),
+          
+          # ngram-hash.c: In function ‘cl_delete_ngram_hash’:
+          #   ngram-hash.c:146:30: warning: variable ‘temp’ set but not used [-Wunused-but-set-variable]
+          # cl_ngram_hash_entry entry, temp;
           replace = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1)
         ),
         
         "src/cwb/cl/regopt.c" = list(
           insert_after = list('^#include\\s"regopt\\.h"', "void Rprintf(const char *, ...);"),
+          
+          # regopt.c: In function ‘make_jump_table’:
+          #   regopt.c:1148:18: warning: suggest parentheses around comparison in operand of ‘&’ [-Wparentheses]
+          # if (ch >= 32 & ch < 127)
           replace = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
         ),
         
@@ -462,6 +531,12 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/groups.c" = list(
+          
+          # Comment out open_temporary_file(char *tmp_name_buffer) in
+          # cqp/output.c, in cqp/output.h and in usage in functions calling
+          # this function: ComputeGroupExternally (cqp/groups.c) and
+          # SortExternally (cqp/ranges.c)
+
           delete_line_before = list("^Group\\s\\*", 3L),
           delete_line_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
           delete_line_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
@@ -480,6 +555,11 @@ PatchEngine <- R6Class(
         "src/cwb/cqp/output.c" = c(
           list(),
           if (revision < 1400) list(
+            
+            # Comment out open_temporary_file(char *tmp_name_buffer) in
+            # cqp/output.c, in cqp/output.h and in usage in functions calling
+            # this function: ComputeGroupExternally (cqp/groups.c) and
+            # SortExternally (cqp/ranges.c)
             delete_line_before = list('^\\s*sprintf\\(prefix,\\s"cqpt\\.%d",\\s\\(unsigned\\sint\\)getpid\\(\\)\\);', 1L, 8L),
             insert_before = list("^FILE\\s\\*\\s*", "/*", 1),
             insert_after = list("^\\}\\s*$", "*/", 3),
@@ -524,6 +604,12 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/lex.yy.c" = list(
+          
+          # Funktion yyunput auskommentiert, zur Vermeidung von FEhler:
+          #   lex.yy.c:2459:17: warning: unused function 'yyunput' [-Wunused-function]
+          # auskommentiert: static int input  (void)
+          # um zu vermeiden:
+          #   lex.yy.c:2500:16: warning: function 'input' is not needed and will not be emitted [-Wunneeded-internal-declaration]
           delete_line_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L),
           insert_before = list("#ifdef __cplusplus", "/*", 3L),
           insert_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", "", 1L),
@@ -532,6 +618,15 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/Makefile" = list(
+          
+          # Define target 'all' as follows:
+          # all: libcqp.a
+          #
+          # new target added - to generate libcqp.a
+          # libcqp.a: $(OBJS) $(CQI_OBJS)
+          #     $(RM) $@
+          #     $(AR) $@ $^
+          #     $(RANLIB) $@
           delete_line_before = list("^clean:$", 1L, 7L),
           delete_line_before = list("^cqp\\$\\(EXEC_SUFFIX\\):", 1L, 8L),
           insert_before = list("^cqp\\$\\(EXEC_SUFFIX\\):.*", "libcqp.a: $(OBJS) $(CQI_OBJS)\n\t$(RM) $@\n\t$(AR) cq $@ $^\n", 1L),
@@ -541,6 +636,11 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/hash.c" = list(
+          
+          # The symbols/functions 'hash_string', 'is_prime' and 'find_prime' are
+          # defined exactly the same way in cl/lexhash.c and cqp/hash.c. To
+          # avoid linker errors, the functions are commented out in cqp/hash.c
+
           insert_before = list("^\\s*int\\s*$", "/*", 1),
           insert_before = list("^\\s*int\\s*$", "/*", 2),
           insert_before = list("^unsigned\\sint\\s*$", "/*", 1),
@@ -559,8 +659,16 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1),
           replace = list("^(\\s*)if\\s\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1),
           replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
+          
+          # eval.c: In function ‘cqp_run_tab_query’:
+          #   eval.c:2911:21: warning: variable ‘corpus_size’ set but not used [-Wunused-but-set-variable]
+          # int smallest_col, corpus_size;
           replace = list("^(\\s*)int\\ssmallest_col,\\scorpus_size;", "\\1int smallest_col;", 1),
           replace = list("^(\\s*)corpus_size\\s=\\sevalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1),
+          
+          # The line 'assert(col->type = tabular)' (line 2891) is turned into
+          # 'assert((col->type = tabular));' to avoid -Wparentheses error (on
+          # Debian CRAN machine)
           replace = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1)
         ),
         
@@ -568,6 +676,8 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
           replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
           replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
+          
+          # global variables prepended by "extern"
           extern = list(
             "int eep;",
             "EvalEnvironment Environment[MAXENVIRONMENT];",
@@ -582,14 +692,24 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/html-print.c" = list(
+          # html-print.c: In function ‘html_print_context’:
+          #   html-print.c:317:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+          # char *s;
           replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
+          
+          # html-print.c: In function ‘html_print_output’:
+          #   html-print.c:418:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
+          # AttributeList *strucs;
           replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
           replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
         ),
         
         "src/cwb/cqp/latex-print.c" = list(
+          # latex-print.c: In function ‘latex_print_context’:
+          #   latex-print.c:236:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+          # char *s;
           replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
           replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1)
@@ -597,6 +717,8 @@ PatchEngine <- R6Class(
         
         "src/cwb/cqp/options.h" = list(
           replace = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
+          
+          # all global variables prepended by "extern" statement
           extern = as.list(c(
             
             "char *def_unbr_attr;",
@@ -694,6 +816,10 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/output.h" = list(
+          # Comment out open_temporary_file(char *tmp_name_buffer) in
+          # cqp/output.c, in cqp/output.h and in usage in functions calling
+          # this function: ComputeGroupExternally (cqp/groups.c) and
+          # SortExternally (cqp/ranges.c)
           replace = list("^(\\s*)FILE\\s\\*open_temporary_file\\(char\\s\\*tmp_name_buffer);", "\\1/* FILE *open_temporary_file(char *tmp_name_buffer); */", 1)
         ),
         
@@ -710,28 +836,48 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/corpmanag.c" = list(
+          # global variable corpuslist prepended by extern statement
           extern = list("CorpusList *corpuslist;")
         ),
         
         "src/cwb/cqp/corpmanag.h" = list(
-          extern = list("CorpusList *current_corpus;", "CorpusList *corpuslist;")
+          # global variables current_corpus and corpusList prepended by "extern" statement
+          extern = list(
+            "CorpusList *current_corpus;",
+            "CorpusList *corpuslist;"
+          )
         ),
         
         "src/cwb/cqp/regex2dfa.c" = list(
+          
+          # regex2dfa.c: In function ‘Parse’:
+          #   regex2dfa.c:544:7: warning: variable ‘ignore_value’ set but not used [-Wunused-but-set-variable]
+          # int ignore_value;             /* ignore value of POP() macro */
           replace = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1)
         ),
         
         "src/cwb/cqp/sgml-print.c" = list(
+          # sgml-print.c: In function ‘sgml_print_output’:
+          #   sgml-print.c:325:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
+          # AttributeList *strucs;
           replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
+          
           replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
         ),
         
         "src/cwb/cqp/parser.tab.c" = list(
+          
+          # cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
+          # replaced by:
+          #   cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
+          # The previous version resulted in an awful total crash. QueryBuffer causes the problem! 
           replace = list('^(\\s*)cqpmessage\\(Error,\\s"CQP\\sSyntax\\sError:.*?",\\ss,\\sQueryBuffer\\);', '\\1cqpmessage(Error, "CQP Syntax Error: %s", s);', 1L),
           replace = list("^(\\s+)int\\sok;", "\\1int ok __attribute__((unused));", 4L)
         ),
         
         "src/cwb/cqp/cqp.h" = list(
+          
+          # global variables prepended by "extern"
           extern = as.list(c(
             "CYCtype LastExpression;",
             "int exit_cqp;",
