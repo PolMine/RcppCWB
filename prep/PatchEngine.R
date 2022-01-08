@@ -491,7 +491,7 @@ PatchEngine <- R6Class(
         "src/cwb/cl/makecomps.c" = c(
           list(
             # Unchanged in r1690
-            insert_before = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", "")),
+            insert_before = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", ""))
           ),
           
           if (revision == 1069) list(
