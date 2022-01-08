@@ -318,103 +318,145 @@ PatchEngine <- R6Class(
     patches = function(revision){
       list(
         
-        "src/cwb/cl/lex.creg.c" = list(
+        "src/cwb/cl/lex.creg.c" = c(
+          list(),
+          # These changes are highly specific and are unlikely to work out of the box for r1690
           
-          delete_line_before = list("^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)", 4L, 4L),
-          delete_line_before = list("^\\s*cregrestart\\(cregin\\s*\\);", 2L, 11L),
-          delete_line_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L),
-          insert_before = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
-          insert_before = list("#ifndef\\sYY_NO_INPUT", "/*", 1L),
-          insert_before = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "/*", 1L),
-          insert_before = list("^#ifndef\\sYY_NO_INPUT", "/*", 2L),
-          insert_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
-          insert_after = list("#endif", "*/", 28L),
-          insert_after = list("^\\}$", "*/", 5L),
+          if (revision == 1069) list(
+            delete_line_before = list("^\\s*if\\s\\(\\s\\(yy_c_buf_p\\)", 4L, 4L),
+            delete_line_before = list("^\\s*cregrestart\\(cregin\\s*\\);", 2L, 11L),
+            delete_line_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 1L),
+            insert_before = list("/\\*\\send\\sstandard\\sC\\sheaders\\.\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1),
+            insert_before = list("#ifndef\\sYY_NO_INPUT", "/*", 1L),
+            insert_before = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "/*", 1L),
+            insert_before = list("^#ifndef\\sYY_NO_INPUT", "/*", 2L),
+            insert_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", c("*/", ""), 1L),
+            insert_after = list("#endif", "*/", 28L),
+            insert_after = list("^\\}$", "*/", 5L),
+            
+            # Funktion 'static void yyunput (int c, register char * yy_bp )'
+            # auskommentiert, zur Vermeidung Nachricht: lex.creg.c:1410:17:
+            # warning: unused function 'yyunput' [-Wunused-function]
+            
+            replace = list("^(\\s*)(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);).*?$", "\\1/* \\2 */", 1),
+            replace = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "static void yyunput (int c, register char * yy_bp )", 1L),
+            replace = list("^(\\s*)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
+            replace = list("/\\*\\scast\\sfor\\s8-bit\\schar's\\s\\*/", "", 1L),
+            replace = list("\\s*/\\*\\spreserve\\scregtext\\s\\*/", "", 1L),
+            replace = list("/\\*\\sifndef YY_NO_INPUT\\s\\*/", "", 1L),
+            remove_lines = list("^\\s/\\*\\sundo\\seffects\\sof\\ssetting\\sup\\scregtext\\s\\*/", 1L),
+            remove_lines = list("/\\*\\sneed\\sto\\sshift\\sthings\\sup\\sto\\smake\\sroom\\s\\*/", 1L),
+            remove_lines = list("/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/", 1L),
+            remove_lines = list("^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L),
+            remove_lines = list("^\\s*/\\*FALLTHROUGH\\*/\\s*$", 1L)
+          )
+        ),
+        
+        "src/cwb/cl/endian2.h" = c(
+          list(
+            insert_before = list("#include\\s<windows\\.h>" , "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */", 1L)
+          ),
           
-          # Funktion 'static void yyunput (int c, register char * yy_bp )'
-          # auskommentiert, zur Vermeidung Nachricht: lex.creg.c:1410:17:
-          # warning: unused function 'yyunput' [-Wunused-function]
+          # Ensure that order of inclusion is 'winsock2.h' and then 'windows.h'.
+          # The windows.h/winsock2.h order has persisted, but the comment after
+          # has changed.
+          if (revision == 1069) list(
+            delete_line_before = list("/* for consistency:", 1L, 1L)
+          ),
+          if (revision >= 1690) list(
+            delete_line_before = list("/\\*\\snote,\\sin\\sorder\\sfor\\sall\\sthis\\sto\\swork,", 1L, 1L)
+          )
+        ),
+        
+        # "src/cwb/cl/Makefile" = list(
+        #   delete_line_before = list("^libcl.a: \\$\\(OBJS\\)", 1L, if (revision >= 1400) 9L else 6L),
+        #   delete_line_before = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
+        #   delete_line_before = list("^depend:$", 1L, if (revision >= 1400) 14L else 22L),
+        #   replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
+        #   replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
+        #   replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
+        #   remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L)
+        # ),
+        
+        "src/cwb/cl/attributes.c" = c(
 
-          replace = list("^(\\s*)(static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);).*?$", "\\1/* \\2 */", 1),
-          replace = list("^\\s*static\\svoid\\syyunput\\s\\(int\\sc,\\sregister\\schar\\s\\*\\syy_bp\\s\\)", "static void yyunput (int c, register char * yy_bp )", 1L),
-          replace = list("^(\\s*)\\{(\\s*)/\\*\\sneed\\smore\\sinput\\s\\*/", "\\1{\\2", 1L),
-          replace = list("/\\*\\scast\\sfor\\s8-bit\\schar's\\s\\*/", "", 1L),
-          replace = list("\\s*/\\*\\spreserve\\scregtext\\s\\*/", "", 1L),
-          replace = list("/\\*\\sifndef YY_NO_INPUT\\s\\*/", "", 1L),
-          remove_lines = list("^\\s/\\*\\sundo\\seffects\\sof\\ssetting\\sup\\scregtext\\s\\*/", 1L),
-          remove_lines = list("/\\*\\sneed\\sto\\sshift\\sthings\\sup\\sto\\smake\\sroom\\s\\*/", 1L),
-          remove_lines = list("/\\*\\s\\+2\\sfor\\sEOB\\schars\\.\\s\\*/", 1L),
-          remove_lines = list("^\\s*/\\*\\sThis\\swas\\sreally\\sa\\sNUL\\.\\s\\*/", 1L),
-          remove_lines = list("^\\s*/\\*FALLTHROUGH\\*/\\s*$", 1L)
-        ),
-        
-        "src/cwb/cl/endian2.h" = list(
-          delete_line_before = list("/* for consistency:", 1L, 1L),
-          insert_before = list("#include\\s<windows\\.h>" , "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */", 1L)
-        ),
-        
-        "src/cwb/cl/Makefile" = list(
-          delete_line_before = list("^libcl.a: \\$\\(OBJS\\)", 1L, if (revision >= 1400) 9L else 6L),
-          delete_line_before = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
-          delete_line_before = list("^depend:$", 1L, if (revision >= 1400) 14L else 22L),
-          replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
-          replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
-          replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
-          remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L)
-        ),
-        
-        "src/cwb/cl/attributes.c" = list(
-
-          insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
+          list(
+            # This will work for r1690 too
+            insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", ""))
+          ),
           
-          # attributes.c:755:19: warning: variable ‘dollar’ set but not used [-Wunused-but-set-variable]
-          # int ppos, bpos, dollar, rpos;
-          replace = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
-          replace = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
-          replace = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */", 1),
+          # Cannot find the dollar variabl in r1690 - seems to be gone
+          if (revision == 1069) list(
+            # attributes.c:755:19: warning: variable ‘dollar’ set but not used [-Wunused-but-set-variable]
+            # int ppos, bpos, dollar, rpos;
+            replace = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
+            replace = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
+            replace = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */", 1)
+          ),
           
-          # attributes.c: In function ‘component_full_name’:
-          #   macros.h:59:22: warning: the address of ‘rname’ will always evaluate as ‘true’ [-Waddress]
-          # ((a) && (b) && (strcmp((a), (b)) == 0)))
-          # attributes.c:807:11: note: in expansion of macro ‘STREQ’
-          # if (STREQ(rname, "HOME"))
-          replace = list('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
-          
-          # attributes.c:809:16: note: in expansion of macro ‘STREQ’
-          # else if (STREQ(rname, "APATH"))
-          replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
-          
-          # attributes.c:812:16: note: in expansion of macro ‘STREQ’
-          # STREQ macro dissolved to avoid warnings in attributes.c
-          # else if (STREQ(rname, "ANAME"))
-          replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)', 1)
+          # The STREQ macro is replaced by a cl_str_is() function in r1690
+          if (revision == 1690) list(
+            
+            # attributes.c: In function ‘component_full_name’:
+            #   macros.h:59:22: warning: the address of ‘rname’ will always evaluate as ‘true’ [-Waddress]
+            # ((a) && (b) && (strcmp((a), (b)) == 0)))
+            # attributes.c:807:11: note: in expansion of macro ‘STREQ’
+            # if (STREQ(rname, "HOME"))
+            replace = list('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
+            
+            # attributes.c:809:16: note: in expansion of macro ‘STREQ’
+            # else if (STREQ(rname, "APATH"))
+            replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
+            
+            # attributes.c:812:16: note: in expansion of macro ‘STREQ’
+            # STREQ macro dissolved to avoid warnings in attributes.c
+            # else if (STREQ(rname, "ANAME"))
+            replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)', 1)
+          )
         ),
         
         "src/cwb/cl/bitio.c" = list(
+          # Unchanged, will work as in 1069
           insert_before = list("^#include\\s<sys/types\\.h>", "void Rprintf(const char *, ...);")
         ),
         
-        "src/cwb/cl/class-mapping.c" = list(
-          insert_before = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
-          
-          # argumet names class renamed to obj
-          replace = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 2),
-          replace = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 1),
-          replace = list("^(\\s+)return\\smember_of_class_i\\(map,\\sclass,\\sid\\);", "\\1return member_of_class_i(map, obj, id);", 1),
-          replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
-          replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
-          replace = list("^(\\s+)class->tokens,", "\\1obj->tokens,", 1),
-          replace = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1)
+        "src/cwb/cl/class-mapping.c" = c(
+          list(),
+          # This file does not exist in r1960
+          if (revision == 1069) list(
+            insert_before = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
+            
+            # argumet names class renamed to obj
+            replace = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 2),
+            replace = list("(\\s*)\\*\\s@param\\sclass\\s+The\\sclass\\s+to\\scheck\\.", "\\1* @param obj  The class to check.", 1),
+            replace = list("^(\\s+)return\\smember_of_class_i\\(map,\\sclass,\\sid\\);", "\\1return member_of_class_i(map, obj, id);", 1),
+            replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
+            replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1),
+            replace = list("^(\\s+)class->tokens,", "\\1obj->tokens,", 1),
+            replace = list("^(\\s+)class->nr_tokens,", "\\1obj->nr_tokens,", 1)
+          )
         ),
         
-        "src/cwb/cl/corpus.c" = list(
-          insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
-          remove_lines = list("(\\s+)stderr,", 3),
-          remove_lines = list("(\\s+)stderr,", 2),
-          remove_lines = list("(\\s+)stderr,", 1)
+        "src/cwb/cl/corpus.c" = c(
+          list(
+            # Should work in r1690 too
+            insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
+          ),
+          
+          # Usage of stderr on a separate line - 3 times in r1069, but only once in r1690
+          if (revision == 1069) list(
+            remove_lines = list("(\\s+)stderr,", 3),
+            remove_lines = list("(\\s+)stderr,", 2)
+          ),
+          list(
+            remove_lines = list("(\\s+)stderr,", 1)
+          )
         ),
         
         "src/cwb/cl/fileutils.c" = list(
+          
+          # All if this should work in r1690 too (though patches for Solares may be obsolete)
+          
           insert_before = list('^#include\\s<sys/stat\\.h>', "void Rprintf(const char *, ...);"),
           
           # to satisfy solaris
@@ -424,34 +466,52 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cl/globals.h" = list(
-          insert_before = list('^#ifndef\\s_globals_h_', "void Rprintf(const char *, ...);")
+          # Note the change from _globals_h_ to _cl_globals_h_
+          insert_before = list(
+            if (revision == 1069) '^#ifndef\\s_globals_h_' else '^#ifndef\\s_cl_globals_h_',
+            "void Rprintf(const char *, ...);")
         ),
         
         "src/cwb/cl/lexhash.c" = list(
           insert_before = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);"),
-          insert_after = list('^#include\\s"lexhash\\.h"', "#include <unistd.h>")
+          
+          # Do not recall why this include is necessary, but the lexhash.h include (and file)
+          # are absent in r1690 - so use another anchor.
+          insert_after = list(
+            if (revision == 1069) '^#include\\s"lexhash\\.h"' else '#include\\s"globals\\.h"',
+            "#include <unistd.h>"
+            )
         ),
         
         "src/cwb/cl/macros.c" = list(
+          # Unchanged in r1690
           insert_before = list('#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
         ),
         
-        "src/cwb/cl/makecomps.c" = list(
-          insert_before = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", "")),
+        "src/cwb/cl/makecomps.c" = c(
+          list(
+            # Unchanged in r1690
+            insert_before = list('#include\\s<ctype\\.h>', c("void Rprintf(const char *, ...);", "")),
+          ),
           
-          # commented out: char errmsg[CL_MAX_LINE_LENGTH] because also defined elsewhere
-          replace = list("^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1)
+          if (revision == 1069) list(
+            # commented out: char errmsg[CL_MAX_LINE_LENGTH] because also defined elsewhere
+            replace = list("^(\\s*)char\\serrmsg\\[CL_MAX_LINE_LENGTH\\];", "/* char errmsg[CL_MAX_LINE_LENGTH]; */", 1)
+          )
         ),
         
         "src/cwb/cl/registry.y" = list(
+          # Stable r1069-1690
           insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
         ),
         
         "src/cwb/cl/special-chars.c" = list(
+          # Stable r1069-1690
           insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
         ),
         
         "src/cwb/cl/storage.c" = list(
+          # All of this is stable r1069-1690
           insert_before = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
           
           # storage.c: In function ‘mmapfile’:
@@ -462,94 +522,129 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cl/windows-mmap.c" = list(
+          # stable r1069 and r1690
           insert_before = list('^#include\\s"windows-mmap\\.h"', "void Rprintf(const char *, ...);")
         ),
         
+        # This file is not present in r1690
         "src/cwb/cl/registry.tab.c" = list(
           insert_before = list("#define\\sYYBISON\\s1", "void Rprintf(const char *, ...);", 1L)
         ),
         
+        
         "src/cwb/cl/bitfields.c" = list(
+          # stable r1069-r1690
           insert_after = list("^static\\sint\\sBaseTypeBits", "void Rprintf(const char *, ...);")
         ),
         
-        "src/cwb/cl/cdaccess.c" = list(
-
-          insert_after = list('^#include\\s"cdaccess\\.h"', "void Rprintf(const char *, ...);"),
+        "src/cwb/cl/cdaccess.c" = c(
           
-          replace = list("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;", 1),
-          replace = list("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
-          replace = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
+          list(
+            # The include of 'cdaccess.h' is gone with r1690 so we use another anchor
+            insert_after = list(
+              if (revision == 1069) '^#include\\s"cdaccess\\.h"' else '^#include\\s+"compression\\.h"',
+              "void Rprintf(const char *, ...);"
+            ),
+            
+            # This code is unchanged with r1690
+            
+            # cdaccess.c:2697:12: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+            # fgets(call, CL_MAX_LINE_LENGTH, pipe);
+            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
+            
+            replace = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1)
+          ),
           
-          # cdaccess.c: In function ‘cl_regex2id’:
-          #   cdaccess.c:1392:20: warning: variable ‘off_end’ set but not used [-Wunused-but-set-variable]
-          # int off_start, off_end;     /* start and end offset of current lexicon entry */
-          replace = list("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
-          
-          replace = list("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
-          replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 3),
-          
-          # cdaccess.c: In function ‘cl_dynamic_call’:
-          #   cdaccess.c:2533:17: warning: variable ‘arg’ set but not used [-Wunused-but-set-variable]
-          # DynCallResult arg;
-          replace = list("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
-          replace = list("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1),
-          
-          # cdaccess.c:2697:12: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
-          # fgets(call, CL_MAX_LINE_LENGTH, pipe);
-          replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
-          
-          replace = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1)
+          # These are unused variable patches gone with r1690 (vars commented out, for instance)
+          if (revision == 1069) list(
+            replace = list("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;", 1),
+            replace = list("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
+            replace = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
+            
+            # cdaccess.c: In function ‘cl_regex2id’:
+            #   cdaccess.c:1392:20: warning: variable ‘off_end’ set but not used [-Wunused-but-set-variable]
+            # int off_start, off_end;     /* start and end offset of current lexicon entry */
+            replace = list("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
+            replace = list("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
+            replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 3),
+            
+            # cdaccess.c: In function ‘cl_dynamic_call’:
+            #   cdaccess.c:2533:17: warning: variable ‘arg’ set but not used [-Wunused-but-set-variable]
+            # DynCallResult arg;
+            replace = list("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
+            replace = list("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1)
+          )
         ),
         
         "src/cwb/cl/globals.c" = list(
+          # stable r10690 - r1690
           insert_after = list('^#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
         ),
         
-        "src/cwb/cl/ngram-hash.c" = list(
-          insert_after = list("^#include\\s<math\\.h>", "void Rprintf(const char *, ...);"),
-          replace = list("^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;", "\\1cl_ngram_hash_entry entry;", 1),
-          
-          # ngram-hash.c: In function ‘cl_delete_ngram_hash’:
-          #   ngram-hash.c:146:30: warning: variable ‘temp’ set but not used [-Wunused-but-set-variable]
-          # cl_ngram_hash_entry entry, temp;
-          replace = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1)
-        ),
-        
-        "src/cwb/cl/regopt.c" = list(
-          insert_after = list('^#include\\s"regopt\\.h"', "void Rprintf(const char *, ...);"),
-          
-          # regopt.c: In function ‘make_jump_table’:
-          #   regopt.c:1148:18: warning: suggest parentheses around comparison in operand of ‘&’ [-Wparentheses]
-          # if (ch >= 32 & ch < 127)
-          replace = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
-        ),
-        
-        "src/cwb/cl/class-mapping.h" = list(
-          replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
-          replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1)
-        ),
-        
-        "src/cwb/cqp/groups.c" = list(
-          
-          # Comment out open_temporary_file(char *tmp_name_buffer) in
-          # cqp/output.c, in cqp/output.h and in usage in functions calling
-          # this function: ComputeGroupExternally (cqp/groups.c) and
-          # SortExternally (cqp/ranges.c)
+        "src/cwb/cl/ngram-hash.c" = c(
+          list(
+            insert_after = list("^#include\\s<math\\.h>", "void Rprintf(const char *, ...);")            
+          ),
 
-          delete_line_before = list("^Group\\s\\*", 3L),
-          delete_line_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
-          delete_line_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
-          delete_line_before = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{", 1L),
-          delete_line_before = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{", 1L),
-          delete_line_before = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);", 1L),
-          delete_line_before = list("^\\s*return\\sComputeGroupExternally\\(group\\);", 1L),
-          insert_before = list("^Group\\s\\*", "/*", 3), # begin of commenting out ComputeGroupExternally(Group *group),
-          insert_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", c("*/", "")), # end of commenting out ComputeGroupExternally(Group *group)
-          insert_after = list("return\\sComputeGroupInternally\\(group\\);", c("   */", "  return group;")),
-          replace = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1),
-          replace = list("^(.*?)\\s*/\\*\\smodifies\\sGroup\\sobject\\sin\\splace\\sand\\sreturns\\spointer\\s\\*/", "\\1", 1),
-          replace = list("^(\\s*)(if\\s\\(UseExternalGrouping\\s&&\\s\\!insecure\\s&&\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))", "\\1/* \\2", 1)
+          # The variable 'temp' is unused only in r1069?!
+          if (revision == 1069) list(
+            # ngram-hash.c: In function ‘cl_delete_ngram_hash’:
+            #   ngram-hash.c:146:30: warning: variable ‘temp’ set but not used [-Wunused-but-set-variable]
+            # cl_ngram_hash_entry entry, temp;
+            replace = list("^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;", "\\1cl_ngram_hash_entry entry;", 1),
+            replace = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1)
+          )
+        ),
+        
+        "src/cwb/cl/regopt.c" = c(
+          list(
+            insert_after = list(
+              if (revision == 1069) '^#include\\s"regopt\\.h"' else '^#include\\s"globals\\.h"',
+              "void Rprintf(const char *, ...);"
+            ) 
+          ),
+          
+          # The issue may still be present but the syntax has changed - so we do not apply this for now
+          if (revision == 1069) list(
+            # regopt.c: In function ‘make_jump_table’:
+            #   regopt.c:1148:18: warning: suggest parentheses around comparison in operand of ‘&’ [-Wparentheses]
+            # if (ch >= 32 & ch < 127)
+            replace = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
+          )
+        ),
+        
+        "src/cwb/cl/class-mapping.h" = c(
+          list(),
+          # The file is not there in r1690
+          if (revision == 1069) list(
+            replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 2),
+            replace = list("^(\\s+)SingleMapping\\sclass,", "\\1SingleMapping obj,", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/groups.c" = c(
+          list(),
+          # The file is gone with r1690
+          if (revision == 1069) list(
+            # Comment out open_temporary_file(char *tmp_name_buffer) in
+            # cqp/output.c, in cqp/output.h and in usage in functions calling
+            # this function: ComputeGroupExternally (cqp/groups.c) and
+            # SortExternally (cqp/ranges.c)
+            
+            delete_line_before = list("^Group\\s\\*", 3L),
+            delete_line_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
+            delete_line_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", 1L),
+            delete_line_before = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{", 1L),
+            delete_line_before = list("^\\s*if\\s\\(\\(fd\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\s==\\sNULL\\)\\s\\{", 1L),
+            delete_line_before = list("^(\\s*)sprintf\\(sort_call,\\sExternalGroupingCommand,\\stemporary_name\\);", 1L),
+            delete_line_before = list("^\\s*return\\sComputeGroupExternally\\(group\\);", 1L),
+            insert_before = list("^Group\\s\\*", "/*", 3), # begin of commenting out ComputeGroupExternally(Group *group),
+            insert_before = list("^Group\\s\\*compute_grouping\\(CorpusList\\s\\*cl,", c("*/", "")), # end of commenting out ComputeGroupExternally(Group *group)
+            insert_after = list("return\\sComputeGroupInternally\\(group\\);", c("   */", "  return group;")),
+            replace = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1),
+            replace = list("^(.*?)\\s*/\\*\\smodifies\\sGroup\\sobject\\sin\\splace\\sand\\sreturns\\spointer\\s\\*/", "\\1", 1),
+            replace = list("^(\\s*)(if\\s\\(UseExternalGrouping\\s&&\\s\\!insecure\\s&&\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))", "\\1/* \\2", 1)
+          )
         ),
         
         "src/cwb/cqp/output.c" = c(
@@ -569,56 +664,68 @@ PatchEngine <- R6Class(
           )
         ),
         
-        "src/cwb/cqp/parser.y" = list(
-          delete_line_before = list("^\\s*if\\s\\(\\$2\\s&&\\sgenerate_code\\)\\s\\{", 3L),
-          replace = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 3),
-          replace = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 2),
-          replace = list("^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1)
-        ),
-        
-        "src/cwb/cqp/ranges.c" = list(
-          delete_line_before = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 2L, 5L),
-          delete_line_before = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 1L, 5L),
-          delete_line_before = list("^\\s*value\\s=\\scl_string_canonical\\(value,\\ssrt_cl->corpus->charset,\\ssrt_flags,\\sCL_STRING_CANONICAL_STRDUP\\);", 1L, 7L),
-          insert_before = list("^int", "/*", 9),
-          insert_after = list("^\\}\\s*$", "*/", 11),
-          replace = list("^(\\s*)line\\s=\\s-1;(\\s*)\\s/\\*\\swill\\sindicate\\ssort\\sfailure\\sbelow\\sif\\stext_size\\s==\\s0\\s\\*/", "\\1line = -1;\\2", 1),
-          replace = list("^(\\s*)\\}(\\s)/\\*\\send\\sfor\\seach\\stoken\\s\\*/", "\\1}\\2", 1),
-          replace = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\sfailure\\sof\\sexternal\\ssort\\scommand\\s*\\*/", "\\1line = -1;\\2", 1),
-          replace = list("^(\\s*)break;\\s*/\\*\\sabort\\s\\*/", "\\1break;", 1),
-          replace = list("^(\\s*)ok\\s=\\sSortExternally\\(\\);", "\\1/* ok = SortExternally(); */", 1),
-          # "src/cwb/cqp/regex2dfa.c" = list(
-          #  replace = list("^(\\s*)va_start\\(AP,\\sFormat\\);\\vRprintf(Format, AP); va_end(AP);", "\\1va_start(AP, Format); Rprintf(Format, AP); va_end(AP);", 1),
-          # ),
-          remove_lines = list("^\\s*/\\*\\suses\\ssettings\\sfrom\\sstatic\\ssrt_\\*\\svariables\\s\\*/", 1),
-          remove_lines = list("^\\s*/\\*\\sdetermine\\sstart\\sand\\send\\sposition\\sof\\ssort\\sinterval\\sfor\\sthis\\smatch\\s\\*/", 1),
-          remove_lines = list("/\\*\\sadjust\\ssort\\sboundaries.*?\\*/", 1),
-          remove_lines = list("/*\\sswap\\sstart\\sand\\send\\sof\\sinterval.*?\\*/", 1),
-          remove_lines = list("/\\*\\sdetermine\\ssort\\sdirection\\s\\*/", 1),
-          remove_lines = list("/\\*\\show\\smany\\stokens\\sto\\sprint\\s\\*/", 1),
-          remove_lines = list("/\\*\\swhen\\susing\\sflags,\\sprint\\snormalised\\stoken\\ssequence.*?\\*/", 1),
-          remove_lines = list("/\\*\\sprint\\ssequence\\sof\\stokens\\sin\\ssort\\sinterval\\s\\*/", 1),
-          remove_lines = list("/\\*\\snow,\\sexecute\\sthe\\sexternal\\ssort\\scommand.*?\\*/", 1),
-          remove_lines = list("/\\*\\srun\\ssort\\scmd\\sand\\sread\\sfrom\\spipe\\s\\*/", 1),
-          remove_lines = list("/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/", 1)
-        ),
-        
-        "src/cwb/cqp/lex.yy.c" = list(
+        "src/cwb/cqp/parser.y" = c(
+          list(),
           
-          # Funktion yyunput auskommentiert, zur Vermeidung von FEhler:
-          #   lex.yy.c:2459:17: warning: unused function 'yyunput' [-Wunused-function]
-          # auskommentiert: static int input  (void)
-          # um zu vermeiden:
-          #   lex.yy.c:2500:16: warning: function 'input' is not needed and will not be emitted [-Wunneeded-internal-declaration]
-          delete_line_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L),
-          insert_before = list("#ifdef __cplusplus", "/*", 3L),
-          insert_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", "", 1L),
-          insert_after = list("#endif", "*/", 27L),
-          replace = list("^\\s+static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);", "  /*  static void yyunput (int c,char *buf_ptr  ); */", 1L)
+          # Want to see issues with r1690 before adapting / checking these patches
+          if (revision == 1069) list(
+            delete_line_before = list("^\\s*if\\s\\(\\$2\\s&&\\sgenerate_code\\)\\s\\{", 3L),
+            replace = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 3),
+            replace = list("^(\\s*)int\\sok;", "\\1int ok __attribute__((unused));", 2),
+            
+            replace = list("^(\\s*)ok\\s=\\sSortSubcorpus\\(\\$2,\\s\\$3,\\s\\(\\$4\\s>=\\s1\\)\\s\\?\\s\\$4\\s:\\s1,\\s&\\(\\$5\\)\\);", "\\1SortSubcorpus($2, $3, ($4 >= 1) ? $4 : 1, &($5));", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/ranges.c" = c(
+          list(),
+          
+          # This is highly specific - want to see what happens before adapting things to r1690
+          if (revision == 1069) list(
+            delete_line_before = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 2L, 5L),
+            delete_line_before = list("^\\s*for\\s\\(i\\s=\\s0;\\si\\s<\\sp;\\si\\+\\+\\)", 1L, 5L),
+            delete_line_before = list("^\\s*value\\s=\\scl_string_canonical\\(value,\\ssrt_cl->corpus->charset,\\ssrt_flags,\\sCL_STRING_CANONICAL_STRDUP\\);", 1L, 7L),
+            insert_before = list("^int", "/*", 9),
+            insert_after = list("^\\}\\s*$", "*/", 11),
+            replace = list("^(\\s*)line\\s=\\s-1;(\\s*)\\s/\\*\\swill\\sindicate\\ssort\\sfailure\\sbelow\\sif\\stext_size\\s==\\s0\\s\\*/", "\\1line = -1;\\2", 1),
+            replace = list("^(\\s*)\\}(\\s)/\\*\\send\\sfor\\seach\\stoken\\s\\*/", "\\1}\\2", 1),
+            replace = list("^(\\s*)line\\s=\\s-1;(\\s*)/\\*\\swill\\sindicate\\sfailure\\sof\\sexternal\\ssort\\scommand\\s*\\*/", "\\1line = -1;\\2", 1),
+            replace = list("^(\\s*)break;\\s*/\\*\\sabort\\s\\*/", "\\1break;", 1),
+            replace = list("^(\\s*)ok\\s=\\sSortExternally\\(\\);", "\\1/* ok = SortExternally(); */", 1),
+            remove_lines = list("^\\s*/\\*\\suses\\ssettings\\sfrom\\sstatic\\ssrt_\\*\\svariables\\s\\*/", 1),
+            remove_lines = list("^\\s*/\\*\\sdetermine\\sstart\\sand\\send\\sposition\\sof\\ssort\\sinterval\\sfor\\sthis\\smatch\\s\\*/", 1),
+            remove_lines = list("/\\*\\sadjust\\ssort\\sboundaries.*?\\*/", 1),
+            remove_lines = list("/*\\sswap\\sstart\\sand\\send\\sof\\sinterval.*?\\*/", 1),
+            remove_lines = list("/\\*\\sdetermine\\ssort\\sdirection\\s\\*/", 1),
+            remove_lines = list("/\\*\\show\\smany\\stokens\\sto\\sprint\\s\\*/", 1),
+            remove_lines = list("/\\*\\swhen\\susing\\sflags,\\sprint\\snormalised\\stoken\\ssequence.*?\\*/", 1),
+            remove_lines = list("/\\*\\sprint\\ssequence\\sof\\stokens\\sin\\ssort\\sinterval\\s\\*/", 1),
+            remove_lines = list("/\\*\\snow,\\sexecute\\sthe\\sexternal\\ssort\\scommand.*?\\*/", 1),
+            remove_lines = list("/\\*\\srun\\ssort\\scmd\\sand\\sread\\sfrom\\spipe\\s\\*/", 1),
+            remove_lines = list("/\\*\\snow\\swe\\sshould\\shave\\sread\\sexactly.*?\\*/", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/lex.yy.c" = c(
+          list(),
+          
+          # See what happens before taking pains to fit this on r1690
+          if (revision == 1069) list(
+            # Funktion yyunput auskommentiert, zur Vermeidung von FEhler:
+            #   lex.yy.c:2459:17: warning: unused function 'yyunput' [-Wunused-function]
+            # auskommentiert: static int input  (void)
+            # um zu vermeiden:
+            #   lex.yy.c:2500:16: warning: function 'input' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+            delete_line_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", 1L, 111L),
+            insert_before = list("#ifdef __cplusplus", "/*", 3L),
+            insert_before = list("/\\*\\*\\sImmediately\\sswitch\\sto\\sa\\sdifferent\\sinput\\sstream\\.", "", 1L),
+            insert_after = list("#endif", "*/", 27L),
+            replace = list("^\\s+static\\svoid\\syyunput\\s\\(int\\sc,char\\s\\*buf_ptr\\s+\\);", "  /*  static void yyunput (int c,char *buf_ptr  ); */", 1L)
+          )
         ),
         
         "src/cwb/cqp/Makefile" = list(
-          
+
           # Define target 'all' as follows:
           # all: libcqp.a
           #
@@ -635,187 +742,215 @@ PatchEngine <- R6Class(
           remove_lines = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L)
         ),
         
-        "src/cwb/cqp/hash.c" = list(
-          
-          # The symbols/functions 'hash_string', 'is_prime' and 'find_prime' are
-          # defined exactly the same way in cl/lexhash.c and cqp/hash.c. To
-          # avoid linker errors, the functions are commented out in cqp/hash.c
-
-          insert_before = list("^\\s*int\\s*$", "/*", 1),
-          insert_before = list("^\\s*int\\s*$", "/*", 2),
-          insert_before = list("^unsigned\\sint\\s*$", "/*", 1),
-          insert_after = list("^\\s*\\}\\s*$", "*/", 1),
-          insert_after = list("^\\s*\\}\\s*$", "*/", 2),
-          insert_after = list("^\\s*\\}\\s*$", "*/", 3),
-          replace = list("^(.*?)\\s*/\\*\\swill\\sexit\\son\\sint\\soverflow\\s\\*/", "\\1", 1)
-        ),
-        
-        "src/cwb/cqp/macro.c" = list(
-          insert_before = list('#include\\s"hash\\.h"', '#include "../cl/lexhash.h" /* newly added by AB */', 1)
-        ),
-        
-        "src/cwb/cqp/eval.c" = list(
-          replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 2),
-          replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1),
-          replace = list("^(\\s*)if\\s\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1),
-          replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
-          
-          # eval.c: In function ‘cqp_run_tab_query’:
-          #   eval.c:2911:21: warning: variable ‘corpus_size’ set but not used [-Wunused-but-set-variable]
-          # int smallest_col, corpus_size;
-          replace = list("^(\\s*)int\\ssmallest_col,\\scorpus_size;", "\\1int smallest_col;", 1),
-          replace = list("^(\\s*)corpus_size\\s=\\sevalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1),
-          
-          # The line 'assert(col->type = tabular)' (line 2891) is turned into
-          # 'assert((col->type = tabular));' to avoid -Wparentheses error (on
-          # Debian CRAN machine)
-          replace = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1)
-        ),
-        
-        "src/cwb/cqp/eval.h" = list(
-          replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
-          replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
-          replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
-          
-          # global variables prepended by "extern"
-          extern = list(
-            "int eep;",
-            "EvalEnvironment Environment[MAXENVIRONMENT];",
-            "EEP CurEnv, evalenv;"
+        "src/cwb/cqp/hash.c" = c(
+          # File not there any more at revision 1690
+          list(),
+          if (revision == 1069) list(
+            # The symbols/functions 'hash_string', 'is_prime' and 'find_prime' are
+            # defined exactly the same way in cl/lexhash.c and cqp/hash.c. To
+            # avoid linker errors, the functions are commented out in cqp/hash.c
+            
+            insert_before = list("^\\s*int\\s*$", "/*", 1),
+            insert_before = list("^\\s*int\\s*$", "/*", 2),
+            insert_before = list("^unsigned\\sint\\s*$", "/*", 1),
+            insert_after = list("^\\s*\\}\\s*$", "*/", 1),
+            insert_after = list("^\\s*\\}\\s*$", "*/", 2),
+            insert_after = list("^\\s*\\}\\s*$", "*/", 3),
+            replace = list("^(.*?)\\s*/\\*\\swill\\sexit\\son\\sint\\soverflow\\s\\*/", "\\1", 1)
+            
           )
         ),
         
-        "src/cwb/cqp/hash.h" = list(
-          replace = list("(\\s*int\\sis_prime\\(int\\sn\\);)", "/* \\1 */", 1),
-          replace = list("^(\\s*int\\sfind_prime\\(int\\sn\\);)", "/* \\1 */", 1),
-          replace = list("^(\\s*unsigned\\sint\\shash_string\\(char\\s\\*s\\);)", "/* \\1 */", 1)
-        ),
-        
-        "src/cwb/cqp/html-print.c" = list(
-          # html-print.c: In function ‘html_print_context’:
-          #   html-print.c:317:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
-          # char *s;
-          replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
-          replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
-          replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
+        "src/cwb/cqp/macro.c" = c(
+          # The include of hash.h is gone in revision 1690 and there is a macro.h
+          list(),
+          if (revision == 1069) list(
+            insert_before = list('#include\\s"hash\\.h"', '#include "../cl/lexhash.h" /* newly added by AB */', 1)
+          )
           
-          # html-print.c: In function ‘html_print_output’:
-          #   html-print.c:418:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
-          # AttributeList *strucs;
-          replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
-          replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
         ),
         
-        "src/cwb/cqp/latex-print.c" = list(
-          # latex-print.c: In function ‘latex_print_context’:
-          #   latex-print.c:236:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
-          # char *s;
-          replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
-          replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
-          replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1)
-        ),
-        
-        "src/cwb/cqp/options.h" = list(
-          replace = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
+        "src/cwb/cqp/eval.c" = c(
+          list(),
           
-          # all global variables prepended by "extern" statement
-          extern = as.list(c(
+          # The corpus_size variable is used in revision 1690. This is commented out to see whether problems persist.
+          if (revision == 1069) list(
+            replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 2),
+            replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1),
+            replace = list("^(\\s*)if\\s\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1),
+            replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
             
-            "char *def_unbr_attr;",
-            "enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;",
-            "char *matching_strategy_name;",
-            "char *pager;",
-            "char *tested_pager;",
-            "char *less_charset_variable;",
-            "char *printModeString;",
-            "char *printModeOptions;",
-            "char *printStructure;",
-            "char *left_delimiter;",
-            "char *right_delimiter;",
-            "char *registry;",
-            "char *LOCAL_CORP_PATH;",
-            "char *cqp_init_file;",
-            "char *macro_init_file;",
-            "char *cqp_history_file;",
-            "char *default_corpus;",
-            "char *query_string;",
-            "char *ExternalSortingCommand;",
-            "char *progname;",
-            "char *licensee;",
-            "FILE *batchfd;",
+            # eval.c: In function ‘cqp_run_tab_query’:
+            #   eval.c:2911:21: warning: variable ‘corpus_size’ set but not used [-Wunused-but-set-variable]
+            # int smallest_col, corpus_size;
+            replace = list("^(\\s*)int\\ssmallest_col,\\scorpus_size;", "\\1int smallest_col;", 1),
+            replace = list("^(\\s*)corpus_size\\s=\\sevalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1),
             
+            # The line 'assert(col->type = tabular)' (line 2891) is turned into
+            # 'assert((col->type = tabular));' to avoid -Wparentheses error (on
+            # Debian CRAN machine)
+            replace = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/eval.h" = c(
+          list(),
+          # No matches for 'int delete' in revision 1690
+          if (revision == 1069) list(
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
+            
+            # global variables prepended by "extern"
+            extern = list(
+              "int eep;", # no match in r1690
+              "EvalEnvironment Environment[MAXENVIRONMENT];", # extern'ed in r1690
+              "EEP CurEnv, evalenv;" # extern'ed in r1690
+            )
+          )
 
-            if (revision < 1500)
-              c(
-                "int insecure;",
-                "int inhibit_activation;",
-                "int parseonly;",
-                "int verbose_parser;",
-                "int show_symtab;",
-                "int show_gconstraints;",
-                "int show_evaltree;",
-                "int show_patlist;",
-                "int show_compdfa;",
-                "int show_dfa;",
-                "int symtab_debug;",
-                "int parser_debug;",
-                "int tree_debug;",
-                "int eval_debug;",
-                "int search_debug;",
-                "int initial_matchlist_debug;",
-                "int debug_simulation;",
-                "int activate_cl_debug;",
-                "int server_log;",
-                "int server_debug;",
-                "int snoop;",
-                "int private_server;",
-                "int server_port;",
-                "int localhost;",
-                "int server_quit;",
-                "int query_lock;",
-                "int query_lock_violation;",
-                "int enable_macros;",
-                "int macro_debug;",
-                "int hard_boundary;",
-                "int hard_cut;",
-                if (revision <= 1137) "int subquery;" else "int auto_subquery;",
-                if (revision >= 1165) "int anchor_number_target;",
-                if (revision >= 1171) "int anchor_number_keyword;",
-                "int query_optimize;",
-                "int strict_regions;",
-                "int use_readline;",
-                "int highlighting;",
-                "int paging;",
-                "int use_colour;",
-                "int progress_bar;",
-                "int pretty_print;",
-                "int autoshow;",
-                "int timing;",
-                "int show_tag_attributes;",
-                "int show_targets;",
-                "int printNrMatches;",
-                "int auto_save;",
-                "int save_on_exit;",
-                "int write_history_file;",
-                "int batchmode;",
-                "int silent;",
-                "int UseExternalSorting;",
-                "int UseExternalGrouping;",
-                "char *ExternalGroupingCommand;",
-                "int user_level;",
-                "int rangeoutput;",
-                "int child_process;",
-                "ContextDescriptor CD;",
-                "int handle_sigpipe;",
-                if (revision >= 1291) "char *attribute_separator;",
-                if (revision >= 1330) "MatchingStrategy matching_strategy;",
-                if (revision >= 1330) "char *matching_strategy_name;"
-              )
+        ),
+        
+        "src/cwb/cqp/hash.h" = c(
+          list(),
+          
+          # This file is not there with revision r1690 any more
+          if (revision == 1069) list(
+            replace = list("(\\s*int\\sis_prime\\(int\\sn\\);)", "/* \\1 */", 1),
+            replace = list("^(\\s*int\\sfind_prime\\(int\\sn\\);)", "/* \\1 */", 1),
+            replace = list("^(\\s*unsigned\\sint\\shash_string\\(char\\s\\*s\\);)", "/* \\1 */", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/html-print.c" = c(
+          list(),
+          
+          # None of these lines is findable in r1690
+          if (revision == 1069) list(
+            # html-print.c: In function ‘html_print_context’:
+            #   html-print.c:317:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+            # char *s;
+            replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
+            replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
+            replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
+            
+            # html-print.c: In function ‘html_print_output’:
+            #   html-print.c:418:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
+            # AttributeList *strucs;
+            replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
+            replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/latex-print.c" = c(
+          list(),
+          # Not findable in r1690
+          if (revision == 1069) list(
+            # latex-print.c: In function ‘latex_print_context’:
+            #   latex-print.c:236:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+            # char *s;
+            replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
+            replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
+            replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1)
+          )
+        ),
+        
+        "src/cwb/cqp/options.h" = c(
+          list(),
+          
+          # Prepending 'extern' not necessary in r1690 - is there already
+          if (revision == 1069) list(
+            replace = list("^(\\s*)enum\\s_which_app\\s\\{\\sundef,\\scqp,\\scqpcl,\\scqpserver}\\swhich_app;", "\\1enum _which_app { undef, cqp, cqpcl, cqpserver} extern which_app;", 1),
+            extern = list(
+              "char *def_unbr_attr;",
+              "enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;",
+              "char *matching_strategy_name;",
+              "char *pager;",
+              "char *tested_pager;",
+              "char *less_charset_variable;",
+              "char *printModeString;",
+              "char *printModeOptions;",
+              "char *printStructure;",
+              "char *left_delimiter;",
+              "char *right_delimiter;",
+              "char *registry;",
+              "char *LOCAL_CORP_PATH;",
+              "char *cqp_init_file;",
+              "char *macro_init_file;",
+              "char *cqp_history_file;",
+              "char *default_corpus;",
+              "char *query_string;",
+              "char *ExternalSortingCommand;",
+              "char *progname;",
+              "char *licensee;",
+              "FILE *batchfd;",
+              "int insecure;",
+              "int inhibit_activation;",
+              "int parseonly;",
+              "int verbose_parser;",
+              "int show_symtab;",
+              "int show_gconstraints;",
+              "int show_evaltree;",
+              "int show_patlist;",
+              "int show_compdfa;",
+              "int show_dfa;",
+              "int symtab_debug;",
+              "int parser_debug;",
+              "int tree_debug;",
+              "int eval_debug;",
+              "int search_debug;",
+              "int initial_matchlist_debug;",
+              "int debug_simulation;",
+              "int activate_cl_debug;",
+              "int server_log;",
+              "int server_debug;",
+              "int snoop;",
+              "int private_server;",
+              "int server_port;",
+              "int localhost;",
+              "int server_quit;",
+              "int query_lock;",
+              "int query_lock_violation;",
+              "int enable_macros;",
+              "int macro_debug;",
+              "int hard_boundary;",
+              "int hard_cut;",
+              if (revision <= 1137) "int subquery;" else "int auto_subquery;",
+              if (revision >= 1165) "int anchor_number_target;",
+              if (revision >= 1171) "int anchor_number_keyword;",
+              "int query_optimize;",
+              "int strict_regions;",
+              "int use_readline;",
+              "int highlighting;",
+              "int paging;",
+              "int use_colour;",
+              "int progress_bar;",
+              "int pretty_print;",
+              "int autoshow;",
+              "int timing;",
+              "int show_tag_attributes;",
+              "int show_targets;",
+              "int printNrMatches;",
+              "int auto_save;",
+              "int save_on_exit;",
+              "int write_history_file;",
+              "int batchmode;",
+              "int silent;",
+              "int UseExternalSorting;",
+              "int UseExternalGrouping;",
+              "char *ExternalGroupingCommand;",
+              "int user_level;",
+              "int rangeoutput;",
+              "int child_process;",
+              "ContextDescriptor CD;",
+              "int handle_sigpipe;",
             )
           )
         ),
         
         "src/cwb/cqp/output.h" = list(
+          # Unchanged for r1690 - is it really harmful?
+          
           # Comment out open_temporary_file(char *tmp_name_buffer) in
           # cqp/output.c, in cqp/output.h and in usage in functions calling
           # this function: ComputeGroupExternally (cqp/groups.c) and
@@ -823,46 +958,70 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)FILE\\s\\*open_temporary_file\\(char\\s\\*tmp_name_buffer);", "\\1/* FILE *open_temporary_file(char *tmp_name_buffer); */", 1)
         ),
         
-        "src/cwb/cqp/parse_actions.c" = list(
-          replace = list("^(\\s*)c->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1c->idlist.del = left->pa_ref.del;", 1),
-          replace = list("^(\\s*)left->pa_ref\\.delete\\s=\\s0;", "\\1left->pa_ref.del = 0;", 1),
-          replace = list("^(\\s*)node->idlist\\.delete\\s=\\s0;", "\\1node->idlist.del = 0;", 1),
-          replace = list("^(\\s*)res->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1res->idlist.del = left->pa_ref.del;", 1),
-          replace = list("^(\\s*)res->pa_ref\\.delete\\s=\\sauto_delete;", "\\1res->pa_ref.del = auto_delete;", 1),
-          replace = list("^(\\s*)res->sa_ref\\.delete\\s=\\sauto_delete;", "\\1res->sa_ref.del = auto_delete;", 1),
-          replace = list("^(\\s*)res->pa_ref\\.delete\\s=\\s0;", "\\1res->pa_ref.del = 0;", 1),
-          replace = list("^(\\s*)res->pa_ref\\.delete\\s=\\sauto_delete;", "\\1res->pa_ref.del = auto_delete;", 1),
-          replace = list("^(\\s*)res->sa_ref\\.delete\\s=\\s0;", "\\1res->sa_ref.del = 0;", 1)
-        ),
-        
-        "src/cwb/cqp/corpmanag.c" = list(
-          # global variable corpuslist prepended by extern statement
-          extern = list("CorpusList *corpuslist;")
-        ),
-        
-        "src/cwb/cqp/corpmanag.h" = list(
-          # global variables current_corpus and corpusList prepended by "extern" statement
-          extern = list(
-            "CorpusList *current_corpus;",
-            "CorpusList *corpuslist;"
+        "src/cwb/cqp/parse_actions.c" = c(
+          list(),
+          if (revision == 1069) list(
+            replace = list("^(\\s*)c->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1c->idlist.del = left->pa_ref.del;", 1),
+            replace = list("^(\\s*)left->pa_ref\\.delete\\s=\\s0;", "\\1left->pa_ref.del = 0;", 1),
+            replace = list("^(\\s*)node->idlist\\.delete\\s=\\s0;", "\\1node->idlist.del = 0;", 1),
+            replace = list("^(\\s*)res->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1res->idlist.del = left->pa_ref.del;", 1),
+            replace = list("^(\\s*)res->pa_ref\\.delete\\s=\\sauto_delete;", "\\1res->pa_ref.del = auto_delete;", 1),
+            replace = list("^(\\s*)res->sa_ref\\.delete\\s=\\sauto_delete;", "\\1res->sa_ref.del = auto_delete;", 1),
+            replace = list("^(\\s*)res->pa_ref\\.delete\\s=\\s0;", "\\1res->pa_ref.del = 0;", 1),
+            replace = list("^(\\s*)res->pa_ref\\.delete\\s=\\sauto_delete;", "\\1res->pa_ref.del = auto_delete;", 1),
+            replace = list("^(\\s*)res->sa_ref\\.delete\\s=\\s0;", "\\1res->sa_ref.del = 0;", 1)
           )
         ),
         
-        "src/cwb/cqp/regex2dfa.c" = list(
+        "src/cwb/cqp/corpmanag.c" = c(
+          list(),
           
-          # regex2dfa.c: In function ‘Parse’:
-          #   regex2dfa.c:544:7: warning: variable ‘ignore_value’ set but not used [-Wunused-but-set-variable]
-          # int ignore_value;             /* ignore value of POP() macro */
-          replace = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1)
+          # In r1690, this is not "extern" but "static"
+          if (revision == 1069) list(
+            # global variable corpuslist prepended by extern statement
+            extern = list("CorpusList *corpuslist;")
+            
+          )
         ),
         
-        "src/cwb/cqp/sgml-print.c" = list(
-          # sgml-print.c: In function ‘sgml_print_output’:
-          #   sgml-print.c:325:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
-          # AttributeList *strucs;
-          replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
+        "src/cwb/cqp/corpmanag.h" = c(
+          list(),
           
-          replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
+          # extern'ed in original CWB code
+          if (revision == 1690) list(
+            # global variables current_corpus and corpusList prepended by "extern" statement
+            extern = list(
+              "CorpusList *current_corpus;",
+              "CorpusList *corpuslist;"
+            )
+          )
+          
+        ),
+        
+        "src/cwb/cqp/regex2dfa.c" = c(
+          
+          list(),
+          if (revision == 1069) list(
+            # regex2dfa.c: In function ‘Parse’:
+            #   regex2dfa.c:544:7: warning: variable ‘ignore_value’ set but not used [-Wunused-but-set-variable]
+            # int ignore_value;             /* ignore value of POP() macro */
+            replace = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1)
+          )
+        ),
+        
+        "src/cwb/cqp/sgml-print.c" = c(
+          list(),
+          
+          # No matches for these patches in r1690
+          if (revision == 1069) list(
+            # sgml-print.c: In function ‘sgml_print_output’:
+            #   sgml-print.c:325:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
+            # AttributeList *strucs;
+            replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
+            
+            replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
+            
+          )
         ),
         
         "src/cwb/cqp/parser.tab.c" = list(
@@ -872,84 +1031,108 @@ PatchEngine <- R6Class(
           #   cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
           # The previous version resulted in an awful total crash. QueryBuffer causes the problem! 
           replace = list('^(\\s*)cqpmessage\\(Error,\\s"CQP\\sSyntax\\sError:.*?",\\ss,\\sQueryBuffer\\);', '\\1cqpmessage(Error, "CQP Syntax Error: %s", s);', 1L),
+          
           replace = list("^(\\s+)int\\sok;", "\\1int ok __attribute__((unused));", 4L)
         ),
         
-        "src/cwb/cqp/cqp.h" = list(
+        "src/cwb/cqp/cqp.h" = c(
           
-          # global variables prepended by "extern"
-          extern = as.list(c(
-            "CYCtype LastExpression;",
-            "int exit_cqp;",
-            if (revision < 1075) "char *cqp_input_string;", # starting from r1075 externed anyway
-            if (revision < 1075) "int cqp_input_string_position;", # starting from r1075 externed anyway
-            "int initialize_cqp(int argc, char **argv);",
-            "int cqp_parse_file(FILE *fd, int exit_on_parse_errors);",
-            "int cqp_parse_string(char *s);",
-            "int EvaluationIsRunning;",
-            "int setInterruptCallback(InterruptCheckProc f);",
-            "void CheckForInterrupts(void);",
-            "int signal_handler_is_installed;",
-            "void install_signal_handler(void);"
-          ))
+          list(),
+          if (revision == 1069) list(
+            # global variables prepended by "extern"
+            extern = list(
+              "CYCtype LastExpression;",
+              "int exit_cqp;",
+              "char *cqp_input_string;", # starting from r1075 externed anyway
+              "int cqp_input_string_position;", # starting from r1075 externed anyway
+              "int initialize_cqp(int argc, char **argv);",
+              "int cqp_parse_file(FILE *fd, int exit_on_parse_errors);",
+              "int cqp_parse_string(char *s);",
+              "int EvaluationIsRunning;",
+              "int setInterruptCallback(InterruptCheckProc f);",
+              "void CheckForInterrupts(void);",
+              "int signal_handler_is_installed;",
+              "void install_signal_handler(void);"
+            )
+          )
         ),
         
         
-        "src/cwb/CQi/auth.c" = list(
-          insert_before = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
+        "src/cwb/CQi/auth.c" = c(
+          list(),
+          if (revision == 1069) list(
+            insert_before = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
+          )
         ),
         
         "src/cwb/CQi/server.c" = list(
           insert_before = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
-          insert_after = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1)
+          insert_after = list(
+            if (revision == 1069) '#include "\\.\\./cqp/hash\\.h"' else if (revision >= 1690) '^#include\\s+"cqi\\.h"',
+            '#include "../cl/lexhash.h" /* inserted by AB */', 1)
         ),
         
         "src/cwb/CQi/cqpserver.c" = list(
+          # stable r1069 - r1690
           insert_after = list('#include "\\.\\./cqp/groups\\.h"', "void Rprintf(const char *, ...);", 1)
         ),
         
         "src/cwb/utils/cwb-makeall.c" = list(
+          # stable r1069 - r1690. But maybe obsolete, because cwb-makeall.c is not compiled?
           insert_before = list("/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/", c("#include <netinet/in.h>", ""), 1)
         ),
         
         "src/cwb/definitions.mk" = list(
+          # stable r1069 - r1690
           replace = list("(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)", "# \\1", 1L)
         ),
         
         "src/cwb/config/platform/darwin-64" = list(
+          # stable r1069-r1690
           replace = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L)
         ),
         
         "src/cwb/config/platform/darwin" = list(
+          # stable r1069-r1690
           replace = list("^READLINE_DEFINES\\s:=.*?$", "READLINE_DEFINES =", 1L),
           replace = list("^READLINE_LIBS\\s:=.*?$", "READLINE_LIBS =", 1L)
         ),
         
-        "src/cwb/config/platform/darwin-port-core2" = list(
-          replace = list("^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$", "\\1 \\2", 1L)
+        "src/cwb/config/platform/darwin-port-core2" = c(
+          # This file is gone in r1690
+          list(),
+          if (revision == 1069) list(
+            replace = list("^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$", "\\1 \\2", 1L)
+          )
         ),
         
         "src/cwb/config/platform/darwin-universal" = list(
+          # stable r1069 - r1690
           replace = list("^(CFLAGS\\s*=.*?)\\s+-march=core2\\s+(.*?)$", "\\1 \\2", 1L)
         ),
         
         "src/cwb/config/platform/darwin-brew" = list(
+          # stable r1069-r1690
           replace = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L)
         ),
         
         "src/cwb/config/platform/linux-opteron" = list(
+          # stable r1069-r1690
           replace = list("^(CFLAGS\\s*=.*?)\\s+-march=opteron\\s+(.*?)$", "\\1 \\2", 1L)
         ),
         
         "src/cwb/config/platform/unix" = list(
+          # stable r1069-r1690
           replace = list("^AR\\s+=\\s+ar\\scq\\s*$", "AR = ar", 1L)
         ),
         
         "src/cwb/config/platform/linux" = list(
+          # stable r1069-r1690
           insert_before = list("##\\sCPU\\sarchitecture", c("## require position-independent code", "CFLAGS += -fPIC", ""), 1L)
         ),
         
         "src/cwb/config.mk" = list(
+          # stable r1069-r1690
           replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
         ),
         
