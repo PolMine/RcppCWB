@@ -8,7 +8,7 @@
 #' P <- PatchEngine$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
-#'   revision = 1400
+#'   revision = 1069
 #' )
 #' P$patch_all()
 PatchEngine <- R6Class(
@@ -943,7 +943,7 @@ PatchEngine <- R6Class(
               "int rangeoutput;",
               "int child_process;",
               "ContextDescriptor CD;",
-              "int handle_sigpipe;",
+              "int handle_sigpipe;"
             )
           )
         ),
