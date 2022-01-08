@@ -298,7 +298,6 @@ PatchEngine <- R6Class(
     extern = function(code, action, file){
       if (length(action) == 0L) return(code)
       for (ext in action){
-        print(ext)
         matches <- which(startsWith(code, ext))
         if (length(matches) > 0L){
           for (position in matches){
@@ -370,15 +369,15 @@ PatchEngine <- R6Class(
           )
         ),
         
-        # "src/cwb/cl/Makefile" = list(
-        #   delete_line_before = list("^libcl.a: \\$\\(OBJS\\)", 1L, if (revision >= 1400) 9L else 6L),
-        #   delete_line_before = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
-        #   delete_line_before = list("^depend:$", 1L, if (revision >= 1400) 14L else 22L),
-        #   replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
-        #   replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
-        #   replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
-        #   remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L)
-        # ),
+        "src/cwb/cl/Makefile" = list(
+          delete_line_before = list("^libcl.a: \\$\\(OBJS\\)", 1L, if (revision >= 1400) 9L else 6L),
+          delete_line_before = list("##\\scl\\.h\\sheader\\s", 1L, 11L),
+          delete_line_before = list("^depend:$", 1L, if (revision >= 1400) 14L else 22L),
+          replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
+          replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
+          replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
+          remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L)
+        ),
         
         "src/cwb/cl/attributes.c" = c(
 
@@ -393,12 +392,10 @@ PatchEngine <- R6Class(
             # int ppos, bpos, dollar, rpos;
             replace = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
             replace = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
-            replace = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */", 1)
-          ),
-          
-          # The STREQ macro is replaced by a cl_str_is() function in r1690
-          if (revision == 1690) list(
+            replace = list("^(\\s+)dollar = ppos;\\s", "\\1/* dollar = ppos; */", 1),
             
+            # The STREQ macro is replaced by a cl_str_is() function in r1690
+
             # attributes.c: In function ‘component_full_name’:
             #   macros.h:59:22: warning: the address of ‘rname’ will always evaluate as ‘true’ [-Waddress]
             # ((a) && (b) && (strcmp((a), (b)) == 0)))
@@ -988,7 +985,7 @@ PatchEngine <- R6Class(
           list(),
           
           # extern'ed in original CWB code
-          if (revision == 1690) list(
+          if (revision == 1069) list(
             # global variables current_corpus and corpusList prepended by "extern" statement
             extern = list(
               "CorpusList *current_corpus;",
