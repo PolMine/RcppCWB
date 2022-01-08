@@ -298,6 +298,7 @@ PatchEngine <- R6Class(
     extern = function(code, action, file){
       if (length(action) == 0L) return(code)
       for (ext in action){
+        print(ext)
         matches <- which(startsWith(code, ext))
         if (length(matches) > 0L){
           for (position in matches){
