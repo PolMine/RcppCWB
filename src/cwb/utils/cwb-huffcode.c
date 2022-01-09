@@ -31,6 +31,7 @@ void Rprintf(const char *, ...);
 int do_protocol = 0;
 /** File handle for this program's progress-info output: note, it is always stdout */
 FILE *protocol; /* For Gnuwin32 compatibility, this must be initialised in main(), not here. */
+
 /* ---------------------------------------------------------------------- */
 
 /* char *progname; */
@@ -47,7 +48,7 @@ void huffcode_usage(char *msg, int error_code);
 /**
  * Prints, to the specified stream, a string containing
  * a binary representation of an integer.
- * 
+ *
  * @param i       Integer to print
  * @param width   Number of bits in the integer
  * @param stream  Where to print to.
@@ -116,8 +117,11 @@ dump_heap(int *heap, int heap_size, int node, int indent)
     /* for (i = 0; i < indent * 3; i++)
       putc((i % 3) == 0 ? '|' : ' ', protocol); */
     
-    Rprintf("Node %d (p: %d, f: %d)\n", node, heap[node-1], heap[heap[node-1]]);
-    
+    Rprintf("Node %d (p: %d, f: %d)\n",
+            node,
+            heap[node-1],
+            heap[heap[node-1]]);
+
     dump_heap(heap, heap_size, 2 * node,     indent + 1);
     dump_heap(heap, heap_size, 2 * node + 1, indent + 1);
   }
@@ -139,7 +143,8 @@ print_heap(int *heap, int heap_size, char *title)
   /* node = 1; */
   /* depth = 0; */
 
-  Rprintf("\nDump of %s (size %d)\n\n", title, heap_size);
+  Rprintf("\nDump of %s (size %d)\n\n",
+          title, heap_size);
   
   dump_heap(heap, heap_size, 1, 0);
 
@@ -271,6 +276,7 @@ ReadHCD(char *filename, HCD *hc)
 /* TODO: should these two functions perhaps be in cl/attributes.h? (prototype of HCD is in attributes.h)
  *       or all HCD object in separate module? */
 
+
 /* ================================================== COMPRESSION */
 
 /**
@@ -339,7 +345,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
   /*
    * strongly follows Witten/Moffat/Bell: ``Managing Gigabytes'', pp. 335ff.
-   * pp. 335ff.
    */
 
   hc->size = cl_max_id(attr);                /* the size of the attribute (nr of items) */
@@ -361,7 +366,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   memset((char *)hc->lcount,   '\0', MAXCODELEN * sizeof(int));
   memset((char *)hc->min_code, '\0', MAXCODELEN * sizeof(int));
   memset((char *)hc->symindex, '\0', MAXCODELEN * sizeof(int));
-  
+
   memset((char *)issued_codes, '\0', MAXCODELEN * sizeof(int));
 
   codelength = (unsigned int *)cl_calloc(hc->size, sizeof(unsigned));
@@ -391,7 +396,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   /* ============================== PROTOCOL ============================== */
   if (do_protocol > 0)
     Rprintf("Allocated heap with %d cells for %d items\n\n", hc->size * 2, hc->size);
-            hc->size * 2, hc->size);
   if (do_protocol > 2)
     print_heap(heap, hc->size, "After Initialization");
   /* ============================== PROTOCOL ============================== */
@@ -407,7 +411,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
    * we address the heap in the following manner: when we start array
    * indices at 1, the left child is at 2i, and the right child is at
    * 2i+1. So we maintain this scheme and decrement just before
-   * addressing the array. 
+   * addressing the array.
    */
 
   /*
@@ -541,7 +545,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
       assert((hc->size == 1) && "Major error: code length of 0 bits should only happen for lexicon size = 1");
       cl = 1; /* special case: if lexicon contains only a single type, generate 1-bit code '0' */
     }
-  
+
     sum_bits += cl * get_id_frequency(attr, i);
     codelength[i] = cl;
 
@@ -700,8 +704,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
       Rprintf("- writing code descriptor block to %s\n",  hcd_path);
       if (!WriteHCD(hcd_path, hc)) {
-        Rprintf("ERROR: writing %s failed. Aborted.\n",
-                hcd_path);
+        Rprintf("ERROR: writing %s failed. Aborted.\n", hcd_path);
         return 1;
       }
 
