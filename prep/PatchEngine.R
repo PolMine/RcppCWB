@@ -1165,7 +1165,7 @@ PatchEngine <- R6Class(
           
           insert_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
           delete_line_beginning_with = list("^\\s*/\\*\\s-+\\s\\*/\\s*$", 2L, 33L),
-          delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 139L),
+          delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 142L),
           replace = list(
             "^(\\s*compress_reversed_index\\(Attribute\\s\\*attr,\\schar\\s\\*output_fn)\\)\\s*$",
             "\\1, char *corpus_id, int debug)",
