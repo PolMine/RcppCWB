@@ -16,6 +16,11 @@
  */
 
 
+/* included by AB to ensure that winsock2.h is included before windows.h */
+#ifdef __MINGW__
+#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
+#endif
+
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
@@ -30,11 +35,12 @@
 #include "../cl/globals.h"
 #include "../cl/macros.h"
 #include "../cl/storage.h"      /* NwriteInt() & NwriteInts() */
-#include "../cl/lexhash.h"
+/* #include "../cl/lexhash.h" */ 
 /* byte order conversion functions taken from Corpus Library */
-#include "../cl/endian.h"
+#include "../cl/endian2.h"
 #include "../cl/attributes.h"   /* for DEFAULT_ATT_NAME */
 
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 /* ---------------------------------------------------------------------- */
 
@@ -75,28 +81,30 @@
 
 /* global variables representing configuration */
 
-char *field_separators = FIELDSEPS;     /**< string containing the characters that can function as field separators */
-char *undef_value = UNDEF_VALUE;        /**< string used as value of P-attributes when a value is missing
+
+extern char *field_separators;     /**< string containing the characters that can function as field separators */
+extern char *undef_value;        /**< string used as value of P-attributes when a value is missing
                                              ie if a tab-delimited field is empty */
-int debug = 0;                          /**< debug mode on or off? */
-int silent = 0;                         /**< hide messages */
-int verbose = 0;                        /**< show progress (this is _not_ the opposite of silent!) */
-int xml_aware = 0;                      /**< substitute XML entities in p-attributes & ignore <? and <! lines */
-int skip_empty_lines = 0;               /**< skip empty lines when encoding? */
-unsigned line = 0;                      /**< corpus position currently being encoded (ie cpos of _next_ token) */
+extern int debugmode;                          /**< debug mode on or off? */
+extern int quietly;                         /**< hide messages */
+extern int verbose;                        /**< show progress (this is _not_ the opposite of silent!) */
+extern int xml_aware;                      /**< substitute XML entities in p-attributes & ignore <? and <! lines */
+extern int skip_empty_lines;               /**< skip empty lines when encoding? */
+extern unsigned line;                      /**< corpus position currently being encoded (ie cpos of _next_ token) */
 /* unsigned so it doesn't wrap after first 2^31 tokens and we can abort encoding when corpus size is exceeded */
-int strip_blanks = 0;                   /**< strip leading and trailing blanks from input and token annotations */
-cl_string_list input_files = NULL;      /**< list of input file(s) (-f option(s)) */
-int nr_input_files = 0;                 /**< number of input files (length of list after option processing) */
-int current_input_file = 0;             /**< index of input file currently being processed */
-char *current_input_file_name = NULL;   /**< filename of current input file, for error messages */
-FILE *input_fd = NULL;                  /**< file handle for current input file (or pipe) (text mode!) */
-unsigned long input_line = 0;           /**< input line number (reset for each new file) for error messages */
-char *registry_file = NULL;             /**< if set, auto-generate registry file named {registry_file}, listing declared attributes */
-char *directory = NULL;                 /**< corpus data directory (no longer defaults to current directory) */
-char *corpus_character_set = "latin1";  /**< character set label that is inserted into the registry file */
-CorpusCharset encoding_charset;         /**< a charset object to be generated from corpus_character_set */
-int clean_strings = 0;                  /**< clean up input strings by replacing invalid bytes with '?' */
+extern int strip_blanks;                   /**< strip leading and trailing blanks from input and token annotations */
+extern cl_string_list input_files;      /**< list of input file(s) (-f option(s)) */
+extern int nr_input_files;                 /**< number of input files (length of list after option processing) */
+extern int current_input_file;             /**< index of input file currently being processed */
+extern char *current_input_file_name;   /**< filename of current input file, for error messages */
+extern FILE *input_fd;                  /**< file handle for current input file (or pipe) (text mode!) */
+extern unsigned long input_line;           /**< input line number (reset for each new file) for error messages */
+extern char *registry_file;             /**< if set, auto-generate registry file named {registry_file}, listing declared attributes */
+extern char *directory;                 /**< corpus data directory (no longer defaults to current directory) */
+extern char *corpus_character_set;  /**< character set label that is inserted into the registry file */
+extern CorpusCharset encoding_charset;         /**< a charset object to be generated from corpus_character_set */
+extern int clean_strings;                  /**< clean up input strings by replacing invalid bytes with '?' */
+
 
 /* ---------------------------------------------------------------------- */
 
@@ -108,7 +116,7 @@ int clean_strings = 0;                  /**< clean up input strings by replacing
  *
  * TODO should probably be called an SAttr or SAttEncoder or something.
  */
-typedef struct _Range {
+typedef struct _SAttEncoder {
   char *dir;                    /**< directory where this s-attribute is stored */
   char *name;                   /**< name of the s-attribute (range) */
 
@@ -135,7 +143,7 @@ typedef struct _Range {
   int max_recursion;            /**< maximum auto-recursion level; 0 = no recursion (maximal regions), -1 = assume flat structure */
   int recursion_level;          /**< keeps track of level of embedding when auto-recursion is activated */
   int element_drop_count;       /**< count how many recursive subelements were dropped because of the max_recursion limit */
-  struct _Range **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
+  struct _SAttEncoder **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
                                              use as array; recursion_children[0] points to self! */
 
   int is_open;                  /**< boolean: whether there is an open structure at the moment */
@@ -144,12 +152,12 @@ typedef struct _Range {
 
   int num;                      /**< number of current (if this->is_open) or next structure */
 
-} Range;
+} SAttEncoder;
 
 /** A global array for keeping track of S-attributes being encoded. */
-Range ranges[MAXRANGES];
+extern SAttEncoder ranges[MAXRANGES];
 /** @see ranges */
-int range_ptr = 0;
+extern int range_ptr;
 
 /**
  * WAttr object: represents a P-attribute being encoded.
@@ -178,15 +186,41 @@ int wattr_ptr = 0;
  * lookup hash for undeclared s-attributes and s-attributes declared with -S that
  * have annotations (which will be ignored), so warnings are issued only once
  */
-cl_lexhash undeclared_sattrs = NULL; 
+extern cl_lexhash undeclared_sattrs; 
 
 /* ---------------------------------------------------------------------- */
 
-/** name of the currently running program */
-char *progname = NULL;
+/* ----------------- cl/special_chars.c - is here temporarily ------------- */
 
+/**
+ * Removes all trailing CR and LF characters from specified string (in-place).
+ *
+ * The main purpose of this function is to remove trailing line breaks from input
+ * lines regardless of whether a text file is in Unix (LF) or Windows (CR-LF) format.
+ * All text input except for simple numeric data should be passed through cl_string_chomp().
+ *
+ * @param s     String to chomp (modified in-place).
+ */
+void
+  string_chomp(char *s) {
+    char *point = s;
+    /* advance point to NUL terminator */
+    while (*point)
+      point++;
+    point--; /* now points at last byte of string */
+    /* delete CR and LF, but don't move beyond start of string */
+    while (point >= s && (*point == '\r' || *point == '\n')) {
+      *point = '\0';
+      point--;
+    }
+  }
+
+/* ----------------- END ------------- */
 
 /* ======================================== helper functions */
+
+
+
 
 
 /**
@@ -197,10 +231,10 @@ char *progname = NULL;
  * @return       The next token from the string.
  */
 char *
-encode_strtok(register char *s, register const char *delim)
+encode_strtok(char *s, const char *delim)
 {
-  register char *spanp;
-  register int c, sc;
+  char *spanp;
+  int c, sc;
   char *tok;
   static char *last;
   
@@ -250,94 +284,17 @@ encode_strtok(register char *s, register const char *delim)
  * @param msg     Message to incorporate into the string that is printed.
  */
 void
-encode_print_time(FILE *stream, char *msg)
+encode_print_time(char *msg)
 {
   time_t now;
 
   time(&now);
 
-  fprintf(stream, "%s: %s\n", msg, ctime(&now));
+  Rprintf("%s: %s\n", msg, ctime(&now));
 }
 
 /* ======================================== print error message and exit */
 
-/**
- * Prints a usage message and exits the program.
- */
-void 
-encode_usage(void)
-{
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage:  %s -f <file> [options] -d <dir> [attribute declarations]\n", progname);
-  fprintf(stderr, "        ... | %s [options] -d <dir> [attribute declarations]\n\n", progname);
-  fprintf(stderr, "Reads verticalised text from stdin (or an input file with -f option) and \n");
-  fprintf(stderr, "converts it to the CWB binary format. Each TAB-separated column is encoded as a\n");
-  fprintf(stderr, "separate p-attribute. The first p-attribute is named \"word\" (unless changed\n");
-  fprintf(stderr, "with -p), additional columns must be declared with -P flags. S-attributes can be\n");
-  fprintf(stderr, "declared with -S (without annotations) or -V (with annotations) flags. In\n");
-  fprintf(stderr, "the input data, they must appear as opening and closing XML tags on separate\n");
-  fprintf(stderr, "lines. For each encoded attribute, one or more data files are created in the\n");
-  fprintf(stderr, "current directory (or any directory specified with -d). After encoding, use\n");
-  fprintf(stderr, "cwb-makeall to create the required index files and frequency lists, then\n");
-  fprintf(stderr, "compress them with cwb-huffcode and cwb-compress-rdx (or preferably use the\n");
-  fprintf(stderr, "cwb-make program from the CWB/Perl interface).\n\n");
-  fprintf(stderr, "NB: If you re-encode an existing corpus, be sure to delete all old data files,\n");
-  fprintf(stderr, "in particular the index and any compressed data files, before running\n");
-  fprintf(stderr, "cwb-encode!\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Attribute declarations:\n");
-  fprintf(stderr, "  -p <att>  change name of default p-attribute from \"word\" to <att>\n");
-  fprintf(stderr, "  -p -      no default p-attribute (all must be declared with -P)\n");
-  fprintf(stderr, "  -P <att>  declare additional p-attribute <att>\n");
-  fprintf(stderr, "     * append / to mark as feature set => values will be validated and\n");
-  fprintf(stderr, "       normalised\n");
-  fprintf(stderr, "  -S <att>  declare s-attribute <att> without annotations\n");
-  fprintf(stderr, "  -V <att>  declare s-attribute <att> with annotations\n");
-  fprintf(stderr, "     * append :<n> for automatic renaming of nested regions, :0 to drop nested\n");
-  fprintf(stderr, "       regions (highly recommended, otherwise every start tag will begin a new\n");
-  fprintf(stderr, "       flat region)\n");
-  fprintf(stderr, "     * attribute-value pairs in XML start tags can be auto-split into separate\n");
-  fprintf(stderr, "       s-attributes; the relevant attribute names are appended with + signs\n");
-  fprintf(stderr, "       (e.g., -S s:0+id+len stores XML tags like <s id=\"abc\" len=42> in\n");
-  fprintf(stderr, "       attributes s, s_id and s_len)\n");
-  fprintf(stderr, "     * use -V to store original attribute-value pairs as single string in\n");
-  fprintf(stderr, "       addition to auto-splitting into individual s-attributes (e.g. \n");
-  fprintf(stderr, "       -V s:0+id+len)\n");
-  fprintf(stderr, "     * annotations and values of XML tag attributes can be feature sets; append\n");
-  fprintf(stderr, "       / to relevant attribute name for format validation and normalisation\n");
-  fprintf(stderr, "       (e.g. -S np:2+agr/+head)\n");
-  fprintf(stderr, "  -0 <att>  declare null s-attribute <att> (discards tags)\n\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -d <dir>  directory for data files created by cwb-encode\n");
-  fprintf(stderr, "     * this option always has to be specified (use -d . for current directory)\n");
-  fprintf(stderr, "  -f <file> read input from <file> [default is stdin; -f may be used repeatedly]\n");
-  fprintf(stderr, "     * gzipped files named *.gz will be decompressed automatically\n");
-  fprintf(stderr, "     * alias -t <file> is provided for backward compatibility\n");
-  fprintf(stderr, "  -F <dir>  read all files named *" DEFAULT_INFILE_EXTENSION
-                               " or *" DEFAULT_INFILE_EXTENSION ".gz in directory <dir>\n");
-  fprintf(stderr, "     * files will be added to the corpus in alphabetical order (ASCII)\n");
-  fprintf(stderr, "     * it is not possible to scan subdirectories recursively\n");
-/* uncomment the following lines when (if...) the -C and -r flags are implemented */
-/* a different character for the "C" option would be needed as we are now using it for "clean" */
-/*    fprintf(stderr, "  -C <id>   (re-)encode corpus <id> (using data path from registry)\n"); */
-/*    fprintf(stderr, "  -r <dir>  set registry directory (for -C flag)\n"); */
-  fprintf(stderr, "  -R <rf>   create registry entry (named <rf>) listing all encoded attributes\n");
-  fprintf(stderr, "  -B        strip leading/trailing blanks from (input lines & token annotations)\n");
-  fprintf(stderr, "  -x        XML-aware (replace XML entities and ignore <!.. and <?..)\n");
-  fprintf(stderr, "  -s        skip empty lines in input data (recommended)\n");
-  fprintf(stderr, "  -U <str>  insert <str> for missing columns [default: \"%s\"]\n", undef_value);
-  fprintf(stderr, "  -b <n>    number of buckets in lexicon hash tables\n");
-  fprintf(stderr, "  -c <charset> specify corpus character set (instead of the default latin1)\n");
-  fprintf(stderr, "     * valid charsets: ascii ; latin1 .. latin9 ; arabic, greek, hebrew, cyrillic ; utf8\n");
-  fprintf(stderr, "     * iso-8859-1 .. iso-8859-15 are also accepted, but converted to canonical names above\n");
-  fprintf(stderr, "  -C        clean strings, replacing invalid bytes with '?' (not in UTF-8 mode)\n");
-  fprintf(stderr, "  -v        verbose mode (show progress messages while encoding)\n");
-  fprintf(stderr, "  -q        quiet mode (suppresses most warnings)\n");
-  fprintf(stderr, "  -D        debug mode (quiet, sorry, quite the opposite :-)\n");
-  fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-  exit(2);
-}
 
 /**
  * Prints the input line number (and input filename, if applicable) on STDERR,
@@ -347,9 +304,9 @@ void
 encode_print_input_lineno(void)
 {
   if (nr_input_files > 0 && current_input_file_name != NULL)
-    fprintf(stderr, "file %s, line #%ld", current_input_file_name, input_line);
+    Rprintf("file %s, line #%ld", current_input_file_name, input_line);
   else
-    fprintf(stderr, "input line #%ld", input_line);
+    Rprintf("input line #%ld", input_line);
 }
 
 /**
@@ -368,17 +325,17 @@ encode_error(char *format, ...)
   va_start(ap, format);
 
   if (format != NULL) {
-    vfprintf(stderr, format, ap);
-    fprintf(stderr, "\n");
+    Rprintf(format, ap);
+    Rprintf("\n");
   }
   else {
-    fprintf(stderr, "Internal error. Aborted.\n");
+    Rprintf("Internal error. Aborted.\n");
   }
   if ((input_line > 0) || (current_input_file > 0)) {
     /* show location only if we've already been reading input */
-    fprintf(stderr, "[location of error: ");
+    Rprintf("[location of error: ");
     encode_print_input_lineno();
-    fprintf(stderr, "]\n");
+    Rprintf("]\n");
   }
   exit(1);
 }
@@ -446,7 +403,7 @@ encode_scan_directory(char *dir)
     encode_error("Failed to scan directory specified with -F %s -- aborted.\n", dir);
   }
   if (n_files == 0) {
-    fprintf(stderr, "Warning: No input files found in directory -F %s !!\n", dir);
+    Rprintf("Warning: No input files found in directory -F %s !!\n", dir);
   }
   closedir(dirp);
   
@@ -484,9 +441,9 @@ range_find(char *name)
  * @param print_comment  Boolean: if true, a comment on the original XML tags is printed.
  */
 void
-range_print_registry_line(Range *rng, FILE *fd, int print_comment)
+range_print_registry_line(SAttEncoder *rng, FILE *fd, int print_comment)
 {
-  Range *child;
+  SAttEncoder *child;
   int i, n_atts;
 
   if (rng->in_registry)
@@ -536,7 +493,7 @@ range_print_registry_line(Range *rng, FILE *fd, int print_comment)
       for (i = 0; i < n_atts; i++) {
         cl_lexhash_entry entry = cl_lexhash_find(rng->el_attributes,
                                                  cl_string_list_get(rng->el_atts_list, i));
-        child = (Range *) entry->data.pointer;
+        child = (SAttEncoder *) entry->data.pointer;
         range_print_registry_line(child, fd, 0);
       }
     }
@@ -569,21 +526,21 @@ range_print_registry_line(Range *rng, FILE *fd, int print_comment)
  *                        program was invoked.
  * @param null_attribute  boolean: this is a null attribute, i.e. an XML
  *                        element to be ignored.
- * @return                Pointer to the new Range object (which is a member
+ * @return                Pointer to the new SAttEncoder object (which is a member
  *                        of the global ranges array).
  */
-Range *
+SAttEncoder *
 range_declare(char *name, char *directory, int store_values, int null_attribute)
 {
   char buf[CL_MAX_LINE_LENGTH];
-  Range *rng;
+  SAttEncoder *rng;
   char *p, *rec, *ea_start, *ea;
   cl_lexhash_entry entry;
   int i, is_feature_set;
   char *flag_SV = (store_values) ? "-V" : "-S";
 
-  if (debug)
-    fprintf(stderr, "ATT: %s %s\n", flag_SV, name);
+  if (debugmode)
+    Rprintf("ATT: %s %s\n", flag_SV, name);
 
   if (range_ptr >= MAXRANGES) {
     encode_error("Too many s-attributes declared (last was <%s>).", name);
@@ -633,7 +590,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   if (null_attribute) {
     rng->null_attribute = 1;
     if (rec != NULL || ea_start != NULL)
-      fprintf(stderr, "Warning: recursion and element attribute specificiers are ignored for null attributes (-0 %s).'n", name);
+      Rprintf("Warning: recursion and element attribute specificiers are ignored for null attributes (-0 %s).'n", name);
     return rng;                 /* stop initialisation here; other functions shouldn't do anything with this att */
   }
   else {
@@ -680,7 +637,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   /* now that the range is initialised, declare its 'children' if necessary */
   /* recursion children */
   if (rng->max_recursion >= 0) {
-    rng->recursion_children = (Range **) cl_calloc(rng->max_recursion + 1, sizeof(Range *));
+    rng->recursion_children = (SAttEncoder **) cl_calloc(rng->max_recursion + 1, sizeof(SAttEncoder *));
     rng->recursion_children[0] = rng; /* zeroeth recursion level is stored in the att. itself */
     for (i = 1; i <= rng->max_recursion; i++) {
       /* recursion children have 'flat' structure, because recursion is handled explicitly */
@@ -693,7 +650,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
   }
   /* element attributes children can handle recursion on their own */
   if (ea_start != NULL) {
-    Range *att_ptr;
+    SAttEncoder *att_ptr;
 
     rng->has_children = 1;
     rng->el_attributes = cl_new_lexhash(REP_CHECK_LEXHASH_SIZE);
@@ -742,7 +699,7 @@ range_declare(char *name, char *directory, int store_values, int null_attribute)
  * @param end_pos  The corpus position at which this instance closes.
  */
 void
-range_close(Range *rng, int end_pos)
+range_close(SAttEncoder *rng, int end_pos)
 {
   cl_lexhash_entry entry;
   int close_this_range = 0;     /* whether we actually have to close this range (may be skipped or delegated in recursion mode) */
@@ -755,10 +712,10 @@ range_close(Range *rng, int end_pos)
     rng->recursion_level--;     /* decrement level of nesting */
     if (rng->recursion_level < 0) {
       /* extra close tag (ignored) */
-      if (!silent) {
-        fprintf(stderr, "Surplus </%s> tag ignored (", rng->name);
+      if (!quietly) {
+        Rprintf("Surplus </%s> tag ignored (", rng->name);
         encode_print_input_lineno();
-        fprintf(stderr, ").\n");
+        Rprintf(").\n");
       }
       rng->recursion_level = 0;
     }
@@ -779,10 +736,10 @@ range_close(Range *rng, int end_pos)
     }
     else {
       /* extra close tag (ignored) */
-      if (!silent) {
-        fprintf(stderr, "Close tag </%s> without matching open tag ignored (", rng->name);
+      if (!quietly) {
+        Rprintf("Close tag </%s> without matching open tag ignored (", rng->name);
         encode_print_input_lineno();
-        fprintf(stderr, ").\n");
+        Rprintf(").\n");
       }
     }
   }
@@ -798,11 +755,11 @@ range_close(Range *rng, int end_pos)
         /* check annotation length & truncate if necessary */
         l = strlen(rng->annot);
         if (l >= CL_MAX_LINE_LENGTH) {
-          if (!silent) {
-            fprintf(stderr, "Value of <%s> region exceeds maximum string length (%d > %d chars), truncated (", 
+          if (!quietly) {
+            Rprintf("Value of <%s> region exceeds maximum string length (%d > %d chars), truncated (", 
                     rng->name, l, CL_MAX_LINE_LENGTH-1);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
           rng->annot[CL_MAX_LINE_LENGTH-2] = '$'; /* truncation marker, as e.g. in Emacs */
           rng->annot[CL_MAX_LINE_LENGTH-1] = '\0';
@@ -851,7 +808,7 @@ range_close(Range *rng, int end_pos)
       if (entry == NULL) {
         encode_error("Internal error in <%s>: rng->el_attributes inconsistent with rng->el_atts_list!", rng->name);
       }
-      range_close((Range *) entry->data.pointer, end_pos);
+      range_close((SAttEncoder *) entry->data.pointer, end_pos);
     }
   }
 
@@ -870,7 +827,7 @@ range_close(Range *rng, int end_pos)
  * @param annot      The annotation string (the XML element's att-val pairs).
  */
 void
-range_open(Range *rng, int start_pos, char *annot)
+range_open(SAttEncoder *rng, int start_pos, char *annot)
 {
   cl_lexhash_entry entry;
   int open_this_range = 0;      /* whether we actually have to open this range (may be skipped or delegated in recursion mode) */
@@ -925,11 +882,11 @@ range_open(Range *rng, int start_pos, char *annot)
       if (rng->feature_set) {
         char *token = cl_make_set(rng->annot, /*split*/ 0);
         if (token == NULL) {
-          if (! silent) {
-            fprintf(stderr, "Warning: '%s' is not a valid feature set for s-attribute %s, replaced by empty set | (", 
+          if (! quietly) {
+            Rprintf("Warning: '%s' is not a valid feature set for s-attribute %s, replaced by empty set | (", 
                             rng->annot, rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ")\n");
+            Rprintf(")\n");
           }
           token = cl_strdup("|"); /* rng->annot will be free()d later, so it must be an allocated string */
         }
@@ -941,10 +898,10 @@ range_open(Range *rng, int start_pos, char *annot)
       /* warn about non-empty annotation string in -S attribute (unless annotation string is parsed), but only once */
       if ((!rng->has_children) && (*annot != '\0')) { 
         if (!cl_lexhash_freq(undeclared_sattrs, rng->name)) {
-          if (!silent) {
-            fprintf(stderr, "Annotations of s-attribute <%s> not stored (", rng->name);
+          if (!quietly) {
+            Rprintf("Annotations of s-attribute <%s> not stored (", rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ", warning issued only once).\n");
+            Rprintf(", warning issued only once).\n");
           }
           cl_lexhash_add(undeclared_sattrs, rng->name); /* we can re-use the lookup hash for undeclared s-attributes :o) */
         }
@@ -980,10 +937,10 @@ range_open(Range *rng, int start_pos, char *annot)
 
       /* now annot[point] should be the separator '=' char */
       if (annot[point] != '=') {
-        if (!silent) {
-          fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (``='' not found) (", rng->name);
+        if (!quietly) {
+          Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (``='' not found) (", rng->name);
           encode_print_input_lineno();
-          fprintf(stderr, ").\n");
+          Rprintf(").\n");
         }
         break;                  /* stop processing attributes */
       }
@@ -1001,10 +958,10 @@ range_open(Range *rng, int start_pos, char *annot)
         while ((annot[point] != quote_char) && (annot[point] != '\0'))
           point++;
         if (annot[point] == '\0') { /* syntax error: missing end quote */
-          if (!silent) {
-            fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (value missing end quote) (", rng->name);
+          if (!quietly) {
+            Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (value missing end quote) (", rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
           break;                /* stop processing attributes */
         }
@@ -1025,10 +982,10 @@ range_open(Range *rng, int start_pos, char *annot)
           mark = point + 1;
         }
         if (strlen(el_att_value) == 0) { /* syntax error: attribute=id with empty value (not allowed) */
-          if (!silent) {
-            fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (attribute=id with empty value (not allowed)) (", rng->name);
+          if (!quietly) {
+            Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (attribute=id with empty value (not allowed)) (", rng->name);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
           break;                /* stop processing attributes */
         }
@@ -1036,10 +993,10 @@ range_open(Range *rng, int start_pos, char *annot)
 
       /* syntax check: el_att_name must be non-empty (values "" and '' are allowed) */
       if (strlen(el_att_name) == 0) {
-        if (!silent) {
-          fprintf(stderr, "Attributes of open tag <%s ...> ignored because of syntax error (empty attribute name)) (", rng->name);
+        if (!quietly) {
+          Rprintf("Attributes of open tag <%s ...> ignored because of syntax error (empty attribute name)) (", rng->name);
           encode_print_input_lineno();
-          fprintf(stderr, ").\n");
+          Rprintf(").\n");
         }
         break;          /* stop processing attributes */
       }
@@ -1048,10 +1005,10 @@ range_open(Range *rng, int start_pos, char *annot)
       entry = cl_lexhash_find(rng->el_attributes, el_att_name);
       if (entry == NULL) {      /* undeclared element attribute (ignored) */
         if (!cl_lexhash_freq(rng->el_undeclared_attributes, el_att_name)) {
-          if (!silent) {
-            fprintf(stderr, "Undeclared element attribute <%s %s=...> ignored (", rng->name, el_att_name);
+          if (!quietly) {
+            Rprintf("Undeclared element attribute <%s %s=...> ignored (", rng->name, el_att_name);
             encode_print_input_lineno();
-            fprintf(stderr, ", warning issued only once).\n");
+            Rprintf(", warning issued only once).\n");
           }
           cl_lexhash_add(rng->el_undeclared_attributes, el_att_name);
         }
@@ -1059,16 +1016,16 @@ range_open(Range *rng, int start_pos, char *annot)
       else {                    /* declared element attribute -> decode XML entities in value and delegate to child */
         if (entry->data.integer) {
           /* attribute already handled, i.e. it must have occurred twice in start tag -> issue warning */
-          if (!silent) {
-            fprintf(stderr, "Duplicate attribute value <%s %s=... %s=...> ignored (", rng->name, el_att_name, el_att_name);
+          if (!quietly) {
+            Rprintf("Duplicate attribute value <%s %s=... %s=...> ignored (", rng->name, el_att_name, el_att_name);
             encode_print_input_lineno();
-            fprintf(stderr, ").\n");
+            Rprintf(").\n");
           }
         }
         else {
           entry->data.integer = 1; /* mark el. att. as handled */
           cl_xml_entity_decode(el_att_value);
-          range_open((Range *) entry->data.pointer, start_pos, el_att_value);
+          range_open((SAttEncoder *) entry->data.pointer, start_pos, el_att_value);
         }
       }
 
@@ -1081,7 +1038,7 @@ range_open(Range *rng, int start_pos, char *annot)
     for (i = 0; i < n_children; i++) {
       entry = cl_lexhash_find(rng->el_attributes, cl_string_list_get(rng->el_atts_list, i));
       if (entry->data.integer == 0) {
-        range_open((Range *) entry->data.pointer, start_pos, "");
+        range_open((SAttEncoder *) entry->data.pointer, start_pos, "");
       }
     }
 
@@ -1208,253 +1165,6 @@ wattr_close_all(void)
 
 
 
-/**
- * Parses program options and sets global variables.
- *
- * @param argc  argc - passed from main()
- * @param argv  argv - passed from main()
- *
- */
-void
-encode_parse_options(int argc, char **argv)
-{
-  int c;
-  extern char *optarg;
-  extern int optind;
-  struct stat dir_status;
-
-  char *prefix = DEFAULT_ATT_NAME;
-
-  int number_of_buckets = 0;    /* -> use CL default unless changed with -b <n> */
-  int first_attr_declared = 0;  /* whether we have already declared the default 'word' attribute (useful for "-p -") */
-
-  cl_string_list dir_files;   /* list of input files found in directory (-F option) */
-  int i, l;
-
-  while((c = getopt(argc, argv, "p:P:S:V:0:f:t:F:d:R:U:Bsb:c:CxvqhD")) != EOF)
-    switch(c) {
-
-      /* -B: strip leading and trailing blanks from tokens and annotations */
-    case 'B':
-      strip_blanks++;
-      break;
-
-      /* -v: show progress messages */
-    case 'v':
-      verbose++;
-      break;
-
-      /* -q: suppress warnings (quiet mode) */
-    case 'q':
-      silent++;
-      break;
-
-      /* -c: specifies a character set */
-    case 'c':
-      corpus_character_set = cl_charset_name_canonical(optarg);
-      if (corpus_character_set == NULL)
-        encode_error("Invalid character set specified with the -c flag!");
-      break;
-
-      /* -C: clean up strings (remove invalid bytes) */
-    case 'C':
-      clean_strings++;
-      break;
-
-      /* -x: translate XML entities and ignore declarations & comments */
-    case 'x':
-      xml_aware++;
-      break;
-
-      /* -p <att>: change name of first p-attribute ("-p -": skip first attribute) */
-    case 'p':
-      if (first_attr_declared)
-        encode_error("Usage error: -p option used after -P <att>, or used twice.");
-      prefix = optarg;
-      if (strcmp(prefix, "-") != 0) {
-        wattr_declare(prefix, directory, number_of_buckets);
-      }
-      first_attr_declared = 1;  /* even if we haven't _really_ declared it because it's "-" */
-      break;
-
-      /* -d <dir>: create files in this directory */
-    case 'd':
-      directory = optarg;
-      /* Check if directory exists */
-      if (stat(directory, &dir_status) != 0 || !(dir_status.st_mode & S_IFDIR)) {
-        encode_error("Error: data directory '%s' does not exist.\nPlease create this directory first.",
-                     directory);
-      }
-      break;
-
-      /* -R <rf>: create registry file named <rf> */
-    case 'R':
-      if (registry_file != NULL)
-        encode_error("Usage error: -R option used twice.");
-      else {
-        int size;
-        int registry_is_ok = 1;
-        int registry_is_canonical = 1;
-        registry_file = optarg;
-
-        /* Check for path ending in slash and for non-lowercase in last part of the filename;
-         * allow EITHER possible value of SUBDIR_SEPARATOR */
-        size = strlen(registry_file) - 1;
-        if ((size < 0) || (registry_file[size] == '/') || (registry_file[size] == '\\'))
-          encode_error("Usage error: invalid filename '%s' for registry entry", registry_file);
-
-        while (size >= 0 && registry_file[size] != '/' && registry_file[size] != '\\') {
-          char c = registry_file[size];
-          if ((c >= 'A' && c <= 'Z') || c == '.' || c == '~')
-            registry_is_ok = 0; /* uppercase characters, '.' and '~' are definitely not allowed */
-          
-          if (!( c == '_' || c == '-' || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ))
-            registry_is_canonical = 0; /* new canonical form allows only ASCII a-z, 0-9, _, - */
-
-          size--;
-        }
-        
-        if (!registry_is_ok)
-          encode_error("Usage error: invalid filename '%s' for registry entry.\n"
-              "Filename must not contain uppercase letters, '.' or '~'.", registry_file + size + 1);
-        if (!registry_is_canonical)
-          fprintf(stderr, "Warning: filename '%s' of registry entry not in canonical format.\n"
-              "(Allowed characters: a-z, 0-9, -, _)\n", registry_file + size + 1);
-
-        if (size >= 0) {
-          /* the registry filename includes a directory part, so check that it exists and is indeed a directory */
-          char sep = registry_file[size];
-          registry_file[size] = 0; /* now registry_file holds the directory part as a NUL-terminated string */
-          if (stat(registry_file, &dir_status) != 0 || !(dir_status.st_mode & S_IFDIR))
-            encode_error("Error: registry directory '%s' does not exist.\nPlease create this directory first.", registry_file);
-          registry_file[size] = sep;
-        }
-        
-      }
-      break;
-
-      /* -f, -t: verticalised text input file */
-    case 't':
-    case 'f':
-      cl_string_list_append(input_files, optarg);
-      break;
-
-      /* -F: read all files named *.vrt or *.vrt.gz in directory */
-    case 'F':
-      dir_files = encode_scan_directory(optarg);
-      l = cl_string_list_size(dir_files);
-      for (i = 0; i < l; i++) {
-        cl_string_list_append(input_files, cl_string_list_get(dir_files, i));
-      }
-      cl_delete_string_list(dir_files); /* allocated strings have been moved into input_files, so don't free() them */
-      break;
-
-      /* -s: skip empty lines */
-    case 's': 
-      skip_empty_lines++;
-      break;
-
-      /* -b <n>: number of buckets */
-    case 'b':
-      number_of_buckets = atoi(optarg);
-      break;
-
-      /* -D: debug mode */
-    case 'D':
-      debug++;
-      break;
-      
-      /* -S: declare s-attribute without annotations */
-    case 'S':
-      if (range_ptr < MAXRANGES) {
-        if (range_find(optarg) == -1)
-          range_declare(optarg, directory, /*annot*/ 0, /*null*/ 0);
-        else 
-          encode_error("Usage error: s-attribute <%s> declared twice!", optarg);
-      }
-      else 
-        encode_error("Too many s-attributes (max. %d).", MAXRANGES);
-      break;
-
-      /* -V: declare s-attribute with annotations */
-    case 'V':
-      if (range_ptr < MAXRANGES) {
-        if (range_find(optarg) == -1) {
-          range_declare(optarg, directory, /*annot*/ 1, /*null*/ 0);
-        }
-        else 
-          encode_error("Usage error: s-attribute <%s> declared twice!", optarg);
-      }
-      else
-        encode_error("Too many s-attributes (max. %d).", MAXRANGES);
-      break;
-
-      /* -0: declare NULL s-attribute */
-    case '0':
-      if (range_ptr < MAXRANGES) {
-        if (range_find(optarg) == -1) {
-          range_declare(optarg, directory, /*annot*/ 0, /*null*/ 1);
-        }
-        else 
-          encode_error("Usage error: s-attribute <%s> declared twice!", optarg);
-      }
-      else
-        encode_error("Too many s-attributes (max. %d).", MAXRANGES);
-      break;
-
-      /* -P: declare additional p-attribute */
-    case 'P':
-
-      if (!first_attr_declared) { /* no word attribute declared yet */
-        wattr_declare(prefix, directory, number_of_buckets);
-        first_attr_declared = 1;
-      }
-
-      if (wattr_ptr < MAXRANGES) {
-        if (wattr_find(optarg) == -1)
-          wattr_declare(optarg, directory, number_of_buckets);
-        else 
-          encode_error("Usage error: %s attribute declared twice!", optarg);
-      }
-      else
-        encode_error("Too many p-attributes (max. %d).", MAXRANGES);
-      break;
-
-      /* -U: default value for missing columns */
-    case 'U':
-      undef_value = optarg;
-      break;
-
-      /* default or -h: help page */
-    case 'h':
-    default:
-      encode_usage();
-      break;
-    }
-  
-  /* if no attributes have been declared, declare the standard attribute */
-  if (!first_attr_declared)     /* no word attribute declared yet */
-    wattr_declare(prefix, directory, number_of_buckets);
-
-
-  /* now, check the default and obligatory values */
-  if (optind < argc) {
-    
-    fprintf(stderr, "%s:\n  Warning: additional arguments in command ignored:",
-            progname);
-
-    while (optind < argc) {
-      fprintf(stderr, " %s", argv[optind]);
-      optind++;
-    }
-    fprintf(stderr, "\n  (perhaps you forgot -P, -p, -S, or -V before an attribute name?)\n");
-    
-  }
-
-}
-
-
-
 
 /**
  * Processes a token data line.
@@ -1508,11 +1218,11 @@ encode_add_wattr_line(char *str)
     if (wattrs[fc].feature_set) {
       token = cl_make_set(field, /*split*/ 0);
       if (token == NULL) {
-        if (! silent) {
-          fprintf(stderr, "Warning: '%s' is not a valid feature set for -P %s/, replaced by empty set | (", 
+        if (! quietly) {
+          Rprintf("Warning: '%s' is not a valid feature set for -P %s/, replaced by empty set | (", 
                           field, wattrs[fc].name);
           encode_print_input_lineno();
-          fprintf(stderr, ")\n");
+          Rprintf(")\n");
         }
         token = cl_strdup("|");
         /* so we always have to cl_free() token for feature set attributes,
@@ -1526,11 +1236,11 @@ encode_add_wattr_line(char *str)
     /* check annotation length & truncate if necessary (assumes it's ok to modify token[] destructively) */
     length = strlen(token);
     if (length >= CL_MAX_LINE_LENGTH) {
-      if (!silent) {
-        fprintf(stderr, "Value of p-attribute '%s' exceeds maximum string length (%d > %d chars), truncated (", 
+      if (!quietly) {
+        Rprintf("Value of p-attribute '%s' exceeds maximum string length (%d > %d chars), truncated (", 
                 wattrs[fc].name, length, CL_MAX_LINE_LENGTH-1);
         encode_print_input_lineno();
-        fprintf(stderr, ").\n");
+        Rprintf(").\n");
       }
       token[CL_MAX_LINE_LENGTH-2] = '$'; /* truncation marker, as e.g. in Emacs */
       token[CL_MAX_LINE_LENGTH-1] = '\0';
@@ -1587,7 +1297,7 @@ int
 encode_get_input_line(char *buffer, int bufsize)
 {
   int ok;
-
+  
   if (nr_input_files == 0) {
     /* read one line of text from stdin */
     ok = (NULL != fgets(buffer, MAX_INPUT_LINE_LENGTH, stdin));
@@ -1599,7 +1309,6 @@ encode_get_input_line(char *buffer, int bufsize)
         return 0;
       
       current_input_file_name = cl_string_list_get(input_files, current_input_file);
-
       input_fd = cl_open_stream(current_input_file_name, CL_STREAM_READ, CL_STREAM_MAGIC);
       if (input_fd == NULL) {
         cl_error(current_input_file_name);
@@ -1622,7 +1331,7 @@ encode_get_input_line(char *buffer, int bufsize)
       /* assume we're at end of file -> close current input file, and try reading from next one */
       ok = (0 == cl_close_stream(input_fd));
       if (! ok) {
-        fprintf(stderr, "ERROR reading from file %s (ignored).\n", current_input_file_name);
+        Rprintf("ERROR reading from file %s (ignored).\n", current_input_file_name);
         cl_error(current_input_file_name);
       }
 
@@ -1664,8 +1373,8 @@ encode_generate_registry_file(char *registry_file)
   char *path = NULL;
   int i;
 
-  if (debug)
-    fprintf(stderr, "Writing registry file %s ...\n", registry_file);
+  if (debugmode)
+    Rprintf("Writing registry file %s ...\n", registry_file);
 
   if ((registry_fd = fopen(registry_file, "w")) == NULL) {
     perror(registry_file);
@@ -1734,293 +1443,4 @@ encode_generate_registry_file(char *registry_file)
   cl_free(info_file);
 }
 
-
-
-/* *************** *\
- *      MAIN()     *
-\* *************** */
-
-/**
- * Main function for cwb-encode.
- *
- * As well as the entry point to the program, this contains
- * the main loop for each line of the corpus to be encoded.
- *
- * The string of each line is sent to one of a number of
- * different functions, depending on what is found in that string!
- *
- * @param argc   Number of command-line arguments.
- * @param argv   Command-line arguments.
- */
-int 
-main(int argc, char **argv)
-{
-  int i, j, k, rng, handled;
-
-  char linebuf[MAX_INPUT_LINE_LENGTH];
-  char *buf;                    /* 'virtual' buffer; may be advanced to skip leading blanks */
-  char separator;
-  
-  int input_length;             /* length of input line */
-
-  /* initialise global variables */
-  progname = "cwb-encode";
-  input_files = cl_new_string_list();
-
-  /* parse command-line options */
-  encode_parse_options(argc, argv);
-  nr_input_files = cl_string_list_size(input_files);
-
-  /* initialisation debug messages */
-  if (debug) {
-    cl_set_debug_level(1);
-    if (nr_input_files > 0) {
-      fprintf(stderr, "List of input files:\n");
-      for (i = 0; i < nr_input_files; i++)
-        fprintf(stderr, " - %s\n", cl_string_list_get(input_files, i));
-    }
-    else {
-      fprintf(stderr, "Reading from standard input.\n");
-    }
-    encode_print_time(stderr, "Start");
-  }
-
-  /* initialise loop variables ... */
-  encoding_charset = cl_charset_from_name(corpus_character_set);
-  line = 0;
-  input_line = 0;
-
-  /* lookup hash for (undeclared) structural attributes (inserted as tokens into corpus) */
-  undeclared_sattrs = cl_new_lexhash(REP_CHECK_LEXHASH_SIZE);
-
-  /* MAIN LOOP: read one line of input and process it */
-  while ( encode_get_input_line(linebuf, MAX_INPUT_LINE_LENGTH) ) {
-    if (verbose && (line % 15000 == 0)) {
-      printf("%" COMMA_SEP_THOUSANDS_CONVSPEC "9dk tokens processed\r", line >> 10);
-      fflush(stdout);
-    }
-
-    input_line++;
-    input_length = strlen(linebuf);
-    if (input_length >= (MAX_INPUT_LINE_LENGTH - 1)) { /* buffer filled -> line may have been longer */
-      encode_error("Input line too long (max: %d characters/bytes).", MAX_INPUT_LINE_LENGTH - 2);
-    }
-
-    /* remove trailing line break (LF or CR-LF) */
-    cl_string_chomp(linebuf);
-
-    buf = linebuf;
-    if (strip_blanks) {
-      while (*buf == ' ')
-        /* strip leading blanks (trailing blanks will be erased during further processing) */
-        buf++;
-    }
-
-    /* This bit runs UNLESS either (a) skip_empty_lines (-s) is active and this an empty line;
-     * or (b) xml_aware (-x) is active and this line is an XML comment or declaration, i.e. <? or <!
-     * To put it another way "if (this is a line that should be encoded)" ...  */
-    if ( (! (skip_empty_lines && (buf[0] == '\0')) ) &&                            /* skip empty lines with -s  */
-         (! (xml_aware && (buf[0] == '<') && ((buf[1] == '?') || (buf[1] == '!'))) ) /* skip XML declarations/comments with -x  */
-      ) {
-      /* skip empty lines with -s option (for an empty line, first character will usually be newline) */
-      handled = 0;
-
-      if (buf[0] == '<') {
-        /* XML tag (may be declared or undeclared s-attribute, start or end tag) */
-        k = (buf[1] == '/' ? 2 : 1);
-        
-        /* identify XML element name (according to slightly relaxed attribute naming conventions!) */
-        i = k;                  
-        while (cl_xml_is_name_char(buf[i]))
-          i++;
-        /* first non-valid XML element name character must be whitespace or '>' or '/' (for empty XML element) */
-        if (! ((buf[i] == ' ') || (buf[i] == '\t') || (buf[i] == '>') || (buf[i] == '/')) ) 
-          i = k;                /* no valid element name found */
-
-        if (i > k) {
-          /* looks like a valid XML tag */
-          separator = buf[i];   /* terminate string containing element name, but remember original char */
-          buf[i] = '\0';        /* so that we can reconstruct the line if we have to insert it literally after all */
-          
-          if ((rng = range_find(&buf[k])) >= 0) {
-            /* good, it's a declared s-attribute and can be handled */
-            handled = 1;
-
-            if (ranges[rng].automatic) {
-              if (!cl_lexhash_freq(undeclared_sattrs, &buf[k])) {
-                fprintf(stderr, "explicit XML tag <%s%s> for implicit s-attribute ignored (", 
-                        (k == 1) ? "" : "/", &buf[k]);
-                encode_print_input_lineno();
-                fprintf(stderr, ", warning issued only once).\n");
-                cl_lexhash_add(undeclared_sattrs, &buf[k]); /* can reuse lexhash for undeclared attributes here */
-              }
-            }
-            else {
-              if (k == 1) {     /* XML start tag or empty tag */
-                i++;            /* identify annotation string, i.e. tag attributes (if there are any) */
-                while ((buf[i] == ' ') || (buf[i] == '\t')) /* skip whitespace between element name and first attribute */
-                  i++;
-                if (separator == '>') {
-                  /* tag without annotations: check that there is no extraneous material on the line */
-                  if (buf[i] != '\0') {
-                    fprintf(stderr, "Warning: extra material after XML tag ignored (");
-                    encode_print_input_lineno();
-                    fprintf(stderr, ").\n");
-                    buf[i] = '\0';
-                  }
-                }
-                else {
-                  j = i + strlen(buf+i); /* find '>' character marking end of tag (must be last character on line) */
-                  while ((j > i) && (buf[j] == ' ' || buf[j] == '\t' || buf[j] == '\0'))
-                    j--; /* set j to last non-blank character on line, which should be '>' */
-                  if (buf[j] != '>') {
-                    fprintf(stderr, "Malformed XML tag: missing > terminator at end of line (");
-                    encode_print_input_lineno();
-                    fprintf(stderr, ", annotations will be ignored).\n");
-                    buf[i] = '\0'; /* so the annotation string passed to range_open() below is empty */
-                  }
-                  else {
-                    if (buf[j-1] == '/') {
-                      j--; /* empty tag: remove "/" from annotation string and handle as an open tag */
-                      /* Note that this implicitly closes the previous instance of the empty tag:
-                       *  - this means that we can work with empty elements by looking just at the "open-point" of each range;
-                       *  - it also means that empty tags with metadata at the start of each text will automatically extend over the full text.
-                       * However, the approach sketched here only works with "flat" s-attributes declared without recursion (even without :0). */
-                    }
-                    buf[j] = '\0';
-                  }
-                }
-                /* start tag: open range */
-                range_open(&ranges[rng], line, buf+i);
-              }
-              else {            /* XML end tag */
-                if (separator != '>') {
-                  fprintf(stderr, "Warning: no annotations allowed on XML close tag </%s ...> (", &buf[k]);
-                  encode_print_input_lineno();
-                  fprintf(stderr, ", ignored).\n");
-                }
-                range_close(&ranges[rng], line - 1); /* end tag belongs to previous line! */
-              }
-            }
-          }
-          else {
-            /* no appropriate s-attribute declared -> insert tag literally */
-            if (!silent) {
-              if (!cl_lexhash_freq(undeclared_sattrs, &buf[k])) {
-                fprintf(stderr,
-                        "s-attribute <%s> not declared, inserted literally (", &buf[k]);
-                encode_print_input_lineno();
-                fprintf(stderr, ", warning issued only once).\n");
-                cl_lexhash_add(undeclared_sattrs, &buf[k]);
-              }
-            }
-            buf[i] = separator; /* restore original line, which will be interpreted as token line */
-          }
-        }
-        /* malformed XML tag (no element name found) */
-        else if (!silent) {
-          fprintf(stderr, "Malformed tag %s, inserted literally (", buf);
-          encode_print_input_lineno();
-          fprintf(stderr, ").\n");
-        }
-      } /* endif line begins with < */
-      
-      /* if we haven't handled the line so far, it must be data for the positional attributes */
-      if (!handled) {
-        encode_add_wattr_line(buf);
-        line++;                 /* line is now the corpus position of the next token that will be encoded */
-        if (line >= CL_MAX_CORPUS_SIZE) {
-          /* largest admissible corpus size should be 2^31 - 1 tokens, with maximal cpos = 2^31 - 2 */
-          fprintf(stderr, "WARNING: Maximal corpus size has been exceeded.\n");
-          fprintf(stderr, "         Input truncated to the first %d tokens (", CL_MAX_CORPUS_SIZE);
-          encode_print_input_lineno();
-          fprintf(stderr, ").\n");
-          break;
-        }
-      }
-    } /* endif (this is a line that should be encoded) */
-  } /* endwhile (main loop for each line) */
-
-  if (verbose) {
-    printf("%50s\r", "");       /* clear progress line */
-    printf("Total size: %" COMMA_SEP_THOUSANDS_CONVSPEC "d tokens (%.1fM)\n", line, ((float) line) / 1048576);
-  }
-
-  /* close open regions at end of input; then close file handles for s-attributes */
-  for (i = 0; i < range_ptr; i++) {
-    Range *rng = &ranges[i];
-
-    if (! rng->null_attribute) { /* don't attempt to close NULL attribute */
-    
-      /* This is fairly tricky: When multiple end tags are missing for an attribute declared with recursion (even ":0"),
-         we have to call range_close() repeatedly to ensure that the open region at the top level is really closed
-         (which happens when rng->recursion_level == 1). At the same time, range_close() will also close the corresponding
-         ranges of any implicitly defined attributes (used to resolve recursive embedding and element attributes).
-         Therefore, the following code calls range_close() repeatedly until the current range is actually closed.
-         It also relies on the ordering of the ranges[] array, where top level attributes always precede their children,
-         so they should be closed automatically before cleanup reaches them. If the ordering were different, children might
-         be closed directly at first, and the following attempt to close them automatically from within the range_close()
-         function would produce highly confusing error messages. To be on the safe side (for some definition of safe :-),
-         we _never_ close ranges for implicit attributes, and issue a warning if they're still open when cleanup reaches them. 
-      */
-      if (rng->automatic) {     /* implicitly generated s-attributes should have been closed automatically */
-        if (!silent && rng->is_open) {
-          fprintf(stderr, "Warning: implicit s-attribute <%s> open at end of input (should not have happened).\n",
-                  rng->name);
-        }
-      }
-      else {
-        if (rng->is_open) {
-          if (rng->recursion_level > 1) 
-            fprintf(stderr, "Warning: %d missing </%s> tags inserted at end of input.\n", 
-                    rng->recursion_level, rng->name);
-          else
-            fprintf(stderr, "Warning: missing </%s> tag inserted at end of input.\n", 
-                    rng->name);
-          
-          /* close open region; this will automatically close children from recursion and element attributes;
-             if multiple end tags are missing, we have to call range_close() repeatedly until we reach the top level */
-          while (rng->is_open) { /* should _not_ create an infinite loop, I hope */
-            range_close(rng, line - 1);
-          }
-        }
-
-        if (!silent && (rng->max_recursion >= 0) && (rng->element_drop_count > 0)) {
-          fprintf(stderr, "%7d <%s> regions dropped because of deep nesting.\n",
-                  rng->element_drop_count, rng->name);
-        }
-      }
-
-      /* close file handles for s-attributes */
-      if (EOF == fclose(rng->fd)) {
-        perror("fclose() failed");
-        encode_error("Error writing .rng file for s-attribute <%s>", rng->name);
-      }
-      if (rng->store_values) {
-        if (EOF == fclose(rng->avs)) {
-          perror("fclose() failed");
-          encode_error("Error writing .avs file for s-attribute <%s>", rng->name);
-        }
-        if (EOF == fclose(rng->avx)) {
-          perror("fclose() failed");
-          encode_error("Error writing .avx file for s-attribute <%s>", rng->name);
-        }
-      }
-
-    }
-  } /* endfor: closing each open region and s-attribute filehandle for each Range */
-
-  /* close file handles for positional attributes */
-  wattr_close_all();
-
-  /* if registry_file != NULL, write appropriate registry entry to file named <registry_file> */
-  if (registry_file != NULL) {
-    encode_generate_registry_file(registry_file);
-  }
-
-  if (debug)
-    encode_print_time(stderr, "Done");
-
-  exit(0);
-}
 

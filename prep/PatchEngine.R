@@ -1143,7 +1143,52 @@ PatchEngine <- R6Class(
           insert_after = list('#include "\\.\\./cqp/groups\\.h"', "void Rprintf(const char *, ...);", 1)
         ),
         
+        "src/cwb/utils/cwb-encode.c" = list(
+        ),
+        
+        "src/cwb/utils/cwb-compress-rdx.c" = list(
+          
+          # /*
+          #   * MODIFICATIONS
+          # * - global variable progname commented out
+          # * - global variable corpus_id commented out, passed expressively into functions
+          # * - global variable corpus as extern
+          # * - function 'usage' removed
+          # * - main function modified
+          # * - global variable 'debug' replaced by local variable that is passed around
+          # */
+            
+        ),
+        
+        "src/cwb/utils/cwb-huffcode.c" = list(
+
+                    # /*
+          #   * MODIFICATIONS:
+          #   * - progrname commented out
+          # * - function 'usage' and placeholder for usage deleted
+          # * - Rcpp.h included
+          # * - includes moved to extern "C" {}
+          # * - all uses of 'protocol' commented out
+          # * - exit(1); replaced by return 1;
+          # * - return value of decode_check_huff turned into 'int'
+          # * - corpus_id is passed explicitly into decode_check_huff
+          # */
+          #   
+          
+        ),
+
         "src/cwb/utils/cwb-makeall.c" = list(
+          
+          # /* COPIED AND SLIGHTLY MODIFIED FROM utils-makeall.c 
+          # * Modifications:
+          #   * - printf -> Rprintf;
+          # * - fprintf -> Rprintf (without stderr)
+          # * - exit -> return
+          # * - fflush(stdout); commented out (twice)
+          # * - do_attribute and make_component return integer value;
+          # */
+            
+          
           # stable r1069 - r1690. But maybe obsolete, because cwb-makeall.c is not compiled?
           insert_before = list("/\\*\\*\\sThe\\scorpus\\swe\\sare\\sworking\\son\\s\\*/", c("#include <netinet/in.h>", ""), 1)
         ),

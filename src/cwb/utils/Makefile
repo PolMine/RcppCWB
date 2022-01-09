@@ -36,11 +36,11 @@ include $(TOP)/config.mk
 ## ----------------------------------------------------------------------
 ## CWB command-line utilities  headers / sources / binaries 
 
-SRCS =  _cwb_encode.c _cwb_makeall.c \
-	_cwb_huffcode.c _cwb_compress_rdx.c \
+SRCS =  cwb-encode.c cwb-makeall.c \
+	cwb-huffcode.c cwb-compress-rdx.c \
 
-OBJS =  _cwb_encode.o _cwb_makeall.o \
-	_cwb_huffcode.o _cwb_compress_rdx.o \
+OBJS =  cwb-encode.o cwb-makeall.o \
+	cwb-huffcode.o cwb-compress-rdx.o \
 
 
 all: libcwb.a
@@ -49,24 +49,21 @@ libcwb.a: $(OBJS)
 	@$(ECHO) "--------------------------------- CREATING ARCHIVE"
 	$(RM) $@
 	$(AR) cq $@ $^
-#	$(AR) -s $@
 
-_cwb_encode.o: _cwb_encode.c
-	${CC} -c ${CFLAGS} -o _cwb_encode.o _cwb_encode.c
+cwb-encode.o: cwb-encode.c
+	${CC} -c ${CFLAGS} -o cwb-encode.o cwb-encode.c
 
-_cwb_makeall.o: _cwb_makeall.c
-	${CC} -c ${CFLAGS} -o _cwb_makeall.o _cwb_makeall.c
+cwb-makeall.o: cwb-makeall.c
+	${CC} -c ${CFLAGS} -o cwb-makeall.o cwb-makeall.c
 
-_cwb_huffcode.o: _cwb_huffcode.c
-	${CC} -c ${CFLAGS} -o _cwb_huffcode.o _cwb_huffcode.c
+cwb-huffcode.o: cwb-huffcode.c
+	${CC} -c ${CFLAGS} -o cwb-huffcode.o cwb-huffcode.c
 
-_cwb_compress_rdx.o: _cwb_compress_rdx.c
-	${CC} -c ${CFLAGS} -o _cwb_compress_rdx.o _cwb_compress_rdx.c
+cwb-compress-rdx.o: cwb-compress-rdx.c
+	${CC} -c ${CFLAGS} -o cwb-compress-rdx.o cwb-compress-rdx.c
 
 clean:
 	$(RM) *.o *~
 
 realclean:	clean
 	-$(RM) depend.mk
-
-
