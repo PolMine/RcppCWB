@@ -204,7 +204,6 @@ compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int d
    * .corpus.rev and .corpus.rdx components in order to force
    * subsequent CL calls to use the uncompressed data.
    */
-
   {
     Component *comp;
 
@@ -217,7 +216,6 @@ compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int d
       Rprintf("Index compression requires the REVCIDX component\n");
       compressrdx_cleanup(1);
     }
-
   }
 
   nr_elements = cl_max_id(attr);
@@ -319,12 +317,12 @@ compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int d
  * Checks a compressed reversed index for errors by decompressing it.
  *
  * This function this assumes that compress_reversed_index() has been called
- * beforehand and made sure that the _uncompressed_ index is used by CL
+ * beforehand and made sure that the _uncompressed_ index is usable by CL
  * access functions.
  *
  * @param attr      The attribute to check the index of.
  * @param output_fn Base name for the compressed RDX files to be read
- *                  (if this is null, filename swill be taken from the
+ *                  (if this is null, filename will be taken from the
  *                  attribute).
  */
 void 
@@ -423,9 +421,8 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_i
         compressrdx_cleanup(1);
       }
       if (pos != true_pos) {
-        Rprintf("ERROR: wrong occurrence of token #%d at cpos %d (correct cpos: %d). Aborted.\n",
-              i, pos, true_pos);
-        compressrdx_cleanup(1);
+        Rprintf("ERROR: wrong occurrence of type #%d at cpos %d (correct cpos: %d) (on attribute: %s). Aborted.\n",
+                i, pos, true_pos, attr->any.name);        compressrdx_cleanup(1);
       }
 
     }
@@ -448,17 +445,19 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_i
 
 
 /**
- * Cleans up memory prior to an error-prompted exit.
+ * Cleans up memory prior to an (error-prompted or normal) exit.
  *
  * @param error_code  Value to be returned by the program when it exits.
  */
-int
-cleanup(int error_code) {
+void
+compressrdx_cleanup(int error_code)
+{
   if (corpus)
-    drop_corpus(corpus);
+    cl_delete_corpus(corpus);
 
-  /* if (debug_output != stderr) fclose(debug_output); */
+  if (debug_output != stderr)
+      fclose(debug_output);
 
-  return error_code;
+  exit()error_code);
 }
 
