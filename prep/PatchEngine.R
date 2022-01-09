@@ -195,7 +195,7 @@ PatchEngine <- R6Class(
           c("cl", "cqp", "CQi"),
           function(subdir) list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
         )),
-        path.exand(
+        path.expand(
           file.path(cwb_pkg_dir, "util", c("cwb-encode.c", "cwb-makeall.c", "cwb-huffcode.c", "cwb-compress-rdx.c"))
         )
       )
