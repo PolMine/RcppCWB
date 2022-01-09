@@ -15,7 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
+void Rprintf(const char *, ...);
 
 #include <math.h>
 
@@ -311,8 +311,7 @@ compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int d
 
 /* ================================================== DECOMPRESSION & ERROR CHECKING */
 
-/*
-    */
+
 /**
  * Checks a compressed reversed index for errors by decompressing it.
  *
@@ -444,7 +443,6 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_i
   return;
 }
 
-
 /**
  * Cleans up memory prior to an (error-prompted or normal) exit.
  *
@@ -461,4 +459,3 @@ compressrdx_cleanup(int error_code)
 
   exit(error_code);
 }
-
