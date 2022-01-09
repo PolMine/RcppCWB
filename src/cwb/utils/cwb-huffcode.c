@@ -16,19 +16,7 @@
  */
 
 
-/*
- * MODIFICATIONS:
- * - progrname commented out
- * - function 'usage' and placeholder for usage deleted
- * - Rcpp.h included
- * - includes moved to extern "C" {}
- * - all uses of 'protocol' commented out
- * - exit(1); replaced by return 1;
- * - return value of decode_check_huff turned into 'int'
- * - corpus_id is passed explicitly into decode_check_huff
- */
-
-void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
+void Rprintf(const char *, ...);
 
 #include "../cl/globals.h"
 #include "../cl/cl.h"

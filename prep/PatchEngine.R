@@ -331,7 +331,7 @@ PatchEngine <- R6Class(
         
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
@@ -344,7 +344,8 @@ PatchEngine <- R6Class(
         # best solution I could come up with is to rename endian.h into endian2.h.
         # In addition - turn 'endian.h' into 'endian2.h' in the Makefile - change
         # include statements to 'include "endian2.h"'
-        c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"') # only files in cl, maybe limit this
+        c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"'), # only files in cl, maybe limit this,
+        c("^(\\s*)exit\\(1\\);", "\\1return 1;")
       )
     },
     
@@ -1190,6 +1191,12 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/utils/cwb-huffcode.c" = list(
+          
+          insert_before = list('#include\\s"\\.\\./cl/globals\\.h"', c("void Rprintf(const char *, ...);", ""), 1L),
+          
+          replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
+          extern = list("Corpus *corpus;"),
+          
 
                     # /*
           #   * MODIFICATIONS:
