@@ -534,6 +534,7 @@ Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus)
 SEXP cqp_drop_subcorpus(SEXP inSubcorpus)
 {
   SEXP			result = R_NilValue;
+  /*
   char *			subcorpus;
   char 			*c, *sc;
   CorpusList *	cl;
@@ -542,27 +543,23 @@ SEXP cqp_drop_subcorpus(SEXP inSubcorpus)
   
   subcorpus = (char*)CHAR(STRING_ELT(inSubcorpus,0));
   
-  /* Make sure it is a subcorpus, not a root corpus */
   if (!split_subcorpus_spec(subcorpus, &c, &sc)) {
     UNPROTECT(1);
-    /* rcqp_error_code(cqi_errno); */
   } else if (sc == NULL) {
     free(c);
     UNPROTECT(1);
-    /* error("can't drop a root corpus."); */
   } else {
     free(c); free(sc);
     cl = cqi_find_corpus(subcorpus);
     if (cl == NULL) {
       UNPROTECT(1);
-      /* rcqp_error_code(cqi_errno); */
     } else {
       dropcorpus(cl);
     }
   }
   
   UNPROTECT(1);
-  
+  */
   return result;
 }
 

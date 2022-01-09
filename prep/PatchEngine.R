@@ -17,6 +17,8 @@ PatchEngine <- R6Class(
   
   public = list(
     
+    #' @field global_replacements Generated `$initialize()` by calling
+    #'   `$configure_global_replacements`
     revision = NULL,
     cwb_dir_svn = NULL,
     repodir = NULL,
@@ -25,19 +27,7 @@ PatchEngine <- R6Class(
     last_commit = NULL,
     patch_commit = NULL,
     patchbranch = NULL,
-    global_replacements = list(
-      c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf("),
-      c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
-      c("fprintf\\s*\\(", "Rprintf("),
-      c("(\\s+)printf\\(", "\\1Rprintf("),
-      c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
-      
-      # The CWB file 'endian.h' causes issues with the endian.h system file. The
-      # best solution I could come up with is to rename endian.h into endian2.h.
-      # In addition - turn 'endian.h' into 'endian2.h' in the Makefile - change
-      # include statements to 'include "endian2.h"'
-      c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"') # only files in cl, maybe limit this
-    ),
+    global_replacements = NULL,
     file_patches = NULL,
     verbose = TRUE,
     diff_global_replacements = NULL,
@@ -61,6 +51,8 @@ PatchEngine <- R6Class(
       
       self$repository <- repository(self$repodir)
       self$last_commit <- last_commit(repo = self$repodir)
+      
+      self$global_replacements <- self$configure_global_replacements(revision)
       self$file_patches <- self$patches(revision)
       
       message("flex version: ", system("flex --version", intern = TRUE))
@@ -225,6 +217,22 @@ PatchEngine <- R6Class(
       code
     },
     
+    delete_line_after = function(code, action, file){
+      which_position <- if (length(action) > 1L) action[[2]] else 1L
+      times <- if (length(action) == 3L) action[[3]] else 1L
+      
+      position <- grep(pattern = action[[1]], code)[which_position]
+      if (!is.na(position)){
+        code <- code[-(position + 1L:times)]
+      } else {
+        message(
+          sprintf("Trying to patch file '%s' - no match for action 'delete_line_after' (regex: %s | match: %d | lines: %d) ", file, action[[1]], which_position, times)
+        )
+      }
+      code
+    },
+    
+    
     insert_before = function(code, action, file){
       which_position <- if (length(action) > 2L) action[[3]] else 1
       
@@ -308,6 +316,27 @@ PatchEngine <- R6Class(
         }
       }
       code
+    },
+    
+    configure_global_replacements = function(revision){
+      list(
+        # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
+        if (revision == 1069){
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf(")
+        } else if (revision >= 1690){
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh),\\s*", "Rprintf(")
+        },
+        c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
+        c("fprintf\\s*\\(", "Rprintf("),
+        c("(\\s+)printf\\(", "\\1Rprintf("),
+        c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
+        
+        # The CWB file 'endian.h' causes issues with the endian.h system file. The
+        # best solution I could come up with is to rename endian.h into endian2.h.
+        # In addition - turn 'endian.h' into 'endian2.h' in the Makefile - change
+        # include statements to 'include "endian2.h"'
+        c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"') # only files in cl, maybe limit this
+      )
     },
     
     # Order to maintain:
@@ -621,6 +650,21 @@ PatchEngine <- R6Class(
           )
         ),
         
+        "src/cwb/cl/ui-helpers.c" = c(
+          list(),
+          if (revision >= 1690) list(
+            insert_before = list('^#include\\s"cl\\.h"', c("void Rprintf(const char *, ...);", ""), 1L)
+          )
+        ),
+        
+        "src/cwb/cl/cwb-globals.h" = c(
+          list(),
+          if (revision >= 1690) list(
+            delete_line_after = list("#if\\s__STDC_VERSION__\\s>=\\s199901L", 1L, 21L)
+          )
+        ),
+        
+        
         "src/cwb/cqp/groups.c" = c(
           list(),
           # The file is gone with r1690
@@ -789,6 +833,20 @@ PatchEngine <- R6Class(
             # 'assert((col->type = tabular));' to avoid -Wparentheses error (on
             # Debian CRAN machine)
             replace = list("^(\\s*)assert\\(col->type\\s=\\stabular\\);", "\\1assert((col->type = tabular));", 1)
+          ),
+          if (revision >= 1690) list(
+            # eval.c:190:23: error: unknown type name 'bool'
+            # bool keep_old_ranges)
+            # eval.c:2815:27: error: use of undeclared identifier 'false'
+            # false);
+            # eval.c:3249:64: error: use of undeclared identifier 'false'
+            # set_corpus_matchlists(evalenv->query_corpus, &result, 1, false); /* return empty result set */
+            # eval.c:3397:60: error: use of undeclared identifier 'false'
+            # set_corpus_matchlists(evalenv->query_corpus, &result, 1, false);
+            replace = list("bool\\skeep_old_ranges)\\s*$", "int keep_old_ranges)", 1),
+            replace = list("^(\\s*)false);", "\\10);", 1),
+            replace = list("^(\\s*set_corpus_matchlists\\(evalenv->query_corpus,\\s&result,\\s1,\\s)false);", "\\10);", 1),
+            replace = list("^(\\s*set_corpus_matchlists\\(evalenv->query_corpus,\\s&result,\\s1,\\s)false);", "\\10);", 1)
           )
         ),
         
@@ -1057,16 +1115,23 @@ PatchEngine <- R6Class(
         
         "src/cwb/CQi/auth.c" = c(
           list(),
+          if (revision >= 1690) list(
+            insert_before = list('^#include\\s"auth\\.h"', c("void Rprintf(const char *, ...);", ""), 1L)
+          ),
           if (revision == 1069) list(
             insert_before = list("/\\*\\sdata\\sstructures\\s\\(internal\\suse\\sonly\\)\\s\\*/", c("void Rprintf(const char *, ...);", ""), 1)
           )
         ),
         
-        "src/cwb/CQi/server.c" = list(
-          insert_before = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
-          insert_after = list(
-            if (revision == 1069) '#include "\\.\\./cqp/hash\\.h"' else if (revision >= 1690) '^#include\\s+"cqi\\.h"',
-            '#include "../cl/lexhash.h" /* inserted by AB */', 1)
+        "src/cwb/CQi/server.c" = c(
+          list(
+            insert_before = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L)
+          ),
+          
+          # File 'lexhash.h' not there any more at r1690
+          if (revision == 1069) list(
+            insert_after = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1)
+          )
         ),
         
         "src/cwb/CQi/cqpserver.c" = list(
