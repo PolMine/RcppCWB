@@ -328,9 +328,13 @@ PatchEngine <- R6Class(
     
     configure_global_replacements = function(revision){
       list(
+        list(
+          c("compressrdx_cleanup\\(1\\);", "cleanup(1);")
+        ),
+        
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output),\\s*", "Rprintf(")
         } else if (revision >= 1690){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
@@ -1155,6 +1159,12 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
+          
+          replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
+          replace = list("^char\\s\\*corpus_id\\s=\\sNULL;", "/* char *corpus_id = NULL; */", 1L),
+          replace = list('^FILE\\s\\*debug_output;', "/* FILE *debug_output; */", 1L),
+          extern = list("int debug = 0;")
+          
           
           # /*
           #   * MODIFICATIONS

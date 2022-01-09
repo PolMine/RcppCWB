@@ -186,16 +186,11 @@ library(magrittr)</code></pre>
 </div>
 <div id="loading-and-configuring-the-patchengine" class="section level2">
 <h2>Loading and configuring the PatchEngine</h2>
-<pre class="r"><code>source(&quot;~/Lab/github/RcppCWB/prep/autopatch/R/PatchEngine.R&quot;)
-
-data_files &lt;- list.files(&quot;~/Lab/github/RcppCWB/prep/autopatch/data&quot;, full.names = TRUE)
-for (fname in data_files) source(fname)</code></pre>
+<pre class="r"><code>source(&quot;~/Lab/github/RcppCWB/prep/PatchEngine.R&quot;)</code></pre>
 <pre class="r"><code>P &lt;- PatchEngine$new(
   cwb_dir_svn = &quot;~/Lab/tmp/cwb/trunk&quot;,
   repodir = &quot;~/Lab/github/RcppCWB&quot;,
-  revision = 1069L, # see explanation below
-  global_replacements = global_replacements,
-  file_patches = file_patches
+  revision = params$revision
 )</code></pre>
 <pre><code>## RcppCWB repository path: /Users/andreasblaette/Lab/github/RcppCWB</code></pre>
 <pre><code>## SVN directory with CWB code: /Users/andreasblaette/Lab/tmp/cwb/trunk</code></pre>
@@ -211,88 +206,31 @@ for (fname in data_files) source(fname)</code></pre>
 <pre><code>## Active revision of CWB SVN repository: 1069</code></pre>
 <pre><code>## Copy unaltered CWB code into RcppCWB repository ...689 files copied
 ## Add newly created files to CWB code (overwriting existing files)
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config.mk
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/darwin-arm64
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_spark
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_x86
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/Makefile
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_compress_rdx.c
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_encode.c
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_huffcode.c
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/_cwb_makeall.c
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/Makefile
 ## Run bison and flex parsers
 ## Rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)
 ## Create dummy depend.mk files ...
 ## Perform global replacements ...
-## ... patching file: src/cwb/cl/lex.creg.c
-## No match for action &#39;replace&#39; (regex: ^(\s)\{(\s*)/\*\sneed\smore\sinput\s\*/ | match: 1 | replacement: \1{\2)Patch #13 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## ... patching file: src/cwb/cl/endian2.h
-## ... patching file: src/cwb/cl/Makefile
-## ... patching file: src/cwb/cl/attributes.c
-## ... patching file: src/cwb/cl/bitio.c
-## no match for action &#39;insert_after&#39; (regex: ^static\sint\sBaseTypeBits | match: 1 | insertion: void Rprintf(const char *, ...);)
-## Patch #2 for file &#39;src/cwb/cl/bitio.c&#39; does not change code
-## ... patching file: src/cwb/cl/class-mapping.c
-## ... patching file: src/cwb/cl/corpus.c
-## ... patching file: src/cwb/cl/fileutils.c
-## ... patching file: src/cwb/cl/globals.h
-## ... patching file: src/cwb/cl/lexhash.c
-## ... patching file: src/cwb/cl/macros.c
-## ... patching file: src/cwb/cl/makecomps.c
-## ... patching file: src/cwb/cl/registry.y
-## ... patching file: src/cwb/cl/special-chars.c
-## ... patching file: src/cwb/cl/storage.c
-## ... patching file: src/cwb/cl/windows-mmap.c
-## ... patching file: src/cwb/cl/registry.tab.c
-## ... patching file: src/cwb/cl/bitfields.c
-## ... patching file: src/cwb/cl/cdaccess.c
-## ... patching file: src/cwb/cl/globals.c
-## ... patching file: src/cwb/cl/ngram-hash.c
-## ... patching file: src/cwb/cl/regopt.c
-## ... patching file: src/cwb/cl/class-mapping.h
-## ... patching file: src/cwb/cqp/groups.c
-## ... patching file: src/cwb/cqp/output.c
-## ... patching file: src/cwb/cqp/parser.y
-## ... patching file: src/cwb/cqp/ranges.c
-## ... patching file: src/cwb/cqp/lex.yy.c
-## ... patching file: src/cwb/cqp/Makefile
-## ... patching file: src/cwb/cqp/hash.c
-## ... patching file: src/cwb/cqp/macro.c
-## ... patching file: src/cwb/cqp/eval.c
-## ... patching file: src/cwb/cqp/eval.h
-## ... patching file: src/cwb/cqp/hash.h
-## ... patching file: src/cwb/cqp/html-print.c
-## ... patching file: src/cwb/cqp/latex-print.c
-## ... patching file: src/cwb/cqp/options.h
-## ... patching file: src/cwb/cqp/output.h
-## ... patching file: src/cwb/cqp/parse_actions.c
-## ... patching file: src/cwb/cqp/corpmanag.c
-## ... patching file: src/cwb/cqp/corpmanag.h
-## ... patching file: src/cwb/cqp/regex2dfa.c
-## ... patching file: src/cwb/cqp/sgml-print.c
-## ... patching file: src/cwb/cqp/parser.tab.c
-## ... patching file: src/cwb/cqp/cqp.h
-## ... patching file: src/cwb/CQi/auth.c
-## ... patching file: src/cwb/CQi/server.c
-## ... patching file: src/cwb/CQi/cqpserver.c
-## ... patching file: src/cwb/utils/cwb-makeall.c
-## ... patching file: src/cwb/definitions.mk
-## ... patching file: src/cwb/config/platform/darwin-64
-## ... patching file: src/cwb/config/platform/darwin
-## No match for action &#39;replace&#39; (regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2)Patch #1 for file &#39;src/cwb/config/platform/darwin&#39; does not change code
-## ... patching file: src/cwb/config/platform/darwin-port-core2
-## ... patching file: src/cwb/config/platform/darwin-universal
-## ... patching file: src/cwb/config/platform/darwin-brew
-## ... patching file: src/cwb/config/platform/linux-opteron
-## ... patching file: src/cwb/config/platform/unix
-## ... patching file: src/cwb/config/platform/linux
-## No match for action &#39;replace&#39; (regex: ^(CFLAGS\s*=.*?)\s+-march=native\s+(.*?)$ | match: 1 | replacement: \1 \2)Patch #2 for file &#39;src/cwb/config/platform/linux&#39; does not change code
-## Number of files successfully patched: 58
+## Actions defined for the following files, but file not present:
+## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ui-helpers.c
+## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cwb-globals.h
+## - /Users/andreasblaette/Lab/github/RcppCWB/src/globalvars.h
+## Number of files successfully patched: 59
 ## Add new and altered files to HEAD in repo: /Users/andreasblaette/Lab/github/RcppCWB
 ## Commit: /Users/andreasblaette/Lab/github/RcppCWB
 ## Story to be told
 ## Return to branch of departure: patch</code></pre>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<ul>
+<li>We do not patch the general Makefile but copy a manually patched version of r1069: The diffs between r1069 and r1690 show differences with new targets, but not relevant here.</li>
+<li>The Makefile utils/Makefile is copied in - r1690 has better verbosity but does not change substantially anything</li>
+</ul>
 </div>
 
 
