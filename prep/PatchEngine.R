@@ -329,8 +329,6 @@ PatchEngine <- R6Class(
     configure_global_replacements = function(revision){
       list(
         
-        c("compressrdx_cleanup\\(1)\\;", "cleanup(1);"),
-
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output),\\s*", "Rprintf(")
@@ -1162,8 +1160,8 @@ PatchEngine <- R6Class(
           replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
           replace = list("^char\\s\\*corpus_id\\s=\\sNULL;", "/* char *corpus_id = NULL; */", 1L),
           replace = list('^FILE\\s\\*debug_output;', "/* FILE *debug_output; */", 1L),
-          replace = list("^extern\\sint\\sdebug\\s=\\s0;", "/* extern int debug = 0; */", 1L),
-          extern = list("Corpus *corpus;\\s")
+          replace = list("^int\\sdebug\\s=\\s0;", "/* extern int debug = 0; */", 1L),
+          extern = list("Corpus *corpus;")
           
           
           # /*
