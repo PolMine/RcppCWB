@@ -578,13 +578,14 @@ PatchEngine <- R6Class(
             
             # cdaccess.c:2697:12: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
             # fgets(call, CL_MAX_LINE_LENGTH, pipe);
-            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
-            
-            replace = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1)
+            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1)
           ),
           
           # These are unused variable patches gone with r1690 (vars commented out, for instance)
           if (revision == 1069) list(
+            # unchanged in r1690? But does not match
+            replace = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1),
+            
             replace = list("^(\\s*)int\\sregex_result,\\sidx,\\si,\\slen,\\slexsize;", "\\1int idx, i, lexsize;", 1),
             replace = list("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
             replace = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
@@ -1079,15 +1080,18 @@ PatchEngine <- R6Class(
           )
         ),
         
-        "src/cwb/cqp/parser.tab.c" = list(
+        "src/cwb/cqp/parser.tab.c" = c(
+          list(
+            # cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
+            # replaced by:
+            #   cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
+            # The previous version resulted in an awful total crash. QueryBuffer causes the problem! 
+            replace = list('^(\\s*)cqpmessage\\(Error,\\s"CQP\\sSyntax\\sError:.*?",\\ss,\\sQueryBuffer\\);', '\\1cqpmessage(Error, "CQP Syntax Error: %s", s);', 1L)
+          ),
           
-          # cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
-          # replaced by:
-          #   cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
-          # The previous version resulted in an awful total crash. QueryBuffer causes the problem! 
-          replace = list('^(\\s*)cqpmessage\\(Error,\\s"CQP\\sSyntax\\sError:.*?",\\ss,\\sQueryBuffer\\);', '\\1cqpmessage(Error, "CQP Syntax Error: %s", s);', 1L),
-          
-          replace = list("^(\\s+)int\\sok;", "\\1int ok __attribute__((unused));", 4L)
+          if (revision == 1069) list(
+            replace = list("^(\\s+)int\\sok;", "\\1int ok __attribute__((unused));", 4L)
+          )
         ),
         
         "src/cwb/cqp/cqp.h" = c(
