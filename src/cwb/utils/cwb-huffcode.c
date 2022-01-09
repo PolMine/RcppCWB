@@ -576,7 +576,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
     Rprintf("Problem: No output generated -- no items?\n");
     /* nr_codes = 0; */
-
   }
   else {
 
