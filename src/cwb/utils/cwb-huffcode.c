@@ -28,10 +28,9 @@ void Rprintf(const char *, ...);
 
 
 /** Level of progress-info (inc compression protocol) message output: 0 = none. */
-int do_protocol = 1;
-/** File handle for this program's progress-info output: always stdout */
-/* FILE *protocol; */ /* " = stdout;" init moved to main() for Gnuwin32 compatibility */
-
+int do_protocol = 0;
+/** File handle for this program's progress-info output: note, it is always stdout */
+FILE *protocol; /* For Gnuwin32 compatibility, this must be initialised in main(), not here. */
 /* ---------------------------------------------------------------------- */
 
 /* char *progname; */
@@ -41,12 +40,14 @@ char *corpus_id = NULL;
 
 int debug = 0;
 
+void huffcode_usage(char *msg, int error_code);
 
 /* ---------------------------------------------------------------------- */
 
 /**
- * Prints a binary representation of an integer to a stream.
- *
+ * Prints, to the specified stream, a string containing
+ * a binary representation of an integer.
+ * 
  * @param i       Integer to print
  * @param width   Number of bits in the integer
  * @param stream  Where to print to.
@@ -96,7 +97,7 @@ bprintf(unsigned int i, int width, FILE *stream)
 
 
 /**
- * Dumps the specified heap of memory to the program output stream.
+ * Dumps the specified heap of memory to the program's STDOUT.
  *
  * @see protocol
  * @param heap       Location of the heap to dump.
@@ -112,7 +113,8 @@ dump_heap(int *heap, int heap_size, int node, int indent)
 
   if (node <= heap_size) {
 
-    /* for (i = 0; i < indent * 3; i++) putc((i % 3) == 0 ? '|' : ' ', protocol); */
+    /* for (i = 0; i < indent * 3; i++)
+      putc((i % 3) == 0 ? '|' : ' ', protocol); */
     
     Rprintf("Node %d (p: %d, f: %d)\n", node, heap[node-1], heap[heap[node-1]]);
     
@@ -122,7 +124,7 @@ dump_heap(int *heap, int heap_size, int node, int indent)
 }
 
 /**
- * Prints a description of the specified heap of memory to the program output stream.
+ * Prints a description of the specified heap of memory to the program's STDOUT.
  *
  * @see protocol
  * @param heap       Location of the heap to print.
@@ -141,7 +143,7 @@ print_heap(int *heap, int heap_size, char *title)
   
   dump_heap(heap, heap_size, 1, 0);
 
-  Rprintf("");
+  Rprintf("\x0c");
 }
 
 
@@ -167,21 +169,18 @@ sift(int *heap, int heap_size, int node)
    * 2i+1. So we maintain this scheme and decrement just before
    * addressing the array.
    *
-   * left child in 2*node, right child in 2*node + 1, parent in
-   * node */
+   * left child in 2*node, right child in 2*node + 1, parent in node
+   */
 
   while (child <= heap_size) {
  
     if ((child < heap_size) && 
         (heap[heap[child]] < heap[heap[child-1]])) {
-      
       /* select right branch in heap[child+1-1] */
-      
       child++;
     }
     
     if (heap[heap[node-1]] > heap[heap[child-1]]) {
-      
       /* root is larger than selected child, so we have to swap and
        * recurse down */
 
@@ -192,7 +191,6 @@ sift(int *heap, int heap_size, int node)
       heap[node-1] = tmp;
       
       /* recurse downwards */
-      
       node = child;
       child = node * 2;
     }
@@ -216,7 +214,7 @@ WriteHCD(char *filename, HCD *hc)
 {
   FILE *fd;
 
-  if ((fd = fopen(filename, "w")) == NULL) {
+  if ((fd = fopen(filename, "wb")) == NULL) {
     perror(filename);
     return 0;
   }
@@ -239,10 +237,10 @@ WriteHCD(char *filename, HCD *hc)
 }
 
 /**
- * Reads a Huffman compressed sequence from file.
+ * Reads a Huffman Code Descriptor from file.
  *
- * @param filename  Path to file where compressed sequence is saved.
- * @param hc        Pointer to location where the sequence's descriptor block will be loaded to.
+ * @param filename  Path to file where descriptor is saved.
+ * @param hc        Pointer to location where the descriptor block will be loaded to.
  * @return          Boolean: true for all OK, false for error.
  */
 int
@@ -250,7 +248,7 @@ ReadHCD(char *filename, HCD *hc)
 {
   FILE *fd;
 
-  if ((fd = fopen(filename, "r")) == NULL) {
+  if ((fd = fopen(filename, "rb")) == NULL) {
     perror(filename);
     return 0;
   }
@@ -270,8 +268,8 @@ ReadHCD(char *filename, HCD *hc)
     return 1;
   }
 }
-/* should these two functions perhaps be in cl/attributes.h? (prototype of HCD is in attributes.h) or all HCD object in separate module? */
-
+/* TODO: should these two functions perhaps be in cl/attributes.h? (prototype of HCD is in attributes.h)
+ *       or all HCD object in separate module? */
 
 /* ================================================== COMPRESSION */
 
@@ -292,8 +290,9 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
   /* int nr_codes = 0; */
 
-  int *heap = NULL;
-  unsigned *codelength = NULL;        /* was char[], probably to save space; but that's unnecessary and makes gcc complain */
+  unsigned int *heap = NULL;
+  /* must be unsigned: because of add-1 trick below to avoid codes longer than 32 bits, cumulative frequencies in heap may exceed 2G limit */
+  unsigned int *codelength = NULL;
 
   int issued_codes[MAXCODELEN];
   int next_code[MAXCODELEN];
@@ -302,6 +301,14 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
 
   Rprintf("COMPRESSING TOKEN STREAM of %s.%s\n", corpus_id, attr->any.name);
+
+  /* I need the following components:
+   * - CompCorpus
+   * - CompCorpusFreqs
+   * - CompLexicon
+   * - CompLexiconIdx
+   * and want to force the CL to use them rather than compressed data. 
+   */
 
   {
     Component *comp;
@@ -331,7 +338,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   }
 
   /*
-   * strongly follows Witten/Moffat/Bell: ``Managing Gigabytes'', 
+   * strongly follows Witten/Moffat/Bell: ``Managing Gigabytes'', pp. 335ff.
    * pp. 335ff.
    */
 
@@ -351,27 +358,39 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   hc->min_codelen = 100;
   hc->max_codelen = 0;
 
-  bzero((char *)hc->lcount, MAXCODELEN * sizeof(int));
-  bzero((char *)hc->min_code, MAXCODELEN * sizeof(int));
-  bzero((char *)hc->symindex, MAXCODELEN * sizeof(int));
+  memset((char *)hc->lcount,   '\0', MAXCODELEN * sizeof(int));
+  memset((char *)hc->min_code, '\0', MAXCODELEN * sizeof(int));
+  memset((char *)hc->symindex, '\0', MAXCODELEN * sizeof(int));
+  
+  memset((char *)issued_codes, '\0', MAXCODELEN * sizeof(int));
 
-  bzero((char *)issued_codes, MAXCODELEN * sizeof(int));
-
-  codelength = (unsigned *)cl_calloc(hc->size, sizeof(unsigned));
+  codelength = (unsigned int *)cl_calloc(hc->size, sizeof(unsigned));
 
 
   /* =========================================== make & initialize the heap */
 
-  heap = (int *)cl_malloc(hc->size * 2 * sizeof(int));
+  heap = (unsigned int *)cl_malloc(hc->size * 2 * sizeof(int));
+  /* The heap initially consists of two consecutive arrays:
+   * a) an array of pointers into the second array (given as offsets on heap[])
+   * b) an array of frequency counts for the leaves of the Huffman tree
+   * In the algorithm below, inner nodes of the tree are created by merging the two least frequent
+   * nodes. The corresponding frequency counts, which are no longer needed, are replaced by pointers
+   * to the parent node.
+   */
 
   for (i = 0; i < hc->size; i++) {
     heap[i] = hc->size + i;
-    heap[hc->size+i] = get_id_frequency(attr, i);
+    heap[hc->size+i] = cl_id2freq(attr, i) + 1;
+    /* add-one trick needed to avoid unsupported Huffman codes > 31 bits for very large corpora of ca. 2 billion words:
+     * theoretical optimal code length for hapax legomena in such corpora is ca. 31 bits, and the Huffman algorithm
+     * sometimes generates 32-bit codes; with add-one trick, the theoretical optimal code length is always <= 30 bits
+     * NB: this means that cumulative frequency counts may exceed the corpus size and hence the 2G limit (-> unsigned int)
+     */
   }
 
   /* ============================== PROTOCOL ============================== */
   if (do_protocol > 0)
-    Rprintf("Allocated heap with %d cells for %d items\n\n",
+    Rprintf("Allocated heap with %d cells for %d items\n\n", hc->size * 2, hc->size);
             hc->size * 2, hc->size);
   if (do_protocol > 2)
     print_heap(heap, hc->size, "After Initialization");
@@ -388,7 +407,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
    * we address the heap in the following manner: when we start array
    * indices at 1, the left child is at 2i, and the right child is at
    * 2i+1. So we maintain this scheme and decrement just before
-   * adressing the array. 
+   * addressing the array. 
    */
 
   /*
@@ -401,7 +420,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
      * bottom up, left to right,
      * for each root of each subtree, sift if necessary
      */
-
     sift(heap, h, i);
   }
 
@@ -498,8 +516,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
   /* ================================================== Phase 3 */
 
-  /* compute the code lengths. We don't have any freqs in heap any
-   * more, only pointers to parents */
+  /* compute the code lengths. We don't have any freqs in heap any more, only pointers to parents */
 
   heap[0] = -1U;
 
@@ -520,16 +537,16 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   for (i = 0; i < hc->size; i++) {
 
     int cl = heap[i+hc->size];
-
+    if (cl == 0) {
+      assert((hc->size == 1) && "Major error: code length of 0 bits should only happen for lexicon size = 1");
+      cl = 1; /* special case: if lexicon contains only a single type, generate 1-bit code '0' */
+    }
+  
     sum_bits += cl * get_id_frequency(attr, i);
-
     codelength[i] = cl;
-    if (cl == 0)
-      continue;
 
     if (cl > hc->max_codelen)
       hc->max_codelen = cl;
-
     if (cl < hc->min_codelen)
       hc->min_codelen = cl;
 
@@ -596,7 +613,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
     /* ============================== PROTOCOL ============================== */
     if (do_protocol > 1) {
-      Rprintf("\n");
+      Rprintf("\n");
       Rprintf("   Item   f(item)  CL      Bits     Code, String\n");
       Rprintf("------------------------------------"
               "------------------------------------\n");
@@ -646,15 +663,14 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
     {
       char *path;
 
-      char hcd_path[MAX_LINE_LENGTH];
-      char huf_path[MAX_LINE_LENGTH];
-      char sync_path[MAX_LINE_LENGTH];
+      char hcd_path[CL_MAX_LINE_LENGTH];
+      char huf_path[CL_MAX_LINE_LENGTH];
+      char sync_path[CL_MAX_LINE_LENGTH];
 
       Component *corp;
 
       BFile bfd;
       FILE *sync;
-
       int cl, code, pos;
 
       corp = ensure_component(attr, CompCorpus, 0);
@@ -708,7 +724,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
       for (i = 0; i < hc->length; i++) {
 
         /* SYNCHRONIZE */
-
         if ((i % SYNCHRONIZATION) == 0) {
           if (i > 0)
             BFflush(&bfd);
@@ -721,9 +736,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
           cdperror("(aborting) cl_cpos2id() failed");
           return 1;
         }
-
         else {
-
           assert((id >= 0) && (id < hc->size) && "Internal Error");
 
           cl = codelength[id];
@@ -734,9 +747,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
                     id, code, cl, i);
             return 1;
           }
-
         }
-
       }
 
       fclose(sync);
@@ -744,8 +755,8 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
     }
   }
 
-  free(codelength);
-  free(heap);
+  cl_free(codelength);
+  cl_free(heap);
  
   return 1;
 }
@@ -753,9 +764,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
 
 /* ================================================== DECOMPRESSION & ERROR CHECKING */
-
-/* this
-    */
 
 /**
  * Checks a huffcoded attribute for errors by decompressing it.
@@ -782,9 +790,9 @@ decode_check_huff(Attribute *attr, char *corpus_id, char *fname)
   
   unsigned char bit;
 
-  char hcd_path[MAX_LINE_LENGTH];
-  char huf_path[MAX_LINE_LENGTH];
-  char sync_path[MAX_LINE_LENGTH];
+  char hcd_path[CL_MAX_LINE_LENGTH];
+  char huf_path[CL_MAX_LINE_LENGTH];
+  char sync_path[CL_MAX_LINE_LENGTH];
 
   
   Rprintf("VALIDATING %s.%s\n", corpus_id, attr->any.name);
