@@ -1213,7 +1213,10 @@ PatchEngine <- R6Class(
           insert_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "int ", 1L),
           replace = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "\\1decode_check_huff(Attribute *attr, char *corpus_id, char *fname)", 1L),
           
-          extern = list("Corpus *corpus;")
+          extern = list("Corpus *corpus;"),
+          
+          delete_line_before = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 37L),
+          delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 130L)
           
 
                     # /*
