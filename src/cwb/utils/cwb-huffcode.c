@@ -898,6 +898,7 @@ decode_check_huff(Attribute *attr, char *corpus_id, char *fname)
   Rprintf("!! You can delete the file <%s> now.\n",
          component_full_name(attr, CompCorpus, NULL));
   
-  return 0;                        /* exits on error, so there's no return value */
+  return 0;
+  /* exits on error, so there's no return value */
 }
 

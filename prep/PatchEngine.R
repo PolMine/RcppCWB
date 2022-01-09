@@ -1195,7 +1195,7 @@ PatchEngine <- R6Class(
           insert_before = list('#include\\s"\\.\\./cl/globals\\.h"', c("void Rprintf(const char *, ...);", ""), 1L),
           
           replace = list("^char\\s\\*progname;", "/* char *progname; */", 1L),
-          replace = list("^(\\s*)int\\si;", "\\1/* int i */", 1L),
+          replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 1L),
           replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
           replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
           replace = list("^(\\s*putc\\(\\(i\\s%\\s3\\)\\s==\\s0\\s\\?\\s'\\|'\\s:\\s'\\s',\\sprotocol\\);)", "\\1 */", 1L),
@@ -1204,6 +1204,14 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)depth\\s=\\s0;", "\\1/* depth = 0; */", 1L),
           replace = list("^(\\s*)int\\snr_codes\\s=\\s0;", "\\1/* int nr_codes = 0; */", 1L),
           replace = list("^(\\s*)nr_codes\\s=\\s0;", "\\1/* nr_codes = 0; */", 1L),
+          replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
+          
+          replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L),
+          replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L),
+          
+          delete_line_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", 1L, 1L),
+          insert_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "int ", 1L),
+          replace = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "\\1decode_check_huff(Attribute *attr, char *corpus_id, char *fname)", 1L),
           
           extern = list("Corpus *corpus;")
           
