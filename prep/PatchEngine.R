@@ -1163,7 +1163,7 @@ PatchEngine <- R6Class(
           replace = list("^int\\sdebug\\s=\\s0;", "/* extern int debug = 0; */", 1L),
           extern = list("Corpus *corpus;"),
           
-          inser_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
+          insert_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
           delete_line_beginning_with = list("^/\\*\\s-+\\s\\*/ \\s*$", 1L, 33L),
           delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\s*$", 1L, 1L),
           replace = list(
