@@ -171,7 +171,7 @@ int read_golomb_code_am(int b, BFile *bf)
  *
  * @param attr      The attribute to compress the index of.
  * @param output_fn Base name for the compressed RDX files to be written
- *                  (if this is null, filename will be taken from the
+ *                  (if this is null, filenames will be taken from the
  *                  attribute).
  */
 void 
@@ -322,7 +322,7 @@ compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int d
  *
  * @param attr      The attribute to check the index of.
  * @param output_fn Base name for the compressed RDX files to be read
- *                  (if this is null, filename will be taken from the
+ *                  (if this is null, filenames will be taken from the
  *                  attribute).
  */
 void 
