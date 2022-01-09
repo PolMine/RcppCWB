@@ -1194,7 +1194,17 @@ PatchEngine <- R6Class(
           
           insert_before = list('#include\\s"\\.\\./cl/globals\\.h"', c("void Rprintf(const char *, ...);", ""), 1L),
           
-          replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
+          replace = list("^char\\s\\*progname;", "/* char *progname = NULL; */", 1L),
+          replace = list("^(\\s*)int\\si;", "\\1/*int i */", 1L),
+          replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
+          replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
+          replace = list("^(\\s*putc\\(\\(i\\s%\\s3\\)\\s==\\s0\\s\\?\\s'\\|'\\s:\\s'\\s',\\sprotocol\\);)", "\\1 */", 1L),
+          replace = list("^\\sint\\snode,\\sdepth;", "/* int node, depth; */", 1L),
+          replace = list("^(\\s*)node\\s=\\s1;", "\\1/* node = 1; */", 1L),
+          replace = list("^(\\s*)depth\\s=\\s0;", "\\1/* depth = 0;", 1L),
+          replace = list("^(\\s)int\\snr_codes\\s=\\s0;", "\\1/* int nr_codes = 0; */", 1L),
+          replace = list("^(\\s)nr_codes\\s=\\s0;", "\\1/* nr_codes = 0; */", 1L),
+          
           extern = list("Corpus *corpus;")
           
 
