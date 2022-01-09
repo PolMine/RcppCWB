@@ -189,15 +189,23 @@ PatchEngine <- R6Class(
     replace_globally = function(){
       if (self$verbose) message("Perform global replacements ...")
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
-      for (subdir in c("cl", "cqp", "CQi")){
-        files <- list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
-        for (f in files){
-          code <- readLines(f)
-          for (i in 1L:length(self$global_replacements)){
-            code <- gsub(self$global_replacements[[i]][1], self$global_replacements[[i]][2], code)
-          }
-          writeLines(text = code, con = f)
+      
+      files <- c(
+        unlist(lapply(
+          c("cl", "cqp", "CQi"),
+          function(subdir) list.files(file.path(cwb_pkg_dir, subdir), full.names = TRUE)
+        )),
+        path.exand(
+          file.path(cwb_pkg_dir, "util", c("cwb-encode.c", "cwb-makeall.c", "cwb-huffcode.c", "cwb-compress-rdx.c"))
+        )
+      )
+
+      for (f in files){
+        code <- readLines(f)
+        for (i in 1L:length(self$global_replacements)){
+          code <- gsub(self$global_replacements[[i]][1], self$global_replacements[[i]][2], code)
         }
+        writeLines(text = code, con = f)
       }
       
     },
