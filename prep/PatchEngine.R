@@ -217,13 +217,13 @@ PatchEngine <- R6Class(
       code
     },
     
-    delete_line_after = function(code, action, file){
+    delete_line_beginning_with = function(code, action, file){
       which_position <- if (length(action) > 1L) action[[2]] else 1L
       times <- if (length(action) == 3L) action[[3]] else 1L
       
       position <- grep(pattern = action[[1]], code)[which_position]
       if (!is.na(position)){
-        code <- code[-(position + 1L:times)]
+        code <- code[-(position + 0L:times)]
       } else {
         message(
           sprintf("Trying to patch file '%s' - no match for action 'delete_line_after' (regex: %s | match: %d | lines: %d) ", file, action[[1]], which_position, times)
@@ -324,7 +324,7 @@ PatchEngine <- R6Class(
         if (revision == 1069){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream),\\s*", "Rprintf(")
         } else if (revision >= 1690){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
         c("fprintf\\s*\\(", "Rprintf("),
@@ -661,7 +661,7 @@ PatchEngine <- R6Class(
         "src/cwb/cl/cwb-globals.h" = c(
           list(),
           if (revision >= 1690) list(
-            delete_line_after = list("#if\\s__STDC_VERSION__\\s>=\\s199901L", 1L, 21L)
+            delete_line_beginning_with = list("#if\\s__STDC_VERSION__\\s>=\\s199901L", 1L, 22L)
           )
         ),
         
