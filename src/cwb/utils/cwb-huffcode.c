@@ -26,7 +26,6 @@ void Rprintf(const char *, ...);
 #include "../cl/bitio.h"
 #include "../cl/macros.h"
 
-
 /** Level of progress-info (inc compression protocol) message output: 0 = none. */
 int do_protocol = 0;
 /** File handle for this program's progress-info output: note, it is always stdout */
@@ -121,7 +120,7 @@ dump_heap(int *heap, int heap_size, int node, int indent)
             node,
             heap[node-1],
             heap[heap[node-1]]);
-
+    
     dump_heap(heap, heap_size, 2 * node,     indent + 1);
     dump_heap(heap, heap_size, 2 * node + 1, indent + 1);
   }
@@ -340,7 +339,6 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
               corpus->registry_dir, corpus->registry_name, attr->any.name);
       return 1;
     }
-
   }
 
   /*
@@ -675,6 +673,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
       BFile bfd;
       FILE *sync;
+
       int cl, code, pos;
 
       corp = ensure_component(attr, CompCorpus, 0);
