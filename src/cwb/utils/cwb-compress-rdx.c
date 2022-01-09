@@ -171,7 +171,7 @@ int read_golomb_code_am(int b, BFile *bf)
  *
  * @param attr      The attribute to compress the index of.
  * @param output_fn Base name for the compressed RDX files to be written
- *                  (if this is null, filenames will be taken from the
+ *                  (if this is null, filename will be taken from the
  *                  attribute).
  */
 void 
@@ -422,7 +422,8 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_i
       }
       if (pos != true_pos) {
         Rprintf("ERROR: wrong occurrence of type #%d at cpos %d (correct cpos: %d) (on attribute: %s). Aborted.\n",
-                i, pos, true_pos, attr->any.name);        compressrdx_cleanup(1);
+                i, pos, true_pos, attr->any.name);
+        compressrdx_cleanup(1);
       }
 
     }
@@ -456,8 +457,8 @@ compressrdx_cleanup(int error_code)
     cl_delete_corpus(corpus);
 
   if (debug_output != stderr)
-      fclose(debug_output);
+    fclose(debug_output);
 
-  exit()error_code);
+  exit(error_code);
 }
 
