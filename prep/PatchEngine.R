@@ -1195,7 +1195,7 @@ PatchEngine <- R6Class(
           insert_before = list('#include\\s"\\.\\./cl/globals\\.h"', c("void Rprintf(const char *, ...);", ""), 1L),
           
           replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
-          extern = list("Corpus *corpus;"),
+          extern = list("Corpus *corpus;")
           
 
                     # /*
