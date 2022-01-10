@@ -1176,7 +1176,7 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)int\\sdebugmode\\s*=.*?;", "\\1extern int debugmode;", 1L),
           replace = list("^(\\s*)int\\squietly\\s*=.*?;", "\\1extern int quietly;", 1L),
           replace = list("^(\\s*)int\\sverbose\\s*=.*?;", "\\1extern int verbose;", 1L),
-          replace = list("^(\\s*)int\\sxml_aware\\\s*=.*?;", "\\1extern int xml_aware;", 1L),
+          replace = list("^(\\s*)int\\sxml_aware\\s*=.*?;", "\\1extern int xml_aware;", 1L),
           replace = list("^(\\s*)int\\sskip_empty_lines\\s*=.*?;", "\\1extern int skip_empty_lines;", 1L),
           replace = list("^(\\s*)unsigned\\sline\\s*=.*?;", "\\1extern unsigned line;", 1L),
           replace = list("^(\\s*)int\\sstrip_blanks\\s*=.*?;", "\\1extern int strip_blanks;", 1L),
