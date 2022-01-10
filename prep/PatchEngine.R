@@ -1173,10 +1173,9 @@ PatchEngine <- R6Class(
             1L
           ),
           
-          delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L),
           insert_before = list(
             "^/\\*\\s-*\\s\\*/",
-            c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+            "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
             1L
           ),
           
@@ -1190,7 +1189,7 @@ PatchEngine <- R6Class(
           replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
           
           insert_before = list(
-            "^char\\s\\*progname\\s=\\sNULL;",
+            "^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram",
             c(          
               "/* ----------------- cl/special_chars.c - is here temporarily ------------- */",
               "",            
@@ -1219,8 +1218,9 @@ PatchEngine <- R6Class(
               "",
               "/* ----------------- END ------------- */"
             ),
-            1L
+            1L, 1L
           ),
+          
           # extern variables
           replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
           replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
@@ -1245,6 +1245,7 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)int\\srange_ptr\\s*=.*?;", "\\1extern int range_ptr;", 1L),
           replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
           replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
+          
           delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
           
           
