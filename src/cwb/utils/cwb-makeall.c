@@ -281,5 +281,3 @@ makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
     return 0;
     
   }
-
-

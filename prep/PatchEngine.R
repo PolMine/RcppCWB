@@ -1393,7 +1393,7 @@ PatchEngine <- R6Class(
           
           delete_line_before = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", 1L, 4L),
           insert_before = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", c("    return 0;", "", "  }"), 1L),
-          delete_line_beginning_with = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", 1L, 189L)
+          delete_line_beginning_with = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", 1L, 187L)
           
         ),
         
