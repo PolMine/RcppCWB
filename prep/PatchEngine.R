@@ -286,7 +286,7 @@ PatchEngine <- R6Class(
     replace = function(code, action, file){
       position <- grep(pattern = action[[1]], code)
       
-      if (is.na(position)){
+      if (length(position) == 0L){
         message(
           sprintf("Trying to patch file '%s' - no match for action 'replace' (regex: %s | match: %d | replacement: %s)",
                   file, action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
