@@ -44,8 +44,8 @@ Corpus *corpus;
  * @param cid   The component ID of the component to check.
  * @return      RUE iff the component has already been created.
  */
-void
-makeall_component_ok(Attribute *attr, ComponentID cid)
+int
+component_ok(Attribute *attr, ComponentID cid)
   {
     ComponentState state;
     
@@ -74,9 +74,9 @@ makeall_component_ok(Attribute *attr, ComponentID cid)
 * @param attr  The attribute of the component to create.
 * @param cid   The component ID of the component to create.
 */
-int
-  makeall_make_component(Attribute *attr, ComponentID cid)
-  {
+void
+makeall_make_component(Attribute *attr, ComponentID cid)
+{
     int state;
     
     if (! component_ok(attr, cid)) {
