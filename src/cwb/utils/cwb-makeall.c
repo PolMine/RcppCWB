@@ -1,3 +1,20 @@
+/*
+ *  IMS Open Corpus Workbench (CWB)
+ *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+ *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+ *
+ *  This program is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the
+ *  Free Software Foundation; either version 2, or (at your option) any later
+ *  version.
+ *
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+ *  Public License for more details (in the file "COPYING", or available via
+ *  WWW at http://www.gnu.org/copyleft/gpl.html).
+ */
+
 void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 /* included by AB to ensure that winsock2.h is included before windows.h */
@@ -27,8 +44,8 @@ Corpus *corpus;
  * @param cid   The component ID of the component to check.
  * @return      RUE iff the component has already been created.
  */
-int
-  component_ok(Attribute *attr, ComponentID cid)
+void
+makeall_component_ok(Attribute *attr, ComponentID cid)
   {
     ComponentState state;
     
@@ -58,7 +75,7 @@ int
 * @param cid   The component ID of the component to create.
 */
 int
-  make_component(Attribute *attr, ComponentID cid)
+  makeall_make_component(Attribute *attr, ComponentID cid)
   {
     int state;
     
@@ -172,7 +189,7 @@ return 1;
 *                  the resulting revcorp.
 */
 int
-  do_attribute(Attribute *attr, ComponentID cid, int validate)
+makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
   {
     assert(attr);
     
@@ -190,15 +207,15 @@ int
       
       /* lexicon and lexicon offsets must have been created by encode */
       if (! (component_ok(attr, CompLexicon) && component_ok(attr, CompLexiconIdx))) {
-        /* if none of the components exits, we assume that the attribute will be created later & skip it */
+        /* if none of the components exists, we assume that the attribute will be created later & skip it */
         if (!component_ok(attr, CompLexicon) && !component_ok(attr, CompLexiconIdx) &&
         !component_ok(attr, CompLexiconSrt) &&
         !component_ok(attr, CompCorpus) && !component_ok(attr, CompCorpusFreqs) &&
         !component_ok(attr, CompHuffSeq) && !component_ok(attr, CompHuffCodes) &&
         !component_ok(attr, CompHuffSync) &&
         !component_ok(attr, CompRevCorpus) && !component_ok(attr, CompRevCorpusIdx) &&
-        !component_ok(attr, CompCompRF) && !component_ok(attr, CompCompRFX))
-        {
+        !component_ok(attr, CompCompRF) && !component_ok(attr, CompCompRFX
+        )) {
           /* issue a warning message & return */
           Rprintf(" ! attribute not created yet (skipped)\n");
           if (strcmp(attr->any.name, "word") == 0) {
@@ -213,12 +230,12 @@ int
       }
       else {
         /* may need to create "alphabetically" sorted lexicon */
-        make_component(attr, CompLexiconSrt);
+        makeall_make_component(attr, CompLexiconSrt);
         Rprintf(" - lexicon      OK\n");
       }
       
       /* create token frequencies if necessary (must be able to do so if they aren't already there) */
-      make_component(attr, CompCorpusFreqs);
+      makeall_make_component(attr, CompCorpusFreqs);
       Rprintf(" - frequencies  OK\n");
       
       /* check if token sequence has been compressed, otherwise create CompCorpus (if necessary) */
@@ -226,7 +243,7 @@ int
         Rprintf(" - token stream OK (COMPRESSED)\n");
       }
       else {
-        make_component(attr, CompCorpus);
+        makeall_make_component(attr, CompCorpus);
         Rprintf(" - token stream OK\n");
       }
       
@@ -235,9 +252,9 @@ int
         Rprintf(" - index        OK (COMPRESSED)\n");
       }
       else {
-        make_component(attr, CompRevCorpusIdx);
+        makeall_make_component(attr, CompRevCorpusIdx);
         if (! component_ok(attr, CompRevCorpus)) { /* need this check to avoid validation of existing revcorp  */
-      make_component(attr, CompRevCorpus);
+      makeall_make_component(attr, CompRevCorpus);
           if (validate) {
             /* validate the index, i.e. the REVCORP component we just created */
             if (! validate_revcorp(attr)) {
@@ -253,7 +270,7 @@ int
       /* create requested component only */
       Rprintf("Processing component %s of ATTRIBUTE %s\n",
              cid_name(cid), attr->any.name);
-      make_component(attr, cid);
+      makeall_make_component(attr, cid);
       if (validate && (cid == CompRevCorpus)) { /* validates even if REVCORP already existed -> useful trick for validating later */
       if (! validate_revcorp(attr)) {
         Rprintf("ERROR. Validation failed.\n");
