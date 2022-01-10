@@ -284,16 +284,22 @@ PatchEngine <- R6Class(
     },
     
     replace = function(code, action, file){
-      position <- grep(pattern = action[[1]], code)[ action[[3]] ]
-      if (!is.na(position)){
-        code[position] <- gsub(action[1], action[2], code[position])
-      } else {
+      position <- grep(pattern = action[[1]], code)
+      
+      if (na(position)){
         message(
           sprintf("Trying to patch file '%s' - no match for action 'replace' (regex: %s | match: %d | replacement: %s)",
                   file, action[[1]], action[[3]], paste(action[[2]], collapse = "///")),
           appendLF = FALSE
         )
+        return(code)
       }
+      
+      if (!is.na(action[[3]])) position <- position[ action[[3]] ]
+      for (p in position){
+        code[position] <- gsub(action[1], action[2], code[position])
+      }
+      
       code
     },
     
@@ -1172,13 +1178,15 @@ PatchEngine <- R6Class(
             c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
             1L
           ),
-
-          replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */', 1L),
           
-          replace = list("^(\\s*)char\\s\\*field_separators\\s=.*?", "\\1extern char *field_separators;", 1L),
+          replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
+
+          replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
+          
+          replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
           replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
-          replace = list("^(\\s*)int\\sdebugmode\\s*=.*?;", "\\1extern int debugmode;", 1L),
-          replace = list("^(\\s*)int\\squietly\\s*=.*?;", "\\1extern int quietly;", 1L),
+          replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
+          replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L),
           replace = list("^(\\s*)int\\sverbose\\s*=.*?;", "\\1extern int verbose;", 1L),
           replace = list("^(\\s*)int\\sxml_aware\\s*=.*?;", "\\1extern int xml_aware;", 1L),
           replace = list("^(\\s*)int\\sskip_empty_lines\\s*=.*?;", "\\1extern int skip_empty_lines;", 1L),
@@ -1193,8 +1201,10 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
           replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
           replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L),
-          replace = list("^(\\s*)CorpusCharset\\sencoding_charset\\s*=.*?;", "\\1extern CorpusCharset encoding_charset;", 1L),
-          replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L)
+          replace = list("^(\\s*)CorpusCharset\\s*encoding_charset\\s*=.*?;", "\\1extern CorpusCharset encoding_charset;", 1L),
+          replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
+          
+          replace = list("(struct\\s_|}\\s|^\\s|\\()Range", "\\1SAttEncoder", NA)
           
           # replace("silent", "quietly", NA),
           # replace("debug", "debugmode", NA),
