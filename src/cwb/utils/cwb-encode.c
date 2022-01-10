@@ -104,7 +104,6 @@ extern char *corpus_character_set;  /**< character set label that is inserted in
 extern CorpusCharset encoding_charset;         /**< a charset object to be generated from corpus_character_set */
 extern int clean_strings;                  /**< clean up input strings by replacing invalid bytes with '?' */
 
-
 /* ---------------------------------------------------------------------- */
 
 /* cwb-encode encodes S-attributes and P-attributes, so there is an object-type and global array representing each. */
@@ -218,9 +217,6 @@ void
 
 
 /* ======================================== helper functions */
-
-
-
 
 
 /**
@@ -1165,7 +1161,6 @@ wattr_close_all(void)
 
 
 
-
 /**
  * Processes a token data line.
  *
@@ -1297,7 +1292,7 @@ int
 encode_get_input_line(char *buffer, int bufsize)
 {
   int ok;
-  
+
   if (nr_input_files == 0) {
     /* read one line of text from stdin */
     ok = (NULL != fgets(buffer, MAX_INPUT_LINE_LENGTH, stdin));
@@ -1309,6 +1304,7 @@ encode_get_input_line(char *buffer, int bufsize)
         return 0;
       
       current_input_file_name = cl_string_list_get(input_files, current_input_file);
+
       input_fd = cl_open_stream(current_input_file_name, CL_STREAM_READ, CL_STREAM_MAGIC);
       if (input_fd == NULL) {
         cl_error(current_input_file_name);
