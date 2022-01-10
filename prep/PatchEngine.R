@@ -1207,7 +1207,7 @@ PatchEngine <- R6Class(
               "    point--; /* now points at last byte of string */",
               "    /* delete CR and LF, but don't move beyond start of string */",
               "    while (point >= s && (*point == '\r' || *point == '\n')) {",
-              "      *point = '\0';",
+              "      *point = '\\0';",
               "      point--;",
               "    }",
               "  }",
