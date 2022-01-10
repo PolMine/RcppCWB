@@ -1206,7 +1206,7 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
           replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
           replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
-          delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram\\s\\*/", 2L),
+          delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 2L),
           
           
           replace = list("\\(\\!(\\s*)silent\\)", "(!\\1quietly)", NA),
