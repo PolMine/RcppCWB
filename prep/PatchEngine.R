@@ -1184,6 +1184,39 @@ PatchEngine <- R6Class(
           
           replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
           
+          insert_before = list(
+            "^char\\s\\*progname\\s=\\sNULL;",
+            c(          
+              "/* ----------------- cl/special_chars.c - is here temporarily ------------- */",
+              "",            
+              "/**",
+              " * Removes all trailing CR and LF characters from specified string (in-place).",
+              " *",
+              " * The main purpose of this function is to remove trailing line breaks from input",
+              " * lines regardless of whether a text file is in Unix (LF) or Windows (CR-LF) format.",
+              " * All text input except for simple numeric data should be passed through cl_string_chomp().",
+              " *",
+              " * @param s     String to chomp (modified in-place).",
+              " */",
+              "void",
+              "  string_chomp(char *s) {",
+              "    char *point = s;",
+              "    /* advance point to NUL terminator */",
+              "    while (*point)",
+              "      point++;",
+              "    point--; /* now points at last byte of string */",
+              "    /* delete CR and LF, but don't move beyond start of string */",
+              "    while (point >= s && (*point == '\r' || *point == '\n')) {",
+              "      *point = '\0';",
+              "      point--;",
+              "    }",
+              "  }",
+              "",
+              "/* ----------------- END ------------- */"
+            ),
+            1L
+          ),
+          # extern variables
           replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
           replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
           replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
@@ -1204,9 +1237,10 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L),
           replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
           replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
+          replace = list("^(\\s*)int\\srange_ptrs\\s*=.*?;", "\\1extern int range_ptr;", 1L),
           replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
           replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
-          delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 2L),
+          delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 2L),
           
           
           replace = list("\\(\\!(\\s*)silent\\)", "(!\\1quietly)", NA),
