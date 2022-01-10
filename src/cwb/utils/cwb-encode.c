@@ -1133,6 +1133,9 @@ wattr_declare(char *name, char *directory, int nr_buckets)
   return 1;
 }
 
+
+
+
 /**
  * Closes all three file handles for each of the wattr objects
  * in cwb-encode's global array.
