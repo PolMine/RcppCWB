@@ -1244,9 +1244,12 @@ PatchEngine <- R6Class(
           
           
           replace = list("\\(\\!(\\s*)silent\\)", "(!\\1quietly)", NA),
-          replace = list("\\(debug\\)", "(debugmode)", NA)
+          replace = list("\\(debug\\)", "(debugmode)", NA),
+          replace = list("register\\s+", "", NA),
           
-          # cl/special_chars.c - is here temporarily # present in RcppCWB
+          delete_line_before = list("^encode_usage\\(void\\)\\s$", 1L, 4L),
+          delete_line_beginning_with = list("^encode_usage\\(void\\)\\s$", 1L, 72L)
+          
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
