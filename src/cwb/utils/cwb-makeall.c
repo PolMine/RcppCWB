@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+
 void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 /* included by AB to ensure that winsock2.h is included before windows.h */
@@ -34,6 +35,7 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 #include "../cl/fileutils.h"
 
 Corpus *corpus;
+
 
 /**
  * Checks whether a component has already been created.
@@ -93,6 +95,7 @@ makeall_make_component(Attribute *attr, ComponentID cid)
       Rprintf("OK\n");
     }
     return 0;
+    
   }
 
 
