@@ -1359,7 +1359,7 @@ PatchEngine <- R6Class(
             
           
           insert_before = list(
-            "",
+            '#include\\s"\\.\\./cl/globals\\.h"',
             c(
               "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
               "",
