@@ -114,7 +114,6 @@ makeall_make_component(Attribute *attr, ComponentID cid)
 int
   validate_revcorp(Attribute *attr)
   {
-    
     Component *revcorp = ensure_component(attr, CompRevCorpus, 0);
     int *ptab;                        /* table of index offsets for each lexicon entry */
 int lexsize, corpsize;
