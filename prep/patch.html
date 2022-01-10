@@ -204,7 +204,7 @@ library(magrittr)</code></pre>
 <h2>Run the PatchEngine</h2>
 <pre class="r"><code>P$patch_all()</code></pre>
 <pre><code>## Active revision of CWB SVN repository: 1069</code></pre>
-<pre><code>## Copy unaltered CWB code into RcppCWB repository ...680 files copied
+<pre><code>## Copy unaltered CWB code into RcppCWB repository ...687 files copied
 ## Add newly created files to CWB code (overwriting existing files)
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/darwin-arm64
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_spark
@@ -216,52 +216,16 @@ library(magrittr)</code></pre>
 ## Create dummy depend.mk files ...
 ## Perform global replacements ...
 ## Actions defined for the following files, but file not present:
-## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.c
-## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/class-mapping.h
+## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ui-helpers.c
+## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cwb-globals.h
 ## - /Users/andreasblaette/Lab/github/RcppCWB/src/globalvars.h
-## Trying to patch file &#39;src/cwb/cl/lex.creg.c&#39; - no match for action &#39;insert_before&#39; (regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | insertion: /*)
-## Patch #6 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/lex.creg.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)(static\svoid\syyunput\s\(int\sc,char\s\*buf_ptr\s+\);).*?$ | match: 1 | replacement: \1/* \2 */)Patch #11 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/lex.creg.c&#39; - no match for action &#39;replace&#39; (regex: ^\s*static\svoid\syyunput\s\(int\sc,\sregister\schar\s\*\syy_bp\s\) | match: 1 | replacement: static void yyunput (int c, register char * yy_bp ))Patch #12 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/lex.creg.c&#39; - no match for action &#39;remove_lines&#39; (regex: ^\s/\*\sundo\seffects\sof\ssetting\sup\scregtext\s\*/ | match: 1)Patch #17 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/lex.creg.c&#39; - no match for action &#39;remove_lines&#39; (regex: /\*\sneed\sto\sshift\sthings\sup\sto\smake\sroom\s\*/ | match: 1)Patch #18 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/lex.creg.c&#39; - no match for action &#39;remove_lines&#39; (regex: /\*\s\+2\sfor\sEOB\schars\.\s\*/ | match: 1)Patch #19 for file &#39;src/cwb/cl/lex.creg.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/endian2.h&#39; - no match for action &#39;delete_line_before&#39; (regex: /* for consistency: | match: 1 | lines: 1) 
-## Patch #2 for file &#39;src/cwb/cl/endian2.h&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/attributes.c&#39; - no match for action &#39;replace&#39; (regex: (\s+)int\sppos,\sbpos,\sdollar,\srpos; | match: 1 | replacement: \1int ppos, bpos, rpos;)Patch #2 for file &#39;src/cwb/cl/attributes.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/attributes.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s+)dollar = 0; | match: 1 | replacement: \1/* dollar = 0; */)Patch #3 for file &#39;src/cwb/cl/attributes.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/attributes.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s+)dollar = ppos;\s | match: 1 | replacement: \1/* dollar = ppos; */)Patch #4 for file &#39;src/cwb/cl/attributes.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/attributes.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s+)if\s\(STREQ\(rname,\s&quot;HOME&quot;\)\) | match: 1 | replacement: \1if (strcmp(rname, &quot;HOME&quot;) == 0))Patch #5 for file &#39;src/cwb/cl/attributes.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/attributes.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;APATH&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;APATH&quot;) == 0))Patch #6 for file &#39;src/cwb/cl/attributes.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/attributes.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s+)else\sif\s\(STREQ\(rname,\s&quot;ANAME&quot;\)\) | match: 1 | replacement: \1else if (strcmp(rname, &quot;ANAME&quot;) == 0))Patch #7 for file &#39;src/cwb/cl/attributes.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/corpus.c&#39; - no match for action &#39;remove_lines&#39; (regex: (\s+)stderr, | match: 3)Patch #2 for file &#39;src/cwb/cl/corpus.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/corpus.c&#39; - no match for action &#39;remove_lines&#39; (regex: (\s+)stderr, | match: 2)Patch #3 for file &#39;src/cwb/cl/corpus.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/globals.h&#39; - no match for action &#39;insert_before&#39; (regex: ^#ifndef\s_globals_h_ | match: 1 | insertion: void Rprintf(const char *, ...);)
-## Patch #1 for file &#39;src/cwb/cl/globals.h&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/lexhash.c&#39; - no match for action &#39;insert_after&#39; (regex: ^#include\s&quot;lexhash\.h&quot; | match: 1 | insertion: #include &lt;unistd.h&gt;)
-## Patch #2 for file &#39;src/cwb/cl/lexhash.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/makecomps.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)char\serrmsg\[CL_MAX_LINE_LENGTH\]; | match: 1 | replacement: /* char errmsg[CL_MAX_LINE_LENGTH]; */)Patch #2 for file &#39;src/cwb/cl/makecomps.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;insert_after&#39; (regex: ^#include\s&quot;cdaccess\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...);)
-## Patch #1 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)off_end\s=\sntohl\(lexidx_data\[idx\s\+\s1\]\)\s-\s1; | match: 1 | replacement: \1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */)Patch #3 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\sregex_result,\sidx,\si,\slen,\slexsize; | match: 1 | replacement: \1int idx, i, lexsize;)Patch #4 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\soptimised,\sgrain_match; | match: 1 | replacement: \1int optimised;)Patch #5 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)char\s\*word,\s\*preprocessed_string; | match: 1 | replacement: \1char *word;)Patch #6 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\soff_start,\soff_end; | match: 1 | replacement: \1int off_start;)Patch #7 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)char\s\*p; | match: 1 | replacement: \1/* char *p; */)Patch #8 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\si; | match: 3 | replacement: \1/* int i; */)Patch #9 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)DynCallResult\sarg; | match: 1 | replacement: \1/* DynCallResult arg; */)Patch #10 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/cdaccess.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)arg\s=\sargs\[argnum\]; | match: 1 | replacement: \1/* arg = args[argnum]; */)Patch #11 for file &#39;src/cwb/cl/cdaccess.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/regopt.c&#39; - no match for action &#39;insert_after&#39; (regex: ^#include\s&quot;regopt\.h&quot; | match: 1 | insertion: void Rprintf(const char *, ...);)
-## Patch #1 for file &#39;src/cwb/cl/regopt.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/cl/regopt.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)if\s\(ch\s&gt;=\s32\s&amp;\sch\s&lt;\s127\) | match: 1 | replacement: \1if ((ch &gt;= 32) &amp; (ch &lt; 127)))Patch #2 for file &#39;src/cwb/cl/regopt.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\sdebugmode\s*=.*?; | match: 1 | replacement: \1extern int debugmode;)Patch #5 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\squietly\s*=.*?; | match: 1 | replacement: \1extern int quietly;)Patch #6 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)unsigned\sline\s*=.*?; | match: 1 | replacement: \1extern unsigned line;)Patch #10 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)unsigned\slong\sinput_line\s*=.*?; | match: 1 | replacement: \1extern unsigned long input_line;)Patch #17 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)char\s\*corpus_character_set\s*=.*?; | match: 1 | replacement: \1extern char *corpus_character_set;)Patch #20 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)CorpusCharset\sencoding_charset\s*=.*?; | match: 1 | replacement: \1extern CorpusCharset encoding_charset;)Patch #21 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
-## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\sclean_strings\s*=.*?; | match: 1 | replacement: \1extern int clean_strings;)Patch #22 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\sdebugmode\s*=.*?; | match: 1 | replacement: \1extern int debugmode;)Patch #6 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\squietly\s*=.*?; | match: 1 | replacement: \1extern int quietly;)Patch #7 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)unsigned\sline\s*=.*?; | match: 1 | replacement: \1extern unsigned line;)Patch #11 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)unsigned\slong\sinput_line\s*=.*?; | match: 1 | replacement: \1extern unsigned long input_line;)Patch #18 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)char\s\*corpus_character_set\s*=.*?; | match: 1 | replacement: \1extern char *corpus_character_set;)Patch #21 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)CorpusCharset\sencoding_charset\s*=.*?; | match: 1 | replacement: \1extern CorpusCharset encoding_charset;)Patch #22 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
+## Trying to patch file &#39;src/cwb/utils/cwb-encode.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*)int\sclean_strings\s*=.*?; | match: 1 | replacement: \1extern int clean_strings;)Patch #23 for file &#39;src/cwb/utils/cwb-encode.c&#39; does not change code
 ## Trying to patch file &#39;src/cwb/utils/cwb-compress-rdx.c&#39; - no match for action &#39;delete_line_after&#39; (regex: ^\s*/\*\s\*+\s\*\\\s*$ | match: 1 | lines: 142) 
 ## Patch #8 for file &#39;src/cwb/utils/cwb-compress-rdx.c&#39; does not change code
 ## Trying to patch file &#39;src/cwb/utils/cwb-compress-rdx.c&#39; - no match for action &#39;replace&#39; (regex: ^(\s*compress_reversed_index\(Attribute\s\*attr,\schar\s\*output_fn)\)\s*$ | match: 1 | replacement: \1, char *corpus_id, int debug))Patch #9 for file &#39;src/cwb/utils/cwb-compress-rdx.c&#39; does not change code
@@ -273,7 +237,7 @@ library(magrittr)</code></pre>
 ## Patch #20 for file &#39;src/cwb/utils/cwb-huffcode.c&#39; does not change code
 ## Trying to patch file &#39;src/cwb/utils/cwb-makeall.c&#39; - no match for action &#39;insert_before&#39; (regex: /\*\*\sThe\scorpus\swe\sare\sworking\son\s\*/ | match: 1 | insertion: #include &lt;netinet/in.h&gt;///)
 ## Patch #1 for file &#39;src/cwb/utils/cwb-makeall.c&#39; does not change code
-## Number of files successfully patched: 60
+## Number of files successfully patched: 62
 ## Add new and altered files to HEAD in repo: /Users/andreasblaette/Lab/github/RcppCWB
 ## Commit: /Users/andreasblaette/Lab/github/RcppCWB
 ## Story to be told
