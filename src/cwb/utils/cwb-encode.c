@@ -82,28 +82,28 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 /* global variables representing configuration */
 
 
-extern char *field_separators;     /**< string containing the characters that can function as field separators */
-extern char *undef_value;        /**< string used as value of P-attributes when a value is missing
+extern char *field_separators;     /* string containing the characters that can function as field separators */
+extern char *undef_value;        /* string used as value of P-attributes when a value is missing
                                              ie if a tab-delimited field is empty */
-extern int debugmode;                          /**< debug mode on or off? */
-extern int quietly;                         /**< hide messages */
-extern int verbose;                        /**< show progress (this is _not_ the opposite of silent!) */
-extern int xml_aware;                      /**< substitute XML entities in p-attributes & ignore <? and <! lines */
-extern int skip_empty_lines;               /**< skip empty lines when encoding? */
-extern unsigned line;                      /**< corpus position currently being encoded (ie cpos of _next_ token) */
+extern int debugmode;                          /* debug mode on or off? */
+extern int quietly;                         /* hide messages */
+extern int verbose;                        /* show progress (this is _not_ the opposite of silent!) */
+extern int xml_aware;                      /* substitute XML entities in p-attributes & ignore <? and <! lines */
+extern int skip_empty_lines;               /* skip empty lines when encoding? */
+extern unsigned line;                      /* corpus position currently being encoded (ie cpos of _next_ token) */
 /* unsigned so it doesn't wrap after first 2^31 tokens and we can abort encoding when corpus size is exceeded */
-extern int strip_blanks;                   /**< strip leading and trailing blanks from input and token annotations */
-extern cl_string_list input_files;      /**< list of input file(s) (-f option(s)) */
-extern int nr_input_files;                 /**< number of input files (length of list after option processing) */
-extern int current_input_file;             /**< index of input file currently being processed */
-extern char *current_input_file_name;   /**< filename of current input file, for error messages */
-extern FILE *input_fd;                  /**< file handle for current input file (or pipe) (text mode!) */
-extern unsigned long input_line;           /**< input line number (reset for each new file) for error messages */
-extern char *registry_file;             /**< if set, auto-generate registry file named {registry_file}, listing declared attributes */
-extern char *directory;                 /**< corpus data directory (no longer defaults to current directory) */
-extern char *corpus_character_set;  /**< character set label that is inserted into the registry file */
-extern CorpusCharset encoding_charset;         /**< a charset object to be generated from corpus_character_set */
-extern int clean_strings;                  /**< clean up input strings by replacing invalid bytes with '?' */
+extern int strip_blanks;                   /* strip leading and trailing blanks from input and token annotations */
+extern cl_string_list input_files;      /* list of input file(s) (-f option(s)) */
+extern int nr_input_files;                 /* number of input files (length of list after option processing) */
+extern int current_input_file;             /* index of input file currently being processed */
+extern char *current_input_file_name;   /* filename of current input file, for error messages */
+extern FILE *input_fd;                  /* file handle for current input file (or pipe) (text mode!) */
+extern unsigned long input_line;           /* input line number (reset for each new file) for error messages */
+extern char *registry_file;             /* if set, auto-generate registry file named {registry_file}, listing declared attributes */
+extern char *directory;                 /* corpus data directory (no longer defaults to current directory) */
+extern char *corpus_character_set;  /* character set label that is inserted into the registry file */
+extern CorpusCharset encoding_charset;         /* a charset object to be generated from corpus_character_set */
+extern int clean_strings;                  /* clean up input strings by replacing invalid bytes with '?' */
 
 
 /* ---------------------------------------------------------------------- */

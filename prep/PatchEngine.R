@@ -1169,6 +1169,12 @@ PatchEngine <- R6Class(
             1L
           ),
           
+          insert_before = list(
+            "^/\\*\\s-*\\s\\*/",
+            c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+            1L
+          ),
+
           replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"', '/* #include "../cl/lexhash.h" */', 1L),
           
           replace = list("^(\\s*)char\\s\\*field_separators\\s=.*?", "\\1extern char *field_separators;", 1L),
