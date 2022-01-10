@@ -216,6 +216,7 @@ void
 
 /* ----------------- END ------------- */
 
+
 /* ======================================== helper functions */
 
 
@@ -336,7 +337,7 @@ encode_error(char *format, ...)
     encode_print_input_lineno();
     Rprintf("]\n");
   }
-  exit(1);
+  return 1;
 }
 
 /* =================================================== processing directories of input files */
