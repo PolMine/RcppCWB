@@ -1158,8 +1158,6 @@ PatchEngine <- R6Class(
           insert_before = list(
             "^#include\\s<ctype.h>",
             c(
-              "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
-              "",
               "/* included by AB to ensure that winsock2.h is included before windows.h */",
               "#ifdef __MINGW__",
               "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */",
