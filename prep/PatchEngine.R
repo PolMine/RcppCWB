@@ -1247,8 +1247,8 @@ PatchEngine <- R6Class(
           replace = list("\\(debug\\)", "(debugmode)", NA),
           replace = list("register\\s+", "", NA),
           
-          delete_line_before = list("^encode_usage\\(void\\)\\s$", 1L, 4L),
-          delete_line_beginning_with = list("^encode_usage\\(void\\)\\s$", 1L, 72L)
+          delete_line_before = list("^encode_usage\\(void\\)\\s*$", 1L, 4L),
+          delete_line_beginning_with = list("^encode_usage\\(void\\)\\s*$", 1L, 72L)
           
         ),
         
