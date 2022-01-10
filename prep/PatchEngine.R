@@ -1376,6 +1376,10 @@ PatchEngine <- R6Class(
             1L
           ),
           
+          delete_line_beginning_with = list('#include\\s"\\.\\./cl/corpus\\.h', 1L, 0L),
+          replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
+          
+          
           # stable r1069 - r1690. But maybe obsolete, because cwb-makeall.c is not compiled?
           replace = list("fflush\\(stdout\\);", "/* fflush(stdout); */", NA),
           
