@@ -1169,7 +1169,7 @@ PatchEngine <- R6Class(
             1L
           ),
           
-          replace('^#include\\s"\\.\\./cl/lexhash\\.h"', '/* #include "../cl/lexhash.h" */', 1L),
+          replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"', '/* #include "../cl/lexhash.h" */', 1L),
           
           replace = list("^(\\s*)char\\s\\*field_separators\\s=.*?", "\\1extern char *field_separators;", 1L),
           replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
