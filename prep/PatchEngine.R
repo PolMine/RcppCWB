@@ -1155,18 +1155,29 @@ PatchEngine <- R6Class(
         
         "src/cwb/utils/cwb-encode.c" = list(
           
-          /* included by AB to ensure that winsock2.h is included before windows.h */
-            #ifdef __MINGW__
-            #include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
-            #endif
-            
-            #include <ctype.h>
-            
-            void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
-            
-            /* ---------------------------------------------------------------------- */
-            
-            silent -> quietly
+          insert_before = list(
+            "^#include\\s<ctype.h>",
+            c(
+              "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
+              "",
+              "/* included by AB to ensure that winsock2.h is included before windows.h */",
+              "#ifdef __MINGW__",
+              "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */",
+              "#endif",
+              ""
+            ),
+            1L
+          ),
+          
+          replace("silent", "quietly", NA),
+          replace("debug", "debugmode", NA)
+
+          replace("", "/* #include "../cl/lexhash.h" */", ),
+          extern 
+
+          
+          externed variables with values
+          cl/special_chars.c - is here temporarily # present in RcppCWB
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
