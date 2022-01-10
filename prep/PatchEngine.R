@@ -1169,15 +1169,33 @@ PatchEngine <- R6Class(
             1L
           ),
           
-          replace("silent", "quietly", NA),
-          replace("debug", "debugmode", NA)
-
-          replace("", "/* #include "../cl/lexhash.h" */", ),
-          extern 
-
+          replace('^#include\\s"\\.\\./cl/lexhash\\.h"', '/* #include "../cl/lexhash.h" */', 1L),
           
-          externed variables with values
-          cl/special_chars.c - is here temporarily # present in RcppCWB
+          replace("^(\\s*)char\\s\\*field_separators\\s=.*?", "\\1extern char *field_separators;", 1L),
+          replace = list("^(\s*)char\\s\\*undef_value\s*=.*?;\s*", "\\1extern char *undef_value;", 1L),
+          replace = list("^(\s*)int\\sdebugmode\s*=.*?;\s*", "\\1extern int debugmode;", 1L),
+          replace = list("^(\s*)int\\squietly\\s*=.*?;\s*", "\\1extern int quietly;", 1L),
+          replace = list("^(\s*)int\\sverbose\\s*=.*?;\s*", "\\1extern int verbose;", 1L),
+          replace = list("^(\s*)int\\sxml_aware\\s*=.*?;\s*", "\\1extern int xml_aware;", 1L),
+          replace = list("^(\s*)int\\sskip_empty_lines\\s*=.*?;\s*", "\\1extern int skip_empty_lines;", 1L),
+          replace = list("^(\s*)unsigned\\sline\\s*=.*?;\s*", "\\1extern unsigned line;", 1L),
+          replace = list("^(\s*)int\\sstrip_blanks\\s*=.*?;\s*", "\\1extern int strip_blanks;", 1L),
+          replace = list("^(\s*)cl_string_list\\sinput_files\\s*=.*?;\s*", "\\1extern cl_string_list input_files;", 1L),
+          replace = list("^(\s*)int\\snr_input_files\\s*=.*?;\s*", "\\1extern int nr_input_files;", 1L),
+          replace = list("^(\s*)int\\scurrent_input_file\\s*=.*?;\s*", "\\1extern int current_input_file;", 1L),
+          replace = list("^(\s*)char\\s\\*current_input_file_name\\s*=.*?;\s*", "\\1extern char *current_input_file_name;", 1L),
+          replace = list("^(\s*)FILE\\s\\*input_fd\\s*=.*?;\s*", "\\1extern FILE *input_fd;", 1L),
+          replace = list("^(\s*)unsigned\\slong\\sinput_line\\s*=.*?;\s*", "\\1extern unsigned long input_line;", 1L),
+          replace = list("^(\s*)char\\s\\*registry_file\\s*=.*?;\s*", "\\1extern char *registry_file;", 1L),
+          replace = list("^(\s*)char\\s\\*directory\\s*=.*?;\s*", "\\1extern char *directory;", 1L),
+          replace = list("^(\s*)char\\s\\*corpus_character_set\\s*=.*?;\s*", "\\1extern char *corpus_character_set;", 1L),
+          replace = list("^(\s*)CorpusCharset\\sencoding_charset\\s*=.*?;\s*", "\\1extern CorpusCharset encoding_charset;", 1L),
+          replace = list("^(\s*)int\\sclean_strings\\s*=.*?;\s*", "\\1extern int clean_strings;", 1L)
+          
+          # replace("silent", "quietly", NA),
+          # replace("debug", "debugmode", NA),
+
+          # cl/special_chars.c - is here temporarily # present in RcppCWB
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
