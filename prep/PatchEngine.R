@@ -342,7 +342,7 @@ PatchEngine <- R6Class(
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
-        c("fprintf\\s*\\(", "Rprintf("),
+#        c("fprintf\\s*\\(", "Rprintf("),
         c("(\\s+)printf\\(", "\\1Rprintf("),
         c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
         
@@ -1288,7 +1288,6 @@ PatchEngine <- R6Class(
           # * - main function modified
           # * - global variable 'debug' replaced by local variable that is passed around
           # */
-            
         ),
         
         "src/cwb/utils/cwb-huffcode.c" = list(
