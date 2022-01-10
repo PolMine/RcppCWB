@@ -1173,6 +1173,7 @@ PatchEngine <- R6Class(
             1L
           ),
           
+          delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L),
           insert_before = list(
             "^/\\*\\s-*\\s\\*/",
             "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
@@ -1185,7 +1186,7 @@ PatchEngine <- R6Class(
           replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
           replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
 
-          #           replace = list("Pointer\\sto\\sthe\\snew\\sSAttEncoder", "Pointer to the new Range object", 1L),
+          replace = list("Pointer\\sto\\sthe\\snew\\sRange", "Pointer to the new SAttEncoder object", 1L),
           
           replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
           
@@ -1264,7 +1265,8 @@ PatchEngine <- R6Class(
           delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 286L),
           
           replace = list("Rprintf\\(registry_fd,", "fprintf(registry_fd,", NA),
-          replace = list("Rprintf\\(fd,", "fprintf(fd,", NA)
+          replace = list("Rprintf\\(fd,", "fprintf(fd,", NA),
+          replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
