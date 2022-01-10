@@ -1205,7 +1205,7 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
           
           replace = list("(struct\\s_|}\\s|^\\s|\\()Range", "\\1SAttEncoder", NA),
-          replace = list("\\(\\!silent\\)", "(!quietly)", NA),
+          replace = list("\\(\\!(\\s*)silent\\)", "(!\\1quietly)", NA),
           replace = list("\\(debug\\)", "(debugmode)", NA)
           
           # cl/special_chars.c - is here temporarily # present in RcppCWB
