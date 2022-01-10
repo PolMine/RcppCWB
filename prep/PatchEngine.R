@@ -1175,7 +1175,7 @@ PatchEngine <- R6Class(
           
           insert_before = list(
             "^/\\*\\s-*\\s\\*/",
-            c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+            "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
             1L
           ),
           
@@ -1201,14 +1201,13 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
           replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
           replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L),
-          replace = list("^(\\s*)CorpusCharset\\s*encoding_charset\\s*=.*?;", "\\1extern CorpusCharset encoding_charset;", 1L),
+          replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
           replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
           
-          replace = list("(struct\\s_|}\\s|^\\s|\\()Range", "\\1SAttEncoder", NA)
+          replace = list("(struct\\s_|}\\s|^\\s|\\()Range", "\\1SAttEncoder", NA),
+          replace = list("\\(\\!silent\\)", "(!quietly)", NA),
+          replace = list("\\(debug\\)", "(debugmode)", NA),
           
-          # replace("silent", "quietly", NA),
-          # replace("debug", "debugmode", NA),
-
           # cl/special_chars.c - is here temporarily # present in RcppCWB
         ),
         
