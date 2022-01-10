@@ -337,12 +337,12 @@ PatchEngine <- R6Class(
         
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
-          c("(vf|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
-#        c("fprintf\\s*\\(", "Rprintf("),
+        c("fprintf\\s*\\(", "Rprintf("),
         c("(\\s+)printf\\(", "\\1Rprintf("),
         c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
         
@@ -1254,7 +1254,9 @@ PatchEngine <- R6Class(
           delete_line_beginning_with = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 235L),
           
           delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
-          delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 286L)
+          delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 286L),
+          
+          replace = list("Rprintf(registry_fd,", "fprintf(registry_fd,", NA)
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
