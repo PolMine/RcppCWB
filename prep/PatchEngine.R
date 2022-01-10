@@ -1183,6 +1183,10 @@ PatchEngine <- R6Class(
           replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
           
           replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
+          replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
+          replace = list("Pointer\\sto\\sthe\\snew\\sSAttEncoder", "Pointer to the new Range object", 1L),
+          
+          replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
           
           insert_before = list(
             "^char\\s\\*progname\\s=\\sNULL;",
