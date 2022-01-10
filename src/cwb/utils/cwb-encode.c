@@ -81,7 +81,6 @@ void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
 /* global variables representing configuration */
 
-
 extern char *field_separators;     /**< string containing the characters that can function as field separators */
 extern char *undef_value;        /**< string used as value of P-attributes when a value is missing
                                              ie if a tab-delimited field is empty */

@@ -1173,9 +1173,10 @@ PatchEngine <- R6Class(
             1L
           ),
           
+          delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L),
           insert_before = list(
             "^/\\*\\s-*\\s\\*/",
-            "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
+            c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
             1L
           ),
           
