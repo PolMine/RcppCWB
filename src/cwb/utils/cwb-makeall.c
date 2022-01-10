@@ -268,7 +268,7 @@ makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
       }
     }
     else {
-      /* create requested component only */
+      /* cid != CompLast; so, create requested component only */
       Rprintf("Processing component %s of ATTRIBUTE %s\n",
              cid_name(cid), attr->any.name);
       makeall_make_component(attr, cid);

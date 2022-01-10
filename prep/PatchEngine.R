@@ -1382,6 +1382,8 @@ PatchEngine <- R6Class(
           
           # stable r1069 - r1690. But maybe obsolete, because cwb-makeall.c is not compiled?
           replace = list("^\\s*fflush\\(stdout\\);\\s*$", "/* fflush(stdout); */", NA),
+          
+          replace = list("^(\\s*)return;(\\s*)$", "\\1return 0;\\2", NA),
 
           delete_line_before = list("makeall_do_attribute\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", 1L, 1L),
           insert_before = list("makeall_do_attribute\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", "int", 1L),
