@@ -1256,7 +1256,7 @@ PatchEngine <- R6Class(
           replace = list("register\\s+", "", NA),
           
           delete_line_before = list("^encode_usage\\(void\\)\\s*$", 1L, 4L),
-          delete_line_beginning_with = list("^encode_usage\\(void\\)\\s*$", 1L, 70L),
+          delete_line_beginning_with = list("^encode_usage\\(void\\)\\s*$", 1L, 72L),
           
           delete_line_before = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 10L),
           delete_line_beginning_with = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 237L),
