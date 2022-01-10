@@ -1256,7 +1256,8 @@ PatchEngine <- R6Class(
           delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
           delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 286L),
           
-          replace = list("Rprintf\\(registry_fd,", "fprintf(registry_fd,", NA)
+          replace = list("Rprintf\\(registry_fd,", "fprintf(registry_fd,", NA),
+          replace = list("Rprintf\\(fd,", "fprintf(fd,", NA)
         ),
         
         "src/cwb/utils/cwb-compress-rdx.c" = list(
