@@ -176,7 +176,7 @@ typedef struct {
 /** A global array for keeping track of P-attributes being encoded. */
 WAttr wattrs[MAXRANGES];
 /** @see wattrs */
-int wattr_ptr = 0;
+extern int wattr_ptr;
 
 /* ---------------------------------------------------------------------- */
 
@@ -314,7 +314,7 @@ encode_print_input_lineno(void)
  * @param format  Format-specifying string of the error message.
  * @param ...     Additional arguments, printf-style.
  */
-void
+int
 encode_error(char *format, ...)
 {
   va_list ap;
@@ -1439,4 +1439,289 @@ encode_generate_registry_file(char *registry_file)
   cl_free(info_file);
 }
 
+
+int cwb_encode_main(cl_string_list dir_files){
+  
+  /* the following code is copied from cwb_encode.c */
+  
+  int i, j, k, rng, handled;
+  
+  char linebuf[MAX_INPUT_LINE_LENGTH];
+  char *buf;                    /* 'virtual' buffer; may be advanced to skip leading blanks */
+  char separator;
+  int input_length;             /* length of input line */
+  
+  /* default settings that substitute encode_parse_options() */
+  
+  verbose++;
+  quietly = 0; /* values larger than 0 would silence cwb_encode, but we want messages */
+  strip_blanks++; /* -B: strip leading and trailing blanks from tokens and annotations by default */
+  clean_strings++; /*< clean up input strings by replacing invalid bytes with '?' */
+  xml_aware++; /* -x: translate XML entities and ignore declarations & comments */
+  corpus_character_set = cl_charset_name_canonical(strdup("utf8"));
+  skip_empty_lines++; /* -s: skip empty lines */
+  
+  input_files = cl_new_string_list();
+
+  int l;
+  l = cl_string_list_size(dir_files);
+  for (i = 0; i < l; i++) {
+    cl_string_list_append(input_files, cl_string_list_get(dir_files, i));
+  }
+  cl_delete_string_list(dir_files); /* allocated strings have been moved into input_files, so don't free() them */
+  
+  nr_input_files = cl_string_list_size(input_files);
+  
+  /* initialisation debug messages */
+  if (debugmode) {
+    cl_set_debug_level(1);
+    if (nr_input_files > 0) {
+      Rprintf("List of input files:\n");
+      for (i = 0; i < nr_input_files; i++)
+        Rprintf(" - %s\n", cl_string_list_get(input_files, i));
+    }
+    else {
+      Rprintf("Reading from standard input.\n");
+    }
+    encode_print_time(strdup("Start"));
+  }
+  
+  /* initialise loop variables ... */
+  encoding_charset = cl_charset_from_name(corpus_character_set);
+  line = 0;
+  input_line = 0;
+  
+  /* lookup hash for (undeclared) structural attributes (inserted as tokens into corpus) */
+  undeclared_sattrs = cl_new_lexhash(REP_CHECK_LEXHASH_SIZE);
+  
+  /* -------------------------------------------------- */
+  
+  /* MAIN LOOP: read one line of input and process it */
+  while ( encode_get_input_line(linebuf, MAX_INPUT_LINE_LENGTH) ) {
+    if (verbose && (line % 15000 == 0)) {
+      Rprintf("%" COMMA_SEP_THOUSANDS_CONVSPEC "9dk tokens processed\r", line >> 10);
+      /* fflush(stdout); */
+    }
+    
+    input_line++;
+    input_length = strlen(linebuf);
+    if (input_length >= (MAX_INPUT_LINE_LENGTH - 1)) { /* buffer filled -> line may have been longer */
+      encode_error(strdup("Input line too long (max: %d characters/bytes)."), MAX_INPUT_LINE_LENGTH - 2);
+    }
+    
+    /* remove trailing line break (LF or CR-LF) */
+    string_chomp(linebuf);
+    
+    buf = linebuf;
+    if (strip_blanks) {
+      while (*buf == ' ')
+        /* strip leading blanks (trailing blanks will be erased during further processing) */
+        buf++;
+    }
+    
+    /* This bit runs UNLESS either (a) skip_empty_lines (-s) is active and this an empty line;
+     * or (b) xml_aware (-x) is active and this line is an XML comment or declaration, i.e. <? or <!
+     * To put it another way "if (this is a line that should be encoded)" ...  */
+    if ( (! (skip_empty_lines && (buf[0] == '\0')) ) &&                            /* skip empty lines with -s  */
+    (! (xml_aware && (buf[0] == '<') && ((buf[1] == '?') || (buf[1] == '!'))) ) /* skip XML declarations/comments with -x  */
+    ) {
+      /* skip empty lines with -s option (for an empty line, first character will usually be newline) */
+      handled = 0;
+      
+      if (buf[0] == '<') {
+        /* XML tag (may be declared or undeclared s-attribute, start or end tag) */
+        k = (buf[1] == '/' ? 2 : 1);
+        
+        /* identify XML element name (according to slightly relaxed attribute naming conventions!) */
+        i = k;                  
+        while (cl_xml_is_name_char(buf[i]))
+          i++;
+        /* first non-valid XML element name character must be whitespace or '>' or '/' (for empty XML element) */
+        if (! ((buf[i] == ' ') || (buf[i] == '\t') || (buf[i] == '>') || (buf[i] == '/')) ) 
+          i = k;                /* no valid element name found */
+        
+        if (i > k) {
+          /* looks like a valid XML tag */
+          separator = buf[i];   /* terminate string containing element name, but remember original char */
+          buf[i] = '\0';        /* so that we can reconstruct the line if we have to insert it literally after all */
+          
+          if ((rng = range_find(&buf[k])) >= 0) {
+            /* good, it's a declared s-attribute and can be handled */
+            handled = 1;
+            
+            if (ranges[rng].automatic) {
+              if (!cl_lexhash_freq(undeclared_sattrs, &buf[k])) {
+                Rprintf("explicit XML tag <%s%s> for implicit s-attribute ignored (", 
+                        (k == 1) ? "" : "/", &buf[k]);
+                encode_print_input_lineno();
+                Rprintf(", warning issued only once).\n");
+                cl_lexhash_add(undeclared_sattrs, &buf[k]); /* can reuse lexhash for undeclared attributes here */
+              }
+            }
+            else {
+              if (k == 1) {     /* XML start tag or empty tag */
+            i++;            /* identify annotation string, i.e. tag attributes (if there are any) */
+            while ((buf[i] == ' ') || (buf[i] == '\t')) /* skip whitespace between element name and first attribute */
+            i++;
+            if (separator == '>') {
+              /* tag without annotations: check that there is no extraneous material on the line */
+              if (buf[i] != '\0') {
+                Rprintf("Warning: extra material after XML tag ignored (");
+                encode_print_input_lineno();
+                Rprintf(").\n");
+                buf[i] = '\0';
+              }
+            }
+            else {
+              j = i + strlen(buf+i); /* find '>' character marking end of tag (must be last character on line) */
+              while ((j > i) && (buf[j] == ' ' || buf[j] == '\t' || buf[j] == '\0'))
+                j--; /* set j to last non-blank character on line, which should be '>' */
+              if (buf[j] != '>') {
+                Rprintf("Malformed XML tag: missing > terminator at end of line (");
+                encode_print_input_lineno();
+                Rprintf(", annotations will be ignored).\n");
+                buf[i] = '\0'; /* so the annotation string passed to range_open() below is empty */
+              }
+              else {
+                if (buf[j-1] == '/') {
+                  j--; /* empty tag: remove "/" from annotation string and handle as an open tag */
+              /* Note that this implicitly closes the previous instance of the empty tag:
+               *  - this means that we can work with empty elements by looking just at the "open-point" of each range;
+               *  - it also means that empty tags with metadata at the start of each text will automatically extend over the full text.
+               * However, the approach sketched here only works with "flat" s-attributes declared without recursion (even without :0). */
+                }
+                buf[j] = '\0';
+              }
+            }
+            /* start tag: open range */
+            range_open(&ranges[rng], line, buf+i);
+              }
+              else {            /* XML end tag */
+            if (separator != '>') {
+              Rprintf("Warning: no annotations allowed on XML close tag </%s ...> (", &buf[k]);
+              encode_print_input_lineno();
+              Rprintf(", ignored).\n");
+            }
+            range_close(&ranges[rng], line - 1); /* end tag belongs to previous line! */
+              }
+            }
+          }
+          else {
+            /* no appropriate s-attribute declared -> insert tag literally */
+            if (!quietly) {
+              if (!cl_lexhash_freq(undeclared_sattrs, &buf[k])) {
+                Rprintf("s-attribute <%s> not declared, inserted literally (", &buf[k]);
+                encode_print_input_lineno();
+                Rprintf(", warning issued only once).\n");
+                cl_lexhash_add(undeclared_sattrs, &buf[k]);
+              }
+            }
+            buf[i] = separator; /* restore original line, which will be interpreted as token line */
+          }
+        }
+        /* malformed XML tag (no element name found) */
+        else if (!quietly) {
+          Rprintf("Malformed tag %s, inserted literally (", buf);
+          encode_print_input_lineno();
+          Rprintf(").\n");
+        }
+      } /* endif line begins with < */
+        
+        /* if we haven't handled the line so far, it must be data for the positional attributes */
+        if (!handled) {
+          encode_add_wattr_line(buf);
+          line++;                 /* line is now the corpus position of the next token that will be encoded */
+        if (line >= CL_MAX_CORPUS_SIZE) {
+          /* largest admissible corpus size should be 2^31 - 1 tokens, with maximal cpos = 2^31 - 2 */
+          Rprintf("WARNING: Maximal corpus size has been exceeded.\n");
+          Rprintf("         Input truncated to the first %d tokens (", CL_MAX_CORPUS_SIZE);
+          encode_print_input_lineno();
+          Rprintf(").\n");
+          break;
+        }
+        }
+    } /* endif (this is a line that should be encoded) */
+  } /* endwhile (main loop for each line) */
+          
+          if (verbose) {
+            Rprintf("%50s\r", "");       /* clear progress line */
+          Rprintf("Total size: %" COMMA_SEP_THOUSANDS_CONVSPEC "d tokens (%.1fM)\n", line, ((float) line) / 1048576);
+          }
+          
+          /* close open regions at end of input; then close file handles for s-attributes */
+          for (i = 0; i < range_ptr; i++) {
+            SAttEncoder *rng = &ranges[i];
+            
+            if (! rng->null_attribute) { /* don't attempt to close NULL attribute */
+          
+          /* This is fairly tricky: When multiple end tags are missing for an attribute declared with recursion (even ":0"),
+           we have to call range_close() repeatedly to ensure that the open region at the top level is really closed
+           (which happens when rng->recursion_level == 1). At the same time, range_close() will also close the corresponding
+           ranges of any implicitly defined attributes (used to resolve recursive embedding and element attributes).
+           Therefore, the following code calls range_close() repeatedly until the current range is actually closed.
+           It also relies on the ordering of the ranges[] array, where top level attributes always precede their children,
+           so they should be closed automatically before cleanup reaches them. If the ordering were different, children might
+           be closed directly at first, and the following attempt to close them automatically from within the range_close()
+           function would produce highly confusing error messages. To be on the safe side (for some definition of safe :-),
+           we _never_ close ranges for implicit attributes, and issue a warning if they're still open when cleanup reaches them. 
+           */
+          if (rng->automatic) {     /* implicitly generated s-attributes should have been closed automatically */
+          if (!quietly && rng->is_open) {
+            Rprintf("Warning: implicit s-attribute <%s> open at end of input (should not have happened).\n",
+                    rng->name);
+          }
+          }
+          else {
+            if (rng->is_open) {
+              if (rng->recursion_level > 1) 
+                Rprintf("Warning: %d missing </%s> tags inserted at end of input.\n", 
+                        rng->recursion_level, rng->name);
+              else
+                Rprintf("Warning: missing </%s> tag inserted at end of input.\n", rng->name);
+              
+              /* close open region; this will automatically close children from recursion and element attributes;
+               if multiple end tags are missing, we have to call range_close() repeatedly until we reach the top level */
+              while (rng->is_open) { /* should _not_ create an infinite loop, I hope */
+              range_close(rng, line - 1);
+              }
+            }
+            
+            if (!quietly && (rng->max_recursion >= 0) && (rng->element_drop_count > 0)) {
+              Rprintf("%7d <%s> regions dropped because of deep nesting.\n",
+                      rng->element_drop_count, rng->name);
+            }
+          }
+          
+          /* close file handles for s-attributes */
+          if (EOF == fclose(rng->fd)) {
+            perror("fclose() failed");
+            encode_error(strdup("Error writing .rng file for s-attribute <%s>"), rng->name);
+          }
+          if (rng->store_values) {
+            if (EOF == fclose(rng->avs)) {
+              perror("fclose() failed");
+              encode_error(strdup("Error writing .avs file for s-attribute <%s>"), rng->name);
+            }
+            if (EOF == fclose(rng->avx)) {
+              perror("fclose() failed");
+              encode_error(strdup("Error writing .avx file for s-attribute <%s>"), rng->name);
+            }
+          }
+          
+            }
+          } /* endfor: closing each open region and s-attribute filehandle for each Range */
+          
+          /* close file handles for positional attributes */
+          wattr_close_all();
+          
+          /* if registry_file != NULL, write appropriate registry entry to file named <registry_file> */
+          if (registry_file != NULL) {
+            encode_generate_registry_file(registry_file);
+          }
+          
+          if (debugmode)
+            encode_print_time(strdup("Done"));
+          
+          return nr_input_files;
+}
 

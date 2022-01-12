@@ -47,7 +47,7 @@ void compressrdx_cleanup(int error_code);
 /** debug level */
 /* extern int debug = 0; */
 /** where debug messages are to be sent to (stderr) */
-/* FILE *debug_output; */ /* " = stderr;" init moved to main() for Gnuwin32 compatibility */
+FILE *debug_output; /* " = stderr;" init moved to main() for Gnuwin32 compatibility */
 
 /** stores current position in a bit-write-file */
 int codepos = 0;

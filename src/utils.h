@@ -1,10 +1,10 @@
-extern Corpus *corpus;
-int cleanup(int error_code);
+Corpus *corpus;
+void compressrdx_cleanup(int error_code);
 void compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug);
 void decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug);
 int decode_check_huff(Attribute *attr, char* corpus_id, char *fname);
 int compute_code_lengths(Attribute *attr, HCD *hc, char *fname);
-int do_attribute(Attribute *attr, ComponentID cid, int validate);
+int makeall_do_attribute(Attribute *attr, ComponentID cid, int validate);
 
 
 /* --------------- functions in cwb_encode.c ------------------------------ */
@@ -28,5 +28,6 @@ void encode_add_wattr_line(char *str);
 int encode_get_input_line(char *buffer, int bufsize);
 void encode_generate_registry_file(char *registry_file);
 void string_chomp(char *s); /* replaces cl_string_chomp */
+int cwb_encode_main(cl_string_list dir_files);
 
 /* ---------------------------------------------------------------------- */

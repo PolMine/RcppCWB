@@ -74,7 +74,7 @@ component_ok(Attribute *attr, ComponentID cid)
 * @param attr  The attribute of the component to create.
 * @param cid   The component ID of the component to create.
 */
-void
+int
 makeall_make_component(Attribute *attr, ComponentID cid)
 {
     int state;
