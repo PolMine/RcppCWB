@@ -35,6 +35,7 @@ source("~/Lab/github/RcppCWB/prep/PatchEngine.R")
 P <- PatchEngine$new(
   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
   repodir = "~/Lab/github/RcppCWB",
+  makeheaders = "~/Lab/github_foreign/makeheaders/src/makeheaders",
   revision = params$revision
 )
 ```
