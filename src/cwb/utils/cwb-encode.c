@@ -1440,7 +1440,7 @@ encode_generate_registry_file(char *registry_file)
 }
 
 
-int cwb_encode_main(cl_string_list dir_files){
+int cwb_encode_worker(cl_string_list dir_files){
   
   /* the following code is copied from cwb_encode.c */
   

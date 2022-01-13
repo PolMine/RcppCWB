@@ -1262,8 +1262,10 @@ PatchEngine <- R6Class(
           delete_line_beginning_with = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 237L),
           
           delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
-          delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 286L),
-          
+          insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list dir_files){"), 1L),
+          delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
+          replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
+
           replace = list("Rprintf\\(registry_fd,", "fprintf(registry_fd,", NA),
           replace = list("Rprintf\\(fd,", "fprintf(fd,", NA),
           replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
