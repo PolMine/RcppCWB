@@ -8,6 +8,7 @@
 #' P <- PatchEngine$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
+#'   makeheaders_dir = "~/Lab/github_foreign/makeheaders/src/makeheaders",
 #'   revision = 1069
 #' )
 #' P$patch_all()
@@ -32,8 +33,9 @@ PatchEngine <- R6Class(
     verbose = TRUE,
     diff_global_replacements = NULL,
     diff_file_patches = NULL,
+    makeheaders = NULL,
     
-    initialize = function(cwb_dir_svn, revision, repodir, verbose = TRUE){
+    initialize = function(cwb_dir_svn, revision, repodir, makeheaders, verbose = TRUE){
       self$verbose <- verbose
       
       self$repodir <- path.expand(repodir)
@@ -57,7 +59,9 @@ PatchEngine <- R6Class(
       
       message("flex version: ", system("flex --version", intern = TRUE))
       message("bison version: ", system("bison --version", intern = TRUE)[1])
-      
+      message("makeheaders utility is available: ", identical(system(makeheaders, intern = TRUE), character()))
+      self$makeheaders <- makeheaders
+
       invisible(self)
     },
     
@@ -1467,6 +1471,19 @@ PatchEngine <- R6Class(
       )
     },
     
+    make_utils_header = function(){
+      message("... create header file utils.h ...", appendLF = FALSE)
+      utils <- file.path(
+        self$repodir, "src", "cwb", "utils",
+        c("cwb-encode.c", "cwb-compress-rdx.c", "cwb-huffcode.c", "cwb-makeall.c")
+      )
+      cmd <- sprintf("%s -h %s", self$makeheaders, paste(utils, collapse = " "))
+      h <- unique(system(cmd, intern = TRUE))
+      writeLines(h, con = file.path(self$repodir, "src", "utils.h"))
+      message("OK")
+      invisible(h)
+    },
+    
     patch_file = function(file){
       
       fname_full <- fs::path(self$repodir, file)
@@ -1566,6 +1583,8 @@ PatchEngine <- R6Class(
       commit(self$repository, message = "global replacements applied")
       
       self$patch_files()
+      
+      self$make_utils_header()
       self$diff_file_patches <- self$get_difflist()
 
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
