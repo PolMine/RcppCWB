@@ -208,7 +208,11 @@ PatchEngine <- R6Class(
     create_globalvars_file = function(){
       if (self$verbose) message("Create globalvars.h ... ", appendLF = FALSE)
       
-      externed <- unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
+      externed <- c(
+        "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
+        unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
+      )
+
       externed <- externed[!externed %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
       
       writeLines(text = externed, con = file.path(self$repodir, "src", "globalvars.h"))
@@ -963,7 +967,8 @@ PatchEngine <- R6Class(
             ),
             1L
           ),
-          replace = list("^\\s*Boolean\\seval_bool\\(Constrainttree\\sctptr,\\sRefTab\\srt,\\sint\\scorppos\\);", "", 1L)
+          replace = list("^\\s*Boolean\\seval_bool\\(Constrainttree\\sctptr,\\sRefTab\\srt,\\sint\\scorppos\\);", "", 1L),
+          replace = list("^#endif.*$", "", 1L)
           ),
           if (revision == 1069) list(
             replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
