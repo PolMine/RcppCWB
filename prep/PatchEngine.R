@@ -213,7 +213,7 @@ PatchEngine <- R6Class(
         "int EvaluationIsRunning;",        # cqp.h
         "int signal_handler_is_installed;" # cqp.h
       )
-      writeLines(text = extern, con = file.path(self$repodir, "src", "_globalvars.h"))
+      writeLines(text = content, con = file.path(self$repodir, "src", "_globalvars.h"))
       messsage("OK")
     },
     
