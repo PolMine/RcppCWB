@@ -383,7 +383,7 @@ PatchEngine <- R6Class(
         
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
