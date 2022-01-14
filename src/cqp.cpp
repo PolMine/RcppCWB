@@ -11,7 +11,7 @@ extern "C" {
 /*  #include "corpmanag.h" */
   #include "server.h"
   #include "globalvars.h"
-  #include "env.h"
+  #include "_eval.h"
 }
 
 #include <Rcpp.h>

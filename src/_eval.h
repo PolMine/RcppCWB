@@ -1,6 +1,35 @@
 #include "corpmanag.h"
 
+typedef struct _label_entry {
+  int        flags;
+  char      *name;
+  int        ref;             /**< array index the label refers to */
+  struct _label_entry *next;
+} *LabelEntry;
+
+typedef struct _symbol_table {
+  LabelEntry  user;                /**< user namespace */
+  LabelEntry  rdat;                /**< namespace for LAB_RDAT labels */
+  int next_index;                  /**< next free reference table index */
+} *SymbolTable;
+
+typedef struct dfa {
+  int Max_States;         /**< max number of states of the current dfa;
+ state no. 0 is the initial state.             */
+  int Max_Input;          /**< max number of input chars of the current dfa. */
+  int **TransTable;       /**< state transition table of the current dfa.    */
+  Boolean *Final;         /**< set of final states.                          */
+  int E_State;            /**< Error State -- it is introduced in order to
+ *   make the dfa complete, so the state transition
+ *   is a total mapping. The value of this variable
+ *   is Max_States.
+ */
+} DFA;
+
+/** Number of AVStructures to put in each Patternlist */
 #define MAXPATTERNS 5000
+
+/** maximum number of EvalEnvironments iin the global array */
 #define MAXENVIRONMENT 10
 
 
@@ -305,6 +334,6 @@ typedef struct evalenv {
 typedef EvalEnvironment *EEP;
 
 /** A global array of EvalEnvironment structures */
-extern EvalEnvironment Environment[MAXENVIRONMENT];
+EvalEnvironment Environment[MAXENVIRONMENT];
 
-extern EEP CurEnv, evalenv;
+EEP CurEnv, evalenv;

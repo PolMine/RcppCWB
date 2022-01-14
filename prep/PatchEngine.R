@@ -198,6 +198,11 @@ PatchEngine <- R6Class(
         overwrite = TRUE
       )
       
+      file.copy(
+        from = file.path(self$repodir, "src", "cwb", "cqp", "eval.h"),
+        to = file.path(self$repodir, "src", "_eval.h"),
+        overwrite = TRUE
+      )
     },
     
     create_globalvars_file = function(){
@@ -210,6 +215,7 @@ PatchEngine <- R6Class(
       message("OK")
     },
     
+
     create_dummy_depend_files = function(){
       if (self$verbose) message("Create dummy depend.mk files ...")
       cat("\n", file = file.path(self$repodir, "src", "cwb", "cl", "depend.mk"))
@@ -919,6 +925,45 @@ PatchEngine <- R6Class(
             )
           )
 
+        ),
+        
+        "src/eval.h" = list(
+          delete_line_before("^/\\*\\*\\sNumber\\sof\\sAVStructures", 1L, NA),
+          insert_before(
+            "^/\\*\\*\\sNumber\\sof\\sAVStructures",
+            c(
+              '#include "corpmanag.h"',
+              '',
+              'typedef struct _label_entry {',
+              '  int        flags;',
+              '  char      *name;',
+              '  int        ref;             /**< array index the label refers to */',
+              '    struct _label_entry *next;',
+              '} *LabelEntry;',
+              '',
+              'typedef struct _symbol_table {',
+              '  LabelEntry  user;                /**< user namespace */',
+              '    LabelEntry  rdat;                /**< namespace for LAB_RDAT labels */',
+              '    int next_index;                  /**< next free reference table index */',
+              '} *SymbolTable;',
+              '',
+              'typedef struct dfa {',
+              '  int Max_States;         /**< max number of states of the current dfa;',
+              '  state no. 0 is the initial state.             */',
+              '    int Max_Input;          /**< max number of input chars of the current dfa. */',
+              '    int **TransTable;       /**< state transition table of the current dfa.    */',
+              '    Boolean *Final;         /**< set of final states.                          */',
+              '    int E_State;            /**< Error State -- it is introduced in order to',
+              '  *   make the dfa complete, so the state transition',
+              '  *   is a total mapping. The value of this variable',
+              '  *   is Max_States.',
+              '  */',
+              '} DFA;'
+            ),
+            1L
+          ),
+          replace = list("^\\s*extern\\sEvalEnvironment\\sEnvironment\\[MAXENVIRONMENT\\];", "EvalEnvironment Environment[MAXENVIRONMENT];", 1L),
+          replace = list("^\\s*extern\\sEEP\\sCurEnv,\\sevalenv;", "EEP CurEnv, evalenv;", 1L)
         ),
         
         "src/cwb/cqp/hash.h" = c(
@@ -1663,6 +1708,7 @@ PatchEngine <- R6Class(
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       git2r::add(repo = self$repodir, path = "src/cl_min.h")
+      git2r::add(repo = self$repodir, path = "src/_eval.h")
       git2r::add(repo = self$repodir, path = "src/globalvars.h")
       if (self$verbose) message("Commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
