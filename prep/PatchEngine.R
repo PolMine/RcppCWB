@@ -202,18 +202,10 @@ PatchEngine <- R6Class(
     
     create_globalvars_file = function(){
       if (self$verbose) message("Create globalvars.h ... ", appendLF = FALSE)
-      content <- c(
-        unique(unname(unlist(lapply(self$file_patches, `[[`, "extern")))),
-        "CorpusList *current_corpus;",
-        "CorpusList *corpuslist;",
-        "CYCtype LastExpression;",         # cqp.h
-        "int exit_cqp;",                   # cqp.h
-        "char *cqp_input_string;",         # cqp.h
-        "int cqp_input_string_position;",  # cqp.h
-        "int EvaluationIsRunning;",        # cqp.h
-        "int signal_handler_is_installed;" # cqp.h
+      writeLines(
+        text = unique(unname(unlist(lapply(self$file_patches, `[[`, "extern")))),
+        con = file.path(self$repodir, "src", "_globalvars.h")
       )
-      writeLines(text = content, con = file.path(self$repodir, "src", "_globalvars.h"))
       message("OK")
     },
     
