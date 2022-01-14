@@ -244,6 +244,9 @@ PatchEngine <- R6Class(
       for (f in files){
         code <- readLines(f)
         for (i in 1L:length(self$global_replacements)){
+          if (length(global_replacements[[i]] >= 2L)){
+            if (endsWith(f, global_replacements[[i]][[3]])) next
+          }
           code <- gsub(self$global_replacements[[i]][1], self$global_replacements[[i]][2], code)
         }
         writeLines(text = code, con = f)
@@ -383,10 +386,11 @@ PatchEngine <- R6Class(
         
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
+        if (revision == 1069) c("(vf|f|v)printf\\s*\\(\\s*fd,\\s*", "Rprintf(", "cwb-encode.c"),
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
         c("fprintf\\s*\\(", "Rprintf("),
         c("(\\s+)printf\\(", "\\1Rprintf("),
