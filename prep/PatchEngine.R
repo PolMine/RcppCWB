@@ -1479,7 +1479,8 @@ PatchEngine <- R6Class(
       )
       cmd <- sprintf("%s -h %s", self$makeheaders, paste(utils, collapse = " "))
       h <- unique(system(cmd, intern = TRUE))
-      writeLines(h, con = file.path(self$repodir, "src", "utils.h"))
+      h_fns <- grep("\\)\\s*;\\s*$", h, value = TRUE)
+      writeLines(h_fns, con = file.path(self$repodir, "src", "utils.h"))
       message("OK")
       invisible(h)
     },
@@ -1574,7 +1575,7 @@ PatchEngine <- R6Class(
       self$rename_files()
       self$create_dummy_depend_files()
       
-      git2r::add(repo = self$repodir, path = "src/cwb/*")
+      git2r::add(repo = self$repodir, path = "src/*")
       commit(self$repository, message = "before global replacements")
       
       self$replace_globally()
