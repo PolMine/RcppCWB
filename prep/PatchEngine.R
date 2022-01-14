@@ -1302,7 +1302,7 @@ PatchEngine <- R6Class(
           
           replace = list('^(#define\\sUNDEF_VALUE\\s*)("__UNDEF__")', '\\1(char*)\\2', 1L),
           replace = list('^(#define\\sFIELDSEPS\\s*)(".*?")', '\\1(char*)\\2', 1L),
-          replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)"latin1";', '\\1(char*)\\2', 1L),
+          replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)("latin1";)', '\\1(char*)\\2', 1L),
           
           replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
           replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L)
