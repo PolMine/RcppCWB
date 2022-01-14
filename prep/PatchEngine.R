@@ -1629,6 +1629,8 @@ PatchEngine <- R6Class(
       commit(self$repository, message = "before global replacements")
       
       self$replace_globally()
+      self$create_copy()
+      
       self$diff_global_replacements <- self$get_difflist()
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       commit(self$repository, message = "global replacements applied")
