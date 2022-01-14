@@ -8,7 +8,7 @@
 #' P <- PatchEngine$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
-#'   makeheaders_dir = "~/Lab/github_foreign/makeheaders/src/makeheaders",
+#'   makeheaders = "~/Lab/github_foreign/makeheaders/src/makeheaders",
 #'   revision = 1069
 #' )
 #' P$patch_all()
@@ -198,6 +198,23 @@ PatchEngine <- R6Class(
         overwrite = TRUE
       )
       
+    },
+    
+    create_globalvars_file = function(){
+      if (self$verbose) message("Create globalvars.h ... ", appendLF)
+      content <- c(
+        unique(unname(unlist(lapply(self$file_patches, `[[`, "extern")))),
+        "CorpusList *current_corpus;",
+        "CorpusList *corpuslist;",
+        "CYCtype LastExpression;",         # cqp.h
+        "int exit_cqp;",                   # cqp.h
+        "char *cqp_input_string;",         # cqp.h
+        "int cqp_input_string_position;",  # cqp.h
+        "int EvaluationIsRunning;",        # cqp.h
+        "int signal_handler_is_installed;" # cqp.h
+      )
+      writeLines(text = extern, con = file.path(self$repodir, "src", "_globalvars.h"))
+      messsage("OK")
     },
     
     create_dummy_depend_files = function(){
@@ -1504,10 +1521,10 @@ PatchEngine <- R6Class(
           replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
         ),
         
-        "src/globalvars.h" = c(
-          list(),
-          if (revision > 1330) list(replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L))
-        ),
+        # "src/globalvars.h" = c(
+        #   list(),
+        #   if (revision > 1330) list(replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L))
+        # ),
         
         "src/cl_min.h" = list(
           replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s^\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
@@ -1647,11 +1664,13 @@ PatchEngine <- R6Class(
       self$patch_files()
       
       self$make_utils_header()
+      self$create_globalvars_file()
       self$diff_file_patches <- self$get_difflist()
 
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       git2r::add(repo = self$repodir, path = "src/cl_min.h")
+      git2r::add(repo = self$repodir, path = "src/globalvars.h")
       if (self$verbose) message("Commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
       self$patch_commit <- last_commit(self$repository)
