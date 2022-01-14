@@ -249,7 +249,7 @@ PatchEngine <- R6Class(
       times <- if (length(action) == 3L) action[[3]] else 1L
       
       position <- grep(pattern = action[[1]], code)[which_position]
-      if (is.na(position)) times <- length(code) - position
+      if (is.na(times)) times <- length(code) - position
       
       if (!is.na(position)){
         code <- code[-(position + 0L:times)]
