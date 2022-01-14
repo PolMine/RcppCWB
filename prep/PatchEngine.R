@@ -183,6 +183,18 @@ PatchEngine <- R6Class(
       invisible(self)
     },
     
+    create_copy = function(){
+      if (self$verbose) message ("Create utils/globals.h as a copy of cwb-encode.c")
+      
+      g <- file.path(self$repodir, "src", "cwb", "utils", "globals.h")
+      if (file.exists(g)) file.remove(g)
+      
+      file.copy(
+        from = file.path(self$repodir, "src", "cwb", "utils", "cwb-encode.c"),
+        to = file.path(self$repodir, "src", "cwb", "utils", "globals.h")
+      )
+    },
+    
     create_dummy_depend_files = function(){
       if (self$verbose) message("Create dummy depend.mk files ...")
       cat("\n", file = file.path(self$repodir, "src", "cwb", "cl", "depend.mk"))
@@ -219,6 +231,8 @@ PatchEngine <- R6Class(
       times <- if (length(action) == 3L) action[[3]] else 1L
 
       position <- grep(pattern = action[[1]], code)[which_position]
+      if (is.na(times)) times <- position - 1L
+      
       if (!is.na(position)){
         code <- code[-(position - 1L:times)]
       } else {
@@ -229,11 +243,14 @@ PatchEngine <- R6Class(
       code
     },
     
+    
     delete_line_beginning_with = function(code, action, file){
       which_position <- if (length(action) > 1L) action[[2]] else 1L
       times <- if (length(action) == 3L) action[[3]] else 1L
       
       position <- grep(pattern = action[[1]], code)[which_position]
+      if (is.na(position)) times <- length(code) - position
+      
       if (!is.na(position)){
         code <- code[-(position + 0L:times)]
       } else {
@@ -1274,7 +1291,25 @@ PatchEngine <- R6Class(
           replace = list("Rprintf\\(fd,", "fprintf(fd,", NA),
           replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
         ),
+
+        "src/cwb/utils/globals.h" = list(
+          
+          delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, NA),
+          delete_line_beginning_with = list("^/\\*\\s-*\\s\\*/", 5L, NA),
+
+          replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
+          replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
+          
+          replace = list('^(#define\\sUNDEF_VALUE\\s*)("__UNDEF__")', '\\1(char*)\\2', 1L),
+          replace = list('^(#define\\sFIELDSEPS\\s*)(".*?")', '\\1(char*)\\2', 1L),
+          replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)"latin1";', '\\1(char*)\\2', 1L),
+          
+          replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
+          replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L)
+
+        ),
         
+                
         "src/cwb/utils/cwb-compress-rdx.c" = list(
           
           replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
