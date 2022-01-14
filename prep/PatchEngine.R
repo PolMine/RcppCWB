@@ -927,9 +927,9 @@ PatchEngine <- R6Class(
 
         ),
         
-        "src/eval.h" = list(
-          delete_line_before("^/\\*\\*\\sNumber\\sof\\sAVStructures", 1L, NA),
-          insert_before(
+        "src/_eval.h" = list(
+          delete_line_before = list("^/\\*\\*\\sNumber\\sof\\sAVStructures", 1L, NA),
+          insert_before = list(
             "^/\\*\\*\\sNumber\\sof\\sAVStructures",
             c(
               '#include "corpmanag.h"',
