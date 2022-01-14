@@ -1519,7 +1519,7 @@ PatchEngine <- R6Class(
         # ),
         
         "src/cl_min.h" = list(
-          replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s^\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
+          replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
         )
       )
     },
