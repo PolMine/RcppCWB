@@ -1486,7 +1486,14 @@ PatchEngine <- R6Class(
         }
       )
       
-      h <- c("/* Do not edit by hand! This file has been automatically generated */", "", unlist(h_li))
+      h <- c(
+        "/* Do not edit by hand! This file has been automatically generated */",
+        "",
+        "Corpus *corpus;",
+        "typedef struct _SAttEncoder SAttEncoder;",
+        "", "",
+        unlist(h_li)
+      )
       
       writeLines(h, con = file.path(self$repodir, "src", "cwb", "utils", "utils.h"))
       message("OK")

@@ -1,5 +1,8 @@
 /* Do not edit by hand! This file has been automatically generated */
 
+Corpus *corpus;
+typedef struct _SAttEncoder SAttEncoder;
+
 /* functions defined in cwb-encode.c */
 
 void Rprintf(const char *,...);
