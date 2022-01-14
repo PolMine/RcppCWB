@@ -958,12 +958,15 @@ PatchEngine <- R6Class(
               '  *   is a total mapping. The value of this variable',
               '  *   is Max_States.',
               '  */',
-              '} DFA;'
+              '} DFA;',
+              '',
+              ''
             ),
             1L
           ),
           replace = list("^\\s*extern\\sEvalEnvironment\\sEnvironment\\[MAXENVIRONMENT\\];", "EvalEnvironment Environment[MAXENVIRONMENT];", 1L),
-          replace = list("^\\s*extern\\sEEP\\sCurEnv,\\sevalenv;", "EEP CurEnv, evalenv;", 1L)
+          replace = list("^\\s*extern\\sEEP\\sCurEnv,\\sevalenv;", "EEP CurEnv, evalenv;", 1L),
+          replace = list("^Boolean\\seval_bool\\(Constrainttree\\sctptr,\\sRefTab\\srt,\\sint\\scorppos\\);$", "/* \\1 */", 1L)
         ),
         
         "src/cwb/cqp/hash.h" = c(
