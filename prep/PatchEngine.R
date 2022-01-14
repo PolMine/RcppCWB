@@ -1286,6 +1286,10 @@ PatchEngine <- R6Class(
           replace = list("Pointer\\sto\\sthe\\snew\\sRange", "Pointer to the new SAttEncoder", 1L),
           
           replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
+          replace = list("^(\\s*)encode_print_time\\(stderr", "\\1encode_print_time(", 1L),
+          
+          delete_line_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", 1L, 1L),
+          insert_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", "int", 1L),
           
           replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
           
@@ -1322,6 +1326,8 @@ PatchEngine <- R6Class(
             1L, 1L
           ),
           
+          replace = list('^(\\s*)(progname\\s=\\s"cwb-encode";)\\s*$', "\\1/* \\s */", 1L),
+          
           # extern variables
           replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
           replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
@@ -1350,7 +1356,7 @@ PatchEngine <- R6Class(
           delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
           
           
-          replace = list("\\(\\!(\\s*)silent\\)", "(!\\1quietly)", NA),
+          replace = list("\\(\\!(\\s*)silent\\", "(!\\1quietly", NA),
           replace = list("\\(debug\\)", "(debugmode)", NA),
           replace = list("register\\s+", "", NA),
           
