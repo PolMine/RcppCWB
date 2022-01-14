@@ -114,7 +114,7 @@ int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute) {
   compress_reversed_index(attr, output_fn, corpus_id, debug);
   if (! i_want_to_believe) decompress_check_reversed_index(attr, output_fn, corpus_id, debug);
   
-  compressrdx_cleanup(0);
+  /* compressrdx_cleanup(1);  */
   return 0;                        /* to keep gcc from complaining */
 }
 
