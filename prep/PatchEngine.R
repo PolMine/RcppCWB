@@ -186,13 +186,18 @@ PatchEngine <- R6Class(
     create_copy = function(){
       if (self$verbose) message ("Create utils/globals.h as a copy of cwb-encode.c")
       
-      g <- file.path(self$repodir, "src", "cwb", "utils", "globals.h")
-      if (file.exists(g)) file.remove(g)
-      
       file.copy(
         from = file.path(self$repodir, "src", "cwb", "utils", "cwb-encode.c"),
-        to = file.path(self$repodir, "src", "cwb", "utils", "globals.h")
+        to = file.path(self$repodir, "src", "cwb", "utils", "globals.h"),
+        overwrite = TRUE
       )
+      
+      file.copy(
+        from = file.path(self$repodir, "src", "cwb", "cl", "cl.h"),
+        to = file.path(self$repodir, "src", "cl_min.h"),
+        overwrite = TRUE
+      )
+      
     },
     
     create_dummy_depend_files = function(){
@@ -1502,6 +1507,10 @@ PatchEngine <- R6Class(
         "src/globalvars.h" = c(
           list(),
           if (revision > 1330) list(replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L))
+        ),
+        
+        "src/cl_min.h" = list(
+          replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s^\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
         )
       )
     },
@@ -1642,6 +1651,7 @@ PatchEngine <- R6Class(
 
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
+      git2r::add(repo = self$repodir, path = "src/cl_min.h")
       if (self$verbose) message("Commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
       self$patch_commit <- last_commit(self$repository)
