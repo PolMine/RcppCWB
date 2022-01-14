@@ -1356,7 +1356,7 @@ PatchEngine <- R6Class(
           delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
           
           
-          replace = list("\\(\\!(\\s*)silent\\", "(!\\1quietly", NA),
+          replace = list("\\(\\!(\\s*)silent", "(!\\1quietly", NA),
           replace = list("\\(debug\\)", "(debugmode)", NA),
           replace = list("register\\s+", "", NA),
           
