@@ -927,8 +927,9 @@ PatchEngine <- R6Class(
 
         ),
         
-        "src/_eval.h" = list(
-          delete_line_before = list("^/\\*\\*\\sNumber\\sof\\sAVStructures", 1L, NA),
+        "src/_eval.h" = c(
+          list(
+            delete_line_before = list("^/\\*\\*\\sNumber\\sof\\sAVStructures", 1L, NA),
           insert_before = list(
             "^/\\*\\*\\sNumber\\sof\\sAVStructures",
             c(
@@ -958,15 +959,18 @@ PatchEngine <- R6Class(
               '  *   is a total mapping. The value of this variable',
               '  *   is Max_States.',
               '  */',
-              '} DFA;',
-              '',
-              ''
+              '} DFA;'
             ),
             1L
           ),
           replace = list("^\\s*extern\\sEvalEnvironment\\sEnvironment\\[MAXENVIRONMENT\\];", "EvalEnvironment Environment[MAXENVIRONMENT];", 1L),
-          replace = list("^\\s*extern\\sEEP\\sCurEnv,\\sevalenv;", "EEP CurEnv, evalenv;", 1L),
-          replace = list("^Boolean\\seval_bool\\(Constrainttree\\sctptr,\\sRefTab\\srt,\\sint\\scorppos\\);$", "/* \\1 */", 1L)
+          replace = list("^\\s*extern\\sEEP\\sCurEnv,\\sevalenv;", "EEP CurEnv, evalenv;", 1L)
+          ),
+          if (revision == 1069) list(
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+          )
         ),
         
         "src/cwb/cqp/hash.h" = c(
