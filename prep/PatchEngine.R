@@ -1283,6 +1283,8 @@ PatchEngine <- R6Class(
           
           replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
           
+          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
+          
           insert_before = list(
             "^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram",
             c(          
@@ -1388,6 +1390,8 @@ PatchEngine <- R6Class(
           replace = list("^char\\s\\*corpus_id\\s=\\sNULL;", "/* char *corpus_id = NULL; */", 1L),
           replace = list('^FILE\\s\\*debug_output;', "/* FILE *debug_output; */", 1L),
           replace = list("^int\\sdebug\\s=\\s0;", "/* extern int debug = 0; */", 1L),
+          
+          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
           extern = list("Corpus *corpus;"),
           
           insert_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
@@ -1437,6 +1441,8 @@ PatchEngine <- R6Class(
           delete_line_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", 1L, 1L),
           insert_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "int ", 1L),
           replace = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "\\1decode_check_huff(Attribute *attr, char *corpus_id, char *fname)", 1L),
+          
+          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
           
           extern = list("Corpus *corpus;"),
           
@@ -1491,7 +1497,7 @@ PatchEngine <- R6Class(
           
           delete_line_beginning_with = list('#include\\s"\\.\\./cl/corpus\\.h', 1L, 0L),
           replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
-          
+          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
           
           # stable r1069 - r1690. But maybe obsolete, because cwb-makeall.c is not compiled?
           replace = list("^\\s*fflush\\(stdout\\);\\s*$", "/* fflush(stdout); */", NA),
