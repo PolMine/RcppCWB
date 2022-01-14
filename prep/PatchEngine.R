@@ -201,7 +201,7 @@ PatchEngine <- R6Class(
     },
     
     create_globalvars_file = function(){
-      if (self$verbose) message("Create globalvars.h ... ", appendLF)
+      if (self$verbose) message("Create globalvars.h ... ", appendLF = FALSE)
       content <- c(
         unique(unname(unlist(lapply(self$file_patches, `[[`, "extern")))),
         "CorpusList *current_corpus;",
