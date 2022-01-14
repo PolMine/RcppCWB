@@ -396,8 +396,9 @@ PatchEngine <- R6Class(
         # best solution I could come up with is to rename endian.h into endian2.h.
         # In addition - turn 'endian.h' into 'endian2.h' in the Makefile - change
         # include statements to 'include "endian2.h"'
-        c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"'), # only files in cl, maybe limit this,
-        c("^(\\s*)exit\\(1\\);", "\\1return 1;")
+        c('^\\s*#include\\s+"endian\\.h"\\s*$', '#include "endian2.h"') # only files in cl, maybe limit this,
+#        c("^(\\s*)exit\\(1\\);", "\\1return 1;")
+        
       )
     },
     
