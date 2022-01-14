@@ -206,7 +206,7 @@ PatchEngine <- R6Class(
       externed <- unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
       externed <- externed[!externed %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;")]
       
-      writeLines(text = externed, con = file.path(self$repodir, "src", "_globalvars.h"))
+      writeLines(text = externed, con = file.path(self$repodir, "src", "globalvars.h"))
       message("OK")
     },
     
