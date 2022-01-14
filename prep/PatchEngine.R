@@ -1473,14 +1473,22 @@ PatchEngine <- R6Class(
     
     make_utils_header = function(){
       message("... create header file utils.h ...", appendLF = FALSE)
-      utils <- file.path(
-        self$repodir, "src", "cwb", "utils",
-        c("cwb-encode.c", "cwb-compress-rdx.c", "cwb-huffcode.c", "cwb-makeall.c")
+      utils <- c("cwb-encode.c", "cwb-compress-rdx.c", "cwb-huffcode.c", "cwb-makeall.c")
+      
+      h_li <- lapply(
+        utils,
+        function(util){
+          util_full_name <- file.path(self$repodir, "src", "cwb", "utils", util)
+          cmd <- sprintf("%s -h %s", self$makeheaders, util_full_name)
+          defs <- unique(system(cmd, intern = TRUE))
+          fns <- grep("\\)\\s*;\\s*$", defs, value = TRUE)
+          c(sprintf("/* functions defined in %s */", util), "", fns, "", "")
+        }
       )
-      cmd <- sprintf("%s -h %s", self$makeheaders, paste(utils, collapse = " "))
-      h <- unique(system(cmd, intern = TRUE))
-      h_fns <- grep("\\)\\s*;\\s*$", h, value = TRUE)
-      writeLines(h_fns, con = file.path(self$repodir, "src", "utils.h"))
+      
+      h <- c("/* Do not edit by hand! This file has been automatically generated */", "", unlist(h_li))
+      
+      writeLines(h, con = file.path(self$repodir, "src", "cwb", "utils", "utils.h"))
       message("OK")
       invisible(h)
     },
@@ -1575,7 +1583,7 @@ PatchEngine <- R6Class(
       self$rename_files()
       self$create_dummy_depend_files()
       
-      git2r::add(repo = self$repodir, path = "src/*")
+      git2r::add(repo = self$repodir, path = "src/cwb/*")
       commit(self$repository, message = "before global replacements")
       
       self$replace_globally()
