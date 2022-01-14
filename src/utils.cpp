@@ -1,7 +1,7 @@
 extern "C" {
   #include "cl_min.h"
   #include <attributes.h>
-  #include "utils.h"
+  #include "cwb/utils/utils.h"
 }
 
 
