@@ -202,10 +202,11 @@ PatchEngine <- R6Class(
     
     create_globalvars_file = function(){
       if (self$verbose) message("Create globalvars.h ... ", appendLF = FALSE)
-      writeLines(
-        text = unique(unname(unlist(lapply(self$file_patches, `[[`, "extern")))),
-        con = file.path(self$repodir, "src", "_globalvars.h")
-      )
+      
+      externed <- unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
+      externed <- externed[!externed %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;")]
+      
+      writeLines(text = externed, con = file.path(self$repodir, "src", "_globalvars.h"))
       message("OK")
     },
     
