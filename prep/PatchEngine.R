@@ -214,7 +214,7 @@ PatchEngine <- R6Class(
         "int signal_handler_is_installed;" # cqp.h
       )
       writeLines(text = content, con = file.path(self$repodir, "src", "_globalvars.h"))
-      messsage("OK")
+      message("OK")
     },
     
     create_dummy_depend_files = function(){
