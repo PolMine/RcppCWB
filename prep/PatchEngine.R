@@ -244,8 +244,8 @@ PatchEngine <- R6Class(
       for (f in files){
         code <- readLines(f)
         for (i in 1L:length(self$global_replacements)){
-          if (length(global_replacements[[i]] >= 2L)){
-            if (endsWith(f, global_replacements[[i]][[3]])) next
+          if (length(self$global_replacements[[i]] >= 2L)){
+            if (endsWith(f, self$global_replacements[[i]][[3]])) next
           }
           code <- gsub(self$global_replacements[[i]][1], self$global_replacements[[i]][2], code)
         }
