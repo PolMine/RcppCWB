@@ -1390,7 +1390,7 @@ PatchEngine <- R6Class(
           replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)("latin1";)', '\\1(char*)\\2', 1L),
           
           replace = list("^(\\s*)int\\sdebug\\s*=\\s*(.*?);", "\\1int debugmode = \\2;", 1L),
-          replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L)
+          replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L)
 
         ),
         
