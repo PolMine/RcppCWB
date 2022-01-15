@@ -1517,6 +1517,9 @@ PatchEngine <- R6Class(
           delete_line_before = list("makeall_do_attribute\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", 1L, 1L),
           insert_before = list("makeall_do_attribute\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", "int", 1L),
           
+          delete_line_before = list("makeall_make_component\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", 1L, 1L),
+          insert_before = list("makeall_make_component\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", "int", 1L),
+          
           delete_line_before = list("^Corpus\\s\\*corpus;", 1L, 1L),
           delete_line_beginning_with = list("/\\*\\*\\sName\\sof\\sthis\\sprogram\\s\\*/", 1L, 1L),
           
