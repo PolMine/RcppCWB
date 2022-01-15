@@ -1416,7 +1416,10 @@ PatchEngine <- R6Class(
             "^(\\s*decompress_check_reversed_index\\(Attribute\\s\\*attr,\\schar\\s\\*output_fn)\\)",
             "\\1, char *corpus_id, int debug)",
             1L
-          )
+          ),
+          replace = list("^(\\s*)(if\\s\\(debug_output\\s\\!=\\sstderr\\))", "\\1/* \\s */", 1L),
+          replace = list("^(\\s*)fclose\\(debug_output\\);", "\\1/* \\2 */", 1L)
+
           
           # /*
           #   * MODIFICATIONS
