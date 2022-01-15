@@ -1352,7 +1352,7 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)int\\srange_ptr\\s*=.*?;", "\\1extern int range_ptr;", 1L),
           replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
           replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
-          replace = list("^(\\s*)int\\swattr_ptr\\s=\\s0;", "\\1extern wattr_ptr;", 1L),
+          replace = list("^(\\s*)int\\swattr_ptr\\s=\\s0;", "\\1extern int wattr_ptr;", 1L),
           
           delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
           
@@ -1389,7 +1389,7 @@ PatchEngine <- R6Class(
           replace = list('^(#define\\sFIELDSEPS\\s*)(".*?")', '\\1(char*)\\2', 1L),
           replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)("latin1";)', '\\1(char*)\\2', 1L),
           
-          replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
+          replace = list("^(\\s*)int\\sdebug\\s*=\\s*(.*?);", "\\1int debugmode = \\2;", 1L),
           replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L)
 
         ),
