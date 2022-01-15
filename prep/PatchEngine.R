@@ -1286,7 +1286,7 @@ PatchEngine <- R6Class(
           replace = list("Pointer\\sto\\sthe\\snew\\sRange", "Pointer to the new SAttEncoder", 1L),
           
           replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
-          replace = list("^(\\s*)encode_print_time\\(stderr,\\s*", "\\1encode_print_time(", 1L),
+          replace = list("^(\\s*)encode_print_time\\(stderr,\\s*", "\\1encode_print_time(", 1L, NA),
           
           delete_line_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", 1L, 1L),
           insert_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", "int", 1L),
