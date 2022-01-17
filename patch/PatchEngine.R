@@ -1584,7 +1584,7 @@ PatchEngine <- R6Class(
           delete_line_before = list(
             "\\*\\sValidates\\sthe\\sREVCORP\\scomponent\\sof\\sthe\\sgiven\\sattribute\\.",
             1L,
-            if (revision >= 1690) 5L else 6L,
+            if (revision >= 1690) 5L else 6L
             ),
           insert_before = list(
             "\\*\\sValidates\\sthe\\sREVCORP\\scomponent\\sof\\sthe\\sgiven\\sattribute\\.",
