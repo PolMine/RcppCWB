@@ -1333,7 +1333,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
             replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
             replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
-            replace = list("^(\\s*)char\\s\\*(corpus|encoding)_character_set\\s*=.*?;", "\\1extern char *\\2_character_set;", 1L), # 1069 encoding_character_set!
+            replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
             replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
             
@@ -1365,9 +1365,7 @@ PatchEngine <- R6Class(
             delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
             
             replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
-            replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA),
-            replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1", NA),
-            replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
+            replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA)
           ),
           if (revision == 1069) list(
             replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
@@ -1414,12 +1412,15 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)int\\srange_ptr\\s*=.*?;", "\\1extern int range_ptr;", 1L),
             replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
             replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
-            replace = list("^(\\s*)int\\swattr_ptr\\s=\\s0;", "\\1extern int wattr_ptr;", 1L)
+            replace = list("^(\\s*)int\\swattr_ptr\\s=\\s0;", "\\1extern int wattr_ptr;", 1L),
+            replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1", NA),
+            replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
             
           ),
           if (revision >= 1690) list(
+            replace = list("^(\\s*)char\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
-            replace = list("^(\\s*)int\\sint\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
+            replace = list("^(\\s*)int\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
             replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute", 1L)
           )
         ),
@@ -1436,7 +1437,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L)
           ),
           
-          if (revision <= 1690) list(
+          if (revision < 1690) list(
             # things that are different in the later revision
             replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
             replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
@@ -1502,7 +1503,6 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 1L), 
             replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
             replace = list("^(\\s*putc\\(\\(i\\s%\\s3\\)\\s==\\s0\\s\\?\\s'\\|'\\s:\\s'\\s',\\sprotocol\\);)", "\\1 */", 1L),
-            replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
             
             # return value of decode_check_huff turned into 'int'
             # corpus_id is passed explicitly into decode_check_huff
@@ -1514,16 +1514,18 @@ PatchEngine <- R6Class(
             
             # int return value. not void
             replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L),
-            replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L), # deliberately a second time!
             
             extern = list("Corpus *corpus;"),
             
             delete_line_before = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, 37L),
             
             # Functions usage() and main() deleted
-            delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, NA)
+            delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, NA)
           ),
           if (revision < 1690) list(
+            replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
+            replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L), # deliberately a second time!
+            
             replace = list("^(\\s*)int\\snode,\\sdepth;", "\\1/* int node, depth; */", 1L),
             replace = list("^(\\s*)node\\s=\\s1;", "\\1/* node = 1; */", 1L),
             replace = list("^(\\s*)depth\\s=\\s0;", "\\1/* depth = 0; */", 1L),
@@ -1535,7 +1537,7 @@ PatchEngine <- R6Class(
         "src/cwb/utils/cwb-makeall.c" = list(
           
           insert_before = list(
-            '#include\\s"\\.\\./cl/globals\\.h"',
+            '#include\\s"\\.\\./cl/(cwb-|)globals\\.h"',
             c(
               "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
               "",
