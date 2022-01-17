@@ -10,7 +10,7 @@ extern "C" {
 /*  #include "cqp.h" */
 /*  #include "corpmanag.h" */
   #include "server.h"
-  #include "globalvars.h"
+  #include "_globalvars.h"
   #include "_eval.h"
 }
 
