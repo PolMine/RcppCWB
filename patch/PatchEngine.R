@@ -1362,7 +1362,7 @@ PatchEngine <- R6Class(
             
             replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
             replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA),
-            replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1,", NA),
+            replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1", NA),
             replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
           ),
           if (revision == 1069) list(
