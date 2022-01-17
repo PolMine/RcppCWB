@@ -12,8 +12,8 @@ extern "C" {
 
   /* includes for utils */
   #include <attributes.h>
-  #include "cwb/utils/utils.h"
   #include "cwb/utils/globals.h"
+  #include "cwb/utils/utils.h"
 }
 
 #include <Rcpp.h>
