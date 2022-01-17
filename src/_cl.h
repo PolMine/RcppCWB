@@ -117,7 +117,7 @@
  */
 
 
-
+char* cl_get_version();
 
 /* The actual code of the header file begins here. */
 
