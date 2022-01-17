@@ -1277,95 +1277,93 @@ PatchEngine <- R6Class(
         
         "src/cwb/utils/cwb-encode.c" = c(
           list(
-            insert_before = c(
-              # leaves things somewhere in between in r1069 - but does not matter (?)
-              list(
-                "^#include\\s<ctype.h>",
-                c(
-                  "/* included by AB to ensure that winsock2.h is included before windows.h */",
-                  "#ifdef __MINGW__",
-                  "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */",
-                  "#endif",
-                  ""
-                ),
-                1L
+            # leaves things somewhere in between in r1069 - but does not matter (?)
+            insert_before = list(
+              "^#include\\s<ctype.h>",
+              c(
+                "/* included by AB to ensure that winsock2.h is included before windows.h */",
+                "#ifdef __MINGW__",
+                "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */",
+                "#endif",
+                ""
               ),
-              
-              
-              delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L), # purely cosmetic
-              insert_before = list(
-                "^/\\*\\s-*\\s\\*/",
-                c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
-                1L
-              ),
-              
-              replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
-              
-              replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
-              replace = list("^(\\s*)encode_print_time\\(stderr,\\s*", "\\1encode_print_time(", NA),
-              
-              # return value of encode_error should be 'int' (not 'void') - stable 1069-1690
-              delete_line_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", 1L, 1L),
-              insert_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", "int", 1L),
-              
-              replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
-              
-              replace = list('^(\\s*)(progname\\s=\\s.*?;)\\s*$', "\\1/* \\s */", 1L),
-              
-              # extern variables
-              replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
-              replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
-              replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
-              replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L),
-              replace = list("^(\\s*)int\\sverbose\\s*=.*?;", "\\1extern int verbose;", 1L),
-              replace = list("^(\\s*)int\\sxml_aware\\s*=.*?;", "\\1extern int xml_aware;", 1L),
-              replace = list("^(\\s*)int\\sskip_empty_lines\\s*=.*?;", "\\1extern int skip_empty_lines;", 1L),
-              replace = list("^(\\s*)unsigned\\sline\\s*=.*?;", "\\1extern unsigned line;", 1L),
-              replace = list("^(\\s*)int\\sstrip_blanks\\s*=.*?;", "\\1extern int strip_blanks;", 1L),
-              replace = list("^(\\s*)cl_string_list\\sinput_files\\s*=.*?;", "\\1extern cl_string_list input_files;", 1L),
-              replace = list("^(\\s*)int\\snr_input_files\\s*=.*?;", "\\1extern int nr_input_files;", 1L),
-              replace = list("^(\\s*)int\\scurrent_input_file\\s*=.*?;", "\\1extern int current_input_file;", 1L),
-              replace = list("^(\\s*)char\\s\\*current_input_file_name\\s*=.*?;", "\\1extern char *current_input_file_name;", 1L),
-              replace = list("^(\\s*)FILE\\s\\*input_(fd|fh)\\s*=.*?;", "\\1extern FILE *input_\\2;", 1L),
-              replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
-              replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
-              replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
-              replace = list("^(\\s*)char\\s\\*(corpus|encoding)_character_set\\s*=.*?;", "\\1extern char *\\s_character_set;", 1L), # 1069 encoding_character_set!
-              replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
-              replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
-              
-              
-              delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
-              
-              replace = list("\\(\\!(\\s*)silent", "(!\\1quietly", NA),
-              replace = list("\\(debug\\)", "(debugmode)", NA),
-              
-              replace = list("register\\s+", "", NA), # not well understood
-              
-              delete_line_before = list("^encode_usage\\(void\\)\\s*$", 1L, 4L), # stable r1069/r1690
-              delete_line_beginning_with = list(
-                "^encode_usage\\(void\\)\\s*$",
-                1L,
-                if (revision == 1069) 72L else 78L # longer in revision 1690!
-              ),
-              
-              delete_line_before = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 10L), # r1069 and r1690
-              delete_line_beginning_with = list(
-                "^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$",
-                1L,
-                if (revision == 1069) 237L else 279L
-              ), 
-              
-              # turn main() into function cwb_encode_worker()
-              delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
-              insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list dir_files){"), 1L),
-              delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
-              
-              replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
-              replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA),
-              replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1,", NA),
-              replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
-            )
+              1L
+            ),
+            
+            
+            delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L), # purely cosmetic
+            insert_before = list(
+              "^/\\*\\s-*\\s\\*/",
+              c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+              1L
+            ),
+            
+            replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
+            
+            replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
+            replace = list("^(\\s*)encode_print_time\\(stderr,\\s*", "\\1encode_print_time(", NA),
+            
+            # return value of encode_error should be 'int' (not 'void') - stable 1069-1690
+            delete_line_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", 1L, 1L),
+            insert_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", "int", 1L),
+            
+            replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
+            
+            replace = list('^(\\s*)(progname\\s=\\s.*?;)\\s*$', "\\1/* \\s */", 1L),
+            
+            # extern variables
+            replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
+            replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
+            replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
+            replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L),
+            replace = list("^(\\s*)int\\sverbose\\s*=.*?;", "\\1extern int verbose;", 1L),
+            replace = list("^(\\s*)int\\sxml_aware\\s*=.*?;", "\\1extern int xml_aware;", 1L),
+            replace = list("^(\\s*)int\\sskip_empty_lines\\s*=.*?;", "\\1extern int skip_empty_lines;", 1L),
+            replace = list("^(\\s*)unsigned\\sline\\s*=.*?;", "\\1extern unsigned line;", 1L),
+            replace = list("^(\\s*)int\\sstrip_blanks\\s*=.*?;", "\\1extern int strip_blanks;", 1L),
+            replace = list("^(\\s*)cl_string_list\\sinput_files\\s*=.*?;", "\\1extern cl_string_list input_files;", 1L),
+            replace = list("^(\\s*)int\\snr_input_files\\s*=.*?;", "\\1extern int nr_input_files;", 1L),
+            replace = list("^(\\s*)int\\scurrent_input_file\\s*=.*?;", "\\1extern int current_input_file;", 1L),
+            replace = list("^(\\s*)char\\s\\*current_input_file_name\\s*=.*?;", "\\1extern char *current_input_file_name;", 1L),
+            replace = list("^(\\s*)FILE\\s\\*input_(fd|fh)\\s*=.*?;", "\\1extern FILE *input_\\2;", 1L),
+            replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
+            replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
+            replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
+            replace = list("^(\\s*)char\\s\\*(corpus|encoding)_character_set\\s*=.*?;", "\\1extern char *\\s_character_set;", 1L), # 1069 encoding_character_set!
+            replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
+            replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
+            
+            
+            delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
+            
+            replace = list("\\(\\!(\\s*)silent", "(!\\1quietly", NA),
+            replace = list("\\(debug\\)", "(debugmode)", NA),
+            
+            replace = list("register\\s+", "", NA), # not well understood
+            
+            delete_line_before = list("^encode_usage\\(void\\)\\s*$", 1L, 4L), # stable r1069/r1690
+            delete_line_beginning_with = list(
+              "^encode_usage\\(void\\)\\s*$",
+              1L,
+              if (revision == 1069) 72L else 78L # longer in revision 1690!
+            ),
+            
+            delete_line_before = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 10L), # r1069 and r1690
+            delete_line_beginning_with = list(
+              "^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$",
+              1L,
+              if (revision == 1069) 237L else 279L
+            ), 
+            
+            # turn main() into function cwb_encode_worker()
+            delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
+            insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list dir_files){"), 1L),
+            delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
+            
+            replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
+            replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA),
+            replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1,", NA),
+            replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
           ),
           if (revision == 1069) list(
             replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
