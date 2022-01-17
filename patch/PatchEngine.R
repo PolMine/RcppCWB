@@ -1311,6 +1311,8 @@ PatchEngine <- R6Class(
             
             replace = list('^(\\s*)(progname\\s=\\s.*?;)\\s*$', "\\1/* \\s */", 1L),
             
+            replace = list("^(\\s*)char\\s\\*progname\\s=\\s(.*?);", "\\1/* char *progname = \\2; */", 1L),
+            
             # extern variables
             replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
             replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
