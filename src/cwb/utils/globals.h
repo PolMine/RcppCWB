@@ -70,7 +70,7 @@ int clean_strings = 0;                  /**< clean up input strings by replacing
  *
  * TODO should probably be called an SAttr or SAttEncoder or something.
  */
-typedef struct _Range {
+typedef struct _SAttEncoder {
   char *dir;                    /**< directory where this s-attribute is stored */
   char *name;                   /**< name of the s-attribute (range) */
 
@@ -90,14 +90,14 @@ typedef struct _Range {
   cl_lexhash lh;                /**< lexicon hash for attribute values */
 
   int has_children;             /**< whether attribute values of XML elements are stored in s-attribute 'children' */
-  cl_lexhash el_attributes;     /**< maps XML element attribute names to the appropriate s-attribute 'children' (Range *) */
+  cl_lexhash el_attributes;     /**< maps XML element attribute names to the appropriate s-attribute 'children' (SAttEncoder *) */
   cl_string_list el_atts_list;  /**< list of declared element attribute names, required by range_close() function */
   cl_lexhash el_undeclared_attributes; /**< remembers undeclared element attributes, so warnings will be issued only once */
 
   int max_recursion;            /**< maximum auto-recursion level; 0 = no recursion (maximal regions), -1 = assume flat structure */
   int recursion_level;          /**< keeps track of level of embedding when auto-recursion is activated */
   int element_drop_count;       /**< count how many recursive subelements were dropped because of the max_recursion limit */
-  struct _Range **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
+  struct _SAttEncoder **recursion_children;   /**< (usually very short) list of s-attribute 'children' for auto-recursion;
                                              use as array; recursion_children[0] points to self! */
 
   int is_open;                  /**< boolean: whether there is an open structure at the moment */
@@ -106,10 +106,10 @@ typedef struct _Range {
 
   int num;                      /**< number of current (if this->is_open) or next structure */
 
-} Range;
+} SAttEncoder;
 
 /** A global array for keeping track of S-attributes being encoded. */
-Range ranges[MAXRANGES];
+SAttEncoder ranges[MAXRANGES];
 /** @see ranges */
 int range_ptr = 0;
 
