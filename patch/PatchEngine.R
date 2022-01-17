@@ -967,19 +967,19 @@ PatchEngine <- R6Class(
               '#include "corpmanag.h"',
               if (revision >= 1690) '#include "symtab.h"' else '',
               '',
-              'typedef struct _label_entry {',
-              '  int        flags;',
-              '  char      *name;',
-              '  int        ref;             /**< array index the label refers to */',
-              '    struct _label_entry *next;',
-              '} *LabelEntry;',
-              '',
-              'typedef struct _symbol_table {',
-              '  LabelEntry  user;                /**< user namespace */',
-              '    LabelEntry  rdat;                /**< namespace for LAB_RDAT labels */',
-              '    int next_index;                  /**< next free reference table index */',
-              '} *SymbolTable;',
-              '',
+              if (revision < 1690) c('typedef struct _label_entry {',
+                '  int        flags;',
+                '  char      *name;',
+                '  int        ref;             /**< array index the label refers to */',
+                '    struct _label_entry *next;',
+                '} *LabelEntry;',
+                '',
+                'typedef struct _symbol_table {',
+                '  LabelEntry  user;                /**< user namespace */',
+                '    LabelEntry  rdat;                /**< namespace for LAB_RDAT labels */',
+                '    int next_index;                  /**< next free reference table index */',
+                '} *SymbolTable;',
+                '') else c(),
               'typedef struct dfa {',
               '  int Max_States;         /**< max number of states of the current dfa;',
               '  state no. 0 is the initial state.             */',
@@ -996,12 +996,12 @@ PatchEngine <- R6Class(
             1L
           ),
           replace = list("^\\s*Boolean\\seval_bool\\(Constrainttree\\sctptr,\\sRefTab\\srt,\\sint\\scorppos\\);", "", 1L),
-          replace = list("^#endif.*$", "", 1L)
-          ),
-          if (revision == 1069) list(
-            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
-            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
-            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+          replace = list("^#endif.*$", "", 1L),
+          
+          replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
+          replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
+          replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+          
           )
         ),
         
