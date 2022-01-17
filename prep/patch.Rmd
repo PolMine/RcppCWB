@@ -27,7 +27,7 @@ library(R6)
 ## Loading and configuring the PatchEngine
 
 ```{r load_code_and_data}
-source("~/Lab/github/RcppCWB/prep/PatchEngine.R")
+source("~/Lab/github/RcppCWB/patch/PatchEngine.R")
 ```
 
 
