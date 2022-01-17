@@ -1329,7 +1329,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
             replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
             replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
-            replace = list("^(\\s*)char\\s\\*(corpus|encoding)_character_set\\s*=.*?;", "\\1extern char *\\1_character_set;", 1L), # 1069 encoding_character_set!
+            replace = list("^(\\s*)char\\s\\*(corpus|encoding)_character_set\\s*=.*?;", "\\1extern char *\\2_character_set;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
             replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
             
