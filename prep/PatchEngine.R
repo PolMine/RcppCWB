@@ -1402,7 +1402,7 @@ PatchEngine <- R6Class(
           replace = list('^FILE\\s\\*debug_output;', "/* FILE *debug_output; */", 1L),
           replace = list("^int\\sdebug\\s=\\s0;", "/* extern int debug = 0; */", 1L),
           
-          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
+          replace = list("^(\\s*)exit\\(.*?\\);", "\\1return 1;", NA),
           extern = list("Corpus *corpus;"),
           
           
@@ -1424,8 +1424,8 @@ PatchEngine <- R6Class(
             "\\1, char *corpus_id, int debug)",
             1L
           ),
-          replace = list("^(\\s*)(if\\s\\(debug_output\\s\\!=\\sstderr\\))", "\\1/* \\1 */", 1L),
-          replace = list("^(\\s*)fclose\\(debug_output\\);", "\\1/* \\2 */", 1L)
+          replace = list("^(\\s*)(if\\s\\(debug_output\\s\\!=\\sstderr\\))", "\\1/* \\2 */", 1L),
+          replace = list("^(\\s*)(fclose\\(debug_output\\));", "\\1/* \\2 */", 1L)
         ),
         
         "src/cwb/utils/cwb-huffcode.c" = list(
