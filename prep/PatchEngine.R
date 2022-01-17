@@ -194,7 +194,7 @@ PatchEngine <- R6Class(
       
       file.copy(
         from = file.path(self$repodir, "src", "cwb", "cl", "cl.h"),
-        to = file.path(self$repodir, "src", "cl_min.h"),
+        to = file.path(self$repodir, "src", "_cl.h"),
         overwrite = TRUE
       )
       
@@ -1594,7 +1594,7 @@ PatchEngine <- R6Class(
         #   if (revision > 1330) list(replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L))
         # ),
         
-        "src/cl_min.h" = list(
+        "src/_cl.h" = list(
           replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
         )
       )
@@ -1737,7 +1737,7 @@ PatchEngine <- R6Class(
 
       if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
       git2r::add(repo = self$repodir, path = "src/cwb/*")
-      git2r::add(repo = self$repodir, path = "src/cl_min.h")
+      git2r::add(repo = self$repodir, path = "src/_cl.h")
       git2r::add(repo = self$repodir, path = "src/_eval.h")
       git2r::add(repo = self$repodir, path = "src/globalvars.h")
       if (self$verbose) message("Commit: ", self$repodir)
