@@ -1435,7 +1435,6 @@ PatchEngine <- R6Class(
           replace = list("^char\\s\\*progname;", "/* char *progname; */", 1L),
           replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 1L),
           replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
-          replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
           replace = list("^(\\s*putc\\(\\(i\\s%\\s3\\)\\s==\\s0\\s\\?\\s'\\|'\\s:\\s'\\s',\\sprotocol\\);)", "\\1 */", 1L),
           replace = list("^(\\s*)int\\snode,\\sdepth;", "\\1/* int node, depth; */", 1L),
           replace = list("^(\\s*)node\\s=\\s1;", "\\1/* node = 1; */", 1L),
