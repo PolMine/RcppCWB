@@ -206,7 +206,7 @@ PatchEngine <- R6Class(
     },
     
     create_globalvars_file = function(){
-      if (self$verbose) message("Create globalvars.h ... ", appendLF = FALSE)
+      if (self$verbose) message("Create _globalvars.h ... ", appendLF = FALSE)
       
       externed <- c(
         "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
@@ -215,7 +215,7 @@ PatchEngine <- R6Class(
 
       externed <- externed[!externed %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
       
-      writeLines(text = externed, con = file.path(self$repodir, "src", "globalvars.h"))
+      writeLines(text = externed, con = file.path(self$repodir, "src", "_globalvars.h"))
       message("OK")
     },
     
@@ -1589,11 +1589,6 @@ PatchEngine <- R6Class(
           replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
         ),
         
-        # "src/globalvars.h" = c(
-        #   list(),
-        #   if (revision > 1330) list(replace = list("^enum\\s*_matching_strategy.*?\\smatching_strategy;\\s*$", "MatchingStrategy matching_strategy;", 1L))
-        # ),
-        
         "src/_cl.h" = list(
           replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
         )
@@ -1739,7 +1734,7 @@ PatchEngine <- R6Class(
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       git2r::add(repo = self$repodir, path = "src/_cl.h")
       git2r::add(repo = self$repodir, path = "src/_eval.h")
-      git2r::add(repo = self$repodir, path = "src/globalvars.h")
+      git2r::add(repo = self$repodir, path = "src/_globalvars.h")
       if (self$verbose) message("Commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
       self$patch_commit <- last_commit(self$repository)
