@@ -383,7 +383,7 @@ PatchEngine <- R6Class(
     },
     
     configure_global_replacements = function(revision){
-      list(
+      replacements <- list(
         
         # In revision 1690, there are further targets dst->stream, outfh, tmp, fh
         if (revision == 1069){
@@ -405,6 +405,8 @@ PatchEngine <- R6Class(
 #        c("^(\\s*)exit\\(1\\);", "\\1return 1;")
         
       )
+      for (i in which(sapply(replacements, is.null) == TRUE)) replacements[[i]] <- NULL
+      replacements
     },
     
     # Order to maintain:
