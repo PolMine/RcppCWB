@@ -941,13 +941,13 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/eval.h" = c(
-          list(),
-          # No matches for 'int delete' in revision 1690
-          if (revision == 1069) list(
+          list(
             replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 3),
             replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 2),
-            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1),
-            
+            replace = list("^(\\s*)int(\\s+)delete;", "\\1int\\2del;", 1)
+          ),
+          # No matches for 'int delete' in revision 1690
+          if (revision == 1069) list(
             # global variables prepended by "extern"
             extern = list(
               "int eep;", # no match in r1690
@@ -965,6 +965,7 @@ PatchEngine <- R6Class(
             "^/\\*\\*\\sNumber\\sof\\sAVStructures",
             c(
               '#include "corpmanag.h"',
+              if (revision >= 1690) '#include "symtab.h"' else '',
               '',
               'typedef struct _label_entry {',
               '  int        flags;',
