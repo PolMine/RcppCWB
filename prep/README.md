@@ -18,6 +18,10 @@ gcc -c makeheaders.c
 gcc makeheaders.o -o makeheaders
 ```
 
+## Notes
+
+- We do not patch the general Makefile but copy a manually patched version of r1069: The diffs between r1069 and r1690 show differences with new targets, but not relevant here.
+- The Makefile utils/Makefile is copied in - r1690 has better verbosity but does not change substantially anything
 
 
 

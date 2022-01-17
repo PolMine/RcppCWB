@@ -96,7 +96,7 @@ PatchEngine <- R6Class(
     
     cwb_fresh_copy = function(){
       
-      if (self$verbose) message("Copy unaltered CWB code into RcppCWB repository ...", appendLF = FALSE)
+      if (self$verbose) message("* copy unaltered CWB code into RcppCWB repository ... ", appendLF = FALSE)
       
       self$patchbranch <- sprintf("r%d", self$svn_get_revision()) # name of new branch
       
@@ -142,7 +142,7 @@ PatchEngine <- R6Class(
     #' registry.tab.h, registry.y)
     run_bison_flex = function(){
       
-      if (self$verbose) message("Run bison and flex parsers")
+      if (self$verbose) message("* run bison and flex parsers")
       
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
       old_wd <- setwd(path(cwb_pkg_dir, "cl"))
@@ -158,7 +158,7 @@ PatchEngine <- R6Class(
     
     rename_files = function(){
       
-      if (self$verbose) message("Rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)")
+      if (self$verbose) message("* rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)")
       
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
       file.rename(
@@ -174,7 +174,7 @@ PatchEngine <- R6Class(
     },
     
     copy_files = function(){
-      if (self$verbose) message("Add newly created files to CWB code (overwriting existing files)")
+      if (self$verbose) message("* add newly created files to CWB code (overwriting existing files)")
       new_files <- list.files(path = file.path(self$repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
       for (fname in new_files){
         if (self$verbose) message("... copy file: ", fname)
@@ -184,7 +184,7 @@ PatchEngine <- R6Class(
     },
     
     create_copy = function(){
-      if (self$verbose) message ("Create utils/globals.h as a copy of cwb-encode.c")
+      if (self$verbose) message ("* create utils/globals.h as a copy of cwb-encode.c")
       
       file.copy(
         from = file.path(self$repodir, "src", "cwb", "utils", "cwb-encode.c"),
@@ -206,7 +206,7 @@ PatchEngine <- R6Class(
     },
     
     create_globalvars_file = function(){
-      if (self$verbose) message("Create _globalvars.h ... ", appendLF = FALSE)
+      if (self$verbose) message("* create _globalvars.h ... ", appendLF = FALSE)
       
       externed <- c(
         "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
@@ -221,14 +221,14 @@ PatchEngine <- R6Class(
     
 
     create_dummy_depend_files = function(){
-      if (self$verbose) message("Create dummy depend.mk files ...")
+      if (self$verbose) message("* create dummy depend.mk files ...")
       cat("\n", file = file.path(self$repodir, "src", "cwb", "cl", "depend.mk"))
       cat("\n", file = file.path(self$repodir, "src", "cwb", "cqp", "depend.mk"))
       invisible(self)
     },
     
     replace_globally = function(){
-      if (self$verbose) message("Perform global replacements ...")
+      if (self$verbose) message("* perform global replacements ...")
       cwb_pkg_dir <- file.path(self$repodir, "src", "cwb")
       
       files <- c(
@@ -1595,7 +1595,7 @@ PatchEngine <- R6Class(
     },
     
     make_utils_header = function(){
-      message("... create header file utils.h ...", appendLF = FALSE)
+      message("* create header file utils.h ... ", appendLF = FALSE)
       utils <- c("cwb-encode.c", "cwb-compress-rdx.c", "cwb-huffcode.c", "cwb-makeall.c")
       
       h_li <- lapply(
@@ -1652,12 +1652,12 @@ PatchEngine <- R6Class(
       missing_files_with_actions <- files_with_actions[!files_with_actions %in% cwb_files]
       
       if (length(missing_files_with_actions) > 0L){
-        message("Actions defined for the following files, but file not present:")
+        message("* actions defined for the following files, but file not present:")
         for (f in missing_files_with_actions) message("- ", f)
       }
       
       results <- sapply(names(self$file_patches), self$patch_file)
-      if (self$verbose) message("Number of files successfully patched: ", table(results)[["TRUE"]])
+      if (self$verbose) message("* number of files successfully patched: ", table(results)[["TRUE"]])
     },
     
     get_difflist = function(){
@@ -1729,17 +1729,16 @@ PatchEngine <- R6Class(
       self$create_globalvars_file()
       self$diff_file_patches <- self$get_difflist()
 
-      if (self$verbose) message("Add new and altered files to HEAD in repo: ", self$repodir)
+      if (self$verbose) message("* add new and altered files to HEAD")
       git2r::add(repo = self$repodir, path = "src/cwb/*")
       git2r::add(repo = self$repodir, path = "src/_cl.h")
       git2r::add(repo = self$repodir, path = "src/_eval.h")
       git2r::add(repo = self$repodir, path = "src/_globalvars.h")
-      if (self$verbose) message("Commit: ", self$repodir)
+      if (self$verbose) message("* commit: ", self$repodir)
       commit(self$repository, message = "CWB patched")
       self$patch_commit <- last_commit(self$repository)
-      if (self$verbose) message("Story to be told")
-      
-      if (self$verbose) message("Return to branch of departure: ", self$branch_of_departure)
+
+      if (self$verbose) message("return to branch of departure: ", self$branch_of_departure)
       checkout(repo = self$repodir, branch = self$branch_of_departure)
       invisible(self)
     }
