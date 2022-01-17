@@ -2,8 +2,7 @@
 #'
 #' Flag -fcommon removed from config and config/platform/linux again
 #' @examples 
-#' data_files <- list.files("~/Lab/github/RcppCWB/prep/autopatch/data", full.names = TRUE)
-#' for (fname in data_files) source(fname)
+#' source("~/Lab/github/RcppCWB/patch/PatchEngine.R")
 #' 
 #' P <- PatchEngine$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
@@ -175,10 +174,10 @@ PatchEngine <- R6Class(
     
     copy_files = function(){
       if (self$verbose) message("* add newly created files to CWB code (overwriting existing files)")
-      new_files <- list.files(path = file.path(self$repodir, "prep", "cwb"), full.names = TRUE, recursive = TRUE)
+      new_files <- list.files(path = file.path(self$repodir, "patch", "cwb"), full.names = TRUE, recursive = TRUE)
       for (fname in new_files){
         if (self$verbose) message("... copy file: ", fname)
-        file.copy(from = fname, to = gsub("/prep/", "/src/", fname), overwrite = TRUE)
+        file.copy(from = fname, to = gsub("/patch/", "/src/", fname), overwrite = TRUE)
       }
       invisible(self)
     },
