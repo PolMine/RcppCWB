@@ -241,10 +241,8 @@ PatchEngine <- R6Class(
       )
 
       for (f in files){
-        print(f)
         code <- readLines(f)
         for (i in 1L:length(self$global_replacements)){
-          print(i)
           if (length(self$global_replacements[[i]]) > 2L){
             if (endsWith(f, self$global_replacements[[i]][[3]])) next
           }
@@ -476,7 +474,7 @@ PatchEngine <- R6Class(
           replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
           replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
           remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L),
-          remove_lines = list('^@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
+          remove_lines = list('^\\s*@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
         ),
         
         "src/cwb/cl/attributes.c" = c(
@@ -873,7 +871,7 @@ PatchEngine <- R6Class(
           replace = list("all:\\s\\$\\(PROGRAMS\\)", "all: libcqp.a", 1L),
           replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
           remove_lines = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L),
-          remove_lines = list('^@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
+          remove_lines = list('^\\s*@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
         ),
         
         "src/cwb/cqp/hash.c" = c(
