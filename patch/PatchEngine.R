@@ -674,7 +674,20 @@ PatchEngine <- R6Class(
         
         "src/cwb/cl/globals.c" = list(
           # stable r10690 - r1690
-          insert_after = list('^#include\\s"globals\\.h"', "void Rprintf(const char *, ...);")
+          insert_after = list(
+            '^#include\\s"globals\\.h"',
+            c(
+              "void Rprintf(const char *, ...);",
+              "",
+              "char* cl_get_version(){",
+              "  #ifdef VERSION",
+              "  char* version = VERSION;",
+              "  #else",
+              '  char* version = "";',
+              "  #endif",
+              "  return version;"
+            )
+          )
         ),
         
         "src/cwb/cl/ngram-hash.c" = c(
@@ -1589,7 +1602,8 @@ PatchEngine <- R6Class(
         ),
         
         "src/_cl.h" = list(
-          replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L)
+          replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L),
+          insert_after = list("\\s*#endif\\s/\\*\\sifndef\\s_cwb_cl_h_\\s\\*/\\s*", c("", "char* cl_get_version();"), 1L)
         )
       )
     },

@@ -18,6 +18,15 @@
 #include "globals.h"
 void Rprintf(const char *, ...);
 
+char* cl_get_version(){
+#ifdef VERSION
+  char* version = VERSION;
+#else 
+  char* version = "";
+#endif
+  return version;
+}
+
 /**
  *  global configuration variable: debug level.
  *
@@ -87,13 +96,4 @@ cl_set_memory_limit(int megabytes) {
   else {
     cl_memory_limit = megabytes;
   }
-}
-
-char* cl_get_version(){
-  #ifdef VERSION
-    char* version = VERSION;
-  #else 
-    char* version = "";
-  #endif
-  return version;
 }
