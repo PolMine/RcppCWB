@@ -1526,7 +1526,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)node\\s=\\s1;", "\\1/* node = 1; */", 1L),
             replace = list("^(\\s*)depth\\s=\\s0;", "\\1/* depth = 0; */", 1L),
             replace = list("^(\\s*)int\\snr_codes\\s=\\s0;", "\\1/* int nr_codes = 0; */", 1L),
-            replace = list("^(\\s*)nr_codes\\s=\\s0;", "\\1/* nr_codes = 0; */", 1L),
+            replace = list("^(\\s*)nr_codes\\s=\\s0;", "\\1/* nr_codes = 0; */", 1L)
           )
         ),
 
