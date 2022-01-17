@@ -1648,8 +1648,8 @@ PatchEngine <- R6Class(
     patch_files = function(){
       
       files_with_actions <- fs::path(path.expand(self$repodir), names(self$file_patches))
-      cwb_files <- list.files(path = path(self$repodir, "src", "cwb"), full.names = TRUE, recursive = TRUE)
-      missing_files_with_actions <- files_with_actions[!files_with_actions %in% cwb_files]
+      src_files <- list.files(path = path(self$repodir, "src"), full.names = TRUE, recursive = TRUE)
+      missing_files_with_actions <- files_with_actions[!files_with_actions %in% src_files]
       
       if (length(missing_files_with_actions) > 0L){
         message("* actions defined for the following files, but file not present:")
