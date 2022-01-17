@@ -241,8 +241,10 @@ PatchEngine <- R6Class(
       )
 
       for (f in files){
+        print(f)
         code <- readLines(f)
         for (i in 1L:length(self$global_replacements)){
+          print(i)
           if (length(self$global_replacements[[i]]) > 2L){
             if (endsWith(f, self$global_replacements[[i]][[3]])) next
           }
