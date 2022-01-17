@@ -1333,7 +1333,6 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
             replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
             replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
-            replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
             replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
             
@@ -1409,6 +1408,8 @@ PatchEngine <- R6Class(
               1L, 1L
             ),
             
+            replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L),
+            
             replace = list("^(\\s*)int\\srange_ptr\\s*=.*?;", "\\1extern int range_ptr;", 1L),
             replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
             replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
@@ -1418,7 +1419,7 @@ PatchEngine <- R6Class(
             
           ),
           if (revision >= 1690) list(
-            replace = list("^(\\s*)char\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
+            replace = list("^(\\s*)const\\schar\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern const char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
             replace = list("^(\\s*)int\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
             replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute", 1L)
