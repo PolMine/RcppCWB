@@ -186,7 +186,7 @@ library(magrittr)</code></pre>
 </div>
 <div id="loading-and-configuring-the-patchengine" class="section level2">
 <h2>Loading and configuring the PatchEngine</h2>
-<pre class="r"><code>source(&quot;~/Lab/github/RcppCWB/prep/PatchEngine.R&quot;)</code></pre>
+<pre class="r"><code>source(&quot;~/Lab/github/RcppCWB/patch/PatchEngine.R&quot;)</code></pre>
 <pre class="r"><code>P &lt;- PatchEngine$new(
   cwb_dir_svn = &quot;~/Lab/tmp/cwb/trunk&quot;,
   repodir = &quot;~/Lab/github/RcppCWB&quot;,
@@ -208,11 +208,6 @@ library(magrittr)</code></pre>
 <pre><code>## Active revision of CWB SVN repository: 1069</code></pre>
 <pre><code>## * copy unaltered CWB code into RcppCWB repository ... 687 files copied
 ## * add newly created files to CWB code (overwriting existing files)
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/darwin-arm64
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_spark
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_x86
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/Makefile
-## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/Makefile
 ## * run bison and flex parsers
 ## * rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)
 ## * create dummy depend.mk files ...
