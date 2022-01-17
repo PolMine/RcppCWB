@@ -1278,3 +1278,5 @@ void cl_ngram_hash_print_stats(cl_ngram_hash hash, int max_n);
 */
 
 #endif /* ifndef _cwb_cl_h_ */
+
+char* cl_get_version();

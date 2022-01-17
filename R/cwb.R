@@ -157,3 +157,11 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
     s_attributes_noanno = s_attributes_noanno
   )
 }
+
+#' Get CWB version
+#' 
+#' Get the CWB version used and available when compiling the source code.
+#' 
+#' @export
+#' @return A length-one `character` vector.
+cwb_version <- function() .cwb_version()

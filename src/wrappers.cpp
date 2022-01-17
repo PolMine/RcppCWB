@@ -753,3 +753,10 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   nr_input_files = cwb_encode_worker(vrt_files);
   return nr_input_files;
 }
+
+// [[Rcpp::export(name=".cwb_version")]]
+Rcpp::StringVector cwb_version(){
+  Rcpp::StringVector result(1);
+  result(0) = cl_get_version();
+  return result;
+}
