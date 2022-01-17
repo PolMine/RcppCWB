@@ -685,7 +685,8 @@ PatchEngine <- R6Class(
               "  #else",
               '  char* version = "";',
               "  #endif",
-              "  return version;"
+              "  return version;",
+              "}"
             )
           )
         ),
@@ -1603,7 +1604,7 @@ PatchEngine <- R6Class(
         
         "src/_cl.h" = list(
           replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L),
-          insert_after = list("\\s*#endif\\s/\\*\\sifndef\\s_cwb_cl_h_\\s\\*/\\s*", c("", "char* cl_get_version();"), 1L)
+          insert_before = list("\\s*#endif\\s/\\*\\sifndef\\s_cwb_cl_h_\\s\\*/\\s*", c("", "char* cl_get_version();"), 1L)
         )
       )
     },
