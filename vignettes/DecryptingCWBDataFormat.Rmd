@@ -1,0 +1,337 @@
+---
+title: "Creating a CWB indexed corpus: 66 % Pure R"
+author: "Andreas Blaette"
+date: "2 2 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+## Introduction: Aims of this vignette
+
+This is a minimal example to explain the different files of a CWB indexed corpus. We re-create the REUTERS corpus included in this package, first, by carrying out the cwb-encode / cwb-makeall / cwb-huffcode procedure explained in the [`CWB Encoding Tutorial'](http://cwb.sourceforge.net/files/CWB_Encoding_Tutorial.pdf). Second we pursue a pure R approach, up to the point when [Huffman compression](https://en.wikipedia.org/wiki/Huffman_coding) begins. 
+
+
+## Some preparatory steps
+
+### Data: Decoding the REUTERS corpus
+
+To ensure that we work with data that is available to every user with a RcppCWB installation, we turn the indexed corpus into a character vector.
+
+```{r}
+library(RcppCWB)
+registry_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
+```
+
+To iterate through corpus positions (cpos), we need to now the corpus size first.
+
+```{r}
+no_tokens <- cl_attribute_size(
+  "REUTERS", attribute = "word", attribute_type = "p",
+  registry = registry_dir
+  )
+```
+
+Now we get the ids for all corpus positions first. Then we turn this into a character vector with the 'token stream' of the corpus.
+
+```{r}
+ids <- cl_cpos2id(
+  "REUTERS", p_attribute = "word", cpos = 0:(no_tokens - 1),
+  registry = registry_dir
+  )
+words <- cl_id2str(
+  "REUTERS", p_attribute = "word", id = ids,
+  registry = registry_dir
+)
+```
+
+Of course you could use any other corpus as an example! Note that we need a character vector of individual tokens. Consider the package 'tokenizers' splitting text into tokens.
+
+
+### Creating directories for our tests
+
+For our experiment, we create a set of temporary directories.
+
+```{r}
+cwb_dir <- tempdir()
+
+registry_dir <- file.path(cwb_dir, "registry") # the registry directory 
+cwb_data_dir <- file.path(cwb_dir, "cwb") # cwb-generated files
+R_data_dir <- file.path(cwb_dir, "R") # directory for R-generated files
+input_dir <- file.path(cwb_dir, "txt") # this is where we store input tokenstream
+
+dir.create(registry_dir)
+dir.create(cwb_data_dir)
+dir.create(R_data_dir)
+dir.create(input_dir)
+```
+
+```{r}
+input_txt_file <- file.path(input_dir, "corpus.vrt")
+cat(words, file = input_txt_file, sep = "\n")
+```
+
+
+## The indexing part
+
+```{r}
+corpus <- "reuters"
+p_attribute <- "word"
+```
+
+### Step 1: cwb-encode
+
+
+```{r}
+cmd <- c(
+  "cwb-encode",
+  "-vBs",
+  "-d", cwb_data_dir, # the directory where the binary files will reside
+  "-f", input_txt_file, # input file
+  "-R", file.path(registry_dir, corpus) # registry file
+)
+system(paste(cmd, collapse = " "))
+```
+
+So let is see which files have been created ...
+
+```{r}
+list.files(cwb_data_dir)
+```
+
+
+#### Understanding the 'word.corpus' file
+
+The corpus file is a sequence of the token ids. The length of the corpus file will be the number of tokens in a corpus.
+
+```{r}
+corpus_file <- file.path(cwb_data_dir, "word.corpus")
+corpus_file_size <- file.info(corpus_file)$size
+cwb_ids <- readBin(
+  con = corpus_file, what = integer(), size = 4L,
+  n = corpus_file_size, endian = "big"
+  )
+```
+
+First, we should see that the number of ids in the word.corpus file is the same as the length of the vector 'words'
+
+```{r}
+no_Tokens <- corpus_file_size / 4
+no_tokens == length(words)
+```
+
+Second, the ids we derived earlier on from REUTERS should be identical with what we have created anew.
+
+```{r}
+identical(cwb_ids, ids)
+```
+
+R solution
+
+```{r}
+ts_factor <- factor(words, levels = unique(words))
+ids <- as.integer(ts_factor) - 1L
+corpus_file <- file.path(R_data_dir, paste(p_attribute, "corpus", sep = "."))
+writeBin(object = ids, size = 4L, endian = "big", con = corpus_file)
+```
+
+
+#### Understanding the 'word.lexicon' file
+
+The file 'word.lexicon' lists the unique words of the corpus.
+
+```{r}
+lexicon_file <- file.path(cwb_data_dir, "word.lexicon")
+lexicon_file_size <- file.info(lexicon_file)$size
+lexicon <- readBin(con = lexicon_file, what = character(), n = lexicon_file_size)
+```
+
+Something would be wrong, if the number of words in the lexicon file would be different from the number of unique words in the character vector 'words'.
+
+```{r}
+length(lexicon) == length(unique(words))
+```
+
+
+```{r}
+lexicon_file <- file.path(R_data_dir, paste(p_attribute, "lexicon", sep = "."))
+lexicon <- levels(ts_factor)
+writeBin(object = lexicon, con = lexicon_file)
+```
+
+
+#### Understanding the 'word.lexicon.idx' file
+
+The idx file offers the positions/beginnings of a token in the lexicon file.
+
+```{r}
+idx_file <- file.path(cwb_data_dir, "word.lexicon.idx")
+idx_file_size <- file.info(idx_file)$size
+idx <- readBin(
+  con = idx_file, what = integer(), size = 4L,
+  n = idx_file_size, endian = "big"
+  )
+```
+
+Now let's do it in R
+
+```{r}
+index <- c(0L, grep("\\|", strsplit(paste(lexicon, collapse = "|"), "")[[1]]))
+lexicon_index_file <- file.path(R_data_dir, paste(p_attribute, "lexicon.idx", sep = "."))
+writeBin(object = index, size = 4L, endian = "big", con = lexicon_index_file)
+```
+
+
+And check that it is the same ... 
+
+```{r}
+identical(index, idx)
+```
+
+### Step 2: cwb-makeall
+
+```{r}
+cmd <- c(
+  "cwb-makeall",
+  "-P", "word",
+  "-r", registry_dir,
+  "-V", toupper(corpus)
+)
+system(paste(cmd, collapse = " "))
+```
+
+```{r}
+list.files(cwb_data_dir)
+```
+
+
+#### word.corpus.cnt
+
+The cnt file is a list of integer values, the frequency of the tokens.
+
+```{r}
+cnt_file <- file.path(cwb_data_dir, "word.corpus.cnt")
+cnt_file_size <- file.info(cnt_file)$size
+cnt <- readBin(con = cnt_file, what = integer(), size = 4L, n = cnt_file_size, endian = "big")
+```
+
+To achieve this from R ...
+
+```{r}
+df <- data.frame(id = ids, word = words, stringsAsFactors = FALSE)
+df[["cpos"]] <- 0L:(nrow(df) - 1L)
+```
+
+
+```{r}
+p_attr <- "word"
+corpus_cnt_file <- file.path(R_data_dir, paste(p_attr, "corpus.cnt", sep = "."))
+cnt_array <- tapply(X = df[["cpos"]], INDEX = df[["id"]], FUN = length)
+cnt_matrix <- as.matrix(cnt_array)
+cnt_vector <- unname(cnt_matrix[,1])
+writeBin(object = cnt_vector, size = 4, endian = "big", con = corpus_cnt_file)
+```
+
+Ah ... we want to know, whether this is actually the same ...
+
+```{r}
+identical(cnt_vector, cnt)
+```
+
+
+#### word.corpus.rev
+
+As long as the number of tokens. Indicates the corpus positions of a token.
+
+```{r}
+rev_file <- file.path(cwb_data_dir, "word.corpus.rev")
+rev_file_size <- file.info(rev_file)$size
+rev <- readBin(con = rev_file, what = integer(), size = 4L, n = rev_file_size, endian = "big")
+```
+
+To write the same file from R
+
+```{r}
+p_attr <- "word"
+corpus_rev_file <- file.path(R_data_dir, paste(p_attr, "corpus.rev", sep = "."))
+df_rev <- df[order(df[["id"]]),]
+writeBin(object = df_rev[["cpos"]], size = 4, endian = "big", con = corpus_rev_file)
+```
+
+
+#### word.corpus.rdx
+
+This points to the position in the rev file where the corpus positions for a token id begin.
+
+```{r}
+rdx_file <- file.path(cwb_data_dir, "word.corpus.rdx")
+rdx_file_size <- file.info(rdx_file)$size
+rdx <- readBin(con = rdx_file, what = integer(), size = 4L, n = rdx_file_size, endian = "big")
+```
+
+How can we do that from R?
+
+```{r}
+positions <- c(0L, cumsum(cnt_vector)[1:(length(cnt_vector) - 1)])
+corpus_rdx_file <- file.path(R_data_dir, paste(p_attr, "corpus.rdx", sep = "."))
+writeBin(object = positions, size = 4, endian = "big", con = corpus_rdx_file)
+```
+
+Before we forget, the check whether it's identical!
+
+```{r}
+identical(rdx, positions)
+```
+
+#### word.lexicon.srt
+
+```{r}
+srt_file <- file.path(cwb_data_dir, "word.lexicon.srt")
+srt_file_size <- file.info(srt_file)$size
+srt <- readBin(con = srt_file, what = integer(), size = 4L, n = srt_file_size, endian = "big")
+```
+
+and now from R
+
+```{r}
+sorted <- order(lexicon) - 1L
+R_srt_file <- file.path(R_data_dir, paste(p_attr, "lexicon.srt", sep = "."))
+writeBin(object = sorted, size = 4, endian = "big", con = R_srt_file)
+```
+
+
+### cwb-huffcode
+
+```{r}
+cmd <- c(
+  "cwb-huffcode",
+  "-r", registry_dir,
+  "-P", "word",
+  toupper(corpus)
+)
+system(paste(cmd, collapse = " "))
+```
+
+New files (replacing word.corpus) are:
+  - word.hcd
+  - word.huf
+  - word.huf.syn
+
+
+### cwb-compress-rdx
+
+```{r}
+cmd <- c(
+  "cwb-compress-rdx",
+  "-r", registry_dir,
+  "-P", "word",
+  toupper(corpus)
+)
+system(paste(cmd, collapse = " "))
+```
+
+New files present:
+  - word.crc (compressed index, replaces word.corpus.rev)
+  - word.crx (compressed index offsets, replaces word.crx)
+
