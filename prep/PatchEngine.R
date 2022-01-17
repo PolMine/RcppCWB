@@ -1595,7 +1595,7 @@ PatchEngine <- R6Class(
     },
     
     make_utils_header = function(){
-      message("* create header file utils.h ... ", appendLF = FALSE)
+      message("* create header file utils/utils.h ... ", appendLF = FALSE)
       utils <- c("cwb-encode.c", "cwb-compress-rdx.c", "cwb-huffcode.c", "cwb-makeall.c")
       
       h_li <- lapply(
@@ -1738,7 +1738,7 @@ PatchEngine <- R6Class(
       commit(self$repository, message = "CWB patched")
       self$patch_commit <- last_commit(self$repository)
 
-      if (self$verbose) message("return to branch of departure: ", self$branch_of_departure)
+      if (self$verbose) message("* return to branch of departure: ", self$branch_of_departure)
       checkout(repo = self$repodir, branch = self$branch_of_departure)
       invisible(self)
     }

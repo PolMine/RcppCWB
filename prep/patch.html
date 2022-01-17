@@ -206,37 +206,29 @@ library(magrittr)</code></pre>
 <h2>Run the PatchEngine</h2>
 <pre class="r"><code>P$patch_all()</code></pre>
 <pre><code>## Active revision of CWB SVN repository: 1069</code></pre>
-<pre><code>## Copy unaltered CWB code into RcppCWB repository ...687 files copied
-## Add newly created files to CWB code (overwriting existing files)
+<pre><code>## * copy unaltered CWB code into RcppCWB repository ... 687 files copied
+## * add newly created files to CWB code (overwriting existing files)
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/darwin-arm64
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_spark
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/config/platform/solaris_x86
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/Makefile
 ## ... copy file: /Users/andreasblaette/Lab/github/RcppCWB/prep/cwb/utils/Makefile
-## Run bison and flex parsers
-## Rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)
-## Create dummy depend.mk files ...
-## Perform global replacements ...
-## Create utils/globals.h as a copy of cwb-encode.c
-## Actions defined for the following files, but file not present:
+## * run bison and flex parsers
+## * rename files cl/endian.h (to endian2.h) and instutils/Makefile (to _Makefile)
+## * create dummy depend.mk files ...
+## * perform global replacements ...
+## * create utils/globals.h as a copy of cwb-encode.c
+## * actions defined for the following files, but file not present:
 ## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/ui-helpers.c
 ## - /Users/andreasblaette/Lab/github/RcppCWB/src/cwb/cl/cwb-globals.h
 ## - /Users/andreasblaette/Lab/github/RcppCWB/src/_eval.h
 ## - /Users/andreasblaette/Lab/github/RcppCWB/src/_cl.h
-## Number of files successfully patched: 65
-## ... create header file utils.h ...OK
-## Create _globalvars.h ... OK
-## Add new and altered files to HEAD in repo: /Users/andreasblaette/Lab/github/RcppCWB
-## Commit: /Users/andreasblaette/Lab/github/RcppCWB
-## Story to be told
-## Return to branch of departure: patch</code></pre>
-</div>
-<div id="notes" class="section level2">
-<h2>Notes</h2>
-<ul>
-<li>We do not patch the general Makefile but copy a manually patched version of r1069: The diffs between r1069 and r1690 show differences with new targets, but not relevant here.</li>
-<li>The Makefile utils/Makefile is copied in - r1690 has better verbosity but does not change substantially anything</li>
-</ul>
+## * number of files successfully patched: 65
+## * create header file utils.h ... OK
+## * create _globalvars.h ... OK
+## * add new and altered files to HEAD
+## * commit: /Users/andreasblaette/Lab/github/RcppCWB
+## return to branch of departure: patch</code></pre>
 </div>
 
 
