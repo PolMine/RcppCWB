@@ -1405,32 +1405,27 @@ PatchEngine <- R6Class(
           replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
           extern = list("Corpus *corpus;"),
           
+          
           insert_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
           delete_line_beginning_with = list("^\\s*/\\*\\s-+\\s\\*/\\s*$", 2L, 33L),
+          
+          # * - function 'usage' removed
           delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 142L),
+          
+          # * - global variable 'debug' replaced by local variable that is passed around
           replace = list(
             "^(\\s*compress_reversed_index\\(Attribute\\s\\*attr,\\schar\\s\\*output_fn)\\)\\s*$",
             "\\1, char *corpus_id, int debug)",
             1L
           ),
+          # * - global variable corpus_id commented out, passed expressively into functions
           replace = list(
             "^(\\s*decompress_check_reversed_index\\(Attribute\\s\\*attr,\\schar\\s\\*output_fn)\\)",
             "\\1, char *corpus_id, int debug)",
             1L
           ),
-          replace = list("^(\\s*)(if\\s\\(debug_output\\s\\!=\\sstderr\\))", "\\1/* \\s */", 1L),
+          replace = list("^(\\s*)(if\\s\\(debug_output\\s\\!=\\sstderr\\))", "\\1/* \\1 */", 1L),
           replace = list("^(\\s*)fclose\\(debug_output\\);", "\\1/* \\2 */", 1L)
-
-          
-          # /*
-          #   * MODIFICATIONS
-          # * - global variable progname commented out
-          # * - global variable corpus_id commented out, passed expressively into functions
-          # * - global variable corpus as extern
-          # * - function 'usage' removed
-          # * - main function modified
-          # * - global variable 'debug' replaced by local variable that is passed around
-          # */
         ),
         
         "src/cwb/utils/cwb-huffcode.c" = list(
