@@ -354,7 +354,7 @@ PatchEngine <- R6Class(
     remove_lines = function(code, action, file){
       
       position <- grep(pattern = action[[1]], code)
-      position <- if (!is.na(action[[2]])) matching[ action[[2]] ]
+      position <- if (!is.na(action[[2]])) position[ action[[2]] ]
       if (!is.na(position)){
         code <- code[-position]
       } else {
