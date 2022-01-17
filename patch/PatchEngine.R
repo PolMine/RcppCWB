@@ -871,7 +871,7 @@ PatchEngine <- R6Class(
           replace = list("all:\\s\\$\\(PROGRAMS\\)", "all: libcqp.a", 1L),
           replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
           remove_lines = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L),
-          remove_lines = list('^\\s*@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
+          remove_lines = list('\\$\\(ECHO\\)\\s*".*?"', NA) # r1690 is beautiful - but we nee verbosity
         ),
         
         "src/cwb/cqp/hash.c" = c(
