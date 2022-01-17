@@ -19,6 +19,7 @@ extern "C" {
 #include <Rcpp.h>
 using namespace Rcpp;
 
+char* cl_get_version();
 int cqp_initialization_status = 0;
 
 Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry){
