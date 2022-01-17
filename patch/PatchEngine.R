@@ -387,7 +387,7 @@ PatchEngine <- R6Class(
         if (revision == 1069){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
         },
         if (revision == 1069) c("(vf|f|v)printf\\s*\\(\\s*fd,\\s*", "Rprintf(", "cwb-encode.c"),
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
@@ -471,7 +471,8 @@ PatchEngine <- R6Class(
           replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
           replace = list("^(\\s+)endian.h", "\\1endian2.h", 1L),
           replace = list("^(\\s+)\\$\\(AR\\)\\s", "\\1$(AR) cq ", 1L),
-          remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L)
+          remove_lines = list("^\\s+\\$\\(RANLIB\\)", 1L),
+          remove_lines = list('^@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
         ),
         
         "src/cwb/cl/attributes.c" = c(
@@ -647,7 +648,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1)
           ),
           
-          # These are unused variable patches gone with r1690 (vars commented out, for instance)
+          # These are patches to omit 'unused variable' warnings gone with r1690 (vars commented out, for instance)
           if (revision == 1069) list(
             # unchanged in r1690? But does not match
             replace = list("^(\\s*)off_end\\s=\\sntohl\\(lexidx_data\\[idx\\s\\+\\s1\\]\\)\\s-\\s1;", "\\1/* off_end = ntohl(lexidx_data[idx + 1]) - 1; */", 1),
@@ -731,6 +732,7 @@ PatchEngine <- R6Class(
           )
         ),
         
+        # This file has appeared along the way, it just needs the minimal header
         "src/cwb/cl/ui-helpers.c" = c(
           list(),
           if (revision >= 1690) list(
@@ -850,20 +852,24 @@ PatchEngine <- R6Class(
         
         "src/cwb/cqp/Makefile" = list(
 
-          # Define target 'all' as follows:
-          # all: libcqp.a
-          #
-          # new target added - to generate libcqp.a
+          delete_line_before = list("^clean:$", 1L, 7L),
+          
+          # remove targets parser.tab.c and lex.yy.c
+          delete_line_before = list("^cqp\\$\\(EXEC_SUFFIX\\):", 1L, 8L),
+          
+          # insert new target to generate libcqp.a
           # libcqp.a: $(OBJS) $(CQI_OBJS)
           #     $(RM) $@
           #     $(AR) $@ $^
           #     $(RANLIB) $@
-          delete_line_before = list("^clean:$", 1L, 7L),
-          delete_line_before = list("^cqp\\$\\(EXEC_SUFFIX\\):", 1L, 8L),
           insert_before = list("^cqp\\$\\(EXEC_SUFFIX\\):.*", "libcqp.a: $(OBJS) $(CQI_OBJS)\n\t$(RM) $@\n\t$(AR) cq $@ $^\n", 1L),
+          
+          # Define target 'all' as follows:
+          # all: libcqp.a
           replace = list("all:\\s\\$\\(PROGRAMS\\)", "all: libcqp.a", 1L),
           replace = list("^TOP\\s=\\s\\$\\(shell\\spwd\\)/\\.\\.", "TOP = $(R_PACKAGE_SOURCE)", 1L),
-          remove_lines = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L)
+          remove_lines = list("\\s+-\\$\\(RM\\)\\slex\\.yy\\.c\\sparser\\.tab\\.c\\sparser\\.tab\\.h", 1L),
+          remove_lines = list('^@\\$\\(ECHO\\)\\s".*?"\\s*$', NA) # r1690 is beautiful - but we nee verbosity
         ),
         
         "src/cwb/cqp/hash.c" = c(
@@ -1269,146 +1275,178 @@ PatchEngine <- R6Class(
           insert_after = list('#include "\\.\\./cqp/groups\\.h"', "void Rprintf(const char *, ...);", 1)
         ),
         
-        "src/cwb/utils/cwb-encode.c" = list(
-          
-          insert_before = list(
-            "^#include\\s<ctype.h>",
-            c(
-              "/* included by AB to ensure that winsock2.h is included before windows.h */",
-              "#ifdef __MINGW__",
-              "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */",
-              "#endif",
-              ""
+        "src/cwb/utils/cwb-encode.c" = c(
+          list(
+            insert_before = c(
+              # leaves things somewhere in between in r1069 - but does not matter (?)
+              list(
+                "^#include\\s<ctype.h>",
+                c(
+                  "/* included by AB to ensure that winsock2.h is included before windows.h */",
+                  "#ifdef __MINGW__",
+                  "#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */",
+                  "#endif",
+                  ""
+                ),
+                1L
+              ),
+              
+              
+              delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L), # purely cosmetic
+              insert_before = list(
+                "^/\\*\\s-*\\s\\*/",
+                c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+                1L
+              ),
+              
+              replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
+              
+              replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
+              replace = list("^(\\s*)encode_print_time\\(stderr,\\s*", "\\1encode_print_time(", NA),
+              
+              # return value of encode_error should be 'int' (not 'void') - stable 1069-1690
+              delete_line_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", 1L, 1L),
+              insert_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", "int", 1L),
+              
+              replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
+              
+              replace = list('^(\\s*)(progname\\s=\\s.*?;)\\s*$', "\\1/* \\s */", 1L),
+              
+              # extern variables
+              replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
+              replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
+              replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
+              replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L),
+              replace = list("^(\\s*)int\\sverbose\\s*=.*?;", "\\1extern int verbose;", 1L),
+              replace = list("^(\\s*)int\\sxml_aware\\s*=.*?;", "\\1extern int xml_aware;", 1L),
+              replace = list("^(\\s*)int\\sskip_empty_lines\\s*=.*?;", "\\1extern int skip_empty_lines;", 1L),
+              replace = list("^(\\s*)unsigned\\sline\\s*=.*?;", "\\1extern unsigned line;", 1L),
+              replace = list("^(\\s*)int\\sstrip_blanks\\s*=.*?;", "\\1extern int strip_blanks;", 1L),
+              replace = list("^(\\s*)cl_string_list\\sinput_files\\s*=.*?;", "\\1extern cl_string_list input_files;", 1L),
+              replace = list("^(\\s*)int\\snr_input_files\\s*=.*?;", "\\1extern int nr_input_files;", 1L),
+              replace = list("^(\\s*)int\\scurrent_input_file\\s*=.*?;", "\\1extern int current_input_file;", 1L),
+              replace = list("^(\\s*)char\\s\\*current_input_file_name\\s*=.*?;", "\\1extern char *current_input_file_name;", 1L),
+              replace = list("^(\\s*)FILE\\s\\*input_(fd|fh)\\s*=.*?;", "\\1extern FILE *input_\\2;", 1L),
+              replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
+              replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
+              replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
+              replace = list("^(\\s*)char\\s\\*(corpus|encoding)_character_set\\s*=.*?;", "\\1extern char *\\s_character_set;", 1L), # 1069 encoding_character_set!
+              replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
+              replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
+              
+              
+              delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
+              
+              replace = list("\\(\\!(\\s*)silent", "(!\\1quietly", NA),
+              replace = list("\\(debug\\)", "(debugmode)", NA),
+              
+              replace = list("register\\s+", "", NA), # not well understood
+              
+              delete_line_before = list("^encode_usage\\(void\\)\\s*$", 1L, 4L), # stable r1069/r1690
+              delete_line_beginning_with = list(
+                "^encode_usage\\(void\\)\\s*$",
+                1L,
+                if (revision == 1069) 72L else 78L # longer in revision 1690!
+              ),
+              
+              delete_line_before = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 10L), # r1069 and r1690
+              delete_line_beginning_with = list(
+                "^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$",
+                1L,
+                if (revision == 1069) 237L else 279L
+              ), 
+              
+              # turn main() into function cwb_encode_worker()
+              delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
+              insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list dir_files){"), 1L),
+              delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
+              
+              replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
+              replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA),
+              replace = list("Rprintf\\(f(d|h)", "fprintf(f\\1,", NA),
+              replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
+            )
+          ),
+          if (revision == 1069) list(
+            replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
+            
+            replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
+            replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
+            
+            replace = list("Pointer\\sto\\sthe\\snew\\sRange", "Pointer to the new SAttEncoder", 1L),
+            
+            # r1690 has cl.h as an include and uses cl_string_chomp()
+            insert_before = list(
+              "^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram",
+              c(          
+                "/* ----------------- cl/special_chars.c - is here temporarily ------------- */",
+                "",            
+                "/**",
+                " * Removes all trailing CR and LF characters from specified string (in-place).",
+                " *",
+                " * The main purpose of this function is to remove trailing line breaks from input",
+                " * lines regardless of whether a text file is in Unix (LF) or Windows (CR-LF) format.",
+                " * All text input except for simple numeric data should be passed through cl_string_chomp().",
+                " *",
+                " * @param s     String to chomp (modified in-place).",
+                " */",
+                "void",
+                "  string_chomp(char *s) {",
+                "    char *point = s;",
+                "    /* advance point to NUL terminator */",
+                "    while (*point)",
+                "      point++;",
+                "    point--; /* now points at last byte of string */",
+                "    /* delete CR and LF, but don't move beyond start of string */",
+                "    while (point >= s && (*point == '\\r' || *point == '\\n')) {",
+                "      *point = '\\0';",
+                "      point--;",
+                "    }",
+                "  }",
+                "",
+                "/* ----------------- END ------------- */"
+              ),
+              1L, 1L
             ),
-            1L
+            
+            replace = list("^(\\s*)int\\srange_ptr\\s*=.*?;", "\\1extern int range_ptr;", 1L),
+            replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
+            replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
+            replace = list("^(\\s*)int\\swattr_ptr\\s=\\s0;", "\\1extern int wattr_ptr;", 1L)
+            
           ),
-          
-          delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L),
-          insert_before = list(
-            "^/\\*\\s-*\\s\\*/",
-            c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
-            1L
-          ),
-          
-          replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
-          replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
-          
-          replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
-          replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
-
-          replace = list("Pointer\\sto\\sthe\\snew\\sRange", "Pointer to the new SAttEncoder", 1L),
-          
-          replace = list("^encode_print_time\\(FILE\\s\\*stream,\\schar\\s\\*msg\\)", "encode_print_time(char *msg)", 1L),
-          replace = list("^(\\s*)encode_print_time\\(stderr,\\s*", "\\1encode_print_time(", NA),
-          
-          delete_line_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", 1L, 1L),
-          insert_before = list("^\\s*encode_error\\(char\\s+\\*format,\\s\\.\\.\\.\\)", "int", 1L),
-          
-          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
-          
-          insert_before = list(
-            "^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram",
-            c(          
-              "/* ----------------- cl/special_chars.c - is here temporarily ------------- */",
-              "",            
-              "/**",
-              " * Removes all trailing CR and LF characters from specified string (in-place).",
-              " *",
-              " * The main purpose of this function is to remove trailing line breaks from input",
-              " * lines regardless of whether a text file is in Unix (LF) or Windows (CR-LF) format.",
-              " * All text input except for simple numeric data should be passed through cl_string_chomp().",
-              " *",
-              " * @param s     String to chomp (modified in-place).",
-              " */",
-              "void",
-              "  string_chomp(char *s) {",
-              "    char *point = s;",
-              "    /* advance point to NUL terminator */",
-              "    while (*point)",
-              "      point++;",
-              "    point--; /* now points at last byte of string */",
-              "    /* delete CR and LF, but don't move beyond start of string */",
-              "    while (point >= s && (*point == '\\r' || *point == '\\n')) {",
-              "      *point = '\\0';",
-              "      point--;",
-              "    }",
-              "  }",
-              "",
-              "/* ----------------- END ------------- */"
-            ),
-            1L, 1L
-          ),
-          
-          replace = list('^(\\s*)(progname\\s=\\s"cwb-encode";)\\s*$', "\\1/* \\s */", 1L),
-          
-          # extern variables
-          replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
-          replace = list("^(\\s*)char\\s\\*undef_value\\s*=.*?;", "\\1extern char *undef_value;", 1L),
-          replace = list("^(\\s*)int\\sdebug\\s*=.*?;", "\\1extern int debugmode;", 1L),
-          replace = list("^(\\s*)int\\ssilent\\s*=.*?;", "\\1extern int quietly;", 1L),
-          replace = list("^(\\s*)int\\sverbose\\s*=.*?;", "\\1extern int verbose;", 1L),
-          replace = list("^(\\s*)int\\sxml_aware\\s*=.*?;", "\\1extern int xml_aware;", 1L),
-          replace = list("^(\\s*)int\\sskip_empty_lines\\s*=.*?;", "\\1extern int skip_empty_lines;", 1L),
-          replace = list("^(\\s*)unsigned\\sline\\s*=.*?;", "\\1extern unsigned line;", 1L),
-          replace = list("^(\\s*)int\\sstrip_blanks\\s*=.*?;", "\\1extern int strip_blanks;", 1L),
-          replace = list("^(\\s*)cl_string_list\\sinput_files\\s*=.*?;", "\\1extern cl_string_list input_files;", 1L),
-          replace = list("^(\\s*)int\\snr_input_files\\s*=.*?;", "\\1extern int nr_input_files;", 1L),
-          replace = list("^(\\s*)int\\scurrent_input_file\\s*=.*?;", "\\1extern int current_input_file;", 1L),
-          replace = list("^(\\s*)char\\s\\*current_input_file_name\\s*=.*?;", "\\1extern char *current_input_file_name;", 1L),
-          replace = list("^(\\s*)FILE\\s\\*input_fd\\s*=.*?;", "\\1extern FILE *input_fd;", 1L),
-          replace = list("^(\\s*)unsigned\\slong\\sinput_line\\s*=.*?;", "\\1extern unsigned long input_line;", 1L),
-          replace = list("^(\\s*)char\\s\\*registry_file\\s*=.*?;", "\\1extern char *registry_file;", 1L),
-          replace = list("^(\\s*)char\\s\\*directory\\s*=.*?;", "\\1extern char *directory;", 1L),
-          replace = list("^(\\s*)char\\s\\*corpus_character_set\\s*=.*?;", "\\1extern char *corpus_character_set;", 1L),
-          replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
-          replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
-          replace = list("^(\\s*)int\\srange_ptr\\s*=.*?;", "\\1extern int range_ptr;", 1L),
-          replace = list("^(\\s*)SAttEncoder\\sranges\\[MAXRANGES\\];", "extern SAttEncoder ranges[MAXRANGES];", 1L),
-          replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s*=.*?;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
-          replace = list("^(\\s*)int\\swattr_ptr\\s=\\s0;", "\\1extern int wattr_ptr;", 1L),
-          
-          delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
-          
-          
-          replace = list("\\(\\!(\\s*)silent", "(!\\1quietly", NA),
-          replace = list("\\(debug\\)", "(debugmode)", NA),
-          replace = list("register\\s+", "", NA),
-          
-          delete_line_before = list("^encode_usage\\(void\\)\\s*$", 1L, 4L),
-          delete_line_beginning_with = list("^encode_usage\\(void\\)\\s*$", 1L, 72L),
-          
-          delete_line_before = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 10L),
-          delete_line_beginning_with = list("^encode_parse_options\\(int\\sargc,\\schar\\s\\*\\*argv\\)\\s*$", 1L, 237L),
-          
-          delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
-          insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list dir_files){"), 1L),
-          delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
-          replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
-
-          replace = list("Rprintf\\(registry_fd,", "fprintf(registry_fd,", NA),
-          replace = list("Rprintf\\(fd,", "fprintf(fd,", NA),
-          replace = list('Rprintf\\(rng->avs', 'fprintf(rng->avs', 1L)
+          if (revision >= 1690) list(
+            replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
+            replace = list("^(\\s*)int\\sint\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
+            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute", 1L)
+          )
         ),
 
-        "src/cwb/utils/globals.h" = list(
+        "src/cwb/utils/globals.h" = c(
           
-          delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, NA),
-          delete_line_beginning_with = list("^/\\*\\s-*\\s\\*/", 5L, NA),
-
-          replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
-          replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
+          list(
+            delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, NA),
+            delete_line_beginning_with = list("^\\s*/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram\\s\\*/\\s*$", 1L, NA),
+            
+            replace = list('^(#define\\sFIELDSEPS\\s*)(".*?")', '\\1(char*)\\2', 1L),
+            
+            replace = list("^(\\s*)int\\sdebug\\s*=\\s*(.*?);", "\\1int debugmode = \\2;", 1L),
+            replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L)
+          ),
           
-          replace = list('^(#define\\sUNDEF_VALUE\\s*)("__UNDEF__")', '\\1(char*)\\2', 1L),
-          replace = list('^(#define\\sFIELDSEPS\\s*)(".*?")', '\\1(char*)\\2', 1L),
-          replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)("latin1";)', '\\1(char*)\\2', 1L),
-          
-          replace = list("^(\\s*)int\\sdebug\\s*=\\s*(.*?);", "\\1int debugmode = \\2;", 1L),
-          replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L)
-
+          if (revision <= 1690) list(
+            # things that are different in the later revision
+            replace = list("(struct\\s_|}\\s|^\\s*|\\()Range", "\\1SAttEncoder", NA),
+            replace = list("'children'\\s\\(SAttEncoder\\s\\*\\)", "'children' (Range *)", 1L),
+            replace = list('^(#define\\sUNDEF_VALUE\\s*)("__UNDEF__")', '\\1(char*)\\2', 1L),
+            replace = list('^(char\\s\\*corpus_character_set\\s*=\\s*)("latin1";)', '\\1(char*)\\2', 1L)
+          )
         ),
         
                 
         "src/cwb/utils/cwb-compress-rdx.c" = list(
+          
+          insert_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
           
           replace = list("^char\\s\\*progname\\s=\\sNULL;", "/* char *progname = NULL; */", 1L),
           replace = list("^char\\s\\*corpus_id\\s=\\sNULL;", "/* char *corpus_id = NULL; */", 1L),
@@ -1416,14 +1454,19 @@ PatchEngine <- R6Class(
           replace = list("^int\\sdebug\\s=\\s0;", "/* extern int debug = 0; */", 1L),
           
           replace = list("^(\\s*)exit\\(.*?\\);", "\\1return;", NA),
+          
           extern = list("Corpus *corpus;"),
-          
-          
-          insert_before = list("#include <math.h>", c("void Rprintf(const char *, ...);", ""), 1L),
+
+          # remove function 'usage()' - works for r1069 and r1690
           delete_line_beginning_with = list("^\\s*/\\*\\s-+\\s\\*/\\s*$", 2L, 33L),
           
-          # * - function 'usage' removed
-          delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 142L),
+          
+          # remove main() function
+          delete_line_beginning_with = list(
+            if (revision == 1069) "^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$" else "^\\s*/\\*\\s=+\\s\\*\\s*$",
+            1L,
+            NA
+          ),
           
           # * - global variable 'debug' replaced by local variable that is passed around
           replace = list(
@@ -1431,72 +1474,63 @@ PatchEngine <- R6Class(
             "\\1, char *corpus_id, int debug)",
             1L
           ),
-          # * - global variable corpus_id commented out, passed expressively into functions
+          # global variable corpus_id commented out, passed expressively into functions
           replace = list(
             "^(\\s*decompress_check_reversed_index\\(Attribute\\s\\*attr,\\schar\\s\\*output_fn)\\)",
             "\\1, char *corpus_id, int debug)",
             1L
           ),
+          
+          # causes a crash beause debug_output is commented out / undefined
           replace = list("^(\\s*)(if\\s\\(debug_output\\s\\!=\\sstderr\\))", "\\1/* \\2 */", 1L),
           replace = list("^(\\s*)(fclose\\(debug_output\\));", "\\1/* \\2 */", 1L)
         ),
         
-        "src/cwb/utils/cwb-huffcode.c" = list(
-          
-          insert_before = list('#include\\s"\\.\\./cl/globals\\.h"', c("void Rprintf(const char *, ...);", ""), 1L),
-          
-          replace = list("^char\\s\\*progname;", "/* char *progname; */", 1L),
-          replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 1L),
-          replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
-          replace = list("^(\\s*putc\\(\\(i\\s%\\s3\\)\\s==\\s0\\s\\?\\s'\\|'\\s:\\s'\\s',\\sprotocol\\);)", "\\1 */", 1L),
-          replace = list("^(\\s*)int\\snode,\\sdepth;", "\\1/* int node, depth; */", 1L),
-          replace = list("^(\\s*)node\\s=\\s1;", "\\1/* node = 1; */", 1L),
-          replace = list("^(\\s*)depth\\s=\\s0;", "\\1/* depth = 0; */", 1L),
-          replace = list("^(\\s*)int\\snr_codes\\s=\\s0;", "\\1/* int nr_codes = 0; */", 1L),
-          replace = list("^(\\s*)nr_codes\\s=\\s0;", "\\1/* nr_codes = 0; */", 1L),
-          replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
-          
-          replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L),
-          replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L),
-          
-          delete_line_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", 1L, 1L),
-          insert_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "int ", 1L),
-          replace = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "\\1decode_check_huff(Attribute *attr, char *corpus_id, char *fname)", 1L),
-          
-          replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
-          
-          extern = list("Corpus *corpus;"),
-          
-          delete_line_before = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 37L),
-          delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, 130L)
-          
-
-                    # /*
-          #   * MODIFICATIONS:
-          #   * - progrname commented out
-          # * - function 'usage' and placeholder for usage deleted
-          # * - Rcpp.h included
-          # * - includes moved to extern "C" {}
-          # * - all uses of 'protocol' commented out
-          # * - exit(1); replaced by return 1;
-          # * - return value of decode_check_huff turned into 'int'
-          # * - corpus_id is passed explicitly into decode_check_huff
-          # */
-          #   
-          
+        "src/cwb/utils/cwb-huffcode.c" = c(
+          list(
+            insert_before = list(
+              if (revision >= 1690) '#include "../cl/cl.h"' else '#include\\s"\\.\\./cl/globals\\.h"',
+              c("void Rprintf(const char *, ...);", ""),
+              1L
+            ),
+            
+            replace = list("^char\\s\\*progname;", "/* char *progname; */", 1L), # unchanged in r1690
+            
+            # all uses of 'protocol' commented out, starting with a loop
+            replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 1L), 
+            replace = list("^(\\s*)(for\\s\\(i\\s=\\s0;\\si\\s<\\sindent\\s\\*\\s3;\\si\\+\\+\\))", "\\1/* \\2", 1L),
+            replace = list("^(\\s*putc\\(\\(i\\s%\\s3\\)\\s==\\s0\\s\\?\\s'\\|'\\s:\\s'\\s',\\sprotocol\\);)", "\\1 */", 1L),
+            replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
+            
+            # return value of decode_check_huff turned into 'int'
+            # corpus_id is passed explicitly into decode_check_huff
+            delete_line_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", 1L, 1L),
+            insert_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "int ", 1L),
+            replace = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "\\1decode_check_huff(Attribute *attr, char *corpus_id, char *fname)", 1L),
+            
+            replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
+            
+            # int return value. not void
+            replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L),
+            replace = list("^(\\s*)return;\\s*$", "\\1return 0;", 1L), # deliberately a second time!
+            
+            extern = list("Corpus *corpus;"),
+            
+            delete_line_before = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, 37L),
+            
+            # Functions usage() and main() deleted
+            delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*\\\\\\s*$", 1L, NA)
+          ),
+          if (revision < 1690) list(
+            replace = list("^(\\s*)int\\snode,\\sdepth;", "\\1/* int node, depth; */", 1L),
+            replace = list("^(\\s*)node\\s=\\s1;", "\\1/* node = 1; */", 1L),
+            replace = list("^(\\s*)depth\\s=\\s0;", "\\1/* depth = 0; */", 1L),
+            replace = list("^(\\s*)int\\snr_codes\\s=\\s0;", "\\1/* int nr_codes = 0; */", 1L),
+            replace = list("^(\\s*)nr_codes\\s=\\s0;", "\\1/* nr_codes = 0; */", 1L),
+          )
         ),
 
         "src/cwb/utils/cwb-makeall.c" = list(
-          
-          # /* COPIED AND SLIGHTLY MODIFIED FROM utils-makeall.c 
-          # * Modifications:
-          #   * - printf -> Rprintf;
-          # * - fprintf -> Rprintf (without stderr)
-          # * - exit -> return
-          # * - fflush(stdout); commented out (twice)
-          # * - do_attribute and make_component return integer value;
-          # */
-            
           
           insert_before = list(
             '#include\\s"\\.\\./cl/globals\\.h"',
@@ -1511,34 +1545,47 @@ PatchEngine <- R6Class(
               "#include <stdio.h>",
               "#include <stdlib.h>",
               "#include <string.h>",
-              '#include "../cl/cl.h"'
+              if (revision >= 1690) NULL else '#include "../cl/cl.h"' # cl.h is already included in r1690
             ),
             1L
           ),
           
           delete_line_beginning_with = list('#include\\s"\\.\\./cl/corpus\\.h', 1L, 0L),
           replace = list('^#include\\s"\\.\\./cl/endian\\.h"\\s*', '#include "../cl/endian2.h"', 1L),
+          
+          # exit(1) -> return 1 
           replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
+          
+          # return -> return 0
+          replace = list("^(\\s*)return;(\\s*)$", "\\1return 0;\\2", NA),
           
           # stable r1069 - r1690. But maybe obsolete, because cwb-makeall.c is not compiled?
           replace = list("^\\s*fflush\\(stdout\\);\\s*$", "/* fflush(stdout); */", NA),
-          
-          replace = list("^(\\s*)return;(\\s*)$", "\\1return 0;\\2", NA),
 
+          # change return value 'void' of makeall_do_attribute() to 'int'
           delete_line_before = list("makeall_do_attribute\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", 1L, 1L),
           insert_before = list("makeall_do_attribute\\(Attribute\\s\\*attr,\\sComponentID\\scid,\\sint\\svalidate\\)", "int", 1L),
           
+          # change return value 'void' of makeall_make_component() to 'int'
           delete_line_before = list("makeall_make_component\\(Attribute\\s\\*attr,\\sComponentID\\scid\\)", 1L, 1L),
           insert_before = list("makeall_make_component\\(Attribute\\s\\*attr,\\sComponentID\\scid\\)", "int", 1L),
           
-          delete_line_before = list("^Corpus\\s\\*corpus;", 1L, 1L),
-          delete_line_beginning_with = list("/\\*\\*\\sName\\sof\\sthis\\sprogram\\s\\*/", 1L, 1L),
+          delete_line_before = list("^Corpus\\s\\*corpus;", 1L, 1L), # Necessary? Removes a comment?
+          delete_line_beginning_with = list("/\\*\\*\\sName\\sof\\sthis\\sprogram\\s\\*/", 1L, 1L), # Necessary? Removes only a comment?
           
+          # Changes return value of makeall_do_attribute() to int (works for r1069 and r1690)
           delete_line_before = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", 1L, 4L),
           insert_before = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", c("    return 0;", "", "  }"), 1L),
-          delete_line_beginning_with = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", 1L, 187L),
           
-          delete_line_before = list("\\*\\sValidates\\sthe\\sREVCORP\\scomponent\\sof\\sthe\\sgiven\\sattribute\\.", 1L, 6L),
+          
+          delete_line_beginning_with = list("\\*\\sPrints\\sa\\susage\\smessage\\sand\\sexits\\sthe\\sprogram\\.", 1L, NA),
+          
+          # changes the return value of makeall_make_component() from void to int
+          delete_line_before = list(
+            "\\*\\sValidates\\sthe\\sREVCORP\\scomponent\\sof\\sthe\\sgiven\\sattribute\\.",
+            1L,
+            if (revision >= 1690) 5L else 6L,
+            ),
           insert_before = list(
             "\\*\\sValidates\\sthe\\sREVCORP\\scomponent\\sof\\sthe\\sgiven\\sattribute\\.",
             c("  return 0;", "", "  }", "", "", "", "/**"),
