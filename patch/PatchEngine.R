@@ -434,7 +434,7 @@ PatchEngine <- R6Class(
         if (revision == 1069){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|dst->stream|outfh|tmp|fh|dest|dst|protocol),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|dst->stream|outfh|tmp|fh|dest|dst|protocol|tmp_dst),\\s*", "Rprintf(")
         },
         if (revision == 1069) c("(vf|f|v)printf\\s*\\(\\s*fd,\\s*", "Rprintf(", "cwb-encode.c"),
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
@@ -799,7 +799,6 @@ PatchEngine <- R6Class(
         
         "src/cwb/cqp/groups.c" = c(
           list(),
-          # The file is gone with r1690
           if (revision == 1069) list(
             # Comment out open_temporary_file(char *tmp_name_buffer) in
             # cqp/output.c, in cqp/output.h and in usage in functions calling
@@ -819,6 +818,11 @@ PatchEngine <- R6Class(
             replace = list("^(.*?)\\s*/\\*\\s\\(source\\sID,\\starget\\sID)\\s*\\*/", "\\1", 1),
             replace = list("^(.*?)\\s*/\\*\\smodifies\\sGroup\\sobject\\sin\\splace\\sand\\sreturns\\spointer\\s\\*/", "\\1", 1),
             replace = list("^(\\s*)(if\\s\\(UseExternalGrouping\\s&&\\s\\!insecure\\s&&\\s\\!\\(source_is_struc\\s\\|\\|\\starget_is_struc\\s\\|\\|\\sis_grouped\\)\\))", "\\1/* \\2", 1)
+          ),
+          if (revision == 1690) list(
+            delete_line_beginning_with = list("^\\s*if\\s\\(\\!\\(tmp_dst\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\)\\s\\{", 1L, 5L),
+            delete_line_beginning_with = list("^\\s*fclose\\(tmp_dst\\);\\s*$", 1L, 1L),
+            delete_line_beginning_with = list("^FILE\\s\\*tmp_dst;\\s*$", 1L, 1L)
           )
         ),
         
