@@ -216,8 +216,7 @@ PatchEngine <- R6Class(
         sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "src", "cwb", "cqp", "options.c")),
         intern = TRUE
       ), value = TRUE))
-      print(externed2)
-      
+
       # combine results
       extern <- unique(c(extern_by_patch, extern_by_default))
       
