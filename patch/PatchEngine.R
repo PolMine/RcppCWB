@@ -1484,7 +1484,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)const\\schar\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern const char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
             replace = list("^(\\s*)int\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
-            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute", 1L)
+            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L)
           )
         ),
 
@@ -1667,9 +1667,15 @@ PatchEngine <- R6Class(
           
         ),
         
-        "src/cwb/definitions.mk" = list(
+        "src/cwb/definitions.mk" = c(
           # stable r1069 - r1690
-          replace = list("(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)", "# \\1", 1L)
+          list(
+            replace = list("(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)", "# \\1", 1L)
+          ),
+          if (revision >= 1690) list(
+            delete_line_beginning_with = list('^\\s+@\\$\\(ECHO\\)\\s"\\s+\\.+\\scompile\\ssource\\sfile"', 1L, 1L)
+          )
+          
         ),
         
         "src/cwb/config/platform/darwin-64" = list(
@@ -1716,9 +1722,15 @@ PatchEngine <- R6Class(
           insert_before = list("##\\sCPU\\sarchitecture", c("## require position-independent code", "CFLAGS += -fPIC", ""), 1L)
         ),
         
-        "src/cwb/config.mk" = list(
+        "src/cwb/config.mk" = c(
           # stable r1069-r1690
-          replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
+          list(
+            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
+          ),
+          if (revision >= 1690) list(
+            # Un-comment FULL_MESSAGES, this will re-activate full output
+            replace = list("^\\s*#\\s+FULL_MESSAGES\\s+=\\s+1\\s*$", "FULL_MESSAGES = 1", 1L)
+          )
         ),
         
         "src/_cl.h" = list(
