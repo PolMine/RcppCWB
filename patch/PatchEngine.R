@@ -434,7 +434,7 @@ PatchEngine <- R6Class(
         if (revision == 1069){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|dst->stream|outfh|tmp|fh|dest),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|dst->stream|outfh|tmp|fh|dest|dst|protocol),\\s*", "Rprintf(")
         },
         if (revision == 1069) c("(vf|f|v)printf\\s*\\(\\s*fd,\\s*", "Rprintf(", "cwb-encode.c"),
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
