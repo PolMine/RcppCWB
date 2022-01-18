@@ -731,20 +731,23 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, Rcpp::StringVector p_a
   int p_attrs_n = p_attributes.length();
   int m;
   for (m = 0; m < p_attrs_n; m++){
-    wattr_declare(p_attributes(m), directory, 0);
+    /* wattr_declare(p_attributes(m), directory, 0); */
+    p_att_declare(p_attributes(m), directory, 0);
   }
   
   /* declare s-attribute with annotations */
   
   int s_attrs_len = s_attributes_anno.length();
   for (m = 0; m < s_attrs_len; m++){
-    range_declare(s_attributes_anno(m), directory, 1, 0);
+    /* range_declare(s_attributes_anno(m), directory, 1, 0); */
+    s_att_declare(s_attributes_anno(m), directory, 1, 0);
   }
   
   /* declare s-attribute without annotations */
   s_attrs_len = s_attributes_noanno.length();
   for (m = 0; m < s_attrs_len; m++){
-    range_declare(s_attributes_noanno(m), directory, 0, 0);
+    /* range_declare(s_attributes_noanno(m), directory, 0, 0); */
+    s_att_declare(s_attributes_noanno(m), directory, 0, 0);
   }
   
   
