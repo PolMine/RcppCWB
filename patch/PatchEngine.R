@@ -224,7 +224,7 @@ PatchEngine <- R6Class(
       typedef_CQPOption <- self$get_snippet(
         file = file.path(self$repodir, "cwb", "src", "cqp", "options.h"),
         from = "^\\s*typedef\\sstruct\\s_cqpoption\\s{\\s*$",
-        end = "^\\s*}\\s+CQPOption;\\s*$"
+        to = "^\\s*}\\s+CQPOption;\\s*$"
       )
       extern <- c(
         if (self$revision < 1690) "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
