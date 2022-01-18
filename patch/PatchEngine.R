@@ -223,6 +223,7 @@ PatchEngine <- R6Class(
       # manual additions
       extern <- c(
         if (self$revision < 1690) "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
+        if (self$revision >= 1690) "typedef enum which_app { undef, cqp, cqpcl, cqpserver} which_app_t;",
         extern
       )
 
