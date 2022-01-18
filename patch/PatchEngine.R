@@ -950,15 +950,15 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/eval.c" = c(
-          list(),
-          
-          # The corpus_size variable is used in revision 1690. This is commented out to see whether problems persist.
-          if (revision == 1069) list(
+          list(
             replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 2),
             replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1),
             replace = list("^(\\s*)if\\s\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1),
-            replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
-            
+            replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1)
+          ),
+          
+          # The corpus_size variable is used in revision 1690. This is commented out to see whether problems persist.
+          if (revision == 1069) list(
             # eval.c: In function ‘cqp_run_tab_query’:
             #   eval.c:2911:21: warning: variable ‘corpus_size’ set but not used [-Wunused-but-set-variable]
             # int smallest_col, corpus_size;
