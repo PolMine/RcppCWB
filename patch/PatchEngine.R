@@ -1197,7 +1197,7 @@ PatchEngine <- R6Class(
           # cqp/output.c, in cqp/output.h and in usage in functions calling
           # this function: ComputeGroupExternally (cqp/groups.c) and
           # SortExternally (cqp/ranges.c)
-          replace = list("^(\\s*)FILE\\s\\*open_temporary_file\\(char\\s\\*tmp_name_buffer);", "\\1/* FILE *open_temporary_file(char *tmp_name_buffer); */", 1)
+          # replace = list("^(\\s*)FILE\\s\\*open_temporary_file\\(char\\s\\*tmp_name_buffer);", "\\1/* FILE *open_temporary_file(char *tmp_name_buffer); */", 1)
         ),
         
         "src/cwb/cqp/parse_actions.c" = c(
