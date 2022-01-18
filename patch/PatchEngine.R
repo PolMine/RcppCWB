@@ -822,7 +822,7 @@ PatchEngine <- R6Class(
           if (revision == 1690) list(
             delete_line_beginning_with = list("^\\s*if\\s\\(\\!\\(tmp_dst\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\)\\s\\{", 1L, 5L),
             delete_line_beginning_with = list("^\\s*fclose\\(tmp_dst\\);\\s*$", 1L, 1L),
-            delete_line_beginning_with = list("^FILE\\s\\*tmp_dst;\\s*$", 1L, 1L)
+            delete_line_beginning_with = list("^\\s*FILE\\s\\*tmp_dst;\\s*$", 1L, 1L)
           )
         ),
         
