@@ -223,7 +223,7 @@ PatchEngine <- R6Class(
       # manual additions
       typedef_CQPOption <- self$get_snippet(
         file = file.path(self$repodir, "src", "cwb", "cqp", "options.h"),
-        from = "^\\s*typedef\\sstruct\\s_cqpoption\\s{\\s*$",
+        from = "^\\s*typedef\\sstruct\\s_cqpoption\\s\\{\\s*$",
         to = "^\\s*}\\s+CQPOption;\\s*$"
       )
       extern <- c(
