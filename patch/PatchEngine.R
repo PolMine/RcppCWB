@@ -282,7 +282,7 @@ PatchEngine <- R6Class(
       end <- grep(to, code)
       if (!length(end)) warning("Fn get_snippet - no match for query to get end: ", end)
       code[start:end]
-    }
+    },
     
     delete_line_before = function(code, action, file){
       which_position <- if (length(action) > 1L) action[[2]] else 1L
