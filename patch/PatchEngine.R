@@ -232,12 +232,12 @@ PatchEngine <- R6Class(
         to = '#define\\sCQP_FALLBACK_PAGER\\s"more"'
       )
       
-      options <- self$get_snippet(
-          file = file.path(self$repodir, "src", "cwb", "cqp", "options.c"),
-          from = "^CQPOption\\scqpoptions\\[\\]\\s=\\s\\{\\s*$",
-          to = '\\s*\\*\\sNON-OPTION\\sGLOBAL\\sVARIABLES\\s*$'
-        )
-      options <- options[1:(length(options) - 3)]
+      # options <- self$get_snippet(
+      #     file = file.path(self$repodir, "src", "cwb", "cqp", "options.c"),
+      #     from = "^CQPOption\\scqpoptions\\[\\]\\s=\\s\\{\\s*$",
+      #     to = '\\s*\\*\\sNON-OPTION\\sGLOBAL\\sVARIABLES\\s*$'
+      #   )
+      # options <- options[1:(length(options) - 3)]
 
       extern <- c(
         if (self$revision < 1690) "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
@@ -245,7 +245,7 @@ PatchEngine <- R6Class(
         typedef_CQPOption,
         extern,
         defs,
-        options
+        "extern CQPOption cqpoptions;"
       )
 
       extern <- extern[!extern %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;", "CQPOption cqpoptions[];")]
@@ -1398,7 +1398,12 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)CorpusCharset\\s*encoding_charset;", "\\1extern CorpusCharset encoding_charset;", 1L),
             replace = list("^(\\s*)int\\sclean_strings\\s*=.*?;", "\\1extern int clean_strings;", 1L),
             
-            
+            replace = list("^(\\s*)int\\ss_encoder_ix\\s=\\s0;", "\\1extern int s_encoder_ix;", 1L),
+            replace = list("^(\\s*)int\\sp_encoder_ix\\s=\\s0;", "\\1extern int p_encoder_ix;", 1L),
+            replace = list("^(\\s*)s_att_builder\\s\\*conll_sentence_satt\\s=\\sNULL;", "\\1extern s_att_builder *conll_sentence_satt;", 1L),
+            replace = list("^(\\s*)cl_lexhash\\sundeclared_sattrs\\s=\\sNULL;", "\\1extern cl_lexhash undeclared_sattrs;", 1L),
+            replace = list("^(\\s*)int\\sauto_null\\s=\\s0;", "\\1extern int auto_null;", 1L),
+
             # delete_line_beginning_with = list("^/\\*\\*\\sname\\sof\\sthe\\scurrently\\srunning\\sprogram", 1L, 1L),
             
             replace = list("\\(\\!(\\s*)silent", "(!\\1quietly", NA),
