@@ -248,7 +248,7 @@ PatchEngine <- R6Class(
         options
       )
 
-      extern <- extern[!extern %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
+      extern <- extern[!extern %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;", "CQPOption cqpoptions[];")]
       
       writeLines(text = extern, con = file.path(self$repodir, "src", "_globalvars.h"))
       message("OK")
