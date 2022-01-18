@@ -1493,7 +1493,8 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)const\\schar\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern const char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
             replace = list("^(\\s*)int\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
-            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L)
+            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L),
+            replace = list('Rprintf\\(encoder->avs_fh', 'fprintf(encoder->avs_fh', 1L)
           )
         ),
 
