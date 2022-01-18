@@ -226,11 +226,26 @@ PatchEngine <- R6Class(
         from = "^\\s*typedef\\senum\\s_opttype\\s\\{\\s*$",
         to = "^\\s*}\\s+CQPOption;\\s*$"
       )
+      defs <- self$get_snippet(
+        file = file.path(self$repodir, "src", "cwb", "cqp", "options.h"),
+        from = "^#define\\sOPTION_VISIBLE_IN_CQP\\s+\\d+\\s*$",
+        to = '#define\\sCQP_FALLBACK_PAGER\\s"more"'
+      )
+      
+      options <- self$get_snippet(
+          file = file.path(self$repodir, "src", "cwb", "cqp", "options.c"),
+          from = "^CQPOption\\scqpoptions\\[\\]\\s=\\s\\{\\s*$",
+          to = '\\s*\\*\\sNON-OPTION\\sGLOBAL\\sVARIABLES\\s*$'
+        )
+      options <- options[1:(length(options) - 3)]
+
       extern <- c(
         if (self$revision < 1690) "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
         if (self$revision >= 1690) "typedef enum which_app { undef, cqp, cqpcl, cqpserver} which_app_t;",
         typedef_CQPOption,
-        extern
+        extern,
+        defs,
+        options
       )
 
       extern <- extern[!extern %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
