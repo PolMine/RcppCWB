@@ -1509,7 +1509,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L),
             
             # To avoid warning: ISO C++11 does not allow conversion from string literal to 'char *'
-            replace = list("^\\s*char\\s\\*undef_value\\s=\\sCWB_PA_UNDEF_VALUE;\\s*$", "char *undef_value = (char *)CWB_PA_UNDEF_VALUE;", 1L)
+            replace = list("^\\s*char\\s*\\*\\s*undef_value\\s*=\\s*CWB_PA_UNDEF_VALUE;\\s*$", "char *undef_value = (char *)CWB_PA_UNDEF_VALUE;", 1L)
             
           ),
           
