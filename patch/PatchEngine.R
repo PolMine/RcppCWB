@@ -207,22 +207,29 @@ PatchEngine <- R6Class(
     create_globalvars_file = function(){
       if (self$verbose) message("* create _globalvars.h ... ", appendLF = FALSE)
       
-      externed <- c(
-        "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
-        unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
-      )
-      
-      externed2 <- gsub("^\\s*extern\\s+", "", grep("^\\s*extern\\s", system(
+      # Strategy 1: Variables that are declared as 'extern' by patch are global vars
+      extern_by_patch <- unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
+
+      # Strategy 2: Later version of CWB prepends extern by default. Use makeheaders 
+      # utility to autogenerate a header and grep externed vars 
+      extern_by_default <- gsub("^\\s*extern\\s+", "", grep("^\\s*extern\\s", system(
         sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "src", "cwb", "cqp", "options.c")),
         intern = TRUE
       ), value = TRUE))
       print(externed2)
       
-      externed <- unique(c(externed, externed2))
-
-      externed <- externed[!externed %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
+      # combine results
+      extern <- unique(c(extern_by_patch, extern_by_default))
       
-      writeLines(text = externed, con = file.path(self$repodir, "src", "_globalvars.h"))
+      # manual additions
+      extern <- c(
+        if (self$revision < 1690) "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
+        extern
+      )
+
+      extern <- extern[!extern %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
+      
+      writeLines(text = extern, con = file.path(self$repodir, "src", "_globalvars.h"))
       message("OK")
     },
     
