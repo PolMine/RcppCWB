@@ -211,6 +211,14 @@ PatchEngine <- R6Class(
         "enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;",
         unique(unname(unlist(lapply(self$file_patches, `[[`, "extern"))))
       )
+      
+      externed2 <- gsub("^\\s*extern\\s+", "", grep("^\\s*extern\\s", system(
+        sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "cwb", "cqp", "options.c")),
+        intern = TRUE
+      ), value = TRUE))
+      print(externed2)
+      
+      externed <- unique(c(externed, externed2))
 
       externed <- externed[!externed %in% c("EvalEnvironment Environment[MAXENVIRONMENT];", "EEP CurEnv, evalenv;", "int eep;")]
       
