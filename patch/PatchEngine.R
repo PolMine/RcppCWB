@@ -1203,7 +1203,7 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)left->pa_ref\\.delete\\s=\\s0;", "\\1left->pa_ref.del = 0;", 1),
             replace = list("^(\\s*)node->idlist\\.delete\\s=\\s0;", "\\1node->idlist.del = 0;", 1),
             
-            replace = list("^(\\s*)result->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1resut->idlist.del = left->pa_ref.del;", 1),
+            replace = list("^(\\s*)result->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1result->idlist.del = left->pa_ref.del;", 1),
             replace = list("^(\\s*)result->pa_ref\\.delete\\s=\\sauto_delete;", "\\1result->pa_ref.del = auto_delete;", 1),
             replace = list("^(\\s*)result->sa_ref\\.delete\\s=\\sauto_delete;", "\\1result->sa_ref.del = auto_delete;", 1),
             
