@@ -821,8 +821,8 @@ PatchEngine <- R6Class(
           ),
           if (revision == 1690) list(
             delete_line_beginning_with = list("^\\s*if\\s\\(\\!\\(tmp_dst\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\)\\s\\{", 1L, 5L),
-            delete_line_beginning_with = list("^\\s*fclose\\(tmp_dst\\);\\s*$", 1L, 1L),
-            delete_line_beginning_with = list("^\\s*FILE\\s\\*tmp_dst;\\s*$", 1L, 1L)
+            delete_line_beginning_with = list("^\\s*fclose\\(tmp_dst\\);\\s*$", 1L, 0L),
+            delete_line_beginning_with = list("^\\s*FILE\\s\\*tmp_dst;\\s*$", 1L, 0L)
           )
         ),
         
@@ -1506,7 +1506,11 @@ PatchEngine <- R6Class(
             replace = list('^(#define\\sFIELDSEPS\\s*)(".*?")', '\\1(char*)\\2', 1L),
             
             replace = list("^(\\s*)int\\sdebug\\s*=\\s*(.*?);", "\\1int debugmode = \\2;", 1L),
-            replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L)
+            replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L),
+            
+            # To avoid warning: ISO C++11 does not allow conversion from string literal to 'char *'
+            replace = list("^\\s*char\\s\\*undef_value\\s=\\sCWB_PA_UNDEF_VALUE;\\s*$", "char *undef_value = (char *)CWB_PA_UNDEF_VALUE;", 1L)
+            
           ),
           
           if (revision < 1690) list(
@@ -1581,7 +1585,8 @@ PatchEngine <- R6Class(
             delete_line_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", 1L, 1L),
             insert_before = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "int ", 1L),
             replace = list("^(\\s*)decode_check_huff\\(Attribute\\s\\*attr,\\schar\\s\\*fname\\)", "\\1decode_check_huff(Attribute *attr, char *corpus_id, char *fname)", 1L),
-            
+            insert_after = list('printf\\("\\!\\!\\sYou\\scan\\sdelete\\sthe\\sfile', "  return 1;", 1L),
+
             replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
             
             # int return value. not void
