@@ -51,16 +51,16 @@ libcwb.a: $(OBJS)
 	$(AR) cq $@ $^
 
 cwb-encode.o: cwb-encode.c
-	${CC} -c ${CFLAGS} -o cwb-encode.o cwb-encode.c
+	${CC} -c $(CFLAGS_ALL) -o cwb-encode.o cwb-encode.c
 
 cwb-makeall.o: cwb-makeall.c
-	${CC} -c ${CFLAGS} -o cwb-makeall.o cwb-makeall.c
+	${CC} -c $(CFLAGS_ALL) -o cwb-makeall.o cwb-makeall.c
 
 cwb-huffcode.o: cwb-huffcode.c
-	${CC} -c ${CFLAGS} -o cwb-huffcode.o cwb-huffcode.c
+	${CC} -c $(CFLAGS_ALL) -o cwb-huffcode.o cwb-huffcode.c
 
 cwb-compress-rdx.o: cwb-compress-rdx.c
-	${CC} -c ${CFLAGS} -o cwb-compress-rdx.o cwb-compress-rdx.c
+	${CC} -c $(CFLAGS_ALL) -o cwb-compress-rdx.o cwb-compress-rdx.c
 
 clean:
 	$(RM) *.o *~
