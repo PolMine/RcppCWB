@@ -213,7 +213,7 @@ PatchEngine <- R6Class(
       )
       
       externed2 <- gsub("^\\s*extern\\s+", "", grep("^\\s*extern\\s", system(
-        sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "cwb", "cqp", "options.c")),
+        sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "src", "cwb", "cqp", "options.c")),
         intern = TRUE
       ), value = TRUE))
       print(externed2)
