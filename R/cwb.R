@@ -132,7 +132,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
 #' }
-cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, p_attributes = c("word", "pos", "lemma"), s_attributes){
+cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, encoding = "utf-8", p_attributes = c("word", "pos", "lemma"), s_attributes){
   
   s_attributes_noanno <- unlist(lapply(
     names(s_attributes),
@@ -152,6 +152,7 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
     regfile = file.path(registry, tolower(corpus)),
     data_dir = data_dir,
     vrt_dir = vrt_dir,
+    encoding = encoding,
     p_attributes = p_attributes,
     s_attributes_anno = s_attributes_anno,
     s_attributes_noanno = s_attributes_noanno
