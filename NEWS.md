@@ -7,6 +7,7 @@
 * A new function `cwb_version()` will report the version of the CWB source code.
 * The `cwb_encode()` function now has a previously missing argument `encoding` to state the encoding of the corpus to be indexed.
 * Encoding a cropus using `cwb_encode()` now assumes implicitly that input files are XML files and remove blank lines and leading and trailing whitespace. This is equivalent to the option "-xsB" of the command line utility `cwb-encode`.
+* The CWB code is updated to v3.4.33 (r1690).
 
 # RcppCWB 0.4.4
 
