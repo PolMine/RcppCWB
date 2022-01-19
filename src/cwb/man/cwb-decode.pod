@@ -4,8 +4,8 @@ cwb-decode - Utility for decoding a CWB corpus into various text formats
 
 =head1 SYNOPSIS
 
-B<cwb-decode> (-L|-H|-C|-Cx|-X) [-n] [-r I<registry_dir>]
-    [-s I<start>] [-e I<end>] [-p | -f I<file>]
+B<cwb-decode> (-L|-H|-C|-Cx|-X) [-n] [-b I<attribute>] [-r I<registry_dir>]
+    [-s I<start>] [-e I<end>] [-p | -f I<file>] [-Sp | -Sf I<file>]
     I<corpus>  [-c I<attribute>] [-ALL]
     (-P I<attribute>|-S I<attribute>|-V I<attribute>|-A I<attribute>)+
 
@@ -17,7 +17,15 @@ In normal mode, the entire corpus (or a segment specified with the C<-s> and C<-
 is printed.
 
 In matchlist mode (C<-p> or C<-f>), (pairs of) corpus positions are read from standard input 
-or a file specified with C<-f>, and the corresponding tokens or ranges are displayed. 
+or a file specified with C<-f>, and the corresponding tokens or ranges are displayed. These
+start and end positions are expected in the first two whitespace-delimited fields of each line;
+any additional fields are silently ignored. See L<"OUTPUT FORMATS"> for the effect of matchlist
+mode on different output modes.
+
+In subcorpus mode (C<-Sp> or C<-Sf>), all s-attribute start and end tags in the corpus are printed,
+but tokens (i.e. p-attributes) outside the selected ranges are suppressed.  Since B<cwb-encode> 
+ignores empty s-attribute regions, subcorpus mode can be used to create a physical subcorpus for
+a sequence of cpos ranges. The input format is the same as in matchlist mode.
 
 In either case, the output is to standard output; any accompanying error or warning messages are printed to
 standard error. 
@@ -25,8 +33,7 @@ standard error.
 The attribute declaration flags C<-P>, C<-S>, C<-V> and C<-A> determine which attributes will be printed; 
 use C<-ALL> for all attributes. 
 
-See L<"OUTPUT FORMATS"> below for available output modes. If no output format is specified, Standard format will
-be used.
+See L<"OUTPUT FORMATS"> below for available output modes. If no output format is specified, Standard format will be used.
 
 Command-line B<options> (which control the output format, range of corpus positions, etc.) 
 must be specified before the I<corpus> name, while B<attribute declarations> (which select attributes 
@@ -45,6 +52,12 @@ environment variable, or CWB's built-in default registry will be used.
 Please note that the CWB utilities do not currently support GNU-style C<--long-options>.
 
 =over 4
+
+=item B<-b> I<attribute>
+
+Print a blank line at the end of each region of s-attribute I<attribute>. It will be printed after the last token of the region, following any XML end tags and alignment attributes. Note that the blank line is only printed if this last token is part of the output.
+
+The B<-b> option is intended to be used with B<-C> or B<-Cn> mode in order to produce CoNLL-style output files (see EXAMPLES below).
 
 =item B<-C>
 
@@ -80,7 +93,7 @@ Activates Lisp output mode.
 
 Activates printing of corpus positions ("numbers") alongside each token. The precise format of the corpus
 positions depends on which output mode is activated. For instance, they will appear as attribute values
-in XML mode; as line-start labels in standard mode.
+in XML mode; as a first positional column in standard mode.
 
 =item B<-p>
 
@@ -96,6 +109,14 @@ the built-in CWB default will be used.
 =item B<-s> I<start>
 
 Specifies the start point for output; the first token printed will be corpus position I<start>.
+
+=item B<-Sf> I<file>
+
+Activates subcorpus mode (with input from I<file>).
+
+=item B<-Sp>
+
+Activates subcorpus mode (with input from standard input).
 
 =item B<-X>
 
@@ -117,6 +138,30 @@ Declares that p-attribute I<attribute> should be printed.
 Declares that s-attribute I<attribute> should be printed 
 (possibly including annotations, if they are present).
 
+=item B<-S> [I<name>=]I<attribute>[:I<n>][+I<av1>+I<av2>+...]
+
+This extended declaration can be used to modify the XML tags printed by B<cwb-decode>:
+
+=over 4
+
+=item I<name>=
+
+Display an XML element name I<name> in the output that is different from the attribute name.
+E.g. C<-S text=novel> prints regions of the s-attribute C<novel> as C<< <text> ... </text> >>.
+
+=item :I<n>
+
+Reconstruct nested XML elements up to depth I<n>, which have been broken up into individual s-attributes by a corresponding declaration in B<cwb-encode>.
+E.g. S<-S np:2> prints regions of three s-attributes C<np>, C<np1> and C<np2> as nested elements C<< <np> ... </np> >>.
+
+=item +I<av1>+I<av2>+...
+
+Reconstruct attribute-value pairs in XML start tags, which have been broken up into individual s-attributes by a corresponding declaration in B<cwb-encode>.
+E.g. S<-S text+id+title> will access the additional s-attributes C<text_id> and C<text_title> to print regions of the form C<< <text id=".." title=".."> ... </text> >>.
+Annotated values for I<attribute> itself will be ignored with a warning.
+
+=back
+
 =item B<-V> I<attribute>  
 
 In matchlist mode only, declares that the s-attribute annotation that surrounds each input range should be printed.
@@ -135,8 +180,7 @@ A-attributes must still be added manually, if required.
 =item B<-c> I<attribute>
 
 Sets a context attribute. In matchlist mode only, each range will be expanded to a full containing I<attribute> region.
-In "normal" mode with concordance style output, each individual token will be printed within its full
-containing I<attribute>.
+In "normal" mode with concordance style output, each individual token will be printed within its full containing I<attribute>.
 
 =back
 
@@ -173,18 +217,25 @@ As in standard mode, one token is printed per line. However, only p-attributes a
 shown on token lines. S-attributes and a-attributes are instead shown on separate
 lines, in pseudo-XML-esque form. 
 
-S-attributes are printed in the form C<< <I<attribute> I<annotation>> >> ,
-with simple closing tags.
+S-attributes are printed in the form C<< <I<attribute> I<annotation>> >>,
+with simple closing tags C<< </I<attribute>> >>. It is also possible to reconstruct
+nesting and attribute-value pairs in start tags broken up by B<cwb-encode> into
+multiple s-attributes (see L<"ATTRIBUTE DECLARATIONS"> above).
+
 A-attributes are given as simple unvalued tags, unless printing of token numbers
 is enabled, in which case the a-attribute tags will contain a pair of numbers
 representing the start and end points of the corresponding region in the aligned corpus.
 These numbers will also appear in the closing tag of the a-attribute. 
 
-In matchlist mode, if a context attribute is being used, it is not actually printed.
+In matchlist or subcorpus mode, if a context attribute is being used, it is not actually
+shown in the output (but the context expansion is still applied).
 
-In matchlist mdoe, the values of "surrounding" s-attributes are shown in the form
+In matchlist mode, the values of "surrounding" s-attributes (C<-V>) are shown in the form
 of a comment - a line formatted as C<# I<attribute>=I<value>> . These comments
-may need to be stripped before the output is sent to B<cwb-encode>.
+may need to be stripped before the output is sent to B<cwb-encode>; they will automatically
+be ignored in numbered input mode (C<-n>). A blank line is printed after each match.
+
+In subcorpus mode, neither comments nor blank lines are included in the output.
 
 
 =item B<XML-compatible compact output>
@@ -305,6 +356,43 @@ The CORPUS_REGISTRY is overruled by the B<-r> option, if present; if neither of 
 of specifying the registry is used, then the built-in CWB default registry location will be used.
 
 =back
+
+
+=head1 EXAMPLES
+
+=head2 CoNLL format
+
+The various B<CoNLL> formats provide a simple representation of tokenized and annotated text collections,
+which has become very popular in NLP (see e.g. L<https://universaldependencies.org/format.html>).
+A CoNLL-style file is understood here as a collection of sentences with token-level annotations (i.e. p-attributes)
+in verticalised text format, with an additional first column enumerating token positions within a sentence
+(as targets for dependency links. Sentence boundaries are indicated by blank lines; there is no other structural annotation.
+CoNLL files often contain comment lines (starting with C<#>) that provide text-level metadata or other information for
+human readers.
+
+If a CWB corpus has been indexed with token numbers (say, in the p-attribute C<id>), it can easily be decoded
+into a CoNLL-like format by combining compact output mode (C<-C>) with C<-b s> to insert a blank line after each sentence.
+
+  cwb-decode -C -b s CORPUS -P id -P word -P pos -P lemma > conll_format.txt
+
+Note that C<id> must be printed in the first column and that no s-attributes (C<-S> flags) may be included.
+If token numbers haven't been annotated, use C<-n> to insert corpus positions in the first column:
+
+  cwb-decode -Cn -b s CORPUS -P word -P pos -P lemma > conll_format.txt
+
+An alternative approach uses matchlist mode to export all (or selected) sentences, which makes it possible to
+include metadata in comment lines at the start of each sentence. Matchlist mode already inserts blank lines,
+so the C<-b> option is superfluous.
+
+  cwb-s-decode CORPUS -S s 
+    | cwb-decode -Cn -p CORPUS -P word -P pos -P lemma -V text_id -V s_len 
+    > conll_format.txt
+
+Selected sentences can be obtained with a suitable CQP query and C<dump>ed to the C<cwb-decode> command:
+
+  cqpcl -D CORPUS 'A = [lemma="elephant"] expand to s; dump A;'
+    | cwb-decode -Cn -p CORPUS -P word -P pos -P lemma -V text_id -V s_len 
+    > conll_format.txt
 
 
 =head1 SEE ALSO

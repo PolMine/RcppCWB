@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -18,17 +18,9 @@
 #include <math.h>
 
 #include "globals.h"
-
-#include "bitio.h"
-
 #include "compression.h"
 
 
-#if __STDC_VERSION__ >= 199901L
-/* C99 has log2() already, but many pre-C99 Cs don't */
-#else
-#define log2(x) (log(x)/log(2.0))
-#endif
 
 /**
  * {I have no idea what this does -- AH}
@@ -42,20 +34,20 @@ compute_ba(int ft, int corpus_size)
 {
   double p;
   int pa;
-  
+
   p = (ft * (double)1.0)/(corpus_size * (double)1.0);
   pa = ceil(-log(2.0-p)/log(1.0-p));
 
   /* safety check for high-frequency IDs, such as the NIL Id
      in sparse attributes (evert, 01 Mar 99) */
-  if (pa > 1) 
+  if (pa > 1)
     return pa;
   else
     return 2;
 }
 
 /*
- * Version with Alistair Moffat's comments worked in 
+ * Version with Alistair Moffat's comments worked in
  * Tue Jan 24 10:07:12 1995 (oli)
  */
 /**
@@ -87,13 +79,9 @@ write_golomb_code(int x, int b, BFile *bf)
     BFwrite(bit1, 1, bf);
   BFwrite(bit0, 1, bf);
 
-
   /* write the binary part */
-
-  /* nr_sc = 2^ub - b */
-
   nr_sc = (1 << ub) - b;
-  
+
   if (res < nr_sc)
     BFwriteWord((unsigned int)res, lb, bf);
   else
@@ -129,7 +117,7 @@ int read_golomb_code_bf(int b, BFile *bf)
   } while (bit);
 
   nr_sc = (1 << ub) - b;
-  
+
   /* read binary part, bitwise */
 
   r = 0;
@@ -178,7 +166,7 @@ read_golomb_code_bs(int b, BStream *bs)
   } while (bit);
 
   nr_sc = (1 << ub) - b;
-  
+
   /* read binary part, bitwise */
 
   r = 0;

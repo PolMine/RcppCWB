@@ -1,0 +1,65 @@
+##   -*-Makefile-*-
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+
+##
+##  PLATFORM CONFIGURATION FILE:
+##  Statically linked Apple Silicon (M1 and other ARM CPUs) 64-bit binaries for MacOS 11 (Big Sur)
+##  and newer. with prerequisite libraries provided by HomeBrew package manager.
+
+## --- WARNING ---
+## HomeBrew is not ideal for binary releases. While statically linked libraries can
+## be created, they are always compiled for the current MacOS version and will often
+## not be compatible with earlier MacOS releases.
+## A quick Web search suggests that there is no feasible work-around. In fact,
+## HomeBrew goes out of its way to keep users from modifying compilation settings.
+## In order to provide binary packages for general release, you will have to find
+## a machine running a sufficiently old version of MacOS.
+
+
+## Inherits from basic Darwin configuration
+include $(TOP)/config/platform/darwin
+
+## Make sure that Apple's gcc is used (not e.g. a fink-installed version)
+CC = /usr/bin/gcc
+
+## Compile for Apple Silicon (M1 and other ARM CPUs)
+## Currently, Apple GCC doesn't support any sensible -march, -mcpu or -mtune options
+CFLAGS = -Wall -O3 -arch arm64
+
+DEPEND_CFLAGS = -Wall -O3
+
+AR = libtool -static -o # should probably be used by all MacOS builds
+
+
+## Must specify static libraries explicitly so linker won't prefer .dylib versions
+READLINE_DEFINES = -I/opt/homebrew/opt/readline/include
+READLINE_LIBS = /opt/homebrew/opt/readline/lib/libreadline.a /opt/homebrew/opt/readline/lib/libhistory.a
+
+PCRE_DEFINES = -I/opt/homebrew/opt/pcre/include
+PCRE_LIBS = /opt/homebrew/opt/pcre/lib/libpcre.a
+
+## GLib must be linked dynamically against system-provided libraries and frameworks
+GLIB_DEFINES = -I/opt/homebrew/opt/glib/include/glib-2.0 -I/opt/homebrew/opt/glib/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include
+GLIB_LIBS = /opt/homebrew/opt/glib/lib/libglib-2.0.a /opt/homebrew/opt/gettext/lib/libintl.a -liconv -framework CoreFoundation -framework CoreServices -framework Foundation
+
+## CPU architecture and operating system used to name binary releases
+RELEASE_ARCH = arm64
+
+## extra static libraries needed for linking against the binary release
+RELEASE_CFLAGS = -arch $(RELEASE_ARCH)
+RELEASE_LDFLAGS = -lcl -lpcre -lglib-2.0 -lintl -liconv -framework CoreFoundation -framework CoreServices -framework Foundation
+RELEASE_EXTRA_LIBS = /opt/homebrew/opt/pcre/lib/libpcre.a /opt/homebrew/opt/glib/lib/libglib-2.0.a /opt/homebrew/opt/gettext/lib/libintl.a

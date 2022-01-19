@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -19,11 +19,55 @@
  *  Copyright (C) 2010      by ANR Textométrie, ENS de Lyon
  */
 
+/**
+ * @file
+ *
+ * This file contains the Optimised Regular Expression object, which wraps around  PCRE.
+ */
+
+
 #include <glib.h>
 
+/* include external regular expression library */
+#include <pcre.h>
+
 #include "globals.h"
-#include "regopt.h"
-void Rprintf(const char *, ...);
+
+
+/**
+ * Maximum number of grains of optimisation.
+ *
+ * There's no point in scanning for too many grains, but some regexps used to be bloody inefficient.
+ */
+#define MAX_GRAINS 12
+
+/**
+ * Underlying structure for CL_Regex object.
+ *
+ * @see regopt.c
+ */
+struct _cl_regex {
+  pcre *needle;                      /**< buffer for the actual regex object (PCRE) */
+  pcre_extra *extra;                 /**< buffer for PCRE's internal optimisation data */
+  CorpusCharset charset;             /**< the character set in use for this regex */
+  int icase;                         /**< whether IGNORE_CASE flag was set for this regex (needs special processing) */
+  int idiac;                         /**< whether IGNORE_DIAC flag was set for this regex */
+  char *haystack_buf;                /**< a buffer of size CL_MAX_LINE_LENGTH used for accent folding by cl_regex_match(),
+                                          allocated only if IGNORE_DIAC was specified */
+  char *haystack_casefold;           /**< additional, larger (2 * CL_MAX_LINE_LENGTH) buffer for a case-folded version,
+                                          allocated only if optimizer is active and IGNORE_CASE was specified */
+  /* Note: these buffers are for the string being tested, NOT for the regular expression.
+   * They are allocated once here to avoid frequent small allocation and deallocations in cl_regex_match(). */
+
+  /* data from optimiser (see global variables in regopt.c for comments) */
+  int grains;                        /**< number of grains (0 = not optimised). @see cl_regopt_grains */
+  int grain_len;                     /**< @see cl_regopt_grain_len */
+  char *grain[MAX_GRAINS];           /**< @see cl_regopt_grain */
+  int anchor_start;                  /**< @see cl_regopt_anchor_start */
+  int anchor_end;                    /**< @see cl_regopt_anchor_end */
+  int jumptable[256];                /**< @see cl_regopt_jumptable @see make_jump_table */
+};
+
 
 /**
  * @file
@@ -78,13 +122,12 @@ int grain_buffer_len[MAX_GRAINS]; /**< the length of each grain (in characters) 
 int grain_buffer_grains = 0;
 
 /** A buffer for grain strings. @see local_grain_data */
-char public_grain_data[CL_MAX_LINE_LENGTH]; /* input regexp shouldn't be longer than CL_MAX_LINE_LENGTH, so all grains must fit */
-/* TODO - above assumes rx no longer than CL_MAX_LINE_LENGTH, but in cl_new_regex(), it is explicitly assumed that
- *        there may be regexs (with RE() ) that are of any gargantuan length... */
+char public_grain_data[CL_MAX_LINE_LENGTH]; /* input regexp shouldn't be longer than CL_MAX_LINE_LENGTH, so all grains must fit;
+                                             * RE() operator can create GIANT regexen, so cl_new_regex() only runs the optimiser
+                                             * iff the length of the regex is less than CL_MAX_LINE_LENGTH. */
+
 /** A buffer for grain strings. @see public_grain_data */
 char local_grain_data[CL_MAX_LINE_LENGTH];
-
-int cl_regopt_analyse(char *regex);
 
 /**
  * A counter of how many times the "grain" system has allwoed us to avoid
@@ -107,6 +150,13 @@ int cl_regopt_successes = 0;
  */
 char cl_regex_error[CL_MAX_LINE_LENGTH];
 
+
+/*
+ * static prototypes
+ */
+static void regopt_data_copy_to_regex_object(CL_Regex rx);
+static int cl_regopt_analyse(char *regex);
+
 /**
  * Create a new CL_regex object (ie a regular expression buffer).
  *
@@ -122,7 +172,7 @@ char cl_regex_error[CL_MAX_LINE_LENGTH];
  *
  * The optimizer only understands a subset of PCRE syntax:
  *  - literal characters (alphanumeric, safe punctuation, escaped punctuation)
- *  - numeric character codes (\x and \o)
+ *  - numeric character codes (\\x and \\o)
  *  - escape sequences for character classes and Unicode properties
  *  - all repetition operators
  *  - simple alternatives (...|...|...)
@@ -168,7 +218,7 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   delatexed_regex = (char *) cl_malloc(l + 1);
 
   /* allocate and initialise CL_Regex object */
-  rx = (CL_Regex) cl_malloc(sizeof(struct _CL_Regex));
+  rx = (CL_Regex) cl_malloc(sizeof(struct _cl_regex));
   rx->haystack_buf = NULL;
   rx->haystack_casefold = NULL;
   rx->charset = charset;
@@ -192,14 +242,14 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
     options_for_pcre |= PCRE_CASELESS; /* case folding is left to the PCRE matcher */
   if (charset == utf8) {
     if (cl_debug)
-      Rprintf("CL: enabling PCRE's UTF8 mode for regex %s\n", anchored_regex);
+      fprintf(stderr, "CL: enabling PCRE's UTF8 mode for regex %s\n", anchored_regex);
     /* note we assume all strings have been checked upon input (i.e. indexing or by the parser) */
     options_for_pcre |= PCRE_UTF8|PCRE_NO_UTF8_CHECK;
   }
   rx->needle = pcre_compile(anchored_regex, options_for_pcre, &errstring_for_pcre, &erroffset_for_pcre, NULL);
   if (rx->needle == NULL) {
     strcpy(cl_regex_error, errstring_for_pcre);
-    Rprintf("CL: Regex Compile Error: %s\n", cl_regex_error);
+    fprintf(stderr, "CL: Regex Compile Error: %s\n", cl_regex_error);
     cl_free(rx);
     cl_free(preprocessed_regex);
     cl_free(anchored_regex);
@@ -207,7 +257,7 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
     return NULL;
   }
   else if (cl_debug)
-    Rprintf("CL: Regex compiled successfully using PCRE library\n");
+    fprintf(stderr, "CL: Regex compiled successfully using PCRE library\n");
 
 
   /* a spot of code to handle use with a pre-JIT version of PCRE.
@@ -219,7 +269,7 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
 #define PCRE_STUDY_JIT_COMPILE 0
 #endif
   if (cl_debug)
-    Rprintf("CL: PCRE's JIT compiler is %s.\n", (is_pcre_jit_available ? "available" : "unavailable"));
+    fprintf(stderr, "CL: PCRE's JIT compiler is %s.\n", (is_pcre_jit_available ? "available" : "unavailable"));
 
   /* always use pcre_study because nearly all our regexes are going to be used lots of times;
    * with recent version of PCRE, this will also JIT-compile the expression for much faster matching */
@@ -227,15 +277,18 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   if (errstring_for_pcre != NULL) {
     rx->extra = NULL;
     if (cl_debug)
-      Rprintf("CL: calling pcre_study failed with message...\n   %s\n", errstring_for_pcre);
+      fprintf(stderr, "CL: calling pcre_study failed with message...\n   %s\n", errstring_for_pcre);
     /* note that failure of pcre_study is not a critical error, we can just continue without the extra info */
   }
   if (cl_debug && rx->extra)
-    Rprintf("CL: calling pcre_study produced useful information...\n");
+    fprintf(stderr, "CL: calling pcre_study produced useful information...\n");
 
   /* attempt to optimise regular expression */
   cl_regopt_utf8 = (charset == utf8);
-  optimised = cl_regopt_analyse(preprocessed_regex);
+  if (CL_MAX_LINE_LENGTH <= (l+1))
+    optimised = cl_regopt_analyse(preprocessed_regex);
+  else
+    optimised = 0;   /* IE: avoid optimisation if the regex is longer than the grain buffer. */
 
   /* decide whether it makes sense to use the optimizer:
    *  - testing showed that it is usually faster to rely directly on PCRE's caseless matching than
@@ -248,11 +301,11 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   if (rx->icase && (charset == utf8 || is_pcre_jit_available)) {
     if (optimised && cl_debug) {
       int i;
-      Rprintf("CL: Found grain set with %d items(s)", cl_regopt_grains);
+      fprintf(stderr, "CL: Found grain set with %d items(s)", cl_regopt_grains);
       for (i = 0; i < cl_regopt_grains; i++) {
-        Rprintf(" [%s]", cl_regopt_grain[i]);
+        fprintf(stderr, " [%s]", cl_regopt_grain[i]);
       }
-      Rprintf("\nCL: but optimization disabled for case-insensitive search\n");
+      fprintf(stderr, "\nCL: but optimization disabled for case-insensitive search\n");
     }
     optimised = 0;
   }
@@ -329,7 +382,7 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
 
   if (rx->idiac || do_nfc) { /* perform accent folding on input string if necessary */
     haystack_pcre = rx->haystack_buf;
-    strcpy(haystack_pcre, str);
+    cl_strcpy(haystack_pcre, str);
     cl_string_canonical(haystack_pcre, rx->charset, rx->idiac | do_nfc, CL_MAX_LINE_LENGTH);
   }
   else
@@ -340,12 +393,12 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
    *  - use regexp optimizer only if cl_optimize is set
    *  - allows comparative testing & benchmarking
    *  - question: is the optimizer still worth the effort for PCRE with JIT?
-   *  - switch optimizer back to default before release **TODO**
+   *  - TODO switch optimizer back to default before release
    */
   if (optimised && cl_optimize) {
     if (rx->icase) {
       haystack = rx->haystack_casefold;
-      strcpy(haystack, haystack_pcre);
+      cl_strcpy(haystack, haystack_pcre);
       cl_string_canonical(haystack, rx->charset, rx->icase, 2 * CL_MAX_LINE_LENGTH);
     }
     else
@@ -361,9 +414,8 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
 
     while (i <= max_i) {
       jump = rx->jumptable[(unsigned char) haystack[i + rx->grain_len - 1]];
-      if (jump > 0) {
+      if (jump > 0)
         i += jump; /* Boyer-Moore search */
-      }
       else {
         /* for each grain */
         for (k = 0; k < rx->grains; k++) {
@@ -404,7 +456,7 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
                        ovector, 30);
     if (result < PCRE_ERROR_NOMATCH && cl_debug)
       /* note, "no match" is a PCRE "error", but all actual errors are lower numbers */
-      Rprintf("CL: Regex Execute Error no. %d (see `man pcreapi` for error codes)\n", result);
+      fprintf(stderr, "CL: Regex Execute Error no. %d (see `man pcreapi` for error codes)\n", result);
   }
 
 
@@ -412,7 +464,7 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
   /* debugging code used before version 2.2.b94, modified to pcre return values & re-enabled in 3.2.b3 */
   /* check for critical error: optimiser didn't accept candidate, but regex matched */
   if ((result > 0) && !grain_match)
-    Rprintf("CL ERROR: regex optimiser did not accept '%s' although it should have!\n", str);
+    fprintf(stderr, "CL ERROR: regex optimiser did not accept '%s' although it should have!\n", str);
 #endif
 
   return (result > 0); /* return true if regular expression matched */
@@ -422,7 +474,7 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
  * Deletes a CL_Regex object, and frees all resources associated with
  * the pre-compiled regex.
  *
- * @param rx  The CL_Regex to delete.
+ * @param rx  The CL_Regex to delete. Null-safe.
  */
 void
 cl_delete_regex(CL_Regex rx)
@@ -483,7 +535,7 @@ cl_delete_regex(CL_Regex rx)
 int
 is_safe_char(unsigned char c)
 {
-  /* note: this function is UTF8-safe because byte values above 0x7f 
+  /* note: this function is UTF8-safe because byte values above 0x7f
    * (forming UTF-8 multi-byte sequences) are always allowed */
   if (
       (c >= 'A' && c <= 'Z') ||
@@ -523,7 +575,7 @@ is_safe_char(unsigned char c)
 /**
  * Is the given character an ASCII alphanumeric?
  *
- * ASCII alphanumeric characters comprise A-Z, a-z and 0-9; they are the only 
+ * ASCII alphanumeric characters comprise A-Z, a-z and 0-9; they are the only
  * characters that form special escape sequences in PCRE regular expressions.
  *
  * @param c  The character (cast to unsigned for the comparison).
@@ -614,12 +666,14 @@ is_hexadecimal(unsigned char c) {
  * Read in an escape sequence for a character or class - part of the CL Regex Optimiser.
  *
  * This function reads one of the following escape sequences:
- *   \x##, \x{###} ... hexadecimal character code
- *   \o{###}       ... octal character code
- *   \w, \W, \d, \D, \s, \S  ...  generic character types
- *   \p#, \p{###}  ... Unicode properties
- *   \P#, \P{###}  ... negated Unicode properties
- *   \X            ... Unicode extended grapheme cluster
+ *
+ *     \x##, \x{###} ... hexadecimal character code
+ *     \o{###}       ... octal character code
+ *     \w, \W, \d, \D, \s, \S  ...  generic character types
+ *     \p#, \p{###}  ... Unicode properties
+ *     \P#, \P{###}  ... negated Unicode properties
+ *     \X            ... Unicode extended grapheme cluster
+ *
  */
 char *
 read_escape_seq(char *mark)
@@ -687,9 +741,9 @@ read_escape_seq(char *mark)
  * The following elements are currently recognized:
  *  - a matchall (.)
  *  - a safe literal character or escaped ASCII punctuation
- *  - an escape sequence for a simple character class (\w, \d, etc.)
+ *  - an escape sequence for a simple character class (\\w, \\d, etc.)
  *  - an escape sequence for a Unicode property
- *  - a hexadecimal (\x) or octal (\o) character code
+ *  - a hexadecimal (\\x) or octal (\\o) character code
  *  - a simple character set such as [a-z], [A-Z] and [0-9]
  * The precise syntax of character sets is rather messy, so we will not
  * make an attempt to recognize more complex sets.
@@ -855,7 +909,7 @@ read_wildcard(char *mark)
  * Reads in a literal grain from a regex - part of the CL Regex Optimiser.
  *
  * A grain is a string of safe symbols: alphanumeric, safe punctuation and
- * escaped punctuation; numeric character codes (\x, \u) are not supported.
+ * escaped punctuation; numeric character codes (\\x, \\u) are not supported.
  * The last symbol might be followed by a repetition operator. It is only
  * included in the grain if the repetition count is at least one.
  *
@@ -999,7 +1053,7 @@ read_disjunction(char *mark, int *align_start, int *align_end, int no_paren)
     else
       return mark; /* disjunction group must be parenthesized */
   }
-  
+
   buf = local_grain_data;
   grain_buffer_grains = 0;
   grain = 0;
@@ -1066,7 +1120,7 @@ read_disjunction(char *mark, int *align_start, int *align_end, int no_paren)
  * @param at_end    Boolean: if True, all grains are anchored on the right
  *
  */
-void
+static void
 update_grain_buffer(int at_start, int at_end)
 {
   char *buf = public_grain_data;
@@ -1140,18 +1194,14 @@ make_jump_table(CL_Regex rx)
 
       rx->jumptable[ch] = jump;
     }
-    if (cl_debug) { /* in debug mode, print out the entire jumptable */
-      Rprintf("CL: cl_regopt_jumptable for Boyer-Moore search is\n");
+    if (cl_debug) {
+      /* in debug mode, print out the entire jumptable */
+      fprintf(stderr, "CL: cl_regopt_jumptable for Boyer-Moore search is\n");
       for (k = 0; k < 256; k += 16) {
-        Rprintf("CL: ");
-        for (j = 0; j < 15; j++) {
-          ch = k + j;
-          if ((ch >= 32) & (ch < 127))
-            Rprintf("|%2d %c  ", rx->jumptable[ch], ch);
-          else
-            Rprintf("|%2d %02X ", rx->jumptable[ch], ch);
-        }
-        Rprintf("\n");
+        fprintf(stderr, "CL: ");
+        for (j = 0, ch = k ; j < 15 ; j++, ch++)
+          fprintf(stderr, (ch >= 32 && ch < 127) ? "|%2d %c  " : "|%2d %02X ", rx->jumptable[ch], ch);
+        fprintf(stderr, "\n");
       }
     }
   }
@@ -1174,7 +1224,7 @@ make_jump_table(CL_Regex rx)
  *
  * @param rx    a pointer to an initialized CL_Regex object
  */
-void
+static void
 regopt_data_copy_to_regex_object(CL_Regex rx)
 {
   char *grain;
@@ -1231,17 +1281,17 @@ regopt_data_copy_to_regex_object(CL_Regex rx)
   rx->anchor_end = cl_regopt_anchor_end;
 
   if (cl_debug) {
-    Rprintf("CL: Regex optimised, %d grain(s) of length %d\n",
+    fprintf(stderr, "CL: Regex optimised, %d grain(s) of length %d\n",
         rx->grains, rx->grain_len);
-    Rprintf("CL: grain set is");
+    fprintf(stderr, "CL: grain set is");
     for (i = 0; i < rx->grains; i++) {
-      Rprintf(" [%s]", rx->grain[i]);
+      fprintf(stderr, " [%s]", rx->grain[i]);
     }
     if (rx->anchor_start)
-      Rprintf(" (anchored at beginning of string)");
+      fprintf(stderr, " (anchored at beginning of string)");
     if (rx->anchor_end)
-      Rprintf(" (anchored at end of string)");
-    Rprintf("\n");
+      fprintf(stderr, " (anchored at end of string)");
+    fprintf(stderr, "\n");
   }
 
   /* compute jump table for Boyer-Moore search */
@@ -1249,7 +1299,7 @@ regopt_data_copy_to_regex_object(CL_Regex rx)
     make_jump_table(rx);
 
   if (cl_debug)
-    Rprintf("CL: using %d grain(s) for optimised regex matching\n", rx->grains);
+    fprintf(stderr, "CL: using %d grain(s) for optimised regex matching\n", rx->grains);
 }
 
 
@@ -1280,7 +1330,7 @@ regopt_data_copy_to_regex_object(CL_Regex rx)
  * @param regex  String containing the regex to optimise.
  * @return       Boolean: true = ok, false = couldn't optimise regex.
  */
-int
+static int
 cl_regopt_analyse(char *regex)
 {
   char *point, *mark;
@@ -1288,7 +1338,7 @@ cl_regopt_analyse(char *regex)
 
   mark = regex;
   if (cl_debug) {
-    Rprintf("CL: cl_regopt_analyse('%s')\n", regex);
+    fprintf(stderr, "CL: cl_regopt_analyse('%s')\n", regex);
   }
   cl_regopt_grains = 0;
   cl_regopt_grain_len = 0;
@@ -1407,7 +1457,7 @@ cl_regopt_count_reset(void)
  *   if (cl_regex_match(rx, haystacks[i]))
  *     hits++;
  *
- * Rprintf(
+ * fprintf(stderr,
  *         "Found %d matches; avoided regex matching %d times out of %d trials",
  *         hits, cl_regopt_count_get(), n );
  *

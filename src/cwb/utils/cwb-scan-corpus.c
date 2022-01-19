@@ -15,11 +15,16 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <assert.h>
 
-#include "../cl/globals.h"
-#include "../cl/corpus.h"
 #include "../cl/cl.h"
-#include "../cl/special-chars.h"
+#include "../cl/cwb-globals.h"
+#include "../cl/corpus.h"           /* for internals of the Corpus object */
+#include "../cl/special-chars.h"    /* for cl_iso_char_is_alphanumeric */
 
 
 /** maximum value of N (makes life a little easier) */
@@ -44,6 +49,9 @@ struct _Hash {
   /* optional frequency values for corpus rows */
   Attribute *frequency_values;
   int *frequency;           /**< pre-computed integer values for the attribute keys */
+
+  /* optional within constraint */
+  Attribute *within;
 
   /* p-attributes */
   int *(id_list[MAX_N]);    /**< optional regex constraint (stored as a list of matching lexicon IDs) */
@@ -74,6 +82,9 @@ char *output_file = NULL;    /**< output file name (-o option) */
 int sort_output = 0;         /**< sort output in canonical order (-S option) */
 int frequency_threshold = 0; /**< frequency threshold for result table (-f option) */
 char *frequency_att = NULL;  /**< p-attribute with frequency entries for corpus rows (when abusing corpus as frequency database) */
+char *within_att = NULL;     /**< s-attribute that n-grams must be contained in, with optional document frequency counts */
+int do_within = 0;           /**< n-grams must be within region (-w <att>) */
+int do_df = 0;               /**< compute document frequencies wrt. s-attribute (-d <att>, implies -w <att>) */
 int global_start = 0;        /**< start scanning at this cpos (defaults to start of corpus) */
 int global_end = -1;         /**< will be set up in main() unless changed with -e switch. @see global_start */
 char *ranges_file = NULL;    /**< file with ranges to scan (pairs of corpus positions) */
@@ -112,13 +123,17 @@ scancorpus_usage(void)
   fprintf(stderr, "  -F <att>  add up frequency values from p-attribute <att>\n");
   fprintf(stderr, "  -C        clean up data, i.e. accept only \"regular\" words\n");
   fprintf(stderr, "            (does not apply to constraint keys marked with '?')\n");
+  fprintf(stderr, "  -w <att>  all n-grams must be contained within <att> regions\n");
+  fprintf(stderr, "            (including constraint keys; multiple -w flags are not allowed)\n");
+  fprintf(stderr, "  -d <att>  compute document frequencies for <att> regions\n");
+  fprintf(stderr, "            (implies -w <att>; -d and -w cannot be combined)\n");
   fprintf(stderr, "  -s <n>    start scanning at corpus position <n>\n");
   fprintf(stderr, "  -e <n>    stop scanning at corpus position <n>\n");
   fprintf(stderr, "  -R <file> read list of corpus ranges to scan from <file>\n");
   fprintf(stderr, "  -q        quiet mode (no progress information on stderr)\n");
   fprintf(stderr, "  -D        activate CL debugging (use repeatedly for more output)\n");
   fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(1);
 }
 
@@ -136,7 +151,7 @@ scancorpus_parse_options(int argc, char *argv[])
   extern char *optarg;
   int c;
 
-  while ((c = getopt(argc, argv, "+r:b:o:Sf:F:Cs:e:R:qDh")) != EOF) {
+  while ((c = getopt(argc, argv, "+r:b:o:Sf:F:Cw:d:s:e:R:qDh")) != EOF) {
     switch (c) {
     case 'r':                        /* -r <dir> */
       if (reg_dir == NULL)
@@ -173,6 +188,29 @@ scancorpus_parse_options(int argc, char *argv[])
       break;
     case 'C':                        /* -C */
       check_words = 1;
+      break;
+    case 'w':                        /* -w <att> */
+      if (within_att) {
+        if (do_df)
+          fprintf(stderr, "Error: -w and -d cannot be used together.\n");
+        else
+          fprintf(stderr, "Error: multiple -w options are not allowed.\n");
+        exit(1);
+      }
+      within_att = optarg;
+      do_within = 1;
+      break;
+    case 'd':                        /* -d <att> */
+      if (within_att) {
+        if (do_within)
+          fprintf(stderr, "Error: -w and -d cannot be used together.\n");
+        else
+          fprintf(stderr, "Error: -d option used twice.\n");
+        exit(1);
+      }
+      within_att = optarg;
+      do_df = 1;
+      do_within = 1;
       break;
     case 's':                        /* -s <n> */
       global_start = atoi(optarg);
@@ -463,7 +501,7 @@ get_next_range(int *start, int *end)
  * Format n-gram hash entry.
  *
  * The formatted n-gram entry is written to the specified stream in format
- *   <freq> TAB <w1> TAB <w2> TAB ...
+ *   [freq] TAB [w1] TAB [w2] TAB ...
  *
  * @param fh    output stream (use stdout to display in terminal)
  * @param entry n-gram hash entry to be printed
@@ -557,10 +595,17 @@ main (int argc, char *argv[])
   int Csize = 0;                   /* corpus size (= number of tokens) */
   Attribute *word;                 /* need default p-attribute to compute corpus size */
   int cpos, next_cpos, start_cpos, end_cpos, previous_end;
+  int cpos_last_progress = -1024;  /* cpos of last progress message */
+
+  cl_startup();
+  progname = argv[0];
 
   /* parse command line options */
-  progname = argv[0];
   argind = scancorpus_parse_options(argc, argv);
+  if (frequency_att && do_df) {
+    fprintf(stderr, "Error: options -F and -d cannot be combined.\n");
+    exit(1);
+  }
   if ((argc - argind) < 2) {
     scancorpus_usage();                       /* not enough arguments -> print usage info */
   }
@@ -573,6 +618,7 @@ main (int argc, char *argv[])
   Hash.max_offset = 0;
   Hash.frequency_values = NULL;
   Hash.frequency = NULL;
+  Hash.within = NULL;
 
   /* first argument: corpus */
   corpname = argv[argind++];
@@ -587,11 +633,21 @@ main (int argc, char *argv[])
     if (C->charset == utf8) {
       /* utf8: don't fold diacritics, but use Unicode character properties */
       if (NULL == (regular_rx = cl_new_regex("([\\pL\\pM]+|\\pN+)(-([\\pL\\pM]+|\\pN+))*", 0, C->charset)) ) {
-        fprintf(stderr, "Error: can't initialise regex\n");
+        fprintf(stderr, "Error: can't initialise regex for -C option\n");
         exit(1);
       }
     }
     /* other character sets don't use regex engine: see scancorpus_word_is_regular */
+  }
+
+  if (within_att) {
+    /* add constraint '?<att>+0' for -w <att> and -d <att> so that we can check within limits after main n-gram,
+     * but still avoid unnecessary computation if current cpos is outside <att> region
+     */
+    char *within_key = cl_malloc(strlen(within_att) + 4);
+    sprintf(within_key, "?%s+0", within_att);
+    scancorpus_add_key(within_key);
+    cl_free(within_key);
   }
 
   /* remaining arguments are specifiers for keys forming N-tuple */
@@ -601,7 +657,10 @@ main (int argc, char *argv[])
   }
 
   /* now initalise the n-gram hash table */
-  Hash.table = cl_new_ngram_hash(Hash.K, n_buckets);
+  /* With -d option, a user payload of 1 int stores the s-attribute structure of the last
+   * occurrence of each n-gram, so duplicates in the same region can be filtered out.
+   */
+  Hash.table = cl_new_ngram_hash(Hash.K, n_buckets, (do_df) ? 1 : 0);
   if (n_buckets > 0)
     cl_ngram_hash_auto_grow(Hash.table, 0);
 
@@ -652,6 +711,15 @@ main (int argc, char *argv[])
     }
   }
 
+  /* open s-attribute for "within" constraint (-w and -d options) */
+  if (within_att) {
+    Hash.within = cl_new_attribute(C, within_att, ATT_STRUC);
+    if (Hash.within == NULL) {
+      fprintf(stderr, "Error: can't load s-attribute %s.%s\n", corpname, within_att);
+      exit(1);
+    }
+  }
+
   if (! quiet)
     fprintf(stderr, "Scanning corpus %s for %d-tuples ... \n", corpname, Hash.N);
 
@@ -681,15 +749,17 @@ main (int argc, char *argv[])
     for (cpos = start_cpos; cpos <= end_cpos; cpos = next_cpos) {
       int tuple[MAX_N];
       int i=0, k, accept;
+      int within_struc = -1;
 
       next_cpos = cpos + 1;        /* this device allows the code to "skip" to the next matching region for s-attribute constraints */
 
-      if ((! quiet) && ((cpos & 0xffff) == 0)) {
+      if ((! quiet) && (cpos >= cpos_last_progress + 1024)) {
         int cpK = cpos >> 10;
         int csK = Csize >> 10;
         int entriesK = cl_ngram_hash_size(Hash.table) >> 10;
         fprintf(stderr, "Progress: %7dK / %dK  | %7dK n-grams \r", cpK, csK, entriesK);
         fflush(stderr);
+        cpos_last_progress = cpK << 10;
       }
 
       accept = 1;
@@ -720,8 +790,8 @@ main (int argc, char *argv[])
             }
             if (id == idlist[bot]) {   /* now id==idlist[bot==top], or id is not in list */
               if (Hash.is_negated[i])  /* a) id found -> reject if constraint is negated */
-                accept = 0;            
-            } 
+                accept = 0;
+            }
             else {
               if (Hash.is_negated[i]) {/* b) id not found -> reject unless negated, otherwise must check -C flag */
                 if (check_words && !Hash.is_constraint[i]) {
@@ -771,8 +841,8 @@ main (int argc, char *argv[])
               }
               if (check_words && !Hash.is_constraint[i] && !scancorpus_word_is_regular(str))   /* -C flag (ignored for constraint keys) */
                 Hash.constraint_ok[i] = 0;
-              /* may jump directly to next region when regex constraint is present (or for ``?head'' constraints) */ 
-              if (Hash.regex[i] != NULL || Hash.source_base[i] == NULL) { 
+              /* may jump directly to next region when regex constraint is present (or for ``?head'' constraints) */
+              if (Hash.regex[i] != NULL || Hash.source_base[i] == NULL) {
                 int jump_target;
                 if (Hash.constraint_ok[i])
                   jump_target = Hash.start_cpos[i] - Hash.offset[i]; /* convert back from effective_cpos to cpos */
@@ -792,7 +862,7 @@ main (int argc, char *argv[])
           }
           else {                        /* outside region, ID is undef (-1) and any regex constraint fails */
             id = -1;
-            if (Hash.regex[i] != NULL || Hash.is_constraint[i]) 
+            if (Hash.regex[i] != NULL || Hash.is_constraint[i])
               accept = 0; /* pure constraint keys also fail outside regions */
             /* note that -C flag is _not_ applied here */
           }
@@ -803,11 +873,42 @@ main (int argc, char *argv[])
         }
       }
 
+      /* check that complete n-gram falls within s-attribute region (-w and -d options);
+       * the check is deferred past n-gram constructions so that skip-scans based on s-attribute constraints are still effective;
+       * an implicit constraint key '?<att>+0' in first position avoids unnecessary work due to the deferred within check
+       */
+      if (do_within && accept) {
+        int start, end;
+        within_struc = cl_cpos2struc(Hash.within, cpos);
+        if (within_struc < 0)
+          accept = 0; /* first n-gram item not in s-attribute region -> skip (should not happen due to implicit constraint) */
+        else {
+          cl_struc2cpos(Hash.within, within_struc, &start, &end);
+          if (!(cpos + Hash.max_offset <= end)) {
+            /* full n-gram (including constraints) doesn't fit in region -> skip */
+            accept = 0;
+            if (within_struc + 1 < cl_max_struc(Hash.within)) {
+              cl_struc2cpos(Hash.within, within_struc + 1, &start, &end);
+              if (start > next_cpos)
+                next_cpos = start;   /* jump to start of next -w region (unless we already have a better skip target) */
+            }
+          }
+        }
+      }
+
       if (accept) {
         if (Hash.frequency_values) /* note that the frequency attribute is always used with offset 0 */
           cl_ngram_hash_add(Hash.table, tuple, Hash.frequency[cl_cpos2id(Hash.frequency_values, cpos)]);
-        else
+        else if (!do_df)
           cl_ngram_hash_add(Hash.table, tuple, 1);
+        else {
+          cl_ngram_hash_entry entry = cl_ngram_hash_add(Hash.table, tuple, 0); /* defer incrementing frequency count */
+          int *last_seen = cl_ngram_hash_payload(Hash.table, entry, NULL); /* last struc where n-gram has been counted (initialised to -1 if new entry) */
+          if (within_struc > *last_seen) {
+            entry->freq++; /* increment df because this is not a repetition in the same struc */
+            *last_seen = within_struc; /* and update the payload of the entry */
+          }
+        }
       }
     } /* end of scan loop for current range */
 

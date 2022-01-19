@@ -245,7 +245,7 @@ cwbci_check_line(char *line)
 
     if (xml_aware && (line[1] == '!' || line[1] == '?') )
       /* this is an xml element which we can ignore */
-      ;
+      1;
     else {
       /* check for perfect nesting */
       if (check_nesting){
@@ -495,6 +495,7 @@ main(int argc, char **argv)
 
 
   /* initialise global variables */
+  cl_startup();
   progname = argv[0];
 
   cwbci_parse_options(argc, argv);    /* parse command-line options */

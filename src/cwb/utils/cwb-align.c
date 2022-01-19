@@ -22,8 +22,9 @@
 #include <unistd.h>
 #include <math.h>
 
-#include "../cl/globals.h"
-#include "../cl/attributes.h"
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
+//#include "../cl/attributes.h"
 
 #include "feature_maps.h"
 
@@ -86,7 +87,7 @@ int pre2 = 0;                   /**< number of pre-alignment regions (target cor
 
 /* global options */
 
-char word_name[CL_MAX_FILENAME_LENGTH] = DEFAULT_ATT_NAME;  /**< name of the word attribute (default: word) */
+char word_name[CL_MAX_FILENAME_LENGTH] = CWB_DEFAULT_ATT_NAME;  /**< name of the word attribute (default: word) */
 char outfile_name[CL_MAX_FILENAME_LENGTH] = "out.align";    /**< name of the output file */
 
 double split_factor = 1.2;      /**< 2:2 alignment split factor */
@@ -146,7 +147,7 @@ align_usage(void)
   for (i = 0; i < DEFAULT_CONFIG_LINES; i++)
     fprintf(stderr, "%s ", default_config[i]);
   fprintf(stderr, "\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(1);
 }
 
@@ -170,25 +171,26 @@ align_parse_args(int ac, char *av[], int min_args)
   int c;
 
   progname = av[0];
-  while ((c = getopt(ac, av, "+hvqo:P:S:V:s:w:r:")) != EOF)
+
+  while (EOF != (c = getopt(ac, av, "+hvqo:P:S:V:s:w:r:")))
     switch (c) {
       /* -P: positional attribute */
     case 'P':
-      strcpy(word_name, optarg);
+      cl_strcpy(word_name, optarg);
       break;
       /* -S: pre-alignment */
     case 'S':
-      strcpy(prealign_name, optarg);
+      cl_strcpy(prealign_name, optarg);
       prealign_has_values = 0;
       break;
       /* -V: pre-alignment with ID matching */
     case 'V':
-      strcpy(prealign_name, optarg);
+      cl_strcpy(prealign_name, optarg);
       prealign_has_values = 1;
       break;
       /* -o: output file */
     case 'o':
-      strcpy(outfile_name, optarg);
+      cl_strcpy(outfile_name, optarg);
       break;
       /* -q : quiet */
     case 'q':
@@ -241,9 +243,7 @@ align_parse_args(int ac, char *av[], int min_args)
   return(optind);               /* return index of first argument in argv[] */
 }
 
-/*
-   write given information to file <fd> as a .align format line
-   */
+
 /**
  * Prints an alignment line.
  *
@@ -360,6 +360,8 @@ main(int argc, char *argv[]) {
   FMS fms;
   FILE *of;                     /* output file */
   int steps = 0;
+
+  cl_startup();
 
   /* parse command line and read arguments */
   argindex = align_parse_args(argc, argv, 3);

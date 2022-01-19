@@ -1,0 +1,224 @@
+#!/bin/sh
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+##
+
+# Installation for most common Linux distributions
+# Run as root! su or sudo.
+
+who=$(whoami)
+
+if [ "$who" != "root" ]
+then
+    echo "This script must be run as root."
+    echo "Please try again: sudo install-scripts/install-linux"
+    echo "Thanks!"
+    exit 1
+fi
+
+# check for silence request as "--quiet".
+(echo "$*" | grep -Eq  "[-][-]quiet") && hide_installer_messages=1 || hide_installer_messages=0
+
+
+############################################################################################################
+# We check for distro indicators in order of reliability.
+# 
+# (1) distro-specific version files.    Mostly depracated, but very reliable when present.
+# (2) /etc/os-release.                  The new standard being pushed by systemd. Some distros don't have 
+#                                       it, but very reliable when present.
+# (3) lsb_release.                      Older system. However, in package-based distros, 
+#                                       it's an optional package, so we can't rely on it being present.
+# (4) /etc/lsb-release.                 Again, older; some distros got rid of it, apparently some have 
+#                                       reintroduced it. So leave till last. 
+############################################################################################################
+
+#
+# Distro-specific files
+#
+if [ -f /etc/debian_version ]
+then
+    OS=debian
+    OS_SHOW=Debian
+    VER=$(cat /etc/debian_version)
+    # Ubuntu has "xxxx/sid" in the debian_version file rather than "n.m" as on Debian. Sigh!
+    if [ $(echo $VER | grep -c '/sid$' ) -eq 1 ]
+    then
+    	OS_SHOW=Ubuntu
+    	VER=$(lsb_release -rs)
+    	# this will make VERCOMPARE, below, correctly contain a Debian major version number
+	fi
+elif [ -f /etc/fedora-release ]
+then
+    OS=fedora
+    OS_SHOW=Fedora
+    VER=$(cat /etc/fedora-release)
+elif [ -f /etc/alpine-release ]
+then
+    OS=alpine
+    OS_SHOW=Alpine
+    VER=$(cat /etc/alpine-release)
+elif [ -f /etc/redhat-release ]
+then
+    OS=centos
+    OS_SHOW=CentOS
+    VER=$(cat /etc/redhat-release)
+elif [ -f /etc/SUSE-brand -o -f /etc/SuSE-release ]
+then
+    OS=suse
+    OS_SHOW=SUSE
+    # these files have the version on line 2, with a leading "VERSION = " in /etc/SuSE-release
+    if [ -f /etc/SUSE-brand ]
+    then
+        VER=$(cat /etc/SUSE-brand | head -n 2 | tail -n 1)
+    else
+        $(cat /etc/SuSE-release | head -n 2 | tail -n 1)
+        VER=$VERSION
+    fi
+
+#
+# /etc/os-release
+#
+elif [ -f /etc/os-release ]
+then
+    . /etc/os-release
+    OS=$ID
+    OS_SHOW=$NAME
+    VER=$VERSION_ID
+
+#
+# lsb_release executable
+#
+elif [ -x "$(command -v lsb_release)" ]
+then
+    OS_SHOW=$(lsb_release -rs)
+    OS=$(echo "$OS_SHOW" | tr '[:upper:]' '[:lower:]')
+    VER=$(lsb_release -rs)
+
+#
+# /etc/lsb-release
+#
+elif [ -f /etc/lsb-release ]
+then
+    . /etc/lsb-release
+    OS_SHOW=$DISTRIB_ID
+    OS=$(echo "$OS_SHOW" | tr '[:upper:]' '[:lower:]')
+    VER=$DISTRIB_RELEASE
+
+#
+# NOTHING has worked.
+#
+else
+    # Fall back to uname, e.g. "Linux <version>"; also works for BSD, etc.
+    OS=$(uname -s)
+    VER=$(uname -r)
+    echo "You seem to be running $OS version $VER. Sorry but CWB auto-install doesn't work on that OS!"
+    echo "You should use manual installation with 'make' instead (see file INSTALL)."
+    exit 1
+
+fi
+
+
+# Print results of the above if not --quiet
+if [ $hide_installer_messages -eq 0 ] ; then echo "Linux distribution successfully detected: $OS_SHOW $VER" ; fi
+
+
+# For comparison purposes, drop any fractional part of the version. 
+VERCOMPARE=$(echo $VER | sed 's/\..*$//')
+
+
+
+#################################################################################################
+# At this point, we have printable OS_SHOW, lowercase OS, and some kind of version string in VER.
+#################################################################################################
+
+case "$OS" in
+    debian)
+        # Debian/Ubuntu/etc.
+        INSTALLER='apt-get install -y'
+        if [ $hide_installer_messages -eq 1 ] ; then INSTALLER="$INSTALLER -qq" ; fi
+
+        if [ "$VERCOMPARE" -lt 9 ]
+        then
+            # Older Debian/Ubuntu with old package names for libreadline*. 
+            PACKAGES='autoconf bison flex gcc make pkg-config libc6-dev libncurses5 libncurses5-dev libpcre3-dev libglib2.0-0 libglib2.0-dev libreadline6-dev'
+        else
+            # contemporary Debian/Ubuntu
+            PACKAGES='autoconf bison flex gcc make pkg-config libc6-dev libncurses-dev libpcre3-dev libglib2.0-dev libreadline-dev'
+        fi
+        ;;
+    
+    fedora)
+        # Fedora
+        # Package manager detection requires an extra step on Fedora
+        DnfCheck=$(command -v dnf)
+        if [ -z "$DnfCheck" ]
+        then
+            # Newer Fedora uses DNF instead of YUM; we assume we have the latter if we can't detect the former.
+            INSTALLER='dnf -y install'
+            if [ $hide_installer_messages -eq 1 ] ; then INSTALLER='dnf -yq install' ; fi
+        else
+            INSTALLER='yum install -y'
+            if [ $hide_installer_messages -eq 1 ] ; then INSTALLER="$INSTALLER -q" ; fi
+        fi
+        PACKAGES='autoconf bison flex gcc pkgconfig glibc glibc-common glibc-devel glibc-headers make ncurses ncurses-libs ncurses-devel pcre pcre-devel glib2 glib2-devel readline readline-devel'
+        ;;
+    
+    alpine)
+        # Alpine Linux
+        INSTALLER='apk add '
+        if [ $hide_installer_messages -eq 1 ] ; then INSTALLER="$INSTALLER -q" ; fi
+        PACKAGES='autoconf bison flex gcc make pkgconf libc-dev ncurses ncurses-dev pcre glib glib-dev readline readline-dev'
+        ;;
+    
+    centos)
+        # Older Red Hat, CentOS, etc.
+        INSTALLER='yum install -y'
+        if [ $hide_installer_messages -eq 1 ] ; then INSTALLER="$INSTALLER -q" ; fi
+        PACKAGES='autoconf bison flex gcc pkgconfig glibc glibc-common glibc-devel glibc-headers make ncurses ncurses-libs ncurses-devel pcre pcre-devel glib2 glib2-devel readline readline-devel'
+        ;;
+    
+    suse)
+        # SUSE or openSUSE
+        INSTALLER='zypper install -y'
+        if [ $hide_installer_messages -eq 1 ] ; then INSTALLER="$INSTALLER -q" ; fi
+        PACKAGES='autoconf bison flex gcc make pkgconf libc-dev ncurses ncurses-dev pcre glib glib-dev readline readline-dev'
+        ;;
+esac
+
+
+
+# we replace the lengthy messages with just one "start" and one "end" message if --quiet
+if [ $hide_installer_messages -eq 1 ] ; then echo 'Checking that your computer has all the software packages that CWB needs...' ; fi
+
+CONFIG_FLAGS=$(./install-scripts/config-basic) 
+
+
+# Install OS packages
+$INSTALLER $PACKAGES
+
+if [ $hide_installer_messages -eq 1 ] ; then echo '    .... software check complete.' ; fi
+
+if [ $hide_installer_messages -eq 1 ] ; then LOUD='' ; else LOUD='FULL_MESSAGES=1' ; fi
+
+
+make clean        $CONFIG_FLAGS $LOUD \
+&& make depend    $CONFIG_FLAGS $LOUD \
+&& make cl        $CONFIG_FLAGS $LOUD \
+&& make utils     $CONFIG_FLAGS $LOUD \
+&& make cqp       $CONFIG_FLAGS $LOUD \
+&& make install   $CONFIG_FLAGS $LOUD \
+&& make realclean $CONFIG_FLAGS $LOUD 
+

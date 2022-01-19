@@ -14,15 +14,14 @@
  *  Public License for more details (in the file "COPYING", or available via
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
-
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <math.h>
 
-#include "../cl/globals.h"
 #include "../cl/cl.h"
-#include "../cl/corpus.h"
-#include "../cl/attributes.h"
-#include "../cl/macros.h"
+#include "../cl/cwb-globals.h"
 
 /** String set to the name of this program. */
 char *progname;
@@ -104,20 +103,19 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
 
   Attribute *attr = NULL;
 
-  if ((attr = cl_new_attribute(corpus, attr_name, ATT_POS)) == NULL) {
-    fprintf(stderr, "Attribute %s.%s does not exist. Aborted.\n",
-            corpus_id, attr_name);
+  if (!(attr = cl_new_attribute(corpus, attr_name, ATT_POS))) {
+    fprintf(stderr, "Attribute %s.%s does not exist. Aborted.\n", corpus_id, attr_name);
     exit(1);
   }
 
   attr_size = cl_max_cpos(attr);
-  if (cl_errno != CDA_OK) {
+  if (!cl_all_ok()) {
     cl_error("(aborting) cl_max_cpos() failed");
     exit(1);
   }
 
   size = cl_max_id(attr);
-  if (cl_errno != CDA_OK) {
+  if (!cl_all_ok()) {
     cl_error("(aborting) cl_max_id() failed");
     exit(1);
   }
@@ -127,68 +125,53 @@ lexdecode_show(char *attr_name, char *rx, int rx_flags)
     printf("Types:\t%d\n", size);
   }
   else {                        /* without -S option */
-
-    if (input_filename != NULL) { /* with -F <file> option */
-
-      input_fd = cl_open_stream(input_filename, CL_STREAM_READ, CL_STREAM_MAGIC);
-      if (input_fd == NULL) {
+    if (input_filename) { /* with -F <file> option */
+      if (!(input_fd = cl_open_stream(input_filename, CL_STREAM_READ, CL_STREAM_MAGIC))) {
         cl_error(input_filename);
         exit(1);
       }
 
-      while (fgets(s, CL_MAX_LINE_LENGTH, input_fd) != NULL) {
-
+      while (fgets(s, CL_MAX_LINE_LENGTH, input_fd)) {
         len = strlen(s);
-        if (len <= 0) {
-          fprintf(stderr, "%s Warning: read empty string from input file (ignored)\n",
-                  progname);
-        }
+        if (len <= 0)
+          fprintf(stderr, "%s Warning: read empty string from input file (ignored)\n", progname);
         else {
-          if (s[len-1] == '\n') { /* chomp; # :o) */
-            s[len-1] = '\0';
-            len--;
-          }
+          if (s[len-1] == '\n')
+            s[--len] = '\0';  /* chomp; # :o) */
 
           if (input_are_numbers)
             i = atoi(s);
           else
             i = cl_str2id(attr, s);
 
-          if ((i < 0) && (!freq_0_if_unknown))
-              fprintf(stderr, "%s Warning: ``%s'' not found in lexicon (ignored)\n", progname, s);
-            else
-              lexdecode_print_item_info(attr, i, (input_are_numbers) ? NULL : s);
+          if (i < 0 && !freq_0_if_unknown)
+            fprintf(stderr, "%s Warning: ``%s'' not found in lexicon (ignored)\n", progname, s);
+          else
+            lexdecode_print_item_info(attr, i, input_are_numbers ? NULL : s);
         }
-
       }
-
       cl_close_stream(input_fd);
 
     }
     else {                        /* without -F option */
-
       if (rx != NULL) {
         idlist = cl_regex2id(attr, rx, rx_flags, &size);
-        if ((size == 0) || (idlist == NULL))
-          return;                /* no matches */
+        if (size == 0 || !idlist)
+          return;     /* no matches */
       }
 
       for (k = 0; k < size; k++) {
-
-        if (idlist != NULL) {
+        if (idlist)
           i = idlist[k];
-        }
         else if (sort) {
           i = cl_sort2id(attr, k);
-          if (cl_errno != CDA_OK) {
+          if (!cl_all_ok()) {
             cl_error("(aborting) cl_sort2id() failed");
             exit(1);
           }
         }
-        else {
+        else
           i = k;
-        }
-
         lexdecode_print_item_info(attr, i, NULL);
       }
     }
@@ -224,7 +207,7 @@ lexdecode_usage(void)
   fprintf(stderr, "  -0        [with -F <file>] show non-existing strings with frequency 0\n");
   fprintf(stderr, "  -N        [with -F <file>] read lexicon IDs from <file>\n");
   fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(2);
 }
 
@@ -242,7 +225,7 @@ lexdecode_usage(void)
 int
 main(int argc, char **argv) {
   char *registry_directory = NULL;
-  char *attr_name = DEFAULT_ATT_NAME;
+  char *attr_name = CWB_DEFAULT_ATT_NAME;
   char *rx = NULL;
   int   rx_flags = 0;
 
@@ -251,15 +234,15 @@ main(int argc, char **argv) {
 
   int c;
 
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
+  cl_startup();
   progname = argv[0];
 
-  if (argc == 1)
+  if (argc < 2)
     lexdecode_usage();
 
-  /* parse arguments */
-  while ((c = getopt(argc, argv, "+P:Sr:fnlbsp:cdF:O0Nh")) != EOF) {
+  /* ------------------------------------------------- PARSE ARGUMENTS */
+
+  while (EOF != (c = getopt(argc, argv, "+P:Sr:fnlbsp:cdF:O0Nh"))) {
 
     switch (c) {
     case 'S':                        /* S: show lexicon size only */
@@ -339,31 +322,26 @@ main(int argc, char **argv) {
 
   /* single argument: corpus id */
   if (optind < argc) {
-
     corpus_id = argv[optind++];
 
-    if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
+    if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
       fprintf(stderr, "%s: Corpus %s not found in registry %s . Aborted.\n",
-              progname, corpus_id,
-              (registry_directory ? registry_directory : central_corpus_directory()));
+              progname, corpus_id, (registry_directory ? registry_directory : cl_standard_registry()));
       exit(1);
     }
 
     if (optind < argc) {
-      fprintf(stderr, "Too many arguments. Try \"%s -h\" for more information.\n",
-              progname);
+      fprintf(stderr, "Too many arguments. Try \"%s -h\" for more information.\n", progname);
       exit(2);
     }
 
     lexdecode_show(attr_name, rx, rx_flags);
-
     cl_delete_corpus(corpus);
   }
   else {
-    fprintf(stderr, "No corpus specified. Try \"%s -h\" for more information.\n",
-            progname);
+    fprintf(stderr, "No corpus specified. Try \"%s -h\" for more information.\n", progname);
     exit(2);
   }
 
-  exit(0);
+  return 0;
 }

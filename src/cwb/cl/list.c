@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -17,12 +17,35 @@
 
 #include "globals.h"
 
-#include "cl.h"
-#include "macros.h"
 
-#include "list.h"
+/* just define the structs here; <cl.h> contains object definitions:
+   typedef struct _cl_int_list    *cl_int_list;
+   typedef struct _cl_string_list *cl_string_list; */
 
+/**
+ * Underlying structure for the cl_int_list object.
+ */
+struct _cl_int_list {
+  int size;         /**< number of elements */
+  int allocated;    /**< number of elements, for which space has been allocated */
+  int lumpsize;     /**< lump size by which list is reallocated */
+  int *data;        /**< pointer to the data */
+};
 
+/**
+ * Underlying structure for the cl_string_list object.
+ *
+ * Note -- the data in this object is ONLY an "array" of pointers-to-char.
+ * The strings themselves are stored elsewhere.
+ */
+struct _cl_string_list {
+  int size;         /**< number of elements */
+  int allocated;    /**< number of elements, for which space has been allocated */
+  int lumpsize;     /**< lump size by which list is reallocated */
+  char **data;      /**< pointer to the data */
+};
+
+/* function prototypes now in <cl.h> */
 
 /**
  * Default size of steps (lumps) by which auto-growing lists
@@ -47,7 +70,7 @@
 /**
  * Creates a new cl_int_list object.
  */
-cl_int_list 
+cl_int_list
 cl_new_int_list(void) {
   cl_int_list l = cl_malloc(sizeof(struct _cl_int_list));
   l->data = cl_calloc(LUMPSIZE, sizeof(int));
@@ -60,7 +83,7 @@ cl_new_int_list(void) {
 /**
  * Deletes a cl_int_list object.
  */
-void 
+void
 cl_delete_int_list(cl_int_list l) {
   cl_free(l->data);
   cl_free(l);
@@ -96,7 +119,7 @@ cl_int_list_size(cl_int_list l) {
  * @return   The n'th integer on the list, or 0 if there
  *           is no n'th integer.
  */
-int 
+int
 cl_int_list_get(cl_int_list l, int n) {
   if (n < 0 || n >= l->size) {
     return 0;
@@ -112,10 +135,10 @@ cl_int_list_get(cl_int_list l, int n) {
  * The n'th element on the list is set to val, and the
  * list is auto-extended if necessary.
  */
-void 
+void
 cl_int_list_set(cl_int_list l, int n, int val) {
   int newalloc, i;
-  
+
   if (n < 0) {
     return;
   }
@@ -143,13 +166,13 @@ cl_int_list_set(cl_int_list l, int n, int val) {
 /**
  * Appends an integer to the end of a cl_int_list object.
  */
-void 
+void
 cl_int_list_append(cl_int_list l, int val) {
   cl_int_list_set(l, l->size, val);
 }
 
 /** comparison function for int list sort : non-exported */
-int
+static int
 cl_int_list_intcmp(const void *a, const void *b) {
   return (*(int *)a - *(int *)b);
 }
@@ -170,7 +193,7 @@ cl_int_list_qsort(cl_int_list l) {
 /**
  * Creates a new cl_string_list object.
  */
-cl_string_list 
+cl_string_list
 cl_new_string_list(void) {
   cl_string_list l = cl_malloc(sizeof(struct _cl_string_list));
   l->data = cl_calloc(LUMPSIZE, sizeof(char *));
@@ -183,7 +206,7 @@ cl_new_string_list(void) {
 /**
  * Deletes a cl_string_list object.
  */
-void 
+void
 cl_delete_string_list(cl_string_list l) {
   cl_free(l->data);
   cl_free(l);
@@ -249,10 +272,10 @@ cl_string_list_get(cl_string_list l, int n) {
  * The n'th element on the list is set to val, and the
  * list is auto-extended if necessary.
  */
-void 
+void
 cl_string_list_set(cl_string_list l, int n, char *val) {
   int newalloc, i;
-  
+
   if (n < 0) {
     return;
   }
@@ -280,13 +303,13 @@ cl_string_list_set(cl_string_list l, int n, char *val) {
 /**
  * Appends a string pointer to the end of a cl_string_list object.
  */
-void 
+void
 cl_string_list_append(cl_string_list l, char *val) {
   cl_string_list_set(l, l->size, val);
 }
 
 /** comparison function for string list sort : non-exported */
-int
+static int
 cl_string_list_strcmp(const void *a, const void *b) {
   return cl_strcmp(*(char **)a, *(char **)b); /*, I think. */
 }

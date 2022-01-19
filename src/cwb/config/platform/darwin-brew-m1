@@ -1,0 +1,32 @@
+##   -*-Makefile-*-
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+
+##
+##  PLATFORM CONFIGURATION FILE:
+##  Apple Silicon (M1 and other ARM CPUs) 64-bit binaries for MacOS 11 (Big Sur) and newer 
+##  with prerequisite libraries provided by HomeBrew package manager
+##
+
+## Inherits from Intel HomeBrew configuration
+include $(TOP)/config/platform/darwin-brew
+
+## Compile for Apple Silicon (M1 and other ARM CPUs)
+## Currently, Apple GCC doesn't support any sensible -march, -mcpu or -mtune options
+CFLAGS = -Wall -O3 -arch arm64
+
+## CPU architecture and operating system used to name binary releases
+RELEASE_ARCH = arm64

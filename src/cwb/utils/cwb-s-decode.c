@@ -16,8 +16,16 @@
  */
 
 
-#include "../cl/globals.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+
 #include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
+
+
 
 /** Name of the program (from the shell) */
 char *progname;
@@ -39,15 +47,13 @@ sdecode_usage(void)
           "  -h        print this usage text.\n"
           "Output line format:\n"
           "   <region_start> TAB <region_end> [ TAB <annotation> ]\n"
-          "Part of the IMS Open Corpus Workbench v" VERSION "\n\n"
+          "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n"
           , progname);
   exit(1);
 }
 
 
-/* *************** *\
- *      MAIN()     *
-\* *************** */
+
 
 /**
  * Main function for cwb-s-decode.
@@ -76,12 +82,12 @@ main(int argc, char **argv)
   extern char *optarg;
   int c;
 
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
+  cl_startup();
   progname = argv[0];
 
-  /* parse arguments */
-  while ((c = getopt(argc, argv, "+r:nvh")) != EOF) {
+  /* ------------------------------------------------- PARSE ARGUMENTS */
+
+  while (EOF != (c = getopt(argc, argv, "+r:nvh"))) {
     switch (c) {
 
     /* r: registry directory */
@@ -107,7 +113,6 @@ main(int argc, char **argv)
     case 'h':
       sdecode_usage();
       break;
-
     }
   } /* endwhile: options */
 
@@ -122,12 +127,11 @@ main(int argc, char **argv)
 
   /* first argument: corpus id */
   corpus_id = argv[optind++];
-  if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
+  if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
     fprintf(stderr, "%s: Corpus <%s> not registered in %s\n",
-              progname,
-              corpus_id,
-              (registry_directory ? registry_directory
-               : central_corpus_directory()));
+            progname,
+            corpus_id,
+            registry_directory ? registry_directory : cl_standard_registry());
     exit(1);
   }
 
@@ -137,16 +141,14 @@ main(int argc, char **argv)
 
   /* third argument: attribute name */
   attr_name = argv[optind];
-  if ((att = cl_new_attribute(corpus, attr_name, ATT_STRUC)) == NULL) {
-    fprintf(stderr, "%s: Can't access s-attribute <%s.%s>\n",
-              progname,
-              corpus_id, attr_name);
+  if (!(att = cl_new_attribute(corpus, attr_name, ATT_STRUC))) {
+    fprintf(stderr, "%s: Can't access s-attribute <%s.%s>\n", progname, corpus_id, attr_name);
     exit(1);
   }
 
   /* check if attribute has annotations */
   has_values = cl_struc_values(att);
-  if (! has_values)
+  if (!has_values)
     show_values = 0;
   if (!show_regions && !has_values) {
     fprintf(stderr, "Error: option -n can only be used if s-attribute has annotated values\n");
@@ -168,13 +170,10 @@ main(int argc, char **argv)
         printf("\t");
     }
     if (show_values) {
-      annot = cl_struc2str(att, n);
-      if (annot == NULL) {
+      if (!(annot = cl_struc2str(att, n)))
         printf("<no annotation>");
-      }
-      else {
+      else
         printf("%s", annot);
-      }
     }
     printf("\n");
   }

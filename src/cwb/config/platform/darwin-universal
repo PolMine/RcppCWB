@@ -17,8 +17,9 @@
 
 ##
 ##  PLATFORM CONFIGURATION FILE:
-##  Universal binaries for Mac OS X 10.6 (Snow Leopard) and newer
+##  Universal binaries for Mac OS X 10.6 (Snow Leopard) to 10.13 (High Sierr)
 ##  with prerequisite libraries installed by user or package manager in standard locations
+##  (outdated and deprecated)
 ##
 
 ## Inherits from basic Darwin configuration
@@ -28,7 +29,7 @@ include $(TOP)/config/platform/darwin
 CC = /usr/bin/gcc
 
 ## needs universal versions of glib and pcre (see installation notes)
-CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -mtune=core2
+CFLAGS = -Wall -O3 -arch x86_64 -arch i386 -march=core2 -mtune=core2
 
 DEPEND_CFLAGS = -Wall -O3
 

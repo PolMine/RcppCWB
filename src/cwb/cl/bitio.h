@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -16,8 +16,8 @@
  */
 
 
-#ifndef _BITIO_H_
-#define _BITIO_H_
+#ifndef _cl_bitio_h_
+#define _cl_bitio_h_
 
 #include <sys/types.h>
 
@@ -34,6 +34,7 @@ typedef struct _bfilebuf {
   off_t position;
 } BFile;
 
+
 /**
  * Stream buffer for bit input / output.
  */
@@ -45,7 +46,8 @@ typedef struct _bstreambuf {
   off_t position;
 } BStream;
 
-
+typedef BFile *ClBitFile;
+typedef BStream *ClBitStream;
 
 int BFopen(char *filename, char *type, BFile *bf);
 int BFclose(BFile *stream);

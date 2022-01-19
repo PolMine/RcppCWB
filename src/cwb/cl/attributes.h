@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,28 +15,14 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#ifndef __attributes_h
-#define __attributes_h
+#ifndef _cl_attributes_h_
+#define _cl_attributes_h_
 
 #include "globals.h"
-
-#include "storage.h"                /* gets sys/types.h, so we don't need it here */
+#include "storage.h"
 #include "corpus.h"
 
-/**
- * String used to identify the default attribute.
- *
- * It is "word".
- *
- * Don't change this or we'll all end up in hell !!! I MEAN IT !!!!
- */
-#define DEFAULT_ATT_NAME "word"
 
-/* attribute allocation classes */
-#define ATTS_NONE 0
-#define ATTS_LOCAL 1
-
-/* attribute and argument/result types now defined in <cl.h> */
 
 
 /* ================================================== Arguments for dynamic attrs */
@@ -44,15 +30,16 @@
 /**
  * The DynArg object contains an argument for a dynamic attribute.
  */
-typedef struct _DynArg {
+typedef struct _dyn_arg {
   int type;
-  struct _DynArg *next;
+  struct _dyn_arg *next;
 } DynArg;
 
 DynArg *makearg(char *type_id);
 
 /* ================================================== Huffman compressed item seq */
 
+/** The number of integers in the p-attribute Huffmann code decompression block. */
 #define SYNCHRONIZATION 128
 /** The maximum length of a single code, which is also the number of possible code lengths */
 #define MAXCODELEN 32
@@ -61,7 +48,6 @@ DynArg *makearg(char *type_id);
  * A Huffman Code Descriptor block (HCD) for Huffman compressed sequences.
  */
 typedef struct _huffman_code_descriptor {
-
   int size;                       /**< the id range of the item sequence */
   int length;                     /**< the number of items in the sequence */
 
@@ -146,13 +132,10 @@ typedef enum component_states {
 typedef struct TComponent {
   char *path;                   /**< the full filename of this component */
   Corpus *corpus;               /**< the corpus this component belongs to */
-  union _Attribute *attribute;  /**< the attribute this component belongs to */
+  Attribute *attribute;         /**< the attribute this component belongs to */
   ComponentID id;               /**< the type of this component */
   int size;                     /**< a copy of the number of items in the structure */
-
   MemBlob data;                 /**< the actual contents of this component */
-
-  /* struct TComponent *next; *//* formerly a linked list, now an array */
 } Component;
 
 
@@ -169,19 +152,21 @@ int MayHaveComponent(int attr_type, ComponentID cid);
 
 /**
  * Members found in ALL the different types of Attribute object.
+ *
+ * NOTE: NO SEMICOLON AFTER LAST FIELD!! So when used, follow with ;
  */
 #define COMMON_ATTR_FIELDS  \
-int type;                  /**< the attribute type */                          \
-char *name;                /**< the attribute name or multi-purpose field*/    \
+int type;                  /**< the attribute type. MUST BE THE FIRST FIELD. */\
+char *name;                /**< the attribute name or multi-purpose field */   \
 union _Attribute *next;    /**< the next member of the attr chain */           \
 int attr_number;           /**< a number, unique in this corpus, 0 for word */ \
 char *path;                /**< path to attribute data files */                \
  \
 struct TCorpus *mother;              /**< corpus this att is assigned to */    \
 Component *components[CompLast]      /**< the component vector (array of pointers) of the attribute */ \
+
 /* endof COMMON_ATTR_FIELDS */
 
-/* NO SEMICOLON AFTER LAST FIELD ABOVE!!! DUE TO EMACS INDENTATION */
 
 typedef struct {
   COMMON_ATTR_FIELDS;
@@ -214,10 +199,8 @@ typedef struct {
 
 
 
-/* typedef union _Attribute Attribute; in <cl.h> */
-
 /**
- * The Attribute object.
+ * The Attribute object (typedef in cl.h, union/stuct defs in attributes.h).
  *
  * The Attribute object is a union of structures, one for each of the various
  * kinds of attribute (positional (P), structural (S), alignment (A), dynamic).
@@ -238,61 +221,37 @@ union _Attribute {
 
 
 
-/* ============================================================ FUNCTIONS */
+/* ============================================================ ATTRIBUTE FUNCTIONS */
 
-
-
-
-Attribute *setup_attribute(Corpus *corpus, 
-                           char *attribute_name,
-                           int type,
-                           char *data);
-
-
-
-
-int drop_attribute(Corpus *corpus,
-                   char *attribute_name,
-                   int type,
-                   char *data);  /* depends on type, either char* or int*, but ***UNUSED*** */
-
+/* function exported for the use of the registry parser. don't call it. */
+Attribute *setup_attribute(Corpus *corpus, char *attribute_name, int type, char *data);
 
 
 /* ======================================== COMPONENT FUNCTIONS */
-
 
 Component *load_component(Attribute *attribute, ComponentID component);
 
 int drop_component(Attribute *attribute, ComponentID component);
 
-int comp_drop_component(Component *component);
-
 Component *create_component(Attribute *attribute, ComponentID component);
 
 Component *find_component(Attribute *attribute, ComponentID component);
 
-Component *ensure_component(Attribute *attribute, ComponentID component, 
-                            int try_creation);
+Component *ensure_component(Attribute *attribute, ComponentID component, int try_creation);
 
-Component *declare_component(Attribute *attribute, ComponentID cid,
-                             char *path);
+Component *declare_component(Attribute *attribute, ComponentID cid, char *path);
 
 void declare_default_components(Attribute *attribute);
 
-
 ComponentState component_state(Attribute *attribute, ComponentID component);
 
-ComponentState comp_component_state(Component *comp);
-
-char *component_full_name(Attribute *attribute,
-                          ComponentID component,
-                          char *path);
+char *component_full_name(Attribute *attribute, ComponentID component, char *path);
 
 /* =============================================== LOOP THROUGH ATTRIBUTES */
 
 Attribute *first_corpus_attribute(Corpus *corpus);
 
-Attribute *next_corpus_attribute();
+Attribute *next_corpus_attribute(void);
 
 /* =============================================== INTERACTIVE FUNCTIONS */
 
@@ -300,6 +259,5 @@ void describe_attribute(Attribute *attribute);
 
 void describe_component(Component *component);
 
-/* ================================================================= EOF */
 
 #endif

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "../cl/cl.h"
 
 /**
  * @file
@@ -104,14 +105,14 @@ BAR_reinit(BARdesc BAR, int N, int M, int W)
 
   /* reallocate data space if necessary */
   if (size > BAR->data_size) {
-    assert(BAR->data = (int *) realloc(BAR->data, size * sizeof(int)));
+    BAR->data = (int *)cl_realloc(BAR->data, size * sizeof(int));
     BAR->data_size = size;
   }
   /* reallocate access vectors if necessary */
   if (vsize > BAR->vector_size) {
-    assert(BAR->d_block_start_x = (int *) realloc(BAR->d_block_start_x, vsize * sizeof(int)));
-    assert(BAR->d_block_data = (int **) realloc(BAR->d_block_data, vsize * sizeof(int *)));
-    BAR -> vector_size = vsize;
+    BAR->d_block_start_x = (int *)cl_realloc(BAR->d_block_start_x, vsize * sizeof(int));
+    BAR->d_block_data = (int **)cl_realloc(BAR->d_block_data, vsize * sizeof(int *));
+    BAR->vector_size = vsize;
   }
   /* init access vectors */
   for (i = 0; i < BAR->d_size; i++) {
@@ -131,7 +132,7 @@ void
 BAR_delete(BARdesc BAR)
 {
   assert(BAR);
-  free(BAR->data);	
+  free(BAR->data);
   free(BAR->d_block_start_x);
   free(BAR->d_block_data);
   free(BAR);
@@ -162,14 +163,14 @@ BAR_write(BARdesc BAR, int x, int y, int i)
   int *p, *p1;
   if (((unsigned)x < BAR->x_size) && ((unsigned)y < BAR->y_size)) { /* fast bounds check */
     int d = x + y;
-    if (BAR->d_block_start_x[d] < 0) { 
+    if (BAR->d_block_start_x[d] < 0) {
       /* uninitialised diagonal */
       BAR->d_block_start_x[d] = x;
       /* initialise diagonal with zeroes */
       p1 = BAR->d_block_data[d] + BAR->beam_width;
       for (p = BAR->d_block_data[d]; p < p1; p++) *p = 0;
       BAR->d_block_data[d][0] = i;
-    } 
+    }
     else {
       /* set value if within beam range */
       int dx = x - BAR->d_block_start_x[d];

@@ -48,23 +48,28 @@ BASENAMES = $(MANS:.man=)
 all:	$(MANS)
 
 %.man:	%.pod
+	@$(ECHO) "    .... compile manual file" $@
 	pod2man --section=1 --center="IMS Open Corpus Workbench" --release=$(VERSION) $< > $@
 
 pdf:	$(PDFMANS)
 
 %.pdf:	%.man
+	@$(ECHO) "    .... convert manual file" $< "to pdf document" $@
 	groff -man -Tps $< | ps2pdf - $@
 
 install: $(MANS)
+	@$(ECHO) "    .... install all manual files"
 	if [ ! -d $(MANINSTDIR)/man$(MANEXT) ];	then  $(INSTALL) $(INST_FLAGS_DIR) $(MANINSTDIR)/man$(MANEXT); fi
 	for i in $(BASENAMES); do $(INSTALL) $(INST_FLAGS_DATA) $$i.man $(MANINSTDIR)/man$(MANEXT)/$$i.$(MANEXT) ; done
 
 ifdef __MINGW__
 release: $(PDFMANS)
+	@$(ECHO) "    .... add PDF document" $@ "to the release bundle"
 	if [ ! -d "$(RELEASE_DIR)/man" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/man"; fi;
 	for i in $(PDFMANS); do $(INSTALL) $(INST_FLAGS_DATA) $$i "$(RELEASE_DIR)/man/$$i"; done
 else
 release: $(MANS)
+	@$(ECHO) "    .... add manual file" $@ "to the release bundle"
 	if [ ! -d "$(RELEASE_DIR)/man/man$(MANEXT)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)/man/man$(MANEXT)"; fi;
 	for i in $(BASENAMES); do $(INSTALL) $(INST_FLAGS_DATA) $$i.man "$(RELEASE_DIR)/man/man$(MANEXT)/$$i.$(MANEXT)"; done
 endif
@@ -73,14 +78,16 @@ uninstall:
 	@$(ECHO) "ERROR: uninstall operation is currently not supported!"
 
 clean:
+	@$(ECHO) "    .... cleanup PDF files"
 	-rm -f $(PDFMANS) *~
 
 realclean:
+	@$(ECHO) "    .... cleanup all manual files"
 	-rm -f $(PDFMANS) $(MANS) *~
 
 depend:
-	@$(ECHO) "Nothing to be done for 'make depend'"
+	@$(ECHO) "         Nothing to be done for 'make depend' in directory 'man'"
 
 size:
-	@$(ECHO) "Nothing to be done for 'make size'"
+	@$(ECHO) "         Nothing to be done for 'make size' in directory 'man'"
 

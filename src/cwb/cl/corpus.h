@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,11 +15,10 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#ifndef _corpus_h
-#define _corpus_h
+#ifndef _cl_corpus_h_
+#define _cl_corpus_h_
 
 #include "globals.h"
-
 
 
 
@@ -42,24 +41,8 @@ typedef struct _idbuf {
 } IDBuf;
 
 
-
-void FreeIDList(IDList *list);
-int memberIDList(char *s, IDList l);
-
-/* a new-style API for idlists */
-#define IDList_delete(l) FreeIDList(l)
-#define IDList_check_member(l, s) memberIDList(s, l) /* parameter order standardised for objects */
-
-
-
-
-/* ---------------------------------------------------------------------- */
-
-/* typedef struct TCorpus Corpus; now in <cl.h> */
-
 /** Underlying structure for the Corpus class. */
 struct TCorpus {
-
   char *id;                        /**< a unique ID (i.e., the registry name identifying the corpus to the CWB) */
   char *name;                      /**< the full name of the corpus (descriptive, for information only) */
   char *path;                      /**< the ``home directory'' of the corpus  */
@@ -68,37 +51,30 @@ struct TCorpus {
   CorpusCharset charset;           /**< a special corpus property: specifies character set of the encoded text */
   CorpusProperty properties;       /**< head of a linked list of CorpusProperty object. */
 
-  char *admin;                     /**< {doesn't seem to be used?} */
-
   IDList groupAccessList;          /**< List of groups allowed to access this corpus (can be NULL) */
   IDList userAccessList;           /**< List of users allowed to access this corpus (can be NULL) */
   IDList hostAccessList;           /**< List of host machines allowed to access this corpus (can be NULL) */
-  
+
   char *registry_dir;              /**< Directory where this corpus's registry file is located */
   char *registry_name;             /**< the cwb-name of this corpus */
 
   int nr_of_loads;                 /**< the number of setup_corpus ops */
 
   union _Attribute *attributes;    /**< the list of attributes */
-  
-  struct TCorpus *next;            /**< next entry in a linked-list of loaded corpora */
 
+  struct TCorpus *next;            /**< next entry in a linked-list of loaded corpora */
 };
 
 /* ---------------------------------------------------------------------- */
 
 /* external variable declarations: from the registry parser */
-
 extern char *cregin_path;
 extern char *cregin_name;
 
-/* ---------------------------------------------------------------------- */
-
+/* linked list of known corpora ... */
 extern Corpus *loaded_corpora;
 
 /* ---------------------------------------------------------------------- */
-
-/* (most) function prototypes are now in <cl.h> */
 
 void add_corpus_property(Corpus *corpus, char *property, char *value);
 Corpus *find_corpus(char *registry_dir, char *registry_name);

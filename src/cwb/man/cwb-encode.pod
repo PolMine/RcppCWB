@@ -4,9 +4,10 @@ cwb-encode - The CWB corpus encoding utility
 
 =head1 SYNOPSIS
 
-B<cwb-encode> [-xsBCvqDh] [-d I<data_directory>] [-R I<registry_file>] [-U I<string>] [-b I<num>] 
-    [-c I<charset>] -f I<input_file> [...] -F I<input_directory> [...] [-p -|-p <attribute>] 
-    (-P I<attribute>|-S I<attribute_spec>|-V I<attribute_spec>|-0 I<attribute>)*
+B<cwb-encode> [-xsBCn9vqDh] [-d I<data_directory>] [-R I<registry_file>] [-U I<string>] 
+    -f I<input_file> [...] -F I<input_directory> [...] [-c I<charset>] 
+    [-p - | -p <attribute>] [-N <id_attribute>] [-L <sentence_attribute>] [-b I<num>] 
+    (-P I<attribute> | -S I<attribute_spec> | -V I<attribute_spec> | -0 I<attribute>)*
 
 ... | B<cwb-encode> S<[I<options>] [I<declarations>]>
 
@@ -255,9 +256,14 @@ It is usual to put all your registry files in a special corpus registry director
 
 Makes the encoding process skip any empty lines in the input data. It is recommended to use this flag in most situations.
 
+=item B<-L> I<sentence_attribute>
+
+Blank lines are interpreted as sentence boundaries (or other textual units) and encoded in s-attribute I<sentence_attribute>.
+This convention is used by the popular CoNLL format as well as various tokenizers and other NLP tools. The option B<-s> is implied. (Mnemonic: B<-L> stands for sentence B<L>imits.)
+
 =item B<-t> I<input_file> 
 
-Depracated synonym for B<-f>, preserved for backward compatibility.
+Deprecated synonym for B<-f>, preserved for backward compatibility.
 
 =item B<-U> I<string>  
 
@@ -275,10 +281,38 @@ Activates XML-aware mode. In this mode, the basic XML entities (&gt; &lt; &amp; 
 will be replaced in the indexed corpus by the characters they represent. Also, any input lines that begin with an 
 XML comment (C<<!...>) or an XML declaration (C<<?...>) will be ignored.
 
-It is recommended to use this flag in most situations.
+It is recommended to use this flag in most situations (unless the robust B<-n> input format is used).
+
+=item B<-n>
+
+Activates an alternative input format in which tokens are numbered, i.e. every token line must start with a
+non-negative integer number in the first tab-delimited column. Comment lines starting with a hash (C<#>) are silently ignored (add C<-B> if there might be leading whitespace). This format avoids ambiguities between XML tags
+and token lines; it is similar to formats used by CoNLL and SketchEngine.
+The line numbers are ignored by B<cwb-encode> and must not be declared with B<-P> or B<-p>; use B<-N> to encode line numbers.
+
+Line numbers of the form C<X-Y> and C<X.Y> indicate multiword and trace tokens, respectively, in CoNLL-U format. They are
+silently discarded.
+
+This format is a useful alternative to B<-x>, since many NLP tools don't work well with tokens containing XML entities.
+It is the counterpart to C<cwb-decode -Cn> and should ensure a safe decode-encode round trip.
+
+Note that the B<-n> and B<-x> options can be combined, though there is little reason to do so.
+
+=item B<-N> I<id_attribute>
+
+Token ID numbers in the first column of the B<-n> input format are stored in the p-attribute I<id_attribute>
+instead of being silently ignored. This option implies B<-n> mode, which does not need to be activated separately.
+
+Note that a round-trip decode of the resulting corpus uses C<cwb-decode -C> (rather than C<-Cn>) because
+the token numbers are already encoded in the corpus as the first p-attribute.
+
+=item B<-9>
+
+Auto-declare null attributes for unknown XML tags. Such tags will thus be ignored (with a warning message
+printed once) rather than inserted as regular tokens.  This option is particuarly useful when encoding 
+input files with complex and/or undocumented XML markup.
 
 =back
-
 
 
 =head1 ATTRIBUTE DECLARATIONS
@@ -301,8 +335,11 @@ the first column, must be declared with B<-P>.
 Declares I<attribute> as a p-attribute. The order in which the p-attributes are declared
 must reflect the order of the columns they refer to in the input data.
 
-If  / is appended to the name of a p-attribute, the contents of that p-attribute are marked as a feature set.
-In this case, the values within the feature set will be validated and normalised.
+If C</> is appended to the name of a p-attribute, the contents of that p-attribute are marked as a feature set.
+In this case, the values within the feature set will be validated and normalised (i.a. sorted alphabetically).
+C<cwb-encode> accepts feature sets without the leading and trailing C<|> character (as used e.g. in CoNLL formats);
+hence there will be no warnings if a regular annotation is delared as a feature set by mistaker.
+An empty string (only possible with C<-U "">) or single underscore (C<_>, for CoNLL input) is converted to an empty set (C<|>).
 
 
 =item B<-S> I<attribute_spec>
@@ -386,24 +423,26 @@ All XML tags that have not been declared with a B<-S>, B<-V> or B<-0> flag will 
 B<cwb-encode> has a built-in limit on the number of attributes it can create, namely 2,048 attributes,
 of which at most 1,024 can be p-attributes and at most 1,024 can be s-attributes.
 
-Note, however, that encoding a corpus requires a large number of files to be created simultaneously,
-and most operating systems put a limit on the number of files a program is allowed to have open
-at the same time. How you discover this limit is dependent on your operating system and, perhaps, your
-shell; if you are using the popular B<bash> shell, you can find out what the maximum number of open files 
-is with the command C<ulimit -n>. A common value, especially on Linux, is 1,024.
+However, in practice, you may not be able to go up to CWB's limit of 2,048 attributes.
+Encoding a corpus requires many files to be created simultaneously,
+and most operating systems put a limit on the number of files a program can have open
+at the same time. How you discover this limit depends on your operating system and, perhaps, your shell. 
+If you are using the popular B<bash> shell, you can find out the maximum open files per program
+with the command C<ulimit -n>. A common maximum, especially on Linux, is 1,024.
 
-A good rule of thumb for working with this OS-imposed limit is that each attribute requires three files.
-(The exception: s-attributes without annotations only require one file to be created.)
-So, if you are working in an environment which imposes the 1,024-file limit, the maximum number
-of attributes that you can be sure of creating safely create is 341 (one-third of 1,024).
+A good rule of thumb for working with this OS-imposed limit is that 
+each p- or s-attribute requires B<cwb-encode> to have three open files.
+(The exception: s-attributes without annotations only require one open file.)
+So, if you are working in an environment which imposes the 1,024-file limit, 
+the maximum number of attributes that you can be sure of creating safely is 341 (one-third of 1,024).
 
-It is possible to add more attributes using subsequent additional runs of B<cwb-encode> (for p-attributes)
+You can add more attributes using subsequent additional runs of B<cwb-encode> (for p-attributes)
 or using B<cwb-s-encode> (for s-attributes).
 
 
 =head1 INPUT FILE FORMAT
 
-The following is a summary of the rules for CWB input files; for more details, DESCRIPTION above, 
+The following is a summary of the rules for CWB input files; for more details, see DESCRIPTION above
 and the I<CWB Encoding Tutorial>:
 
 =over 4
@@ -422,6 +461,8 @@ and the I<CWB Encoding Tutorial>:
 
 =item * The first p-attribute is assumed to be the token wordform unless you specify otherwise (see above).
 
+=item * In the alternative C<-n> input format, token lines must be numbered in the first tab-delimited column.
+
 =item * P-attribute values may have the form of feature sets; see the I<CWB Encoding Tutorial>.
 
 =item * Files may also contain lines that specify begin and/or end-points of s-attrbiutes.
@@ -434,10 +475,28 @@ and the I<CWB Encoding Tutorial>:
 
 =item * In XML mode, XML comments and declarations are also allowed, but must occupy individual lines.
 
-=item * Stray whitespace (extra spaces, empty lines) is not allowed, unless the B<-b> and B<-s> options are used.
+=item * Stray whitespace (extra spaces, empty lines) is not allowed, unless the B<-B> and B<-s> options are used.
 
 =back
 
+
+=head1 EXAMPLES
+
+=head2 CoNLL input files
+
+The various B<CoNLL> formats (see e.g. L<https://universaldependencies.org/format.html>) can be read directly
+as C<cwb-encode> input files with the format options
+
+  -n -L s
+
+which ignores token numbers in the first column, skips comment lines and multiword/trace tokens, 
+and encodes sentence breaks indicated by blank lines in the s-attribute C<s>.
+If you want to preserve token IDs in a p-attribute C<id>, change the options to
+
+  -N id -L s
+
+Of course, the columns of the respective CoNLL format have to be declared with B<-P> flags as usual.
+Feature set attributes should be marked with C</> (e.g. C<-P morph/>) so they are converted to CWB notation.
 
 
 =head1 SEE ALSO

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -28,10 +28,9 @@
  * (Note this is regular expression across tokens, not single-string regexes, which
  * are dealt with by functions in the corpus library.)
  *
- * TODO: rename the functions and make this more object-oriented.
- * Ideally, this should be a cleanly separated module, with "in" and "out" only
- * via the methods declared here. Currently it's not like that - info
- * is passed in via global variables, most blatantly searchstr.
+ * The RX-to-DFA parser is not in keeping with the rest of the CWB code in terms of style etc.,
+ * reflecting its origins. So this object does not behave much like others.
+ * In particular, all the info to make a DFA has to be passed in via global variables.
  */
 typedef struct dfa {
   int Max_States;         /**< max number of states of the current dfa;

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -23,8 +23,8 @@
 #include "globals.h"
 
 off_t file_length(char *filename);
-off_t fd_file_length(FILE *fd);
-off_t fi_file_length(int fileno);
+off_t fh_file_length(FILE *fd);
+off_t fd_file_length(int fileno);
 
 long fprobe(char *fname);
 
@@ -33,8 +33,8 @@ int is_file(char *path);
 int is_link(char *path);
 
 /* data structure for managing I/O streams */
-typedef struct _CLStream *CLStream;
-struct _CLStream {
+typedef struct CLStream *CLStream;
+struct CLStream {
   FILE *handle;
   int mode; /* not really needed */
   int type; /* the specified or guessed stream type */

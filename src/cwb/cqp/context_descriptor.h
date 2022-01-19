@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,25 +15,30 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#ifndef _CONTEXT_DESCRIPTOR_H_
-#define _CONTEXT_DESCRIPTOR_H_
+#ifndef _cqp_context_descriptor_h_
+#define _cqp_context_descriptor_h_
 
 
 #include "attlist.h"
 
-/* The following constant define flags for the four different ways of measuring context-width: */
-
-/** Context width measured in characters */
-#define CHAR_CONTEXT  -1
-/** Context width measured in tokens */
-#define WORD_CONTEXT  -2
-/** Context width measured in terms of an s-attribute */
-#define STRUC_CONTEXT -3
-/** Context width measured in terms of an a-attribute - that is, alignment blocks as the unit of context */
-#define ALIGN_CONTEXT -4
 
 /**
- * ContextDescriptor object: a bundle of CQP options
+ * Enumeration of the four different ways to measure the width of co-text in a concordance line.
+ */
+typedef enum _context_type {
+  /** Context width measured in characters */
+  char_context  = -1,
+  /** Context width measured in tokens */
+  word_context  = -2,
+  /** Context width measured in terms of an s-attribute */
+  s_att_context = -3,
+  /** Context width measured in terms of an a-attribute - that is, alignment blocks as the unit of context */
+  a_att_context = -4
+
+} context_type;
+
+/**
+ * ContextDescriptor class object: a bundle of CQP options
  * describing how a list of corpus positions is to be
  * displayed in a concordance: with left context,
  * with right context, with what attributes, etc.
@@ -47,66 +52,55 @@
  * for each print style; the user can choose among modes
  * but cannot modify the settings individually.
  *
- * TODO This object is confusingly named, as it DOES NOT
- * merely specify the "Context" size; it also specifies
+ * This object is confusingly named, as it DOES NOT
+ * merely specify the "Context" size; it ALSO specifies
  * which attributes get printed, and so on.
- *
  * (It would be better called a "concordance line co-text
- * configuration object".)
+ * configuration object". Or even just a ConcordanceDescriptor.)
  *
  * @see PrintDescriptionRecord
+ * @see PrintOptions
  *
- * TODO why is it necessary for concordance-printing
- * options to be spread across two separate objects?
+ * A PDR contains strings for "concordance building bits" a the CD
+ * contains settings controlling which attributes/how much co-text to show.
  */
-typedef struct _context_description_block {
-  /* oh hurray look, yet another **different** way for the struct tag to correspond to the classname........... */
+typedef struct {
 
   /* ==================== left context scope description variables */
 
   int left_width;                    /**< Amount of context to show before the match, in units specified by left_type */
-  int left_type;                     /**< Unit in which context is measured;
-                                          Set to one of the constants: CHAR_CONTEXT, WORD_CONTEXT, STRUC_CONTEXT, ALIGN_CONTEXT */
-  /* TODO Is being able to have the left co-text measured in words and the right context in (say) paragraphs something we really are bovvered about? */
-
-  char *left_structure_name;
-  Attribute *left_structure;
+  context_type left_type;            /**< Unit in which context is measured; context_type enum. */
+  char *left_structure_name;         /**< If the "unit" is an s-attribute, its name is here. */
+  Attribute *left_structure;         /**< If the "unit" is an s-attribute, the Attribute itself is here. */
 
   /* ==================== right context scope description variables */
 
   int right_width;                   /**< Amount of context to show after the match, in units specified by right_type */
-  int right_type;                    /**< Unit in which context is measured;
-                                          Set to one of the constants: CHAR_CONTEXT, WORD_CONTEXT, STRUC_CONTEXT, ALIGN_CONTEXT */
-  char *right_structure_name;
-  Attribute *right_structure;
+  context_type right_type;           /**< Unit in which context is measured; context_type enum. */
+  char *right_structure_name;        /**< If the "unit" is an s-attribute, its name is here. */
+  Attribute *right_structure;        /**< If the "unit" is an s-attribute, the Attribute itself is here. */
 
-  /** Boolean flag: if true, print corpus position numbers */
+  /** Boolean flag: if true, print corpus position number at the start of each concordance line */
   int print_cpos;
 
   /* ==================== lists of attributes of different types to print */
 
   AttributeList *attributes;         /**< positional attributes to print */
   AttributeList *strucAttributes;    /**< structural attributes to print */
-  AttributeList *printStructureTags; /**< structure tag (values) to print */
+  AttributeList *printStructureTags; /**< structure tag (s-att values) to print */
   AttributeList *alignedCorpora;     /**< aligned corpora from which to print parallel data */
 
 } ContextDescriptor;
 
 
-/* ContextDescriptor methods */
+/* ContextDescriptor class methods */
 
-/* TODO not much naming convention stability among these descriptors! */
-
-int verify_context_descriptor(Corpus *corpus, 
-                              ContextDescriptor *cd,
-                              int remove_illegal_entries);
+int verify_context_descriptor(Corpus *corpus, ContextDescriptor *cd, int remove_illegal_entries);
 
 int initialize_context_descriptor(ContextDescriptor *cd);
 
 int update_context_descriptor(Corpus *corpus, ContextDescriptor *cd);
 
-ContextDescriptor *NewContextDescriptor(void);
-
-void PrintContextDescriptor(ContextDescriptor *cdp);
+void print_context_descriptor(ContextDescriptor *cdp);
 
 #endif

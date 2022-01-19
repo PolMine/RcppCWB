@@ -21,7 +21,8 @@
 #include <string.h>
 #include <unistd.h>		/* for POSIX getopt() */
 
-#include "../cl/globals.h"
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
 
 
 /* global variables */
@@ -85,7 +86,7 @@ alignshow_usage(void)
   fprintf(stderr, "interactive commands are available:\n\n");
   alignshow_print_help();
   fprintf(stderr, "\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(1);
 }
 
@@ -334,6 +335,7 @@ main(int argc, char** argv)
   char line[CL_MAX_LINE_LENGTH];               /* input buffer for .align file */
   char cmd[CL_MAX_LINE_LENGTH];                /* interactive command input */
 
+  cl_startup();
   progname = argv[0];
 
   /* parse command line and read arguments */
@@ -374,16 +376,13 @@ main(int argc, char** argv)
     alignshow_goodbye(1);
   }
   if (NULL == (s1 = cl_new_attribute(corpus1, s1_name, ATT_STRUC))) {
-    fprintf(stderr, "%s warning: can't open s-attribute %s.%s (ignored)\n",
-            progname, corpus1_name, s1_name);
+    fprintf(stderr, "%s warning: can't open s-attribute %s.%s (ignored)\n", progname, corpus1_name, s1_name);
   }
   if (NULL == (s2 = cl_new_attribute(corpus2, s2_name, ATT_STRUC))) {
-    fprintf(stderr, "%s warning: can't open s-attribute %s.%s (ignored)\n",
-            progname, corpus2_name, s2_name);
+    fprintf(stderr, "%s warning: can't open s-attribute %s.%s (ignored)\n", progname, corpus2_name, s2_name);
   }
 
-  printf("Displaying alignment for [%s, %s] from file %s\n",
-         corpus1_name, corpus2_name, align_name);
+  printf("Displaying alignment for [%s, %s] from file %s\n", corpus1_name, corpus2_name, align_name);
   printf("Enter 'h' for help.\n");
 
   /* main loop: read commands from stdin and display alignment */
@@ -394,9 +393,11 @@ main(int argc, char** argv)
 
     /* "parse" command, i.e. look at first character */
     switch (cmd[0]) {
+
     case '\n':
       alignshow_print_next_region(af);
       break;
+
     case 'p':
       {
         int n;
@@ -408,6 +409,7 @@ main(int argc, char** argv)
         }
         break;
       }
+
     case 's':
       {
         int n;
@@ -418,17 +420,20 @@ main(int argc, char** argv)
         alignshow_print_next_region(af);
         break;
       }
+
     case 'h':
       alignshow_print_help();
       break;
-    case 'q': case 'x':
+
+    case 'q':
+    case 'x':
       alignshow_goodbye(0);
       break;
+
     default:
       fprintf(stderr, "UNKNOWN COMMAND. Type 'h' for list of commands.\n");
       break;
     }
-
   }
 
   /* that's it (we shouldn't reach this point) */

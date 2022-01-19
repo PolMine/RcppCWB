@@ -35,18 +35,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
 
 
-/* byte order conversion functions taken from Corpus Library */
-#include "../cl/globals.h"
-#include "../cl/endian.h"
-#include "../cl/macros.h"
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
+#include "../cl/endian.h"       /* for byte order conversion functions */
 #include "../cl/storage.h"      /* for NwriteInt() */
-#include "../cl/lexhash.h"
 
 /* ---------------------------------------------------------------------- */
 
@@ -65,6 +64,7 @@
 /* ---------------------------------------------------------------------- */
 
 /* configuration variables & command-line switches */
+
 int debug = 0;                  /**< debug mode on/off */
 int silent = 0;                 /**< avoid messages in -M / -a modes */
 int strip_blanks_in_values = 0; /* Wow, this is unused :o) */
@@ -79,12 +79,12 @@ unsigned long input_line = 0;   /**< input line number (used for error messages)
 Corpus *corpus = NULL;          /**< corpus we're working on; at the moment, this is only required for add_to_existing */
 CorpusCharset encoding_charset; /**< a charset object; will be the same as that of corpus if we are adding to an existing corpus,
                                      otherwise, should be declared. */
-char *encoding_charset_name = "latin1";
-                                 /**< character set label from the -c option. Value = pre-4.0 default of latin1. */
-int clean_strings = 0;           /**< clean up input strings by replacing invalid bytes with '?' (except for UTF8 encoding)*/
-                                 /* hack for v3.5 for backward compatibility: never clean strings. */
+const char *encoding_charset_name = "latin1";
+                                /**< character set label from the -c option. Value = pre-4.0 default of latin1. */
+int clean_strings = 0;          /**< clean up input strings by replacing invalid bytes with '?' (except for UTF8 encoding)*/
+                                /* hack for v3.5 for backward compatibility: never clean strings. */
 
-/* TODO this would be useful as a general tool , non? */
+/* this would be useful as a general tool , nicht wahr? */
 enum {
   set_none, set_any, set_regular, set_whitespace
 } set_att = set_none;           /**< feature-set attributes: type of. Initial value: not a feature set.
@@ -95,7 +95,7 @@ enum {
 /* ---------------------------------------------------------------------- */
 
 /**
- * SencodeRange object - distinct from the Range object in cwb-encode.
+ * mini_s_builder object - distinct from, and simpler than the similar object in cwb-encode.
  *
  */
 typedef struct {
@@ -112,14 +112,15 @@ typedef struct {
   int last_cpos;                /**< end of last region (consistency checking) */
   int num;                      /**< the next will be the num-th structure */
   int offset;                   /**< string offset for next string */
-} SencodeRange;
+} mini_s_builder;
+
 
 /**
- * Global (and only) instance of the cwb-s-encode SencodeRange object.
+ * Global (and only) instance of the cwb-s-encode mini_s_builder object.
  *
  * Contains information on the new s-attribute being coded.
  */
-SencodeRange new_satt;
+mini_s_builder new_satt;
 
 /* ---------------------------------------------------------------------- */
 
@@ -127,10 +128,9 @@ char *progname = NULL;
 
 /* ---------------------------------------------------------------------- */
 
+
 /**
  * The "structure list" data type is used for 'adding' regions (-a).
- *
- * TODO SL is a really bad name; should be "RegionList".
  *
  * In this case, all existing regions are read into an ordered, bidirectional list;
  * new regions are inserted into that list (overlaps are automatically resolved
@@ -138,18 +138,18 @@ char *progname = NULL;
  * region is retained). Only once the entire input has been read is the data
  * actually encoded and stored on disk.
  */
-typedef struct _SL {
+typedef struct s_region {
   int start;                    /**< start of region */
   int end;                      /**< end of region */
   char *annot;                  /**< annotated string */
-  struct _SL *prev;
-  struct _SL *next;
-} *SL;
+  struct s_region *prev;
+  struct s_region *next;
+} *s_region;
 
-SL StructureList = NULL;        /**< (single) global list */
-SL SL_Point = NULL;             /**< pointer into global list; NULL = start of list; linear search starts from SL_Point */
+s_region StructureList = NULL;        /**< (single) global list of s-att regions */
+s_region SL_Point = NULL;             /**< pointer into global list; NULL = start of list; linear search starts from SL_Point */
 
-/* SL functions:
+/* s_region functions:
  *  item = SL_seek(cpos);           (find region containing (or preceding) cpos; NULL = start of list; sets SL_Point to returned value)
  *  item = SL_insert_after_point(start, end, annot);   (insert region [start, end, annot] after SL_Point; no overlap/position checking)
  *  SL_delete(item);                (delete region from list; updates SL_Point if it happened to point at item)
@@ -170,15 +170,13 @@ SL_rewind(void)
 /**
  * Gets a pointer to the next available structure on the global structure list.
  *
- * Returns NULL if we're at the end of the list.text
+ * Returns NULL if we're at the end of the list.
  */
-SL
+s_region
 SL_next(void)
 {
-  SL item;
-
-  item = SL_Point;
-  if (SL_Point != NULL)
+  s_region item = SL_Point;
+  if (SL_Point)
     SL_Point = SL_Point->next;
   return item;
 }
@@ -186,39 +184,41 @@ SL_next(void)
 /**
  * Find region containing (or preceding) cpos; NULL = start of list; sets SL_Point to returned value.
  */
-SL
+s_region
 SL_seek(int cpos)
 {
-  if (SL_Point == NULL)          /* start-of-list case */
+  if (!SL_Point)          /* start-of-list case */
     SL_Point = StructureList;
 
   while (SL_Point != NULL) {
     if ((SL_Point->start <= cpos) && (cpos <= SL_Point->end))
-      return SL_Point;           /* found region containing cpos */
-    if ((cpos < SL_Point->start)) {
-      SL_Point = SL_Point->prev; /* try previous region: SL_Point may become NULL = start of list */
-    }
-    else if ((cpos > SL_Point->end) && (SL_Point->next != NULL) && (SL_Point->next->start <= cpos)) {
-      SL_Point = SL_Point->next; /* try next region, but only if it isn't _behind_ cpos */
-    }
-    else {
-      return SL_Point;          /* can't do better than that */
-    }
+      return SL_Point;
+      /* found region containing cpos */
+
+    if ((cpos < SL_Point->start))
+      SL_Point = SL_Point->prev;
+      /* try previous region: SL_Point may become NULL = start of list */
+    else if ((cpos > SL_Point->end) && (SL_Point->next != NULL) && (SL_Point->next->start <= cpos))
+      SL_Point = SL_Point->next;
+      /* try next region, but only if it isn't _behind_ cpos */
+    else
+      return SL_Point;
+      /* can't do better than that */
   }
   return NULL;
 }
 
 /**
- * insert region [start, end, annot] after SL_Point; no overlap/position checking
+ * Insert region [start, end, annot] after SL_Point; no overlap/position checking
  */
-SL
+s_region
 SL_insert_after_point(int start, int end, char *annot)
 {
   /* allocate and initialise new item to insert into list */
-  SL item = (SL) cl_malloc(sizeof(struct _SL));
+  s_region item = (s_region)cl_malloc(sizeof(struct s_region));
   item->start = start;
   item->end = end;
-  if (annot != NULL)
+  if (annot)
     item->annot = cl_strdup(annot);
   else
     item->annot = NULL;
@@ -254,7 +254,7 @@ SL_insert_after_point(int start, int end, char *annot)
  * delete region from list; updates SL_Point if it happened to point at item
  */
 void
-SL_delete(SL item)
+SL_delete(s_region item)
 {
   /* unlink item ... we have to handle a few special cases again */
   if (item->prev == NULL) {     /* delete first list element */
@@ -286,7 +286,7 @@ SL_delete(SL item)
 void
 SL_insert(int start, int end, char *annot)
 {
-  SL point, item;
+  s_region point, item;
 
   point = SL_seek(start);
   if (point == NULL) {
@@ -320,8 +320,6 @@ SL_insert(int start, int end, char *annot)
   }
 }
 
-
-/* ---------------------------------------------------------------------- */
 
 
 
@@ -372,9 +370,8 @@ sencode_parse_line(char *line, int *start, int *end, char **annot)
     if (field_end <= field)
       return 0;
   }
-  else {
+  else
     *field_end = 0;
-  }
 
   errno = 0;
   *end = atoi(field);
@@ -414,7 +411,6 @@ sencode_parse_line(char *line, int *start, int *end, char **annot)
 }
 
 
-/* ---------------------------------------------------------------------- */
 
 /**
  * Changes an annotation string to standard set attribute syntax.
@@ -436,17 +432,18 @@ sencode_check_set(char *annot)
 {
   char *set;
 
-  if (set_att == set_none || annot == NULL) {
-    return annot;               /* no modification needed */
-  }
-  else if ((!set_syntax_strict) || set_att == set_any) {
+  if (set_att == set_none || annot == NULL)
+    /* no modification needed */
+    return annot;
+
+  else if (!set_syntax_strict || set_att == set_any)
     /* we work out the set mode on the first item analysed, or on
      * every item iff we are using non-strict set syntax */
-    if (annot[0] == '|')
-      set_att = set_regular;
-    else
-      set_att = set_whitespace;
-  }
+    set_att = (annot[0] == '|' ? set_regular : set_whitespace);
+//    if (annot[0] == '|')
+//      set_att = set_regular;
+//    else
+//      set_att = set_whitespace;
 
   set = cl_make_set(annot, (set_att == set_whitespace));
   cl_free(annot);
@@ -454,7 +451,6 @@ sencode_check_set(char *annot)
 }
 
 
-/* ---------------------------------------------------------------------- */
 
 /**
  * print usage message and exit
@@ -481,7 +477,7 @@ sencode_usage(void)
   fprintf(stderr, "  -D        debug mode\n");
   fprintf(stderr, "  -S <att>  generate s-attribute <att>\n");
   fprintf(stderr, "  -V <att>  generate s-attribute <att> with annotations\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(2);
 }
 
@@ -736,7 +732,7 @@ sencode_write_region(int start, int end, char *annot)
 {
   if (!new_satt.ready)
     sencode_open_files();
-  if (new_satt.store_values && (LH == NULL))
+  if (new_satt.store_values && NULL == LH)
     LH = cl_new_lexhash(0);
 
   /* write start & end positions of region */
@@ -745,15 +741,14 @@ sencode_write_region(int start, int end, char *annot)
 
   /* store annotation for -V attribute */
   if (new_satt.store_values) {
-    int offset, id;
-    cl_lexhash_entry entry;
+    cl_lexhash_entry entry = cl_lexhash_find(LH, annot);
 
-    entry = cl_lexhash_find(LH, annot);
-    if (entry == NULL) {
+    if (!entry) {
       /* must add string to hash and to avs file */
       entry = cl_lexhash_add(LH, annot);
       entry->data.integer = new_satt.offset;
       new_satt.offset += strlen(annot) + 1; /* increment range offset */
+      /* integer overflow check */
       if (new_satt.offset < 0) {
         fprintf(stderr, "Too many annotation values for <%s> regions (lexicon size > %d bytes)\n", new_satt.name, INT_MAX);
         exit(1);
@@ -763,11 +758,9 @@ sencode_write_region(int start, int end, char *annot)
         exit(1);
       }
     }
-    id = entry->id;
-    offset = entry->data.integer;
 
     NwriteInt(new_satt.num, new_satt.avx);
-    NwriteInt(offset, new_satt.avx);
+    NwriteInt(entry->data.integer, new_satt.avx);
   }
 
   new_satt.num++;   /* increment region number */
@@ -802,6 +795,7 @@ main(int argc, char **argv)
       S_annotations_dropped;   /* counter of n of annotations ignored from input because we are encoding a -S */
   int i, N;
 
+  cl_startup();
   progname = argv[0];
   sencode_parse_options(argc, argv);
 
@@ -900,12 +894,12 @@ main(int argc, char **argv)
 
   /* in -M mode, write data to disk now that we have finished looping across input data */
   if (in_memory) {
-    SL item;
+    s_region item;
 
     if (!silent)
       printf("[Creating encoded disk file(s)]\n");
     SL_rewind();
-    while ((item = SL_next()) != NULL)
+    while (NULL != (item = SL_next()))
       sencode_write_region(item->start, item->end, item->annot);
   }
 

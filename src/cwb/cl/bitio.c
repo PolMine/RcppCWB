@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,13 +15,11 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-void Rprintf(const char *, ...);
 #include <sys/types.h>
 
 #include "globals.h"
-#include "endian2.h"
+#include "endian.h"
 #include "bitio.h"
-
 
 
 /**
@@ -89,9 +87,9 @@ BSopen(unsigned char *base, char *type, BStream *bf)
 int
 BFclose(BFile *stream)
 {
-  if (stream->mode == 'w') 
+  if (stream->mode == 'w')
     BFflush(stream);
-  
+
   return (fclose(stream->fd) == 0 ? 1 : 0);
 }
 
@@ -106,7 +104,7 @@ BFclose(BFile *stream)
 int
 BSclose(BStream *stream)
 {
-  if (stream->mode == 'w') 
+  if (stream->mode == 'w')
     BSflush(stream);
   stream->base = NULL;
 
@@ -132,13 +130,13 @@ BFflush(BFile *stream)
   retval = 0;
 
   if (stream->mode == 'w') {
-    if ((stream->bits_in_buf > 0) && 
+    if ((stream->bits_in_buf > 0) &&
         (stream->bits_in_buf < 8)) {
-      
+
       stream->buf <<= (8 - stream->bits_in_buf);
       fwrite(&stream->buf, sizeof(unsigned char), 1, stream->fd);
       stream->position++;
-      
+
       if (fflush(stream->fd) == 0)
         retval = 1;
 
@@ -180,13 +178,13 @@ BSflush(BStream *stream)
   retval = 0;
 
   if (stream->mode == 'w') {
-    if ((stream->bits_in_buf > 0) && 
+    if ((stream->bits_in_buf > 0) &&
 	(stream->bits_in_buf < 8)) {
-      
+
       stream->buf <<= (8 - stream->bits_in_buf);
       stream->base[stream->position] = stream->buf;
       stream->position++;
-      
+
       retval = 1;
 
       stream->buf = '\0';
@@ -223,22 +221,20 @@ BSflush(BStream *stream)
 int
 BFwrite(unsigned char data, int nbits, BFile *stream)
 {
-
   unsigned char mask;
 
   mask = 1 << (nbits - 1);
 
   while (nbits > 0) {
-  
     assert(mask);
     assert(stream->bits_in_buf < 8);
 
     stream->bits_in_buf++;
     stream->buf <<= 1;
 
-    if (data & mask) 
+    if (data & mask)
       stream->buf |= 1;
-    
+
     if (stream->bits_in_buf == 8) {
       if (fwrite(&stream->buf, sizeof(unsigned char), 1, stream->fd) != 1)
         return 0;
@@ -273,16 +269,16 @@ BSwrite(unsigned char data, int nbits, BStream *stream)
   mask = 1 << (nbits - 1);
 
   while (nbits > 0) {
-  
+
     assert(mask);
     assert(stream->bits_in_buf < 8);
 
     stream->bits_in_buf++;
     stream->buf <<= 1;
 
-    if (data & mask) 
+    if (data & mask)
       stream->buf |= 1;
-    
+
     if (stream->bits_in_buf == 8) {
       stream->base[stream->position] = stream->buf;
       stream->position++;
@@ -314,7 +310,7 @@ BFread(unsigned char *data, int nbits, BFile *stream)
   *data = '\0';
 
   while (nbits > 0) {
-  
+
     if (stream->bits_in_buf == 0) {
       if (fread(&stream->buf, sizeof(unsigned char), 1, stream->fd) != 1)
         return 0;
@@ -328,7 +324,7 @@ BFread(unsigned char *data, int nbits, BFile *stream)
 
     stream->buf <<= 1;
     stream->bits_in_buf--;
-    
+
     nbits--;
   }
   return 1;
@@ -350,7 +346,7 @@ BSread(unsigned char *data, int nbits, BStream *stream)
   *data = '\0';
 
   while (nbits > 0) {
-  
+
     if (stream->bits_in_buf == 0) {
       stream->buf = stream->base[stream->position];
       stream->position++;
@@ -363,7 +359,7 @@ BSread(unsigned char *data, int nbits, BStream *stream)
 
     stream->buf <<= 1;
     stream->bits_in_buf--;
-    
+
     nbits--;
   }
   return 1;
@@ -389,7 +385,7 @@ BFwriteWord(unsigned int data, int nbits, BFile *stream)
   unsigned char *cdata;
 
   if ((nbits > 32) || (nbits < 0)) {
-    Rprintf("bitio.o/BFwriteWord: nbits (%d) not in legal bounds\n", nbits);
+    fprintf(stderr, "bitio.o/BFwriteWord: nbits (%d) not in legal bounds\n", nbits);
     return 0;
   }
 
@@ -431,7 +427,7 @@ BFreadWord(unsigned int *data, int nbits, BFile *stream)
   unsigned char *cdata;
 
   if ((nbits > 32) || (nbits < 0)) {
-    Rprintf("bitio.o/BFreadWord: nbits (%d) not in legal bounds\n", nbits);
+    fprintf(stderr, "bitio.o/BFreadWord: nbits (%d) not in legal bounds\n", nbits);
     return 0;
   }
 
@@ -451,7 +447,7 @@ BFreadWord(unsigned int *data, int nbits, BFile *stream)
   /* As in BFwriteWord, the above code assumes that integers are 4 bytes long
      and stored in LSB first fashion. To avoid rewriting the whole code, we just
      convert from this Network byte-order to the platform's native byte-order
-     in the end (which assumes that ints are 4 bytes ... but hey, we've got to 
+     in the end (which assumes that ints are 4 bytes ... but hey, we've got to
      live with that in the CWB! */
   *data = ntohl(*data);
 

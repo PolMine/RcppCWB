@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -33,7 +33,8 @@
  */
 
 
-void Rprintf(const char *, ...);
+#ifdef __MINGW__
+
 #include "windows-mmap.h"
 
 /**
@@ -59,7 +60,7 @@ mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
   if (!fstat(fd, &st))
     len = (size_t) st.st_size;
   else {
-    Rprintf("mmap: could not determine filesize");
+    fprintf(stderr,"mmap: could not determine filesize");
     exit(1);
   }
 
@@ -67,7 +68,7 @@ mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
     length = len - offset;
 
   if (!(flags & MAP_PRIVATE)) {
-    Rprintf("Invalid usage of mmap when built with USE_WIN32_MMAP");
+    fprintf(stderr,"Invalid usage of mmap when built with USE_WIN32_MMAP");
     exit(1);
   }
 
@@ -79,7 +80,7 @@ mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
   temp = MapViewOfFileEx(hmap, FILE_MAP_COPY, h, l, length, start);
 
   if (!CloseHandle(hmap))
-    Rprintf("unable to close file mapping handle\n");
+    fprintf(stderr,"unable to close file mapping handle\n");
   return temp ? temp : MAP_FAILED;
 }
 
@@ -97,3 +98,7 @@ munmap(void *start, size_t length)
 {
   return !UnmapViewOfFile(start);
 }
+
+
+#endif
+

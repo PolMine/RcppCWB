@@ -23,6 +23,8 @@
 #ifndef __windows_mmap_h
 #define __windows_mmap_h
 
+#ifdef __MINGW__
+
 #include <windows.h>
 #include <sys/stat.h>
 #include <stdint.h>
@@ -51,5 +53,7 @@
 
 void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset);
 int munmap(void *start, size_t length);
+
+#endif /* defined __MINGW__ */
 
 #endif

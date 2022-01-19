@@ -15,7 +15,16 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-%option noyywrap
+/*
+ * This is the lexer definition for the registry parser.
+ * 
+ * The name prefix is set to creg (corpus registry)
+ * so functions begin with that instead of yy.
+ */
+%option prefix="creg"
+
+/* unused functions yywrap(), input() and yyunput(): stop them being created in the lexer. */
+%option noyywrap noinput nounput  
 
 %{
 #include <ctype.h>
@@ -28,13 +37,8 @@
 
 #include "registry.tab.h"
 
-/* I guess this was used to avoid having to link with -lfl, but the same effect can be achieved with the noyywrap option:
-#undef cregwrap()
-#define cregwrap() 1
-*/
-
 /**
- * remove \" and \\ escapes, but keep all other "literal" backslashes; modified <string> in place
+ * remove \" and \\ escapes, but keep all other "literal" backslashes; modifies [string] in place
  */
 void
 unescape_string (char *string) {
