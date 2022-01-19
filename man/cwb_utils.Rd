@@ -18,6 +18,7 @@ cwb_encode(
   registry = Sys.getenv("CORPUS_REGISTRY"),
   data_dir,
   vrt_dir,
+  encoding = "utf8",
   p_attributes = c("word", "pos", "lemma"),
   s_attributes
 )
