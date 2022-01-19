@@ -35,8 +35,8 @@
 void Rprintf(const char *, ...);
 
 char* cl_get_version(){
-  #ifdef VERSION
-  char* version = VERSION;
+  #ifdef CWB_VERSION
+  char* version = CWB_VERSION;
   #else
   char* version = "";
   #endif
