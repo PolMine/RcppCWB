@@ -22,8 +22,10 @@ void Rprintf(const char *, ...);
 
 #include <glib.h>
 
+#ifndef __MINGW__
 #include <signal.h> /* added by Andreas Blaette  */
 #include <sys/socket.h> /* added by Andreas Blaette */
+#endif
 
 #include "globals.h"
 #include "fileutils.h"

@@ -606,7 +606,7 @@ PatchEngine <- R6Class(
           # to satisfy solaris
           # #include <signal.h> /* added by Andreas Blaette  */
           # #include <sys/socket.h> /* added by Andreas Blaette */
-          insert_before = list('^#include\\s"globals\\.h"', c("#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", ""))
+          insert_before = list('^#include\\s"globals\\.h"', c("#ifndef __MINGW__", "#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "#endif", ""))
         ),
         
         "src/cwb/cl/globals.h" = list(
