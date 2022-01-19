@@ -18,7 +18,7 @@
 #include <sys/types.h>
 
 #include "globals.h"
-#include "endian.h"
+#include "endian2.h"
 #include "bitio.h"
 
 
@@ -385,7 +385,7 @@ BFwriteWord(unsigned int data, int nbits, BFile *stream)
   unsigned char *cdata;
 
   if ((nbits > 32) || (nbits < 0)) {
-    fprintf(stderr, "bitio.o/BFwriteWord: nbits (%d) not in legal bounds\n", nbits);
+    Rprintf("bitio.o/BFwriteWord: nbits (%d) not in legal bounds\n", nbits);
     return 0;
   }
 
@@ -427,7 +427,7 @@ BFreadWord(unsigned int *data, int nbits, BFile *stream)
   unsigned char *cdata;
 
   if ((nbits > 32) || (nbits < 0)) {
-    fprintf(stderr, "bitio.o/BFreadWord: nbits (%d) not in legal bounds\n", nbits);
+    Rprintf("bitio.o/BFreadWord: nbits (%d) not in legal bounds\n", nbits);
     return 0;
   }
 

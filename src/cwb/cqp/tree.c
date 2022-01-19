@@ -33,7 +33,7 @@
 /* helper function for pretty-printing functions below */
 void print_indent(int indent) {
   for (; indent > 0; indent--)
-    printf("    ");
+    Rprintf("    ");
 }
 
 /**
@@ -49,56 +49,56 @@ print_pattern(int envidx, int index, int indent)
   if (index >= 0 && index <= Environment[envidx].MaxPatIndex)
     switch (Environment[envidx].patternlist[index].type) {
     case Tag:
-      printf("#%d: <%s%s", index,
+      Rprintf("#%d: <%s%s", index,
              (Environment[envidx].patternlist[index].tag.is_closing ? "/" : ""),
              Environment[envidx].patternlist[index].tag.attr->any.name);
       if (Environment[envidx].patternlist[index].tag.constraint) {
-        printf(" %s", Environment[envidx].patternlist[index].tag.constraint);
+        Rprintf(" %s", Environment[envidx].patternlist[index].tag.constraint);
         if (Environment[envidx].patternlist[index].tag.flags)
-          printf(" %s%s%s%s", "%",
+          Rprintf(" %s%s%s%s", "%",
                  (Environment[envidx].patternlist[index].tag.flags & IGNORE_CASE) ? "c" : "",
                  (Environment[envidx].patternlist[index].tag.flags & IGNORE_DIAC) ? "d" : "",
                  (Environment[envidx].patternlist[index].tag.flags & IGNORE_REGEX) ? "l" : "");
       }
-      printf(">\n");
+      Rprintf(">\n");
       break;
     case Pattern:
-      printf("#%d: [...]\n", index);
+      Rprintf("#%d: [...]\n", index);
       print_indent(indent);
       print_booltree(Environment[envidx].patternlist[index].con.constraint, indent);
       break;
     case MatchAll:
-      printf("#%d: []\n", index);
+      Rprintf("#%d: []\n", index);
       break;
     case Region:
-      printf("#%d: <<%s>> ", index, Environment[envidx].patternlist[index].region.name);
+      Rprintf("#%d: <<%s>> ", index, Environment[envidx].patternlist[index].region.name);
       switch (Environment[envidx].patternlist[index].region.opcode) {
       case AVSRegionEnter:
-        printf("ENTER ");
+        Rprintf("ENTER ");
         if (Environment[envidx].patternlist[index].region.attr)
-          printf("(s-attribute)");
+          Rprintf("(s-attribute)");
         else if (Environment[envidx].patternlist[index].region.nqr)
-          printf("(NQR)");
+          Rprintf("(NQR)");
         else
-          printf("!! invalid !!");
+          Rprintf("!! invalid !!");
         break;
       case AVSRegionWait:
-        printf("WAIT");
+        Rprintf("WAIT");
         break;
       case AVSRegionEmit:
-        printf("EMIT");
+        Rprintf("EMIT");
         break;
       default:
-        printf("!! INVALID !!");
+        Rprintf("!! INVALID !!");
       }
-      printf("\n");
+      Rprintf("\n");
       break;
     default:
-      fprintf(stderr, "Unknown pattern type in print_pattern: %d\n", Environment[envidx].patternlist[index].type);
+      Rprintf("Unknown pattern type in print_pattern: %d\n", Environment[envidx].patternlist[index].type);
       break;
     }
   else
-    fprintf(stderr, "Illegal index in print_pattern: %d\n", index);
+    Rprintf("Illegal index in print_pattern: %d\n", index);
 }
 
 
@@ -115,13 +115,13 @@ print_rep_factor(int i)
 {
   switch (i) {
   case repeat_inf:
-    printf("inf");
+    Rprintf("inf");
     break;
   case repeat_none:
-    printf("none");
+    Rprintf("none");
     break;
   default:
-    printf("%d", i);
+    Rprintf("%d", i);
     break;
   }
 }
@@ -154,11 +154,11 @@ print_evaltree(int envidx, Evaltree etptr, int indent)
       assert(etptr->node.min == repeat_none);
       print_evaltree(envidx, etptr->node.left, indent + 1);
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_indent(indent);
-      printf("[.]-+\n");
+      Rprintf("[.]-+\n");
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_evaltree(envidx, etptr->node.right, indent + 1);
       break;
 
@@ -167,11 +167,11 @@ print_evaltree(int envidx, Evaltree etptr, int indent)
       assert(etptr->node.min == repeat_none);
       print_evaltree(envidx, etptr->node.left, indent + 1);
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_indent(indent);
-      printf("[,]-+\n");
+      Rprintf("[,]-+\n");
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_evaltree(envidx, etptr->node.right, indent + 1);
       break;
 
@@ -180,11 +180,11 @@ print_evaltree(int envidx, Evaltree etptr, int indent)
       assert(etptr->node.min == repeat_none);
       print_evaltree(envidx, etptr->node.left, indent + 1);
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_indent(indent);
-      printf("[|]-+\n");
+      Rprintf("[|]-+\n");
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_evaltree(envidx, etptr->node.right, indent + 1);
       break;
 
@@ -193,13 +193,13 @@ print_evaltree(int envidx, Evaltree etptr, int indent)
       assert(etptr->node.min != repeat_none);
       print_evaltree(envidx, etptr->node.left, indent + 1);
       print_indent(indent);
-      printf("    |\n");
+      Rprintf("    |\n");
       print_indent(indent);
-      printf("[*]-+  { ");
+      Rprintf("[*]-+  { ");
       print_rep_factor(etptr->node.min);
-      printf(" , ");
+      Rprintf(" , ");
       print_rep_factor(etptr->node.max);
-      printf(" }\n");
+      Rprintf(" }\n");
       assert(etptr->node.right == NULL);
       break;
     }
@@ -213,16 +213,16 @@ print_evaltree(int envidx, Evaltree etptr, int indent)
     break;
 
   case meet_union:
-    printf("\n");
+    Rprintf("\n");
     for (i = 1; i <= indent; i++)
-      printf("  ");
+      Rprintf("  ");
 
     switch (etptr->cooc.op_id) {
     case cooc_meet:
-      printf("Meet <%d/%d, %s>", etptr->cooc.lw, etptr->cooc.rw, etptr->cooc.struc ? etptr->cooc.struc->any.name : "words");
+      Rprintf("Meet <%d/%d, %s>", etptr->cooc.lw, etptr->cooc.rw, etptr->cooc.struc ? etptr->cooc.struc->any.name : "words");
       break;
     case cooc_union:
-      printf("Union ");
+      Rprintf("Union ");
       break;
     default:
       assert(0 && "Can't be");
@@ -234,12 +234,12 @@ print_evaltree(int envidx, Evaltree etptr, int indent)
     break;
 
   case tabular:
-    printf("Tabular\n");
+    Rprintf("Tabular\n");
     while (etptr) {
       print_pattern(0, etptr->tab_el.patindex, 2);
       /* print the distance? */
       if (etptr->tab_el.next)
-        printf("  {%d,%d}\n", etptr->tab_el.next->tab_el.min_dist,  etptr->tab_el.next->tab_el.max_dist);
+        Rprintf("  {%d,%d}\n", etptr->tab_el.next->tab_el.min_dist,  etptr->tab_el.next->tab_el.max_dist);
       etptr = etptr->tab_el.next;
     }
 
@@ -408,13 +408,13 @@ print_booltree(Constrainttree ctptr, int indent)
     return;
 
   if (tree_debug)
-    printf("booltree is not nil\n");
+    Rprintf("booltree is not nil\n");
   /* denotes the current node an operator? */
   switch (ctptr->type) {
   case bnode:
 
     if (tree_debug)
-      printf("current node is operator (type = %d)\n", ctptr->node.type);
+      Rprintf("current node is operator (type = %d)\n", ctptr->node.type);
 
     switch(ctptr->node.op_id) {
     case b_and:
@@ -428,38 +428,38 @@ print_booltree(Constrainttree ctptr, int indent)
     case cmp_neq:
 
       if (tree_debug)
-        printf("operator (id = %d) is binary\n", ctptr->node.op_id);
+        Rprintf("operator (id = %d) is binary\n", ctptr->node.op_id);
 
       print_booltree(ctptr->node.left, indent + 1);
-      printf("\n");
+      Rprintf("\n");
       print_indent(indent);
       switch(ctptr->node.op_id) {
       case b_and:
-        printf("&\n");
+        Rprintf("&\n");
         break;
       case b_or:
-        printf("|\n");
+        Rprintf("|\n");
         break;
       case b_implies:
-        printf("->\n");
+        Rprintf("->\n");
         break;
       case cmp_gt:
-        printf(">\n");
+        Rprintf(">\n");
         break;
       case cmp_lt:
-        printf("<\n");
+        Rprintf("<\n");
         break;
       case cmp_get:
-        printf(">=\n");
+        Rprintf(">=\n");
         break;
       case cmp_let:
-        printf("<=\n");
+        Rprintf("<=\n");
         break;
       case cmp_eq:
-        printf("=\n");
+        Rprintf("=\n");
         break;
       case cmp_neq:
-        printf("!=\n");
+        Rprintf("!=\n");
         break;
       default:
         break;
@@ -470,19 +470,19 @@ print_booltree(Constrainttree ctptr, int indent)
     case b_not:
     case cmp_ex:
       if (tree_debug)
-        printf("operator (id = %d) is unary\n", ctptr->node.op_id);
-      printf("\n");
+        Rprintf("operator (id = %d) is unary\n", ctptr->node.op_id);
+      Rprintf("\n");
       print_indent(indent);
 
       switch(ctptr->node.op_id) {
       case b_not:
-        printf("!\n");
+        Rprintf("!\n");
         break;
       case cmp_ex:
-        printf("?\n");
+        Rprintf("?\n");
         break;
       default:
-        printf("ILLEGAL OP: %d\n", ctptr->node.op_id);
+        Rprintf("ILLEGAL OP: %d\n", ctptr->node.op_id);
         break;
       }
 
@@ -491,51 +491,51 @@ print_booltree(Constrainttree ctptr, int indent)
 
     default:
       if (tree_debug)
-        printf("operator (id = %d) is unknown\n", ctptr->node.op_id);
+        Rprintf("operator (id = %d) is unknown\n", ctptr->node.op_id);
       break;
     }
     break;
 
   case cnode:
-    printf("constant %d\n", ctptr->constnode.val);
+    Rprintf("constant %d\n", ctptr->constnode.val);
     break;
 
   case id_list:
     if (ctptr->idlist.label)
-      printf("%smembership of %s.%s value in ",
+      Rprintf("%smembership of %s.%s value in ",
              ctptr->idlist.negated ? "non-" : "",
              ctptr->idlist.label->name,
              ctptr->idlist.attr->any.name);
     else
-      printf("%smembership of %s value in ",
+      Rprintf("%smembership of %s value in ",
              ctptr->idlist.negated ? "non-" : "",
              ctptr->idlist.attr->any.name);
     for (i = 0; i < ctptr->idlist.nr_items; i++)
-      printf("%d ", ctptr->idlist.items[i]);
-    printf("\n");
+      Rprintf("%d ", ctptr->idlist.items[i]);
+    Rprintf("\n");
     break;
 
   case var_ref:
-    printf("Variable reference to %s\n", ctptr->varref.varName);
+    Rprintf("Variable reference to %s\n", ctptr->varref.varName);
     break;
 
   case func:
-    printf("\n");
+    Rprintf("\n");
     print_indent(indent);
 
     if (ctptr->func.predef >= 0)
-      printf("%s(", builtin_function[ctptr->func.predef].name);
+      Rprintf("%s(", builtin_function[ctptr->func.predef].name);
     else {
       assert(ctptr->func.dynattr);
-      printf("%s(", ctptr->func.dynattr->any.name);
+      Rprintf("%s(", ctptr->func.dynattr->any.name);
     }
 
     for (arg = ctptr->func.args; arg; arg = arg->next) {
       print_booltree(arg->param, indent+1);
       if (arg->next)
-        printf(", ");
+        Rprintf(", ");
     }
-    printf(")\n");
+    Rprintf(")\n");
 
     break;
 
@@ -544,14 +544,14 @@ print_booltree(Constrainttree ctptr, int indent)
     break;
 
   case pa_ref:
-    printf("\n");
+    Rprintf("\n");
     print_indent(indent);
 
     if (ctptr->pa_ref.label)
-      printf("%s.", ctptr->pa_ref.label->name);
+      Rprintf("%s.", ctptr->pa_ref.label->name);
 
     if (ctptr->pa_ref.attr)
-      printf("%s", ctptr->pa_ref.attr->any.name);
+      Rprintf("%s", ctptr->pa_ref.attr->any.name);
     else
       /* we may have label references without an attribute,
        * referring to the position only (distance)
@@ -561,40 +561,40 @@ print_booltree(Constrainttree ctptr, int indent)
     break;
 
   case sa_ref:
-    printf("%s", ctptr->pa_ref.attr->any.name);
+    Rprintf("%s", ctptr->pa_ref.attr->any.name);
     break;
 
   case string_leaf:
-    printf("\n");
+    Rprintf("\n");
     print_indent(indent);
 
     switch (ctptr->leaf.pat_type) {
     case REGEXP:
-      printf("REGEX %s\n", ctptr->leaf.ctype.sconst);
+      Rprintf("REGEX %s\n", ctptr->leaf.ctype.sconst);
       break;
     case NORMAL:
-      printf("NORMAL %s\n", ctptr->leaf.ctype.sconst);
+      Rprintf("NORMAL %s\n", ctptr->leaf.ctype.sconst);
       break;
     case CID:
-      printf("CID %d\n", ctptr->leaf.ctype.cidconst);
+      Rprintf("CID %d\n", ctptr->leaf.ctype.cidconst);
       break;
     }
     break;
 
   case int_leaf:
-    printf("\n");
+    Rprintf("\n");
     print_indent(indent);
-    printf("%d\n", ctptr->leaf.ctype.iconst);
+    Rprintf("%d\n", ctptr->leaf.ctype.iconst);
     break;
 
   case float_leaf:
-    printf("\n");
+    Rprintf("\n");
     print_indent(indent);
-    printf("%f\n", ctptr->leaf.ctype.fconst);
+    Rprintf("%f\n", ctptr->leaf.ctype.fconst);
     break;
 
   default:
-    printf("ILLEGAL EVAL NODE TYPE: %d\n", ctptr->type);
+    Rprintf("ILLEGAL EVAL NODE TYPE: %d\n", ctptr->type);
     break;
   }
 }
@@ -614,16 +614,16 @@ show_patternlist(int eidx)
 {
   int i;
 
-  printf("\n==================== Pattern List:\n\n");
+  Rprintf("\n==================== Pattern List:\n\n");
 
-  printf("Size: %d\n", Environment[eidx].MaxPatIndex + 1);
+  Rprintf("Size: %d\n", Environment[eidx].MaxPatIndex + 1);
 
   for(i = 0; i <= Environment[eidx].MaxPatIndex; i++) {
-    printf("Pattern #%d:\n", i);
+    Rprintf("Pattern #%d:\n", i);
     print_pattern(eidx, i, 0);
   }
 
-  printf("\n==================== End of Pattern List\n\n");
+  Rprintf("\n==================== End of Pattern List\n\n");
 }
 
 
