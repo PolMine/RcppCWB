@@ -533,7 +533,7 @@ PatchEngine <- R6Class(
           
           # Cannot find the dollar variabl in r1690 - seems to be gone
           if (revision == 1069) list(
-            # attributes.c:755:19: warning: variable ‘dollar’ set but not used [-Wunused-but-set-variable]
+            # attributes.c:755:19: warning: variable ???dollar??? set but not used [-Wunused-but-set-variable]
             # int ppos, bpos, dollar, rpos;
             replace = list("(\\s+)int\\sppos,\\sbpos,\\sdollar,\\srpos;", "\\1int ppos, bpos, rpos;", 1),
             replace = list("^(\\s+)dollar = 0;", "\\1/* dollar = 0; */", 1),
@@ -541,18 +541,18 @@ PatchEngine <- R6Class(
             
             # The STREQ macro is replaced by a cl_str_is() function in r1690
 
-            # attributes.c: In function ‘component_full_name’:
-            #   macros.h:59:22: warning: the address of ‘rname’ will always evaluate as ‘true’ [-Waddress]
+            # attributes.c: In function ???component_full_name???:
+            #   macros.h:59:22: warning: the address of ???rname??? will always evaluate as ???true??? [-Waddress]
             # ((a) && (b) && (strcmp((a), (b)) == 0)))
-            # attributes.c:807:11: note: in expansion of macro ‘STREQ’
+            # attributes.c:807:11: note: in expansion of macro ???STREQ???
             # if (STREQ(rname, "HOME"))
             replace = list('^(\\s+)if\\s\\(STREQ\\(rname,\\s"HOME"\\)\\)', '\\1if (strcmp(rname, "HOME") == 0)', 1),
             
-            # attributes.c:809:16: note: in expansion of macro ‘STREQ’
+            # attributes.c:809:16: note: in expansion of macro ???STREQ???
             # else if (STREQ(rname, "APATH"))
             replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"APATH"\\)\\)', '\\1else if (strcmp(rname, "APATH") == 0)', 1),
             
-            # attributes.c:812:16: note: in expansion of macro ‘STREQ’
+            # attributes.c:812:16: note: in expansion of macro ???STREQ???
             # STREQ macro dissolved to avoid warnings in attributes.c
             # else if (STREQ(rname, "ANAME"))
             replace = list('^(\\s+)else\\sif\\s\\(STREQ\\(rname,\\s"ANAME"\\)\\)', '\\1else if (strcmp(rname, "ANAME") == 0)', 1)
@@ -658,8 +658,8 @@ PatchEngine <- R6Class(
           # All of this is stable r1069-1690
           insert_before = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
           
-          # storage.c: In function ‘mmapfile’:
-          #   storage.c:335:12: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+          # storage.c: In function ???mmapfile???:
+          #   storage.c:335:12: warning: ignoring return value of ???write???, declared with attribute warn_unused_result [-Wunused-result]
           # write(fd, &fd, sizeof(int));
           insert_before = list("^(\\s*)lseek\\(fd,\\s0,\\sSEEK_SET\\);", '      if (success < 0) Rprintf("Operation not successful");'),
           replace = list("^(\\s+)write\\(fd,\\s&fd,\\ssizeof\\(int\\)\\);", "\\1ssize_t success = write(fd, &fd, sizeof(int));", 1)
@@ -692,7 +692,7 @@ PatchEngine <- R6Class(
             
             # This code is unchanged with r1690
             
-            # cdaccess.c:2697:12: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+            # cdaccess.c:2697:12: warning: ignoring return value of ???fgets???, declared with attribute warn_unused_result [-Wunused-result]
             # fgets(call, CL_MAX_LINE_LENGTH, pipe);
             replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1)
           ),
@@ -706,15 +706,15 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)int\\soptimised,\\sgrain_match;", "\\1int optimised;", 1),
             replace = list("^(\\s*)char\\s\\*word,\\s\\*preprocessed_string;", "\\1char *word;", 1),
             
-            # cdaccess.c: In function ‘cl_regex2id’:
-            #   cdaccess.c:1392:20: warning: variable ‘off_end’ set but not used [-Wunused-but-set-variable]
+            # cdaccess.c: In function ???cl_regex2id???:
+            #   cdaccess.c:1392:20: warning: variable ???off_end??? set but not used [-Wunused-but-set-variable]
             # int off_start, off_end;     /* start and end offset of current lexicon entry */
             replace = list("^(\\s*)int\\soff_start,\\soff_end;", "\\1int off_start;", 1),
             replace = list("^(\\s*)char\\s\\*p;", "\\1/* char *p; */", 1),
             replace = list("^(\\s*)int\\si;", "\\1/* int i; */", 3),
             
-            # cdaccess.c: In function ‘cl_dynamic_call’:
-            #   cdaccess.c:2533:17: warning: variable ‘arg’ set but not used [-Wunused-but-set-variable]
+            # cdaccess.c: In function ???cl_dynamic_call???:
+            #   cdaccess.c:2533:17: warning: variable ???arg??? set but not used [-Wunused-but-set-variable]
             # DynCallResult arg;
             replace = list("^(\\s*)DynCallResult\\sarg;", "\\1/* DynCallResult arg; */", 1),
             replace = list("^(\\s*)arg\\s=\\sargs\\[argnum\\];", "\\1/* arg = args[argnum]; */", 1)
@@ -747,8 +747,8 @@ PatchEngine <- R6Class(
 
           # The variable 'temp' is unused only in r1069?!
           if (revision == 1069) list(
-            # ngram-hash.c: In function ‘cl_delete_ngram_hash’:
-            #   ngram-hash.c:146:30: warning: variable ‘temp’ set but not used [-Wunused-but-set-variable]
+            # ngram-hash.c: In function ???cl_delete_ngram_hash???:
+            #   ngram-hash.c:146:30: warning: variable ???temp??? set but not used [-Wunused-but-set-variable]
             # cl_ngram_hash_entry entry, temp;
             replace = list("^(\\s*)cl_ngram_hash_entry\\sentry,\\stemp;", "\\1cl_ngram_hash_entry entry;", 1),
             replace = list("^(\\s*)temp\\s=\\sentry;", "\\1/* temp = entry; */", 1)
@@ -765,8 +765,8 @@ PatchEngine <- R6Class(
           
           # The issue may still be present but the syntax has changed - so we do not apply this for now
           if (revision == 1069) list(
-            # regopt.c: In function ‘make_jump_table’:
-            #   regopt.c:1148:18: warning: suggest parentheses around comparison in operand of ‘&’ [-Wparentheses]
+            # regopt.c: In function ???make_jump_table???:
+            #   regopt.c:1148:18: warning: suggest parentheses around comparison in operand of ???&??? [-Wparentheses]
             # if (ch >= 32 & ch < 127)
             replace = list("^(\\s*)if\\s\\(ch\\s>=\\s32\\s&\\sch\\s<\\s127\\)", "\\1if ((ch >= 32) & (ch < 127))", 1)
           )
@@ -963,8 +963,8 @@ PatchEngine <- R6Class(
           
           # The corpus_size variable is used in revision 1690. This is commented out to see whether problems persist.
           if (revision == 1069) list(
-            # eval.c: In function ‘cqp_run_tab_query’:
-            #   eval.c:2911:21: warning: variable ‘corpus_size’ set but not used [-Wunused-but-set-variable]
+            # eval.c: In function ???cqp_run_tab_query???:
+            #   eval.c:2911:21: warning: variable ???corpus_size??? set but not used [-Wunused-but-set-variable]
             # int smallest_col, corpus_size;
             replace = list("^(\\s*)int\\ssmallest_col,\\scorpus_size;", "\\1int smallest_col;", 1),
             replace = list("^(\\s*)corpus_size\\s=\\sevalenv->query_corpus->mother_size;", "\\1/* corpus_size = evalenv->query_corpus->mother_size; */", 1),
@@ -1071,15 +1071,15 @@ PatchEngine <- R6Class(
           
           # None of these lines is findable in r1690
           if (revision == 1069) list(
-            # html-print.c: In function ‘html_print_context’:
-            #   html-print.c:317:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+            # html-print.c: In function ???html_print_context???:
+            #   html-print.c:317:9: warning: variable ???s??? set but not used [-Wunused-but-set-variable]
             # char *s;
             replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
             replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
             replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
             
-            # html-print.c: In function ‘html_print_output’:
-            #   html-print.c:418:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
+            # html-print.c: In function ???html_print_output???:
+            #   html-print.c:418:18: warning: variable ???strucs??? set but not used [-Wunused-but-set-variable]
             # AttributeList *strucs;
             replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
             replace = list("^(\\s*)strucs\\s=\\scd->printStructureTags;", "\\1/* strucs = cd->printStructureTags; */", 1)
@@ -1090,8 +1090,8 @@ PatchEngine <- R6Class(
           list(),
           # Not findable in r1690
           if (revision == 1069) list(
-            # latex-print.c: In function ‘latex_print_context’:
-            #   latex-print.c:236:9: warning: variable ‘s’ set but not used [-Wunused-but-set-variable]
+            # latex-print.c: In function ???latex_print_context???:
+            #   latex-print.c:236:9: warning: variable ???s??? set but not used [-Wunused-but-set-variable]
             # char *s;
             replace = list("^(\\s*)char\\s\\*s;", "\\1/* char *s; */", 1),
             replace = list('^(\\s*)s\\s=\\s"error";', '\\1/* s = "error"; */', 1),
@@ -1258,8 +1258,8 @@ PatchEngine <- R6Class(
           
           list(),
           if (revision == 1069) list(
-            # regex2dfa.c: In function ‘Parse’:
-            #   regex2dfa.c:544:7: warning: variable ‘ignore_value’ set but not used [-Wunused-but-set-variable]
+            # regex2dfa.c: In function ???Parse???:
+            #   regex2dfa.c:544:7: warning: variable ???ignore_value??? set but not used [-Wunused-but-set-variable]
             # int ignore_value;             /* ignore value of POP() macro */
             replace = list("^(\\s*)int\\signore_value;", "\\1int ignore_value __attribute__((unused));", 1)
           )
@@ -1270,8 +1270,8 @@ PatchEngine <- R6Class(
           
           # No matches for these patches in r1690
           if (revision == 1069) list(
-            # sgml-print.c: In function ‘sgml_print_output’:
-            #   sgml-print.c:325:18: warning: variable ‘strucs’ set but not used [-Wunused-but-set-variable]
+            # sgml-print.c: In function ???sgml_print_output???:
+            #   sgml-print.c:325:18: warning: variable ???strucs??? set but not used [-Wunused-but-set-variable]
             # AttributeList *strucs;
             replace = list("^(\\s*)AttributeList\\s\\*strucs;", "\\1/* AttributeList *strucs; */", 1),
             
@@ -1377,9 +1377,10 @@ PatchEngine <- R6Class(
             
             replace = list("^(\\s*)exit\\(1\\);", "\\1return 1;", NA),
             
-            replace = list('^(\\s*)(progname\\s=\\s.*?;)\\s*$', "\\1/* \\s */", 1L),
-            
+            replace = list('^(\\s*)(progname\\s=\\s.*?;)\\s*$', "\\1/* \\2 */", 1L),
             replace = list("^(\\s*)char\\s\\*progname\\s=\\s(.*?);", "\\1/* char *progname = \\2; */", 1L),
+            
+            replace = list("^\\s*(input_files\\s=\\scl_new_string_list\\(\\);)\\s*", "/* \\1 */", 1L),
             
             # extern variables
             replace = list("^(\\s*)char\\s\\*field_separators\\s=\\s.*?;", "\\1extern char *field_separators;", 1L),
@@ -1431,7 +1432,7 @@ PatchEngine <- R6Class(
             
             # turn main() into function cwb_encode_worker()
             delete_line_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 2L),
-            insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list dir_files){"), 1L),
+            insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list input_files){"), 1L),
             delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
             
             replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
