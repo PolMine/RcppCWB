@@ -726,7 +726,11 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::S
   directory = strdup(Rcpp::as<std::string>(data_dir).c_str());
   registry_file = strdup(Rcpp::as<std::string>(regfile).c_str());
   encoding_charset_name = strdup(Rcpp::as<std::string>(encoding).c_str());
-    
+  
+  xml_aware++;
+  skip_empty_lines++;
+  strip_blanks++;
+
   /* declare p-attributes */
   
   int p_attrs_n = p_attributes.length();
