@@ -16,10 +16,14 @@
  */
 
 
+void Rprintf(const char *, ...);
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include <glib.h>
+
+#include <signal.h> /* added by Andreas Blaette  */
+#include <sys/socket.h> /* added by Andreas Blaette */
 
 #include "globals.h"
 #include "fileutils.h"

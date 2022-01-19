@@ -1,7 +1,35 @@
-enum _which_app { undef, cqp, cqpcl, cqpserver} which_app;
+typedef enum which_app { undef, cqp, cqpcl, cqpserver} which_app_t;
+typedef enum _opttype {
+  OptInteger, OptString, OptBoolean, OptContext
+} OptType;
+
+/**
+ * A CQPOption represents a single configuration option for CQP.
+ *
+ * It does not actually contain the config-option itself; that is held as
+ * a global variable somewhere. Instead, it holds metadata about the
+ * config-option, including a pointer to the actual variable.
+ *
+ * It's possible to have two CQPOption objects referring to the same
+ * actual variable - in this case the two option names in question
+ * are synonymous.
+ */
+typedef struct _cqpoption {
+  char    *opt_abbrev;           /**< Short version of this option's name. */
+  char    *opt_name;             /**< Name of this option as referred to in the interactive control syntax */
+  OptType  type;                 /**< Data type of this configuration option. */
+  void    *address;              /**< Pointer to the actual variable that contains this config option. */
+  char    *cdefault;             /**< Default value for this option (string value) */
+  int      idefault;             /**< Default value for this option (integer/boolean value) */
+  char    *envvar;               /**< The environment variable from which CQP will take a value for this option */
+  int      side_effect;          /**< Ref number of the side effect that changing this option has. @see execute_side_effects */
+  int      flags;                /**< Flags for this option: the only one currently used is OPTION_VISIBLE_IN_CQP @see OPTION_VISIBLE_IN_CQP */
+} CQPOption;
+Corpus *corpus;
+which_app_t which_app;
 int insecure;
 int inhibit_activation;
-int parseonly;
+int parse_only;
 int verbose_parser;
 int show_symtab;
 int show_gconstraints;
@@ -15,7 +43,7 @@ int tree_debug;
 int eval_debug;
 int search_debug;
 int initial_matchlist_debug;
-int debug_simulation;
+int simulate_debug;
 int activate_cl_debug;
 int server_log;
 int server_debug;
@@ -30,10 +58,12 @@ int enable_macros;
 int macro_debug;
 int hard_boundary;
 int hard_cut;
-int subquery;
+int auto_subquery;
 char *def_unbr_attr;
 int query_optimize;
-enum _matching_strategy { traditional, shortest_match, standard_match, longest_match } matching_strategy;
+int anchor_number_target;
+int anchor_number_keyword;
+MatchingStrategy matching_strategy;
 char *matching_strategy_name;
 int strict_regions;
 int use_readline;
@@ -55,8 +85,11 @@ int printNrMatches;
 char *printStructure;
 char *left_delimiter;
 char *right_delimiter;
+char *attribute_separator;
+char *token_separator;
+char *structure_delimiter;
 char *registry;
-char *LOCAL_CORP_PATH;
+char *data_directory;
 int auto_save;
 int save_on_exit;
 char *cqp_init_file;
@@ -67,37 +100,27 @@ int batchmode;
 int silent;
 char *default_corpus;
 char *query_string;
-int UseExternalSorting;
-char *ExternalSortingCommand;
-int UseExternalGrouping;
-char *ExternalGroupingCommand;
+int UseExternalSort;
+char *ExternalSortCommand;
+int UseExternalGroup;
+char *ExternalGroupCommand;
 int user_level;
-int rangeoutput;
+int output_binary_ranges;
 int child_process;
 ContextDescriptor CD;
 int handle_sigpipe;
 char *progname;
 char *licensee;
-FILE *batchfd;
-int initialize_cqp(int argc, char **argv);
-int cqp_parse_file(FILE *fd, int exit_on_parse_errors);
-int cqp_parse_string(char *s);
-int setInterruptCallback(InterruptCheckProc f);
-void CheckForInterrupts(void);
-void install_signal_handler(void);
-int eep;
+FILE *batchfh;
+#define OPTION_VISIBLE_IN_CQP    1
 
-#ifdef _WIN32
-  /* nothing to be done */
-#elif _WIN64
-  /* nothing to be done */
-#else
-  CorpusList *current_corpus;
-  CorpusList *corpuslist;
-  CYCtype LastExpression;
-  int exit_cqp;
-  char *cqp_input_string;
-  int cqp_input_string_position;
-  int EvaluationIsRunning;
-  int signal_handler_is_installed;
-#endif
+/** Default value for the HardBoundary configuration option. */
+#define DEFAULT_HARDBOUNDARY 500
+
+/** Default value for the context scope configuration option (counted in characters) */
+#define DEFAULT_CONTEXT 25
+
+#define DEFAULT_LOCAL_PATH_ENV_VAR "CQP_LOCAL_CORP_DIR"
+
+#define CQP_FALLBACK_PAGER "more"
+extern CQPOption cqpoptions;

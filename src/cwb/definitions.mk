@@ -68,7 +68,7 @@ $(error Configuration variable AR is not set (for building archive from .o files
 endif
 
 ifndef RANLIB
-$(error Configuration variable RANLIB is not set (make table of contents for .a files))
+# $(error Configuration variable RANLIB is not set (make table of contents for .a files))
 endif
 
 
@@ -339,6 +339,4 @@ MANEXT = 1
 #
 
 %.o : %.c
-	@$(ECHO) "    .... compile source file" $< 
-	$(RM) $@
 	$(CC) -c  -o $@ $(CFLAGS_ALL) $<
