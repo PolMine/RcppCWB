@@ -755,7 +755,7 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::S
   input_files = cl_new_string_list();
   cl_string_list vrt_files = encode_scan_directory(strdup(Rcpp::as<std::string>(vrt_dir).c_str()));
   
-  int len;
+  int i, len;
   len = cl_string_list_size(vrt_files);
   for (i = 0; i < len; i++)
     cl_string_list_append(input_files, cl_string_list_get(vrt_files, i));
