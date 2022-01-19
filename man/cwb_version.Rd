@@ -7,12 +7,11 @@
 cwb_version()
 }
 \value{
-A \code{numeric_version} vector.
+A length-one \code{character} vector.
 }
 \description{
 Get the CWB version used and available when compiling the source code.
 }
 \examples{
 cwb_version()
-cwb_version() > numeric_version("3.4.14")
 }

@@ -165,8 +165,7 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
 #' Get the CWB version used and available when compiling the source code.
 #' 
 #' @export
-#' @return A `numeric_version` vector.
+#' @return A length-one `character` vector.
 #' @examples
 #' cwb_version()
-#' cwb_version() > numeric_version("3.4.14")
-cwb_version <- function() numeric_version(.cwb_version())
+cwb_version <- function() .cwb_version()
