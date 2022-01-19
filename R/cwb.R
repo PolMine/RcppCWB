@@ -97,6 +97,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'   files of the indexed corpus.
 #' @param vrt_dir Directory with input corpus files (verticalised format / file
 #'   ending *.vrt).
+#' @param encoding The encoding of the files to be encoded, defaults to "utf8".
 #' @param s_attributes A `list` of named `character` vectors to declare
 #'   structural attributes that shall be encoded. The names of the list are the
 #'   XML elements present in the corpus. Character vectors making up the list
