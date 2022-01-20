@@ -6,6 +6,7 @@ on:
       - main
       - master
       - dev
+      - win
   pull_request:
     branches:
       - main
