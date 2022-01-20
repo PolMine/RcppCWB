@@ -1,13 +1,15 @@
+VERSION=3.4.33
+
 PKG_CPPFLAGS = \
-    -I../windows/libcl-3.4.33/include \
-    -I../windows/libcl-3.4.33/include/cwb/cl \
-    -I../windows/libcl-3.4.33/include/cwb/cqp \
-    -I../windows/libcl-3.4.33/include/cwb/CQi
+    -I../windows/libcl-${VERSION}/include \
+    -I../windows/libcl-${VERSION}/include/cwb/cl \
+    -I../windows/libcl-${VERSION}/include/cwb/cqp \
+    -I../windows/libcl-${VERSION}/include/cwb/CQi
 
 PKG_CXXFLAGS=-D_LIB
 
 PKG_LIBS = \
-    -L../windows/libcl-3.4.33/lib${R_ARCH} \
+    -L../windows/libcl-${VERSION}/lib${R_ARCH} \
     -Wl,--allow-multiple-definition \
     -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl -liconv \
     -lws2_32 -lwinmm -lole32
@@ -18,6 +20,6 @@ clean:
 #	rm -f $(OBJECTS) $(SHLIB)
 
 winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" --vanilla "../tools/winlibs.R"
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" --vanilla "../tools/winlibs.R" ${VERSION}
 
 .PHONY: all winlibs clean
