@@ -4,7 +4,7 @@ extern "C" {
   #include <unistd.h>
   #include <string.h>
   #include "_cl.h"
-  #include "cwb/cqp/cqp.h"
+  #include "cqp.h"
   #include <pcre.h>
   #include "server.h"
   
