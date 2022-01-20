@@ -44,6 +44,17 @@ PARSES  = registry.tab.c lex.creg.c
 PARSEG  = registry.l registry.y
 PARSEO  = registry.tab.o lex.creg.o
 
+## Compile and link-in windows-mmap functions only if we are in MinGW
+ifdef __MINGW__
+MMAPH = windows-mmap.h
+MMAPS = windows-mmap.c
+MMAPO = windows-mmap.o
+else
+MMAPH =
+MMAPS =
+MMAPO =
+endif 
+
 ## cl.h header file will be installed in subdirectory cwb/
 REALINCINSTDIR = $(INCINSTDIR)/cwb
 
