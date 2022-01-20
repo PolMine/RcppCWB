@@ -8,7 +8,7 @@
 * The `cwb_encode()` function now has a previously missing argument `encoding` to state the encoding of the corpus to be indexed.
 * Encoding a cropus using `cwb_encode()` now assumes implicitly that input files are XML files and remove blank lines and leading and trailing whitespace. This is equivalent to the option "-xsB" of the command line utility `cwb-encode`.
 * The CWB code is updated to v3.4.33 (r1690).
-* Changing includes in wrapper.cpp to avoid confusion resulting in errors, relies on fresh copy of header files in libcl repo.
+* Changing includes in wrapper.cpp to avoid confusion resulting in errors, relies on fresh copy of header files in libcl repo and updated cross-compilations of static libraries.
 
 # RcppCWB 0.4.4
 
