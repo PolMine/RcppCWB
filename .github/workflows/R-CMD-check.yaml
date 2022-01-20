@@ -1,11 +1,17 @@
 # For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 on:
+  workflow_dispatch
+    logLevel:
+      description: 'Log level'
+      required: true
+      default: 'check dependencies'
   push:
     branches:
       - main
       - master
       - dev
+      - win
   pull_request:
     branches:
       - main
@@ -109,12 +115,12 @@ jobs:
         shell: Rscript {0}
       
       - name: Build Windows binary package
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.os == 'windows-latest'
         run: pkgbuild::build(binary = TRUE, dest_path = Sys.getenv("GITHUB_WORKSPACE"))
         shell: Rscript {0}
           
       - name: Upload Windows binary
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
           name: RcppCWB-Windows-binary
