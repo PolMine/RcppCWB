@@ -1281,6 +1281,13 @@ PatchEngine <- R6Class(
         
         "src/cwb/cqp/parser.tab.c" = c(
           list(
+            # Patches suggested by Tomas Kalibera for UCRT
+            replace = list("^(\\s*)IPAddress\\s=\\s267,$", "\\1_IPAddress = 267,", 1L),
+            replace = list("^\\s*#define\\sIPAddress\\s267$", "#define\\s_IPAddress\\s267", 1L),
+            
+            # patch suggested by Tom Kalibera for UCRT
+            insert_after = list("^\\s*#include\\s<sys/resource\\.h>\\s*$", c("#else", "# include<winsock2.h>"), 1L),
+            
             # cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
             # replaced by:
             #   cqpmessage(Error, "CQP Syntax Error: %s\n <--", s);
@@ -1570,7 +1577,7 @@ PatchEngine <- R6Class(
           list(
             insert_before = list(
               if (revision >= 1690) '#include "../cl/cl.h"' else '#include\\s"\\.\\./cl/globals\\.h"',
-              c("void Rprintf(const char *, ...);", ""),
+              c("void Rprintf(const char *, ...);", "#include <strings.h>", ""),
               1L
             ),
             
@@ -1685,7 +1692,22 @@ PatchEngine <- R6Class(
         "src/cwb/definitions.mk" = c(
           # stable r1069 - r1690
           list(
-            replace = list("(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)", "# \\1", 1L)
+            replace = list("(\\$\\(error\\sConfiguration\\svariable\\sRANLIB)", "# \\1", 1L),
+            
+            # Patch for UCRT
+            replace = list("^(\\s*ifndef\\sDEPEND\\s*)$", "#\\1", 1L), 
+            replace = list("^(DEPEND\\s*=\\s*\\$\\(.*?\\)\\s*)$", "#\\1", 1L),
+            replace = list("^\\s*(#|)\\s*endif", "#endif", 12L),
+            
+            # Patch for UCRT
+            insert_after = list("^\\s*(PCRE_DEFINES\\s:=\\s\\$\\(shell\\s\\$\\(MINGW_CROSS_HOME\\)/bin/pcre-config\\s--cflags\\))\\s*$", "PCRE_DEFINES := -DPCRE_STATIC", 1L),
+            replace = list("^\\s*(PCRE_DEFINES\\s:=\\s\\$\\(shell\\s\\$\\(MINGW_CROSS_HOME\\)/bin/pcre-config\\s--cflags\\))\\s*$", "#\\1", 1L),
+            replace = list("^\\s(*GLIB_DEFINES\\s:=\\s\\$\\(shell\\sexport\\sPKG_CONFIG_PATH=\\$\\(MINGW_CROSS_HOME\\).*?)$", "#\\1", 1L),
+            
+            # Patch for UCRT
+            insert_before = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", "LDFLAGS_LIBS = -lpcre -lglib-2.0", 1L),
+            delete_line_beginning_with = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", 1L, 3L)
+            
           ),
           if (revision >= 1690) list(
             delete_line_beginning_with = list('^\\s+@\\$\\(ECHO\\)\\s"\\s+\\.+\\scompile\\ssource\\sfile"', 1L, 1L)
@@ -1729,7 +1751,9 @@ PatchEngine <- R6Class(
         
         "src/cwb/config/platform/unix" = list(
           # stable r1069-r1690
-          replace = list("^AR\\s+=\\s+ar\\scq\\s*$", "AR = ar", 1L)
+          replace = list("^AR\\s+=\\s+ar\\scq\\s*$", "AR = ar", 1L),
+          # This is one of the patches for UCRT - presumably because config.mk now has preference for gcc
+          replace = list("^\\s*CC\\s*=(.*?)$", "# CC = GCC", 1L)
         ),
         
         "src/cwb/config/platform/linux" = list(
@@ -1737,10 +1761,20 @@ PatchEngine <- R6Class(
           insert_before = list("##\\sCPU\\sarchitecture", c("## require position-independent code", "CFLAGS += -fPIC", ""), 1L)
         ),
         
+        "src/cwb/config/platform/mingw-native" = list(
+          # stable r1069-r1690
+          replace = list("^(CFLAGS\\s*=.*?)$", "\\1 -D__MINGW__ -DEMULATE_SETENV", 1L),
+          replace = list("^AR\\s+=\\s+ar\\scq\\s*$", "AR = ar", 1L)
+        ),
+        
+        
         "src/cwb/config.mk" = c(
           # stable r1069-r1690
           list(
-            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=darwin-64", 1L)
+            # use mingw-native as default because on any other system, this can be changed
+            # but on Windows, this is hard
+            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=mingw-native", 1L),
+            replace = list("^#\\s*CC\\s*=\\s*gcc\\s*$", "CC = GCC", 1L)
           ),
           if (revision >= 1690) list(
             # Un-comment FULL_MESSAGES, this will re-activate full output
