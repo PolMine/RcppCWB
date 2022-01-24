@@ -656,7 +656,9 @@ PatchEngine <- R6Class(
         "src/cwb/cl/storage.c" = list(
           # All of this is stable r1069-1690
           insert_before = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
-          
+          delete_line_beginning_with = list('#include "endian2.h"', 1L, 0L),
+          insert_after = list('^#include\\s<sys/types\\.h>', '#include "endian2.h"'),
+
           # storage.c: In function ???mmapfile???:
           #   storage.c:335:12: warning: ignoring return value of ???write???, declared with attribute warn_unused_result [-Wunused-result]
           # write(fd, &fd, sizeof(int));
@@ -1705,8 +1707,13 @@ PatchEngine <- R6Class(
             replace = list("^\\s*(GLIB_DEFINES\\s:=\\s\\$\\(shell\\sexport\\sPKG_CONFIG_PATH=\\$\\(MINGW_CROSS_HOME\\).*?)$", "#\\1", 1L),
             # Patch for UCRT
             insert_before = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", "LDFLAGS_LIBS = -lpcre -lglib-2.0", 1L),
-            delete_line_beginning_with = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", 1L, 2L)
+            delete_line_beginning_with = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", 1L, 2L),
             
+            replace = list(
+              '^\\s*(INTERNAL_DEFINES\\s*=)\\s*-DREGISTRY_DEFAULT_PATH=.*?(\\s+-DCOMPILE_DATE=.*?)\\s*$',
+              "\\1\\2", 
+              1L
+            )
           ),
           if (revision >= 1690) list(
             delete_line_beginning_with = list('^\\s+@\\$\\(ECHO\\)\\s"\\s+\\.+\\scompile\\ssource\\sfile"', 1L, 1L)
