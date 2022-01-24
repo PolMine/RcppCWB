@@ -1702,8 +1702,7 @@ PatchEngine <- R6Class(
             # Patch for UCRT
             insert_after = list("^\\s*(PCRE_DEFINES\\s:=\\s\\$\\(shell\\s\\$\\(MINGW_CROSS_HOME\\)/bin/pcre-config\\s--cflags\\))\\s*$", "PCRE_DEFINES := -DPCRE_STATIC", 1L),
             replace = list("^\\s*(PCRE_DEFINES\\s:=\\s\\$\\(shell\\s\\$\\(MINGW_CROSS_HOME\\)/bin/pcre-config\\s--cflags\\))\\s*$", "#\\1", 1L),
-            replace = list("^\\s(*GLIB_DEFINES\\s:=\\s\\$\\(shell\\sexport\\sPKG_CONFIG_PATH=\\$\\(MINGW_CROSS_HOME\\).*?)$", "#\\1", 1L),
-            
+            replace = list("^\\s*(GLIB_DEFINES\\s:=\\s\\$\\(shell\\sexport\\sPKG_CONFIG_PATH=\\$\\(MINGW_CROSS_HOME\\).*?)$", "#\\1", 1L),
             # Patch for UCRT
             insert_before = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", "LDFLAGS_LIBS = -lpcre -lglib-2.0", 1L),
             delete_line_beginning_with = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", 1L, 3L)
