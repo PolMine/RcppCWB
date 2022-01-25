@@ -106,7 +106,6 @@ extern int UseExternalGroup;
 extern char *ExternalGroupCommand;
 extern int user_level;
 extern int output_binary_ranges;
-extern CQPOption cqpoptions[];
 extern int child_process;
 extern ContextDescriptor CD;
 extern int handle_sigpipe;

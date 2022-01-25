@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <math.h>
 
 #include "../cl/cl.h"
@@ -28,22 +30,22 @@
 /* ---------------------------------------------------------------------- */
 
 /** Name of the program */
-char *progname = NULL;
+/* char *progname = NULL; */
 
 /** CWB id of the corpus we are working on */
-char *corpus_id = NULL;
+/* char *corpus_id = NULL; */
 
 /** Record for the corpus we are working on */
-Corpus *corpus;
+extern Corpus *corpus;
 
 void compressrdx_usage(char *msg, int error_code);
 void compressrdx_cleanup(int error_code);
 
 /** debug level */
-int debug = 0;
+/* extern int debug = 0; */
 
 /** where debug messages are to be sent to (stderr) */
-FILE *debug_output; /* " = stderr;" init moved to main() for Gnuwin32 compatibility */
+/* FILE *debug_output; */ /* " = stderr;" init moved to main() for Gnuwin32 compatibility */
 
 /** stores current position in a bit-write-file */
 int codepos = 0;
@@ -171,7 +173,7 @@ int read_golomb_code_am(int b, BFile *bf)
  *                  attribute).
  */
 void
-compress_reversed_index(Attribute *attr, char *output_fn)
+compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug)
 {
   char *s;
   char data_fname[CL_MAX_FILENAME_LENGTH];
@@ -320,7 +322,7 @@ compress_reversed_index(Attribute *attr, char *output_fn)
  *                  attribute).
  */
 void
-decompress_check_reversed_index(Attribute *attr, char *output_fn)
+decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int debug)
 {
   char *s;
   char data_fname[CL_MAX_FILENAME_LENGTH];
@@ -436,40 +438,6 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   return;
 }
 
-/* ---------------------------------------------------------------------- */
-
-
-/**
- * Prints a usage message and exits the program.
- *
- * @param msg         A message about the error.
- * @param error_code  Value to be returned by the program when it exits.
- */
-void
-compressrdx_usage(char *msg, int error_code)
-{
-  if (msg)
-    Rprintf("Usage error: %s\n", msg);
-  Rprintf("\n");
-  Rprintf("Usage:  %s [options] <corpus>\n\n", progname);
-  Rprintf("Compress the index of a positional attribute. Creates .crc and .crx files\n");
-  Rprintf("which replace the corresponding .corpus.rev and .corpus.rdx files. After\n");
-  Rprintf("running this tool successfully, the latter files can be deleted.\n");
-  Rprintf("\n");
-  Rprintf("Options:\n");
-  Rprintf("  -P <att>  compress attribute <att> [default: word]\n");
-  Rprintf("  -A        compress all positional attributes\n");
-  Rprintf("  -r <dir>  set registry directory\n");
-  Rprintf("  -f <file> set output file prefix (creates <file>.crc and <file>.crx)\n");
-  Rprintf("  -d        debug mode (print messages on stderr)\n");
-  Rprintf("  -D <file> debug mode (write messages to <file>)\n");
-  Rprintf("  -T        skip validation pass ('I trust you')\n");
-  Rprintf("  -h        this help page\n\n");
-  Rprintf("Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
-
-  compressrdx_cleanup(error_code);
-}
-
 /**
  * Cleans up memory prior to an (error-prompted or normal) exit.
  *
@@ -481,148 +449,11 @@ compressrdx_cleanup(int error_code)
   if (corpus)
     cl_delete_corpus(corpus);
 
-  if (debug_output != stderr)
-    fclose(debug_output);
+  /* if (debug_output != stderr) */
+    /* fclose(debug_output) */
 
-  exit(error_code);
+  return;
 }
 
 
 
-/* =============== *
- *      MAIN()     *
- * =============== */
-
-/**
- * Main function for cwb-compress-rdx.
- *
- * @param argc   Number of command-line arguments.
- * @param argv   Command-line arguments.
- */
-int
-main(int argc, char **argv)
-{
-  char *registry_directory = NULL;
-  char *attr_name = CWB_DEFAULT_ATT_NAME;
-  Attribute *attr;
-
-  char *output_fn = NULL;
-  char *debug_fn = NULL;
-
-  extern int optind;
-  extern char *optarg;
-  int c;
-
-  int i_want_to_believe = 0;        /* skip error checks? */
-  int all_attributes = 0;
-
-  debug_output = stderr;        /* 'delayed' init (see top of file) */
-
-  cl_startup();
-  progname = argv[0];
-
-
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
-  while ((c = getopt(argc, argv, "+TP:r:f:dD:Ah")) != EOF) {
-
-    switch (c) {
-      /* T: skip decompression / error checking pass ("I trust you")  */
-    case 'T':
-      i_want_to_believe = 1;
-      break;
-
-      /* P: attribute to compress */
-    case 'P':
-      attr_name = optarg;
-      break;
-
-      /* r: registry directory */
-    case 'r':
-      if (registry_directory == NULL)
-        registry_directory = optarg;
-      else {
-        Rprintf("%s: -r option used twice\n", progname);
-        compressrdx_cleanup(2);
-      }
-      break;
-
-      /* f: filename prefix for compressed data files */
-    case 'f':
-      output_fn = optarg;
-      break;
-
-      /* d: debug mode */
-    case 'd':
-      debug++;
-      break;
-
-      /* D: debug to file */
-    case 'D':
-      debug++;
-      debug_fn = optarg;
-      break;
-
-      /* A: compress all attributes */
-    case 'A':
-      all_attributes++;
-      break;
-
-      /* h: help page */
-    case 'h':
-      compressrdx_usage(NULL, 2);
-      break;
-
-    default:
-      compressrdx_usage("illegal option.", 2);
-      break;
-    }
-  }
-
-  if (debug_fn)  {
-    if (strcmp(debug_fn, "-") == 0)
-      debug_output = stdout;
-    else if ((debug_output = fopen(debug_fn, "w")) == NULL) {
-      Rprintf("Can't write debug output to file %s. Aborted.", debug_fn);
-      perror(debug_fn);
-      compressrdx_cleanup(1);
-    }
-  }
-
-  /* single argument: corpus id */
-  if (optind < argc)
-    corpus_id = argv[optind++];
-  else
-    compressrdx_usage("corpus not specified (missing argument)", 1);
-
-  if (optind < argc)
-    compressrdx_usage("Too many arguments", 1);
-
-  if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
-    Rprintf("Corpus %s not found in registry %s . Aborted.\n",
-            corpus_id,
-            (registry_directory ? registry_directory : cl_standard_registry()));
-    compressrdx_cleanup(1);
-  }
-
-  if (all_attributes) {
-    for (attr = corpus->attributes; attr; attr = attr->any.next)
-      if (attr->any.type == ATT_POS) {
-        compress_reversed_index(attr, output_fn);
-        if (! i_want_to_believe)
-          decompress_check_reversed_index(attr, output_fn);
-      }
-  }
-  else {
-    if ((attr = cl_new_attribute_oldstyle(corpus, attr_name, ATT_POS, NULL)) == NULL) {
-      Rprintf("Attribute %s.%s doesn't exist. Aborted.\n", corpus_id, attr_name);
-      compressrdx_cleanup(1);
-    }
-    compress_reversed_index(attr, output_fn);
-    if (! i_want_to_believe)
-      decompress_check_reversed_index(attr, output_fn);
-  }
-
-  compressrdx_cleanup(0);
-  return 0;                        /* never reached; to keep gcc from complaining */
-}
