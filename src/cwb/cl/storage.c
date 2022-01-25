@@ -26,7 +26,7 @@
 #include <errno.h>
 
 #include "globals.h"
-#include "endian.h"
+#include "endian2.h"
 #include "storage.h"
 
 
@@ -243,7 +243,7 @@ free_mblob(MemBlob *blob)
   if (blob->data != NULL) {
     switch (blob->allocation_method) {
     case CL_MEMBLOB_UNALLOCATED:
-      fprintf(stderr, "CL MemBlob:mfree():  Blob flag is UNALLOCATED, but data present -- no free\n");
+      Rprintf("CL MemBlob:mfree():  Blob flag is UNALLOCATED, but data present -- no free\n");
       break;
     case CL_MEMBLOB_MMAPPED:
       map_len = (blob->size > 0) ? blob->size : MMAP_EMPTY_LEN;
@@ -262,7 +262,7 @@ free_mblob(MemBlob *blob)
   }
   else {
     if (blob->allocation_method != CL_MEMBLOB_UNALLOCATED)
-      fprintf(stderr, "CL MemBlob:mfree():  No data, but MemBlob flag isn't UNALLOCATED\n");
+      Rprintf("CL MemBlob:mfree():  No data, but MemBlob flag isn't UNALLOCATED\n");
   }
 }
 
@@ -301,11 +301,11 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
     fd = open(filename, O_RDONLY|binflag);
 
     if (fd == EOF) {
-      fprintf(stderr, "CL MemBlob:mmapfile(): Can't open file %s ... \n\tReason: ", filename);
+      Rprintf("CL MemBlob:mmapfile(): Can't open file %s ... \n\tReason: ", filename);
       perror(NULL);
     }
     else if(EOF == fstat(fd, &stat_buf)) {
-      fprintf(stderr, "CL MemBlob:mmapfile(): Can't fstat() file %s ... \n\tReason: ", filename);
+      Rprintf("CL MemBlob:mmapfile(): Can't fstat() file %s ... \n\tReason: ", filename);
       perror(NULL);
     }
     else {
@@ -326,7 +326,7 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
       fd = creat(filename, 0666);
 
     if (fd == EOF) {
-      fprintf(stderr, "CL MemBlob:mmapfile(): Can't create file %s ...\n\tReason: ", filename);
+      Rprintf("CL MemBlob:mmapfile(): Can't create file %s ...\n\tReason: ", filename);
       perror(NULL);
     }
     else {
@@ -344,11 +344,11 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
     break;
 
   default:
-    fprintf(stderr, "CL MemBlob:mmapfile(): Mode '%s' is not supported ...\n", mode);
+    Rprintf("CL MemBlob:mmapfile(): Mode '%s' is not supported ...\n", mode);
   }
 
   if (space == MAP_FAILED) {
-    fprintf(stderr, "CL MemBlob:mmapfile(): Can't mmap() file %s ...\n"
+    Rprintf("CL MemBlob:mmapfile(): Can't mmap() file %s ...\n"
             "\tYou have probably run out of memory / address space!\n"
             "\tError Message: ",
             filename);
@@ -386,11 +386,11 @@ mallocfile(char *filename, size_t *len_ptr, char *mode)
     fd = open(filename, O_RDONLY|binflag);
 
     if (fd == EOF) {
-      fprintf(stderr, "CL MemBlob:mallocfile():  can't open %s -- ", filename);
+      Rprintf("CL MemBlob:mallocfile():  can't open %s -- ", filename);
       perror(NULL);
     }
     else if(fstat(fd, &stat_buf) == EOF) {
-      fprintf(stderr, "CL MemBlob:mallocfile():  can't stat %s -- ", filename);
+      Rprintf("CL MemBlob:mallocfile():  can't stat %s -- ", filename);
       perror(NULL);
     }
     else {
@@ -399,7 +399,7 @@ mallocfile(char *filename, size_t *len_ptr, char *mode)
       space = (void *)cl_malloc(*len_ptr);
 
       if (read(fd, space, *len_ptr) != *len_ptr) {
-        fprintf(stderr, "CL MemBlob:mallocfile():  couldn't read file contents -- ");
+        Rprintf("CL MemBlob:mallocfile():  couldn't read file contents -- ");
         perror(NULL);
         cl_free(space);
         space = NULL;
@@ -414,14 +414,14 @@ mallocfile(char *filename, size_t *len_ptr, char *mode)
       fd = creat(filename, 0666);
 
     if (fd == EOF) {
-      fprintf(stderr, "CL MemBlob:mallocfile():  can't open/create %s for writing -- ", filename);
+      Rprintf("CL MemBlob:mallocfile():  can't open/create %s for writing -- ", filename);
       perror(NULL);
     }
     else {
       space = cl_malloc(*len_ptr);
 
       if (write(fd, space, *len_ptr) != *len_ptr) {
-        fprintf(stderr, "CL MemBlob:mallocfile():  couldn't write file -- ");
+        Rprintf("CL MemBlob:mallocfile():  couldn't write file -- ");
         perror(NULL);
         cl_free(space);
         space = NULL;
@@ -432,7 +432,7 @@ mallocfile(char *filename, size_t *len_ptr, char *mode)
     break;
 
   default:
-    fprintf(stderr, "CL MemBlob:mallocfile():  mode %s is not supported\n", mode);
+    Rprintf("CL MemBlob:mallocfile():  mode %s is not supported\n", mode);
   }
 
   return space;
@@ -473,7 +473,7 @@ read_file_into_blob(char *filename, int allocation_method, int item_size, MemBlo
   else if (allocation_method == CL_MEMBLOB_MALLOCED)
     blob->data = (int *)mallocfile(filename, &(blob->size), "rb");
   else {
-    fprintf(stderr, "CL MemBlob:read_file_into_blob(): allocation method %d is not supported\n", allocation_method);
+    Rprintf("CL MemBlob:read_file_into_blob(): allocation method %d is not supported\n", allocation_method);
     return 0;
   }
 
@@ -514,19 +514,19 @@ write_file_from_blob(char *filename, MemBlob *blob, int convert_to_nbo)
   blob->changed = 0;
 
   if (blob->data == NULL || (blob->size == 0)) {
-    fprintf(stderr, "CL MemBlob:write_file_from_blob(): no data in blob, nothing to write...\n");
+    Rprintf("CL MemBlob:write_file_from_blob(): no data in blob, nothing to write...\n");
     return 0;
   }
 
   switch (blob->allocation_method) {
   case CL_MEMBLOB_UNALLOCATED:
-    fprintf(stderr, "CL MemBlob:write_file_from_blob(): tried to write unallocated blob...\n");
+    Rprintf("CL MemBlob:write_file_from_blob(): tried to write unallocated blob...\n");
     return 0;
 
   case CL_MEMBLOB_MMAPPED:
   case CL_MEMBLOB_MALLOCED:
     if (!(dst = fopen(filename, "wb"))) {
-      fprintf(stderr, "CL MemBlob:write_file_from_blob(): Can't open output file %s\n", filename);
+      Rprintf("CL MemBlob:write_file_from_blob(): Can't open output file %s\n", filename);
       return 0;
     }
     if (convert_to_nbo)
@@ -537,7 +537,7 @@ write_file_from_blob(char *filename, MemBlob *blob, int convert_to_nbo)
     return 1;
 
   default:
-    fprintf(stderr, "CL MemBlob:write_file_from_blob(): unsupported allocation method # %d...\n", blob->allocation_method);
+    Rprintf("CL MemBlob:write_file_from_blob(): unsupported allocation method # %d...\n", blob->allocation_method);
     return 0;
   }
 
