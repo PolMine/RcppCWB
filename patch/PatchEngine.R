@@ -8,7 +8,7 @@
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
 #'   makeheaders = "~/Lab/github_foreign/makeheaders/src/makeheaders",
-#'   revision = 1069
+#'   revision = 1690
 #' )
 #' P$patch_all()
 PatchEngine <- R6Class(
@@ -212,10 +212,12 @@ PatchEngine <- R6Class(
 
       # Strategy 2: Later version of CWB prepends extern by default. Use makeheaders 
       # utility to autogenerate a header and grep externed vars 
-      extern_by_default <- gsub("^\\s*extern\\s+", "", grep("^\\s*extern\\s", system(
+      extern_by_default <- grep("^\\s*extern\\s", system(
         sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "src", "cwb", "cqp", "options.c")),
         intern = TRUE
-      ), value = TRUE))
+      ), value = TRUE)
+      # extern_by_default <- gsub("^\\s*extern\\s+", "", extern_by_default)
+      
 
       # combine results
       extern <- unique(c(extern_by_patch, extern_by_default))
