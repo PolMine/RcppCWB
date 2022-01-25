@@ -1710,7 +1710,7 @@ PatchEngine <- R6Class(
             delete_line_beginning_with = list("^\\s*LDFLAGS_LIBS\\s:=\\s-L\\$\\(MINGW_CROSS_HOME\\).*?$", 1L, 2L),
             
             replace = list(
-              '^\\s*(INTERNAL_DEFINES\\s*=)\\s*-DREGISTRY_DEFAULT_PATH\\s*=.*?-DCOMPILE_DATE',
+              '^\\s*(INTERNAL_DEFINES\\s*=)\\s*-DCWB_REGISTRY_DEFAULT_PATH\\s*=.*?-DCOMPILE_DATE',
               "\\1 = -DCOMPILE_DATE", 
               1L
             )
