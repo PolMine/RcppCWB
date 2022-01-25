@@ -342,6 +342,7 @@ ComputeGroupExternally(Group *group)
   int cutoff_freq = group->cutoff_frequency;
 
   char temporary_name[TEMP_FILENAME_BUFSIZE];
+  FILE *tmp_dst;
   FILE *pipe;
   char sort_call[CL_MAX_LINE_LENGTH];
 
@@ -350,13 +351,20 @@ ComputeGroupExternally(Group *group)
     return group;
   }
 
+  if (!(tmp_dst = open_temporary_file(temporary_name))) {
+    perror("Error while opening temporary file");
+    cqpmessage(Warning, "Can't open temporary file");
+    return group;
+  }
+
   for (i = 0; i < size; i++)
-    Rprintf("%d %d\n", get_group_id(group, i, 0, NULL), get_group_id(group, i, 1, NULL)); /* (source ID, target ID) */
+    fprintf(tmp_dst, "%d %d\n", get_group_id(group, i, 0, NULL), get_group_id(group, i, 1, NULL)); /* (source ID, target ID) */
+  fclose(tmp_dst);
 
   /* construct sort call */
   sprintf(sort_call, ExternalGroupCommand, temporary_name);
 #if GROUP_DEBUG
-  Rprintf("Running grouping sort: \n\t%s\n", sort_call);
+  fprintf(stderr, "Running grouping sort: \n\t%s\n", sort_call);
 #endif
   if (!(pipe = popen(sort_call, "r"))) {
     perror("Failure opening grouping pipe");
@@ -386,16 +394,16 @@ ComputeGroupExternally(Group *group)
     }
 
     if (tokens != EOF)
-      Rprintf("Warning: could not reach EOF of temporary file!\n");
+      fprintf(stderr, "Warning: could not reach EOF of temporary file!\n");
     pclose(pipe);
   }
 
 #if GROUP_DEBUG
-  Rprintf("Keeping temporary file %s -- delete manually\n", temporary_name);
+  fprintf(stderr, "Keeping temporary file %s -- delete manually\n", temporary_name);
 #else
   if (0 != unlink(temporary_name)) {
     perror(temporary_name);
-    Rprintf("Can't remove temporary file %s -- \n\tI will continue, but you should remove that file.\n", temporary_name);
+    fprintf(stderr, "Can't remove temporary file %s -- \n\tI will continue, but you should remove that file.\n", temporary_name);
   }
 #endif
 
