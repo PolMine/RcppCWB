@@ -216,11 +216,11 @@ PatchEngine <- R6Class(
         sprintf("%s -h %s", self$makeheaders, file.path(self$repodir, "src", "cwb", "cqp", "options.c")),
         intern = TRUE
       ), value = TRUE)
-      # extern_by_default <- gsub("^\\s*extern\\s+", "", extern_by_default)
-      
 
       # combine results
-      extern <- unique(c(extern_by_patch, extern_by_default))
+      extern <- unique(
+        c(sprintf("extern %s", extern_by_patch), extern_by_default)
+      )
       
       # manual additions
       typedef_CQPOption <- self$get_snippet(
@@ -1519,6 +1519,9 @@ PatchEngine <- R6Class(
             
             replace = list("^(\\s*)int\\sdebug\\s*=\\s*(.*?);", "\\1int debugmode = \\2;", 1L),
             replace = list("^(\\s*)int\\ssilent\\s*=\\s(.*?);", "\\1int quietly = \\2;", 1L),
+            
+            replace = list("^(s_att_builder\\ss_encoder\\[MAX_ATTRIBUTES\\];)$", "extern \\1", 1L),
+            replace = list("^(p_att_builder\\sp_encoder\\[MAX_ATTRIBUTES\\];)$", "extern \\2", 1L),
             
             # To avoid warning: ISO C++11 does not allow conversion from string literal to 'char *'
             replace = list("^\\s*char\\s*\\*\\s*undef_value\\s*=\\s*CWB_PA_UNDEF_VALUE;(.*?)$", "char *undef_value = (char *)CWB_PA_UNDEF_VALUE;\\1", 1L)
