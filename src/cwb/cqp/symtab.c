@@ -183,10 +183,10 @@ print_symbol_table(SymbolTable st)
   label_list[0] = st->user;
   label_list[1] = st->rdat;
 
-  fprintf(stderr, "Contents of SYMBOL TABLE:\n");
+  Rprintf("Contents of SYMBOL TABLE:\n");
   for (i = 0; i < 2; i++) {
     for (label = label_list[i] ; label ; label = label->next)
-      fprintf(stderr, "\t%s\t%s(flags: %d)  ->  RefTab[%d]\n", namespace[i], label->name, label->flags, label->ref);
+      Rprintf("\t%s\t%s(flags: %d)  ->  RefTab[%d]\n", namespace[i], label->name, label->flags, label->ref);
   }
 }
 
@@ -254,7 +254,7 @@ dup_reftab(RefTab rt1, RefTab rt2)
 {
   assert(rt1 && rt2);
   if (rt1->size != rt2->size) {
-    fprintf(stderr, "dup_reftab()<symtab.c>: Tried to dup() RefTab (%d entries) to RefTab of different size (%d entries)\n", rt1->size, rt2->size);
+    Rprintf("dup_reftab()<symtab.c>: Tried to dup() RefTab (%d entries) to RefTab of different size (%d entries)\n", rt1->size, rt2->size);
     exit(cqp_error_status ? cqp_error_status : 1);
   }
   memcpy(rt2->data, rt1->data, rt1->size * sizeof(int));
@@ -295,7 +295,7 @@ get_reftab(RefTab rt, int index, int cpos)
     return -1;
 
   if (index < 0 || index >= rt->size) {
-    fprintf(stderr, "get_reftab()<symtab.c>: RefTab index #%d not in range 0 .. %d", index, rt->size - 1);
+    Rprintf("get_reftab()<symtab.c>: RefTab index #%d not in range 0 .. %d", index, rt->size - 1);
     return -1;
   }
 
@@ -317,9 +317,9 @@ print_label_values(SymbolTable st, RefTab rt, int cpos)
 
   char *prefix[] = {"", "USER", "RDAT"};
 
-  fprintf(stderr, "Label values:\n");
+  Rprintf("Label values:\n");
   if ( !st || !rt || st->next_index != rt->size ) {
-    fprintf(stderr, "ERROR\n");
+    Rprintf("ERROR\n");
     return;
   }
 
@@ -329,10 +329,10 @@ print_label_values(SymbolTable st, RefTab rt, int cpos)
     else if (2 == i)
       label = st->rdat;
 
-    fprintf(stderr, "%s:\t", prefix[i]);
+    Rprintf("%s:\t", prefix[i]);
     for ( ; label ; label = label->next)
-      fprintf(stderr, "%s=%d  ", label->name, get_reftab(rt, label->ref, cpos));
-    fprintf(stderr, "\n");
+      Rprintf("%s=%d  ", label->name, get_reftab(rt, label->ref, cpos));
+    Rprintf("\n");
   }
 }
 

@@ -20,7 +20,7 @@
 
 #include "globals.h"
 
-#include "endian.h"
+#include "endian2.h"
 #include "corpus.h"
 #include "fileutils.h"
 
@@ -322,7 +322,7 @@ setup_attribute(Corpus *corpus, char *attribute_name, int type, char *data)
   int a_num;
 
   if (NULL != cl_new_attribute(corpus, attribute_name, type)) {
-    fprintf(stderr, "attributes:setup_attribute(): Warning: \n"
+    Rprintf("attributes:setup_attribute(): Warning: \n"
             "  Attribute %s of type %s already defined in corpus %s\n",
             attribute_name, aid_name(type), corpus->id);
     return NULL;
@@ -396,7 +396,7 @@ cl_new_attribute(Corpus *corpus, const char *attribute_name, int type)
   Attribute *attr = NULL;
 
   if (!corpus)
-    fprintf(stderr, "attributes:cl_new_attribute(): called with NULL corpus\n");
+    Rprintf("attributes:cl_new_attribute(): called with NULL corpus\n");
   else
     for (attr = corpus->attributes ; attr ; attr = attr->any.next)
       if (type == attr->type && cl_streq(attr->any.name, attribute_name))
@@ -439,7 +439,7 @@ cl_delete_attribute(Attribute *attribute)
         break;
 
     if (prev == NULL)
-      fprintf(stderr, "attributes:cl_delete_attribute():\n  Warning: Attribute %s not in list of corpus attributes\n", attribute->any.name);
+      Rprintf("attributes:cl_delete_attribute():\n  Warning: Attribute %s not in list of corpus attributes\n", attribute->any.name);
     else {
       assert("Error in attribute chain" && prev->any.next == attribute);
       prev->any.next = attribute->any.next;
@@ -510,7 +510,7 @@ declare_component(Attribute *attribute, ComponentID cid, char *path)
   Component *component;
 
   if (attribute == NULL) {
-    fprintf(stderr, "attributes:declare_component(): \n  NULL attribute passed in declaration of %s component\n", cid_name(cid));
+    Rprintf("attributes:declare_component(): \n  NULL attribute passed in declaration of %s component\n", cid_name(cid));
     return NULL;
   }
 
@@ -528,7 +528,7 @@ declare_component(Attribute *attribute, ComponentID cid, char *path)
     component_full_name(attribute, cid, path);
   }
   else
-    fprintf(stderr, "attributes:declare_component(): Warning:\n  Component %s of %s declared twice\n", cid_name(cid), attribute->any.name);
+    Rprintf("attributes:declare_component(): Warning:\n  Component %s of %s declared twice\n", cid_name(cid), attribute->any.name);
 
   return component;
 }
@@ -548,7 +548,7 @@ declare_default_components(Attribute *attribute)
   int i;
 
   if (attribute == NULL)
-    fprintf(stderr, "attributes:declare_default_components(): \n  NULL attribute passed -- can't create defaults\n");
+    Rprintf("attributes:declare_default_components(): \n  NULL attribute passed -- can't create defaults\n");
   else
     for (i = CompDirectory; i < CompLast; i++)
       if (0 != (Component_Field_Specs[i].using_atts & attribute->type) && NULL == attribute->any.components[i])
@@ -648,7 +648,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
   compspec = NULL;
   if (path == NULL) {
     if (!(compspec = find_cid_id(cid))) {
-      fprintf(stderr, "attributes:component_full_name(): Warning:\n"
+      Rprintf("attributes:component_full_name(): Warning:\n"
               "  can't find component table entry for Component #%d\n", cid);
       return NULL;
     }
@@ -681,7 +681,7 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
         reference = component_full_name(attribute, compspec->id, NULL);
 
       if (!reference) {
-        fprintf(stderr, "attributes:component_full_name(): Warning:\n  Can't reference to the value of %s -- copying\n", rname);
+        Rprintf("attributes:component_full_name(): Warning:\n  Can't reference to the value of %s -- copying\n", rname);
         reference = rname;
       }
 
@@ -738,7 +738,7 @@ load_component(Attribute *attribute, ComponentID cid)
   assert(attribute != NULL && "Null attribute passed to load_component");
 
   if (NULL == (comp = attribute->any.components[cid])) {
-    fprintf(stderr, "attributes:load_component(): Warning:\n  Component %s is not declared for %s attribute\n", cid_name(cid), aid_name(attribute->type));
+    Rprintf("attributes:load_component(): Warning:\n  Component %s is not declared for %s attribute\n", cid_name(cid), aid_name(attribute->type));
     return NULL;
   }
 
@@ -750,11 +750,11 @@ load_component(Attribute *attribute, ComponentID cid)
     if (cid == CompHuffCodes) {
       if (cl_sequence_compressed(attribute)) {
         if (read_file_into_blob(comp->path, CL_MEMBLOB_MMAPPED, sizeof(int), &(comp->data)) == 0)
-          fprintf(stderr, "attributes:load_component(): Warning:\n  Data of %s component of attribute %s can't be loaded\n", cid_name(cid), attribute->any.name);
+          Rprintf("attributes:load_component(): Warning:\n  Data of %s component of attribute %s can't be loaded\n", cid_name(cid), attribute->any.name);
         else {
           int i;
           if (attribute->pos.hc != NULL)
-            fprintf(stderr, "attributes:load_component: WARNING:\n\tHCD block already loaded, overwritten.\n");
+            Rprintf("attributes:load_component: WARNING:\n\tHCD block already loaded, overwritten.\n");
           attribute->pos.hc = (HCD *)cl_malloc(sizeof(HCD));
           memcpy(attribute->pos.hc, comp->data.data, sizeof(HCD));
 
@@ -775,12 +775,12 @@ load_component(Attribute *attribute, ComponentID cid)
         }
       }
       else
-        fprintf(stderr, "attributes/load_component: missing files of compressed PA,\n\tcomponent CompHuffCodes not loaded\n");
+        Rprintf("attributes/load_component: missing files of compressed PA,\n\tcomponent CompHuffCodes not loaded\n");
     }
     else if (cid > CompDirectory && cid < CompLast) {
       /* i.e. any ComponentID value except CompDirectory / CompLast and CompHuffCodes */
       if (!read_file_into_blob(comp->path, CL_MEMBLOB_MMAPPED, sizeof(int), &(comp->data)))
-        fprintf(stderr, "attributes:load_component(): Warning:\n  Data of %s component of attribute %s can't be loaded\n", cid_name(cid), attribute->any.name);
+        Rprintf("attributes:load_component(): Warning:\n  Data of %s component of attribute %s can't be loaded\n", cid_name(cid), attribute->any.name);
       else {
         comp->size = comp->data.nr_items;
         assert(work_out_component_state(comp) == ComponentLoaded);
@@ -824,7 +824,7 @@ create_component(Attribute *attribute, ComponentID cid)
   Component *comp = attribute->any.components[cid];
 
   if (cl_debug)
-    fprintf(stderr, "Creating %s\n", cid_name(cid));
+    Rprintf("Creating %s\n", cid_name(cid));
 
   if (component_state(attribute, cid) != ComponentDefined)
     return NULL;
@@ -843,20 +843,20 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompCorpus:
     case CompLexicon:
     case CompLexiconIdx:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component. Use 'cwb-encode' to create it out of a text file\n", cid_name(cid));
       return NULL;
 
     case CompHuffSeq:
     case CompHuffCodes:
     case CompHuffSync:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component. Use 'cwb-huffcode' to create it out of an item sequence file\n", cid_name(cid));
       return NULL;
 
     case CompCompRF:
     case CompCompRFX:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component. Use 'cwb-compress-rdx' to create it out of the reversed file index\n", cid_name(cid));
       return NULL;
 
@@ -881,7 +881,7 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompStrucData:
     case CompStrucAVS:
     case CompStrucAVX:
-      fprintf(stderr, "attributes:create_component(): Warning:\n"
+      Rprintf("attributes:create_component(): Warning:\n"
               "  Can't create the '%s' component of %s attribute %s.\nUse the appropriate external tool to create it.\n",
               cid_name(cid), aid_name(attribute->type), attribute->any.name);
       return NULL;
@@ -889,7 +889,7 @@ create_component(Attribute *attribute, ComponentID cid)
 
     default:
       comp = NULL;
-      fprintf(stderr, "attributes:create_component(): Unknown cid: %d\n", cid);
+      Rprintf("attributes:create_component(): Unknown cid: %d\n", cid);
       assert(0);
       break;
     }
@@ -933,7 +933,7 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
 
   if (!(comp = attribute->any.components[cid])) {
     /* component is undeclared */
-    fprintf(stderr, "attributes:ensure_component(): Warning:\n  Undeclared component: %s\n", cid_name(cid));
+    Rprintf("attributes:ensure_component(): Warning:\n  Undeclared component: %s\n", cid_name(cid));
 #ifdef CL_ENSURE_COMPONENT_EXITS
     exit(1);
 #endif
@@ -953,7 +953,7 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
       load_component(attribute, cid);
       if (work_out_component_state(comp) != ComponentLoaded) {
 #ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
-        fprintf(stderr, "attributes:ensure_component(): Warning:\n  Can't load %s component of %s\n", cid_name(cid), attribute->any.name);
+        Rprintf("attributes:ensure_component(): Warning:\n  Can't load %s component of %s\n", cid_name(cid), attribute->any.name);
 #endif
 
 #ifdef CL_ENSURE_COMPONENT_EXITS
@@ -971,7 +971,7 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
         create_component(attribute, cid);
         if (work_out_component_state(comp) != ComponentLoaded) {
 # ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
-          fprintf(stderr, "attributes:ensure_component(): Warning:\n  Can't load or create %s component of %s\n", cid_name(cid), attribute->any.name);
+          Rprintf("attributes:ensure_component(): Warning:\n  Can't load or create %s component of %s\n", cid_name(cid), attribute->any.name);
 # endif
 
 # ifdef CL_ENSURE_COMPONENT_EXITS
@@ -981,7 +981,7 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
         }
 #else
         /* this is the only alert-message NOT subject to the KEEP_SILENT definition */
-        fprintf(stderr, "Sorry, but this program is not set up to allow the creation of corpus components.\n"
+        Rprintf("Sorry, but this program is not set up to allow the creation of corpus components.\n"
                         "Please refer to the manuals or use the ''cwb-makeall'' tool.\n");
 # ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
@@ -992,7 +992,7 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
       else {
         /* !try_creation implies we should return the standard "not ensured" value (NULL). */
 #ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
-        fprintf(stderr, "attributes:ensure_component(): Warning:\n  I'm not allowed to create %s component of %s\n", cid_name(cid), attribute->any.name);
+        Rprintf("attributes:ensure_component(): Warning:\n  I'm not allowed to create %s component of %s\n", cid_name(cid), attribute->any.name);
 #endif
 #ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
@@ -1003,14 +1003,14 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
 
     case ComponentUndefined:
       /*  don't have this, -> error */
-      fprintf(stderr, "attributes:ensure_component(): Warning:\n  Can't ensure undefined/illegal %s component of %s\n", cid_name(cid), attribute->any.name);
+      Rprintf("attributes:ensure_component(): Warning:\n  Can't ensure undefined/illegal %s component of %s\n", cid_name(cid), attribute->any.name);
 #ifdef CL_ENSURE_COMPONENT_EXITS
       exit(1);
 #endif
       break;
 
     default:
-      fprintf(stderr, "attributes:ensure_component(): Warning:\n  Illegal state of  %s component of %s\n",cid_name(cid), attribute->any.name);
+      Rprintf("attributes:ensure_component(): Warning:\n  Illegal state of  %s component of %s\n",cid_name(cid), attribute->any.name);
 #ifdef CL_ENSURE_COMPONENT_EXITS
       exit(1);
 #endif
@@ -1137,29 +1137,29 @@ describe_attribute(Attribute *attribute)
   DynArg *arg;
   ComponentID cid;
 
-  printf("Attribute %s:\n", attribute->any.name);
-  printf("  Type:        %s\n", aid_name(attribute->any.type));
+  Rprintf("Attribute %s:\n", attribute->any.name);
+  Rprintf("  Type:        %s\n", aid_name(attribute->any.type));
 
   /* print type dependent additional data */
 
   if (attribute->type == ATT_DYN) {
-    printf("  Arguments:   (");
+    Rprintf("  Arguments:   (");
     for (arg = attribute->dyn.arglist; arg; arg = arg->next) {
-      printf("%s", argid_name(arg->type));
+      Rprintf("%s", argid_name(arg->type));
       if (arg->next != NULL)
-        printf(", ");
+        Rprintf(", ");
     }
-    printf("):%s\n"
+    Rprintf("):%s\n"
            "               by \"%s\"\n",
            argid_name(attribute->dyn.res_type),
            attribute->dyn.call);
   }
-  printf("\n");
+  Rprintf("\n");
   for (cid = CompDirectory; cid < CompLast; cid++)
     if (attribute->any.components[cid])
       describe_component(attribute->any.components[cid]);
 
-  printf("\n\n");
+  Rprintf("\n\n");
 }
 
 
@@ -1169,29 +1169,29 @@ describe_attribute(Attribute *attribute)
 void
 describe_component(Component *component)
 {
-  printf("  Component %s:\n", cid_name(component->id));
-  printf("    Attribute:   %s\n", component->attribute->any.name);
-  printf("    Path/Value:  %s\n", component->path);
-  printf("    State:       ");
+  Rprintf("  Component %s:\n", cid_name(component->id));
+  Rprintf("    Attribute:   %s\n", component->attribute->any.name);
+  Rprintf("    Path/Value:  %s\n", component->path);
+  Rprintf("    State:       ");
 
   switch (work_out_component_state(component)) {
   case ComponentLoaded:
-    printf("loaded");
+    Rprintf("loaded");
     break;
   case ComponentUnloaded:
-    printf("unloaded (valid & on disk)");
+    Rprintf("unloaded (valid & on disk)");
     break;
   case ComponentDefined:
-    printf("defined  (valid, but not on disk)");
+    Rprintf("defined  (valid, but not on disk)");
     break;
   case ComponentUndefined:
-    printf("undefined (not valid)");
+    Rprintf("undefined (not valid)");
     break;
   default:
-    printf("ILLEGAL! (Illegal component state %d)", work_out_component_state(component));
+    Rprintf("ILLEGAL! (Illegal component state %d)", work_out_component_state(component));
     break;
   }
-  printf("\n\n");
+  Rprintf("\n\n");
 }
 
 
