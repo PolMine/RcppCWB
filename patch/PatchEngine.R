@@ -1711,7 +1711,7 @@ PatchEngine <- R6Class(
             
             replace = list(
               '^\\s*(INTERNAL_DEFINES\\s*=)\\s*-DCWB_REGISTRY_DEFAULT_PATH\\s*=.*?-DCOMPILE_DATE',
-              "\\1 = -DCOMPILE_DATE", 
+              "\\1 -DCOMPILE_DATE", 
               1L
             )
           ),
