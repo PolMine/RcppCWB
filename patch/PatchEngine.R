@@ -591,7 +591,7 @@ PatchEngine <- R6Class(
             remove_lines = list("(\\s+)stderr,", 1),
             delete_line_before = list("^\\s*memberIDList\\(char\\s\\*s,\\sIDList\\sl\\)\\s*$", 1L, 1L),
             insert_before = list("^\\s*memberIDList\\(char\\s\\*s,\\sIDList\\sl\\)\\s*$", c("#ifndef __MINGW__", "static int"), 1L),
-            insert_before = list("^\\s*/\\*\\s-+\\s\\*/\\s*$", "#endif", 8L)
+            insert_before = list("^\\s*/\\*\\s-+\\s\\*/\\s*$", "#endif", 7L)
           )
         ),
         
