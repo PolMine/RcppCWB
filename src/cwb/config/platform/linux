@@ -25,6 +25,9 @@ include $(TOP)/config/platform/unix
 ## Linux distribution should include GNU install
 INSTALL = install
 
+## require position-independent code
+CFLAGS += -fPIC
+
 ## CPU architecture and operating system used to name binary releases
 RELEASE_ARCH = i386
 RELEASE_OS = linux
