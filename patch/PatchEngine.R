@@ -1804,8 +1804,8 @@ PatchEngine <- R6Class(
           insert_before = list("#define\\sCL_STREAM_WRITE_BIN\\s+1", "#ifndef __MINGW__", 1L),
           insert_after = list("#define\\sCL_STREAM_WRITE_BIN\\s+1", "#endif", 1L),
           
-          insert_before = list("#define^\\sCL_STREAM_APPEND_BIN\\s+2", "#ifndef __MINGW__", 1L),
-          insert_after = list("#define^\\sCL_STREAM_APPEND_BIN\\s+2", "#endif", 1L)
+          insert_before = list("#define\\sCL_STREAM_APPEND_BIN\\s+2", "#ifndef __MINGW__", 1L),
+          insert_after = list("#define\\sCL_STREAM_APPEND_BIN\\s+2", "#endif", 1L)
         )
         
       )
