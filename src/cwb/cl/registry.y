@@ -20,7 +20,6 @@
  */
 %{
 
-void Rprintf(const char *, ...);
 #include <ctype.h>
 
 #include "globals.h"
@@ -53,7 +52,7 @@ char cregestring[1024];
 
 void cregerror_cleanup(char *message)
 {
-  Rprintf("REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
+  fprintf(stderr, "REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
 
   if (cregattrib)
     cl_delete_attribute(cregattrib);
