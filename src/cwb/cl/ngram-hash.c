@@ -18,6 +18,7 @@
 
 #include "globals.h"
 #include <math.h>
+void Rprintf(const char *, ...);
 
 
 /** Defines the default number of buckets in an n-gram hash. */

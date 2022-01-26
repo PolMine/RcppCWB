@@ -15,6 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
+
 #include <ctype.h>
 #include <sys/types.h>
 
