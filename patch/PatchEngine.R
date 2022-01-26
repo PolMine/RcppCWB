@@ -601,7 +601,24 @@ PatchEngine <- R6Class(
           # to satisfy solaris
           # #include <signal.h> /* added by Andreas Blaette  */
           # #include <sys/socket.h> /* added by Andreas Blaette */
-          insert_before = list('^#include\\s"globals\\.h"', c("#ifndef __MINGW__", "#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "#endif", ""))
+          insert_before = list('^#include\\s"globals\\.h"', c("#ifndef __MINGW__", "#include <signal.h> /* added by Andreas Blaette  */", "#include <sys/socket.h> /* added by Andreas Blaette */", "#endif", "")),
+          
+          # fileutils.c:400:19: warning: variable 'was_pipe' set but not used [-Wunused-but-set-variable]
+          insert_before = list(
+            "^(\\s*)int\\sresult\\s=\\s0,\\swas_pipe\\s=\\s0;\\s*$",
+            c("#ifndef __MINGW__", "int was_pipe;", "#endif"),
+            1L
+          ),
+          replace = list("^(\\s*)int\\sresult\\s=\\s0,\\swas_pipe\\s=\\s0;\\s*$", "\\1int result = 0;", 1L),
+          insert_before = list("^\\s*was_pipe = 1;\\s*$", "#ifndef __MINGW__", 1L),
+          insert_after = list("^\\s*was_pipe = 1;\\s*$", "#endif", 1L),
+          
+          # fileutils.c:188:1: warning: 'cl_handle_sigpipe' defined but not used [-Wunused-function]
+          delete_line_before = list("^\\s*cl_handle_sigpipe\\(int signum\\)\\s*$", 1L, 1L),
+          insert_before = list("^\\s*cl_handle_sigpipe\\(int signum\\)\\s*$", c("#ifndef __MINGW__", "static void"), 1L),
+          insert_before = list("^\\s*/\\*\\*\\scheck\\swhether\\sstream\\stype\\sinvolves\\sa\\spipe\\s\\*/\\s*$", "#endif", 1L)
+          
+          
         ),
         
         "src/cwb/cl/globals.h" = list(
