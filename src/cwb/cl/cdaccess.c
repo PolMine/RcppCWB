@@ -28,6 +28,7 @@
 #include "special-chars.h"
 #include "bitio.h"
 #include "compression.h"
+void Rprintf(const char *, ...);
 
 /**
  * If COMPRESS_DEBUG is set to a positive integer, cl_cpos2id() will
@@ -2497,7 +2498,7 @@ cl_dynamic_call(Attribute *attribute,
       break;
 
     case ATTAT_STRING:          /* copy output */
-      fgets(call, CL_MAX_LINE_LENGTH, pipe);
+      if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");
       dcr->value.charres = (char *)cl_strdup(call);
       break;
 
