@@ -44,47 +44,180 @@
 #  doxygen      to update the HTML code documentation (requires doxygen to be installed)
 #  
 
-TOP = $(R_PACKAGE_SOURCE)
+TOP = $(shell pwd)
 include $(TOP)/config.mk
 
 # targets for external libraries; currently not used (Glib and PCRE assumed to be on the system already)
-SUBDIRS = cl cqp # subdirectories that have their own makefiles
+ifdef __MINGW__
+#EXTERNALS = 
+else
+EXTERNALS = 
+endif
+SUBDIRS = cl cqp utils man instutils	# subdirectories that have their own makefiles
 SRCDIRS = cl cqp utils CQi	# subdirectories containing C source code
 
 
 .PHONY: clean realclean depend all test install uninstall release mingw-libgnurx-2.5.1 cl cqp utils man instutils tags size
 
+default:
+	@$(ECHO) "Please type one of the following:"
+	@$(ECHO) ""
+	@$(ECHO) "  make clean     remove binaries and temporary files"
+	@$(ECHO) "  make realclean deletes all automatically generated files"
+	@$(ECHO) "  make depend    updated dependencies"
+	@$(ECHO) "  make all       build CWB libaries, programs and man pages"
+	@$(ECHO) "  make install   install CWB into chosen location"
+	@$(ECHO) "  make release   create binary release in build/ directory"
+	@$(ECHO) "  make tarball   create source code release in build/ directory"
+	@$(ECHO) ""
+	@$(ECHO) "  make cl        build low-level corpus library (CL)"
+	@$(ECHO) "  make cqp       build CQP query processor"
+	@$(ECHO) "  make utils     build command-line utilities"
+	@$(ECHO) "  make man       update manpages from POD sources"
+	@$(ECHO) "  make doxygen   update HTML code documentation"
+	@$(ECHO) "  make docset    create MacOS docset (see README)"
+	@$(ECHO) "  make instutils configure installation scripts"
+	@$(ECHO) "  make tags      generate symbol index for GNU Emacs"
+	@$(ECHO) "  make size      check total size of CWB source code"   
+
+all:  $(EXTERNALS)
+	@$(ECHO) "--------------------------------- BUILDING CORPUS LIBRARY (CL)"
+	$(MAKE) -C cl
+	@$(ECHO) "--------------------------------- BUILDING CQP"
+	$(MAKE) -C cqp
+	@$(ECHO) "--------------------------------- BUILDING COMMAND-LINE UTILITIES"
+	$(MAKE) -C utils
+	@$(ECHO) "--------------------------------- BUILDING MANPAGES"
+	$(MAKE) -C man
 
 cl:
 	@$(ECHO) "--------------------------------- BUILDING CORPUS LIBRARY (CL)"
-	cd cl; $(MAKE)
+	$(MAKE) -C cl 
 
 cqp:
 	@$(ECHO) "--------------------------------- BUILDING CQP"
-	cd cqp; $(MAKE)
+	$(MAKE) -C cqp 
 
 utils:
-	@$(ECHO) "--------------------------------- BUILDING UTILITIES"
-	cd utils; $(MAKE)
+	@$(ECHO) "--------------------------------- BUILDING COMMAND-LINE UTILITIES"
+	$(MAKE) -C utils 
 
 man:
 	@$(ECHO) "--------------------------------- BUILDING MANPAGES"
-	cd man; $(MAKE)
+	$(MAKE) -C man 
 
+doxygen:
+	@$(ECHO) "--------------------------------- BUILDING CODE DOCUMENTATION"
+	-$(RM) -rf doc/html
+	doxygen doc/doxygen-config
+	(cd doc && perl textile2html.perl)
+
+docset:
+	@$(ECHO) "--------------------------------- BUILDING CODE DOCSET (MacOS)"
+	-$(RM) -rf doc/docset_html build/net.sourceforge.cwb.CWB3-Code.docset
+	doxygen doc/doxygen-config-docset && \
+	perl -i -lpe '$$_="DESTDIR=../../build" if /^DESTDIR=/; $$_="" if /^XCODE_INSTALL/; s{^(\s+).*/(docsetutil index)}{$$1$$2};' doc/docset_html/Makefile && \
+	(cd doc/docset_html && make install) && \
+	perl -i -lpe '$$_ .= "\n\t<key>dashIndexFilePath</key>\n\t<string>index.html</string>" if /^\s*<dict>/; s{(<string>)doxygen(</string>)}{$$1cwb$$2}' build/net.sourceforge.cwb.CWB3-Code.docset/Contents/Info.plist && \
+	$(RM) -rf doc/docset_html && \
+	$(ECHO) "Created MacOS docset in build/net.sourceforge.cwb.CWB3-Code.docset/"
+
+instutils:
+	@$(ECHO) "--------------------------------- CONFIGURING INSTUTILS"
+	$(MAKE) -C instutils
+
+test:
+	@$(ECHO) "ERROR: no self tests available at the moment."
+#	$(MAKE) -C test
 
 size:
+	@$(ECHO) "--------------------------------- MEASURING EXTENT OF THE CWB CODE"
 	for i in $(SUBDIRS) ;\
 	do \
-	$(ECHO) "--------------------------------- $$i"; \
-	cd $$i; \
-	$(MAKE) size; \
+	@$(ECHO) "--------------------------------- $$i"; \
+	$(MAKE) -C $$i size; \
 	done;
 
 depend:
-	for i in $(SUBDIRS) ; do cd $$i; $(MAKE) depend.mk; cd ..; done;
+	@$(ECHO) "--------------------------------- UPDATING ALL DEPENDENCIES"
+	for i in $(SUBDIRS) ;\
+	do \
+	$(MAKE) -C $$i depend; \
+	done;
 
 clean:
-	for i in $(SUBDIRS); do if [ -f "$$i/Makefile" ]; then cd $$i; $(MAKE) clean; cd ..; fi; done;
+	@$(ECHO) "--------------------------------- PERFORMING TYPICAL CLEANUP"
+	for i in $(SUBDIRS) $(EXTERNALS); do if [ -f "$$i/Makefile" ]; then $(MAKE) -C $$i clean; fi; done;
 	-$(RM) *~ config/*/*~ CQi/*~ CQi/*.o technical/*~ TAGS
-	-$(RM) -rf build
+	-$(RM) -rf build/* doc/docset_html
 
+realclean:	clean
+	@$(ECHO) "--------------------------------- PERFORMING EXTRA CLEANUP"
+	for i in $(SUBDIRS) ; do $(MAKE) -C $$i realclean; done;
+ifdef __MINGW__
+	-$(RM) -rf mingw-libgnurx-2.5.1/config.log mingw-libgnurx-2.5.1/config.status mingw-libgnurx-2.5.1/Makefile
+endif
+
+install:
+ifdef __MINGW__
+	@$(ECHO) "ERROR: install operation is not supported for Windows binaries!"
+else
+	@$(ECHO) "--------------------------------- INSTALLING CORPUS WORKBENCH"
+	$(MAKE) -C cl install   # not in for loop to make sure we abort on error
+	$(MAKE) -C cqp install
+	$(MAKE) -C utils install
+	$(MAKE) -C man install
+	$(MAKE) -C instutils all
+	$(MAKE) -C instutils install
+endif
+
+release:
+	@$(ECHO) "--------------------------------- BUILDING RELEASE BUNDLE"
+	if [ -d "$(RELEASE_DIR)" ]; then $(RM) -rf "$(RELEASE_DIR)"; fi
+	$(INSTALL) $(INST_FLAGS_DIR) "$(RELEASE_DIR)"
+	$(MAKE) -C cl release
+	$(MAKE) -C cqp release
+	$(MAKE) -C utils release
+	$(MAKE) -C man release
+	$(MAKE) -C instutils all
+	$(MAKE) -C instutils release
+	# in case we need extra static libraries
+	for i in $(RELEASE_EXTRA_LIBS); do $(INSTALL) $(INST_FLAGS_DATA) "$$i" "$(RELEASE_DIR)/lib"; done
+ifdef __MINGW__
+	# for windwos, we need DLL file(s) in the bin/ directory
+	for i in $(DLLS_TO_INSTALL); do $(INSTALL) $(INST_FLAGS_DATA) $$i "$(RELEASE_DIR)/bin"; done
+endif
+	if [ -f "$(RELEASE_COMPRESSED_FILENAME)" ]; then $(RM) "$(RELEASE_COMPRESSED_FILENAME)"; fi
+	(cd build/ && $(COMPRESS_COMMAND) "$(RELEASE_COMPRESSED_FILENAME)" "$(RELEASE_NAME)")
+	@$(ECHO) "==> CREATED BINARY RELEASE build/$(RELEASE_COMPRESSED_FILENAME)"
+
+tarball:	realclean	
+	@$(ECHO) "--------------------------------- BUILDING SOURCE RELEASE"
+	$(MAKE) depend
+	$(MAKE) man
+	$(MAKE) clean
+	if [ -d "$(TARBALL_DIR)" ]; then $(RM) -rf "$(TARBALL_DIR)"; fi
+	$(INSTALL) $(INST_FLAGS_DIR) "$(TARBALL_DIR)"
+	$(CP) -p AUTHORS CHANGES COPYING INSTALL INSTALL-MACOS INSTALL-WIN README "$(TARBALL_DIR)"
+	$(CP) -p config.mk definitions.mk Makefile rpm-linux.spec "$(TARBALL_DIR)"
+	$(CP) -pR CQi cl config cqp doc editline install-scripts instutils man utils "$(TARBALL_DIR)"
+	$(INSTALL) $(INST_FLAGS_DIR) "$(TARBALL_DIR)/build"
+	if [ -f "$(TARBALL_COMPRESSED_FILENAME)" ]; then $(RM) "$(TARBALL_COMPRESSED_FILENAME)"; fi
+	(cd build/ && $(COMPRESS_COMMAND) "$(TARBALL_COMPRESSED_FILENAME)" "$(TARBALL_NAME)")
+	@$(ECHO) "==> CREATED SOURCE RELEASE build/$(TARBALL_COMPRESSED_FILENAME)"
+
+uninstall:
+	@$(ECHO) "ERROR: uninstall operation is currently not supported!"
+# 	for i in $(SUBDIRS) ;\
+# 	do \
+# 	$(MAKE) -C $$i uninstall; \
+# 	done;
+
+tags:
+	@$(ECHO) "--------------------------------- GENERATING 'TAGS' FILES"
+	rm -f TAGS
+	for i in $(SRCDIRS) ;\
+	do \
+	$(ETAGS) -a -o TAGS $$i/*.[chly]; \
+	done
+# NB "-a" option is required because we build the TAGS file incrementally
