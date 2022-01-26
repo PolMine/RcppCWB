@@ -53,8 +53,8 @@
  */
 #else
 /* but in windows we need to use winsock2.h (poss also windows.h?) from the Windows API instead */
+#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
 #include <windows.h>
-#include <winsock2.h>
 /* note, in order for all this to work, it is necessary to link against ws2_32 in MinGW. */
 #endif
 

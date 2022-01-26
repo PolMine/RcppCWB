@@ -16,6 +16,7 @@
  */
 
 
+void Rprintf(const char *, ...);
 #include "globals.h"
 
 #include <time.h>
