@@ -119,8 +119,6 @@
 
 
 
-char* cl_get_version();
-
 /* The actual code of the header file begins here. */
 
 #ifndef _cwb_cl_h
@@ -387,9 +385,7 @@ struct ClAutoString {
 /**
  * A single-string object whose memory allocation grows automatically.
  */
-#ifndef __cplusplus 
 typedef struct ClAutoString *ClAutoString;
-#endif
 /* the ClAutoString object API */
 ClAutoString cl_autostring_new(const char *data, size_t init_bytes);
 void cl_autostring_delete(ClAutoString string);
