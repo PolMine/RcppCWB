@@ -192,12 +192,6 @@ PatchEngine <- R6Class(
       )
       
       file.copy(
-        from = file.path(self$repodir, "src", "cwb", "cl", "cl.h"),
-        to = file.path(self$repodir, "src", "_cl.h"),
-        overwrite = TRUE
-      )
-      
-      file.copy(
         from = file.path(self$repodir, "src", "cwb", "cqp", "eval.h"),
         to = file.path(self$repodir, "src", "_eval.h"),
         overwrite = TRUE
@@ -1793,10 +1787,18 @@ PatchEngine <- R6Class(
           )
         ),
         
-        "src/_cl.h" = list(
-          replace = list("^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$", "/* \\1 */", 1L),
-          insert_before = list("\\s*/\\*\\sThe\\sactual\\scode\\sof\\sthe\\sheader\\sfile\\sbegins\\shere\\.\\s\\*/\\s*$", c("char* cl_get_version();", ""), 1L)
+        "src/cwb/cl/cl.h" = list(
+          insert_before = list("\\s*/\\*\\sThe\\sactual\\scode\\sof\\sthe\\sheader\\sfile\\sbegins\\shere\\.\\s\\*/\\s*$", c("char* cl_get_version();", ""), 1L),
+          insert_before = list(
+            "^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$",
+            "#ifndef __cplusplus ", 1L
+          ),
+          insert_after = list(
+            "^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$",
+            "#endif", 1L
+          )
         )
+        
       )
     },
     
@@ -1937,7 +1939,6 @@ PatchEngine <- R6Class(
 
       if (self$verbose) message("* add new and altered files to HEAD")
       git2r::add(repo = self$repodir, path = "src/cwb/*")
-      git2r::add(repo = self$repodir, path = "src/_cl.h")
       git2r::add(repo = self$repodir, path = "src/_eval.h")
       git2r::add(repo = self$repodir, path = "src/_globalvars.h")
       if (self$verbose) message("* commit: ", self$repodir)

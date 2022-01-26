@@ -3,7 +3,7 @@ extern "C" {
   #include <stdlib.h>
   #include <unistd.h>
   #include <string.h>
-  #include "_cl.h"
+  #include "cl.h"
   #include "cqp.h"
   #include <pcre.h>
   #include "server.h"
