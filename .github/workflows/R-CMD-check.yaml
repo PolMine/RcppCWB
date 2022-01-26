@@ -74,11 +74,11 @@ jobs:
 
       - name: Find Rtools42
         run: |
-          ls .
-          ls C:\
-          ls D:\
-          ls D:\a\
-
+          ls c:/
+          ls c:/rtools42/
+          ls c:/rtools42/x86_64-w64-mingw32.static.posix/
+          ls c:/rtools42/x86_64-w64-mingw32.static.posix/include/
+          ls c:/rtools42/x86_64-w64-mingw32.static.posix/include/glib-2.0
 
       - name: Query dependencies
         run: |
