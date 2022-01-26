@@ -2,7 +2,7 @@ R_PACKAGE_SOURCE=$(CURDIR)/cwb
 
 GLIB_DEFINES=-I$(R_TOOLS_SOFT)/include/glib-2.0 \
              -I$(R_TOOLS_SOFT)/lib/glib-2.0/include \
-             -I`pwd`/rtools42/x86_64-w64-mingw32.static.posix/include/glib-2.0
+             -ID:/a/RcppCWB/RcppCWB/rtools42/x86_64-w64-mingw32.static.posix/include/glib-2.0
 
 PKG_CPPFLAGS=-I$(R_PACKAGE_SOURCE)/cqp -I$(R_PACKAGE_SOURCE)/cl -I$(R_PACKAGE_SOURCE)/CQi -DPCRE_STATIC
 
