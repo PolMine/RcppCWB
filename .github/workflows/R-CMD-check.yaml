@@ -47,8 +47,8 @@ jobs:
         run: |
           Invoke-WebRequest -Uri  https://www.r-project.org/nosvn/winutf8/ucrt3/rtools42-4998-4926.exe -OutFile rtools42.exe.
           .\rtools42.exe /suppressmsgboxes
-          ls C:/
-          ls D:/
+          echo "$(RTOOLS40_HOME)"
+          echo "$(RTOOLS42_HOME)"
 
 #      - nme: Setup R (Windows UCRT)
 #        if: matrix.config.os == 'windows-2022'
