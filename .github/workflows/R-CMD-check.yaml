@@ -72,14 +72,6 @@ jobs:
         with:
           extra-packages: rcmdcheck
 
-      - name: Find Rtools42
-        run: |
-          ls c:/
-          ls c:/rtools42/
-          ls c:/rtools42/x86_64-w64-mingw32.static.posix/
-          ls c:/rtools42/x86_64-w64-mingw32.static.posix/include/
-          ls c:/rtools42/x86_64-w64-mingw32.static.posix/include/glib-2.0
-
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -112,6 +104,14 @@ jobs:
           remotes::install_cran("pkgbuild")
           remotes::install_cran("testthat")
         shell: Rscript {0}
+
+      - name: Find Rtools42
+        if: matrix.config.os == 'windows-2022'
+        run: |
+          rm .\rtools42.exe
+          ls c:/
+          ls c:/rtools42/
+          ls c:/rtools42/x86_64-w64-mingw32.static.posix/
 
       - name: Check
         env:
