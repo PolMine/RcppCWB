@@ -48,8 +48,6 @@
 /** the att hash is initially sized to 2 to the power of 14 */
 #define ATTHASHSIZE 16384
 
-void Rprintf(const char *, ...);
-
 /** Error strings are limited to this many bytes. @see cqi_error_string */
 #define GENERAL_ERROR_SIZE 1024
 
@@ -402,8 +400,8 @@ int
 cqi_send_byte(int n, int nosnoop)
 {
 #ifdef __MINGW__
-  const char prep = (const char) 0xff & n;
-  /* prep = (unsigned char) 0xff & n; */
+  unsigned char prep;
+  prep = (unsigned char) 0xff & n;
 #endif
 
   if (!nosnoop)

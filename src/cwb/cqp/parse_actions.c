@@ -216,11 +216,11 @@ after_CorpusCommand(CorpusList *cl)
 {
 #if defined(DEBUG_QB)
   if (QueryBufferOverflow)
-    Rprintf("+ Query Buffer overflow.\n");
+    fprintf(stderr, "+ Query Buffer overflow.\n");
   else if (QueryBuffer[0] == '\0')
-    Rprintf("+ Query Buffer is empty.\n");
+    fprintf(stderr, "+ Query Buffer is empty.\n");
   else
-    Rprintf("Query buffer: >>%s<<\n", QueryBuffer);
+    fprintf(stderr, "Query buffer: >>%s<<\n", QueryBuffer);
 #endif
 
   switch (last_cyc) {
@@ -232,7 +232,7 @@ after_CorpusCommand(CorpusList *cl)
       if (autoshow && cl->size > 0)
         cat_listed_corpus(cl, NULL, 0, -1, GlobalPrintMode);
       else if (!silent)
-        Rprintf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : ""));
+        printf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : ""));
     }
     query_corpus = NULL;
     break;
@@ -249,7 +249,7 @@ after_CorpusCommand(CorpusList *cl)
       if (autoshow && cl->size > 0)
         cat_listed_corpus(cl, NULL, 0, -1, GlobalPrintMode);
       else if (!silent)
-        Rprintf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : "") );
+        printf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : "") );
     }
     break;
 
@@ -346,7 +346,7 @@ ActivateCorpus(CorpusList *cl)
   cqpmessage(Message, "ActivateCorpus: %s", cl);
 
   if (inhibit_activation) {
-    Rprintf("Activation prohibited\n");
+    fprintf(stderr, "Activation prohibited\n");
     exit(cqp_error_status ? cqp_error_status : 1); /* hard way! */
   }
   else {
@@ -533,7 +533,7 @@ do_catString(const char *str, struct Redir *dst)
   }
   *w = '\0'; /* terminate modified string */
 
-  Rprintf("%s", s);
+  fprintf(dst->stream, "%s", s);
   cl_free(s);
 
   close_rd_output_stream(dst);
@@ -1220,9 +1220,9 @@ do_SearchPattern(Evaltree expr, Constrainttree constraint)
     searchstr = evaltree2searchstr(CurEnv->evaltree, NULL);
 
     if (search_debug) {
-      Rprintf("Evaltree: \n");
+      printf("Evaltree: \n");
       print_evaltree(ee_ix, CurEnv->evaltree, 0);
-      Rprintf("Search String: ``%s''\n", searchstr);
+      printf("Search String: ``%s''\n", searchstr);
     }
 
     /* if searchstr is NEITHER empty NOR just a string of spaces, compile it to a DFA */
@@ -1396,7 +1396,6 @@ do_XMLTag(char *s_name, int is_closing, int op, char *regex, int flags)
         int   safe_regex = !(strchr(regex, '|') || strchr(regex, '\\'));
         char *conv_regex;        /* OP_CONTAINS and OP_MATCHES */
         char *pattern;
-        pattern = "";
         CL_Regex rx;
 
         switch(op_type) {
@@ -1779,7 +1778,7 @@ OptimizeStringConstraint(Constrainttree left, enum b_ops op, Constrainttree righ
           c->type = id_list;
           c->idlist.attr = left->pa_ref.attr;
           c->idlist.label = left->pa_ref.label;
-          c->idlist.del = left->pa_ref.del;
+          c->idlist.delete = left->pa_ref.delete;
 
           c->idlist.nr_items = nr_items;
           c->idlist.items = items;
@@ -1922,7 +1921,7 @@ do_StringConstraint(char *s, int flags)
       left->type = pa_ref;
       left->pa_ref.attr = attr;
       left->pa_ref.label = NULL;
-      left->pa_ref.del = 0;
+      left->pa_ref.delete = 0;
 
       /* and what gets returned is then the optimised-constraint created from
          an equals-comparison of the node for the string and the node for the default p-attribute */
@@ -1953,7 +1952,7 @@ Varref2IDList(Attribute *attr, enum b_ops op, char *var_name)
       node->type = id_list;
       node->idlist.attr = attr;
       node->idlist.label = NULL;
-      node->idlist.del = 0;
+      node->idlist.delete = 0;
       node->idlist.negated = (op == cmp_eq ? 0 : 1);
       node->idlist.items = GetVariableItems(v, query_corpus->corpus, attr, &(node->idlist.nr_items));
 
@@ -2250,7 +2249,7 @@ do_RelExpr(Constrainttree left, enum b_ops op, Constrainttree right)
         /* be careful: res might be of type cnode, when an empty id_list has been optimised away */
         if (result && result->type == id_list && generate_code) {
           result->idlist.label  = left->pa_ref.label;
-          result->idlist.del = left->pa_ref.del;
+          result->idlist.delete = left->pa_ref.delete;
         }
       }
       else {
@@ -2350,7 +2349,7 @@ do_LabelReference(char *label_name, int auto_delete)
       result->type = pa_ref;
       result->pa_ref.attr = attr;
       result->pa_ref.label = label;
-      result->pa_ref.del = auto_delete;
+      result->pa_ref.delete = auto_delete;
     }
     else if (!(attr = cl_new_attribute(query_corpus->corpus, hack, ATT_STRUC))) {
       cqpmessage(Error, "Attribute ``%s'' is not defined for corpus", hack);
@@ -2367,7 +2366,7 @@ do_LabelReference(char *label_name, int auto_delete)
         result->type = sa_ref;
         result->sa_ref.attr = attr;
         result->sa_ref.label = label;
-        result->sa_ref.del = auto_delete;
+        result->sa_ref.delete = auto_delete;
       }
     }
   }
@@ -2393,7 +2392,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
       result->type = pa_ref;
       result->pa_ref.attr = attr;
       result->pa_ref.label = NULL;
-      result->pa_ref.del = 0;
+      result->pa_ref.delete = 0;
     }
     else if (NULL != (lab = label_lookup(CurEnv->labels, id_name, LAB_USED, 0))) {
       NEW_BNODE(result);
@@ -2404,7 +2403,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
         cqpmessage(Warning, "Cannot auto-delete special label '%s' [ignored].", id_name);
         auto_delete = 0;
       }
-      result->pa_ref.del = auto_delete;
+      result->pa_ref.delete = auto_delete;
       auto_delete = 0;                /* we'll check that below */
     }
     else if (NULL != (attr = cl_new_attribute(query_corpus->corpus, id_name, ATT_STRUC))) {
@@ -2423,7 +2422,7 @@ do_IDReference(char *id_name, int auto_delete)  /* auto_delete may only be set i
       /* Need to set label to NULL now that we put sa_ref to better use.
          A label's sa_ref now returns the value of the enclosing region */
       result->sa_ref.label = NULL;
-      result->sa_ref.del = 0;
+      result->sa_ref.delete = 0;
     }
     else {
       if (within_gc)
@@ -2932,7 +2931,7 @@ printSingleVariableValue(Variable v, int max_items)
   if (!v)
     return;
 
-  Rprintf("$%s = \n", v->my_name);
+  printf("$%s = \n", v->my_name);
   if (max_items <= 0)
     max_items = v->nr_items;
 
@@ -2986,7 +2985,7 @@ do_printVariableSize(char *varName)
     for (i = 0; i < v->nr_items; i++)
       if (!v->items[i].free)
         size++;
-    Rprintf("$%s has %d entries\n", v->my_name, size);
+    printf("$%s has %d entries\n", v->my_name, size);
   }
   else
     cqpmessage(Error, "%s: no such variable", varName);
@@ -3205,7 +3204,7 @@ do_size(CorpusList *cl, FieldType field)
           for (i = 0; i < cl->size; i++)
             if (cl->targets[i] != -1)
               count++;
-        Rprintf("%d\n", count);
+        printf("%d\n", count);
       }
       else if (field == KeywordField) {
         int count = 0, i;
@@ -3213,18 +3212,18 @@ do_size(CorpusList *cl, FieldType field)
           for (i = 0; i < cl->size; i++)
             if (cl->keywords[i] != -1)
               count++;
-        Rprintf("%d\n", count);
+        printf("%d\n", count);
       }
       else
         /* must be Match or MatchEnd then */
-        Rprintf("%d\n", cl->size);
+        printf("%d\n", cl->size);
     }
     else
-      Rprintf("%d\n", cl->size);
+      printf("%d\n", cl->size);
   }
   else
     /* undefined corpus */
-    Rprintf("0\n");
+    printf("0\n");
 }
 
 
@@ -3257,7 +3256,7 @@ do_dump(CorpusList *cl, int first, int last, struct Redir *dst)
       target  = (cl->targets)  ? cl->targets[j]  : -1;
       keyword = (cl->keywords) ? cl->keywords[j] : -1;
       rg = cl->range + j;
-      Rprintf("%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
+      fprintf(dst->stream, "%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
     }
 
     close_rd_output_stream(dst);
