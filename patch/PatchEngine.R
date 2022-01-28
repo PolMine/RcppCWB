@@ -994,7 +994,7 @@ PatchEngine <- R6Class(
             #   eval.c:1862:50: note: 'cpos' was declared here
             # 1862 |   int nr_strucs, nr_ok, ok, i, k, n, start, end, cpos;
             # |                                                  ^~~~
-            insert_after = list("^int nr_strucs, nr_ok, ok, i, k, n, start, end, cpos;$", "  cpos = -1;", 1L)
+            insert_after = list("^\\s*int\\snr_strucs,\\snr_ok,\\sok,\\si,\\sk,\\sn,\\sstart,\\send,\\scpos;$", "  cpos = -1;", 1L)
           ),
           
           # The corpus_size variable is used in revision 1690. This is commented out to see whether problems persist.
