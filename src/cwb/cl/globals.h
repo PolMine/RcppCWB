@@ -16,6 +16,7 @@
  */
 
 
+void Rprintf(const char *, ...);
 #ifndef _cl_globals_h_
 #define _cl_globals_h_
 
