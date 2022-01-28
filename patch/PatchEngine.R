@@ -849,20 +849,6 @@ PatchEngine <- R6Class(
           )
         ),
         
-        "src/cwb/cqp/parse_actions.c" = list(
-          # In file included from corpmanag.h:22,
-          # from parse_actions.h:31,
-          # from parse_actions.c:18:
-          #   parse_actions.c: In function 'do_XMLTag':
-          #   ../cl/cl.h:208:44: warning: 'pattern' may be used uninitialized in this function [-Wmaybe-uninitialized]
-          # 208 | #define cl_free(p) do { if ((p) != NULL) { free(p); p = NULL; } } while (0)
-          #   |                                            ^~~~
-          #   parse_actions.c:1398:15: note: 'pattern' was declared here
-          # 1398 |         char *pattern;
-          # |               ^~~~~~~
-          insert_after = list("^\\s*char\\s\\*pattern;\\s*", '  pattern = "";', 1L)
-        ),
-        
         "src/cwb/cqp/output.c" = c(
           list(
             # output.c: In function 'pt_get_anchor_cpos':
@@ -1293,8 +1279,19 @@ PatchEngine <- R6Class(
             
             replace = list("^(\\s*)result->pa_ref\\.delete\\s=\\s0;", "\\1result->pa_ref.del = 0;", 1),
             replace = list("^(\\s*)result->pa_ref\\.delete\\s=\\sauto_delete;", "\\1result->pa_ref.del = auto_delete;", 1),
-            replace = list("^(\\s*)result->sa_ref\\.delete\\s=\\s0;", "\\1result->sa_ref.del = 0;", 1)
+            replace = list("^(\\s*)result->sa_ref\\.delete\\s=\\s0;", "\\1result->sa_ref.del = 0;", 1),
             
+            # In file included from corpmanag.h:22,
+            # from parse_actions.h:31,
+            # from parse_actions.c:18:
+            #   parse_actions.c: In function 'do_XMLTag':
+            #   ../cl/cl.h:208:44: warning: 'pattern' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 208 | #define cl_free(p) do { if ((p) != NULL) { free(p); p = NULL; } } while (0)
+            #   |                                            ^~~~
+            #   parse_actions.c:1398:15: note: 'pattern' was declared here
+            # 1398 |         char *pattern;
+            # |               ^~~~~~~
+            insert_after = list("^\\s*char\\s\\*pattern;\\s*", '  pattern = "";', 1L)
           ),
           if (revision == 1069) list(
             replace = list("^(\\s*)c->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1c->idlist.del = left->pa_ref.del;", 1),
