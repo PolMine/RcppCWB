@@ -1630,8 +1630,8 @@ PatchEngine <- R6Class(
           # 149 |         sprintf(mark += strlen(mark), "'%s' ", (char *)((long)arg_list[i]));
           # |                                                ^ 
           replace = list(
-             "^(\\s*)(sprintf\\(mark\\s(.*?))\\(char\\s\\*\\)\\(\\(long\\)arg_list\\[i\\]\\);",
-             "\\1\\2arg_list));",
+             "^(\\s*)(sprintf\\(mark\\s(.*?))\\(char\\s\\*\\)\\(\\(long\\)arg_list\\[i\\]\\)\\);",
+             "\\1\\2arg_list);",
              1L
             )
          ),
