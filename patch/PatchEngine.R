@@ -1368,36 +1368,36 @@ PatchEngine <- R6Class(
             replace = list("^\\s*prep\\s=\\s\\(unsigned\\schar\\)\\s0xff\\s&\\sn;$", "prep = (const char) 0xff & n;)", 1L)
           ),
           
-          "src/cwb/CQi/server.h" = c(
-              # ../CQi/server.c: In function 'cqi_recv_bytes':
-              #   ../CQi/server.c:760:29: warning: pointer targets in passing argument 2 of 'recv' differ in signedness [-Wpointer-sign]
-              # 760 |   if (bytes != recv(connfd, buf, bytes, MSG_WAITALL)) {
-              #   |                             ^~~
-              #     |                             |
-              #     |                             cqi_byte * {aka unsigned char *}
-              #   In file included from ../CQi/server.c:32:
-              #     /usr/x86_64-w64-mingw32/sys-root/mingw/include/winsock2.h:1022:54: note: expected 'char *' but argument is of type 'cqi_byte *' {aka 'unsigned char *'}
-              #   1022 |   WINSOCK_API_LINKAGE int WSAAPI recv(SOCKET s,char *buf,int len,int flags);
-              #   |                                                ~~~~~~^~~
-              #     ../CQi/server.c: In function 'cqi_recv_byte':
-              #     ../CQi/server.c:771:25: warning: pointer targets in passing argument 2 of 'recv' differ in signedness [-Wpointer-sign]
-              #   771 |   if (1 != recv(connfd, &b, 1, MSG_WAITALL)) {
-              #     |                         ^~
-              #       |                         |
-              #       |                         cqi_byte * {aka unsigned char *}
-              #     In file included from ../CQi/server.c:32:
-              #       /usr/x86_64-w64-mingw32/sys-root/mingw/include/winsock2.h:1022:54: note: expected 'char *' but argument is of type 'cqi_byte *' {aka 'unsigned char *'}
-              #     1022 |   WINSOCK_API_LINKAGE int WSAAPI recv(SOCKET s,char *buf,int len,int flags);
-              #     |    
-              replace = list("^\\s*typedef\\sunsigned\\schar\\scqi_byte;\\s*$", "typedef char cqi_byte;", 1L)
-            ),
-            
-          
           # File 'lexhash.h' not there any more at r1690
           if (revision == 1069) list(
             insert_after = list('#include "\\.\\./cqp/hash\\.h"', '#include "../cl/lexhash.h" /* inserted by AB */', 1)
           )
         ),
+
+        "src/cwb/CQi/server.h" = c(
+          # ../CQi/server.c: In function 'cqi_recv_bytes':
+          #   ../CQi/server.c:760:29: warning: pointer targets in passing argument 2 of 'recv' differ in signedness [-Wpointer-sign]
+          # 760 |   if (bytes != recv(connfd, buf, bytes, MSG_WAITALL)) {
+          #   |                             ^~~
+          #     |                             |
+          #     |                             cqi_byte * {aka unsigned char *}
+          #   In file included from ../CQi/server.c:32:
+          #     /usr/x86_64-w64-mingw32/sys-root/mingw/include/winsock2.h:1022:54: note: expected 'char *' but argument is of type 'cqi_byte *' {aka 'unsigned char *'}
+          #   1022 |   WINSOCK_API_LINKAGE int WSAAPI recv(SOCKET s,char *buf,int len,int flags);
+          #   |                                                ~~~~~~^~~
+          #     ../CQi/server.c: In function 'cqi_recv_byte':
+          #     ../CQi/server.c:771:25: warning: pointer targets in passing argument 2 of 'recv' differ in signedness [-Wpointer-sign]
+          #   771 |   if (1 != recv(connfd, &b, 1, MSG_WAITALL)) {
+          #     |                         ^~
+          #       |                         |
+          #       |                         cqi_byte * {aka unsigned char *}
+          #     In file included from ../CQi/server.c:32:
+          #       /usr/x86_64-w64-mingw32/sys-root/mingw/include/winsock2.h:1022:54: note: expected 'char *' but argument is of type 'cqi_byte *' {aka 'unsigned char *'}
+          #     1022 |   WINSOCK_API_LINKAGE int WSAAPI recv(SOCKET s,char *buf,int len,int flags);
+          #     |    
+          replace = list("^\\s*typedef\\sunsigned\\schar\\scqi_byte;\\s*$", "typedef char cqi_byte;", 1L)
+        ),
+        
         
         "src/cwb/CQi/cqpserver.c" = list(
           # stable r1069 - r1690
