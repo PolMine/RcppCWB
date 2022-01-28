@@ -216,11 +216,11 @@ after_CorpusCommand(CorpusList *cl)
 {
 #if defined(DEBUG_QB)
   if (QueryBufferOverflow)
-    fprintf(stderr, "+ Query Buffer overflow.\n");
+    Rprintf("+ Query Buffer overflow.\n");
   else if (QueryBuffer[0] == '\0')
-    fprintf(stderr, "+ Query Buffer is empty.\n");
+    Rprintf("+ Query Buffer is empty.\n");
   else
-    fprintf(stderr, "Query buffer: >>%s<<\n", QueryBuffer);
+    Rprintf("Query buffer: >>%s<<\n", QueryBuffer);
 #endif
 
   switch (last_cyc) {
@@ -232,7 +232,7 @@ after_CorpusCommand(CorpusList *cl)
       if (autoshow && cl->size > 0)
         cat_listed_corpus(cl, NULL, 0, -1, GlobalPrintMode);
       else if (!silent)
-        printf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : ""));
+        Rprintf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : ""));
     }
     query_corpus = NULL;
     break;
@@ -249,7 +249,7 @@ after_CorpusCommand(CorpusList *cl)
       if (autoshow && cl->size > 0)
         cat_listed_corpus(cl, NULL, 0, -1, GlobalPrintMode);
       else if (!silent)
-        printf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : "") );
+        Rprintf("%d matches.%s\n", cl->size, (cl->size > 0 ? " Use 'cat' to show." : "") );
     }
     break;
 
@@ -346,7 +346,7 @@ ActivateCorpus(CorpusList *cl)
   cqpmessage(Message, "ActivateCorpus: %s", cl);
 
   if (inhibit_activation) {
-    fprintf(stderr, "Activation prohibited\n");
+    Rprintf("Activation prohibited\n");
     exit(cqp_error_status ? cqp_error_status : 1); /* hard way! */
   }
   else {
@@ -533,7 +533,7 @@ do_catString(const char *str, struct Redir *dst)
   }
   *w = '\0'; /* terminate modified string */
 
-  fprintf(dst->stream, "%s", s);
+  Rprintf("%s", s);
   cl_free(s);
 
   close_rd_output_stream(dst);
@@ -1220,9 +1220,9 @@ do_SearchPattern(Evaltree expr, Constrainttree constraint)
     searchstr = evaltree2searchstr(CurEnv->evaltree, NULL);
 
     if (search_debug) {
-      printf("Evaltree: \n");
+      Rprintf("Evaltree: \n");
       print_evaltree(ee_ix, CurEnv->evaltree, 0);
-      printf("Search String: ``%s''\n", searchstr);
+      Rprintf("Search String: ``%s''\n", searchstr);
     }
 
     /* if searchstr is NEITHER empty NOR just a string of spaces, compile it to a DFA */
@@ -2931,7 +2931,7 @@ printSingleVariableValue(Variable v, int max_items)
   if (!v)
     return;
 
-  printf("$%s = \n", v->my_name);
+  Rprintf("$%s = \n", v->my_name);
   if (max_items <= 0)
     max_items = v->nr_items;
 
@@ -2985,7 +2985,7 @@ do_printVariableSize(char *varName)
     for (i = 0; i < v->nr_items; i++)
       if (!v->items[i].free)
         size++;
-    printf("$%s has %d entries\n", v->my_name, size);
+    Rprintf("$%s has %d entries\n", v->my_name, size);
   }
   else
     cqpmessage(Error, "%s: no such variable", varName);
@@ -3204,7 +3204,7 @@ do_size(CorpusList *cl, FieldType field)
           for (i = 0; i < cl->size; i++)
             if (cl->targets[i] != -1)
               count++;
-        printf("%d\n", count);
+        Rprintf("%d\n", count);
       }
       else if (field == KeywordField) {
         int count = 0, i;
@@ -3212,18 +3212,18 @@ do_size(CorpusList *cl, FieldType field)
           for (i = 0; i < cl->size; i++)
             if (cl->keywords[i] != -1)
               count++;
-        printf("%d\n", count);
+        Rprintf("%d\n", count);
       }
       else
         /* must be Match or MatchEnd then */
-        printf("%d\n", cl->size);
+        Rprintf("%d\n", cl->size);
     }
     else
-      printf("%d\n", cl->size);
+      Rprintf("%d\n", cl->size);
   }
   else
     /* undefined corpus */
-    printf("0\n");
+    Rprintf("0\n");
 }
 
 
@@ -3256,7 +3256,7 @@ do_dump(CorpusList *cl, int first, int last, struct Redir *dst)
       target  = (cl->targets)  ? cl->targets[j]  : -1;
       keyword = (cl->keywords) ? cl->keywords[j] : -1;
       rg = cl->range + j;
-      fprintf(dst->stream, "%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
+      Rprintf("%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
     }
 
     close_rd_output_stream(dst);

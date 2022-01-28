@@ -52,7 +52,7 @@ char cregestring[1024];
 
 void cregerror_cleanup(char *message)
 {
-  fprintf(stderr, "REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
+  Rprintf("REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
 
   if (cregattrib)
     cl_delete_attribute(cregattrib);

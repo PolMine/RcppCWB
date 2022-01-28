@@ -340,7 +340,7 @@ expand_filename(char *fname)
       rname[rpos] = '\0';
 
       if (!(reference = getenv(rname))) {
-        fprintf(stderr, "options: can't get value of environment variable ``%s''\n", rname);
+        Rprintf("options: can't get value of environment variable ``%s''\n", rname);
         fn[t++] = '$';
 //        reference = &rname[0];
         reference = rname;
@@ -368,64 +368,64 @@ cqp_usage(void)
 {
   switch (which_app) {
   case cqpserver:
-    fprintf(stderr, "Usage: %s [options] [<user>:<password> ...]\n", progname);
+    Rprintf("Usage: %s [options] [<user>:<password> ...]\n", progname);
     break;
   case cqpcl:
-    fprintf(stderr, "Usage: %s [options] '<query>'\n", progname);
+    Rprintf("Usage: %s [options] '<query>'\n", progname);
     break;
   case cqp:
-    fprintf(stderr, "Usage: %s [options]\n", progname);
+    Rprintf("Usage: %s [options]\n", progname);
     break;
   default:
-    fprintf(stderr, "??? Unknown application ???\n");
+    Rprintf("??? Unknown application ???\n");
     exit(cqp_error_status ? cqp_error_status : 1);
   }
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "    -h           help\n");
-  fprintf(stderr, "    -v           version and copyright information\n");
-  fprintf(stderr, "    -r dir       use <dir> as default registry\n");
-  fprintf(stderr, "    -l dir       store/load subcorpora in <dir>\n");
-  fprintf(stderr, "    -I file      read <file> as init file\n");
-  fprintf(stderr, "    -M file      read macro definitions from <file>\n");
-  fprintf(stderr, "    -m           disable macro expansion\n");
+  Rprintf("Options:\n");
+  Rprintf("    -h           help\n");
+  Rprintf("    -v           version and copyright information\n");
+  Rprintf("    -r dir       use <dir> as default registry\n");
+  Rprintf("    -l dir       store/load subcorpora in <dir>\n");
+  Rprintf("    -I file      read <file> as init file\n");
+  Rprintf("    -M file      read macro definitions from <file>\n");
+  Rprintf("    -m           disable macro expansion\n");
   if (which_app == cqpcl)
-    fprintf(stderr, "    -E variable  execute query in $(<variable>)\n");
+    Rprintf("    -E variable  execute query in $(<variable>)\n");
   if (which_app == cqp) {
-    fprintf(stderr, "    -e           enable input line editing\n");
+    Rprintf("    -e           enable input line editing\n");
 #ifndef __MINGW__
-    fprintf(stderr, "    -C           enable ANSI colours (experimental)\n");
+    Rprintf("    -C           enable ANSI colours (experimental)\n");
 #endif
-    fprintf(stderr, "    -f filename  execute commands from file (batch mode)\n");
-    fprintf(stderr, "    -p           turn pager off\n");
-    fprintf(stderr, "    -P pager     use program <pager> to display query results\n");
+    Rprintf("    -f filename  execute commands from file (batch mode)\n");
+    Rprintf("    -p           turn pager off\n");
+    Rprintf("    -P pager     use program <pager> to display query results\n");
   }
   if (which_app != cqpserver) {
-    fprintf(stderr, "    -s           auto auto_subquery mode\n");
-    fprintf(stderr, "    -c           child process mode\n");
-    fprintf(stderr, "    -i           print matching ranges only (binary output)\n");
-    fprintf(stderr, "    -W num       show <num> chars to the left & right of match\n");
-    fprintf(stderr, "    -L num       show <num> chars to the left of match\n");
-    fprintf(stderr, "    -R num       show <num> chars to the right of match\n");
+    Rprintf("    -s           auto auto_subquery mode\n");
+    Rprintf("    -c           child process mode\n");
+    Rprintf("    -i           print matching ranges only (binary output)\n");
+    Rprintf("    -W num       show <num> chars to the left & right of match\n");
+    Rprintf("    -L num       show <num> chars to the left of match\n");
+    Rprintf("    -R num       show <num> chars to the right of match\n");
   }
-  fprintf(stderr, "    -D corpus    set default corpus to <corpus>\n");
-  fprintf(stderr, "    -b num       set hard boundary for kleene star to <num> tokens\n");
-  fprintf(stderr, "    -S           SIG_PIPE handler toggle\n");
-  fprintf(stderr, "    -x           insecure mode (when run SETUID)\n");
+  Rprintf("    -D corpus    set default corpus to <corpus>\n");
+  Rprintf("    -b num       set hard boundary for kleene star to <num> tokens\n");
+  Rprintf("    -S           SIG_PIPE handler toggle\n");
+  Rprintf("    -x           insecure mode (when run SETUID)\n");
   if (which_app == cqpserver) {
-    fprintf(stderr, "    -1           single client server (exits after 1 connection)\n");
-    fprintf(stderr, "    -P  port     listen on port #<port> [default=CQI_PORT]\n");
-    fprintf(stderr, "    -L           accept connections from localhost only (loopback)\n");
-    fprintf(stderr, "    -q           fork() and quit before accepting connections\n");
+    Rprintf("    -1           single client server (exits after 1 connection)\n");
+    Rprintf("    -P  port     listen on port #<port> [default=CQI_PORT]\n");
+    Rprintf("    -L           accept connections from localhost only (loopback)\n");
+    Rprintf("    -q           fork() and quit before accepting connections\n");
   }
-  fprintf(stderr, "    -d mode      activate/deactivate debug mode, where <mode> is one of: \n");
-  fprintf(stderr, "       [ ShowSymtab, ShowPatList, ShowEvaltree, ShowDFA, ShowCompDFA,   ]\n");
-  fprintf(stderr, "       [ ShowGConstraints, SymtabDebug, TreeDebug, CLDebug,             ]\n");
-  fprintf(stderr, "       [ EvalDebug, InitialMatchlistDebug, DebugSimulation,             ]\n");
-  fprintf(stderr, "       [ VerboseParser, ParserDebug, ParseOnly, SearchDebug, MacroDebug ]\n");
+  Rprintf("    -d mode      activate/deactivate debug mode, where <mode> is one of: \n");
+  Rprintf("       [ ShowSymtab, ShowPatList, ShowEvaltree, ShowDFA, ShowCompDFA,   ]\n");
+  Rprintf("       [ ShowGConstraints, SymtabDebug, TreeDebug, CLDebug,             ]\n");
+  Rprintf("       [ EvalDebug, InitialMatchlistDebug, DebugSimulation,             ]\n");
+  Rprintf("       [ VerboseParser, ParserDebug, ParseOnly, SearchDebug, MacroDebug ]\n");
   if (which_app == cqpserver)
-    fprintf(stderr, "       [ ServerLog [on], ServerDebug, Snoop (log all network traffic)   ]\n");
-  fprintf(stderr, "       [ ALL (activate all modes except ParseOnly)                      ]\n");
-  fprintf(stderr, "\n");
+    Rprintf("       [ ServerLog [on], ServerDebug, Snoop (log all network traffic)   ]\n");
+  Rprintf("       [ ALL (activate all modes except ParseOnly)                      ]\n");
+  Rprintf("\n");
   exit(cqp_error_status ? cqp_error_status : 1);
 }
 
@@ -439,18 +439,18 @@ print_option_value(int opt)
   int show_lc_rc = 0;                /* "set context;" should also display left and right context settings */
 
   if (cqpoptions[opt].opt_abbrev)
-    printf("[%s]\t", cqpoptions[opt].opt_abbrev);
+    Rprintf("[%s]\t", cqpoptions[opt].opt_abbrev);
   else
-    printf("\t");
-  printf("%-22s", cqpoptions[opt].opt_name);
+    Rprintf("\t");
+  Rprintf("%-22s", cqpoptions[opt].opt_name);
 
   if (cqpoptions[opt].address) {
-    printf("=  ");
+    Rprintf("=  ");
     switch (cqpoptions[opt].type) {
 
     case OptString:
       if (cl_str_is(cqpoptions[opt].opt_name, "PrintOptions"))
-        printf("%ctbl %chdr %cwrap %cbdr %cnum",
+        Rprintf("%ctbl %chdr %cwrap %cbdr %cnum",
                GlobalPrintOptions.print_tabular ? '+' : '-',
                GlobalPrintOptions.print_header  ? '+' : '-',
                GlobalPrintOptions.print_wrap    ? '+' : '-',
@@ -459,68 +459,68 @@ print_option_value(int opt)
       else if (*((char **)cqpoptions[opt].address)) {
         if ( (cl_str_is(cqpoptions[opt].opt_name, "AttributeSeparator") || cl_str_is(cqpoptions[opt].opt_name, "TokenSeparator"))
             && '\0' == **((char **)cqpoptions[opt].address))
-          printf("<default>");
+          Rprintf("<default>");
         else if (cl_str_is(cqpoptions[opt].opt_name, "StructureDelimiter") && '\0' == **((char **)cqpoptions[opt].address))
-          printf("<none>");
+          Rprintf("<none>");
         else
-          printf("%s", *((char **)cqpoptions[opt].address));
+          Rprintf("%s", *((char **)cqpoptions[opt].address));
       }
       else
-        printf("<no value>");
+        Rprintf("<no value>");
       break;
 
     case OptBoolean:
-      printf((*((int *)cqpoptions[opt].address)) ? "yes" : "no");
+      Rprintf((*((int *)cqpoptions[opt].address)) ? "yes" : "no");
       break;
 
     case OptInteger:
-      printf("%d", *((int *)cqpoptions[opt].address));
+      Rprintf("%d", *((int *)cqpoptions[opt].address));
       break;
 
     case OptContext:
       if (cl_str_is(cqpoptions[opt].opt_name, "Context")) {
-        printf("(see below)");
+        Rprintf("(see below)");
         show_lc_rc = 1;
       }
       else if (cl_str_is(cqpoptions[opt].opt_name, "LeftContext")) {
-        printf("%d ", ((ContextDescriptor *)cqpoptions[opt].address)->left_width);
+        Rprintf("%d ", ((ContextDescriptor *)cqpoptions[opt].address)->left_width);
 
         switch (((ContextDescriptor *)cqpoptions[opt].address)->left_type) {
         case s_att_context:
         case a_att_context:
-          printf("%s",
+          Rprintf("%s",
                  ((ContextDescriptor *)cqpoptions[opt].address)->left_structure_name ?
                  ((ContextDescriptor *)cqpoptions[opt].address)->left_structure_name :
                  "(empty?)");
           break;
 
         case char_context:
-          printf("characters");
+          Rprintf("characters");
           break;
 
         case word_context:
-          printf("words");
+          Rprintf("words");
           break;
         }
       }
       else if (cl_str_is(cqpoptions[opt].opt_name, "RightContext")) {
-        printf("%d ", ((ContextDescriptor *)cqpoptions[opt].address)->right_width);
+        Rprintf("%d ", ((ContextDescriptor *)cqpoptions[opt].address)->right_width);
 
         switch (((ContextDescriptor *)cqpoptions[opt].address)->right_type) {
         case s_att_context:
         case a_att_context:
-          printf("%s",
+          Rprintf("%s",
                  ((ContextDescriptor *)cqpoptions[opt].address)->right_structure_name ?
                  ((ContextDescriptor *)cqpoptions[opt].address)->right_structure_name :
                  "(empty?)");
           break;
 
         case char_context:
-          printf("characters");
+          Rprintf("characters");
           break;
 
         case word_context:
-          printf("words");
+          Rprintf("words");
           break;
         }
       }
@@ -529,7 +529,7 @@ print_option_value(int opt)
       break;
 
     default:
-      printf("WARNING: Illegal Option Type!");
+      Rprintf("WARNING: Illegal Option Type!");
       break;
     }
 
@@ -537,9 +537,9 @@ print_option_value(int opt)
   else
     /* no address given for option -> this is only LeftContext and RightContext in
        normal mode, so refer people to the Context option */
-    printf("<not bound to variable>");
+    Rprintf("<not bound to variable>");
 
-  printf("\n");
+  Rprintf("\n");
 
   if (show_lc_rc) {
     print_option_value(find_option("LeftContext"));
@@ -558,7 +558,7 @@ print_option_values()
   int rc_opt = find_option("RightContext");
 
   if (!silent)
-    printf("Variable settings:\n");
+    Rprintf("Variable settings:\n");
 
   for (opt = 0; cqpoptions[opt].opt_name; opt++)
     if ( cqpoptions[opt].flags & OPTION_VISIBLE_IN_CQP)
@@ -675,7 +675,7 @@ find_matching_strategy(const char *s)
     return longest_match;
 
   else {
-    printf("invalid matching strategy: %s\n", s);
+    Rprintf("invalid matching strategy: %s\n", s);
     return -1;
   }
 }
@@ -779,7 +779,7 @@ execute_side_effects(int opt)
     break;
 
   default:
-    fprintf(stderr, "Unknown side-effect #%d invoked by option %s.\n", cqpoptions[opt].side_effect, cqpoptions[opt].opt_name);
+    Rprintf("Unknown side-effect #%d invoked by option %s.\n", cqpoptions[opt].side_effect, cqpoptions[opt].opt_name);
     exit(cqp_error_status ? cqp_error_status : 1);
   }
 }
@@ -1070,7 +1070,7 @@ parse_options(int ac, char *av[])
 
     case 'E':
       if (!(query_string = getenv(optarg))) {
-        fprintf(stderr, "Environment variable %s has no value, exiting\n", optarg);
+        Rprintf("Environment variable %s has no value, exiting\n", optarg);
         exit(cqp_error_status ? cqp_error_status : 1);
       }
       break;
@@ -1127,7 +1127,7 @@ parse_options(int ac, char *av[])
           cl_set_debug_level(activate_cl_debug);
         }
         else {
-          fprintf(stderr, "Invalid debug mode: -d %s\nType '%s -h' for more information.\n", optarg, progname);
+          Rprintf("Invalid debug mode: -d %s\nType '%s -h' for more information.\n", optarg, progname);
           exit(cqp_error_status ? cqp_error_status : 1);
         }
       }
@@ -1138,7 +1138,7 @@ parse_options(int ac, char *av[])
       break;
 
     case 'v':
-      printf("%s\n", licensee);
+      Rprintf("%s\n", licensee);
       exit(cqp_error_status);
 
     case 's':
@@ -1202,7 +1202,7 @@ parse_options(int ac, char *av[])
       break;
 
     default:
-      fprintf(stderr, "Invalid option. Type '%s -h' for more information.\n", progname);
+      Rprintf("Invalid option. Type '%s -h' for more information.\n", progname);
       exit(cqp_error_status ? cqp_error_status : 1);
       break;
     }
