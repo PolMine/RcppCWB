@@ -55,10 +55,10 @@ show_matchlist(Matchlist matchlist)
 {
   int i;
 
-  Rprintf("Matchlist (size: %d, %sinverted):\n", matchlist.tabsize, matchlist.is_inverted ? "" : "not ");
+  fprintf(stderr, "Matchlist (size: %d, %sinverted):\n", matchlist.tabsize, matchlist.is_inverted ? "" : "not ");
 
   for (i = 0; i < matchlist.tabsize; i++)
-    Rprintf("ml[%d] = [%d, %d] @:%d @9:%d\n",
+    fprintf(stderr, "ml[%d] = [%d, %d] @:%d @9:%d\n",
             i,
             matchlist.start[i],
             matchlist.end[i],
@@ -80,9 +80,9 @@ show_matchlist_firstelements(Matchlist matchlist)
   int i;
   int n = (matchlist.tabsize >= 1000 ? 1000 : matchlist.tabsize % 1000);
 
-  Rprintf("the first (max 1000) elements of the matchlist (size: %d) are:\n", matchlist.tabsize);
+  fprintf(stderr, "the first (max 1000) elements of the matchlist (size: %d) are:\n", matchlist.tabsize);
   for (i = 0; i < n; i++)
-    Rprintf("ml[%d] = [%d,...]\n", i, matchlist.start[i]);
+    fprintf(stderr, "ml[%d] = [%d,...]\n", i, matchlist.start[i]);
 }
 
 
@@ -581,7 +581,7 @@ apply_setop_to_matchlist(Matchlist *list1, MLSetOp operation, Matchlist *list2)
     /* what the hell is the complement of a non-initial matchlist?
      * I simply do not know. so do it only for initial ones. */
     if (list1->end) {
-      Rprintf("Can't calculate complement for non-initial matchlist.\n");
+      fprintf(stderr, "Can't calculate complement for non-initial matchlist.\n");
       return 0;
     }
 
@@ -595,29 +595,29 @@ apply_setop_to_matchlist(Matchlist *list1, MLSetOp operation, Matchlist *list2)
     }
 
     if (!evalenv) {
-      Rprintf("Can't calculate complement with NULL eval env\n");
+      fprintf(stderr, "Can't calculate complement with NULL eval env\n");
       return 0;
     }
 
     if (!evalenv->query_corpus) {
-      Rprintf("Can't calculate complement with NULL query_corpus.\n");
+      fprintf(stderr, "Can't calculate complement with NULL query_corpus.\n");
       return 0;
     }
 
     if (!access_corpus(evalenv->query_corpus)) {
-      Rprintf("Complement: can't access current corpus.\n");
+      fprintf(stderr, "Complement: can't access current corpus.\n");
       return 0;
     }
 
     /* OK. The tests went by. Now, the size of the new ML is the size of the corpus MINUS the size of the current matchlist. */
     if (!(attr = cl_new_attribute(evalenv->query_corpus->corpus, CWB_DEFAULT_ATT_NAME, ATT_POS))) {
-      Rprintf("Complement: can't find %s attribute of current corpus\n", CWB_DEFAULT_ATT_NAME);
+      fprintf(stderr, "Complement: can't find %s attribute of current corpus\n", CWB_DEFAULT_ATT_NAME);
       return 0;
     }
 
     i = cl_max_cpos(attr);
     if (cl_errno != CDA_OK) {
-      Rprintf("Complement: can't get attribute size\n");
+      fprintf(stderr, "Complement: can't get attribute size\n");
       return 0;
     }
 

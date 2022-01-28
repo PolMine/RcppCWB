@@ -215,7 +215,7 @@ get_screen_escapes(void)
 
   /* Linux terminfo bug? fix: tigetstr("sgr0") returns an extra ^O (\x0f) character appended to the escape sequence
      (this may be some code used internally by the ncurses library).
-     Since we Rprintf() the escape sequences directly, we have to remove the extra character or 'less -R' will get confused. */
+     Since we printf() the escape sequences directly, we have to remove the extra character or 'less -R' will get confused. */
   l = strlen(sc_all_out);
   if ((l > 0) && (sc_all_out[l-1] == '\x0f')) {
     sc_all_out = cl_strdup(sc_all_out);
@@ -295,7 +295,7 @@ get_typeface_escape(char typeface)
   case 's': return sc_s_in;
   case 'n': return sc_all_out;        /* also switches off colour */
   default:
-    Rprintf("Internal error: unknown typeface '%c'.\n", typeface);
+    fprintf(stderr, "Internal error: unknown typeface '%c'.\n", typeface);
     return "";
   }
 }
@@ -317,7 +317,7 @@ get_colour_escape(char colour, int foreground) {
       case 'p': return "\x1B[0;35m";
       case 'c': return "\x1B[0;36m";
       default:
-        Rprintf("Internal error: unknown colour '%c'.\n", colour);
+        fprintf(stderr, "Internal error: unknown colour '%c'.\n", colour);
         return "\x1B[0m";
       }
     }
@@ -330,7 +330,7 @@ get_colour_escape(char colour, int foreground) {
       case 'p': return "\x1B[0;45m";
       case 'c': return "\x1B[0;46m";
       default:
-        Rprintf("Internal error: unknown colour '%c'.\n", colour);
+        fprintf(stderr, "Internal error: unknown colour '%c'.\n", colour);
         return "\x1B[0m";
       }
     }
@@ -454,7 +454,7 @@ ascii_print_aligned_line(FILE *stream, int highlighting, char *attribute_name, c
     char *red    = get_colour_escape('r', 1);
     char *bold   = get_typeface_escape('b');
     char *normal = get_typeface_escape('n');
-    Rprintf("%s%s-->%s:%s %s\n",
+    fprintf(stream, "%s%s-->%s:%s %s\n",
             red,
             bold,
             attribute_name,
@@ -462,7 +462,7 @@ ascii_print_aligned_line(FILE *stream, int highlighting, char *attribute_name, c
             line);
   }
   else
-    Rprintf("-->%s: %s\n", attribute_name, line);
+    fprintf(stream, "-->%s: %s\n", attribute_name, line);
 }
 
 
@@ -575,7 +575,7 @@ ascii_print_corpus_header(CorpusList *cl, FILE *dest)
     fputc('-', dest);
   fputc('\n', dest);
 
-  Rprintf(
+  fprintf(dest,
           "#\n"
           "# User:    %s (%s)\n"
           "# Date:    %s"
@@ -594,7 +594,7 @@ ascii_print_corpus_header(CorpusList *cl, FILE *dest)
           (cl->corpus && cl->corpus->name ? cl->corpus->name : "<Unknown Corpus>"),
           cl->mother_name, cl->name,
           cl->size);
-  Rprintf(
+  fprintf(dest,
           "# Context: %d %s left, %d %s right\n"
           "#\n",
           CD.left_width,
@@ -608,7 +608,7 @@ ascii_print_corpus_header(CorpusList *cl, FILE *dest)
           );
 
   if (cl->query_corpus && cl->query_text)
-    Rprintf("# Query: %s; %s\n", cl->query_corpus, cl->query_text);
+    fprintf(dest, "# Query: %s; %s\n", cl->query_corpus, cl->query_text);
 
   fputc('#', dest);
   for (i = 0; i < 75; i++)
@@ -640,7 +640,7 @@ ascii_print_output(CorpusList *cl,
     real_line = cl->sortidx ? cl->sortidx[i] : i;
 
     if (GlobalPrintOptions.number_lines)
-      Rprintf("%6d.\t", output_line++);
+      fprintf(dest, "%6d.\t", output_line++);
 
     ascii_print_concordance_line(dest, cl, real_line,
                            interactive && highlighting,
@@ -680,8 +680,8 @@ ascii_print_group(Group *group, FILE *dest)
       }
       /* separator bar between groups */
       if (cell == 0 || (group->is_grouped && nr_targets == 0))
-        Rprintf(SEPARATOR);
-      Rprintf("%-28s  %-28s\t%6d\n", nr_targets == 0 ? source_s : " ", target_s, count);
+        fprintf(dest, SEPARATOR);
+      fprintf(dest, "%-28s  %-28s\t%6d\n", nr_targets == 0 ? source_s : " ", target_s, count);
     }
     else {
       if (source_id < 0)
@@ -689,9 +689,9 @@ ascii_print_group(Group *group, FILE *dest)
       if (target_id < 0)
         target_s = "";
       if (has_source)
-        Rprintf("%s\t%s\t%d\n", source_s, target_s, count);
+        fprintf(dest, "%s\t%s\t%d\n", source_s, target_s, count);
       else
-        Rprintf("%s\t%d\n", target_s, count);
+        fprintf(dest, "%s\t%d\n", target_s, count);
     }
 
 #if 0
