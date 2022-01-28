@@ -161,6 +161,29 @@
 /*
  * making sure we have log2() and bool, true, false.
  */
+#if __STDC_VERSION__ >= 199901L
+   /* C99 has log2() already, but many pre-C99 Cs don't */
+#  include <stdbool.h>
+#else
+#  ifndef log2
+#    define log2(x) (log(x)/log(2.0))
+#  endif
+#
+#  ifdef __bool_true_false_are_defined
+#    /* I guess we have them after all! */
+#  else
+#    ifndef bool
+#      define bool  int
+#    endif
+#    ifndef true
+#      define true  1
+#    endif
+#    ifndef false
+#      define false 0
+#    endif
+#  endif
+#endif
+
 
 
 
