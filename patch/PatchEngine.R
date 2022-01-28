@@ -578,8 +578,10 @@ PatchEngine <- R6Class(
         
         "src/cwb/cl/corpus.c" = c(
           list(
-            # Should work in r1690 too
-            insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);")
+            # the function and all uses of the function are not defined for MINGW - should be true for header, too
+            insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
+            insert_before = list("^\\s*static\\sint\\smemberIDList\\(char\\s\\*s,\\sIDList\\sl\\s);\\s*$", "#ifndef __MINGW__", 1L),
+            insert_after = list("^\\s*static\\sint\\smemberIDList\\(char\\s\\*s,\\sIDList\\sl\\s);\\s*$", "#endif", 1L)
           ),
           
           # Usage of stderr on a separate line - 3 times in r1069, but only once in r1690
