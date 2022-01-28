@@ -15,7 +15,9 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 #include <sys/types.h>
+#include "endian2.h"
 #ifndef __MINGW__
 #include <sys/mman.h>
 #else
@@ -26,7 +28,6 @@
 #include <errno.h>
 
 #include "globals.h"
-#include "endian2.h"
 #include "storage.h"
 
 
@@ -333,7 +334,8 @@ mmapfile(char *filename, size_t *len_ptr, char *mode)
       /* scroll to the len_ptr'th byte, then overwrite the last integer with a random integer (why? not sure  -- AH),
        * then rewind file */
       lseek(fd, *len_ptr - sizeof(int), SEEK_SET);
-      write(fd, &fd, sizeof(int));
+      ssize_t success = write(fd, &fd, sizeof(int));
+      if (success < 0) Rprintf("Operation not successful");
       lseek(fd, 0, SEEK_SET);
 
       space = mmap(NULL, *len_ptr, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);

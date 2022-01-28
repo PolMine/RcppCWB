@@ -738,6 +738,7 @@ static int
 pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset)
 {
   int real_n, cpos;
+  cpos = -1;
 
   real_n = (cl->sortidx) ? cl->sortidx[n] : n; /* get anchor for n-th match */
 
