@@ -65,9 +65,6 @@ jobs:
           # none ... no toolchain is needed (no native code) 
          toolchain-type: full
           
-#      - name: Check package
-#        if: matrix.config.os == 'windows-2022'
-#        uses: kalibera/R-actions/pkg-check@master
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -117,13 +114,18 @@ jobs:
           ls c:/rtools42/x86_64-w64-mingw32.static.posix/
 
       - name: Check
+        if: matrix.os != 'windows-latest'
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         run: |
           options(crayon.enabled = TRUE)
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
-      
+
+      - name: Check package (UCRT)
+        if: matrix.config.os == 'windows-2022'
+        uses: kalibera/R-actions/pkg-check@master
+
       - name: Build Windows binary package
         if: matrix.os == 'windows-latest'
         run: pkgbuild::build(binary = TRUE, dest_path = Sys.getenv("GITHUB_WORKSPACE"))
@@ -157,5 +159,6 @@ jobs:
           path: check
           
       - name: Test coverage
+        if: matrix.os != 'windows-latest'
         run: covr::codecov()
         shell: Rscript {0}
