@@ -45,7 +45,7 @@ jobs:
       - name: Download Rtools42 
         if: matrix.config.os == 'windows-2022'
         run: |
-          Invoke-WebRequest -Uri  https://www.r-project.org/nosvn/winutf8/ucrt3/rtools42-4998-4926.exe -OutFile rtools42.exe
+          Invoke-WebRequest -Uri  https://www.r-project.org/nosvn/winutf8/ucrt3/rtools42-5008-4926.exe -OutFile rtools42.exe
           .\rtools42.exe /verysilent /suppressmsgboxes
 
 
