@@ -849,7 +849,7 @@ PatchEngine <- R6Class(
           )
         ),
         
-        "src/cwb/cqp/parse-actions.c" = list(
+        "src/cwb/cqp/parse_actions.c" = list(
           # In file included from corpmanag.h:22,
           # from parse_actions.h:31,
           # from parse_actions.c:18:
