@@ -839,12 +839,38 @@ PatchEngine <- R6Class(
           if (revision == 1690) list(
             delete_line_beginning_with = list("^\\s*if\\s\\(\\!\\(tmp_dst\\s=\\sopen_temporary_file\\(temporary_name\\)\\)\\)\\s\\{", 1L, 5L),
             delete_line_beginning_with = list("^\\s*fclose\\(tmp_dst\\);\\s*$", 1L, 0L),
-            delete_line_beginning_with = list("^\\s*FILE\\s\\*tmp_dst;\\s*$", 1L, 0L)
+            delete_line_beginning_with = list("^\\s*FILE\\s\\*tmp_dst;\\s*$", 1L, 0L),
+
+            # groups.c: In function 'get_group_id':
+            #   groups.c:170:7: warning: 'pos' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 170 |   pos += offset; /* compute effective cpos */
+            #   |   ~~~~^~~~~~~~~
+            insert_after = list("^\\s*int\\spos,\\sid;\\s*$", "  pos = -1L", 1L)
           )
         ),
         
+        "src/cwb/cqp/parse-actions.c" = list(
+          # In file included from corpmanag.h:22,
+          # from parse_actions.h:31,
+          # from parse_actions.c:18:
+          #   parse_actions.c: In function 'do_XMLTag':
+          #   ../cl/cl.h:208:44: warning: 'pattern' may be used uninitialized in this function [-Wmaybe-uninitialized]
+          # 208 | #define cl_free(p) do { if ((p) != NULL) { free(p); p = NULL; } } while (0)
+          #   |                                            ^~~~
+          #   parse_actions.c:1398:15: note: 'pattern' was declared here
+          # 1398 |         char *pattern;
+          # |               ^~~~~~~
+          insert_after = list("^\\s*char\\s\\*pattern;\\s*", '  pattern = "";', 1L)
+        ),
+        
         "src/cwb/cqp/output.c" = c(
-          list(),
+          list(
+            # output.c: In function 'pt_get_anchor_cpos':
+            #   output.c:768:15: warning: 'cpos' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 768 |   return cpos + offset;
+            # |          ~~~~~^~~~~~~~
+            insert_after = list("^\\s*int\\sreal_n,\\scpos;", "  cpos = -1;", 1L)
+          ),
           if (revision < 1400) list(
             
             # Comment out open_temporary_file(char *tmp_name_buffer) in
@@ -874,7 +900,17 @@ PatchEngine <- R6Class(
         ),
         
         "src/cwb/cqp/ranges.c" = c(
-          list(),
+          list(
+            
+            # ranges.c: In function 'SortExternally':
+            #   ranges.c:1032:17: warning: 'p1end' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 1032 |         else if (p1end >= text_size)
+            #   |                 ^
+            #   ranges.c:1027:17: warning: 'p1start' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 1027 |         else if (p1start >= text_size)
+            #   |                 ^
+            insert_after = list("int line, p1start, p1end, plen, step, token, l;", c("  p1start = -1;", "  p1end = -1;"), 1L)
+          ),
           
           # This is highly specific - want to see what happens before adapting things to r1690
           if (revision == 1069) list(
@@ -1042,6 +1078,14 @@ PatchEngine <- R6Class(
             )
           )
 
+        ),
+        
+        "src/cwb/cqp/targets.c" = list(
+          # targets.c: In function 'set_target':
+          #   targets.c:174:14: warning: 'cpos' may be used uninitialized in this function [-Wmaybe-uninitialized]
+          # 174 |         cpos += source_offset;
+          # |         ~~~~~^~~~~~~~~~~~~~~~
+          insert_after = list("^\\s*int\\si,\\scpos,\\ssize,\\sn_tokens;", "  cpos = -1;", 1L)
         ),
         
         "src/_eval.h" = c(
@@ -1586,7 +1630,7 @@ PatchEngine <- R6Class(
           # 149 |         sprintf(mark += strlen(mark), "'%s' ", (char *)((long)arg_list[i]));
           # |                                                ^ 
           replace = list(
-             "^(\\s*)(sprintf\\(mark\\s(.*?))\\(char\\s\\*\\)\\(\\(long\\)arg_list\\[i\\]\\)\\);",
+             "^(\\s*)(sprintf\\(mark\\s(.*?))\\(char\\s\\*\\)\\(\\(long\\)arg_list\\[i\\]\\);",
              "\\1\\2arg_list));",
              1L
             )
