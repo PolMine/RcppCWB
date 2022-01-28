@@ -975,7 +975,26 @@ PatchEngine <- R6Class(
             replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 2),
             replace = list("^(\\s*)if\\s\\(ctptr->pa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->pa_ref.del) {", 1),
             replace = list("^(\\s*)if\\s\\(ctptr->sa_ref\\.delete\\)\\s\\{", "\\1if (ctptr->sa_ref.del) {", 1),
-            replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1)
+            replace = list("^(\\s*)if\\s\\(ctptr->idlist\\.delete\\)\\s\\{", "\\1if (ctptr->idlist.del) {", 1),
+            
+            
+            # eval.c: In function 'simulate':
+            #   eval.c:546:37: warning: 'anchor' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 546 |     result = (anchor >= 0 && anchor == corppos) ;
+            # |                              ~~~~~~~^~~~~~~~~~
+            #   eval.c:473:26: note: 'anchor' was declared here
+            # 473 |   int start, end, struc, anchor, n, zero_width;
+            # |                          ^~~~~~
+            insert_after = list("^\\s*int\\sstart,\\send,\\sstruc,\\sanchor,\\sn,\\szero_width;\\s*$", "  anchor = -1;", 1L),
+            
+            # eval.c: In function 'cqp_run_query':
+            #   eval.c:1984:13: warning: 'cpos' may be used uninitialized in this function [-Wmaybe-uninitialized]
+            # 1984 |         cpos++;                        /* </target> anchor refers to point after target token etc. */
+            #   |         ~~~~^~
+            #   eval.c:1862:50: note: 'cpos' was declared here
+            # 1862 |   int nr_strucs, nr_ok, ok, i, k, n, start, end, cpos;
+            # |                                                  ^~~~
+            insert_after = list("^int nr_strucs, nr_ok, ok, i, k, n, start, end, cpos;$", "  cpos = -1;", 1L)
           ),
           
           # The corpus_size variable is used in revision 1690. This is commented out to see whether problems persist.
@@ -1560,6 +1579,18 @@ PatchEngine <- R6Class(
             replace = list('Rprintf\\(encoder->avs_fh', 'fprintf(encoder->avs_fh', 1L)
           )
         ),
+        
+        "src/cwb/CQi/log.c" = list(
+          # ../CQi/log.c: In function 'cqiserver_debug_arglist':
+          #   ../CQi/log.c:149:48: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+          # 149 |         sprintf(mark += strlen(mark), "'%s' ", (char *)((long)arg_list[i]));
+          # |                                                ^ 
+          replace = list(
+             "^(\\s*)(sprintf\\(mark\\s(.*?))\\(char\\s\\*\\)\\(\\(long\\)arg_list\\[i\\]\\)\\);",
+             "\\1\\2arg_list));",
+             1L
+            )
+         ),
 
         "src/cwb/utils/globals.h" = c(
           
