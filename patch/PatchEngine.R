@@ -845,7 +845,7 @@ PatchEngine <- R6Class(
             #   groups.c:170:7: warning: 'pos' may be used uninitialized in this function [-Wmaybe-uninitialized]
             # 170 |   pos += offset; /* compute effective cpos */
             #   |   ~~~~^~~~~~~~~
-            insert_after = list("^\\s*int\\spos,\\sid;\\s*$", "  pos = -1L", 1L)
+            insert_after = list("^\\s*int\\spos,\\sid;\\s*$", "  pos = -1;", 1L)
           )
         ),
         
