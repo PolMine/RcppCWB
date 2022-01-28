@@ -1291,7 +1291,7 @@ PatchEngine <- R6Class(
             #   parse_actions.c:1398:15: note: 'pattern' was declared here
             # 1398 |         char *pattern;
             # |               ^~~~~~~
-            insert_after = list("^\\s*char\\s\\*pattern;\\s*", '  pattern = "";', 1L)
+            insert_after = list("^\\s*char\\s\\*pattern;\\s*", '         pattern = "";', 1L)
           ),
           if (revision == 1069) list(
             replace = list("^(\\s*)c->idlist\\.delete\\s=\\sleft->pa_ref\\.delete;", "\\1c->idlist.del = left->pa_ref.del;", 1),
