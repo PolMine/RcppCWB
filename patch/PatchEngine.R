@@ -1385,7 +1385,7 @@ PatchEngine <- R6Class(
             # |                                                ~~~~~~~~~~~~^~~
             #   
             replace = list("^(\\s*)unsigned\\schar\\sprep;$", "\\1const char prep = (const char) 0xff & n;", 1L),
-            replace = list("^(\\s*)(prep\\s=\\s\\(unsigned\\schar\\)\\s0xff\\s&\\sn;)$", "\\1/* \\s */", 1L)
+            replace = list("^(\\s*)(prep\\s=\\s\\(unsigned\\schar\\)\\s0xff\\s&\\sn;)$", "\\1/* \\2 */", 1L)
           ),
           
           # File 'lexhash.h' not there any more at r1690
