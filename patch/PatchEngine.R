@@ -1374,7 +1374,7 @@ PatchEngine <- R6Class(
           )
         ),
 
-        "src/cwb/CQi/server.h" = c(
+        "src/cwb/CQi/server.h" = list(
           # ../CQi/server.c: In function 'cqi_recv_bytes':
           #   ../CQi/server.c:760:29: warning: pointer targets in passing argument 2 of 'recv' differ in signedness [-Wpointer-sign]
           # 760 |   if (bytes != recv(connfd, buf, bytes, MSG_WAITALL)) {
