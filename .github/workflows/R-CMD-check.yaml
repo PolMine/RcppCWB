@@ -76,6 +76,7 @@ jobs:
           extra-packages: rcmdcheck
 
       - name: Query dependencies
+        if: matrix.config.os != 'windows-2022'
         run: |
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
