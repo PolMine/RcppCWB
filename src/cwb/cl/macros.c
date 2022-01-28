@@ -16,7 +16,6 @@
  */
 
 
-void Rprintf(const char *, ...);
 #include "globals.h"
 
 #include <time.h>
@@ -55,9 +54,9 @@ cl_malloc(size_t bytes)
   void *block;
 
   if (NULL == (block = malloc(bytes))) {
-    Rprintf("CL: Out of memory. (killed)\n");
-    Rprintf("CL: [cl_malloc(%ld)]\n", bytes);
-    Rprintf("\n");		/* for CQP's child mode */
+    fprintf(stderr, "CL: Out of memory. (killed)\n");
+    fprintf(stderr, "CL: [cl_malloc(%ld)]\n", bytes);
+    printf("\n");		/* for CQP's child mode */
     exit(1);
   }
   return block;
@@ -77,9 +76,9 @@ cl_calloc(size_t nr_of_elements, size_t element_size)
   void *block;
 
   if (!(block = calloc(nr_of_elements, element_size))) {
-    Rprintf("CL: Out of memory. (killed)\n");
-    Rprintf("CL: [cl_calloc(%ld*%ld bytes)]\n", nr_of_elements, element_size);
-    Rprintf("\n");		/* for CQP's child mode */
+    fprintf(stderr, "CL: Out of memory. (killed)\n");
+    fprintf(stderr, "CL: [cl_calloc(%ld*%ld bytes)]\n", nr_of_elements, element_size);
+    printf("\n");		/* for CQP's child mode */
     exit(1);
   }
   return block;
@@ -106,9 +105,9 @@ cl_realloc(void *block, size_t bytes)
   if (!new_block) {
     /* only warn if more than 0 bytes were requested. If we got NULL from submitting 0 to m/realloc, no problem. */
     if (bytes != 0) {
-      Rprintf("CL: Out of memory. (killed)\n");
-      Rprintf("CL: [cl_realloc(block at %p to %ld bytes)]\n", block, bytes);
-      Rprintf("\n");		/* for CQP's child mode */
+      fprintf(stderr, "CL: Out of memory. (killed)\n");
+      fprintf(stderr, "CL: [cl_realloc(block at %p to %ld bytes)]\n", block, bytes);
+      printf("\n");		/* for CQP's child mode */
       exit(1);
     }
   }
@@ -128,9 +127,9 @@ cl_strdup(const char *string)
   char *new_string;
 
   if (!(new_string = strdup(string))) {
-    Rprintf("CL: Out of memory. (killed)\n");
-    Rprintf("CL: [cl_strdup(addr=%p, len=%ld)]\n", string, strlen(string));
-    Rprintf("\n");		/* for CQP's child mode */
+    fprintf(stderr, "CL: Out of memory. (killed)\n");
+    fprintf(stderr, "CL: [cl_strdup(addr=%p, len=%ld)]\n", string, strlen(string));
+    printf("\n");		/* for CQP's child mode */
     exit(1);
   }
   return new_string;

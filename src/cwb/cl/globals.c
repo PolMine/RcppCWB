@@ -32,16 +32,6 @@
 #include <locale.h>
 
 #include "globals.h"
-void Rprintf(const char *, ...);
-
-char* cl_get_version(){
-  #ifdef CWB_VERSION
-  char* version = CWB_VERSION;
-  #else
-  char* version = "";
-  #endif
-  return version;
-}
 
 /**
  *  Global configuration variable: debug level.
@@ -128,7 +118,7 @@ void
 cl_set_debug_level(int level)
 {
   if (level < 0 || level > 2)
-    Rprintf("cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
+    fprintf(stderr, "cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
   else
     cl_debug = level;
 }
