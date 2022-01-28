@@ -312,13 +312,13 @@ static void
 REGEX2DFA_ERROR(char *Format, ...)
 {
   va_list AP;
-  fprintf(stderr, "[%d] ", LINE);
+  Rprintf("[%d] ", LINE);
   va_start(AP, Format);
-  vfprintf(stderr, Format, AP);
+  Rprintf(Format, AP);
   va_end(AP);
   fputc('\n', stderr);
   if (++ERRORS == MAX_ERRORS) {
-    fprintf(stderr, "regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
+    Rprintf("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
     exit(cqp_error_status ? cqp_error_status : 1);
   }
 }
@@ -363,7 +363,7 @@ LEX(void)
   if (isalpha(Ch) || Ch == '_' || Ch == '$') {
     for (LastW = ChP; isalnum(Ch) || Ch == '_' || Ch == '$'; ChP++) {
       if (ChP - ChArr == MAX_CHAR) {
-        printf("Out of character space.\n");
+        Rprintf("Out of character space.\n");
         exit(cqp_error_status ? cqp_error_status : 1);
       }
       *ChP = Ch;
@@ -372,7 +372,7 @@ LEX(void)
     if (Ch != EOF)
       UNGET(Ch);
     if (ChP - ChArr == MAX_CHAR) {
-      printf("Out of character space.\n");
+      Rprintf("Out of character space.\n");
       exit(cqp_error_status ? cqp_error_status : 1);
     }
     *ChP++ = '\0';
@@ -382,18 +382,18 @@ LEX(void)
     Ch = GET();
     for (LastW = ChP; Ch != '"' && Ch != EOF; ChP++) {
       if (ChP - ChArr == MAX_CHAR) {
-        printf("Out of character space.\n");
+        Rprintf("Out of character space.\n");
         exit(cqp_error_status ? cqp_error_status : 1);
       }
       *ChP = Ch;
       Ch = GET();
     }
     if (Ch == EOF) {
-      printf("Missing closing \".\n");
+      Rprintf("Missing closing \".\n");
       exit(cqp_error_status ? cqp_error_status : 1);
     }
     if (ChP - ChArr == MAX_CHAR) {
-      printf("Out of character space.\n");
+      Rprintf("Out of character space.\n");
       exit(cqp_error_status ? cqp_error_status : 1);
     }
     *ChP++ = '\0';
@@ -1057,17 +1057,17 @@ WriteStates(void)
     if (SP->Class != Classes)
       continue;
     Classes++;
-    printf("s%d =", SP->Class);
+    Rprintf("s%d =", SP->Class);
     if (SP->Empty) {
-      printf(" fin");
+      Rprintf(" fin");
       if (SP->Shifts > 0)
-        printf(" |");
+        Rprintf(" |");
     }
     for (Sh = 0; Sh < SP->Shifts; Sh++) {
       C = SP->ShList[Sh].RHS;
       if (Sh > 0)
-        printf(" |");
-      printf(" %s s%d", SP->ShList[Sh].LHS->Name, STab[C].Class);
+        Rprintf(" |");
+      Rprintf(" %s s%d", SP->ShList[Sh].LHS->Name, STab[C].Class);
     }
     putchar('\n');
   }
@@ -1108,17 +1108,17 @@ show_complete_dfa(DFA dfa)
   int i, j;
 
   for (i = 0; i < dfa.Max_States; i++) {
-    printf("s%d", i);
+    Rprintf("s%d", i);
     if (dfa.Final[i])
-      printf("(final)");
+      Rprintf("(final)");
     else
       putchar('\t');
     for (j = 0; j < dfa.Max_Input; j++)   {
-      printf("\t%d -> ", j);
+      Rprintf("\t%d -> ", j);
       if (dfa.TransTable[i][j] == dfa.E_State)
-        printf("E\t");
+        Rprintf("E\t");
       else
-        printf("s%d,",dfa.TransTable[i][j]);
+        Rprintf("s%d,",dfa.TransTable[i][j]);
     }
     putchar('\n');
   }
@@ -1176,7 +1176,7 @@ regex2dfa(char *rxs, DFA *automaton)
   Q = Parse();
 
   if (ERRORS > 0)
-    fprintf(stderr, "%d error(s)\n", ERRORS);
+    Rprintf("%d error(s)\n", ERRORS);
   if (Q == -1)
     exit(cqp_error_status ? cqp_error_status : 1);
   FormState(Q);
