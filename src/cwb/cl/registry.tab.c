@@ -44,6 +44,7 @@
    USER NAME SPACE" below.  */
 
 /* Identify Bison output.  */
+void Rprintf(const char *, ...);
 #define YYBISON 1
 
 /* Bison version.  */

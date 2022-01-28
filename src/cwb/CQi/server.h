@@ -21,7 +21,7 @@
 #include "../cl/cl.h"
 #include "../cqp/corpmanag.h"   /* for CorpusList */
 
-typedef unsigned char cqi_byte;
+typedef char cqi_byte;
 
 /* global errno variable; the error code is a CQi error message */
 /* utility functions such as cqi_lookup_attribute() set cqi_errno, so

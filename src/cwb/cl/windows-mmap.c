@@ -35,6 +35,7 @@
 
 #ifdef __MINGW__
 
+void Rprintf(const char *, ...);
 #include "windows-mmap.h"
 
 /**

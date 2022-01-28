@@ -119,6 +119,8 @@
 
 
 
+char* cl_get_version();
+
 /* The actual code of the header file begins here. */
 
 #ifndef _cwb_cl_h
@@ -385,7 +387,9 @@ struct ClAutoString {
 /**
  * A single-string object whose memory allocation grows automatically.
  */
+#ifndef __cplusplus 
 typedef struct ClAutoString *ClAutoString;
+#endif
 /* the ClAutoString object API */
 ClAutoString cl_autostring_new(const char *data, size_t init_bytes);
 void cl_autostring_delete(ClAutoString string);
@@ -428,17 +432,23 @@ void cl_autostring_dump(ClAutoString string);
 /** open in read mode */
 #define CL_STREAM_READ       0
 /** open in binary read mode (on *nix, a synonym for the normal read) */
+#ifndef __MINGW__
 #define CL_STREAM_READ_BIN   0
+#endif
 
 /** open in write mode */
 #define CL_STREAM_WRITE      1
 /** open in binary write mode (on *nix, a synonym for the normal write) */
+#ifndef __MINGW__
 #define CL_STREAM_WRITE_BIN  1
+#endif
 
 /** open in append mode (except for pipe) */
 #define CL_STREAM_APPEND     2
 /** open in binary append mode (on *nix, a synonym for the normal append) */
+#ifndef __MINGW__
 #define CL_STREAM_APPEND_BIN 2
+#endif
 
 #ifdef __MINGW__
 /* only on Windows are the binary flags any different ... */
