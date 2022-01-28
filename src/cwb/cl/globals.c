@@ -118,7 +118,7 @@ void
 cl_set_debug_level(int level)
 {
   if (level < 0 || level > 2)
-    fprintf(stderr, "cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
+    Rprintf("cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
   else
     cl_debug = level;
 }
