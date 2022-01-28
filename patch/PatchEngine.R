@@ -580,8 +580,12 @@ PatchEngine <- R6Class(
           list(
             # the function and all uses of the function are not defined for MINGW - should be true for header, too
             insert_before = list('#include\\s<ctype\\.h>', "void Rprintf(const char *, ...);"),
-            insert_before = list("^\\s*static\\sint\\smemberIDList\\(char\\s\\*s,\\sIDList\\sl\\s);\\s*$", "#ifndef __MINGW__", 1L),
-            insert_after = list("^\\s*static\\sint\\smemberIDList\\(char\\s\\*s,\\sIDList\\sl\\s);\\s*$", "#endif", 1L)
+            
+            # corpus.c:37:12: warning: 'memberIDList' declared 'static' but never defined [-Wunused-function]
+            # 37 | static int memberIDList(char *s, IDList l);
+            # |            ^~~~~~~~~~~~
+            insert_before = list("^\\s*static\\sint\\smemberIDList\\(char\\s\\*s,\\sIDList\\sl\\);\\s*$", "#ifndef __MINGW__", 1L),
+            insert_after = list("^\\s*static\\sint\\smemberIDList\\(char\\s\\*s,\\sIDList\\sl\\);\\s*$", "#endif", 1L)
           ),
           
           # Usage of stderr on a separate line - 3 times in r1069, but only once in r1690
