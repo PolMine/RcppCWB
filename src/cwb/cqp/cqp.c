@@ -118,7 +118,7 @@ sigINT_signal_handler(int signum)
     exit(cqp_error_status ? cqp_error_status : 1); /* make sure we abort if Ctrl-C is pressed a second time (even on platforms where signal handlers don't need to be reinstalled) */
 
   if (EvaluationIsRunning) {
-    fprintf(stderr, "** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
+    Rprintf("** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
     EvaluationIsRunning = 0;
   }
   signal_handler_is_installed = 0;
@@ -245,13 +245,13 @@ initialize_cqp(int argc, char **argv)
       if (NULL != (cqprc = fopen(init_file_fullname, "r"))) {
         reading_cqprc = 1;        /* not good for very much, really */
         if (!cqp_parse_file(cqprc, 1)) {
-          fprintf(stderr, "Parse errors while reading %s, exiting.\n",  init_file_fullname);
+          Rprintf("Parse errors while reading %s, exiting.\n",  init_file_fullname);
           exit(cqp_error_status ? cqp_error_status : 1);
         }
         reading_cqprc = 0; /* no need to close the file - cqp_parse_file() does so once it's chewed it up */
       }
       else if (cqp_init_file) {
-        fprintf(stderr, "Can't read initialization file %s\n", init_file_fullname);
+        Rprintf("Can't read initialization file %s\n", init_file_fullname);
         exit(cqp_error_status ? cqp_error_status : 1);
       }
     }
@@ -282,13 +282,13 @@ initialize_cqp(int argc, char **argv)
         if (NULL != (cqprc = fopen(init_file_fullname, "r"))) {
           reading_cqprc = 1;
           if (!cqp_parse_file(cqprc, 1)) {
-            fprintf(stderr, "Parse errors while reading %s, exiting.\n", init_file_fullname);
+            Rprintf("Parse errors while reading %s, exiting.\n", init_file_fullname);
             exit(cqp_error_status ? cqp_error_status : 1);
           }
           reading_cqprc = 0;
         }
         else if (macro_init_file) {
-          fprintf(stderr, "Can't read macro initialization file %s\n", init_file_fullname);
+          Rprintf("Can't read macro initialization file %s\n", init_file_fullname);
           exit(cqp_error_status ? cqp_error_status : 1);
         }
       }
@@ -299,14 +299,14 @@ initialize_cqp(int argc, char **argv)
 
   /* load the default corpus. */
   if ((default_corpus) && !set_current_corpus_name(default_corpus, 0)) {
-    fprintf(stderr, "Can't set current corpus to default corpus %s, exiting.\n", default_corpus);
+    Rprintf("Can't set current corpus to default corpus %s, exiting.\n", default_corpus);
     exit(cqp_error_status ? cqp_error_status : 1);
   }
 
 #ifndef __MINGW__
   if (signal(SIGPIPE, SIG_IGN) == SIG_IGN)
     signal(SIGPIPE, SIG_DFL);
-    /* fprintf(stderr, "Couldn't install SIG_IGN for SIGPIPE signal\n"); */
+    /* Rprintf("Couldn't install SIG_IGN for SIGPIPE signal\n"); */
     /* -- be silent about not being able to ignore the SIGPIPE signal, which often happens in slave mode */
     /* note that SIGPIPE does not seem to exist in signal.h under MinGW */
 #endif
@@ -366,7 +366,7 @@ cqp_parse_file(FILE *src, int exit_on_parse_errors)
   quiet = silent || (src != stdin);
 
   if (nesting_depth >= CQP_SOURCE_MAXNEST) {
-    fprintf(stderr, "CQP: source'd CQP scripts nested too deeply (%d levels)\n", nesting_depth + 1);
+    Rprintf("CQP: source'd CQP scripts nested too deeply (%d levels)\n", nesting_depth + 1);
     ok = 0;
   }
   else {
@@ -390,7 +390,7 @@ cqp_parse_file(FILE *src, int exit_on_parse_errors)
     while (ok && !feof(src) && !exit_cqp) {
       if (child_process && ferror(src)) {
         /* in child mode, abort on read errors (to avoid hang-up when parent has died etc.) */
-        fprintf(stderr, "READ ERROR -- aborting CQP session\n");
+        Rprintf("READ ERROR -- aborting CQP session\n");
         break;
       }
 
@@ -398,12 +398,12 @@ cqp_parse_file(FILE *src, int exit_on_parse_errors)
         /* print the prompt with the active corpus displayed. */
         if (current_corpus) {
           if (cl_streq(current_corpus->name, current_corpus->mother_name))
-            printf("%s> ", current_corpus->name);
+            Rprintf("%s> ", current_corpus->name);
           else
-            printf("%s:%s[%d]> ", current_corpus->mother_name, current_corpus->name, current_corpus->size);
+            Rprintf("%s:%s[%d]> ", current_corpus->mother_name, current_corpus->name, current_corpus->size);
         }
         else
-          printf("[no corpus]> ");
+          Rprintf("[no corpus]> ");
       }
 
       /* call the parser! This will read, interpret, and implement a command. */
@@ -415,7 +415,7 @@ cqp_parse_file(FILE *src, int exit_on_parse_errors)
           ok = 0;
         /* in child mode, print the error message for parent process to spot the problem */
         if (child_process && !reading_cqprc)
-          fprintf(stderr, CQP_PARSE_ERROR_LINE);
+          Rprintf(CQP_PARSE_ERROR_LINE);
       }
 
       /* in child mode, flush output streams after every parse pass. */
