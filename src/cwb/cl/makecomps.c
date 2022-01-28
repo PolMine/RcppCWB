@@ -25,6 +25,8 @@
  * (CompCorpus, CompLExicon, etc.)
  */
 
+void Rprintf(const char *, ...);
+
 #include <ctype.h>
 #include <sys/types.h>
 
