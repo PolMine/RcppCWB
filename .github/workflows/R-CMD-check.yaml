@@ -114,7 +114,7 @@ jobs:
           ls c:/rtools42/x86_64-w64-mingw32.static.posix/
 
       - name: Check
-        if: matrix.os != 'windows-latest'
+        if: matrix.config.os != 'windows-2022'
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         run: |
@@ -124,6 +124,8 @@ jobs:
 
       - name: Check package (UCRT)
         if: matrix.config.os == 'windows-2022'
+        env:
+          _R_INSTALL_TIME_PATCHES_: no
         uses: kalibera/R-actions/pkg-check@master
 
       - name: Build Windows binary package
@@ -132,7 +134,7 @@ jobs:
         shell: Rscript {0}
           
       - name: Upload Windows binary
-        if: matrix.os == 'windows-latest'
+        if: matrix.config.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
           name: RcppCWB-Windows-binary
