@@ -18,8 +18,6 @@
 
 #include <string.h>
 
-void Rprintf(const char *, ...);
-
 #include "cl.h"
 #include "ui-helpers.h"
 
@@ -76,7 +74,7 @@ progress_bar_clear_line(void) {
   /* messages are on separated lines, so do nothing unless "simple" is switched off. */
   if (!progress_bar_simple) {
     /* clear the contents of the bottom terminal line */
-    Rprintf("                                                            \r");
+    fprintf(stderr, "                                                            \r");
     fflush(stderr);
   }
 }
@@ -105,13 +103,13 @@ progress_bar_message(int pass, int total, char *message)
     progress_bar_total = total;
   }
   if (progress_bar_simple) {
-    Rprintf("-::-PROGRESS-::-\t%d\t%d\t%s\n", pass, total, message);
+    fprintf(stdout, "-::-PROGRESS-::-\t%d\t%d\t%s\n", pass, total, message);
     fflush(stdout);
   }
   else {
-    Rprintf("[");
-    Rprintf("pass %d of %d: ", pass, total);
-    Rprintf("%s]     \r", message);
+    fprintf(stderr, "[");
+    fprintf(stderr, "pass %d of %d: ", pass, total);
+    fprintf(stderr, "%s]     \r", message);
     fflush(stderr);
   }
 }
@@ -154,7 +152,7 @@ static void
 ilist_print_blanks(int n)
 {
   for ( ; n > 0 ; n--)
-    Rprintf(" ");
+    printf(" ");
 }
 
 /**
@@ -194,14 +192,14 @@ ilist_print_break(char *label)
   int llen = (label != NULL) ? strlen(label) : 0;
 
   if (ilist_cursor != 0)
-    Rprintf("\n");
+    printf("\n");
   else
-    Rprintf("\r");
+    printf("\r");
 
   if (llen <= 0)
     ilist_print_blanks(ilist_indent);
   else {
-    Rprintf("%s", label);
+    printf("%s", label);
     ilist_print_blanks(ilist_indent - llen);
   }
   ilist_cursor = 0;
@@ -221,15 +219,15 @@ ilist_print_item(char *string)
     len = strlen(string);
     if ((ilist_cursor + len) > ilist_linewidth)
       ilist_print_break("");
-    Rprintf("%s", string);
+    printf("%s", string);
     ilist_cursor += len;
     /* advance cursor to next tabstop */
     if (ilist_cursor < ilist_linewidth) {
-      Rprintf(" ");
+      printf(" ");
       ilist_cursor++;
     }
     while ((ilist_cursor < ilist_linewidth) && ((ilist_cursor % ilist_tab) != 0)) {
-      Rprintf(" ");
+      printf(" ");
       ilist_cursor++;
     }
   }
@@ -242,9 +240,9 @@ void
 ilist_end(void)
 {
   if (ilist_cursor == 0)
-    Rprintf("\r");        /* no output on last line (just indention) -> erase indention */
+    printf("\r");        /* no output on last line (just indention) -> erase indention */
   else
-    Rprintf("\n");
+    printf("\n");
   ilist_cursor = 0;
   fflush(stdout);
 }

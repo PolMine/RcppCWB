@@ -23,12 +23,11 @@
 
 #include "globals.h"
 
-#include "endian2.h"
+#include "endian.h"
 #include "attributes.h"
 #include "special-chars.h"
 #include "bitio.h"
 #include "compression.h"
-void Rprintf(const char *, ...);
 
 /**
  * If COMPRESS_DEBUG is set to a positive integer, cl_cpos2id() will
@@ -181,9 +180,9 @@ void
 cl_error(char *message)
 {
   if (message)
-    Rprintf("%s: %s\n", cl_error_string(cl_errno), message);
+    fprintf(stderr, "%s: %s\n", cl_error_string(cl_errno), message);
   else
-    Rprintf("%s\n", cl_error_string(cl_errno));
+    fprintf(stderr, "%s\n", cl_error_string(cl_errno));
 }
 
 
@@ -265,7 +264,7 @@ cl_str2id(Attribute *attribute, char *id_string)
   /* simple binary search: any item-not-found condition returns the function */
   for(nr = 0; ; nr++) {
     if (nr >= 1000000) {
-      Rprintf("cl_str2id: too many comparisons with %s\n", id_string);
+      fprintf(stderr, "cl_str2id: too many comparisons with %s\n", id_string);
       return cl_errno = CDA_EOTHER;
     }
 
@@ -650,26 +649,26 @@ cl_id2cpos_oldstyle(Attribute *attribute, int id, int *freq, int *restrictor_lis
 
   size = cl_max_cpos(attribute);
   if (size <= 0 || !cl_all_ok()) {
-    /*       Rprintf("Cannot determine size of PA %s\n", attribute->any.name); */
+    /*       fprintf(stderr, "Cannot determine size of PA %s\n", attribute->any.name); */
       return NULL;
   }
 
   range  = cl_max_id(attribute);
   if (range <= 0 || !cl_all_ok()) {
-    /*       Rprintf("Cannot determine ID range of PA %s\n", attribute->any.name); */
+    /*       fprintf(stderr, "Cannot determine ID range of PA %s\n", attribute->any.name); */
     return NULL;
   }
 
   if (id < 0 || id >= range) {
     cl_errno = CDA_EIDORNG;
-    /*       Rprintf("ID %d out of range of PA %s\n", id, attribute->any.name); */
+    /*       fprintf(stderr, "ID %d out of range of PA %s\n", id, attribute->any.name); */
     *freq = 0;
     return NULL;
   }
 
   *freq = cl_id2freq(attribute, id);
   if (*freq < 0 || !cl_all_ok()) {
-    /*       Rprintf("Frequency %d of ID %d illegal (PA %s)\n", *freq, id, attribute->any.name); */
+    /*       fprintf(stderr, "Frequency %d of ID %d illegal (PA %s)\n", *freq, id, attribute->any.name); */
     return NULL;
   }
 
@@ -745,7 +744,7 @@ cl_id2cpos_oldstyle(Attribute *attribute, int id, int *freq, int *restrictor_lis
 
     if (!(revcorp && revcidx)) {
       cl_errno = CDA_ENODATA;
-      /*        Rprintf("Cannot load REVCORP or REVCIDX component of %s\n", attribute->any.name); */
+      /*        fprintf(stderr, "Cannot load REVCORP or REVCIDX component of %s\n", attribute->any.name); */
       *freq = 0;
       return NULL;
     }
@@ -1029,7 +1028,7 @@ cl_cpos2id(Attribute *attribute, int position)
     unsigned int block, rest, offset, max, v, l, i;
 
     if (COMPRESS_DEBUG > 1)
-      Rprintf("Accessing position %d of %s via compressed item sequence\n", position, attribute->any.name);
+      fprintf(stderr, "Accessing position %d of %s via compressed item sequence\n", position, attribute->any.name);
 
     cis      = ensure_component(attribute, CompHuffSeq, 0);
     cis_map  = ensure_component(attribute, CompHuffCodes, 0);
@@ -1052,7 +1051,7 @@ cl_cpos2id(Attribute *attribute, int position)
          * and hope that we'll get a cache hit next time. */
 
         if (COMPRESS_DEBUG > 0)
-          Rprintf("Block miss: have %d, want %d\n", attribute->pos.this_block_nr, block);
+          fprintf(stderr, "Block miss: have %d, want %d\n", attribute->pos.this_block_nr, block);
 
         /* is the block we read the last block of the corpus? Then, we
          * cannot read SYNC items, but only as much as there are left.
@@ -1067,14 +1066,14 @@ cl_cpos2id(Attribute *attribute, int position)
         offset = ntohl(cis_sync->data.data[block]);
 
         if (COMPRESS_DEBUG > 1)
-          Rprintf("-> Block %d, rest %d, offset %d\n", block, rest, offset);
+          fprintf(stderr, "-> Block %d, rest %d, offset %d\n", block, rest, offset);
 
         BSopen((unsigned char *)cis->data.data, "r", &bs);
         BSseek(&bs, offset);
 
         for (i = 0; i < max; i++) {
           if (!BSread(&bit, 1, &bs)) {
-            Rprintf("cdaccess:decompressed read: Read error/1\n");
+            fprintf(stderr, "cdaccess:decompressed read: Read error/1\n");
             return cl_errno = CDA_ENODATA;
           }
 
@@ -1083,7 +1082,7 @@ cl_cpos2id(Attribute *attribute, int position)
 
           while (v < attribute->pos.hc->min_code[l]) {
             if (!BSread(&bit, 1, &bs)) {
-              Rprintf("cdaccess:decompressed read: Read error/2\n");
+              fprintf(stderr, "cdaccess:decompressed read: Read error/2\n");
               return cl_errno = CDA_ENODATA;
             }
 
@@ -1102,7 +1101,7 @@ cl_cpos2id(Attribute *attribute, int position)
 
       }
       else if (COMPRESS_DEBUG > 0)
-        Rprintf("Block hit: block[%d,%d]\n", block, rest);
+        fprintf(stderr, "Block hit: block[%d,%d]\n", block, rest);
 
       assert(rest < SYNCHRONIZATION);
 
@@ -1263,7 +1262,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
   match_count = 0;
 
   if (!(rx = cl_new_regex(pattern, flags, attribute->pos.mother->charset))) {
-    Rprintf("Regex Compile Error: %s\n", cl_regex_error);
+    fprintf(stderr, "Regex Compile Error: %s\n", cl_regex_error);
     cl_errno = CDA_EBADREGEX;
     return NULL;
   }
@@ -1311,7 +1310,7 @@ cl_regex2id(Attribute *attribute, char *pattern, int flags, int *number_of_match
   }
 
   if (cl_debug && optimised)
-    Rprintf("CL: regexp optimiser avoided calling regex engine for %d candidates out of %d strings\n"
+    fprintf(stderr, "CL: regexp optimiser avoided calling regex engine for %d candidates out of %d strings\n"
                     "    (%d matching strings in total) \n",
                     cl_regopt_count_get(), lexsize, match_count);
 
@@ -1555,7 +1554,7 @@ get_previous_mark(int *data, int size, int position)
 
   while (low <= high) {
     if (++nr > 100000) {
-      Rprintf("Binary search in get_surrounding_positions failed\n");
+      fprintf(stderr, "Binary search in get_surrounding_positions failed\n");
       return NULL;
     }
 
@@ -1995,7 +1994,7 @@ get_alignment(int *data, int size, int position)
   while (low <= high) {
     nr++;
     if (nr > 100000) {
-      Rprintf("Binary search in get_alignment failed\n");
+      fprintf(stderr, "Binary search in get_alignment failed\n");
       return -1;
     }
 
@@ -2059,7 +2058,7 @@ get_extended_alignment(int *data, int size, int position)
   while (low <= high) {
     nr++;
     if (nr > 100000) {
-      Rprintf("Binary search in get_extended_alignment failed\n");
+      fprintf(stderr, "Binary search in get_extended_alignment failed\n");
       return -1;
     }
 
@@ -2483,7 +2482,7 @@ cl_dynamic_call(Attribute *attribute,
     call[ins++] = '\0';
 
     if (cl_debug)
-      Rprintf("Composed dynamic call: \"%s\"\n", call);
+      fprintf(stderr, "Composed dynamic call: \"%s\"\n", call);
 
     if (NULL == (pipe = popen(call, "r")))
       goto error;
@@ -2498,7 +2497,7 @@ cl_dynamic_call(Attribute *attribute,
       break;
 
     case ATTAT_STRING:          /* copy output */
-      if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");
+      fgets(call, CL_MAX_LINE_LENGTH, pipe);
       dcr->value.charres = (char *)cl_strdup(call);
       break;
 
