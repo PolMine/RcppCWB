@@ -19,7 +19,6 @@
  *  Copyright (C) 2010      by ANR Textométrie, ENS de Lyon
  */
 
-void Rprintf(const char *, ...);
 #include <ctype.h>
 
 #include <glib.h>
@@ -1434,7 +1433,7 @@ maptable_init_both(unsigned char *maptable,
   for (i = 0; i < 256; i++) {
     maptable[i] = nocasetable[nodiactable[i]];
     if (maptable[i] != nodiactable[nocasetable[i]]) {
-      Rprintf("CL: tables inconsistent for #%d -> #%d\n", i, maptable[i]);
+      fprintf(stderr, "CL: tables inconsistent for #%d -> #%d\n", i, maptable[i]);
     }
   }
 }
@@ -1465,7 +1464,7 @@ cl_string_maptable(CorpusCharset charset, int flags)
   int idiac = (flags & IGNORE_DIAC) != 0;
 
   if (charset == utf8) {
-    Rprintf("CL: major error, cl_string_maptable called with invalid charset (UTF8).\n"
+    fprintf(stderr, "CL: major error, cl_string_maptable called with invalid charset (UTF8).\n"
                     "    Mapping tables for ASCII have been supplied, but this means any \n"
                     "    characters outside the ASCII range will NOT be correct!\n");
     charset = ascii;
@@ -1722,7 +1721,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
     break;
 
   default: /* unknown_charset, etc. */
-    Rprintf("CL: Error, unrecognised CorpusCharset in cl_string_validate_encoding.\n");
+    fprintf(stderr, "CL: Error, unrecognised CorpusCharset in cl_string_validate_encoding.\n");
     return 0;
 
   } /* end switch */
@@ -2126,7 +2125,7 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags, int inplace_bufsi
     /* GLib documentation insists that g_utf8_* functions must only be used on valid UTF-8 strings;
      * let's assume that a string passed without REQUIRE_NFC is from an internal source and hence safe */
     if (nfc && !g_utf8_validate((gchar *)s, -1, NULL)) {
-      Rprintf("CL: major error, invalid UTF8 string passed to cl_string_canonical ...\n");
+      fprintf(stderr, "CL: major error, invalid UTF8 string passed to cl_string_canonical ...\n");
       return ( 0 < inplace_bufsize ? s : cl_strdup(s) );
     }
 
@@ -2134,7 +2133,7 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags, int inplace_bufsi
     if (idiac) {
       /* convert to decomposed normal form, then strip all combining characters */
       if (NULL == (string = g_utf8_normalize((gchar *)s, -1, G_NORMALIZE_NFD)) ) {
-        Rprintf("CL: major error, cannot decompose string: invalid UTF8 string passed to cl_string_canonical...\n");
+        fprintf(stderr, "CL: major error, cannot decompose string: invalid UTF8 string passed to cl_string_canonical...\n");
         return ( 0 < inplace_bufsize ? s : cl_strdup(s) );
       }
 
@@ -2160,7 +2159,7 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags, int inplace_bufsi
         cl_free(string); /* free temporary string allocated by accent folding above */
       string = new_string;
       if (string == NULL) {
-        Rprintf("CL: major error, cannot compose string: invalid UTF8 string passed to cl_string_canonical...\n");
+        fprintf(stderr, "CL: major error, cannot compose string: invalid UTF8 string passed to cl_string_canonical...\n");
         return ( 0 < inplace_bufsize ? s : cl_strdup(s) );
       }
     }
@@ -2931,7 +2930,7 @@ cl_autostring_truncate(ClAutoString string, int new_length)
 void
 cl_autostring_dump(ClAutoString string)
 {
-  Rprintf("CL: Autostring content: \n\t->data %s,"
+  fprintf(stderr, "CL: Autostring content: \n\t->data %s,"
                   "\n\t->bytes_allocated %ld,\n\t->increment, %ld\n\t->len %ld\n",
                   string->data, string->bytes_allocated, string->increment, string->len);
 }
