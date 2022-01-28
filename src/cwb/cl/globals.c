@@ -32,6 +32,16 @@
 #include <locale.h>
 
 #include "globals.h"
+void Rprintf(const char *, ...);
+
+char* cl_get_version(){
+  #ifdef CWB_VERSION
+  char* version = CWB_VERSION;
+  #else
+  char* version = "";
+  #endif
+  return version;
+}
 
 /**
  *  Global configuration variable: debug level.

@@ -19,6 +19,7 @@
  *  Copyright (C) 2010      by ANR Textométrie, ENS de Lyon
  */
 
+void Rprintf(const char *, ...);
 #include <ctype.h>
 
 #include <glib.h>

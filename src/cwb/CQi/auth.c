@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+void Rprintf(const char *, ...);
+
 #include "auth.h"
 #include "../cl/cl.h"
 

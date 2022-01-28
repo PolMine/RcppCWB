@@ -146,7 +146,7 @@ cqiserver_debug_arglist(const char *arg_list, int n_args, int int_args)
         sprintf(mark += strlen(mark), "%d ", (int)arg_list[i]);
       else
         /* super creaky typecasting needed to get the compiler to not complain here */
-        sprintf(mark += strlen(mark), "'%s' ", (char *)((long)arg_list[i]));
+        sprintf(mark += strlen(mark), "'%s' ", arg_list));
   }
   return buf;
 }
