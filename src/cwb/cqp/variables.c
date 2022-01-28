@@ -386,7 +386,7 @@ VerifyVariable(Variable v, Corpus *corpus, Attribute *attribute)
       if (!v->items[i].free) {
         if (v->items[i].sval == NULL) {
           /* string shouldn't be NULL if free has been set to True */
-          fprintf(stderr, "Error #1 in variable logic. Contact developer.\n");
+          Rprintf("Error #1 in variable logic. Contact developer.\n");
           v->items[i].ival = -1;
         }
         else {

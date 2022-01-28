@@ -298,7 +298,7 @@ get_corpus_positions(Attribute *attribute, char *wordform, Matchlist *matchlist)
   }
 
   if (initial_matchlist_debug && matchlist->start != NULL && matchlist->tabsize > 0 && !silent)
-    fprintf(stderr, "matched initial wordform for non-regex %s, " "%d matches\n", wordform, matchlist->tabsize);
+    Rprintf("matched initial wordform for non-regex %s, " "%d matches\n", wordform, matchlist->tabsize);
 
   return matchlist->tabsize;
 }
@@ -347,7 +347,7 @@ get_matched_corpus_positions(Attribute *attribute,
   /* AH notes Aug 2019: the above comment about 4.0 has nothing to do with our present plans! */
   if (cl_str_is(regstr, ".*")) {
     if (eval_debug)
-      fprintf(stderr, "get_matched_corpus_positions: .* optimization\n");
+      Rprintf("get_matched_corpus_positions: .* optimization\n");
 
     matchlist->start = (int *)cl_malloc(sizeof(int) * size);
 
@@ -397,7 +397,7 @@ get_matched_corpus_positions(Attribute *attribute,
 
   /* finally, possibly print out a debug message */
   if (initial_matchlist_debug && matchlist->start != NULL && matchlist->tabsize > 0 && !silent)
-    fprintf(stderr, "matched initial pattern for regex %s, %d matches\n", regstr, matchlist->tabsize);
+    Rprintf("matched initial pattern for regex %s, %d matches\n", regstr, matchlist->tabsize);
 
   return matchlist->tabsize;
 }
@@ -446,7 +446,7 @@ _add_to_queue(AVS avs, int start, int end, RefTab labels) {
     set_reftab(rt, evalenv->keyword_label->ref, end);
 
   if (simulate_debug) {
-    fprintf(stderr, "<<%s>> ENTER added %d to queue (%d entries)\n",
+    Rprintf("<<%s>> ENTER added %d to queue (%d entries)\n",
             avs->region.name, end, StateQueue_length(avs->region.queue));
     if (symtab_debug)
       print_label_values(evalenv->labels, rt, start);
@@ -675,7 +675,7 @@ eval_constraint(AVS avs, int corppos, RefTab labelrefs, RefTab target_labelrefs,
       if (n <= 0)
         return False;
       if (simulate_debug)
-        fprintf(stderr, "<<%s>> WAIT (%d entries in queue, next is cpos=%d)\n", avs->region.name, StateQueue_length(avs->region.queue), StateQueue_next_cpos(avs->region.queue));
+        Rprintf("<<%s>> WAIT (%d entries in queue, next is cpos=%d)\n", avs->region.name, StateQueue_length(avs->region.queue), StateQueue_next_cpos(avs->region.queue));
       dup_reftab(labelrefs, target_labelrefs); /* preserve labels of the waiting state, to apply strict region checks */
       return True; /* take loop while there are still waiting states */
 
@@ -687,7 +687,7 @@ eval_constraint(AVS avs, int corppos, RefTab labelrefs, RefTab target_labelrefs,
       end = StateQueue_pop(avs->region.queue, target_labelrefs); /* emit first state from queue and copy its label references to target state */
       *out_cpos = end + 1; /* advance to token after end of region in next simulation step */
       if (simulate_debug) {
-        fprintf(stderr, "<<%s>> EMIT to cpos=%d from queue (%d entries remain)\n", avs->region.name, end + 1, StateQueue_length(avs->region.queue));
+        Rprintf("<<%s>> EMIT to cpos=%d from queue (%d entries remain)\n", avs->region.name, end + 1, StateQueue_length(avs->region.queue));
         /* symtab will be printed for target state anyway */
       }
       return True;
@@ -711,7 +711,7 @@ get_label_referenced_position(LabelEntry label, RefTab rt, int corppos)
   if (label) {
     referenced_position = get_reftab(rt, label->ref, corppos);
     if (eval_debug)
-      fprintf(stderr, "Evaluating label %s = %d\n", label->name, referenced_position);
+      Rprintf("Evaluating label %s = %d\n", label->name, referenced_position);
   }
 
   return referenced_position;
@@ -803,7 +803,7 @@ get_leaf_value(Constrainttree ctptr,
       dcr->value.intres = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
       if (ctptr->pa_ref.delete) {
         if (eval_debug)
-          fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n",
+          Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->pa_ref.label->name, dcr->value.intres);
         set_reftab(rt, ctptr->pa_ref.label->ref, -1);
       }
@@ -818,7 +818,7 @@ get_leaf_value(Constrainttree ctptr,
         referenced_position = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
         if (ctptr->pa_ref.delete) {
           if (eval_debug)
-            fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n", ctptr->pa_ref.label->name, referenced_position);
+            Rprintf("** AUTO-DELETING LABEL %s = %d\n", ctptr->pa_ref.label->name, referenced_position);
           set_reftab(rt, ctptr->pa_ref.label->ref, -1);
         }
 
@@ -873,7 +873,7 @@ get_leaf_value(Constrainttree ctptr,
       int referenced_position = get_label_referenced_position(ctptr->sa_ref.label, rt, corppos);
       if (ctptr->sa_ref.delete) {
         if (eval_debug)
-          fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n", ctptr->sa_ref.label->name, referenced_position);
+          Rprintf("** AUTO-DELETING LABEL %s = %d\n", ctptr->sa_ref.label->name, referenced_position);
         set_reftab(rt, ctptr->sa_ref.label->ref, -1);
       }
 
@@ -962,28 +962,28 @@ eval_bool(Constrainttree ctptr, RefTab rt, int curr_cpos)
         /* logical and */
       case b_and:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean and\n");
+          Rprintf("eval_bool: evaluate boolean and\n");
         assert(ctptr->node.left && ctptr->node.right);
         return(eval_bool(ctptr->node.left, rt, curr_cpos) && eval_bool(ctptr->node.right, rt, curr_cpos));
 
         /* logical or */
       case b_or:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean or\n");
+          Rprintf("eval_bool: evaluate boolean or\n");
         assert(ctptr->node.left && ctptr->node.right);
         return eval_bool(ctptr->node.left, rt, curr_cpos) || eval_bool(ctptr->node.right, rt, curr_cpos);
 
         /* logical implication */
       case b_implies:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean implication\n");
+          Rprintf("eval_bool: evaluate boolean implication\n");
         assert(ctptr->node.left && ctptr->node.right);
         return eval_bool(ctptr->node.left, rt, curr_cpos) ? eval_bool(ctptr->node.right, rt, curr_cpos) : True;
 
         /* logical not */
       case b_not:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate boolean not\n");
+          Rprintf("eval_bool: evaluate boolean not\n");
         if (!ctptr->node.left)
           return True;
         assert(ctptr->node.right == NULL);
@@ -998,7 +998,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int curr_cpos)
       case cmp_neq:
       case cmp_ex:
         if (eval_debug)
-          fprintf(stderr, "eval_bool: evaluate comparisons\n");
+          Rprintf("eval_bool: evaluate comparisons\n");
 
         /* check presence of arguments */
         assert(ctptr->node.left &&  (ctptr->node.op_id == cmp_ex || ctptr->node.right) );
@@ -1283,7 +1283,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int curr_cpos)
       int res;
 
       if (eval_debug)
-        fprintf(stderr, "eval_bool: evaluate id_list membership\n");
+        Rprintf("eval_bool: evaluate id_list membership\n");
 
       assert(ctptr->idlist.attr);
 
@@ -1291,7 +1291,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int curr_cpos)
         referenced_corppos = get_label_referenced_position(ctptr->idlist.label, rt, curr_cpos);
         if (ctptr->idlist.delete) {
           if (eval_debug)
-            fprintf(stderr, "** AUTO-DELETING LABEL %s = %d\n", ctptr->idlist.label->name, referenced_corppos);
+            Rprintf("** AUTO-DELETING LABEL %s = %d\n", ctptr->idlist.label->name, referenced_corppos);
           set_reftab(rt, ctptr->idlist.label->ref, -1);
         }
       }
@@ -1418,7 +1418,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr, Matchlist *matchlist, Corpus
       case b_and:                /* logical and */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean and\n");
+          Rprintf("calc_initial_ml: boolean and\n");
 
         assert(ctptr->node.left && ctptr->node.right);
 
@@ -1481,7 +1481,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr, Matchlist *matchlist, Corpus
       case b_or:                /* logical or */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean or\n");
+          Rprintf("calc_initial_ml: boolean or\n");
 
         assert(ctptr->node.left && ctptr->node.right);
 
@@ -1542,7 +1542,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr, Matchlist *matchlist, Corpus
       case b_not:                /* logical negation */
 
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: boolean not\n");
+          Rprintf("calc_initial_ml: boolean not\n");
 
         assert(ctptr->node.left);
 
@@ -1572,7 +1572,7 @@ calculate_initial_matchlist_1(Constrainttree ctptr, Matchlist *matchlist, Corpus
       case cmp_neq:
       case cmp_ex:
         if (eval_debug)
-          fprintf(stderr, "calc_initial_ml: evaluate comparison [%s]\n", get_b_operator_name(ctptr->node.op_id));
+          Rprintf("calc_initial_ml: evaluate comparison [%s]\n", get_b_operator_name(ctptr->node.op_id));
 
         /* check argument types */
         assert(ctptr->node.left && (ctptr->node.op_id == cmp_ex || ctptr->node.right) );
@@ -2012,7 +2012,7 @@ match_first_pattern(AVS pattern, Matchlist *matchlist, CorpusList *corpus)
        */
 
       if (!silent)
-        fprintf(stderr, "QOpt: %f (pos %d)\n", red, nr_pos);
+        Rprintf("QOpt: %f (pos %d)\n", red, nr_pos);
 
       matchlist->start = (int *)cl_malloc(sizeof(int) * nr_pos);
       matchlist->end = NULL;
@@ -2031,7 +2031,7 @@ match_first_pattern(AVS pattern, Matchlist *matchlist, CorpusList *corpus)
       assert(k == nr_pos);
 
       if (!silent)
-        fprintf(stderr, "QOpt: copied ranges\n");
+        Rprintf("QOpt: copied ranges\n");
 
       return k == nr_pos;
     }
@@ -2194,7 +2194,7 @@ simulate(Matchlist *matchlist,
       my_keyword = -1;
 
       if (simulate_debug)
-        fprintf(stderr, "Looking at matchlist element %d (cpos %d)\n  range[rp=%d]=[%d,%d]\n",
+        Rprintf("Looking at matchlist element %d (cpos %d)\n  range[rp=%d]=[%d,%d]\n",
                 i, matchlist->start[i],
                 r_ix,
                 r_ix < evalenv->query_corpus->size ? evalenv->query_corpus->range[r_ix].start : -1,
@@ -2227,13 +2227,13 @@ simulate(Matchlist *matchlist,
         boundary = MIN(b1, b2);
 
         if (simulate_debug)
-          fprintf(stderr, "Starting NFA simulation. Max bound is %d\n", boundary);
+          Rprintf("Starting NFA simulation. Max bound is %d\n", boundary);
 
         if (boundary == -1) {
           /* no match here, since not within selected boundary. */
           matchlist->start[i] = -1;
           if (simulate_debug)
-            fprintf(stderr, "  ... not within selected boundary\n");
+            Rprintf("  ... not within selected boundary\n");
         }
         else {
           int first_transition_traversed, j;
@@ -2283,12 +2283,12 @@ simulate(Matchlist *matchlist,
              * the core of the whole simulation
              */
             if (simulate_debug) {
-              fprintf(stderr, "\nActive states: [ ");
+              Rprintf("\nActive states: [ ");
               for (state = 0; state < evalenv->dfa.Max_States; state++) {
                 if (state_vector[state] >= 0)
-                  fprintf(stderr, "s%d=%d ", state, state_vector[state]);
+                  Rprintf("s%d=%d ", state, state_vector[state]);
               }
-              fprintf(stderr, "]\n");
+              Rprintf("]\n");
             }
 
             /* first, clear the list of target states */
@@ -2309,7 +2309,7 @@ simulate(Matchlist *matchlist,
                */
 
               if (simulate_debug && cpos >= 0) {
-                fprintf(stderr, "  state %d, cpos %d...\n", state, cpos);
+                Rprintf("  state %d, cpos %d...\n", state, cpos);
                 if (symtab_debug)
                   print_label_values(evalenv->labels, reftab_vector[state], cpos);
               }
@@ -2461,7 +2461,7 @@ simulate(Matchlist *matchlist,
                         }
 
                         if (simulate_debug) {
-                          fprintf(stderr, "Transition %d --%d-> %d  (pattern %d TRUE at cpos=%d)\n", state, p, target_state, p, effective_cpos);
+                          Rprintf("Transition %d --%d-> %d  (pattern %d TRUE at cpos=%d)\n", state, p, target_state, p, effective_cpos);
                           if (symtab_debug)
                             print_label_values(evalenv->labels, reftab_target_vector[target_state], effective_cpos);
                         }
@@ -2486,7 +2486,7 @@ simulate(Matchlist *matchlist,
 
                         if (this_is_a_winner) {
                           if (simulate_debug)
-                            fprintf(stderr, "Winning cpos found at %d\n", cpos);
+                            Rprintf("Winning cpos found at %d\n", cpos);
 
                           /* remember the last token (cpos) of this winner & its target position (if set) */
                           winner = zero_width_pattern ?  cpos - 1 : cpos;
@@ -2607,7 +2607,7 @@ simulate(Matchlist *matchlist,
           /* if we returned here, we either have a winning
            * corpus position or no running states any more. */
           if (simulate_debug)
-            fprintf(stderr, "NFA sim terminated. Winner %d, running states %d\n", winner, running_states);
+            Rprintf("NFA sim terminated. Winner %d, running states %d\n", winner, running_states);
 
           /* queries like "</s>" will return empty matches -> ignore those (set to no match)
            * (NB this doesn't happen for open tags, since "<s>" == "<s> []") */
@@ -2854,7 +2854,7 @@ run_standard_query_dfa(int envidx, int cut, int keep_old_ranges)
         /* match the initial pattern. */
         if (match_first_pattern(&(evalenv->patternlist[p]), &matchlist, evalenv->query_corpus)) {
           if (initial_matchlist_debug) {
-            fprintf(stderr, "After initial matching for transition %d: ", p);
+            Rprintf("After initial matching for transition %d: ", p);
             show_matchlist_firstelements(matchlist);
             print_symbol_table(evalenv->labels);
           }
@@ -2889,7 +2889,7 @@ run_standard_query_dfa(int envidx, int cut, int keep_old_ranges)
                                  p);
 
             if (initial_matchlist_debug) {
-              fprintf(stderr, "After simulation for transition %d:\n ", p);
+              Rprintf("After simulation for transition %d:\n ", p);
               show_matchlist(matchlist);
             }
 
@@ -2915,7 +2915,7 @@ run_standard_query_dfa(int envidx, int cut, int keep_old_ranges)
               apply_setop_to_matchlist(&total_matchlist, Union, &matchlist);
 
             if (initial_matchlist_debug && (!FirstTransitionIsDeterministic)) {
-              fprintf(stderr, "Complete Matchlist after simulating transition %d: \n", p);
+              Rprintf("Complete Matchlist after simulating transition %d: \n", p);
               show_matchlist(total_matchlist);
             }
           }
@@ -2939,7 +2939,7 @@ run_standard_query_dfa(int envidx, int cut, int keep_old_ranges)
       total_matchlist = matchlist;
 
     if (initial_matchlist_debug) {
-      fprintf(stderr, "After total simulation:\n");
+      Rprintf("After total simulation:\n");
       show_matchlist(total_matchlist);
     }
 
@@ -2957,7 +2957,7 @@ run_standard_query_dfa(int envidx, int cut, int keep_old_ranges)
     apply_setop_to_matchlist(&total_matchlist, Reduce, NULL);
 
     if (initial_matchlist_debug) {
-      fprintf(stderr, "after final reducing\n");
+      Rprintf("after final reducing\n");
       show_matchlist(total_matchlist);
     }
 
@@ -3276,7 +3276,7 @@ cqp_run_tab_query()
       }
     }
     /* useful for debugging:
-     * printf("TAB pattern #%d: %d hits %s %s\n", i + 1, lists[i].tabsize,
+     * Rprintf("TAB pattern #%d: %d hits %s %s\n", i + 1, lists[i].tabsize,
      *   (lists[i].is_inverted) ? "(inverted)" : "", (lists[i].matches_whole_corpus) ? "(whole corpus)" : "");
      */
 
@@ -3424,7 +3424,7 @@ int
 next_environment(void)
 {
   if (ee_ix >= MAXENVIRONMENT) {
-    fprintf(stderr, "No more environments for evaluation (max %d exceeded)\n", MAXENVIRONMENT);
+    Rprintf("No more environments for evaluation (max %d exceeded)\n", MAXENVIRONMENT);
     return 0; /* set a cqp error value? */
   }
 
@@ -3479,7 +3479,7 @@ free_environment(int thisenv)
   int i;
 
   if (thisenv < 0 || thisenv > ee_ix) {
-    fprintf(stderr, "Environment %d is not occupied\n", thisenv);
+    Rprintf("Environment %d is not occupied\n", thisenv);
     return 0;
   }
   else {
@@ -3575,27 +3575,27 @@ void
 show_environment(int thisenv)
 {
   if (thisenv < 0 || thisenv > ee_ix)
-    fprintf(stderr, "Environment %d not used\n", thisenv);
+    Rprintf("Environment %d not used\n", thisenv);
 
   else if (show_compdfa || show_evaltree || show_gconstraints || show_patlist) {
     /* Note, at least one of the above debugging-variables must be true, or there is nothing to print! */
 
-    printf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
-    printf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
-    printf("Has %skeyword indicator.\n", Environment[thisenv].has_keyword_indicator ? "" : "no ");
+    Rprintf("\n ================= ENVIRONMENT #%d ===============\n\n", thisenv);
+    Rprintf("Has %starget indicator.\n", Environment[thisenv].has_target_indicator ? "" : "no ");
+    Rprintf("Has %skeyword indicator.\n", Environment[thisenv].has_keyword_indicator ? "" : "no ");
 
     if (show_compdfa) {
-      printf("\n==================== DFA:\n\n");
+      Rprintf("\n==================== DFA:\n\n");
       show_complete_dfa(Environment[thisenv].dfa);
     }
 
     if (show_evaltree) {
-      printf("\n==================== Evaluation Tree:\n\n");
+      Rprintf("\n==================== Evaluation Tree:\n\n");
       print_evaltree(thisenv, Environment[thisenv].evaltree, 0);
     }
 
     if (show_gconstraints) {
-      printf("\n==================== Global Constraints:\n\n");
+      Rprintf("\n==================== Global Constraints:\n\n");
       print_booltree(Environment[thisenv].gconstraint, 0);
     }
 
@@ -3606,14 +3606,14 @@ show_environment(int thisenv)
         Environment[thisenv].match_selector.begin_offset ||
         Environment[thisenv].match_selector.end ||
         Environment[thisenv].match_selector.end_offset) {
-      printf("\n==================== Match Selector:\n\n%s[%d] ... %s[%d]\n",
+      Rprintf("\n==================== Match Selector:\n\n%s[%d] ... %s[%d]\n",
              Environment[thisenv].match_selector.begin ? Environment[thisenv].match_selector.begin->name : "match",
              Environment[thisenv].match_selector.begin_offset,
              Environment[thisenv].match_selector.end? Environment[thisenv].match_selector.end->name : "matchend",
              Environment[thisenv].match_selector.end_offset);
     }
 
-    printf("\n ================= END ENVIRONMENT #%d =============\n", thisenv);
+    Rprintf("\n ================= END ENVIRONMENT #%d =============\n", thisenv);
     fflush(stdout);
   }
 }
@@ -3627,7 +3627,7 @@ free_all_environments(void)
   int i;
   for (i = 0; i <= ee_ix; i++) {
     if (!free_environment(i)) {
-      fprintf(stderr, "Problems while free()ing environment %d\n", i);
+      Rprintf("Problems while free()ing environment %d\n", i);
       break;
     }
   }
