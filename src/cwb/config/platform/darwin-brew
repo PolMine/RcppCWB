@@ -28,7 +28,7 @@ include $(TOP)/config/platform/darwin
 CC = /usr/bin/gcc
 
 ## Tune for CPU of the build machine, compiling only 64-bit code
-CFLAGS = -Wall -O3 -arch x86_64 -march=native -mtune=native
+CFLAGS = -Wall -O3 -arch x86_64 -mtune=native
 
 DEPEND_CFLAGS = -Wall -O3
 

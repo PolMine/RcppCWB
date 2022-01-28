@@ -978,6 +978,8 @@ SortExternally(void)
 
   if (NULL != (tmp = open_temporary_file(temporary_name))) {
     int line, p1start, p1end, plen, step, token, l;
+  p1start = -1;
+  p1end = -1;
 
     line = -1;                  /* will indicate sort failure below if text_size == 0 */
     if (text_size > 0) {
