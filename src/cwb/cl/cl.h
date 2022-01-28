@@ -387,7 +387,7 @@ struct ClAutoString {
 /**
  * A single-string object whose memory allocation grows automatically.
  */
-#ifndef __cplusplus 
+#ifndef _sugar_
 typedef struct ClAutoString *ClAutoString;
 #endif
 /* the ClAutoString object API */
