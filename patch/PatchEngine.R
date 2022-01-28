@@ -1792,6 +1792,10 @@ PatchEngine <- R6Class(
           replace = list("^AR\\s+=\\s+ar\\scq\\s*$", "AR = ar", 1L)
         ),
         
+        "src/cwb/config/platform/mingw-cross" = list(
+          replace = list("-DG_OS_WIN32", "", 1L)
+        ),
+        
         
         "src/cwb/config.mk" = c(
           # stable r1069-r1690
