@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 #include <ctype.h>
 #include <sys/types.h>
 #ifndef __MINGW__
@@ -391,7 +392,6 @@ cl_new_corpus(char *registry_dir, char *registry_name)
           /* check whether ID field corresponds to name of registry file */
           if (corpus->id && (strcmp(corpus->id, canonical_name) != 0)) {
             Rprintf(
-                stderr,
                 "CL warning: ID field '%s' does not match name of registry file %s/%s\n",
                 corpus->id, real_registry_name, canonical_name);
           }
@@ -578,6 +578,7 @@ FreeIDList(IDList *list)
  * @param  l  The IDList to search.
  * @return    Boolean: true if s is a member of the list, else false.
  */
+#ifndef __MINGW__
 static int
 memberIDList(char *s, IDList l)
 {
@@ -587,6 +588,7 @@ memberIDList(char *s, IDList l)
   return 0;
 }
 
+#endif
 /* ---------------------------------------------------------------------- */
 
 /*
