@@ -1,22 +1,49 @@
 ## General remarks
 
-This is an immediate follow-up to my first submission to fix an issue that has emerged with the 'cwbtools' dependency.
+The RcppCWB package is a wrapper for the Corpus Workbench (CWB). Previous versions
+included the C code of an increasingly outdated version of CWB (CWB v3.4.14).
+This version re-aligns RcppCWB with upstream CWB development (CWB v3.4.44).
 
-Previous message: This version (v0.4.4) solves issues with setting and re-setting paths. I am confident that this release will solve an issue with the 'cwbtools' package (r-devel-windows-x86_64-new-UL and r-devel-windows-x86_64-new-TK). 
+It uses automated patches (see code in ./patch) to make the CWB fit into this R
+package, so that future releases can always include the most recent (patched)
+CWB code.
+
+However, the most important immediate purpose of this release is to integrate
+patches developed by Tomas Kalibera, bringing it up the the requirements of the
+UCRT toolchain. It is not necessary to apply patches at CRAN
+(installation with _R_INSTALL_TIME_PATCHES_=no)
+
+On this occassion, I would like to gratefully acknowledge the guidance and
+support of Tomas Kalibera, and support and advice given by Brian Ripley.
 
 
 ## Test environments
 
 * Standard checks with R-hub
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* local macOS R 4.1.1
+* local macOS R 4.1.2 (both x86_64 and arm64)
 
 
 ## R CMD check results
 
-I see a NOTE concerning package size on CRAN machines (5.2 MB on r-release-macos-x86_64). I hope this is still tolerable. 
+There is a NOTE concerning package size. It is somewhat more than 5MB, depending
+on the test environment. I hope this is still tolerable for the time being. It
+is quite possible to reduce the size of the test data included in the package.
+I will do this in an upcoming release.
+
+Compatibility with the UCRT toolchain has been the primary concern of this
+release. I applied patches to remove all compiler warnings I saw. Yet there is
+one remaining 'stringop-overflow' compiler warning indicating a fairly
+unlikely scenario that I find hard to address at this time. 
+
+gcc -c -o cdaccess.o -O2 -Wall -D__MINGW__ -DEMULATE_SETENV -DCOMPILE_DATE=\""Sat Jan 29 07:12:07 WEST 2022"\" -DCWB_VERSION=\"3.4.33\" -IC:/rtools42/x86_64-w64-mingw32.static.posix/include/glib-2.0 -IC:/rtools42/x86_64-w64-mingw32.static.posix/lib/glib-2.0/include -I/rtools42/x86_64-w64-mingw32.static.posix/include/glib-2.0 -DPCRE_STATIC cdaccess.c
+cdaccess.c: In function 'cl_read_stream':
+cdaccess.c:982:5: warning: 'memcpy' specified bound between 18446744065119617024 and 18446744073709551612 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+ | memcpy(buffer, ps->base + ps->nr_items, items_to_read * sizeof(int));
+ | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ## Downstream dependencies
 
 I have also checked downstream dependencies (cwbtools, GermaParl, polmineR). I did not see WARNINGs, or NOTEs, or ERRORs.
+ 

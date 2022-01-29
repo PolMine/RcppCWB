@@ -1419,7 +1419,15 @@ PatchEngine <- R6Class(
         
         "src/cwb/CQi/server.c" = c(
           list(
+            
+            insert_before = list(
+              "^\\s*#include\\s+<signal\\.h>\\s*$",
+              c("#ifdef __MINGW__", "#include <winsock2.h>", "#define socklen_t int", "#endif"), 1L
+            ),
+            delete_line_beginning_with = list("#else", 1L, 2L),
+            
             insert_before = list("^\\/\\*", c("void Rprintf(const char *, ...);", ""), 3L),
+            
             # ../CQi/server.c: In function 'cqi_send_byte':
             #   ../CQi/server.c:417:25: warning: pointer targets in passing argument 2 of 'send' differ in signedness [-Wpointer-sign]
             # 417 |       1 != send(connfd, &prep, 1, MSG_WAITALL)
