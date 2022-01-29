@@ -110,6 +110,7 @@ jobs:
         if: matrix.config.os == 'windows-2022'
         env:
           _R_INSTALL_TIME_PATCHES_: no
+          TZ: UTC
         uses: kalibera/R-actions/pkg-check@master
 
       - name: Build Windows binary package
