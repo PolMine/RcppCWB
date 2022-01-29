@@ -28,7 +28,7 @@ include $(TOP)/config/platform/darwin
 CC = /usr/bin/clang
 
 ## Only build Intel 64-bit architecture, optimised for this system
-CFLAGS = -Wall -O3 -arch x86_64 -mtune=native
+CFLAGS = -Wall -O3 -arch x86_64 -march=native -mtune=native
 
 DEPEND_CFLAGS = -Wall -O3
 

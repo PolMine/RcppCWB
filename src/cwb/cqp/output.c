@@ -528,7 +528,7 @@ cat_listed_corpus(CorpusList *cl,
     if (printHeader)
       print_corpus_info_header(cl, dst->stream, mode, 1);
     else if (printNrMatches && mode == PrintASCII)
-      Rprintf("%d matches.\n", cl->size);
+      fprintf(dst->stream, "%d matches.\n", cl->size);
 
     print_concordance_body(cl, dst->stream,
                            isatty(fileno(dst->stream)) || dst->is_paging,
@@ -543,7 +543,7 @@ cat_listed_corpus(CorpusList *cl,
  *
  * @see           MessageType
  * @param type    Specifies what type of message (messages of some types are not always printed)
- * @param format  Format string (and ...) are passed as arguments to vRprintf().
+ * @param format  Format string (and ...) are passed as arguments to vfprintf().
  */
 void
 cqpmessage(MessageType type, const char *format, ...)
@@ -574,9 +574,9 @@ cqpmessage(MessageType type, const char *format, ...)
     }
 
     if (!silent || type == Error) {
-      Rprintf("%s:\n\t", msg);
-      Rprintf(format, ap);
-      Rprintf("\n");
+      fprintf(stderr, "%s:\n\t", msg);
+      vfprintf(stderr, format, ap);
+      fprintf(stderr, "\n");
     }
   }
 
@@ -611,25 +611,25 @@ corpus_info(CorpusList *cl)
 
     /* print name for child mode (added v3.4.15)  */
     if (child_process)
-      Rprintf("Name:    %s\n", cl->name);
+      fprintf(outfh, "Name:    %s\n", cl->name);
     /* print size (should be the mother_size entry) */
-    Rprintf("Size:    %d\n", cl->mother_size);
+    fprintf(outfh, "Size:    %d\n", cl->mother_size);
     /* print charset */
-    Rprintf("Charset: ");
+    fprintf(outfh, "Charset: ");
 
     if (cl->corpus->charset == unknown_charset)
-      Rprintf("<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
+      fprintf(outfh, "<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
     else
-      Rprintf("%s\n", cl_charset_name(cl->corpus->charset));
+      fprintf(outfh, "%s\n", cl_charset_name(cl->corpus->charset));
 
     /* print properties */
-    Rprintf("Properties:\n");
+    fprintf(outfh, "Properties:\n");
     if (!(p = cl_first_corpus_property(cl->corpus)))
-      Rprintf("\t<none>\n");
+      fprintf(outfh, "\t<none>\n");
     else
       for ( ; p != NULL; p = cl_next_corpus_property(p))
-        Rprintf("\t%s = '%s'\n", p->property, p->value);
-    Rprintf("\n");
+        fprintf(outfh, "\t%s = '%s'\n", p->property, p->value);
+    fprintf(outfh, "\n");
 
     /* do we have further info in a .INFO file? */
     if (
@@ -639,7 +639,7 @@ corpus_info(CorpusList *cl)
         /* most of the time this is NOT a problem - it just means the default HOME/.info
          * has not been created. Just another way that there can be no more info. */
         )
-      Rprintf("No further information available about %s\n", cl->name);
+      fprintf(outfh, "No further information available about %s\n", cl->name);
 
     else {
       /* we do have some info to print out. */
@@ -651,7 +651,7 @@ corpus_info(CorpusList *cl)
       /* if the .info file didn't end in a newline, prit one,
        * to ensure that output from "info;" always does end thus.*/
       if (buf[strlen(buf)-1] != '\n')
-        Rprintf("\n");
+        fprintf(outfh, "\n");
 
       cl_close_stream(fh);
     }
@@ -738,7 +738,6 @@ static int
 pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset)
 {
   int real_n, cpos;
-  cpos = -1;
 
   real_n = (cl->sortidx) ? cl->sortidx[n] : n; /* get anchor for n-th match */
 
@@ -869,33 +868,33 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *dst)
         if (cpos >= 0 && cpos <= cl->mother_size) {
           /* valid cpos: print cpos or requested attribute */
           if (item->attribute_type == ATT_NONE)
-            Rprintf("%d", cpos);
+            fprintf(dst->stream, "%d", cpos);
           else {
             char *string = item->attribute_type == ATT_POS ?  cl_cpos2str(item->attribute, cpos) : cl_cpos2struc2str(item->attribute, cpos);
             if (string) {
               if (item->flags) {
                 /* get canonical string as newly alloc'ed duplicate, then print */
                 char *copy = cl_string_canonical(string, cl->corpus->charset, item->flags, CL_STRING_CANONICAL_STRDUP);
-                Rprintf("%s", copy);
+                fprintf(dst->stream, "%s", copy);
                 cl_free(copy);
               }
               else
-                Rprintf("%s", string);
+                fprintf(dst->stream, "%s", string);
             }
           }
         }
         else {
           /* cpos out of bounds: print -1 or empty string */
           if (item->attribute_type == ATT_NONE)
-            Rprintf("-1");
+            fprintf(dst->stream, "-1");
         }
         if (cpos < end)         /* tokens in a range item are separated by blanks */
-          Rprintf(" ");
+          fprintf(dst->stream, " ");
       }
       if (item->next)           /* multiple tabulation items are separated by TABs */
-        Rprintf("\t");
+        fprintf(dst->stream, "\t");
     }
-    Rprintf("\n");
+    fprintf(dst->stream, "\n");
   }
 
   close_rd_output_stream(dst);

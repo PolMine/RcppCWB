@@ -43,7 +43,7 @@ main(int argc, char *argv[])
   which_app = cqpcl;
 
   if (!initialize_cqp(argc, argv)) {
-    Rprintf("Can't initialize CQP\n");
+    fprintf(stderr, "Can't initialize CQP\n");
     return cqp_error_status ? cqp_error_status : 1;
   }
 
@@ -52,14 +52,14 @@ main(int argc, char *argv[])
 
   if (query_string) {
     if (!cqp_parse_string(query_string)) {
-      Rprintf("Syntax error in %s, exiting\n", query_string);
+      fprintf(stderr, "Syntax error in %s, exiting\n", query_string);
       return cqp_error_status ? cqp_error_status : 1;
     }
   }
   else
     for (i = optind; i < argc; i++)
       if (!cqp_parse_string(argv[i])) {
-        Rprintf("Syntax error, exiting\n");
+        fprintf(stderr, "Syntax error, exiting\n");
         return cqp_error_status ? cqp_error_status : 1;
       }
 
