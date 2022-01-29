@@ -173,7 +173,7 @@ char cregestring[1024];
 
 void cregerror_cleanup(char *message)
 {
-  fprintf(stderr, "REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
+  Rprintf("REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
 
   if (cregattrib)
     cl_delete_attribute(cregattrib);
@@ -789,7 +789,7 @@ while (YYID (0))
 #ifndef YY_LOCATION_PRINT
 # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
-     fprintf (File, "%d.%d-%d.%d",			\
+     Rprintf("%d.%d-%d.%d",			\
 	      (Loc).first_line, (Loc).first_column,	\
 	      (Loc).last_line,  (Loc).last_column)
 # else
@@ -811,7 +811,7 @@ while (YYID (0))
 
 # ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
-#  define YYFPRINTF fprintf
+#  define YYFPRINTF Rprintf
 # endif
 
 # define YYDPRINTF(Args)			\
@@ -824,10 +824,10 @@ do {						\
 do {									  \
   if (yydebug)								  \
     {									  \
-      YYFPRINTF (stderr, "%s ", Title);					  \
+      YYFPRINTF ("%s ", Title);					  \
       yy_symbol_print (stderr,						  \
 		  Type, Value); \
-      YYFPRINTF (stderr, "\n");						  \
+      YYFPRINTF ("\n");						  \
     }									  \
 } while (YYID (0))
 
@@ -882,12 +882,12 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 #endif
 {
   if (yytype < YYNTOKENS)
-    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
+    YYFPRINTF ("token %s (", yytname[yytype]);
   else
-    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
+    YYFPRINTF ("nterm %s (", yytname[yytype]);
 
   yy_symbol_value_print (yyoutput, yytype, yyvaluep);
-  YYFPRINTF (yyoutput, ")");
+  YYFPRINTF (")");
 }
 
 /*------------------------------------------------------------------.
@@ -906,10 +906,10 @@ yy_stack_print (bottom, top)
     yytype_int16 *top;
 #endif
 {
-  YYFPRINTF (stderr, "Stack now");
+  YYFPRINTF ("Stack now");
   for (; bottom <= top; ++bottom)
-    YYFPRINTF (stderr, " %d", *bottom);
-  YYFPRINTF (stderr, "\n");
+    YYFPRINTF (" %d", *bottom);
+  YYFPRINTF ("\n");
 }
 
 # define YY_STACK_PRINT(Bottom, Top)				\
@@ -937,16 +937,16 @@ yy_reduce_print (yyvsp, yyrule)
   int yynrhs = yyr2[yyrule];
   int yyi;
   unsigned long int yylno = yyrline[yyrule];
-  YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
+  YYFPRINTF ("Reducing stack by rule %d (line %lu):\n",
 	     yyrule - 1, yylno);
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      fprintf (stderr, "   $%d = ", yyi + 1);
+      Rprintf("   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      fprintf (stderr, "\n");
+      Rprintf("\n");
     }
 }
 
@@ -1331,7 +1331,7 @@ yyparse ()
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  YYDPRINTF ((stderr, "Starting parse\n"));
+  YYDPRINTF (("Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
@@ -1417,14 +1417,14 @@ yyparse ()
       yyvsp = yyvs + yysize - 1;
 
 
-      YYDPRINTF ((stderr, "Stack size increased to %lu\n",
+      YYDPRINTF (("Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
 	YYABORT;
     }
 
-  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
+  YYDPRINTF (("Entering state %d\n", yystate));
 
   goto yybackup;
 
@@ -1446,14 +1446,14 @@ yybackup:
   /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
   if (yychar == YYEMPTY)
     {
-      YYDPRINTF ((stderr, "Reading a token: "));
+      YYDPRINTF (("Reading a token: "));
       yychar = YYLEX;
     }
 
   if (yychar <= YYEOF)
     {
       yychar = yytoken = YYEOF;
-      YYDPRINTF ((stderr, "Now at end of input.\n"));
+      YYDPRINTF (("Now at end of input.\n"));
     }
   else
     {
