@@ -24,15 +24,15 @@ library(R6)
 ```
 
 
-## Loading and configuring the PatchEngine
+## Load and configure PatchCWB
 
 ```{r load_code_and_data}
-source("~/Lab/github/RcppCWB/patch/PatchEngine.R")
+source("~/Lab/github/RcppCWB/patch/PatchCWB.R")
 ```
 
 
 ```{r configure_patch_engine}
-P <- PatchEngine$new(
+P <- PatchCWB$new(
   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
   repodir = "~/Lab/github/RcppCWB",
   makeheaders = "~/Lab/github_foreign/makeheaders/src/makeheaders",

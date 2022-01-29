@@ -1,5 +1,3 @@
-#define _sugar_
-
 extern "C" {
   #include <stdio.h>
   #include <stdlib.h>

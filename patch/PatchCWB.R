@@ -2,18 +2,18 @@
 #'
 #' Flag -fcommon removed from config and config/platform/linux again
 #' @examples 
-#' source("~/Lab/github/RcppCWB/patch/PatchEngine.R")
+#' source("~/Lab/github/RcppCWB/patch/PatchCWB.R")
 #' 
-#' P <- PatchEngine$new(
+#' P <- PatchCWB$new(
 #'   cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
 #'   repodir = "~/Lab/github/RcppCWB",
 #'   makeheaders = "~/Lab/github_foreign/makeheaders/src/makeheaders",
 #'   revision = 1690
 #' )
 #' P$patch_all()
-PatchEngine <- R6Class(
+PatchCWB <- R6Class(
   
-  classname = "PatchEngine",
+  classname = "PatchCWB",
   
   public = list(
     
