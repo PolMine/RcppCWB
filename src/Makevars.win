@@ -2,9 +2,10 @@ VERSION=3.4.33
 
 PKG_CPPFLAGS = \
     -I../windows/libcl-${VERSION}/include \
-    -I../windows/libcl-${VERSION}/include/cwb/cl \
-    -I../windows/libcl-${VERSION}/include/cwb/cqp \
-    -I../windows/libcl-${VERSION}/include/cwb/CQi
+    -Icl \
+    -Icqp \
+    -ICQi \
+    -Iutils
 
 PKG_CXXFLAGS=-D_LIB
 
