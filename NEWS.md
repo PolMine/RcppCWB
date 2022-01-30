@@ -9,6 +9,7 @@
 * Encoding a cropus using `cwb_encode()` now assumes implicitly that input files are XML files and remove blank lines and leading and trailing whitespace. This is equivalent to the option "-xsB" of the command line utility `cwb-encode`.
 * The CWB code is updated to v3.4.33 / r1690 (#29).
 * Changing includes in wrapper.cpp to avoid confusion resulting in errors, relies on fresh copy of header files in libcl repo and updated cross-compilations of static libraries.
+* Adjusted C code called by `cqp_initialize()` such that locale is not changed (#46).
 
 # RcppCWB 0.4.4
 
