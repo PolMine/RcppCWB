@@ -760,7 +760,16 @@ PatchCWB <- R6Class(
               "  return version;",
               "}"
             )
-          )
+          ),
+          
+          # This is propably the biggest intervention into the original CWB code 
+          # Setting the locale to C is explained as follows:
+          # /* setting the locale to C makes the use of locale-sensitive Glib functions
+          # * behave as if they are locale insensitive; result is constant behaviour. */
+          # The price is just to high, because re-setting the locale breaks polmineR
+          # and violates CRAN rules.
+          replace = list('^\\s*(#include\\s<locale\\.h>)\\s*$', "/* \\1 */", 1L),
+          replace = list('^(\\s*)(setlocale\\(LC_ALL,\\s"C"\\);)\\s*$', "\\1/* \\2 */", 1L)
         ),
         
         "src/cwb/cl/ngram-hash.c" = c(
