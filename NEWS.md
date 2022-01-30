@@ -10,6 +10,7 @@
 * The CWB code is updated to v3.4.33 / r1690 (#29).
 * Changing includes in wrapper.cpp to avoid confusion resulting in errors, relies on fresh copy of header files in libcl repo and updated cross-compilations of static libraries.
 * Adjusted C code called by `cqp_initialize()` such that locale is not changed (#46).
+* Reduced number of  example *.vrt-files to one to keep package size below 5GB.
 
 # RcppCWB 0.4.4
 
