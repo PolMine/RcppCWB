@@ -138,6 +138,7 @@ get_group_id(Group *group, int i, int target, int *cpos)
   int is_struc    = (target ? group->target_is_struc  : group->source_is_struc);
   char *base      = (target ? group->target_base      : group->source_base);
   int pos, id;
+  pos = -1;
 
   switch (field_type) {
   case KeywordField:
@@ -342,7 +343,6 @@ ComputeGroupExternally(Group *group)
   int cutoff_freq = group->cutoff_frequency;
 
   char temporary_name[TEMP_FILENAME_BUFSIZE];
-  FILE *tmp_dst;
   FILE *pipe;
   char sort_call[CL_MAX_LINE_LENGTH];
 
@@ -351,15 +351,8 @@ ComputeGroupExternally(Group *group)
     return group;
   }
 
-  if (!(tmp_dst = open_temporary_file(temporary_name))) {
-    perror("Error while opening temporary file");
-    cqpmessage(Warning, "Can't open temporary file");
-    return group;
-  }
-
   for (i = 0; i < size; i++)
     Rprintf("%d %d\n", get_group_id(group, i, 0, NULL), get_group_id(group, i, 1, NULL)); /* (source ID, target ID) */
-  fclose(tmp_dst);
 
   /* construct sort call */
   sprintf(sort_call, ExternalGroupCommand, temporary_name);
