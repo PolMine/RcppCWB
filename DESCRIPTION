@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.4.4.9004
-Date: 2022-01-29
+Version: 0.5.0
+Date: 2022-01-31
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -11,7 +11,8 @@ Author: Andreas Blaette [aut, cre],
   Stefan Evert [ctb],
   Arne Fitschen [ctb],
   Jeroen Ooms [ctb],
-  Marius Bertram [ctb]
+  Marius Bertram [ctb],
+  Tomas Kalibera [ctb]
 Authors@R: c(
   person("Andreas", "Blaette", role = c("aut", "cre"), email = "andreas.blaette@uni-due.de"),
   person("Bernard", "Desgraupes", role = "aut"),
@@ -21,7 +22,8 @@ Authors@R: c(
   person("Stefan", "Evert", role = "ctb"),
   person("Arne", "Fitschen", role = "ctb"),
   person("Jeroen", "Ooms", role = "ctb"),
-  person("Marius", "Bertram", role = "ctb")
+  person("Marius", "Bertram", role = "ctb"),
+  person("Tomas", "Kalibera", role = "ctb")
   )
 Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
 Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query 

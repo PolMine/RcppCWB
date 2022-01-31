@@ -1,4 +1,4 @@
-# RcppCWB 0.4.4.9001-9003
+# RcppCWB 0.5.0
 
 ## New Features
 

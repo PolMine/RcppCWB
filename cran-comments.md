@@ -1,5 +1,9 @@
 ## General remarks
 
+[This is the 2nd submission. Automated patches for UCRT were still in place this
+morning. As I gather from a check with win-builder.r-project.org a few minutes ago,
+skipping these patches is effective now.]
+
 The RcppCWB package is a wrapper for the Corpus Workbench (CWB). Previous versions
 included the C code of an increasingly outdated version of CWB (CWB v3.4.14).
 This version re-aligns RcppCWB with upstream CWB development (CWB v3.4.44).
