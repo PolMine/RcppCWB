@@ -5,16 +5,17 @@ included the C code of an increasingly outdated version of CWB (CWB v3.4.14).
 This version re-aligns RcppCWB with upstream CWB development (CWB v3.4.44).
 
 It uses automated patches (see code in ./patch) to make the CWB fit into this R
-package, so that future releases can always include the most recent (patched)
-CWB code.
+package.  It will now be painless to  include the most recent (patched)
+CWB code in this package.
 
-However, the most important immediate purpose of this release is to integrate
+The most important immediate purpose of this release is to integrate
 patches developed by Tomas Kalibera, bringing it up the the requirements of the
 UCRT toolchain. It is not necessary to apply patches at CRAN
 (installation with _R_INSTALL_TIME_PATCHES_=no)
 
-On this occassion, I would like to gratefully acknowledge the guidance and
-support of Tomas Kalibera, and support and advice given by Brian Ripley.
+On this occassion, I would like to gratefully acknowledge the inredible helpful
+guidance and support of Tomas Kalibera, and support and advice offered by Brian
+Ripley.
 
 
 ## Test environments
@@ -22,14 +23,10 @@ support of Tomas Kalibera, and support and advice given by Brian Ripley.
 * Standard checks with R-hub
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
 * local macOS R 4.1.2 (both x86_64 and arm64)
+* local Windows machine (both R 4.1.2 and R 4.2)
 
 
 ## R CMD check results
-
-There is a NOTE concerning package size. It is somewhat more than 5MB, depending
-on the test environment. I hope this is still tolerable for the time being. It
-is quite possible to reduce the size of the test data included in the package.
-I will do this in an upcoming release.
 
 Compatibility with the UCRT toolchain has been the primary concern of this
 release. I applied patches to remove all compiler warnings I saw. Yet there is
@@ -46,4 +43,3 @@ cdaccess.c:982:5: warning: 'memcpy' specified bound between 18446744065119617024
 ## Downstream dependencies
 
 I have also checked downstream dependencies (cwbtools, GermaParl, polmineR). I did not see WARNINGs, or NOTEs, or ERRORs.
- 
