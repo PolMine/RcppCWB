@@ -734,6 +734,10 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::S
   skip_empty_lines++;
   strip_blanks++;
 
+  verbose++;
+  quietly = 0;
+  debugmode++;
+  
   /* declare p-attributes */
   
   int p_attrs_n = p_attributes.length();
