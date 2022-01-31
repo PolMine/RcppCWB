@@ -1507,7 +1507,17 @@ PatchCWB <- R6Class(
             delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L), # purely cosmetic
             insert_before = list(
               "^/\\*\\s-*\\s\\*/",
-              c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+              c(
+                "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
+                "",
+                "#ifdef __MINGW__",
+                "#undef SUBDIR_SEPARATOR",
+                "#undef SUBDIR_SEP_STRING",
+                "#define SUBDIR_SEPARATOR '/'",
+                '#define SUBDIR_SEP_STRING "/"',
+                "#endif",
+                ""
+                ),
               1L
             ),
             
