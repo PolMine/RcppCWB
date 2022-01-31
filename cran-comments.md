@@ -1,6 +1,8 @@
 ## General remarks
 
-This is an immediate follow-up to my first submission to fix an issue that has emerged with the 'cwbtools' dependency.
+The RcppCWB package is a wrapper for the Corpus Workbench (CWB). Previous versions
+included the C code of an increasingly outdated version of CWB (CWB v3.4.14).
+This version re-aligns RcppCWB with upstream CWB development (CWB v3.4.44).
 
 Previous message: This version (v0.4.4) solves issues with setting and re-setting paths. I am confident that this release will solve an issue with the 'cwbtools' package (r-devel-windows-x86_64-new-UL and r-devel-windows-x86_64-new-TK). 
 
