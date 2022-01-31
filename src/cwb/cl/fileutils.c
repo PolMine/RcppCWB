@@ -16,16 +16,10 @@
  */
 
 
-void Rprintf(const char *, ...);
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include <glib.h>
-
-#ifndef __MINGW__
-#include <signal.h> /* added by Andreas Blaette  */
-#include <sys/socket.h> /* added by Andreas Blaette */
-#endif
 
 #include "globals.h"
 #include "fileutils.h"
@@ -184,20 +178,18 @@ CLStream open_streams;
  */
 int cl_broken_pipe = 0;
 
-#ifndef __MINGW__
 static void
 cl_handle_sigpipe(int signum)
 {
 #ifndef __MINGW__
   cl_broken_pipe = 1;
-  /* Rprintf("Handle broken pipe signal\n"); */
+  /* fprintf(stderr, "Handle broken pipe signal\n"); */
 
   if (SIG_ERR == signal(SIGPIPE, cl_handle_sigpipe))
     perror("CL: Can't reinstall SIGPIPE handler (ignored)"); /* Is this still necessary on modern platforms? */
 #endif
 }
 
-#endif
 /** check whether stream type involves a pipe */
 #define STREAM_IS_PIPE(type) (type == CL_STREAM_PIPE || type == CL_STREAM_GZIP || type == CL_STREAM_BZIP2)
 
@@ -223,7 +215,7 @@ cl_open_stream(const char *filename, int mode, int type)
   char expanded_filename[2 * CL_MAX_FILENAME_LENGTH];
 
   if (l > CL_MAX_FILENAME_LENGTH) {
-    Rprintf("CL: filename '%s' too long (limit: %d bytes)\n", filename, CL_MAX_FILENAME_LENGTH);
+    fprintf(stderr, "CL: filename '%s' too long (limit: %d bytes)\n", filename, CL_MAX_FILENAME_LENGTH);
     cl_errno = CDA_EBUFFER;
     return NULL;
   }
@@ -259,7 +251,7 @@ cl_open_stream(const char *filename, int mode, int type)
     break;
 #endif
   default:
-    Rprintf("CL: invalid I/O stream mode = %d\n", mode);
+    fprintf(stderr, "CL: invalid I/O stream mode = %d\n", mode);
     cl_errno = CDA_EARGS;
     return NULL;
   }
@@ -358,7 +350,7 @@ cl_open_stream(const char *filename, int mode, int type)
     handle = (mode == CL_STREAM_READ) ? stdin : stdout;
     break;
   default:
-    Rprintf("CL: invalid I/O stream type = %d\n", type);
+    fprintf(stderr, "CL: invalid I/O stream type = %d\n", type);
     cl_errno = CDA_EARGS;
     return NULL;
   }
@@ -399,17 +391,14 @@ int
 cl_close_stream(FILE *handle)
 {
   CLStream stream, point;
-#ifndef __MINGW__
-int was_pipe;
-#endif
-  int result = 0;
+  int result = 0, was_pipe = 0;
 
   for (stream = open_streams ; stream ; stream = stream->next)
     if (stream->handle == handle)
       break;
 
   if (!stream) {
-    Rprintf("CL: attempt to close non-managed I/O stream with cl_close_stream() [ignored]\n");
+    fprintf(stderr, "CL: attempt to close non-managed I/O stream with cl_close_stream() [ignored]\n");
     return CDA_EATTTYPE;
   }
 
@@ -424,12 +413,10 @@ int was_pipe;
   case CL_STREAM_BZIP2:
   case CL_STREAM_PIPE:
     result = pclose(stream->handle);
-#ifndef __MINGW__
     was_pipe = 1;
-#endif
     break;
   default:
-    Rprintf("CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);
+    fprintf(stderr, "CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);
     exit(1);
   }
 
