@@ -434,7 +434,7 @@ PatchCWB <- R6Class(
         },
         if (revision == 1069) c("(vf|f|v)printf\\s*\\(\\s*fd,\\s*", "Rprintf(", "cwb-encode.c"),
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
-        c("fprintf\\s*\\(", "Rprintf("),
+#        c("fprintf\\s*\\(", "Rprintf("),
         c("(\\s+)printf\\(", "\\1Rprintf("),
         c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
         
