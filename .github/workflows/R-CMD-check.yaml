@@ -106,6 +106,13 @@ jobs:
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
+      - name: Whereabouts of gcc and g++
+        if: matrix.config.os == 'windows-2022'
+        run: |
+          echo %PATH%
+          where gcc
+          where g++
+
       - name: Check package (UCRT)
         if: matrix.config.os == 'windows-2022'
         env:
