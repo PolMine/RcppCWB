@@ -85,7 +85,7 @@ void write_golomb_code_am(int x, int b, BFile *bf)
   nr_sc = (1 << ub) - b;
 
   if (debug)
-    fprintf(debug_output, " res=%5d CL [%3d/%3d] #sc %4d "
+    Rprintf(" res=%5d CL [%3d/%3d] #sc %4d "
             "writing %5d/%d\n",
             res, lb, ub, nr_sc,
             (res < nr_sc) ? res : res + nr_sc,
@@ -97,7 +97,7 @@ void write_golomb_code_am(int x, int b, BFile *bf)
   else {
     BFwriteWord((unsigned int)(res + nr_sc), ub, bf);
     if (res + nr_sc >= (1 << ub))
-      fprintf(stderr, "Warning: can't encode %d in %d bits\n",
+      Rprintf("Warning: can't encode %d in %d bits\n",
               res + nr_sc, ub);
   }
 
@@ -137,7 +137,7 @@ int read_golomb_code_am(int b, BFile *bf)
   }
 
   if (debug)
-    fprintf(debug_output, "%8d:  Read r=%5d [%3d/%3d]  #sc=%4d, ",
+    Rprintf("%8d:  Read r=%5d [%3d/%3d]  #sc=%4d, ",
             codepos, r, lb, ub, nr_sc);
 
   if (r >= nr_sc) {
@@ -148,7 +148,7 @@ int read_golomb_code_am(int b, BFile *bf)
   }
 
   if (debug)
-    fprintf(debug_output, "final r=%d\tgap=%d\n",
+    Rprintf("final r=%d\tgap=%d\n",
             r, r+q*b);
 
   return r + q * b;
@@ -192,7 +192,7 @@ compress_reversed_index(Attribute *attr, char *output_fn)
   int new_pos;
 
 
-  printf("COMPRESSING INDEX of %s.%s\n", corpus_id, attr->any.name);
+  Rprintf("COMPRESSING INDEX of %s.%s\n", corpus_id, attr->any.name);
 
   /* ensure that we do NOT use the compressed index while building the
    * compressed index (yeah, a nasty thing that). That is, load the
@@ -203,12 +203,12 @@ compress_reversed_index(Attribute *attr, char *output_fn)
     Component *comp;
 
     if ((comp = ensure_component(attr, CompRevCorpus, 0)) == NULL) {
-      fprintf(stderr, "Index compression requires the REVCORP component\n");
+      Rprintf("Index compression requires the REVCORP component\n");
       compressrdx_cleanup(1);
     }
 
     if ((comp = ensure_component(attr, CompRevCorpusIdx, 0)) == NULL) {
-      fprintf(stderr, "Index compression requires the REVCIDX component\n");
+      Rprintf("Index compression requires the REVCIDX component\n");
       compressrdx_cleanup(1);
     }
   }
@@ -240,18 +240,18 @@ compress_reversed_index(Attribute *attr, char *output_fn)
   }
 
   if (! BFopen(data_fname, "w", &data_file)) {
-    fprintf(stderr, "ERROR: can't create file %s\n", data_fname);
+    Rprintf("ERROR: can't create file %s\n", data_fname);
     perror(data_fname);
     compressrdx_cleanup(1);
   }
-  printf("- writing compressed index to %s\n", data_fname);
+  Rprintf("- writing compressed index to %s\n", data_fname);
 
   if ((index_file = fopen(index_fname, "wb")) == NULL) {
-    fprintf(stderr, "ERROR: can't create file %s\n", index_fname);
+    Rprintf("ERROR: can't create file %s\n", index_fname);
     perror(index_fname);
     compressrdx_cleanup(1);
   }
-  printf("- writing compressed index offsets to %s\n", index_fname);
+  Rprintf("- writing compressed index offsets to %s\n", index_fname);
 
   for (i = 0; i < nr_elements; i++) {
 
@@ -273,7 +273,7 @@ compress_reversed_index(Attribute *attr, char *output_fn)
     NwriteInt(fpos, index_file);
 
     if (debug)
-      fprintf(debug_output, "------------------------------ ID %d (f: %d, b: %d)\n",
+      Rprintf("------------------------------ ID %d (f: %d, b: %d)\n",
               i, element_freq, b);
 
     last_pos = 0;
@@ -287,7 +287,7 @@ compress_reversed_index(Attribute *attr, char *output_fn)
       last_pos = new_pos;
 
       if (debug)
-        fprintf(debug_output, "%8d:  gap=%4d, b=%4d\n", codepos, gap, b);
+        Rprintf("%8d:  gap=%4d, b=%4d\n", codepos, gap, b);
 
       write_golomb_code(gap, b, &data_file);
       codepos++;
@@ -341,7 +341,7 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   int true_pos;
 
 
-  printf("VALIDATING %s.%s\n", corpus_id, attr->any.name);
+  Rprintf("VALIDATING %s.%s\n", corpus_id, attr->any.name);
 
   nr_elements = cl_max_id(attr);
   if ((nr_elements <= 0) || (cl_errno != CDA_OK)) {
@@ -370,18 +370,18 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   }
 
   if (! BFopen(data_fname, "r", &data_file)) {
-    fprintf(stderr, "ERROR: can't open file %s\n", data_fname);
+    Rprintf("ERROR: can't open file %s\n", data_fname);
     perror(data_fname);
     compressrdx_cleanup(1);
   }
-  printf("- reading compressed index from %s\n", data_fname);
+  Rprintf("- reading compressed index from %s\n", data_fname);
 
   if ((index_file = fopen(index_fname, "r")) == NULL) {
-    fprintf(stderr, "ERROR: can't open file %s\n", index_fname);
+    Rprintf("ERROR: can't open file %s\n", index_fname);
     perror(index_fname);
     compressrdx_cleanup(1);
   }
-  printf("- reading compressed index offsets from %s\n", index_fname);
+  Rprintf("- reading compressed index offsets from %s\n", index_fname);
 
 
   for (i = 0; i < nr_elements; i++) {
@@ -401,7 +401,7 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
     b = compute_ba(element_freq, corpus_size);
 
     if (debug)
-      fprintf(debug_output, "------------------------------ ID %d (f: %d, b: %d)\n",
+      Rprintf("------------------------------ ID %d (f: %d, b: %d)\n",
               i, element_freq, b);
 
     pos = 0;
@@ -415,7 +415,7 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
         compressrdx_cleanup(1);
       }
       if (pos != true_pos) {
-        fprintf(stderr, "ERROR: wrong occurrence of type #%d at cpos %d (correct cpos: %d) (on attribute: %s). Aborted.\n",
+        Rprintf("ERROR: wrong occurrence of type #%d at cpos %d (correct cpos: %d) (on attribute: %s). Aborted.\n",
                 i, pos, true_pos, attr->any.name);
         compressrdx_cleanup(1);
       }
@@ -430,8 +430,8 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn)
   BFclose(&data_file);
 
   /* tell the user it's safe to delete the REVCORP and REVCIDX components now */
-  printf("!! You can delete the file <%s> now.\n", component_full_name(attr, CompRevCorpus, NULL));
-  printf("!! You can delete the file <%s> now.\n", component_full_name(attr, CompRevCorpusIdx, NULL));
+  Rprintf("!! You can delete the file <%s> now.\n", component_full_name(attr, CompRevCorpus, NULL));
+  Rprintf("!! You can delete the file <%s> now.\n", component_full_name(attr, CompRevCorpusIdx, NULL));
 
   return;
 }
@@ -449,23 +449,23 @@ void
 compressrdx_usage(char *msg, int error_code)
 {
   if (msg)
-    fprintf(stderr, "Usage error: %s\n", msg);
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage:  %s [options] <corpus>\n\n", progname);
-  fprintf(stderr, "Compress the index of a positional attribute. Creates .crc and .crx files\n");
-  fprintf(stderr, "which replace the corresponding .corpus.rev and .corpus.rdx files. After\n");
-  fprintf(stderr, "running this tool successfully, the latter files can be deleted.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -P <att>  compress attribute <att> [default: word]\n");
-  fprintf(stderr, "  -A        compress all positional attributes\n");
-  fprintf(stderr, "  -r <dir>  set registry directory\n");
-  fprintf(stderr, "  -f <file> set output file prefix (creates <file>.crc and <file>.crx)\n");
-  fprintf(stderr, "  -d        debug mode (print messages on stderr)\n");
-  fprintf(stderr, "  -D <file> debug mode (write messages to <file>)\n");
-  fprintf(stderr, "  -T        skip validation pass ('I trust you')\n");
-  fprintf(stderr, "  -h        this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
+    Rprintf("Usage error: %s\n", msg);
+  Rprintf("\n");
+  Rprintf("Usage:  %s [options] <corpus>\n\n", progname);
+  Rprintf("Compress the index of a positional attribute. Creates .crc and .crx files\n");
+  Rprintf("which replace the corresponding .corpus.rev and .corpus.rdx files. After\n");
+  Rprintf("running this tool successfully, the latter files can be deleted.\n");
+  Rprintf("\n");
+  Rprintf("Options:\n");
+  Rprintf("  -P <att>  compress attribute <att> [default: word]\n");
+  Rprintf("  -A        compress all positional attributes\n");
+  Rprintf("  -r <dir>  set registry directory\n");
+  Rprintf("  -f <file> set output file prefix (creates <file>.crc and <file>.crx)\n");
+  Rprintf("  -d        debug mode (print messages on stderr)\n");
+  Rprintf("  -D <file> debug mode (write messages to <file>)\n");
+  Rprintf("  -T        skip validation pass ('I trust you')\n");
+  Rprintf("  -h        this help page\n\n");
+  Rprintf("Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
 
   compressrdx_cleanup(error_code);
 }
@@ -542,7 +542,7 @@ main(int argc, char **argv)
       if (registry_directory == NULL)
         registry_directory = optarg;
       else {
-        fprintf(stderr, "%s: -r option used twice\n", progname);
+        Rprintf("%s: -r option used twice\n", progname);
         compressrdx_cleanup(2);
       }
       break;
@@ -583,7 +583,7 @@ main(int argc, char **argv)
     if (strcmp(debug_fn, "-") == 0)
       debug_output = stdout;
     else if ((debug_output = fopen(debug_fn, "w")) == NULL) {
-      fprintf(stderr, "Can't write debug output to file %s. Aborted.", debug_fn);
+      Rprintf("Can't write debug output to file %s. Aborted.", debug_fn);
       perror(debug_fn);
       compressrdx_cleanup(1);
     }
@@ -599,7 +599,7 @@ main(int argc, char **argv)
     compressrdx_usage("Too many arguments", 1);
 
   if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
-    fprintf(stderr, "Corpus %s not found in registry %s . Aborted.\n",
+    Rprintf("Corpus %s not found in registry %s . Aborted.\n",
             corpus_id,
             (registry_directory ? registry_directory : cl_standard_registry()));
     compressrdx_cleanup(1);
@@ -615,7 +615,7 @@ main(int argc, char **argv)
   }
   else {
     if ((attr = cl_new_attribute_oldstyle(corpus, attr_name, ATT_POS, NULL)) == NULL) {
-      fprintf(stderr, "Attribute %s.%s doesn't exist. Aborted.\n", corpus_id, attr_name);
+      Rprintf("Attribute %s.%s doesn't exist. Aborted.\n", corpus_id, attr_name);
       compressrdx_cleanup(1);
     }
     compress_reversed_index(attr, output_fn);
