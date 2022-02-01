@@ -53,9 +53,7 @@
 #' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
 #' 
 #' # perform cwb_huffcode (equivalent to cwb-makeall command line utility)
-#' if (.Platform$OS.type != "windows"){
-#'   cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-#' }
+#' cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 #' @rdname cwb_utils
 #' @export cwb_makeall
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
@@ -85,9 +83,7 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 #' @rdname cwb_utils
 #' @export cwb_compress_rdx
 #' @examples 
-#' if (.Platform$OS.type != "windows"){
-#'   cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-#' }
+#' cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
 cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
 }
