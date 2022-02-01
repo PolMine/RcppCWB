@@ -1786,16 +1786,14 @@ PatchCWB <- R6Class(
             # Functions usage() and main() deleted
             delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, NA),
             
-            insert_before = list("^(\\s*)for\\s*\\(i\\s=\\s0;\\si\\s<\\shc->length;\\si\\+\\+\\)\\s\\{\\s*$", "\\1int word, success;", 1L),
-            replace = list(
-              "^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$",
-              c(
-                "word = htonl(pos);",
-                "success = fwrite(&word, sizeof(int), 1, sync);",
-                'if (success != 1) Rprintf("File write error!\n");'
-              ),
+            insert_before = list("^(\\s*)for\\s*\\(i\\s=\\s0;\\si\\s<\\shc->length;\\si\\+\\+\\)\\s\\{\\s*$", "       int word, success;", 1L),
+            replace = list("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "word = htonl(pos);", 1L),
+            insert_after = list(
+              "^\\s*word\\s=\\shtonl\\(pos\\);\\s*$",
+              c("success = fwrite(&word, sizeof(int), 1, sync);", 'if (success != 1) Rprintf("File write error!\n");'),
               1L
-              )
+            )
+            
           ),
           if (revision < 1690) list(
             replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
