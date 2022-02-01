@@ -1,0 +1,68 @@
+##   -*-Makefile-*-
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+
+##
+##  PLATFORM CONFIGURATION FILE:
+##  Statically linked Intel 64-bit binaries for MacOS with prerequisite libraries
+##  provided by HomeBrew package manager.  Binaries will be compatible with 
+##  OS version running on the build machine and newer only.
+
+## --- WARNING ---
+## HomeBrew is not ideal for binary releases. While statically linked libraries can
+## be created, they are always compiled for the current MacOS version and will often
+## not be compatible with earlier MacOS releases.
+## A quick Web search suggests that there is no feasible work-around. In fact,
+## HomeBrew goes out of its way to keep users from modifying compilation settings.
+## In order to provide binary packages for general release, you will have to find
+## a machine running a sufficiently old version of MacOS.
+
+
+## Inherits from basic Darwin configuration
+include $(TOP)/config/platform/darwin
+
+## Make sure that Apple's gcc is used (not e.g. a fink-installed version)
+CC = /usr/bin/gcc
+
+## Make sure we're compatible with most current x86 CPUs, but optimise for Core i7.
+## We would like to ensure compatibility with earlier MacOS version by specifying
+##    -mmacosx-version-min=10.10
+## but HomeBrew insists on building its packages for the native CPU and OS version.
+CFLAGS = -Wall -O3 -arch x86_64 -march=core2 -mtune=corei7 
+
+DEPEND_CFLAGS = -Wall -O3
+
+AR = libtool -static -o # should probably be used by all MacOS builds
+
+
+## Must specify static libraries explicitly so linker won't prefer .dylib versions
+READLINE_DEFINES = -I/usr/local/opt/readline/include
+READLINE_LIBS = /usr/local/opt/readline/lib/libreadline.a /usr/local/opt/readline/lib/libhistory.a
+
+PCRE_DEFINES = -I/usr/local/opt/pcre/include
+PCRE_LIBS = /usr/local/opt/pcre/lib/libpcre.a
+
+## GLib must be linked dynamically against system-provided libraries and frameworks
+GLIB_DEFINES = -I/usr/local/opt/glib/include/glib-2.0 -I/usr/local/opt/glib/lib/glib-2.0/include -I/usr/local/opt/gettext/include
+GLIB_LIBS = /usr/local/opt/glib/lib/libglib-2.0.a /usr/local/opt/gettext/lib/libintl.a -liconv -framework CoreFoundation -framework CoreServices -framework Foundation
+
+## CPU architecture and operating system used to name binary releases
+RELEASE_ARCH = x86_64
+
+## extra static libraries needed for linking against the binary release
+RELEASE_CFLAGS = -arch $(RELEASE_ARCH)
+RELEASE_LDFLAGS = -lcl -lpcre -lglib-2.0 -lintl -liconv -framework CoreFoundation -framework CoreServices -framework Foundation
+RELEASE_EXTRA_LIBS = /usr/local/opt/pcre/lib/libpcre.a /usr/local/opt/glib/lib/libglib-2.0.a /usr/local/opt/gettext/lib/libintl.a

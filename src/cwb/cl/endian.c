@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -25,7 +25,6 @@
 
 
 #include "globals.h"
-
 #include "endian2.h"
 
 
@@ -43,8 +42,9 @@
  * @return   The reordered integer.
  */
 int cl_bswap32(int x) {
-  register int y;	        /* return value */
-  y = x & 0xff;			/* let the compiler worry about optimisation */
+  register int y;
+  y = x & 0xff;
+  /* let the compiler worry about optimisation */
   y = (y << 8) + ((x >> 8) & 0xff);
   y = (y << 8) + ((x >> 16) & 0xff);
   y = (y << 8) + ((x >> 24) & 0xff);

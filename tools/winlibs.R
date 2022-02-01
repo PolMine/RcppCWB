@@ -1,9 +1,11 @@
-if( !file.exists("../windows/libcl-gcc11/include/cl.h") ){
+version <- commandArgs(TRUE)
+
+if ( !file.exists(sprintf("../windows/libcl-%s/include/cl.h", version))){
   
   if (getRversion() < "3.3.0") setInternet2()
-  download.file("https://github.com/PolMine/libcl/archive/gcc11.zip", "libcl.zip", quiet = TRUE)
+  download.file(sprintf("https://github.com/PolMine/libcl/archive/v%s.zip", version), "lib.zip", quiet = TRUE)
   dir.create("../windows", showWarnings = FALSE)
-  unzip("libcl.zip", exdir = "../windows")
-  unlink("libcl.zip")
+  unzip("lib.zip", exdir = "../windows")
+  unlink("lib.zip")
   
 }

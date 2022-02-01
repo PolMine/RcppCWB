@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -22,12 +22,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <glib.h>
 
-#include "../cl/globals.h"
-#include "../cl/macros.h"
-
-#include "../cl/attributes.h"
-#include "../cl/cdaccess.h"
+#include "../cl/cl.h"
 
 #include "builtins.h"
 #include "eval.h"
@@ -51,22 +48,22 @@ int ignore_args[]   = {ATTAT_POS};                    /**< Argument types for bu
  * Global array of built-in functions.
  */
 BuiltinF builtin_function[] = {
-  {  0, "f",        1, f_args,        ATTAT_INT }, /* frequency of attribute value (positional attributes) */
+  {  0, "f",        1, f_args,        ATTAT_INT },    /* frequency of attribute value (positional attributes) */
 
-  {  1, "distance", 2, distance_args, ATTAT_INT }, /* distance of tokens (either absolute values or labels) */
-  {  2, "dist",     2, distance_args, ATTAT_INT }, /* abbreviates 'distance' */
-  {  3, "distabs",  2, distabs_args,  ATTAT_INT }, /* abs(distance) */
+  {  1, "distance", 2, distance_args, ATTAT_INT },    /* distance of tokens (either absolute values or labels) */
+  {  2, "dist",     2, distance_args, ATTAT_INT },    /* abbreviates 'distance' */
+  {  3, "distabs",  2, distabs_args,  ATTAT_INT },    /* abs(distance) */
 
-  {  4, "int",      1, string_arg,    ATTAT_INT }, /* typecast: interpret string (e.g. an attribute value) as integer */
+  {  4, "int",      1, string_arg,    ATTAT_INT },    /* typecast: interpret string (e.g. an attribute value) as integer */
 
-  {  5, "lbound",   1, bound_args,    ATTAT_INT }, /* at left boundary of s-attribute range */
-  {  6, "rbound",   1, bound_args,    ATTAT_INT }, /* at right boundary of s-attribute range? */
+  {  5, "lbound",   1, bound_args,    ATTAT_INT },    /* at left boundary of s-attribute range? */
+  {  6, "rbound",   1, bound_args,    ATTAT_INT },    /* at right boundary of s-attribute range? */
 
   {  7, "unify",    2, unify_args,    ATTAT_STRING }, /* "unify", i.e. intersect feature sets */
-  {  8, "ambiguity",1, ambiguity_args,ATTAT_INT }, /* "ambiguity" of feature set, i.e. cardinality of set */
-  {  9, "add",      2, arith_args,    ATTAT_INT }, /* arithmetic operations: add, sub, mul */
-  { 10, "sub",      2, arith_args,    ATTAT_INT }, 
-  { 11, "mul",      2, arith_args,    ATTAT_INT }, 
+  {  8, "ambiguity",1, ambiguity_args,ATTAT_INT },    /* "ambiguity" of feature set, i.e. cardinality of set */
+  {  9, "add",      2, arith_args,    ATTAT_INT },    /* arithmetic operations: add, sub, mul (integer, not float!) */
+  { 10, "sub",      2, arith_args,    ATTAT_INT },
+  { 11, "mul",      2, arith_args,    ATTAT_INT },
   { 12, "prefix",   2, unify_args,    ATTAT_STRING }, /* prefix(a,b) = (longest) common prefix of strings a and b */
   { 13, "is_prefix",2, unify_args,    ATTAT_INT },    /* is_prefix(a,b) = 1 iff a is prefix of b */
   { 14, "minus",    2, unify_args,    ATTAT_STRING }, /* minus(a,b) = result of removing (longest) common prefix of a and b from a */
@@ -76,9 +73,10 @@ BuiltinF builtin_function[] = {
   { 17, "lbound_of",2, distance_args, ATTAT_INT },    /* cpos of start of s-attribute region containing specified position */
   { 18, "rbound_of",2, distance_args, ATTAT_INT },    /* cpos of end of s-attribute region */
 
+  { 19, "strlen",   1, string_arg,    ATTAT_INT },    /* string length in characters */
+
   { -1, NULL,       0, NULL,          ATTAT_NONE }
 };
-/* TODO switch to an enum or to constants instead of integer literals for the first field, to make the big switch below more reader-friendly. */
 
 
 /**
@@ -87,7 +85,7 @@ BuiltinF builtin_function[] = {
  * @param type  One of the ATTAT_x constants (an argument type).
  * @return      The name of the argument type. Do not modify or free.
  */
-char *
+static const char *
 attat_name(int type)
 {
   switch(type) {
@@ -119,32 +117,16 @@ attat_name(int type)
  * @param name  The name of the function to search for.
  * @return      An index into the builtin_function array (or -1 for not found)
  */
-int 
-find_predefined(char *name)
+int
+find_predefined_function(const char *name)
 {
   int i;
-  
+
   for (i = 0; builtin_function[i].name; i++)
-    if (strcmp(builtin_function[i].name, name) == 0)
+    if (cl_streq(builtin_function[i].name, name))
       return i;
   return -1;
 }
-
-/**
- * Checks whether a string is the name of a predefined function.
- *
- * @param name  The name of the function to search for.
- * @return      Boolean.
- */
-int 
-is_predefined_function(char *name)
-{
-  int k;
-
-  k = find_predefined(name);
-  return (k >= 0 ? 1 : 0);
-}
-
 
 /**
  * Calculates the length of a prefix shared by two strings.
@@ -156,17 +138,16 @@ is_predefined_function(char *name)
  *           (Or, to put it another way, the index of the first
  *           non-identical character.)
  */
-int
+static int
 common_prefix_length(char *s, char *t)
 {
   int l = 0;
-  if ((s == NULL) || (t == NULL))
+  if (!s || !t)
     return 0;
   while ((s[l] == t[l]) && s[l] && t[l])
     l++;
   return l;
 }
-
 
 
 /**
@@ -198,20 +179,20 @@ call_predefined_function(int bf_id,
             builtin_function[bf_id].name, nr_args, builtin_function[bf_id].nr_args);
     return False;
   }
-  
+
   argp = 0;
 
   /* check argument types */
   /* ATTENTION there are some implicit conversions built-in functions have to provide:
-     - ATTAT_POS and ATTAT_INT are interchangeable (both use .intres, so there's no problem) 
+     - ATTAT_POS and ATTAT_INT are interchangeable (both use .intres, so there's no problem)
      - ATTAT_PAREF can be cast to ATTAT_STRING (function has to evaluate label reference and retrieve the corresponding token)
-     - ATTAT_NONE is accepted for ATTAT_STRING arguments; 
-     so a label reference for a label that hasn't been set can receive special treatment in unify() 
+     - ATTAT_NONE is accepted for ATTAT_STRING arguments;
+     so a label reference for a label that hasn't been set can receive special treatment in unify()
      (all functions that take ATTAT_STRING arguments must be able to handle ATTAT_NONE) */
 
   n_none = 0; /* check whether any of the arguments are undefined values */
   for (argp = 0; argp < nr_args; argp++) {
-    if (! ((apl[argp].type == builtin_function[bf_id].argtypes[argp]) || 
+    if (! ((apl[argp].type == builtin_function[bf_id].argtypes[argp]) ||
            ((apl[argp].type == ATTAT_INT)   && (builtin_function[bf_id].argtypes[argp] == ATTAT_POS)) ||
            ((apl[argp].type == ATTAT_POS)   && (builtin_function[bf_id].argtypes[argp] == ATTAT_INT)) ||
            ((apl[argp].type == ATTAT_PAREF) && (builtin_function[bf_id].argtypes[argp] == ATTAT_STRING)) ||
@@ -231,27 +212,26 @@ call_predefined_function(int bf_id,
               attat_name(apl[argp].type));
           return False;
         }
-      } 
+      }
   }
 
   /* if any arguments are undefined (ATTAT_NONE) without explicit support in the function, return ATTAT_NONE */
   if (n_none > 0)
     return True; /* this is defined behaviour, not an evaluation error */
 
-  /* 
+  /*
    * nr of args and types are correct. eval it.
    */
 
   switch (bf_id) {
 
   case 0:                        /* f */
-    
     /* it should be a pa_ref */
     assert(ctptr->func.args->param->type == pa_ref);
-    
+
     attr = ctptr->func.args->param->pa_ref.attr;
     assert(attr != NULL);
-    
+
     if (apl[0].type == ATTAT_NONE) {
       result->type = ATTAT_INT;        /* label references which are not set return 0 (no other pa_refs should do that!) */
       result->value.intres = 0;
@@ -260,16 +240,16 @@ call_predefined_function(int bf_id,
     else if (apl[0].type == ATTAT_PAREF)
       pos = apl[0].value.parefres.token_id;
     else
-      pos = get_id_of_string(attr, apl[0].value.charres);
+      pos = cl_str2id(attr, apl[0].value.charres);
 
-    if ((cderrno == CDA_OK) && (pos >= 0)) {
+    if (cl_all_ok() && pos >= 0) {
       result->type = ATTAT_INT;
-      result->value.intres = get_id_frequency(attr, pos);
-      if (cderrno == CDA_OK)
+      result->value.intres = cl_id2freq(attr, pos);
+      if (cl_all_ok())
         return True;
     }
     break;
-    
+
   case 1:                        /* distance */
   case 2:                        /* dist */
     result->type = ATTAT_INT;
@@ -289,7 +269,7 @@ call_predefined_function(int bf_id,
       assert(ctptr->func.args[0].param->type == pa_ref);
       attr = ctptr->func.args[0].param->pa_ref.attr;
       assert(attr != NULL);
-      str0 = get_string_of_id(attr, apl[0].value.parefres.token_id);
+      str0 = cl_id2str(attr, apl[0].value.parefres.token_id);
     }
     else
       str0 = apl[0].value.charres;
@@ -297,7 +277,7 @@ call_predefined_function(int bf_id,
     result->type = ATTAT_NONE;
     {
       int value = 0;
-      
+
       errno = 0;                /* might catch some conversion errors */
       value = atoi(str0);
       if (errno != 0) {
@@ -322,7 +302,7 @@ call_predefined_function(int bf_id,
       result->type = ATTAT_NONE;
       return False;
     }
-    
+
     result->type = ATTAT_INT;
     result->value.intres = 1 & apl[0].value.intres;
     return True;
@@ -339,7 +319,7 @@ call_predefined_function(int bf_id,
       result->type = ATTAT_NONE;
       return False;
     }
-    
+
     result->type = ATTAT_INT;
     result->value.intres = (2 & apl[0].value.intres ? 1 : 0);
     return True;
@@ -363,7 +343,7 @@ call_predefined_function(int bf_id,
       assert(ctptr->func.args[1].param->type == pa_ref);
       attr = ctptr->func.args[1].param->pa_ref.attr;
       assert(attr != NULL);
-      str1 = get_string_of_id(attr, apl[1].value.parefres.token_id);
+      str1 = cl_id2str(attr, apl[1].value.parefres.token_id);
     }
     else
       str1 = apl[1].value.charres;
@@ -373,17 +353,17 @@ call_predefined_function(int bf_id,
       strcpy(result->dynamic_string_buffer, str1);
       return True;
     }
- 
+
     /* convert 1st argument from PAREF to STRING if necessary */
     if (apl[0].type == ATTAT_PAREF) {
       assert(ctptr->func.args[0].param->type == pa_ref);
       attr = ctptr->func.args[0].param->pa_ref.attr;
       assert(attr != NULL);
-      str0 = get_string_of_id(attr, apl[0].value.parefres.token_id);
+      str0 = cl_id2str(attr, apl[0].value.parefres.token_id);
     }
     else
       str0 = apl[0].value.charres;
-    
+
     if (!cl_set_intersection(result->value.charres, str0, str1)) {
       cqpmessage(Error, "Malformed feature sets passed to builtin unify(%s, %s).", str0, str1);
       result->type = ATTAT_NONE;
@@ -407,7 +387,7 @@ call_predefined_function(int bf_id,
       assert(ctptr->func.args[0].param->type == pa_ref);
       attr = ctptr->func.args[0].param->pa_ref.attr;
       assert(attr != NULL);
-      str0 = get_string_of_id(attr, apl[0].value.parefres.token_id);
+      str0 = cl_id2str(attr, apl[0].value.parefres.token_id);
     }
     else
       str0 = apl[0].value.charres;
@@ -415,7 +395,7 @@ call_predefined_function(int bf_id,
     result->type = ATTAT_NONE;
     {
       int count = cl_set_size(str0);
-      
+
       if (count >= 0) {
         result->type = ATTAT_INT;
         result->value.intres = count;
@@ -452,14 +432,12 @@ call_predefined_function(int bf_id,
   case 14:                        /* minus */
     /* first handle the disallowed case of ATTAT_NONE type arguments */
     if (apl[0].type == ATTAT_NONE) {
-      cqpmessage(Error, "First argument to builtin %s() function is undefined.",
-                 builtin_function[bf_id].name);
+      cqpmessage(Error, "First argument to builtin %s() function is undefined.", builtin_function[bf_id].name);
       result->type = ATTAT_NONE; /* ATTAT_NONE not allowed as second argument */
       return False;
     }
     if (apl[1].type == ATTAT_NONE) {
-      cqpmessage(Error, "Second argument to builtin %s() function is undefined.",
-                 builtin_function[bf_id].name);
+      cqpmessage(Error, "Second argument to builtin %s() function is undefined.",  builtin_function[bf_id].name);
       result->type = ATTAT_NONE; /* ATTAT_NONE not allowed as second argument */
       return False;
     }
@@ -469,7 +447,7 @@ call_predefined_function(int bf_id,
       assert(ctptr->func.args[0].param->type == pa_ref);
       attr = ctptr->func.args[0].param->pa_ref.attr;
       assert(attr != NULL);
-      str0 = get_string_of_id(attr, apl[0].value.parefres.token_id);
+      str0 = cl_id2str(attr, apl[0].value.parefres.token_id);
     }
     else
       str0 = apl[0].value.charres;
@@ -479,11 +457,11 @@ call_predefined_function(int bf_id,
       assert(ctptr->func.args[1].param->type == pa_ref);
       attr = ctptr->func.args[1].param->pa_ref.attr;
       assert(attr != NULL);
-      str1 = get_string_of_id(attr, apl[1].value.parefres.token_id);
+      str1 = cl_id2str(attr, apl[1].value.parefres.token_id);
     }
     else
       str1 = apl[1].value.charres;
-    
+
     result->type = ATTAT_NONE;        /* in case of failure */
     if (bf_id == 12) {                /* prefix */
       int l = common_prefix_length(str0, str1);
@@ -530,7 +508,7 @@ call_predefined_function(int bf_id,
     result->value.intres = 1;
     return True;
     break;
-    
+
   case 16:                        /* normalize (case- and/or diacritic-folding) */
     /* check for invalid argument types */
     if (apl[0].type == ATTAT_NONE) {
@@ -551,7 +529,7 @@ call_predefined_function(int bf_id,
       assert(ctptr->func.args[0].param->type == pa_ref);
       attr = ctptr->func.args[0].param->pa_ref.attr;
       assert(attr != NULL);
-      str0 = get_string_of_id(attr, apl[0].value.parefres.token_id);
+      str0 = cl_id2str(attr, apl[0].value.parefres.token_id);
     }
     else
       str0 = apl[0].value.charres;
@@ -614,6 +592,38 @@ call_predefined_function(int bf_id,
 
     result->type = ATTAT_INT;
     result->value.intres = end;
+    return True;
+    break;
+
+  case 19:                        /* strlen */
+    /* check for undefined value */
+    if (apl[0].type == ATTAT_NONE) {
+      cqpmessage(Error, "First argument to builtin %s() function is undefined.",
+                 builtin_function[bf_id].name);
+      result->type = ATTAT_NONE;
+      return False;
+    }
+
+    /* convert argument from PAREF to STRING if necessary */
+    if (apl[0].type == ATTAT_PAREF) {
+      assert(ctptr->func.args[0].param->type == pa_ref);
+      attr = ctptr->func.args[0].param->pa_ref.attr;
+      assert(attr != NULL);
+      str0 = cl_id2str(attr, apl[0].value.parefres.token_id);
+    }
+    else
+      str0 = apl[0].value.charres;
+
+    assert(str0);
+    assert(evalenv->query_corpus);
+    assert(evalenv->query_corpus->corpus);
+
+    /* now determine string length in characters according to current corpus charset */
+    result->type = ATTAT_INT;
+    if (cl_corpus_charset(evalenv->query_corpus->corpus) == utf8)
+      result->value.intres = g_utf8_strlen(str0, -1); /* character count for NUL-terminated string */
+    else
+      result->value.intres = strlen(str0);
     return True;
     break;
 

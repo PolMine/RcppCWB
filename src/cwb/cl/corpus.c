@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -26,37 +26,39 @@ void Rprintf(const char *, ...);
 
 #include "globals.h"
 
-#include "macros.h"
 #include "attributes.h"
 #include "registry.tab.h"       /* the bison parser table */
 
 #include "corpus.h"
 
 
+/* ---------------------------------------------------------------------- IDLIST.*/
+static void FreeIDList(IDList *list);
+#ifndef __MINGW__
+static int memberIDList(char *s, IDList l);
+#endif
+
+
+
 /* ---------------------------------Interface to registry parser */
 
 /**
  * File pointer for loading corpus registry.
- *
  * (External variable, defined in the output from parsing registry.y)
  */
 extern FILE *cregin;
 /**
  * Pointer to a corpus object that is used when loading from the registry.
- *
  * (External variable, defined in the output from parsing registry.y)
  */
 extern Corpus *cregcorpus;
+
 /**
- * Function created in output from parsing registry.y
-void cregerror(char *message);
- * TODO - is the above function unused? in this file? */
-/**
- * Restarts the registry file parse
- *
- * Function created in output from parsing registry.y
+ * Restarts the registry file parse;
+ * function created in output from parsing registry.y
  */
-void cregrestart(FILE *file);
+extern void cregrestart(FILE *file);
+
 /**
  * Parse a corpus registry file.
  *
@@ -81,7 +83,7 @@ char *cregin_name = "";
 
 
 /**
- * Buffer for an error message. {Used in registry parser???}
+ * Buffer for an error message. {appears not to be used anywhere???}
  */
 char errmsg[CL_MAX_LINE_LENGTH];
 
@@ -95,23 +97,9 @@ char errmsg[CL_MAX_LINE_LENGTH];
  */
 Corpus *loaded_corpora = NULL;
 
-/* ---------------------------------------------------------------------- */
 
 
 
-
-/**
- * The default registry directory.
- *
- * It is initialised when the function that reads it is first called.
- *
- * @see cl_standard_registry
- * TODO: would this be better as a static variable WITHIN that function?
- * That way there is no change of anyone acessing the regdir variable
- * except via that function...
- *
- */
-static char *regdir = NULL;
 
 /**
  * Gets a string containing the path of the default registry directory.
@@ -129,10 +117,11 @@ static char *regdir = NULL;
 char *
 cl_standard_registry()
 {
+  static char *regdir = NULL;
   if (regdir == NULL)
-    regdir = getenv(REGISTRY_ENVVAR);
+    regdir = getenv(CWB_REGISTRY_ENVVAR);
   if (regdir == NULL)
-    regdir = REGISTRY_DEFAULT_PATH;
+    regdir = CWB_REGISTRY_DEFAULT_PATH;
   return regdir;
 }
 
@@ -162,9 +151,9 @@ find_corpus(char *registry_dir, char *registry_name)
 
   for (c = loaded_corpora; c != NULL; c = c->next) {
     int l_dir = strlen(c->registry_dir);
-    if (STREQ(registry_name, c->registry_name) &&             /* corpus ID must be the same */
-      (mark = strstr(registry_dir, c->registry_dir)) &&       /* find registry dir of <c> as substring of list <registry_dir> */
-                                                          /* now we must check that the substring corresponds
+    if (cl_streq(registry_name, c->registry_name) &&      /* corpus ID must be the same */
+      (mark = strstr(registry_dir, c->registry_dir)) &&   /* find registry dir of <c> as substring of list <registry_dir>
+                                                           * now we must check that the substring corresponds
                                                            * to a full component of the list */
       (mark == registry_dir || mark[-1] == PATH_SEPARATOR) && /* must start at beginning of string or after ':' separator */
       (mark[l_dir] == '\0' || mark[l_dir] == PATH_SEPARATOR)  /* must end at end of string or before ':' separator */
@@ -199,7 +188,7 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
 
   re_p = 0;
 
-  for (;;) {
+  while (1) {
     if (registry_dir[re_p] == '\0') {
       *real_registry_dir = NULL;
       return NULL;
@@ -213,9 +202,7 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
       start_of_entry = re_p;
 
       do {
-
         full_name[ins_p++] = registry_dir[re_p++];
-
       } while ((registry_dir[re_p] != PATH_SEPARATOR) && (registry_dir[re_p] != '\0'));
 
       end_of_entry = re_p;
@@ -276,7 +263,7 @@ find_corpus_registry(char *registry_dir, char *registry_name, char **real_regist
  * @param verbose  A boolean. Currently ignored.
  * @return         A boolean: true if access is OK, else false.
  */
-int
+static int
 check_access_conditions(Corpus *corpus, int verbose)
 {
   int access_ok = 1;
@@ -287,9 +274,7 @@ check_access_conditions(Corpus *corpus, int verbose)
 
   /* get password data only if we have user / group access restrictions */
   if (corpus->userAccessList || corpus->groupAccessList) {
-    /*     pwd = getpwuid(getuid()); */
-    Rprintf(
-        "CL Error: Sorry, user/group access restrictions are disabled due to incompatibilities.\n");
+    Rprintf("CL Error: Sorry, user/group access restrictions are disabled due to incompatibilities.\n");
     if (pwd == NULL) {
       perror("getpwuid(getuid()): can't get user information");
       access_ok = 0;
@@ -308,7 +293,6 @@ check_access_conditions(Corpus *corpus, int verbose)
   }
 
   if (access_ok && corpus->groupAccessList) {
-
     gid_t gidset[16];
     int nr_groups;
 
@@ -317,20 +301,17 @@ check_access_conditions(Corpus *corpus, int verbose)
       access_ok = 0;
     }
     else {
-
       int i;
       struct group *grpent = NULL;
 
       for (i = 0; i < nr_groups; i++) {
 
         /*      grpent = getgrgid(gidset[i]); */
-        Rprintf(
-            "CL Error: Sorry, user/group access restrictions are disabled due to incompatibilities.\n");
+        Rprintf("CL Error: Sorry, user/group access restrictions are disabled due to incompatibilities.\n");
 
         if (grpent == NULL) {
           perror("getgrgid(2): ");
-          Rprintf("Can't get group information for gid %d\n",
-              (int) gidset[i]);
+          Rprintf("Can't get group information for gid %d\n", (int) gidset[i]);
           access_ok = 0;
         }
         else if (memberIDList(grpent->gr_name, corpus->groupAccessList)) {
@@ -342,36 +323,19 @@ check_access_conditions(Corpus *corpus, int verbose)
   }
 
   if (access_ok && corpus->hostAccessList) {
-
     struct utsname hostinfo;
-
     if (uname(&hostinfo) < 0) {
       perror("uname(2):");
       access_ok = 0;
     }
-    else if (!memberIDList(hostinfo.nodename, corpus->hostAccessList)) {
-#if 0
-      IDList l;
-
-      Rprintf(
-          "The corpus ``%s'' may be used on the following systems only:\n",
-          corpus->id ? corpus->id : "(unknown)");
-
-      for (l = corpus->hostAccessList; l; l = l->next) {
-        Rprintf("\t%s\n", l->string ? l->string : "(null)");
-      }
-#endif
-    }
-    else {
+    else
       access_ok = 1;
-    }
   }
 
-  if (!access_ok) {
-    Rprintf("User ``%s'' is not authorized to access corpus ``%s''\n",
-        (pwd && pwd->pw_name) ? pwd->pw_name : "(unknown)", corpus->name);
-  }
-
+  if (!access_ok)
+    Rprintf(
+            "User ``%s'' is not authorized to access corpus ``%s''\n",
+            (pwd && pwd->pw_name) ? pwd->pw_name : "(unknown)", corpus->name);
 #endif
 
   return access_ok;
@@ -398,16 +362,13 @@ cl_new_corpus(char *registry_dir, char *registry_name)
   cl_free(canonical_name); /* if necessary, free buffer allocated in previous call to setup_corpus() */
 
   canonical_name = cl_strdup(registry_name);
-  /* cl_string_canonical(canonical_name, CHARSET_FOR_IDENTIFIERS, IGNORE_CASE); */
-  /* new function replaces call to cl_string_canonical ... */
   cl_id_tolower(canonical_name);
-  if (!cl_id_validate(canonical_name)) {
+  if (!cl_id_validate(canonical_name))
     Rprintf("cl_new_corpus: <%s> is not a valid corpus name\n", registry_name);
-  }
 
   /* ------------------------------------------------------------------ */
 
-  if ((corpus = find_corpus(registry_dir, canonical_name)) != NULL) {
+  if (NULL != (corpus = find_corpus(registry_dir, canonical_name))) {
     /* we already have the beast loaded, so just increment the references */
     corpus->nr_of_loads++;
   }
@@ -417,11 +378,8 @@ cl_new_corpus(char *registry_dir, char *registry_name)
     if (registry_dir == NULL)
       registry_dir = cl_standard_registry();
 
-    cregin = find_corpus_registry(registry_dir, canonical_name, &real_registry_name);
-
-    if (cregin == NULL) {
+    if (!(cregin = find_corpus_registry(registry_dir, canonical_name, &real_registry_name)))
       Rprintf("cl_new_corpus: can't locate <%s> in %s\n", registry_name, registry_dir);
-    }
     else {
       cregrestart(cregin);
       cregin_path = real_registry_name;
@@ -440,20 +398,15 @@ cl_new_corpus(char *registry_dir, char *registry_name)
                 corpus->id, real_registry_name, canonical_name);
           }
         }
-        else {
+        else
           cl_delete_corpus(cregcorpus);
-        }
       }
       cregin_path = "";
       cregin_name = "";
-
       cregcorpus = NULL;
-
       fclose(cregin);
     }
   }
-
-  /* Check access permissions */
 
   return corpus;
 }
@@ -481,17 +434,13 @@ cl_delete_corpus(Corpus *corpus)
   corpus->nr_of_loads--;
 
   /* delete it physically iff nobody wants to have it any more */
-  if (corpus->nr_of_loads == 0) {
-
+  if (0 == corpus->nr_of_loads) {
     /* remove it from the linked list */
     if (corpus == loaded_corpora)
       loaded_corpora = corpus->next;
     else {
-      prev = loaded_corpora;
-
-      while (prev && (prev->next != corpus))
-        prev = prev->next;
-
+      for (prev = loaded_corpora ; prev && (prev->next != corpus) ; prev = prev->next)
+        ;
       if (prev == NULL) {
         if (corpus != cregcorpus)
           assert("Error in list of loaded corpora" && 0);
@@ -503,7 +452,7 @@ cl_delete_corpus(Corpus *corpus)
     }
 
     /* now, time to actually get rid of it! */
-    while (corpus->attributes != NULL)
+    while (NULL != corpus->attributes)
       cl_delete_attribute(corpus->attributes);
 
     corpus->attributes = NULL;
@@ -516,8 +465,6 @@ cl_delete_corpus(Corpus *corpus)
     cl_free(corpus->registry_dir);
     cl_free(corpus->registry_name);
 
-    cl_free(corpus->admin);
-
     if (corpus->groupAccessList)
       FreeIDList(&(corpus->groupAccessList));
 
@@ -525,10 +472,9 @@ cl_delete_corpus(Corpus *corpus)
       FreeIDList(&(corpus->userAccessList));
 
     if (corpus->hostAccessList)
-      FreeIDList(&(corpus->userAccessList));
+      FreeIDList(&(corpus->hostAccessList));
 
     cl_free(corpus);
-
   }
 
   return 1;
@@ -539,8 +485,8 @@ cl_delete_corpus(Corpus *corpus)
 /**
  * Prints a description of the corpus to STDOUT.
  *
- * TODO might be nice to have this function offer an option of XML-style output.
- * TODO might also be nice to have it return a string, or send to a parameter stream,
+ * In v4: might be nice to have this function offer an option of XML-style output.
+ * It might also be nice to have it return a string, or send to a parameter stream,
  * so that the caller can decide what to do with it: direct UI formatting does not really
  * belong in the low-level CL.
  */
@@ -594,19 +540,14 @@ describe_corpus(Corpus *corpus)
 cl_string_list
 cl_corpus_list_attributes(Corpus *corpus, int attribute_type)
 {
-  cl_string_list attnames;
   Attribute *attr;
+  cl_string_list attnames = cl_new_string_list();
 
-  attnames = cl_new_string_list();
-
-  for (attr = corpus->attributes;
-       attr != NULL;
-       attr= (Attribute *) (attr->any.next)) {
-    /* ie if any of the bits set on the parameter match the type bit of this att   */
-    /* (allows ATT_ANY and ATT_REAL to be passed, and we will get the right result */
-    if ((attr->any.type & attribute_type) != 0)
+  /* foreach att, if any of the bits set on the parameter match its type bit, add to the list!  */
+  for (attr = corpus->attributes ; attr != NULL ; attr = (Attribute *)attr->any.next)
+    if (0 != (attr->any.type & attribute_type))
       cl_string_list_append(attnames, cl_strdup(attr->any.name));
-  }
+  /* (that check allows ATT_ANY and ATT_REAL to be passed, and we will get the right result */
 
   return attnames;
 }
@@ -618,16 +559,15 @@ cl_corpus_list_attributes(Corpus *corpus, int attribute_type)
  *
  * @param list  IDList to delete.
  */
-void
+static void
 FreeIDList(IDList *list)
 {
   IDList l;
-
   while (*list) {
     l = *list;
     *list = (*list)->next;
     cl_free(l->string);
-    free(l);
+    cl_free(l);
   }
   *list = NULL;
 }
@@ -636,21 +576,21 @@ FreeIDList(IDList *list)
 /**
  * Checks whether the specified string occurs in the given IDList.
  *
- * @param s  The username, groupname, or hostname to look for.
- * @param l  The IDList to search.
- * @return   Boolean: true if s is a member of the list, else false.
+ * @param  s  The username, groupname, or hostname to look for.
+ * @param  l  The IDList to search.
+ * @return    Boolean: true if s is a member of the list, else false.
  */
-int
+#ifndef __MINGW__
+static int
 memberIDList(char *s, IDList l)
 {
-  while (l) {
-    if (strcmp(s, l->string) == 0)
+  for ( ; l ; l = l->next)
+    if (cl_streq(s, l->string))
       return 1;
-    l = l->next;
-  }
   return 0;
 }
 
+#endif
 /* ---------------------------------------------------------------------- */
 
 /*
@@ -704,7 +644,7 @@ cl_corpus_property(Corpus *corpus, char *property)
 {
   CorpusProperty p = cl_first_corpus_property(corpus);
 
-  while ((p != NULL) && strcmp(property, p->property))
+  while (p != NULL && strcmp(property, p->property))
     p = cl_next_corpus_property(p);
   if (p != NULL)
     return p->value;
@@ -729,10 +669,8 @@ cl_corpus_charset(Corpus *corpus)
 }
 
 /** structure for the global list of charset names @see charset_names */
-typedef struct _charset_spec
-{
+typedef struct {
   CorpusCharset id;
-  /* TODO should this be const char *? */
   char *name;
 } charset_spec;
 
@@ -741,9 +679,8 @@ typedef struct _charset_spec
  *  CWB-preferred name comes first in the array (and is the same as the
  *  identifier used for that charset in the CorpusCharset enumeration).
  *
- *  TODO should it be const charset_spec ?
  */
-charset_spec charset_names[] = {
+const charset_spec charset_names[] = {
     { ascii,    "ascii" },
     { latin1,   "latin1" },
     { latin1,   "iso-8859-1" },
@@ -778,17 +715,16 @@ charset_spec charset_names[] = {
 /**
  * Gets a string containing the name of the specified CorpusCharset character set object.
  *
- * Note that returned string cannot be modified. TODO It should probably be a const char.
+ * Note that returned string cannot be modified.
  */
-char *
+const char *
 cl_charset_name(CorpusCharset id)
 {
   int i;
 
-  for (i = 0; charset_names[i].name; i++) {
+  for (i = 0; charset_names[i].name; i++)
     if (id == charset_names[i].id)
       return charset_names[i].name;
-  }
   return "<unsupported>";
 }
 
@@ -796,15 +732,13 @@ cl_charset_name(CorpusCharset id)
  * Gets a CorpusCharset enumeration with the id code for the given string.
  */
 CorpusCharset
-cl_charset_from_name(char *name)
+cl_charset_from_name(const char *name)
 {
   int i;
   CorpusCharset fallback = unknown_charset;
-  for (i = 0; charset_names[i].name; i++) {
-    if (strcasecmp(name, charset_names[i].name) == 0) {
+  for (i = 0; charset_names[i].name; i++)
+    if (0 == strcasecmp(name, charset_names[i].name))
       return (charset_names[i].id);
-    }
-  }
   return fallback;
 }
 
@@ -818,15 +752,13 @@ cl_charset_from_name(char *name)
  * @return               Pointer to canonical-form string for that charset's name
  *                       or NULL if name_to_check cannot be linked to a valid charset.
  */
-char *
+const char *
 cl_charset_name_canonical(char *name_to_check)
 {
   int i;
-  for (i = 0; charset_names[i].name; i++) {
-    if (strcasecmp(name_to_check, charset_names[i].name) == 0) {
+  for (i = 0; charset_names[i].name; i++)
+    if (0 == strcasecmp(name_to_check, charset_names[i].name))
       return charset_names[i].name;
-    }
-  }
   return NULL;
 }
 
@@ -847,8 +779,6 @@ void
 add_corpus_property(Corpus *corpus, char *property, char *value)
 {
   CorpusProperty new_prop;
-//  CorpusCharset charset;
-//  int i;
 
   if (cl_corpus_property(corpus, property) != NULL) {
     Rprintf(
@@ -863,8 +793,7 @@ add_corpus_property(Corpus *corpus, char *property, char *value)
     corpus->properties = new_prop;
 
     /* if property=='charset', set corpus->charset accordingly */
-    if (0 == strcmp(property, "charset")) {
+    if (0 == strcmp(property, "charset"))
       corpus->charset = cl_charset_from_name(value);
-    }
   }
 }

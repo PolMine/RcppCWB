@@ -104,7 +104,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 69 "registry.y"
+#line 98 "registry.y"
 {
   char    *strval;
   int      ival;

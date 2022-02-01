@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -24,29 +24,23 @@ void Rprintf(const char *, ...);
 
 #include "endian2.h"
 #include "corpus.h"
-#include "macros.h"
 #include "fileutils.h"
-#include "cdaccess.h"
-#include "makecomps.h"
-#include "list.h"
 
 #include "attributes.h"
+#include "makecomps.h"
 
 
 /*
  *******************************************************************
- * FLAGS controlling how ensure_component() behaves.
+ * CONSTANTS controlling how ensure_component() behaves.
  *******************************************************************
  */
-
-/* TODO: these should be either
- * (a) dynamic - set at runtime or
- * (b) bound to a setting in config.mk or definitions.mk
- * changing these settings should not require hacking the source! */
 
 /**
  * if CL_ENSURE_COMPONENT_EXITS is defined, ensure_component will exit
  * when the component can't be created or loaded.
+ *
+ * @see ensure_component
  */
 #if 0
 #define CL_ENSURE_COMPONENT_EXITS
@@ -55,6 +49,8 @@ void Rprintf(const char *, ...);
 /**
  * if CL_ENSURE_COMPONENT_ALLOW_CREATION is defined, components may be created
  * on the fly by ensure_component.
+ *
+ * @see ensure_component
  */
 #if 0
 #define CL_ENSURE_COMPONENT_ALLOW_CREATION
@@ -93,7 +89,7 @@ typedef struct component_field_spec {
  * object contains.
  */
 static struct component_field_spec Component_Field_Specs[] =
-{ 
+{
   { CompDirectory,    "DIR",     ATT_ALL,    "$APATH"},
 
   { CompCorpus,       "CORPUS",  ATT_POS,    "$DIR" SUBDIR_SEP_STRING "$ANAME.corpus"},
@@ -125,8 +121,9 @@ static struct component_field_spec Component_Field_Specs[] =
 
 
 /* ---------------------------------------------------------------------- */
-/*TODO needed here? move to header file? */
-ComponentState comp_component_state(Component *component);
+
+static ComponentState work_out_component_state(Component *component);
+static int comp_drop_component(Component *component);
 
 /* ---------------------------------------------------------------------- */
 
@@ -148,7 +145,7 @@ find_cid_name(char *name)
   int i;
 
   for (i = 0; i < CompLast; i++) {
-    if (strcmp(Component_Field_Specs[i].name, name) == 0)
+    if (cl_streq(Component_Field_Specs[i].name, name))
       return &Component_Field_Specs[i];
   }
   return NULL;
@@ -180,7 +177,7 @@ find_cid_id(ComponentID id)
 char *
 cid_name(ComponentID id)
 {
-  struct component_field_spec *spec = find_cid_id(id);
+  component_field_spec *spec = find_cid_id(id);
   return (spec == NULL ? "((NULL))" : spec->name);
 }
 
@@ -190,29 +187,28 @@ cid_name(ComponentID id)
 ComponentID
 component_id(char *name)
 {
-  struct component_field_spec *spec = find_cid_name(name);
+  component_field_spec *spec = find_cid_name(name);
   return (spec == NULL ? CompLast : spec->id);
 }
 
 
-/* this function does not appear to be used anywhere ??*/
 /**
  * Checks whether a particular Attribute type can possess
  * the specified component field.
  *
- * @return  True or false.
+ * this function does not appear to be used anywhere ??
+ *
+ * @return  Boolean.
  */
 int
 MayHaveComponent(int attr_type, ComponentID cid)
 {
-  struct component_field_spec *spec;
+  component_field_spec *spec = find_cid_id(cid);
 
-  spec = find_cid_id(cid);
-
-  if (spec && (spec->id != CompLast))
+  if (spec && spec->id != CompLast)
     return (spec->using_atts & attr_type) ? 1 : 0;
-  else
-    return 0;
+
+  return 0;
 }
 
 /**
@@ -220,21 +216,21 @@ MayHaveComponent(int attr_type, ComponentID cid)
  *
  * Non-exported function.
  *
- * @param i  The attribute-type whose name is required.
- *           (Should be one of the values of the constants
- *           defined in cl.h.)
- * @return   String (pointer to internal constant string,
- *           do not change or free).
+ * @param att_type  The attribute-type whose name is required.
+ *                  (Should be one of the values of the constants
+ *                  defined in cl.h.)
+ * @return          String (pointer to internal constant string,
+ *                  do not change or free).
  */
-char *
-aid_name(int i)
+static char *
+aid_name(int att_type)
 {
-  switch (i) {
-  case ATT_NONE:  return "NONE (ILLEGAL)"; break;
-  case ATT_POS:   return "Positional Attribute"; break;
-  case ATT_STRUC: return "Structural Attribute"; break;
-  case ATT_ALIGN: return "Alignment Attribute"; break;
-  case ATT_DYN:   return "Dynamic Attribute"; break;
+  switch (att_type) {
+  case ATT_NONE:  return "NONE (ILLEGAL)";         break;
+  case ATT_POS:   return "Positional Attribute";   break;
+  case ATT_STRUC: return "Structural Attribute";   break;
+  case ATT_ALIGN: return "Alignment Attribute";    break;
+  case ATT_DYN:   return "Dynamic Attribute";      break;
   default:        return "ILLEGAL ATTRIBUTE TYPE"; break;
   }
   /* NOTREACHED */
@@ -244,31 +240,26 @@ aid_name(int i)
 /**
  * Gets a string containing a description of the specified dynamic attribute argument type.
  *
- * Non-exported function.
- *
- * @param i  The argument-type whose name is required.
- *           (Should be one of the values of the constants
- *           defined in cl.h.)
- * @return   String (pointer to internal constant string,
- *           do not change or free).
+ * @param argtype  The argument-type whose name is required.
+ *                 (Should be one of the values of the constants defined in cl.h.)
+ * @return         String (pointer to internal constant string, do not change or free).
  */
-char *
-argid_name(int i)
+static char *
+argid_name(int argtype)
 {
-  switch (i) {
-  case ATTAT_NONE:   return "NONE(ILLEGAL)"; break;
-  case ATTAT_POS:    return "CorpusPosition"; break;
-  case ATTAT_STRING: return "String"; break;
-  case ATTAT_VAR:    return "Variable[StringList]"; break;
-  case ATTAT_INT:    return "Integer"; break;
-  case ATTAT_FLOAT:  return "Float"; break;
-  case ATTAT_PAREF:  return "PARef"; break;
+  switch (argtype) {
+  case ATTAT_NONE:   return "NONE(ILLEGAL)";         break;
+  case ATTAT_POS:    return "CorpusPosition";        break;
+  case ATTAT_STRING: return "String";                break;
+  case ATTAT_VAR:    return "Variable[StringList]";  break;
+  case ATTAT_INT:    return "Integer";               break;
+  case ATTAT_FLOAT:  return "Float";                 break;
+  case ATTAT_PAREF:  return "PARef";                 break;
   default:           return "ILLEGAL*ARGUMENT*TYPE"; break;
   }
   /* NOTREACHED */
   return NULL;
 }
-
 
 
 
@@ -288,37 +279,22 @@ argid_name(int i)
 DynArg *
 makearg(char *type_id)
 {
-  DynArg *arg;
+  DynArg *arg = (DynArg *)cl_malloc(sizeof(DynArg));
 
-  arg = NULL;
+  arg->next = NULL;
 
-  if (strcmp(type_id, "STRING") == 0) {
-    arg = new(DynArg);
+  if (cl_str_is(type_id, "STRING"))
     arg->type = ATTAT_STRING;
-    arg->next = NULL;
-  }
-  else if (strcmp(type_id, "POS") == 0) {
-    arg = new(DynArg);
+  else if (cl_str_is(type_id, "POS"))
     arg->type = ATTAT_POS;
-    arg->next = NULL;
-  }
-  else if (strcmp(type_id, "INT") == 0) {
-    arg = new(DynArg);
+  else if (cl_str_is(type_id, "INT"))
     arg->type = ATTAT_INT;
-    arg->next = NULL;
-  }
-  else if (strcmp(type_id, "VARARG") == 0) {
-    arg = new(DynArg);
+  else if (cl_str_is(type_id, "VARARG"))
     arg->type = ATTAT_VAR;
-    arg->next = NULL;
-  }
-  else if (strcmp(type_id, "FLOAT") == 0) {
-    arg = new(DynArg);
+  else if (cl_str_is(type_id, "FLOAT"))
     arg->type = ATTAT_FLOAT;
-    arg->next = NULL;
-  }
   else
-    arg = NULL;
+    cl_free(arg);
 
   return arg;
 }
@@ -337,77 +313,65 @@ makearg(char *type_id)
  * @param data            Unused. It can just be NULL.
  */
 Attribute *
-setup_attribute(Corpus *corpus,
-                char *attribute_name,
-                int type,
-                char *data)
+setup_attribute(Corpus *corpus, char *attribute_name, int type, char *data)
 {
-  Attribute *attr;
+  ComponentID cid;
+  Attribute *attr = NULL;
   Attribute *prev;
 
-  /* count of attributes that the corpus possesses already, including the default
+  /* count of attributes that the corpus possesses already, including the default;
    * used to calculate this attribute's attr_number value. */
   int a_num;
 
-  attr = NULL;
-
-  if (cl_new_attribute(corpus, attribute_name, type) != NULL)
+  if (NULL != cl_new_attribute(corpus, attribute_name, type)) {
     Rprintf("attributes:setup_attribute(): Warning: \n"
             "  Attribute %s of type %s already defined in corpus %s\n",
             attribute_name, aid_name(type), corpus->id);
-  else {
-
-    ComponentID cid;
-
-    attr = new(Attribute);
-    attr->type = type;
-    attr->any.mother = corpus;
-    attr->any.name = attribute_name;
-
-    for (cid = CompDirectory; cid < CompLast; cid++)
-      attr->any.components[cid] = NULL;
-
-    if (strcmp(attribute_name, DEFAULT_ATT_NAME) == 0 && type == ATTAT_POS)
-      a_num = 0;
-    else
-      a_num = 1;
-
-    /* insert at end of attribute list */
-    
-    attr->any.next = NULL;
-    if (corpus->attributes == NULL)
-      corpus->attributes = attr;
-    else {
-      for (prev = corpus->attributes; prev->any.next; prev = prev->any.next)
-        a_num++;
-      assert(prev);
-      assert(prev->any.next == NULL);
-      prev->any.next = attr;
-    }
-    attr->any.attr_number = a_num;
-
-    attr->any.path = NULL;
-
-    /* ======================================== type specific initializations */
-
-    switch (attr->type) {
-
-    case ATT_POS:
-      attr->pos.hc = NULL;
-      attr->pos.this_block_nr = -1;
-      break;
-
-    case ATT_STRUC:
-      attr->struc.has_attribute_values = -1; /* not yet known */
-      break;
-
-    default:
-      break;
-    }
+    return NULL;
   }
-  
+
+  attr = (Attribute *)cl_malloc(sizeof(Attribute));
+  attr->type = type;
+  attr->any.mother = corpus;
+  attr->any.name = attribute_name;
+
+  for (cid = CompDirectory; cid < CompLast; cid++)
+    attr->any.components[cid] = NULL;
+
+  /* if we're setting up "word", the attr_number will be 0; otherwise, start counting at 1 */
+  a_num = (cl_str_is(attribute_name, CWB_DEFAULT_ATT_NAME) && type == ATTAT_POS) ? 0 : 1;
+
+  /* insert at end of attribute list */
+  attr->any.next = NULL;
+  if (corpus->attributes == NULL)
+    corpus->attributes = attr;
+  else {
+    for (prev = corpus->attributes ; prev->any.next ; prev = prev->any.next)
+      a_num++;
+    prev->any.next = attr;
+  }
+  attr->any.attr_number = a_num;
+  attr->any.path = NULL;
+
+  /* ======================================== type specific initialization */
+
+  switch (attr->type) {
+  case ATT_POS:
+    attr->pos.hc = NULL;
+    attr->pos.this_block_nr = -1;
+    break;
+
+  case ATT_STRUC:
+    attr->struc.has_attribute_values = -1; /* not yet known */
+    break;
+
+  default:
+    break;
+  }
+
   return attr;
 }
+
 
 
 /**
@@ -420,72 +384,29 @@ setup_attribute(Corpus *corpus,
  * of the Corpus object; this function simply locates it and returns a pointer
  * to it.
  *
- * This function is DEPRACATED. Use cl_new_attribute() instead (which is
- * actually a macro to this function, but the parameter list is different.)
- *
- * @see                   cl_new_attribute
+ * @see                   cl_new_attribute_oldstyle
  *
  * @param corpus          The corpus in which to search for the attribute.
  * @param attribute_name  The name of the attribute (i.e. the handle it has in the registry file).
  * @param type            Type of attribute to be searched for.
- * @param data            NOT USED.
  *
  * @return                Pointer to Attribute object, or NULL if not found.
  */
 Attribute *
-cl_new_attribute_oldstyle(Corpus *corpus,
-                          char *attribute_name,
-                          int type,
-                          char *data)
+cl_new_attribute(Corpus *corpus, const char *attribute_name, int type)
 {
-  Attribute *attr;
+  Attribute *attr = NULL;
 
-  attr = NULL;
-
-  if (corpus == NULL)
-    Rprintf("attributes:cl_new_attribute_oldstyle(): called with NULL corpus\n");
-  else {
-    
-    for (attr = corpus->attributes; attr != NULL; attr = attr->any.next)
-      if ((type == attr->type) &&
-          STREQ(attr->any.name, attribute_name))
+  if (!corpus)
+    Rprintf("attributes:cl_new_attribute(): called with NULL corpus\n");
+  else
+    for (attr = corpus->attributes ; attr ; attr = attr->any.next)
+      if (type == attr->type && cl_streq(attr->any.name, attribute_name))
         break;
-  }
+
   return attr;
 }
 
-/**
- * Drops an attribute for the given corpus.
- *
- * The attribute to be dropped is specified by its attribute name
- * and its type (i.e. no pointer needed: compare cl_delete_attribute).
- *
- * After calling this, the corpus does not have the attribute any
- * longer -- it is the same as it was never defined.
- *
- * This is an internal function; the function exposed in the API for
- * this purpose is cl_delete_attribute().
- *
- * tODO: this function can probably actually be deleted. It doesn't
- * todo: seem to be used anywhere, and is much more complex than
- * todo: cl_delete_attribute
- *
- * @see      cl_delete_attribute
- * @return   Boolean: true for all OK, false for a problem
- */
-int
-drop_attribute(Corpus *corpus,
-               char *attribute_name,
-               int type,
-               char *data)
-{
-  if (corpus == NULL) {
-    Rprintf("attributes:drop_attribute(): called with NULL corpus\n");
-    return 0;
-  }
-  else
-    return cl_delete_attribute(cl_new_attribute_oldstyle(corpus, attribute_name, type, data));
-}
 
 /**
  * Deletes the specified Attribute object.
@@ -505,75 +426,54 @@ cl_delete_attribute(Attribute *attribute)
   Corpus *corpus;
   ComponentID cid;
 
-  if (attribute == NULL)
+  if (!attribute)
     return 0;
+
+  corpus = attribute->any.mother;
+  assert("NULL corpus in attribute" && (corpus != NULL));
+
+  /* remove attribute from corpus attribute list */
+  if (attribute == corpus->attributes)
+    corpus->attributes = attribute->any.next;
   else {
+    for (prev = corpus->attributes ; prev ; prev = prev->any.next)
+      if (prev->any.next == attribute)
+        break;
 
-    corpus = attribute->any.mother;
-    
-    assert("NULL corpus in attribute" && (corpus != NULL));
-
-    /* remove attribute from corpus attribute list */
-    if (attribute == corpus->attributes)
-      corpus->attributes = attribute->any.next;
+    if (prev == NULL)
+      Rprintf("attributes:cl_delete_attribute():\n  Warning: Attribute %s not in list of corpus attributes\n", attribute->any.name);
     else {
-      for (prev = corpus->attributes; 
-           (prev != NULL) && (prev->any.next != attribute);
-           prev = prev->any.next)
-        ;
-      
-      if (prev == NULL)
-        Rprintf("attributes:cl_delete_attribute():\n"
-                "  Warning: Attribute %s not in list of corpus attributes\n",
-                attribute->any.name);
-      else {
-        assert("Error in attribute chain" && (prev->any.next == attribute));
-        prev->any.next = attribute->any.next;
-      }
+      assert("Error in attribute chain" && prev->any.next == attribute);
+      prev->any.next = attribute->any.next;
     }
-      
-    /* get rid of components */
-    for (cid = CompDirectory; cid < CompLast; cid++)
-      if (attribute->any.components[cid]) {
-        comp_drop_component(attribute->any.components[cid]);
-        attribute->any.components[cid] = NULL;
-      }
-
-    cl_free(attribute->any.name);
-    cl_free(attribute->any.path);
-    
-    /* get rid of special fields */
-
-    switch (attribute->type) {
-
-    case ATT_POS:
-      cl_free(attribute->pos.hc);
-      break;
-
-    case ATT_DYN:
-      cl_free(attribute->dyn.call);
-      while (attribute->dyn.arglist != NULL) {
-        arg = attribute->dyn.arglist;
-        attribute->dyn.arglist = arg->next;
-        cl_free(arg);
-      }
-      break;
-
-    default:
-      break;
-    }
-
-    /* TODO do we really need to overwrite these members when we are about to free the attribute? */
-    attribute->any.mother = NULL;
-    attribute->any.type = ATT_NONE;
-    attribute->any.next = NULL;
-    
-    cl_free(attribute);
-    return 1;
   }
-  
-  /* notreached */
-  assert("Notreached point reached ..." && 0);
+
+  /* get rid of components */
+  for (cid = CompDirectory; cid < CompLast; cid++)
+    if (attribute->any.components[cid])
+      comp_drop_component(attribute->any.components[cid]);
+
+  cl_free(attribute->any.name);
+  cl_free(attribute->any.path);
+
+  /* get rid of special fields */
+  switch (attribute->type) {
+  case ATT_POS:
+    cl_free(attribute->pos.hc);
+    break;
+  case ATT_DYN:
+    cl_free(attribute->dyn.call);
+    while (attribute->dyn.arglist != NULL) {
+      arg = attribute->dyn.arglist;
+      attribute->dyn.arglist = arg->next;
+      cl_free(arg);
+    }
+    break;
+  default:
+    break;
+  }
+
+  cl_free(attribute);
   return 1;
 }
 
@@ -586,7 +486,6 @@ cl_attribute_mother_corpus(Attribute *attribute)
   return attribute->any.mother;
 }
 
-/* ---------------------------------------------------------------------- */
 
 
 /**
@@ -613,33 +512,26 @@ declare_component(Attribute *attribute, ComponentID cid, char *path)
   Component *component;
 
   if (attribute == NULL) {
-    Rprintf("attributes:declare_component(): \n"
-            "  NULL attribute passed in declaration of %s component\n",
-            cid_name(cid));
+    Rprintf("attributes:declare_component(): \n  NULL attribute passed in declaration of %s component\n", cid_name(cid));
     return NULL;
   }
 
-  if ((component = attribute->any.components[cid]) == NULL) {
-
-    component = new(Component);
-
+  if (!(component = attribute->any.components[cid])) {
+    component = (Component *)cl_malloc(sizeof(Component));
     component->id = cid;
     component->corpus = attribute->any.mother;
     component->attribute = attribute;
     component->path = NULL;
 
     init_mblob(&(component->data));
-
     attribute->any.components[cid] = component;
-    
+
     /* we can then initialize the component path within the attribute */
-    (void) component_full_name(attribute, cid, path);
+    component_full_name(attribute, cid, path);
   }
-  else {
-    Rprintf("attributes:declare_component(): Warning:\n"
-            "  Component %s of %s declared twice\n",
-            cid_name(cid), attribute->any.name);
-  }
+  else
+    Rprintf("attributes:declare_component(): Warning:\n  Component %s of %s declared twice\n", cid_name(cid), attribute->any.name);
+
   return component;
 }
 
@@ -658,25 +550,21 @@ declare_default_components(Attribute *attribute)
   int i;
 
   if (attribute == NULL)
-    Rprintf("attributes:declare_default_components(): \n"
-            "  NULL attribute passed -- can't create defaults\n");
-  else {
+    Rprintf("attributes:declare_default_components(): \n  NULL attribute passed -- can't create defaults\n");
+  else
     for (i = CompDirectory; i < CompLast; i++)
-      if (((Component_Field_Specs[i].using_atts & attribute->type) != 0) &&
-          (attribute->any.components[i] == NULL))
-        (void) declare_component(attribute, i, NULL);
-      /* TODO should the return value of declare_component be checked for error? */
-  }
+      if (0 != (Component_Field_Specs[i].using_atts & attribute->type) && NULL == attribute->any.components[i])
+        declare_component(attribute, i, NULL);
 }
 
-/* ---------------------------------------------------------------------- */
 
 
 /**
  * Works out and returns the state of the component.
+ * For public interface see component_state().
  */
-ComponentState 
-comp_component_state(Component *comp)
+static ComponentState
+work_out_component_state(Component *comp)
 {
   assert(comp);
 
@@ -692,6 +580,7 @@ comp_component_state(Component *comp)
     return ComponentUnloaded;
 }
 
+
 /**
  * Gets the state of a specified component on the given attribute.
  *
@@ -701,23 +590,20 @@ comp_component_state(Component *comp)
  *                   found is ComponentUndefined. Otherwise, some
  *                   other value of ComponentState.
  */
-ComponentState 
+ComponentState
 component_state(Attribute *attribute, ComponentID cid)
 {
-  if (cid < CompLast) {
-    
+  if (attribute && cid < CompLast) {
     Component *comp = attribute->any.components[cid];
-    
     if (comp == NULL)
       return ComponentUndefined;
     else
-      return comp_component_state(comp);
+      return work_out_component_state(comp);
   }
   else
     return ComponentUndefined;
 }
 
-/* ---------------------------------------------------------------------- */
 
 /**
  * Initializes the path of an attribute Component.
@@ -738,37 +624,32 @@ component_state(Attribute *attribute, ComponentID cid)
  *                             in which case, the default path from Component_Field_Specs
  *                             is used.
  * @return                     Pointer to this function's static buffer for creating the
- *                             path (NB: NOT to the path in the actual component! which
- *                             is a copy). If a path already exists, a pointer to that
- *                             path. NULL in case of error in Component_Field_Specs.
- *                             TODO: could this be a void function?
+ *                             path (NB: NOT to the path in the actual component! which is a copy).
+ *                             If a path already exists, a pointer to that path.
+ *                             Either way, don't muck about with the buffer content.
+ *                             NULL in case of error in Component_Field_Specs.
  */
 char *
 component_full_name(Attribute *attribute, ComponentID cid, char *path)
 {
   component_field_spec *compspec;
   Component *component;
-  
-  static char buf[CL_MAX_LINE_LENGTH];
-  char rname[CL_MAX_LINE_LENGTH];
+
+  static char buf[CL_MAX_LINE_LENGTH] = { '\0' };
+  char rname[CL_MAX_LINE_LENGTH] = { '\0' };
   char *reference;
   char c;
-
-  int ppos, bpos, rpos;
-
+  /* index into strings "path", "buf", "reference"/"rname" */
+  int ppos = 0, bpos = 0, rpos = 0;
 
   /*  did we do the job before? */
-  
-  if ((component = attribute->any.components[cid]) != NULL &&
-      (component->path != NULL))
+  if ((component = attribute->any.components[cid]) != NULL && component->path != NULL)
     return component->path;
 
-  /*  yet undeclared. So try to guess the name: */
-  
+  /* component is so far undeclared. So try to guess the name: */
   compspec = NULL;
-
   if (path == NULL) {
-    if ((compspec = find_cid_id(cid)) == NULL) {
+    if (!(compspec = find_cid_id(cid))) {
       Rprintf("attributes:component_full_name(): Warning:\n"
               "  can't find component table entry for Component #%d\n", cid);
       return NULL;
@@ -776,60 +657,42 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
     path = compspec->default_path;
   }
 
-  /* index in string "path" */
-  ppos = 0;
-  /* index in string "buf" */
-  bpos = 0;
-  /* dollar = 0; */
-  rpos = 0;
-  buf[bpos] = '\0';
-
   while ((c = path[ppos]) != '\0') {
-  
     if (c == '$') {
-
-      /*  reference to the name of another component. */
-
-      /* dollar = ppos; */           /* memorize the position of the $ */
-
+      /* the $ is a reference to the name of another component. */
       rpos = 0;
       c = path[++ppos];         /* first skip the '$' */
       while (isupper(c)) {
         rname[rpos++] = c;
-        c = path[++ppos];
+        c = path[++ppos];       /* now, move over the reference while copying its name */
       }
       rname[rpos] = '\0';
 
-      /* ppos now points to the first character after the reference 
-       * rname holds the UPPERCASE name of the referenced component
-       */
+      /* ppos now points to the first character after the reference;
+       * rname holds the UPPERCASE name of the referenced component  */
 
       reference = NULL;
 
-      if (strcmp(rname, "HOME") == 0)
+      if (cl_str_is(rname, "HOME"))
         reference = getenv(rname);
-      else if (strcmp(rname, "APATH") == 0)
-        reference = (attribute->any.path ? attribute->any.path 
-                     : attribute->any.mother->path);
-      else if (strcmp(rname, "ANAME") == 0)
+      else if (cl_str_is(rname, "APATH"))
+        reference = (attribute->any.path ? attribute->any.path : attribute->any.mother->path);
+      else if (cl_str_is(rname, "ANAME"))
         reference = attribute->any.name;
       else if ((compspec = find_cid_name(rname)) != NULL)
         reference = component_full_name(attribute, compspec->id, NULL);
-      
-      if (reference == NULL) {
-        Rprintf("attributes:component_full_name(): Warning:\n"
-                "  Can't reference to the value of %s -- copying\n",
-                rname);
+
+      if (!reference) {
+        Rprintf("attributes:component_full_name(): Warning:\n  Can't reference to the value of %s -- copying\n", rname);
         reference = rname;
       }
 
-      for (rpos = 0; reference[rpos] != '\0'; rpos++) {
+      /* the reference is copied into buf */
+      for (rpos = 0; reference[rpos] != '\0'; rpos++, bpos++)
         buf[bpos] = reference[rpos];
-        bpos++;
-      }
     }
     else {
-      /* just copy the character and scroll */
+      /* just copy the character to the buffer, and advance */
       buf[bpos] = c;
       bpos++;
       ppos++;
@@ -838,16 +701,16 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
   buf[bpos] = '\0';
 
   if (component != NULL)
-    component->path = (char *)cl_strdup(buf);
+    component->path = cl_strdup(buf);
   else
-    (void) declare_component(attribute, cid, buf);
+    declare_component(attribute, cid, buf);
 
   /*  and return it */
   return &buf[0];
   /* ?? why is buf returned instead of component->path, as earlier in the function? -- AH 16/9/09 */
 }
 
-/* ---------------------------------------------------------------------- */
+
 
 /**
  * Loads the specified component for this attribute.
@@ -871,78 +734,62 @@ component_full_name(Attribute *attribute, ComponentID cid, char *path)
 Component *
 load_component(Attribute *attribute, ComponentID cid)
 {
-
   Component *comp;
+  ComponentState state;
 
-  assert((attribute != NULL) && "Null attribute passed to load_component");
+  assert(attribute != NULL && "Null attribute passed to load_component");
 
-  comp = attribute->any.components[cid];
-
-  if (comp == NULL) {
-    Rprintf("attributes:load_component(): Warning:\n"
-            "  Component %s is not declared for %s attribute\n",
-            cid_name(cid), aid_name(attribute->type));
+  if (NULL == (comp = attribute->any.components[cid])) {
+    Rprintf("attributes:load_component(): Warning:\n  Component %s is not declared for %s attribute\n", cid_name(cid), aid_name(attribute->type));
+    return NULL;
   }
-  else if (comp_component_state(comp) == ComponentUnloaded) {
 
+  state = work_out_component_state(comp);
+
+  if (ComponentUnloaded == state) {
     assert(comp->path != NULL);
 
     if (cid == CompHuffCodes) {
-
       if (cl_sequence_compressed(attribute)) {
-
-        if (read_file_into_blob(comp->path, MMAPPED, sizeof(int), &(comp->data)) == 0)
-          Rprintf("attributes:load_component(): Warning:\n"
-                  "  Data of %s component of attribute %s can't be loaded\n",
-                  cid_name(cid), attribute->any.name);
+        if (read_file_into_blob(comp->path, CL_MEMBLOB_MMAPPED, sizeof(int), &(comp->data)) == 0)
+          Rprintf("attributes:load_component(): Warning:\n  Data of %s component of attribute %s can't be loaded\n", cid_name(cid), attribute->any.name);
         else {
-          
+          int i;
           if (attribute->pos.hc != NULL)
-            Rprintf("attributes:load_component: WARNING:\n\t"
-                    "HCD block already loaded, overwritten.\n");
-          
-          attribute->pos.hc = new(HCD);
-          /* bcopy(comp->data.data, attribute->pos.hc, sizeof(HCD)); */
+            Rprintf("attributes:load_component: WARNING:\n\tHCD block already loaded, overwritten.\n");
+          attribute->pos.hc = (HCD *)cl_malloc(sizeof(HCD));
           memcpy(attribute->pos.hc, comp->data.data, sizeof(HCD));
 
-          { /* convert network byte order to native integers */
-            int i;
-            attribute->pos.hc->size = ntohl(attribute->pos.hc->size);
-            attribute->pos.hc->length = ntohl(attribute->pos.hc->length);
-            attribute->pos.hc->min_codelen = ntohl(attribute->pos.hc->min_codelen);
-            attribute->pos.hc->max_codelen = ntohl(attribute->pos.hc->max_codelen);
-            for (i = 0; i < MAXCODELEN; i++) {
-              attribute->pos.hc->lcount[i] = ntohl(attribute->pos.hc->lcount[i]);
-              attribute->pos.hc->symindex[i] = ntohl(attribute->pos.hc->symindex[i]);
-              attribute->pos.hc->min_code[i] = ntohl(attribute->pos.hc->min_code[i]);
-            }
+          /* convert network byte order to native integers */
+          attribute->pos.hc->size = ntohl(attribute->pos.hc->size);
+          attribute->pos.hc->length = ntohl(attribute->pos.hc->length);
+          attribute->pos.hc->min_codelen = ntohl(attribute->pos.hc->min_codelen);
+          attribute->pos.hc->max_codelen = ntohl(attribute->pos.hc->max_codelen);
+          for (i = 0; i < MAXCODELEN; i++) {
+            attribute->pos.hc->lcount[i] = ntohl(attribute->pos.hc->lcount[i]);
+            attribute->pos.hc->symindex[i] = ntohl(attribute->pos.hc->symindex[i]);
+            attribute->pos.hc->min_code[i] = ntohl(attribute->pos.hc->min_code[i]);
           }
           attribute->pos.hc->symbols = comp->data.data + (4+3*MAXCODELEN);
-        
+
           comp->size = attribute->pos.hc->length;
-          assert(comp_component_state(comp) == ComponentLoaded);
+          assert(work_out_component_state(comp) == ComponentLoaded);
         }
       }
-      else {
-        Rprintf("attributes/load_component: missing files of compressed PA,\n"
-                "\tcomponent CompHuffCodes not loaded\n");
-      }
-
+      else
+        Rprintf("attributes/load_component: missing files of compressed PA,\n\tcomponent CompHuffCodes not loaded\n");
     }
-    else if ((cid > CompDirectory) && (cid < CompLast)) {
+    else if (cid > CompDirectory && cid < CompLast) {
       /* i.e. any ComponentID value except CompDirectory / CompLast and CompHuffCodes */
-
-      if (read_file_into_blob(comp->path, MMAPPED, sizeof(int), &(comp->data)) == 0)
-        Rprintf("attributes:load_component(): Warning:\n"
-                "  Data of %s component of attribute %s can't be loaded\n",
-                cid_name(cid), attribute->any.name);
+      if (!read_file_into_blob(comp->path, CL_MEMBLOB_MMAPPED, sizeof(int), &(comp->data)))
+        Rprintf("attributes:load_component(): Warning:\n  Data of %s component of attribute %s can't be loaded\n", cid_name(cid), attribute->any.name);
       else {
         comp->size = comp->data.nr_items;
-        assert(comp_component_state(comp) == ComponentLoaded);
+        assert(work_out_component_state(comp) == ComponentLoaded);
       }
     }
   }
-  else if (comp_component_state(comp) == ComponentDefined)
+  else if (ComponentDefined == state)
     comp->size = 0;
 
   return comp;
@@ -950,7 +797,6 @@ load_component(Attribute *attribute, ComponentID cid)
 
 
 
-/* ---------------------------------------------------------------------- */
 
 /**
  * Creates the specified component for the given Attribute.
@@ -971,65 +817,55 @@ load_component(Attribute *attribute, ComponentID cid)
  * @param cid        The identifier of the Component to create.
  *
  * @return           Pointer to the component created, or NULL in case of
- *                   error (e.g. if an invalid component was requested).
+ *                   error (e.g. if an invalid/undefined component was requested).
  *
  */
 Component *
 create_component(Attribute *attribute, ComponentID cid)
 {
-  
   Component *comp = attribute->any.components[cid];
-  
-  if (cl_debug) {
+
+  if (cl_debug)
     Rprintf("Creating %s\n", cid_name(cid));
-  }
 
-  if (component_state(attribute, cid) == ComponentDefined) {
-
+  if (component_state(attribute, cid) != ComponentDefined)
+    return NULL;
+  else {
     assert(comp != NULL);
     assert(comp->data.data == NULL);
     assert(comp->path != NULL);
 
     switch (cid) {
-      
+
     case CompLast:
     case CompDirectory:
       /*  cannot create these */
       break;
-      
+
     case CompCorpus:
     case CompLexicon:
     case CompLexiconIdx:
       Rprintf("attributes:create_component(): Warning:\n"
-              "  Can't create the '%s' component. Use 'encode' to create it"
-              " out of a text file\n",
-              cid_name(cid));
+              "  Can't create the '%s' component. Use 'cwb-encode' to create it out of a text file\n", cid_name(cid));
       return NULL;
-      break;
 
     case CompHuffSeq:
     case CompHuffCodes:
     case CompHuffSync:
       Rprintf("attributes:create_component(): Warning:\n"
-              "  Can't create the '%s' component. Use 'huffcode' to create it"
-              " out of an item sequence file\n",
-              cid_name(cid));
+              "  Can't create the '%s' component. Use 'cwb-huffcode' to create it out of an item sequence file\n", cid_name(cid));
       return NULL;
-      break;
-      
+
     case CompCompRF:
     case CompCompRFX:
       Rprintf("attributes:create_component(): Warning:\n"
-              "  Can't create the '%s' component. Use 'compress-rdx' to create it"
-              " out of the reversed file index\n",
-              cid_name(cid));
+              "  Can't create the '%s' component. Use 'cwb-compress-rdx' to create it out of the reversed file index\n", cid_name(cid));
       return NULL;
-      break;
-      
+
     case CompRevCorpus:
       creat_rev_corpus(comp);
       break;
-      
+
     case CompRevCorpusIdx:
       creat_rev_corpus_idx(comp);
       break;
@@ -1037,7 +873,7 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompLexiconSrt:
       creat_sort_lexicon(comp);
       break;
-      
+
     case CompCorpusFreqs:
       creat_freqs(comp);
       break;
@@ -1048,12 +884,10 @@ create_component(Attribute *attribute, ComponentID cid)
     case CompStrucAVS:
     case CompStrucAVX:
       Rprintf("attributes:create_component(): Warning:\n"
-              "  Can't create the '%s' component of %s attribute %s.\n"
-              "  Use the appropriate external tool to create it.\n",
+              "  Can't create the '%s' component of %s attribute %s.\nUse the appropriate external tool to create it.\n",
               cid_name(cid), aid_name(attribute->type), attribute->any.name);
       return NULL;
-      break;
-      
+
 
     default:
       comp = NULL;
@@ -1063,8 +897,6 @@ create_component(Attribute *attribute, ComponentID cid)
     }
     return comp;
   }
-
-  return NULL;
 }
 
 
@@ -1100,31 +932,32 @@ Component *
 ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
 {
   Component *comp = NULL;
-  
-  if ((comp = attribute->any.components[cid]) == NULL) {
-    /*  component is undeclared */
-    Rprintf("attributes:ensure_component(): Warning:\n"
-            "  Undeclared component: %s\n", cid_name(cid));
+
+  if (!(comp = attribute->any.components[cid])) {
+    /* component is undeclared */
+    Rprintf("attributes:ensure_component(): Warning:\n  Undeclared component: %s\n", cid_name(cid));
 #ifdef CL_ENSURE_COMPONENT_EXITS
     exit(1);
 #endif
     return NULL;
   }
+
   else {
-    switch (comp_component_state(comp)) {
+    /* component IS declared, so let's see if we can ensure it. */
+    switch (work_out_component_state(comp)) {
 
     case ComponentLoaded:
-      /*  already here, so do nothing */
+      /* already here, so do nothing */
       break;
 
     case ComponentUnloaded:
-      (void) load_component(attribute, cid); /* try to load the component */
-      if (comp_component_state(comp) != ComponentLoaded) {
+      /* try to load the component */
+      load_component(attribute, cid);
+      if (work_out_component_state(comp) != ComponentLoaded) {
 #ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
-        Rprintf("attributes:ensure_component(): Warning:\n"
-                "  Can't load %s component of %s\n", 
-                cid_name(cid), attribute->any.name);
+        Rprintf("attributes:ensure_component(): Warning:\n  Can't load %s component of %s\n", cid_name(cid), attribute->any.name);
 #endif
+
 #ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
 #endif
@@ -1132,40 +965,36 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
       }
       break;
 
-    case ComponentDefined:        /*  try to create the component */
-
-      if (try_creation != 0) {
-
+    case ComponentDefined:
+      /* doesn't exist; try to create if the #defines are set up to allow that and if the caller wants */
+      if (try_creation) {
 #ifdef CL_ENSURE_COMPONENT_ALLOW_CREATION
+        /* try to create the component */
+        create_component(attribute, cid);
+        if (work_out_component_state(comp) != ComponentLoaded) {
+# ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
+          Rprintf("attributes:ensure_component(): Warning:\n  Can't load or create %s component of %s\n", cid_name(cid), attribute->any.name);
+# endif
 
-        (void) create_component(attribute, cid);
-        if (comp_component_state(comp) != ComponentLoaded) {
-#ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
-          Rprintf("attributes:ensure_component(): Warning:\n"
-                  "  Can't load or create %s component of %s\n", 
-                  cid_name(cid), attribute->any.name);
-#endif
-#ifdef CL_ENSURE_COMPONENT_EXITS
+# ifdef CL_ENSURE_COMPONENT_EXITS
           exit(1);
-#endif
+# endif
           return NULL;
         }
 #else
-        Rprintf("Sorry, but this program is not set up to allow the\n"
-                "creation of corpus components. Please refer to the manuals\n"
-                "or use the ''cwb-makeall'' tool.\n");
-#ifdef CL_ENSURE_COMPONENT_EXITS
+        /* this is the only alert-message NOT subject to the KEEP_SILENT definition */
+        Rprintf("Sorry, but this program is not set up to allow the creation of corpus components.\n"
+                        "Please refer to the manuals or use the ''cwb-makeall'' tool.\n");
+# ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
-#endif
+# endif
         return NULL;
 #endif
-
       }
       else {
+        /* !try_creation implies we should return the standard "not ensured" value (NULL). */
 #ifndef CL_ENSURE_COMPONENT_KEEP_SILENT
-        Rprintf("attributes:ensure_component(): Warning:\n"
-                "  I'm not allowed to create %s component of %s\n", 
-                  cid_name(cid), attribute->any.name);
+        Rprintf("attributes:ensure_component(): Warning:\n  I'm not allowed to create %s component of %s\n", cid_name(cid), attribute->any.name);
 #endif
 #ifdef CL_ENSURE_COMPONENT_EXITS
         exit(1);
@@ -1174,19 +1003,16 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
       }
       break;
 
-    case ComponentUndefined:      /*  don't have this, -> error */
-      Rprintf("attributes:ensure_component(): Warning:\n"
-              "  Can't ensure undefined/illegal %s component of %s\n", 
-              cid_name(cid), attribute->any.name);
+    case ComponentUndefined:
+      /*  don't have this, -> error */
+      Rprintf("attributes:ensure_component(): Warning:\n  Can't ensure undefined/illegal %s component of %s\n", cid_name(cid), attribute->any.name);
 #ifdef CL_ENSURE_COMPONENT_EXITS
       exit(1);
 #endif
       break;
 
     default:
-      Rprintf("attributes:ensure_component(): Warning:\n"
-              "  Illegal state of  %s component of %s\n", 
-              cid_name(cid), attribute->any.name);
+      Rprintf("attributes:ensure_component(): Warning:\n  Illegal state of  %s component of %s\n",cid_name(cid), attribute->any.name);
 #ifdef CL_ENSURE_COMPONENT_EXITS
       exit(1);
 #endif
@@ -1196,7 +1022,7 @@ ensure_component(Attribute *attribute, ComponentID cid, int try_creation)
   return comp;
 }
 
-/* ---------------------------------------------------------------------- */
+
 
 /**
  * Gets a pointer to the specified component for the given Attribute.
@@ -1207,20 +1033,19 @@ find_component(Attribute *attribute, ComponentID cid)
   return attribute->any.components[cid];
 }
 
-/* ---------------------------------------------------------------------- */
+
 
 /**
- * Delete a Component object.
+ * Delete a Component object (backend for drop_component).
  *
- * The specified component object, and all memory associated with it, is freed.
+ * The argument component object, and all memory associated with it, is freed.
  *
  * @return Always 1.
  */
-int
+static int
 comp_drop_component(Component *comp)
 {
-  assert((comp != NULL) && "NULL component passed to attributes:comp_drop_component");
-
+  assert(comp && "NULL component passed to attributes:comp_drop_component");
   assert(comp->attribute);
 
   if (comp->attribute->any.components[comp->id] != comp)
@@ -1228,23 +1053,21 @@ comp_drop_component(Component *comp)
 
   comp->attribute->any.components[comp->id] = NULL;
 
-  if (comp->id == CompHuffCodes) {
-
-    /* it may be empty, since declare_component doesn't yet load the data */
-
+  /* Delete Huffcode data (which may or may not have been loaded by the point the component is freed) */
+  if (comp->id == CompHuffCodes)
     cl_free(comp->attribute->pos.hc);
-  }
 
-  mfree(&(comp->data));
+  free_mblob(&(comp->data));
   cl_free(comp->path);
   comp->corpus = NULL;
   comp->attribute = NULL;
   comp->id = CompLast;
 
-  free(comp);
+  cl_free(comp);
 
   return 1;
 }
+
 
 /**
  * Drops the specified component for the given Attribute.
@@ -1257,13 +1080,13 @@ comp_drop_component(Component *comp)
 int
 drop_component(Attribute *attribute, ComponentID cid)
 {
-  Component *comp;
-
-  if ((comp = attribute->any.components[cid]) != NULL)
-    return comp_drop_component(comp);
-  else
-    return 1;
+  Component *comp = attribute->any.components[cid];
+  if (comp)
+    comp_drop_component(comp);
+  return 1;
 }
+
+
 
 /* =============================================== LOOP THROUGH ATTRIUBTES */
 
@@ -1273,10 +1096,11 @@ drop_component(Attribute *attribute, ComponentID cid)
  * @see first_corpus_attribute
  * @see next_corpus_attribute
  */
-Attribute *loop_ptr;
+static Attribute *loop_ptr;
 
 /**
- * Get a pointer to the head entry in the specified corpus's list of attributes.
+ * Get a pointer to the head entry in the specified corpus's list of attributes,
+ * and re-start the iterator that can be accessed further using next_corpus_attribute().
  *
  * @return NULL if the corpus parameter is NULL; otherwise a pointer to Attribute.
  */
@@ -1295,15 +1119,16 @@ first_corpus_attribute(Corpus *corpus)
  * Get a pointer to the next attribute on the list currently being processed.
  */
 Attribute *
-next_corpus_attribute()
+next_corpus_attribute(void)
 {
   if (loop_ptr)
     loop_ptr = loop_ptr->any.next;
   return loop_ptr;
 }
 
-/* =============================================== INTERACTIVE FUNCTIONS */
 
+
+/* =============================================== INTERACTIVE FUNCTIONS */
 
 /**
  * Prints a description of the attribute (inc.components) to STDOUT.
@@ -1313,7 +1138,7 @@ describe_attribute(Attribute *attribute)
 {
   DynArg *arg;
   ComponentID cid;
-  
+
   Rprintf("Attribute %s:\n", attribute->any.name);
   Rprintf("  Type:        %s\n", aid_name(attribute->any.type));
 
@@ -1339,6 +1164,7 @@ describe_attribute(Attribute *attribute)
   Rprintf("\n\n");
 }
 
+
 /**
  * Prints a description of the component to STDOUT.
  */
@@ -1350,8 +1176,8 @@ describe_component(Component *component)
   Rprintf("    Path/Value:  %s\n", component->path);
   Rprintf("    State:       ");
 
-  switch (comp_component_state(component)) {
-  case ComponentLoaded: 
+  switch (work_out_component_state(component)) {
+  case ComponentLoaded:
     Rprintf("loaded");
     break;
   case ComponentUnloaded:
@@ -1364,7 +1190,7 @@ describe_component(Component *component)
     Rprintf("undefined (not valid)");
     break;
   default:
-    Rprintf("ILLEGAL! (Illegal component state %d)", comp_component_state(component));
+    Rprintf("ILLEGAL! (Illegal component state %d)", work_out_component_state(component));
     break;
   }
   Rprintf("\n\n");
@@ -1372,17 +1198,19 @@ describe_component(Component *component)
 
 
 
-/* =============================================== SET ATTRIBUTES */
-
-/* TODO the feature set functions don't really seemt o belong in this file */
+/* =============================================== FEATURE-SET P-ATTRIBUTES */
 
 /**
  * Generates a feature-set attribute value.
  *
  * @param s      The input string.
  * @param split  Boolean; if True, s is split on whitespace.
- *               If False, the function expects input in '|'-delimited format.
- * @return       The set attribute value in standard syntax ('|' delimited, sorted with cl_strcmp).
+ *               If False, the function expects input in `|`-delimited format. Allowances are made
+ *               for CoNLL-style feature sets: (i) leading and trailing `|` are added if not present;
+ *               (ii) an empty string or a single underscore (`_`) are interpreted as an empty set
+ *               and replaced by `|`. As a result, plain strings passed to cl_make_set() by accident
+ *               are still accepted and converted into single-member feature sets.
+ * @return       The set attribute value in standard syntax (`|` delimited, sorted with cl_strcmp).
  *               If there is any syntax error, cl_make_set() returns NULL.
  */
 char *
@@ -1390,9 +1218,10 @@ cl_make_set(char *s, int split)
 {
   char *copy = cl_strdup(s);               /* work on copy of <s> */
   cl_string_list l = cl_new_string_list(); /* list of set elements */
-  int ok = 0;                   /* for split and element check */
+  int ok = 0;                              /* for split and element check */
+
   char *p, *mark, *set;
-  int i, sl, length;
+  int i, set_string_length, length;
 
   cl_errno = CDA_OK;
 
@@ -1400,54 +1229,71 @@ cl_make_set(char *s, int split)
   if (split) {
     /* split on whitespace */
     p = copy;
-    while (*p != 0) {
-      while (*p == ' ' || *p == '\t' || *p == '\n') {
+    while (*p) {
+      /* scan past whitespace then place mark */
+      while (*p == ' ' || *p == '\t' || *p == '\n')
         p++;
-      }
       mark = p;
-      while (*p != 0 && *p != ' ' && *p != '\t' && *p != '\n') {
+      /* scan to end of word (next whitespace/0) */
+      while (*p && *p != ' ' && *p != '\t' && *p != '\n')
         p++;
-      }
-      if (*p != 0) {            /* mark end of substring */
+
+      /* mark end of substring */
+      if (*p) {
         *p = 0;
         p++;
       }
       else {
         /* p points to end of string; since it hasn't been advanced, the while loop will terminate */
       }
-      if (p != mark) {
+      if (p != mark)
         cl_string_list_append(l, mark);
-      }
     }
-    ok = 1;                     /* split on whitespace can't really fail */
+    ok = 1;
+    /* split on whitespace can't really fail */
   }
   else {
-    /* check and split '|'-delimited syntax */
-    if (copy[0] == '|') {
-      mark = p = copy+1;
-      while (*p != 0) {
+    /* check and split '|'-delimited syntax, now very lenient to support CoNLL-style set notation */
+    int cwb_notation = 0; /* whether the input string is in full CWB notation */
+    if (copy[0] == '\0' || (copy[0] == '_' && copy[1] == '\0')) {
+      /* empty set without delimiter (), or CoNLL notation (_) */
+      ok = 1;
+    }
+    else {
+      if (copy[0] == '|') {
+        cwb_notation = 1; /* expect and validate full CWB notation */
+        p = mark = copy + 1;
+      }
+      else
+        p = mark = copy;
+      while (*p) {
         if (*p == '|') {
-          *p = 0;
+          *p = '\0';
           cl_string_list_append(l, mark);
           mark = p = p+1;
         }
-        else {
+        else
           p++;
+      }
+      if (p != mark) { /* i.e. there was no trailing '|' */
+        if (cwb_notation)
+          ok = 0; /* this is an error if full CWB notation is used */
+        else {
+          cl_string_list_append(l, mark);
+          ok = 1;
         }
       }
-      if (p == mark) {          /* otherwise, there was no trailing '|' */
-        ok = 1;
-      }
+      else
+        if (cwb_notation)
+          ok = 1; /* trailing | not allowed if not in full CWB notation */
     }
   }
 
   /* (2) check set elements: must not contain '|' character */
   length = cl_string_list_size(l);
-  for (i = 0; i < length; i++) {
-    if (strchr(cl_string_list_get(l, i), '|') != NULL) {
+  for (i = 0; i < length; i++)
+    if (strchr(cl_string_list_get(l, i), '|') != NULL)
       ok = 0;
-    }
-  }
 
   /* (3) abort if there was any error */
   if (!ok) {
@@ -1461,20 +1307,20 @@ cl_make_set(char *s, int split)
   cl_string_list_qsort(l);
 
   /* (5) combine elements into set attribute string */
-  sl = 2;                       /* compute length of string */
-  for (i = 0; i < length; i++) {
-    sl += strlen(cl_string_list_get(l, i)) + 1;
-  }
-  set = cl_malloc(sl);          /* allocate string of exact size */
+  set_string_length = 2;                       /* compute length of string */
+  for (i = 0; i < length; i++)
+    set_string_length += strlen(cl_string_list_get(l, i)) + 1;
+
+  set = (char *)cl_malloc(set_string_length);          /* allocate string of exact size */
   p = set;
   *p++ = '|';
   for (i = 0; i < length; i++) {
-    strcpy(p, cl_string_list_get(l, i));
+    cl_strcpy(p, cl_string_list_get(l, i));
     p += strlen(cl_string_list_get(l, i));
     *p++ = '|';                 /* overwrites EOS mark inserted by strcpy() */
   }
   *p = 0;                       /* EOS */
- 
+
   /* (6) free intermediate data and return the set string */
   cl_delete_string_list(l);
   cl_free(copy);
@@ -1489,7 +1335,7 @@ cl_make_set(char *s, int split)
  * This function counts the number of elements in a set attribute value
  * (using '|'-delimited standard syntax);
  *
- * @return -1 on error (in particular, if set is malformed)
+ * @return  -1 on error (in particular, if set is malformed)
  */
 int
 cl_set_size(char *s)
@@ -1497,18 +1343,21 @@ cl_set_size(char *s)
   int count = 0;
 
   cl_errno = CDA_OK;
+
   if (*s++ != '|') {
     cl_errno = CDA_EFSETINV;
     return -1;
   }
-  while (*s) {
-    if (*s == '|') count++;
-    s++;
-  }
+
+  while (*s)
+    if (*s++ == '|')
+      count++;
+
   if (s[-1] != '|') {
     cl_errno = CDA_EFSETINV;
     return -1;
   }
+
   return count;
 }
 
@@ -1521,10 +1370,10 @@ cl_set_size(char *s)
  * Compute intersection of two set attribute values (in standard syntax, i.e. sorted and '|'-delimited);
  * memory for the result string must be allocated by the caller.
  *
- * @return         0 on error, 1 otherwise
+ * @return         Boolean. 0 on error, 1 otherwise
 */
 
-int 
+int
 cl_set_intersection(char *result, const char *s1, const char *s2)
 {
   static char f1[CL_DYN_STRING_SIZE], f2[CL_DYN_STRING_SIZE];   /* static feature buffers (hold current feature) */
@@ -1547,7 +1396,7 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
   while (*s1 && *s2) {
     /* while a feature is active, *s_i points to the '|' separator at its end;
        when the feature is used up, *s_i is advanced and we read the next feature */
-    if (*s1 != '|') { 
+    if (*s1 != '|') {
       for (p = f1; *s1 != '|'; s1++) {
         if (!*s1) {
           cl_errno = CDA_EFSETINV;
@@ -1558,7 +1407,7 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
       }
       *p = 0;                   /* terminate feature string */
     }
-    if (*s2 != '|') { 
+    if (*s2 != '|') {
       for (p = f2; *s2 != '|'; s2++) {
         if (!*s2) {
           cl_errno = CDA_EFSETINV;
@@ -1569,6 +1418,7 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
       }
       *p = 0;                   /* terminate feature string */
     }
+
     /* now compare the two active features (uses cl_strcmp to ensure standard behaviour) */
     comparison = cl_strcmp(f1,f2);
     if (comparison == 0) {
@@ -1579,14 +1429,12 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
       /* both features are used up now */
       s1++; s2++;
     }
-    else if (comparison < 0) {
+    else if (comparison < 0)
       /* advance s1 */
       s1++;
-    }
-    else {
+    else
       /* advance s2 */
       s2++;
-    }
   } /* ends: while (*s1 && *s2) */
 
   /* computation complete: terminate result string */
@@ -1595,4 +1443,3 @@ cl_set_intersection(char *result, const char *s1, const char *s2)
 }
 
 
-/* EOF */

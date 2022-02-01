@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -1406,220 +1406,8 @@ unsigned char checktable_is_alphanum[unknown_charset][256] = {
 };
 
 
-
 /* endof massive character data built-ins! */
 
-/* following are old versions, should not be needed any longer */
-
-/* *
- * Table which translates latin-1 characters to lowercase.
- *
- * Use cl_string_maptable to access.
- * @see cl_string_maptable
- * /
-unsigned char latin1_nocase_tab[256] = {
-    0,  
-    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
-   11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-   21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-   31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-   41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-   61, 62, 63, 64,
-                   97, 98, 99,100,101,102, / * ABCDEF -> abcdef * /
-  103,104,105,106,107,108,109,110,111,112, / * GHIJKLMNOP -> ghijklmnop * /
-  113,114,115,116,117,118,119,120,121,122, / * QRSTUVWXYZ -> qrstuvwxyz * /
-  
-   91, 92, 93, 94, 95, 96, 97, 98, 99,100, / * normal * /
-  101,102,103,104,105,106,107,108,109,110,
-  111,112,113,114,115,116,117,118,119,120,
-  121,122,123,124,125,126,127,128,129,130,
-  131,132,133,134,135,136,137,138,139,140,
-  141,142,143,144,145,146,147,148,149,150,
-  151,152,153,154,155,156,157,158,159,160,
-  161,162,163,164,165,166,167,168,169,170,
-  171,172,173,174,175,176,177,178,179,180,
-  181,182,183,184,185,186,187,188,189,190,
-  191,
-      224,225,226,227,228,229,230,231,232, / * 192-222 -> x+32 but not 215 * /
-  233,234,235,236,237,238,239,240,241,242,
-  243,244,245,246,215,248,249,250,251,252,
-  253,254,
-          223,224,225,226,227,228,229,230,
-  231,232,233,234,235,236,237,238,239,240,
-  241,242,243,244,245,246,247,248,249,250,
-  251,252,253,254,255
-};
-
-/ **
- * Table which translates latin-1 characters
- * with diacritics to their [A-Za-z] "equivalents",
- * including s-set->s, thorn->t
- *
- * Use cl_string_maptable to access.
- * @see cl_string_maptable
- * /
-unsigned char latin1_nodiac_tab[256] = {
-    0,  
-    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
-   11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-   21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-   31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-   41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-   61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
-   71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
-   81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
-   91, 92, 93, 94, 95, 96, 97, 98, 99,100,
-  101,102,103,104,105,106,107,108,109,110,
-  111,112,113,114,115,116,117,118,119,120,
-  121,122,123,124,125,126,127,128,129,130,
-  131,132,133,134,135,136,137,138,139,140,
-  141,142,143,144,145,146,147,148,149,150,
-  151,152,153,154,155,156,157,158,159,160,
-  161,162,163,164,165,166,167,168,169,170,
-  171,172,173,174,175,176,177,178,179,180,
-  181,182,183,184,185,186,187,188,189,190,
-  191,
-       65, 65, 65, 65, 65, 65, 65, 67, 69, / * uppercase * /
-   69, 69, 69, 73, 73, 73, 73, 68, 78, 79,
-   79, 79, 79, 79,215, 79, 85, 85, 85, 85,
-   89, 84,115,                  / * thorn -> 'T', szlig -> 's' * /
-               97, 97, 97, 97, 97, 97, 97, / * lowercase * /
-   99,101,101,101,101,105,105,105,105,100,
-  110,111,111,111,111,111,247,111,117,117,
-  117,117,121,116,121
-};
-
-/ *
- * Table which translates cp-1251 (ASCII +
- * cyrillic) characters to lowercase
- *
- * Use cl_string_maptable to access.
- * @see cl_string_maptable
- *
-unsigned char cp1251_nocase_tab[256] = {
-    0,  
-    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
-   11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-   21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-   31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-   41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-   61, 62, 63, 64,
-                   97, 98, 99,100,101,102, / * ABCDEF -> abcdef * /
-  103,104,105,106,107,108,109,110,111,112, / * GHIJKLMNOP -> ghijklmnop * /
-  113,114,115,116,117,118,119,120,121,122, / * QRSTUVWXYZ -> qrstuvwxyz * /
-  
-   91, 92, 93, 94, 95, 96, 97, 98, 99,100, / * normal * /
-  101,102,103,104,105,106,107,108,109,110,
-  111,112,113,114,115,116,117,118,119,120,
-  121,122,123,124,125,126,127,144,131,130,
-  131,132,133,134,135,136,137,154,139,140,
-  157,158,159,144,145,146,147,148,149,150,
-  151,152,153,154,155,156,157,158,159,160,
-  162,162,188,164,180,166,167,184,169,186,
-  171,172,173,174,191,176,177,179,179,180,
-  181,182,183,184,185,186,187,188,190,190,
-  191,224,225,226,227,228,229,230,231,232,
-  233,234,235,236,237,238,239,240,241,242,
-  243,244,245,246,247,248,249,250,251,252,
-  253,254,255,224,225,226,227,228,229,230,
-  231,232,233,234,235,236,237,238,239,240,
-  241,242,243,244,245,246,247,248,249,250,
-  251,252,253,254,255
-};
-
-/ * cp-1251 (ASCII + cyrillic) diacritic-stripping is just the identity mapping */
-
-
-/*
-***
-unsigned char ascii_nocase_tab[256] = {
-    0,  
-    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
-   11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-   21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-   31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-   41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-   61, 62, 63, 64,
-                   97, 98, 99,100,101,102, 
-  103,104,105,106,107,108,109,110,111,112, 
-  113,114,115,116,117,118,119,120,121,122, 
-  
-   91, 92, 93, 94, 95, 96, 97, 98, 99,100, 
-  101,102,103,104,105,106,107,108,109,110,
-  111,112,113,114,115,116,117,118,119,120,
-  121,122,123,124,125,126,127,144,131,130,
-  131,132,133,134,135,136,137,154,139,140,
-  157,158,159,144,145,146,147,148,149,150,
-  151,152,153,154,155,156,157,158,159,160,
-  162,162,188,164,180,166,167,184,169,186,
-  171,172,173,174,191,176,177,179,179,180,
-  181,182,183,184,185,186,187,188,190,190,
-  191,192,193,194,195,196,197,198,199,200,
-  201,202,203,204,205,206,207,208,209,210,
-  211,212,213,214,215,216,217,218,219,220,
-  221,222,223,224,225,226,227,228,229,230,
-  231,232,233,234,235,236,237,238,239,240,
-  241,242,243,244,245,246,247,248,249,250,
-  251,252,253,254,255
-};
-****/
-
-/*
-***
-unsigned char binary_nocase_tab[256] = {
-    0,  
-    1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
-   11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-   21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-   31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-   41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-   61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
-   71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
-   81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
-   91, 92, 93, 94, 95, 96, 97, 98, 99,100,
-  101,102,103,104,105,106,107,108,109,110,
-  111,112,113,114,115,116,117,118,119,120,
-  121,122,123,124,125,126,127,144,131,130,
-  131,132,133,134,135,136,137,154,139,140,
-  157,158,159,144,145,146,147,148,149,150,
-  151,152,153,154,155,156,157,158,159,160,
-  162,162,188,164,180,166,167,184,169,186,
-  171,172,173,174,191,176,177,179,179,180,
-  181,182,183,184,185,186,187,188,190,190,
-  191,192,193,194,195,196,197,198,199,200,
-  201,202,203,204,205,206,207,208,209,210,
-  211,212,213,214,215,216,217,218,219,220,
-  221,222,223,224,225,226,227,228,229,230,
-  231,232,233,234,235,236,237,238,239,240,
-  241,242,243,244,245,246,247,248,249,250,
-  251,252,253,254,255
-};
-****/
-
-/* *
- * Table with identity mapping of latin-1 characters
- * (no flags)
- *
- * Use cl_string_maptable to access.
- * @see cl_string_maptable
- * /
-unsigned char latin1_identity_tab[256];
-int latin1_identity_tab_init = 0;
-
-/ **
- * Table with mapping for the %cd flag for latin-1
- * (no case, no diacritics).
- *
- * Use cl_string_maptable to access.
- * @see cl_string_maptable
- * /
-unsigned char latin1_nocase_nodiac_tab[256];
-int latin1_nocase_nodiac_tab_init = 0;*/
 
 
 
@@ -1690,12 +1478,10 @@ cl_string_maptable(CorpusCharset charset, int flags)
     }
     return nocase_nodiac_tab[charset];
   }
-  else if (icase) {
+  else if (icase)
     return nocase_tab[charset];
-  }
-  else if (idiac) {
+  else if (idiac)
     return nodiac_tab[charset];
-  }
   else {
     if (! identity_tab_init[charset]) {
       maptable_init_identity(identity_tab[charset]);
@@ -1703,30 +1489,6 @@ cl_string_maptable(CorpusCharset charset, int flags)
     }
     return identity_tab[charset];
   }
-  /*
-   * old version of code follows...
-   *
-  if (icase && idiac) {
-    if (! latin1_nocase_nodiac_tab_init) {
-      maptable_init_both(latin1_nocase_nodiac_tab, latin1_nocase_tab, latin1_nodiac_tab);
-      latin1_nocase_nodiac_tab_init = 1;
-    }
-    return latin1_nocase_nodiac_tab;
-  } 
-  else if (icase) {
-    return latin1_nocase_tab;
-  }
-  else if (idiac) {
-    return latin1_nodiac_tab;
-  }
-  else {
-    if (! latin1_identity_tab_init) {
-      maptable_init_identity(latin1_identity_tab);
-      latin1_identity_tab_init = 1;
-    }
-    return latin1_identity_tab;
-  }
-  end old version */
 }
 
 /**
@@ -1742,7 +1504,7 @@ cl_string_maptable(CorpusCharset charset, int flags)
  * @param replace       The replacement character to use. If this is 0, the
  *                      character is deleted rather than replaced.
  * @param zap_tabs      Whether or not tabs should be zapped (boolean).
- * @param zap_newlines  Whether or not \n and \r should be zapped (boolean).
+ * @param zap_newlines  Whether or not \\n and \\r should be zapped (boolean).
  * @return              The number of characters replaced/deleted in the string.
  */
 int
@@ -1781,9 +1543,9 @@ cl_string_zap_controls(char *s, CorpusCharset charset, char replace, int zap_tab
 /**
  * Checks whether a given byte is a UTF-8 continuation byte.
  *
- * @byte    Byte to check.
- * @return  Boolean. True iff the byte is a continuation byte.
- *          If it is a one-byte character, or a valid start byte, false.
+ * @param  byte  Byte to check.
+ * @return       Boolean. True iff the byte is a continuation byte.
+ *               If it is a one-byte character, or a valid start byte, false.
  */
 int
 cl_string_utf8_continuation_byte(unsigned char byte)
@@ -1850,7 +1612,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
   case ascii:
     for (; *str ; str++)
       if ( *str > 0x7f ) {
-        if (repair) 
+        if (repair)
           *str = '?';
         else
           return 0;
@@ -1869,7 +1631,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
   case cyrillic:
     for (; *str ; str++)
       if ( (*str > 0x7f && *str < 0xa0)) {
-        if (repair) 
+        if (repair)
           *str = '?';
         else
           return 0;
@@ -1890,7 +1652,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
                   || *str == 0xf0
                  )
          ) {
-        if (repair) 
+        if (repair)
           *str = '?';
         else
           return 0;
@@ -1901,13 +1663,13 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
   case greek:
     for (; *str ; str++)
       if ( *str > 0x7f
-              && (   *str <  0xa0 
+              && (   *str <  0xa0
                   || *str == 0xae
                   || *str == 0xd2
                   || *str == 0xff
                  )
          ) {
-        if (repair) 
+        if (repair)
           *str = '?';
         else
           return 0;
@@ -1926,7 +1688,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
                   ||  *str == 0xff
                  )
          ) {
-        if (repair) 
+        if (repair)
           *str = '?';
         else
           return 0;
@@ -1952,7 +1714,7 @@ cl_string_validate_encoding(char *s, CorpusCharset charset, int repair)
                   ||  *str >= 0xf3
                  )
          ) {
-        if (repair) 
+        if (repair)
           *str = '?';
         else
           return 0;
@@ -1990,9 +1752,9 @@ cl_string_reverse(const char *s, CorpusCharset charset)
     reversed = cl_strdup((char *)s);
     g_strreverse((gchar *)reversed);
   }
-  else {
+  else
     reversed = (char *)g_utf8_strreverse((gchar *)s, -1);
-  }
+
   return reversed;
 }
 
@@ -2006,7 +1768,8 @@ cl_string_reverse(const char *s, CorpusCharset charset)
  * @param s     String to chomp (modified in-place).
  */
 void
-cl_string_chomp(char *s) {
+cl_string_chomp(char *s)
+{
   char *point = s;
   /* advance point to NUL terminator */
   while (*point)
@@ -2076,7 +1839,7 @@ cl_string_qsort_compare(const char *s1,
   else {
 
     /* allocate the static buffers once and for all */
-    if (! buffers_allocated) {
+    if (!buffers_allocated) {
       /* a normalised string cannot possibly be longer than (CL_MAX_LINE_LENGTH * 2) */
       buffer1 = (char *) cl_malloc(CL_MAX_LINE_LENGTH * 2);
       buffer2 = (char *) cl_malloc(CL_MAX_LINE_LENGTH * 2);
@@ -2123,6 +1886,8 @@ cl_string_qsort_compare(const char *s1,
    * Since the most important goal is to ensure a consistent and well-defined sort order, we now
    * use plain strcmp() in both cases. While the C standard fails to specify the precise behaviour,
    * all known platforms use unsigned characters for the comparison.
+   *
+   * (Note that cl_strcmp is not used because that's signed comparison.)
    */
   return strcmp(comp1, comp2);
 
@@ -2197,15 +1962,16 @@ cl_string_qsort_compare(const char *s1,
  *
  * The rules for these are as follows (see also the CQP lexer):
  *
- * * all characters must be ASCII, ie less than 0x80;
- * * must be at least 1 character long (of course)
- * * first character must be an uppercase or lowercase letter or underscore
- * * second and subsequent characters may also be digits, hyphen or fullstop.
- * * mixed case is allowed (just-upper and just-lower is imposed elsewhere,
+ * - all characters must be ASCII, ie less than 0x80;
+ * - must be at least 1 character long (of course)
+ * - first character must be an uppercase or lowercase letter or underscore
+ * - second and subsequent characters may also be digits, hyphen or fullstop.
+ * - mixed case is allowed (just-upper and just-lower is imposed elsewhere,
  *   where necessary).
  *
- * TODO: should the CL registry lexer be amended to reflect these restricitons?
- * (ID there is rather laxer than this)
+ * The CL registry lexer is  laxer than this, as is the CL macro
+ * cl_xml_is_name_char(), which allows upper-half characters from the
+ * 8-bit range.
  *
  * @param s   The string to check.
  * @return    A boolean. True if the string is a valid ID. Otherwise false.
@@ -2215,6 +1981,7 @@ cl_id_validate(char *s)
 {
   if (s == NULL)
     return 0;
+
   /* check first char */
   if ( ! (
          (*s >= 'a' && *s <= 'z')
@@ -2254,12 +2021,10 @@ void
 cl_id_toupper(char *s)
 {
   int i;
-  i = strlen(s) - 1;
-  while (i >= 0) {
+
+  for (i = strlen(s) - 1  ;  i >= 0  ;  i--)
     if (s[i] >= 'a' && s[i] <= 'z')
       s[i] -= 0x20;
-    i--;
-  }
 }
 
 /**
@@ -2274,12 +2039,10 @@ void
 cl_id_tolower(char * s)
 {
   int i;
-  i = strlen(s) - 1;
-  while (i >= 0) {
+
+  for (i = strlen(s) - 1  ;  i >= 0  ;  i--)
     if (s[i] >= 'A' && s[i] <= 'Z')
       s[i] += 0x20;
-    i--;
-  }
 }
 
 
@@ -2404,7 +2167,7 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags, int inplace_bufsi
 
     /* UTF8 case folding */
     if (icase) {
-      new_string = g_utf8_casefold(string, -1);
+      new_string = g_utf8_strdown(string, -1);
       if (string != s)
         cl_free(string); /* free temporary string allocated by one of the steps above */
       string = new_string;
@@ -2476,7 +2239,6 @@ cl_string_canonical(char *s, CorpusCharset charset, int flags, int inplace_bufsi
   }
   /* end else for non-utf8 encodings */
 
-  /* NOTREACHED */
   assert(0 && "Not reached");
   return NULL;
 }
@@ -2619,9 +2381,8 @@ cl_path_registry_quote(char *path)
     *q++ = '"';
     *q = '\0';
   }
-  else {
+  else
     quoted_path = cl_strdup(path);
-  }
 
   return(quoted_path);
 }
@@ -2631,7 +2392,7 @@ cl_path_registry_quote(char *path)
  * Tokenises a string into components split by ':' (or ';' under Win32).
  *
  * @param s  The string to tokenise; or, NULL if tokenisation has already been initialised.
- * @return   The next token from the string.
+ * @return   The next token from the string, or NULL if there are no more.
  * @see      PATH_SEPARATOR
  */
 char *
@@ -2642,31 +2403,29 @@ cl_path_get_component(char *s)
   static char *last;
 
   if (s == NULL && (s = last) == NULL)
-    return (NULL);
+    return NULL;
 
   do {
     c = *s++;
   } while (c == PATH_SEPARATOR);
 
-  if (c == 0) {           /* no non-delimiter characters */
+  if (c == '\0') {           /* no non-delimiter characters */
     last = NULL;
-    return (NULL);
+    return NULL;
   }
   tok = s - 1;
 
-  for (;;) {
+  while (1) {
     c = *s++;
-
     if (c == PATH_SEPARATOR || c == '\0') {
-      if (c == 0)
+      if (c == '\0')
         s = NULL;
       else
         s[-1] = 0;
       last = s;
-      return (tok);
+      return tok;
     }
   }
-  /* NOTREACHED */
 
   assert(0 && "Not reached");
   return NULL;
@@ -2749,7 +2508,7 @@ cl_string_latex2iso(char *str, char *result, int target_len)
     target_len = strlen(str);
     result = (char *) cl_malloc(target_len + 1);
   }
-  
+
   c = popc(str, src_pos);
   while ((c != '\0') && (target_pos < target_len)) {
 
@@ -2876,7 +2635,7 @@ cl_string_latex2iso(char *str, char *result, int target_len)
       }
     }
   }
-  
+
 endloop:
   result[target_pos] = '\0';
 
@@ -2890,9 +2649,9 @@ endloop:
  * This function decodes pre-defined XML entities in string s.
  * It overwrites the input string s and also returns s for convenience.
  *
- * (The entities are &amp;lt; &amp;gt; &amp;amp; &amp;quot; &amp;apos;).
- *
- * TODO -- numeric entities?
+ * (The entities are &amp;lt; &amp;gt; &amp;amp; &amp;quot; &amp;apos;
+ * numeric entities aren't covered becasue that would require doing
+ * different and complex things depending on the character set.)
  *
  * If passed NULL, it will not fall over - it will just pass NULL back!
  *
@@ -2931,14 +2690,12 @@ cl_xml_entity_decode(char *s)
           *(write++) = '\'';
           read += 6;
         }
-        else {
+        else
           *(write++) = *(read++); /* no known entity after all  */
-        }
       }
-      else {
+      else
         *(write++) = *(read++); /* simply copy char */
-      }
-    } /* endwhile */
+    }
     *write = '\0';              /* terminate result string */
   }
   return s;
@@ -2994,20 +2751,20 @@ cl_strcpy(char *buf, const char *src)
  * Initially, init_bytes is allocated (and the increment step is the same size), unless the string is longer...
  * in which case the length of the string becomes the inital amount of memory allocated.
  *
- * Use 0 for init_len, and the length of the specified string is used as the initial allocation.
+ * Use 0 for init_bytes, and the length of the specified string is used as the initial allocation.
  */
 ClAutoString
 cl_autostring_new(const char *data, size_t init_bytes)
 {
   ClAutoString s;
-  int len;
+  size_t len;
 
   /* calculate initial size of data */
   if (1 > init_bytes)
     init_bytes = CL_MAX_LINE_LENGTH;
   if (data)
-    if ( (len = 1 + strlen(data)) > init_bytes)
-       init_bytes = len;
+    if ( (len = strlen(data)) >= init_bytes)
+      init_bytes = len + 1;
 
   s = cl_malloc(sizeof(struct ClAutoString));
 
@@ -3028,12 +2785,12 @@ cl_autostring_new(const char *data, size_t init_bytes)
 }
 
 /**
- * Delete an autostring object.
+ * Delete an autostring object. NULL-safe.
  */
 void
 cl_autostring_delete(ClAutoString string)
 {
-  if (NULL == string)
+  if (!string)
     return;
   cl_free(string->data);
   cl_free(string);
@@ -3049,9 +2806,8 @@ cl_autostring_delete(ClAutoString string)
 void
 cl_autostring_set_increment(ClAutoString string, size_t new_increment)
 {
-  if (NULL == string)
-    return;
-  string->increment = new_increment;
+  if (string)
+    string->increment = new_increment;
 }
 
 /**
@@ -3062,20 +2818,18 @@ cl_autostring_set_increment(ClAutoString string, size_t new_increment)
 char *
 cl_autostring_ptr(ClAutoString string)
 {
-  if (NULL == string)
-    return NULL;
-  return string->data;
+  return string ? string->data : NULL;
 }
 
 /**
- * Get the length of the currently-stored string (or negative value in case NULL object is passed).
+ * Get the length of the currently-stored string (or 0 in case NULL object is passed).
  *
  * Equivalent to reading the ->len member, except this function checks for a NULL!
  */
 size_t
 cl_autostring_len(ClAutoString string)
 {
-  if (NULL == string)
+  if (!string)
     return 0;
   return string->len;
 }
@@ -3086,9 +2840,12 @@ cl_autostring_len(ClAutoString string)
 void
 cl_autostring_reclaim_mem(ClAutoString string)
 {
-  if (NULL == string)
+  size_t new_bytes;
+  if (!string)
     return;
-  string->data = cl_realloc(string->data, 1 + ( (string->len + 1) / string->increment ));
+  new_bytes = 1 + ( (string->len + 1) / string->increment );
+  string->data = cl_realloc(string->data, new_bytes);
+  string->bytes_allocated = new_bytes;
 }
 
 /**
@@ -3099,10 +2856,10 @@ cl_autostring_copy(ClAutoString dst, const char *src)
 {
   size_t bytes_needed;
 
-  if (NULL == dst)
+  if (!dst)
     return;
 
-  if (NULL == src) {
+  if (!src || '\0' == src[0]) {
     dst->data[0] = '\0';
     dst->len = 0;
   }
@@ -3125,10 +2882,10 @@ cl_autostring_copy(ClAutoString dst, const char *src)
 void
 cl_autostring_concat(ClAutoString dst, const char *src)
 {
-  int bytes_needed;
+  size_t bytes_needed;
   char *c;
 
-  if (NULL == dst || NULL == src)
+  if (!dst || !src || '\0' == src[0])
     return;
 
   bytes_needed = dst->len + strlen(src) + 1;
@@ -3157,7 +2914,7 @@ cl_autostring_concat(ClAutoString dst, const char *src)
 void
 cl_autostring_truncate(ClAutoString string, int new_length)
 {
-  if (NULL == string)
+  if (!string)
     return;
   if (new_length > string->len)
     return;

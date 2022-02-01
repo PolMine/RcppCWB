@@ -1,0 +1,41 @@
+##   -*-Makefile-*-
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+
+##
+##  SITE-SPECIFIC CONFIGURATION FILE:
+##  Install paths for HomeBrew formula (MacOS + Linux)
+##  with default registry in the main HomeBrew directory tree
+##  NB: make variable PREFIX must be set on the command line
+##      and HOMEBREW_ROOT should be provided by PLATFORM=homebrew-formula
+##
+
+ifndef HOMEBREW_ROOT
+HOMEBREW_ROOT := $(shell brew --prefix)
+endif
+
+## Directory tree where binaries, libraries, header files and man pages will be installed
+## must be provided on the command-line (pointing to CWB's keg directory)
+ifndef PREFIX
+$(error PREFIX= must be provided on the command line)
+endif
+
+## Default registry directory (used unless -r option or CORPUS_REGISTRY variable is set)
+## lives in the main HomeBrew tree, not in the keg (so it doesn't get nuked by upgrade)
+DEFAULT_REGISTRY = $(HOMEBREW_ROOT)/share/cwb/registry
+
+## Access permissions for installed files (octal code for regular files)
+INST_PERM = 644

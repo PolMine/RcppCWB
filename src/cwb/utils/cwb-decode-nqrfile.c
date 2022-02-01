@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -19,10 +19,6 @@
  * @file
  *
  * See cqp/corpmanag.c for the file format that this utility decodes.
- *
- * Note, some of the code is repeated across CQP's load-file functions
- * and here. In the long term, we'll aim to remove this duplication.
- * TODO!
  */
 
 #include <stdio.h>
@@ -33,25 +29,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-/** magic number of the subcorpus file format; defined in the CQP code, corpmanag.c ;
- * TODO should probably be defined centrally (cl/globals.h?) */
-#define SUBCORPMAGIC 36193928
-
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
 
 /**
  * Gets the size of the file.
+ * The ponderous name is to avoid clashing with a function in the CL.
  *
- * @param fd  File handle.
- * @return    The size of the file, from stat().
+ * @param file_handle  File handle.
+ * @return             The size of the file, from stat().
  */
 int
-file_length(FILE *fd)
+file_length_from_handle(FILE *file_handle)
 {
   struct stat stat_buf;
-  if(fstat(fileno(fd), &stat_buf) == EOF)
-    return(EOF);
+  if(fstat(fileno(file_handle), &stat_buf) == EOF)
+    return EOF;
   else
-    return(stat_buf.st_size);
+    return stat_buf.st_size;
 }
 
 /**
@@ -66,111 +61,103 @@ file_length(FILE *fd)
  * The registry is printed iff print_header. The start-end pairs
  * are printed on tab-delimited lines, one line per pair.
  *
- * @param fd            File pointer.
+ * @param src           File pointer.
  * @param print_header  Boolean: controls whether a "registry" header
  *                      in the subcorpus file gets printed or not
  * @return              Boolean: true for all OK, false for problem.
  */
 int
-nqrfile_print_info(FILE *fd, int print_header)
+nqrfile_print_info(FILE *src, int print_header)
 {
-  char        *field;
-  char        *p;
+  char  *field;
+  char  *p;
 
   struct range_t {
     int start;
     int end;
   };
-  struct range_t *range;
+  /* thus we can use a pointer to the above as an array of cpos pairs */
+  struct range_t *range_array;
 
   char *registry, *o_name;
   int size;
+  int magic;
 
   int len, j;
 
-  len = file_length(fd);
+  len = file_length_from_handle(src);
 
   if (len <= 0) {
     perror("ERROR: File length of subcorpus is <= 0");
     return 0;
   }
-  else {
-    
-    /* the subcorpus is treated as a byte array */
-    field = (char *)malloc(len);
-    
-    /* read the subcorpus */
-    
-    if (len != fread(field, 1, len, fd)) {
-      fprintf(stderr, "Read error while reading in data from subcorpus file\n");
-      return 0;
-    }
-    else if (*((int *)field) == SUBCORPMAGIC || *((int *)field) == SUBCORPMAGIC+1) {
-      
-      int magic;
 
-      magic = *((int *)field);
+  /* the subcorpus is treated as a byte array */
+  field = (char *)cl_malloc(len);
 
-      p = ((char *)field) + sizeof(int);
-      
-      registry = (char *)p;
-      
-      while (*p)
-        p++;
-      /* skip the '\0' character */
-      p++;
+  /* read the subcorpus */
 
-      
-      o_name = (char *)p;
-      
-      /* advance p to the end of the 2nd string */
-      while (*p)
-        p++;
-      /* skip the '\0' character */
-      p++;
-      
-      /* the length is divisible by 4 -- advance p over the additional '\0' characters */
-      while ((p - field) % 4)
-        p++;
-
-      if (magic == SUBCORPMAGIC) {
-        size = (len - (p - field)) / (2 * sizeof(int));
-      }
-      else {
-        memcpy(&size, p, sizeof(int));
-        p += sizeof(int);
-        fprintf(stderr, "Note: new subcorpus format\n");
-      }
-
-      if (print_header) {
-        printf("REGISTRY %s\n", registry);
-        printf("O_NAME   %s\n", o_name);
-        printf("SIZE     %d\n", size);
-      }
-
-      range = (struct range_t *) p;
-
-      for (j = 0; j < size; j++)
-        printf("%d\t%d\n",
-               range[j].start, range[j].end);
-    }
-    else {
-      fprintf(stderr, "Error: Magic number incorrect in subcorpus file!\n");
-      return 0;
-    }
-      
-    free(field);
-    p = NULL;
-    field = NULL;
-      
-    return 1;
+  if (len != fread(field, 1, len, src)) {
+    fprintf(stderr, "Read error while reading in data from subcorpus file\n");
+    return 0;
   }
+
+  magic = *((int *)field);
+
+  if (magic == CWB_SUBCORPMAGIC_ORIG || magic == CWB_SUBCORPMAGIC_NEW) {
+    /* set p to point to first byte after end of the magic number */
+    p = ((char *)field) + sizeof(int);
+
+    registry = p;
+
+    /* registry name ends in null; scroll plast, plus skip the '\0' character */
+    while (*p)
+      p++;
+    p++;
+
+    o_name = (char *)p;
+
+    /* advance p to the end of the 2nd string, plus skip the '\0' character */
+    while (*p)
+      p++;
+    p++;
+
+    /* the length of the head of the file is divisible by 4 -- advance p over the additional '\0' characters */
+    while ((p - field) % 4)
+      p++;
+
+    if (magic == CWB_SUBCORPMAGIC_ORIG)
+      size = (len - (p - field)) / (2 * sizeof(int));
+    else {
+      memcpy(&size, p, sizeof(int));
+      p += sizeof(int);
+      fprintf(stderr, "Note: new subcorpus format\n");
+    }
+
+    if (print_header) {
+      printf("REGISTRY %s\n", registry);
+      printf("O_NAME   %s\n", o_name);
+      printf("SIZE     %d\n", size);
+    }
+
+    range_array = (struct range_t *) p;
+
+    for (j = 0; j < size; j++)
+      printf("%d\t%d\n", range_array[j].start, range_array[j].end);
+  }
+  else {
+    fprintf(stderr, "Error: Magic number incorrect in subcorpus file!\n");
+    return 0;
+  }
+
+  cl_free(field);
+  p = NULL;
+
+  return 1;
 }
 
 
-/* *************** *\
- *      MAIN()     *
-\* *************** */
+
 
 /**
  * Main function for cwb-decode-nqrfile.
@@ -182,37 +169,37 @@ int
 main(int argc, char **argv)
 {
   int i;
-  FILE *fd;
+  FILE *src;
   int header_required = 1;
+
+  cl_startup();
 
   for (i = 1; i < argc; i++) {
     /* TODO would be useful to change this to +/-H (in v4.0), so that -h is "available" for
-     * a _usage funciton, if we ever decide we need one.
+     * a _usage function, if we ever decide we need one.
      */
-    if (strcmp(argv[i], "-h") == 0)
+    if (cl_str_is(argv[i], "-h"))
       header_required = 0;
-    else if (strcmp(argv[i], "+h") == 0)
+
+    else if (cl_str_is(argv[i], "+h"))
       header_required = 1;
+
     else {
-
       /* treat arg as sc-name */
-
-      if (strcmp(argv[i], "-") == 0) {
+      if (cl_str_is(argv[i], "-")) {
         if (!nqrfile_print_info(stdin, header_required))
           exit(1);
       }
       else {
-        if ((fd = fopen(argv[i], "rb")) == NULL) {
+        if (!(src = fopen(argv[i], "rb"))) {
           perror(argv[i]);
           exit(1);
         }
-        else {
-          if (!nqrfile_print_info(fd, header_required))
-            exit(1);
-          fclose(fd);
-        }
+        if (!nqrfile_print_info(src, header_required))
+          exit(1);
+        fclose(src);
       }
     }
   }
-  exit(0);
+  return 0;
 }

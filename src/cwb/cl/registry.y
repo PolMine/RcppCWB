@@ -14,6 +14,10 @@
  *  Public License for more details (in the file "COPYING", or available via
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
+
+/**
+ * This file contains the Bison grammar for the registry parser.  
+ */
 %{
 
 void Rprintf(const char *, ...);
@@ -22,9 +26,11 @@ void Rprintf(const char *, ...);
 #include "globals.h"
 
 #include "corpus.h"
-#include "macros.h"
 #include "attributes.h"
 
+/*
+ * note that flex/bison run with "creg" specified as their prefix. So cregerror is yyerror, etc. 
+ */
 
 extern int creglex();
 
@@ -34,8 +40,6 @@ Attribute *cregattrib = NULL;
 char cregestring[1024];
 
 /* ====================================================================== */
-
-DynArg *makearg(char *type_id);
 
 #define cregSetAttrComponentPath(attr, cid, path) \
 { \
@@ -51,14 +55,13 @@ void cregerror_cleanup(char *message)
 {
   Rprintf("REGISTRY ERROR (%s/%s): %s\n", cregin_path, cregin_name, message);
 
-  if (cregattrib != NULL)
-    attr_drop_attribute(cregattrib);
+  if (cregattrib)
+    cl_delete_attribute(cregattrib);
+  cregattrib = NULL;
 
   if (cregcorpus != NULL)
-    drop_corpus(cregcorpus);
-
+    cl_delete_corpus(cregcorpus);
   cregcorpus = NULL;
-  cregattrib = NULL;
 }
 
 #define cregerror(message) { cregerror_cleanup(message); YYERROR; }
@@ -66,6 +69,32 @@ void cregerror_cleanup(char *message)
 /* ====================================================================== */
 
 %}
+
+
+/* 
+ * SETTING THE PREFIX FOR EXPORTED PARSER SYMBOLS
+ * ==============================================
+ * 
+ * we want all exported symbols to begin with "creg" instead of "yy";
+ * this would normally imply the following directive:  
+ *
+ *         %name-prefix="creg"
+ *
+ * (though note that they took out the "=" in bison 2.4).
+ *
+ * However, bison 3 deprecates the above; the b3 version of this command is:
+ * 
+ *         %define api.prefix {creg}
+ *
+ * which also is more comprehensive in terms of the symbols it alters
+ * (YYSTYPE, YYDEBUG, etc. ; see the bison NEWS file).
+ * 
+ * bison 2 is still in wide use. But, using the %name-prefix directive
+ * triggers a deprecation warning message in bison 3. (Meanwhile the 
+ * -Wno-deprecation option isn't supported in bison 2.) So although it
+ * would amke sense to have the declaration here, it is instead in the
+ * Makefile (as -p creg).
+ */
 
 %union {
   char    *strval;
@@ -102,8 +131,7 @@ void cregerror_cleanup(char *message)
 %token DYNAMIC_SYM
 %token DOTS_SYM
 
-%token IGNORE_SYM               /* *** ignore MAPTABLEs and NGRAMs, which are present
-                                   in many corpora *** */
+%token IGNORE_SYM               /* ignore MAPTABLEs and NGRAMs, which are present in many corpora  */
 
 %token ADMIN_SYM
 %token ACCESS_SYM
@@ -138,7 +166,7 @@ void cregerror_cleanup(char *message)
 
 %%
 
-Registry        : /* eps */         { cregcorpus = new(Corpus); 
+Registry        : /* eps */         { cregcorpus = (Corpus *)cl_malloc(sizeof(Corpus)); 
                                       cregcorpus->attributes = NULL;
                                       cregcorpus->name = NULL;
                                       cregcorpus->id = NULL;
@@ -146,7 +174,7 @@ Registry        : /* eps */         { cregcorpus = new(Corpus);
                                       cregcorpus->charset = latin1;  /* default charset is latin1 */
                                       cregcorpus->properties = NULL;
                                       cregcorpus->info_file = NULL;
-                                      cregcorpus->admin = NULL;
+                                      /*cregcorpus->admin = NULL; */
                                       cregcorpus->groupAccessList = NULL;
                                       cregcorpus->hostAccessList = NULL;
                                       cregcorpus->userAccessList = NULL;
@@ -189,8 +217,8 @@ OptHome         : HOME_SYM path     { $$ = $2; }
                 | /* eps */         { $$ = NULL; }
                 ; 
 
-OptAdmin        : ADMIN_SYM id      { cregcorpus->admin = $2; }
-                | /* eps */         { cregcorpus->admin = NULL; }
+OptAdmin        : ADMIN_SYM id      { /* still parses... but does nothing //cregcorpus->admin = $2; */ }
+                | /* eps */         { /* still parses... but does nothing //cregcorpus->admin = NULL;  */}
                 ;
 
 OptUserAccessClause: USER_SYM 
@@ -217,8 +245,7 @@ IDDecl          : ID_SYM id         { $$ = $2; }
                    
 Attributes      : Attribute         { 
                                       /* declare components which are not yet declared for local attrs. */
-                                      if ((((Attribute *)$1)->any.path == NULL) &&
-                                          (cregcorpus->path != NULL))
+                                      if ((((Attribute *)$1)->any.path == NULL) && (cregcorpus->path != NULL))
                                         ((Attribute *)$1)->any.path = cl_strdup(cregcorpus->path);
                                       declare_default_components((Attribute *)$1);
                                     }
@@ -396,12 +423,6 @@ Property        : PROPERTY_SYM IDENTIFIER '=' STRING
 
 
 %%
-
-
-
-
-
-
 
 
 

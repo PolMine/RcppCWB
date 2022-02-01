@@ -1,0 +1,50 @@
+---
+title: "Patching the CWB"
+author: "Andreas Blaette"
+date: "January 14, 2022"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+params:
+  revision: 1690
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = path.expand("~/Lab/github/RcppCWB"))
+```
+
+
+## Required libraries
+
+```{r}
+library(git2r)
+library(fs)
+library(magrittr)
+library(R6)
+```
+
+
+## Load and configure PatchCWB
+
+```{r load_code_and_data}
+source("~/Lab/github/RcppCWB/patch/PatchCWB.R")
+```
+
+
+```{r configure_patch_engine}
+P <- PatchCWB$new(
+  cwb_dir_svn = "~/Lab/tmp/cwb/trunk",
+  repodir = "~/Lab/github/RcppCWB",
+  makeheaders = "~/Lab/github_foreign/makeheaders/src/makeheaders",
+  revision = params$revision
+)
+```
+
+The CWB version initially included in the RcppCWB package was 3.4.14 (SVN revision 1069), as can be learned from the file `definitions.mk`.
+
+
+## Run the PatchEngine
+
+```{r run_patch_engine}
+P$patch_all()
+```

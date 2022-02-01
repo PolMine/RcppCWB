@@ -1,0 +1,79 @@
+#!/bin/sh
+
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+
+
+## NB: this script prints command-line flags that should be appended to all make commands,
+##     i.e. typical usage will be:  CONFIG_FLAGS=`install-scripts/config-basic`
+
+platform=""
+siteflags=""
+uname_output=$(uname -a)
+
+case "$uname_output" in
+    Linux*)
+        platform="linux"
+        case "$uname_output" in
+            *x86_64*)
+                platform="${platform}-64"
+                ;;
+        esac
+        ;;
+    Darwin*)
+        case "$uname_output" in
+            *ppc)
+                echo "*** MacOS is no longer supported on PowerPC processors ***"
+                exit
+                ;;
+            *i386)
+                echo "*** MacOS is no longer supported on 32-bit Intel processors ***"
+                exit
+                ;;
+            *x86_64)
+                # build natively optimised 64-bit Intel binaries (x86_64) by default on recent Mac OS X
+                if [ -f /usr/local/opt/glib/lib/libglib-2.0.dylib ] || [ -f /usr/local/opt/glib/lib/libglib-2.0.a ]
+                then
+                  platform="darwin-brew" # GLib seems to be provided by HomeBrew
+                elif [ -f /opt/local/lib/libglib-2.0.dylib ] || [ -f /opt/local/lib/libglib-2.0.a ]
+                then
+                  platform="darwin-port-core2" # GLib seems to be provided by MacPorts
+                else
+                  platform="darwin-64" # assume user has installed the prerequisite manually
+                fi
+                ;;
+              *)
+                echo "*** unsupported CPU architecture `uname -m` ***"
+                exit
+                ;;
+        esac
+        ;;
+    CYGWIN*)
+        platform="cygwin"
+        # and force site to be cygwin
+        siteflags="SITE=cygwin"
+        ;;
+    SunOS*)
+        platform="solaris"
+        ;;
+    *)
+        # go for generic unix
+        platform="unix"
+        ;;
+esac
+
+
+echo "PLATFORM=$platform $siteflags"

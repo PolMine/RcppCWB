@@ -17,29 +17,24 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
-#include "../cl/globals.h"
-#include "../cl/corpus.h"
-#include "../cl/attributes.h"
-#include "../cl/cdaccess.h"
+#include "../cl/cl.h"
 
 #include "corpmanag.h"
 #include "attlist.h"
 #include "output.h"
 #include "options.h"
 
-/** String containing print structure separators */
+/** String containing print structure separator */
 #define PRINT_STRUC_SEP ": ,"
 
-/* ---------------------------------------------------------------------- */
 
 /** Global print-mode setting. */
 PrintMode GlobalPrintMode = PrintASCII;
 
 /** Global print-options: all booleans initially set to false */
 PrintOptions GlobalPrintOptions = { 0, 0, 0, 0, 0 };
-
-/* ---------------------------------------------------------------------- */
 
 
 /**
@@ -53,81 +48,54 @@ PrintOptions GlobalPrintOptions = { 0, 0, 0, 0, 0 };
 AttributeList *
 ComputePrintStructures(CorpusList *cl)
 {
-  if (printStructure == NULL || printStructure[0] == '\0' || cl == NULL)
+  char *token, *p;
+  AttributeList *al = NULL;
+  AttributeInfo *ai = NULL;
+  Attribute *struc = NULL;
+
+  if (!printStructure || printStructure[0] == '\0' || !cl)
     return NULL;
-  else {
-    char *token, *p;
-    AttributeList *al;
-    AttributeInfo *ai;
-    Attribute *struc;
 
-    al = NULL;
-    struc = NULL;
+  if (!(token = strtok(printStructure, PRINT_STRUC_SEP)))
+    return NULL;
 
-    token = strtok(printStructure, PRINT_STRUC_SEP);
-
-    if (!token)
-      return NULL;
-
-    while (token) {
-
-      if ((struc = find_attribute(cl->corpus, token, ATT_STRUC, NULL))
-          == NULL) {
-        cqpmessage(Warning,
-                   "Structure ``%s'' not declared for corpus ``%s''.",
-                   token, cl->corpus->registry_name);
-      }
-      else if (!structure_has_values(struc)) {
-        cqpmessage(Warning, "Structure ``%s'' does not have any values.",
-                   token);
-        struc = NULL;
-      }
-
-      if (struc) {
-        if (al == NULL)
-          al = NewAttributeList(ATT_STRUC);
-
-        (void) AddNameToAL(al, token, 1, 0);
-      }
-      token = strtok(NULL, PRINT_STRUC_SEP);
+  while (token) {
+    if (!(struc = cl_new_attribute(cl->corpus, token, ATT_STRUC)))
+      cqpmessage(Warning, "Structure ``%s'' not declared for corpus ``%s''.", token, cl->corpus->registry_name);
+    else if (!cl_struc_values(struc)) {
+      cqpmessage(Warning, "Structure ``%s'' does not have any values.", token);
+      struc = NULL;
     }
 
-    if (al) {
-      if (!VerifyList(al, cl->corpus, 1)) {
-        cqpmessage(Error,
-                   "Problems while computing print structure list");
-        DestroyAttributeList(&al);
-        al = NULL;
-      }
-      else if (!al->list)
-        DestroyAttributeList(&al);
+    if (struc) {
+      if (!al)
+        al = NewAttributeList(ATT_STRUC);
+      AddNameToAL(al, token, 1, 0);
     }
-
-    /* rebuild printStructure string to show only valid attributes */
-    p = printStructure;
-    *p = '\0';
-    ai = (al) ? al->list : NULL;
-    while (ai != NULL) {
-      if (p != printStructure)
-        *p++ = ' ';                /* insert blank between attributes */
-      sprintf(p, "%s", ai->attribute->any.name);
-      p += strlen(p);
-      ai = ai->next;
-    }
-
-    return al;
+    token = strtok(NULL, PRINT_STRUC_SEP);
   }
-  assert(0 && "Not reached ;-|");
-  return NULL;
-}
 
-/**
- * This function doesn't do anything yet.
- */
-void
-ResetPrintOptions(void)
-{
-  /* ??? */
+  if (al) {
+    if (!VerifyList(al, cl->corpus, 1)) {
+      cqpmessage(Error, "Problems while computing print structure list");
+      DestroyAttributeList(&al);
+      al = NULL;
+    }
+    else if (!al->list)
+      DestroyAttributeList(&al);
+  }
+
+  /* rebuild printStructure string to show only valid attributes */
+  p = printStructure;
+  *p = '\0';
+  for ( ai = al ? al->list : NULL ; ai ; ai = ai->next ) {
+    if (p != printStructure)
+      *p++ = ' ';                /* insert blank between attributes */
+    sprintf(p, "%s", ai->attribute->any.name);
+    p += strlen(p);
+  }
+
+  return al;
 }
 
 
@@ -141,59 +109,43 @@ void
 ParsePrintOptions(void)
 {
   if (printModeOptions) {
-
     char *token;
     char s[CL_MAX_LINE_LENGTH];
     int value;
 
-    /* we must not destructively modify the global variable, as strtok
-       would do */
-
+    /* we must not destructively modify the global variable, so run strtok on a local copy */
     cl_strcpy(s, printModeOptions);
 
     token = strtok(s, " \t\n,.");
     while (token) {
-
-      if (strncasecmp(token, "no", 2) == 0) {
+      /* handle the "no" prefix that turns a setting off, if present */
+      if (0 == strncasecmp(token, "no", 2)) {
         value = 0;
         token += 2;
       }
       else
         value = 1;
 
-      if (strcasecmp(token, "wrap") == 0) {
+      if (cl_streq_ci(token, "wrap"))
         GlobalPrintOptions.print_wrap = value;
-      }
-      else if ((strcasecmp(token, "table") == 0) || (strcasecmp(token, "tbl") == 0)) {
+
+      else if (cl_streq_ci(token, "table")  || cl_streq_ci(token, "tbl"))
         GlobalPrintOptions.print_tabular = value;
-      }
-      else if ((strcasecmp(token, "header") == 0) || (strcasecmp(token, "hdr") == 0)) {
+
+      else if (cl_streq_ci(token, "header") || cl_streq_ci(token, "hdr"))
         GlobalPrintOptions.print_header = value;
-      }
-      else if ((strcasecmp(token, "border") == 0) || (strcasecmp(token, "bdr") == 0)) {
+
+      else if (cl_streq_ci(token, "border") || cl_streq_ci(token, "bdr"))
         GlobalPrintOptions.print_border = value;
-      }
-      else if ((strcasecmp(token, "number") == 0) || (strcasecmp(token, "num") == 0)) {
+
+      else if (cl_streq_ci(token, "number") || cl_streq_ci(token, "num"))
         GlobalPrintOptions.number_lines = value;
-      }
+
       else if (!silent)
-        Rprintf("Warning: %s: unknown print option\n",
-                token);
+        Rprintf("Warning: %s: unknown print option\n", token);
 
       token = strtok(NULL, " \t\n,.");
     }
   }
 }
 
-/**
- * Copies a PrintOptions object.
- *
- * @param target  The PrintOptions object to be overwritten.
- * @param source  The PrintOptions object to copy.
- */
-void
-CopyPrintOptions(PrintOptions *target, PrintOptions *source)
-{
-  if (target && source)
-    memcpy((void *)target, (void *)source, sizeof(PrintOptions));
-}

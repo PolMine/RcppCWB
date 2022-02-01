@@ -1,5 +1,5 @@
 ^windows$
-^prep$
+^patch$
 ^cran-comments\.md$
 ^paper.md$
 ^data-raw$

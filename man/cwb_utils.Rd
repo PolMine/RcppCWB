@@ -18,6 +18,7 @@ cwb_encode(
   registry = Sys.getenv("CORPUS_REGISTRY"),
   data_dir,
   vrt_dir,
+  encoding = "utf8",
   p_attributes = c("word", "pos", "lemma"),
   s_attributes
 )
@@ -35,6 +36,8 @@ files of the indexed corpus.}
 
 \item{vrt_dir}{Directory with input corpus files (verticalised format / file
 ending *.vrt).}
+
+\item{encoding}{The encoding of the files to be encoded, defaults to "utf8".}
 
 \item{p_attributes}{Positional attributes (p-attributes) to be declared.}
 

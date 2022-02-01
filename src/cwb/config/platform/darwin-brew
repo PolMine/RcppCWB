@@ -17,7 +17,7 @@
 
 ##
 ##  PLATFORM CONFIGURATION FILE:
-##  Natively tuned 64-bit binaries for Mac OS X 10.10 (Yosemite) and newer 
+##  Natively tuned Intel 64-bit binaries for Mac OS X 10.10 (Yosemite) and newer 
 ##  with prerequisite libraries provided by HomeBrew package manager
 ##
 
@@ -45,4 +45,7 @@ GLIB_LIBS = -L/usr/local/opt/glib/lib -L/usr/local/opt/gettext/lib -lglib-2.0 -l
 
 ## CPU architecture and operating system used to name binary releases
 RELEASE_ARCH = x86_64
-RELEASE_OS = osx-10.10
+
+## Optionally use newer Bison from HomeBrew (MacOS ships bison 2.3, which is > 15 years old)
+# YACC = /usr/local/opt/bison@2.7/bin/bison -d -t
+# YACC = /usr/local/opt/bison/bin/bison -d -t

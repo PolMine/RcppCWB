@@ -44,6 +44,16 @@ PARSES  = registry.tab.c lex.creg.c
 PARSEG  = registry.l registry.y
 PARSEO  = registry.tab.o lex.creg.o
 
+## Compile and link-in windows-mmap functions only if we are in MinGW
+ifdef __MINGW__
+MMAPH = windows-mmap.h
+MMAPS = windows-mmap.c
+MMAPO = windows-mmap.o
+else
+MMAPH =
+MMAPS =
+MMAPO =
+endif 
 
 ## cl.h header file will be installed in subdirectory cwb/
 REALINCINSTDIR = $(INCINSTDIR)/cwb
@@ -51,21 +61,17 @@ REALINCINSTDIR = $(INCINSTDIR)/cwb
 ## ----------------------------------------------------------------------
 ## CORPUS LIBRARY  headers / sources / objects 
 
-HDRS = globals.h macros.h \
-       list.h lexhash.h ngram-hash.h \
+HDRS = globals.h cwb-globals.h ui-helpers.c \
        bitfields.h storage.h fileutils.h \
-       special-chars.h regopt.h \
+       special-chars.h \
        corpus.h attributes.h makecomps.h \
        $(PARSEH) \
-       cdaccess.h \
        bitio.h \
        endian2.h \
        compression.h \
-       binsert.h \
-       class-mapping.h \
        $(MMAPH)
 
-SRCS = globals.c macros.c \
+SRCS = globals.c macros.c ui-helpers.c \
        list.c lexhash.c ngram-hash.c \
        bitfields.c storage.c fileutils.c \
        special-chars.c regopt.c \
@@ -75,23 +81,18 @@ SRCS = globals.c macros.c \
        bitio.c \
        endian.c \
        compression.c \
-       binsert.c \
-       class-mapping.c \
        $(MMAPS)
  
-OBJS = globals.o macros.o \
+OBJS = globals.o macros.o ui-helpers.o \
        list.o lexhash.o ngram-hash.o \
        bitfields.o storage.o fileutils.o \
        special-chars.o regopt.o \
-       corpus.o attributes.o \
+       corpus.o attributes.o makecomps.o \
        $(PARSEO) \
-       makecomps.o \
        cdaccess.o \
        bitio.o \
        endian.o \
        compression.o \
-       binsert.o \
-       class-mapping.o \
        $(MMAPO)
 
 ## Extra objects (will be compiled, but not included in libcl.a) 
@@ -105,6 +106,15 @@ all: libcl.a $(EXTRA_OBJS)
 libcl.a: $(OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
+
+install: libcl.a
+ifndef __MINGW__
+	if [ ! -d "$(LIBINSTDIR)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(LIBINSTDIR)" ; fi;
+	$(INSTALL) $(INST_FLAGS_DATA) libcl.a "$(LIBINSTDIR)"
+	if [ ! -d "$(REALINCINSTDIR)" ]; then $(INSTALL) $(INST_FLAGS_DIR) "$(REALINCINSTDIR)" ; fi;
+	$(INSTALL) $(INST_FLAGS_DATA) cl.h "$(REALINCINSTDIR)"
+else
+endif
 
 depend:
 	-$(RM) depend.mk
@@ -122,7 +132,9 @@ realclean: clean
 	-$(RM) registry.tab.c registry.tab.c lex.creg.c registry.tab.h
 	-$(RM) depend.mk
 
-size:	$(SRCS) $(HDRS)
+size: $(SRCS) $(HDRS)
+# I am not sure if the following line will work to make these print even with .SILENT turned on ...
+	@$(ECHO) `$(WC) $(SRCS) $(HDRS)` 
 	$(WC) $(SRCS) $(HDRS) 
 
 

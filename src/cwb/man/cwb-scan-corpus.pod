@@ -6,6 +6,7 @@ cwb-scan-corpus - Extract n-gram frequency information from a CWB corpus
 
 B<cwb-scan-corpus> [-Cqh] [-r I<registry_dir>] [-b I<num>]
     [-o I<file>] [-S] [-f I<n>] [-F I<attribute>]
+    [-w <attribute> | -d <attribute>]
     [-s I<start>] [-e I<end>] [-R I<file>]
     I<corpus>  I<key1> I<key2> ...
 
@@ -68,6 +69,14 @@ A regular word consists only of one or more hyphen-connected components, each of
 letters or all digits, and does not start or end with a hyphen.
 
 Cleanup does not apply to the values of "constraint" keys.  All other keys will be affected, however, as C<-C> is a global option.
+
+=item B<-d> I<attribute>
+
+Compute document frequencies of n-grams with respect to regions of s-attribute I<attribute>, i.e. discard multiple
+occurrences of the same n-gram in the same region.
+
+A corresponding within option (C<-w> I<attribute>) is implied, and C<-w> must not be specified explicitly.
+For obvious reasons, C<-d> cannot be combined with C<-F>.  
 
 =item B<-e> I<end>
 
@@ -141,6 +150,14 @@ it overrules both these.
 
 Specifies a start point for scanning. The first token to be treated as a "zero"
 position in the key specification will be the token at corpus position I<start>.
+
+=item B<-w> I<attribute>
+
+N-grams must be contained within regions of s-attribute I<attribute>, i.e. all N-grams that occur
+outside such regions or cross region boundaries are discarded.  Note that constraint keys
+must also fall inside the regions.  Gaps between I<attribute> regions will be skipped efficiently.
+
+Only a single C<-w> option can be specified.
 
 =back
 

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -24,22 +24,21 @@
 /**
  * Print mode: specifies output formats for CQP.
  */
-typedef enum outputmode { 
-  PrintASCII, 
-  PrintSGML, 
-  PrintHTML, 
-  PrintLATEX, 
-  PrintBINARY, 
+typedef enum {
+  PrintASCII,
+  PrintSGML,
+  PrintHTML,
+  PrintLATEX,
   PrintUNKNOWN
 } PrintMode;
 
 /**
  * PrintOptions: records a set of print options.
  *
- * All members starting in print_ are Boolean, to be interpreted as
- * print_XX --> "XX is to be printed"
+ * All members starting in "print_" are Boolean, to be interpreted as
+ * print_xx --> "xx should be printed"
  */
-typedef struct _print_option_rec_ {
+typedef struct {
   int print_header;                /**< Can be: header/hdr,noheader */
   int print_tabular;               /**< Can be: table/tbl,notable */
   int print_wrap;                  /**< Can be: wrap, nowrap */
@@ -55,11 +54,16 @@ typedef struct _print_option_rec_ {
  *
  * Note that currently it is not possible for a new PDR to be defined at
  * runtime. It must be done at compile-time.
+ *
+ * Concordance formatting is configured across this object and
+ * the ContextDescriptor object, qv.
+ *
+ * @see ContextDescriptor
  */
-typedef struct _print_descr_rec_ {
-
+typedef struct {
   char *CPOSPrintFormat;              /**< Rprintf()-Formatting String for display of a corpus position
-                                           (needs a %d or %x or similar in it somewhere)               */
+                                           at the start of a concordance line (needs a %d or %x or
+                                           similar in it somewhere)    */
 
   char *BeforePrintStructures;        /**< to print before PS */
   char *PrintStructureSeparator;      /**< to print as separator */
@@ -78,24 +82,27 @@ typedef struct _print_descr_rec_ {
   char *AttributeSeparator;           /**< what to print as p-att separator within tokens */
   char *AfterToken;                   /**< what to print after a token */
 
-  char *BeforeField;                  /**< what to print before a field */
-  char *FieldSeparator;               /**< what to print between fields */
-  char *AfterField;                   /**< what to print after fields */
+  char *BeforeField;                  /**< though it sounds like it should relate to anchors (Fields),
+                                           actually this and AfterField wrap the whole concordance line
+                                           except the PrintStructures/cpos incipit */
+  char *AfterField;                   /**< though it sounds like it should relate to anchors (Fields),
+                                           actually this and BeforeField wrap the whole concordance line
+                                           except the PrintStructures/cpos incipit */
 
-  char *BeforeLine;                   /**< what to print before a line */
-  char *AfterLine;                    /**< what to print after a line */
+  char *BeforeLine;                   /**< what to print before a line (not used by compose_kwic_line itself, only the callers) */
+  char *AfterLine;                    /**< what to print after a line (not used by compose_kwic_line itself, only the callers)  */
 
-  char *BeforeConcordance;            /**< what to print before the concordance */
-  char *AfterConcordance;             /**< what to print after the concordance */
+  char *BeforeConcordance;            /**< what to print before the whole concordance */
+  char *AfterConcordance;             /**< what to print after the whole concordance */
 
-  char *(*printToken)(char *);        /**< function pointer for printing a token */
-  char *(*printField)(FieldType, int); /**< function pointer for printing a field
+  const char *(*printToken)(const char *);   /**< function pointer for printing a token */
+  char *(*printField)(FieldType, int); /**< function pointer for printing a field,
                                         *   i.e. for highlighting a token that is one of the 4 anchor points;
-                                        *   if NULL, these aren't printed. */
-  
+                                        *   if NULL, these aren't printed.
+                                        *   (unlike Before/AfterField, this really does relate to anchors.)  */
 } PrintDescriptionRecord;
 
-typedef char * (*TokenEscapeFunction)(char *);
+typedef void (*print_aligned_line_func)(FILE *, int, char *, char *);
 
 extern PrintMode GlobalPrintMode;
 
@@ -104,7 +111,5 @@ extern PrintOptions GlobalPrintOptions;
 AttributeList *ComputePrintStructures(CorpusList *cl);
 
 void ParsePrintOptions(void);
-
-void CopyPrintOptions(PrintOptions *target, PrintOptions *source);
 
 #endif

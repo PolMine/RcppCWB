@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include "../cl/macros.h"
+#include "../cl/cl.h"
 
 #include "cqp.h"
 #include "eval.h"
@@ -38,7 +38,6 @@
 #include "output.h"
 #include "ascii-print.h"
 
-
 #ifdef USE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -48,7 +47,7 @@
 
 #ifdef USE_READLINE
 
-/* The implementation of custom completion was largely dictated by the Editline library used 
+/* The implementation of custom completion was largely dictated by the Editline library used
  * as a replacement for GNU Readline:
  *  "unlike GNU Readline, Editline expects to get the full list of possible completions
  *   from the custom completion function; therefore, we need some helper routines which
@@ -58,15 +57,16 @@
  * We keep this architecture for the backport to GNU Readline, using rl_attempted_completion_function
  * instead of the more common rl_completion_entry_function / rl_completion_matches() approach.
 */
-char **cc_compl_list = NULL;      /* list of possible completions */
-int cc_compl_list_size = 0;       /* number of completions in list */
-int cc_compl_list_allocated = 0;  /* number of entries allocated for list (incl. NULL terminator) */
-#define CC_COMPL_LIST_ALLOC_BLOCK 256 /* how many list cells to allocate at a time */
+char **cc_compl_list = NULL;          /**< readline autocomplete: list of possible completions */
+int cc_compl_list_size = 0;           /**< readline autocomplete: number of completions in list */
+int cc_compl_list_allocated = 0;      /**< readline autocomplete: number of entries allocated for list (incl. NULL terminator) */
+#define CC_COMPL_LIST_ALLOC_BLOCK 256 /**< readline autocomplete: how many list cells to allocate at a time */
 #define RL_DEBUG 0
 
 /* initialise new completion list (size 0) without freeing previous list (which was deallocated by readline library) */
 void
-cc_compl_list_init(void) {
+cc_compl_list_init(void)
+{
   cc_compl_list = (char **) cl_malloc(CC_COMPL_LIST_ALLOC_BLOCK * sizeof(char *));
   cc_compl_list_allocated = CC_COMPL_LIST_ALLOC_BLOCK;
   cc_compl_list_size = 1;
@@ -76,7 +76,8 @@ cc_compl_list_init(void) {
 
 /* add string (must be alloc'ed by caller) to completion list */
 void
-cc_compl_list_add(char *string) {
+cc_compl_list_add(char *string)
+{
   if (cc_compl_list_size >= cc_compl_list_allocated - 1) {
     /* extend list if necessary (NB: need to leave room for NULL marker at end of list) */
     cc_compl_list_allocated += CC_COMPL_LIST_ALLOC_BLOCK;
@@ -88,7 +89,8 @@ cc_compl_list_add(char *string) {
 
 /* internal function for sorting list of completions */
 static int
-cc_compl_list_sort(const void *p1, const void *p2) {
+cc_compl_list_sort(const void *p1, const void *p2)
+{
   char *name1 = *((char **) p1);
   char *name2 = *((char **) p2);
   int result = strcmp(name1, name2);
@@ -97,10 +99,11 @@ cc_compl_list_sort(const void *p1, const void *p2) {
 
 /* sort list and remove (& free) duplicates; returns pointer to list */
 char **
-cc_compl_list_sort_uniq(void) {
+cc_compl_list_sort_uniq(void)
+{
   int mark, point;
   char *lcp, *new_string;
-  
+
   if (cc_compl_list_size <= 1) { /* empty list (only containing dummy entry) */
     /* at least some versions of GNU readline are broken and don't accept an empty list */
     rl_attempted_completion_over = 1; /* so readline doesn't fall back to filename completion */
@@ -118,7 +121,7 @@ cc_compl_list_sort_uniq(void) {
   point = 2;                    /* we always keep the first list element */
   while (point < cc_compl_list_size) {
     if (strcmp(cc_compl_list[mark], cc_compl_list[point]) == 0) {
-      free(cc_compl_list[point]);       /* duplicate -> free, don't advance mark */
+      cl_free(cc_compl_list[point]);       /* duplicate -> free, don't advance mark */
     }
     else {
       mark++;                           /* new string -> advance mark & copy there */
@@ -145,10 +148,12 @@ cc_compl_list_sort_uniq(void) {
 
 /* custom completion function: complete corpus/subcorpus names */
 char **
-cqp_custom_completion(const char *text, int start, int end) {
+cqp_custom_completion(const char *text, int start, int end)
+{
   /* <line> is the complete input line; <text> to be completed is the substring from <start> to <end> */
-  char *line = rl_line_buffer;  
+  char *line = rl_line_buffer;
   int text_len = end - start; /* length of <text> */
+  int point, k;
   Variable var;
   CorpusList *cl;
   char *prototype, *prefix;
@@ -166,11 +171,12 @@ cqp_custom_completion(const char *text, int start, int end) {
    */
 
   /* must check for file name completion first because absolute path would be mistaken for a macro invocation */
-  if ((--start >= 0) && (line[start] == '"' || line[start == '\''])) {
-    while ((--start >= 0) && (line[start] == ' ')) {
+  point = start;
+  if ((--point >= 0) && (line[point] == '"' || line[point] == '\'')) {
+    while ((--point >= 0) && (line[point] == ' ')) {
       /* nop */
     }
-    if ((start >= 0) && ((line[start] == '>') || (line[start] == '<'))) {
+    if ((point >= 0) && ((line[point] == '>') || (line[point] == '<'))) {
       /* looks like a redirection (more or less ...), so return NULL and let readline handle filename completion */
       return NULL;
     }
@@ -208,7 +214,7 @@ cqp_custom_completion(const char *text, int start, int end) {
    */
   if (text[0] == '/') {
     cc_compl_list_init();
-    macro_iterator_new();
+    macro_iterator_reset();
     /* find macro name matching current prefix (i.e. characters 1 .. text_len-1 of text[]) */
     prefix = cl_strdup(text + 1);
     prefix[text_len - 1] = '\0'; /* cut prefix[] to text_len - 1 characters */
@@ -219,20 +225,50 @@ cqp_custom_completion(const char *text, int start, int end) {
         cc_compl_list_add(prototype);
       }
       else {
-        free(prototype);        /* if prototype isn't accepted, we have to free it */
+        cl_free(prototype);        /* if prototype isn't accepted, we have to free it */
       }
       prototype = macro_iterator_next_prototype(prefix);
     }
-    free(prefix);
+    cl_free(prefix);
     return cc_compl_list_sort_uniq();
   }
 
   /* at the moment, everything else triggers (sub)corpus name completion */
+  cc_compl_list_init(); /* init completion list now to be built up in steps (D) and (E) */
 
   /*
-   *  (D) (sub)corpus name completion (should be triggered by uppercase letter)
+   *  (D) After "set ..." we expect either a subcorpus name or an option name or abbreviation
+   *      We handle option names here and then fall through to subcorpus completion (E)
    */
-  cc_compl_list_init();
+  if (strncmp(line, "set ", 4) == 0) {
+    point = start;
+    while((--point >= 0) && (line[point] == ' ')) {
+      /* nop */
+    }
+    if (point == 2) {
+      /* we're completing first word after "set", so trigger option name completion */
+      k = 0;
+      while (cqpoptions[k].opt_name != NULL) {
+        if (cqpoptions[k].flags & OPTION_VISIBLE_IN_CQP) {
+          completion = cqpoptions[k].opt_name;
+          if (strncasecmp(completion, text, text_len) == 0)
+            cc_compl_list_add(cl_strdup(completion));
+
+          /* we could also complete abbreviations, but their use is discourage with completion available */
+          /*
+          completion = cqpoptions[k].opt_abbrev;
+          if (completion && strncasecmp(completion, text, text_len) == 0)
+            cc_compl_list_add(cl_strdup(completion));
+           */
+        }
+        k++;
+      }
+    }
+  }
+
+  /*
+   *  (E) (sub)corpus name completion (should be triggered by uppercase letter)
+   */
   colon = strchr(text, ':');
   if ((colon != NULL) && ((mother_len = colon - text) < CL_MAX_LINE_LENGTH)) {
     /* full subcorpus specifier: ''HGC:Last'' */
@@ -247,7 +283,7 @@ cqp_custom_completion(const char *text, int start, int end) {
     real_len = text_len;
   }
 
-  /* run throgh corpus/subcorpus list and collect matches */
+  /* run through corpus/subcorpus list and collect matches */
   cl = FirstCorpusFromList();
   while (cl != NULL) {
     if ((cl->type == SYSTEM) || (cl->type == SUB)) /* don't show subcorpora with status TEMP */
@@ -286,7 +322,7 @@ cqp_custom_completion(const char *text, int start, int end) {
           handled = 1;
         }
       }
-      if (! handled) {
+      if (!handled) {
         /* other possibility: current token is prefix of mother part of a subcorpus */
         if ((cl->type == SUB) && (!mother_len) && cl->mother_name &&
             (strncmp(cl->mother_name, real_name, real_len) == 0))  {
@@ -308,7 +344,8 @@ cqp_custom_completion(const char *text, int start, int end) {
 /* check that line ends in semicolon, otherwise append one to the string
    (returns either same pointer or re-allocated and modified string) */
 char *
-ensure_semicolon (char *line) {
+ensure_semicolon (char *line)
+{
   int i, l;
 
   if (line) {
@@ -317,9 +354,8 @@ ensure_semicolon (char *line) {
       i = l-1;
       while ((i >= 0) && (line[i] == ' ' || line[i] == '\t' || line[i] == '\n'))
         i--;
-      if (i < 0) {
+      if (i < 0)
         *line = 0;              /* line contains only whitespace -> replace by empty string */
-      }
       else {
         if (line[i] != ';') {   /* this is the problematic case: last non-ws character is not a ';' */
           if (i+1 < l) {        /* have some whitespace at end of string that we can overwrite */
@@ -335,12 +371,12 @@ ensure_semicolon (char *line) {
       }
     }
   }
-  return (line);                /* return pointer to line (may have been modified and reallocated */
+  return line;                /* return pointer to line (may have been modified and reallocated) */
 }
 
 
 
-/** this function replaces cqp_parse_file(stdin,0) if we're using GNU Readline */
+/** this function replaces cqp_parse_file(stdin) if we're using GNU Readline */
 void
 readline_main(void)
 {
@@ -352,31 +388,23 @@ readline_main(void)
   /* configuration: don't break tokens on $, so word lists work correctly (everything else corresponds to readline defaults) */
   rl_completer_word_break_characters = " \t\n\"\\'`@><=;|&{(";
   /* if CQP history file is specified, read history from file */
-  if (cqp_history_file != NULL) {
-    /* ignore errors; it's probably just that the history file doesn't exist yet */
+  if (cqp_history_file)
     read_history(cqp_history_file);
-  }
+    /* ignore errors; it's probably just that the history file doesn't exist yet */
 
   /* == the line input loop == */
   while (!exit_cqp) {
-
-    if (input != NULL)
-      {
-        free(input);
-        input = NULL;
-      }
-
     if (highlighting) {
       Rprintf("%s", get_typeface_escape('n')); /* work around 'bug' in less which may not switch off display attributes when user exits */
       fflush(stdout);
     }
 
-    if (silent) {
+    if (silent)
       input = readline(NULL);
-    } else {
+    else {
       if (current_corpus != NULL) {
         /* don't use terminal colours for the prompt because they mess up readline's formatting */
-        if (STREQ(current_corpus->name, current_corpus->mother_name))
+        if (cl_streq(current_corpus->name, current_corpus->mother_name))
           sprintf(prompt, "%s> ", current_corpus->name);
         else
           sprintf(prompt, "%s:%s[%d]> ",
@@ -386,30 +414,34 @@ readline_main(void)
       }
       else
         sprintf(prompt, "[no corpus]> ");
-
       input = readline(prompt);
     }
 
-    if (input != NULL) {
-      input = ensure_semicolon(input); /* add semicolon at end of line if missing (also replaces ws-only lines by "") */
-      if (*input) add_history(input);  /* add input line to history (unless it's an empty line) */
-      cqp_parse_string(input);         /* parse & execute query */
+    if (input) {
+      /* add semicolon at end of line if missing (also replaces whitespace-only lines by "") */
+      input = ensure_semicolon(input);
+
+      /* add input line to history (unless it's an empty line) */
+      if (*input)
+        add_history(input);
+
+      /* parse & execute query */
+      cqp_parse_string(input);
     }
-    else {
-      exit_cqp = True;                 /* NULL means we've had an EOF character */
-    }
+    else
+      /* NULL returned from readline() above means we've had an EOF character */
+      exit_cqp = True;
 
     /* reinstall signal handler if necessary */
-    if (! signal_handler_is_installed)
+    if (!signal_handler_is_installed)
       install_signal_handler();
+
+    /* free memory before the loop test */
+    cl_free(input);
   }
 
-  if (save_on_exit)
-    save_unsaved_subcorpora();
-
-  if (!silent) {
+  if (!silent)
     Rprintf("\nDone. Share and enjoy!\n");
-  }
 
 }
 #endif /* USE_READLINE */
@@ -433,7 +465,7 @@ main(int argc, char *argv[])
 
   if (!initialize_cqp(argc, argv)) {
     Rprintf("Can't initialize CQP\n");
-    exit(1);
+    return cqp_error_status ? cqp_error_status : 1;
   }
 
   /* Test ANSI colours (if CQP was invoked with -C switch) */
@@ -480,15 +512,15 @@ main(int argc, char *argv[])
   install_signal_handler();
 
   if (child_process) {
-    Rprintf("CQP version " VERSION "\n");
+    Rprintf("CQP version " CWB_VERSION "\n");
     fflush(stdout);
   }
 
   if (batchmode) {
-    if (batchfd == NULL)
+    if (!batchfh)
       Rprintf("Can't open batch file\n");
     else
-      cqp_parse_file(batchfd, 1);
+      cqp_parse_file(batchfh, 1);  /* batch mode: abort on parse error */
   }
   else {
 #ifdef USE_READLINE
@@ -496,15 +528,20 @@ main(int argc, char *argv[])
       readline_main();
     else
 #endif /* USE_READLINE */
-      cqp_parse_file(stdin, 0);
+      cqp_parse_file(stdin, 0);  /* interactive mode: don't abort on parse error */
   }
+
+  /* if save_on_exit is set, automatically save all unsaved NQRs */
+  if (save_on_exit)
+    save_unsaved_subcorpora();
 
   if (macro_debug)
     macro_statistics();
 
-  cleanup_kwic_line_memory();
+  /* tidy up all memory */
+  cqp_cleanup_memory();
 
-  return (cqp_error_status == 0 ? 0 : 1);
+  return (cqp_error_status != 0);
 }
 
 

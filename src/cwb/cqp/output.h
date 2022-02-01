@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -29,7 +29,7 @@
  * The Redir structure: contains information about
  * redirecting output to a file or pipe.
  *
- * NB this oufght really to be "OutputRedir" as it is the
+ * NB this ought really to be "OutputRedir" as it is the
  * distaff counterpart of InputRedir...
  */
 struct Redir {
@@ -76,30 +76,28 @@ extern TabulationItem TabulationList;
 
 /* ---------------------------------------------------------------------- */
 
-/* FILE *open_temporary_file(char *tmp_name_buffer); */
+FILE *open_temporary_file(char *tmp_name_buffer);
 
-FILE *open_file(char *name, char *mode);
+int open_rd_output_stream(struct Redir *rd, CorpusCharset charset);
 
-int open_stream(struct Redir *rd, CorpusCharset charset);
+int close_rd_output_stream(struct Redir *rd);
 
-int close_stream(struct Redir *rd);
+int open_rd_input_stream(struct InputRedir *rd);
 
-int open_input_stream(struct InputRedir *rd);
+int close_rd_input_stream(struct InputRedir *rd);
 
-int close_input_stream(struct InputRedir *rd);
+void cat_listed_corpus(CorpusList *cl,
+                       struct Redir *dst,
+                       int first,
+                       int last,
+                       PrintMode mode);
 
-void catalog_corpus(CorpusList *cl,
-                    struct Redir *rd,
-                    int first,
-                    int last,
-                    PrintMode mode);
-
-void print_output(CorpusList *cl,
-                  FILE *fd,
-                  int interactive,
-                  ContextDescriptor *cd,
-                  int first, int last,
-                  PrintMode mode);
+void print_concordance_body(CorpusList *cl,
+                            FILE *fd,
+                            int interactive,
+                            ContextDescriptor *cd,
+                            int first, int last,
+                            PrintMode mode);
 
 void corpus_info(CorpusList *cl);
 
@@ -112,7 +110,7 @@ typedef enum _msgtype {
   Info                          /**< user information (not shown in silent mode) */
 } MessageType;
 
-void cqpmessage(MessageType type, char *format, ...);
+void cqpmessage(MessageType type, const char *format, ...);
 
 void print_corpus_info_header(CorpusList *cl,
                               FILE *stream,

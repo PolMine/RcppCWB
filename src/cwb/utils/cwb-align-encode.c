@@ -19,7 +19,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../cl/globals.h"
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
 #include "../cl/storage.h"           /* for NwriteInt() function */
 #include "../cl/attributes.h"        /* for component_full_name() function */
 
@@ -56,7 +57,7 @@ alignencode_usage(void)
   fprintf(stderr, "  -r <reg> use registry directory <reg>\n");
   fprintf(stderr, "  -v       verbose mode\n");
   fprintf(stderr, "  -h       this help page\n\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(1);
 }
 /* note: must specify either -d or -D option */
@@ -187,6 +188,7 @@ main(int argc, char *argv[])
   int current1, current2;
   int mark, n_0_1, n_1_0;
 
+  cl_startup();
   progname = argv[0];
 
   /* parse command line and read arguments */

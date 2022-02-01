@@ -17,8 +17,9 @@
 
 ##
 ##  PLATFORM CONFIGURATION FILE:
-##  Universal binaries for Mac OS X 10.6 (Snow Leopard) and newer
+##  Universal binaries for Mac OS X 10.6 (Snow Leopard) to 10.13 (High Sierr)
 ##  with prerequisite libraries installed by user or package manager in standard locations
+##  (outdated and deprecated)
 ##
 
 ## Inherits from basic Darwin configuration

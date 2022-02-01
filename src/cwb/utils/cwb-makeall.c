@@ -16,18 +16,26 @@
  */
 
 
-#include "../cl/globals.h"
-#include "../cl/corpus.h"
+#include "../cl/cl.h"
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
+
+/* included by AB to ensure that winsock2.h is included before windows.h */
+#ifdef __MINGW__
+#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
+#endif
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../cl/cwb-globals.h"
 #include "../cl/attributes.h"
-#include "../cl/endian.h"
+#include "../cl/endian2.h"
 #include "../cl/fileutils.h"
 
-#include <netinet/in.h>
-
-/** The corpus we are working on */
 Corpus *corpus;
-/** Name of this program */
-char *progname = NULL;
+
 
 
 /**
@@ -35,7 +43,7 @@ char *progname = NULL;
  *
  * @param attr  The attribute of the component to check.
  * @param cid   The component ID of the component to check.
- * @return      RUE iff the component has already been created.
+ * @return      TRUE iff the component has already been created.
  */
 int
 component_ok(Attribute *attr, ComponentID cid)
@@ -43,16 +51,15 @@ component_ok(Attribute *attr, ComponentID cid)
   ComponentState state;
 
   state = component_state(attr, cid);
-  if ((state == ComponentLoaded) || (state == ComponentUnloaded)) {
+  if (state == ComponentLoaded || state == ComponentUnloaded)
+    return 1;
+
+  if (state != ComponentDefined) {
+    Rprintf("Internal Error: Illegal state %d/component ID %d ???\n", state, cid);
     return 1;
   }
-  else {
-    if (state != ComponentDefined) {
-      fprintf(stderr, "Internal Error: Illegal state %d/component ID %d ???\n", state, cid);
-      exit(1);
-    }
-    return 0;
-  }
+
+  return 0;
 }
 
 
@@ -67,28 +74,28 @@ component_ok(Attribute *attr, ComponentID cid)
  * @param attr  The attribute of the component to create.
  * @param cid   The component ID of the component to create.
  */
-void
+int
 makeall_make_component(Attribute *attr, ComponentID cid)
 {
   int state;
 
-  if (! component_ok(attr, cid)) {
-
-    printf(" + creating %s ... ", cid_name(cid));
-    fflush(stdout);
-    (void) create_component(attr, cid);
+  if (!component_ok(attr, cid)) {
+    Rprintf(" + creating %s ... ", cid_name(cid));
+/* fflush(stdout); */
+    create_component(attr, cid);
 
     state = component_state(attr, cid);
-    if (!(state == ComponentLoaded || state == ComponentUnloaded)) {
-      printf("FAILED\n");
-      fprintf(stderr, "ERROR. Aborted.\n");
-      exit(1);
+    if ( !(state == ComponentLoaded || state == ComponentUnloaded) ) {
+      Rprintf("FAILED\n");
+      Rprintf("ERROR. Aborted.\n");
+      return 1;
     }
 
-    printf("OK\n");
+    Rprintf("OK\n");
   }
+  return 0;
 
-}
+  }
 
 
 
@@ -111,26 +118,26 @@ validate_revcorp(Attribute *attr)
   int lexsize, corpsize;
   int i, offset, cpos, id;
 
-  printf(" ? validating %s ... ", cid_name(CompRevCorpus));
-  fflush(stdout);
+  Rprintf(" ? validating %s ... ", cid_name(CompRevCorpus));
+/* fflush(stdout); */
 
-  if (revcorp == NULL) {
-    printf("FAILED (no data)\n");
+  if (!revcorp) {
+    Rprintf("FAILED (no data)\n");
     return 0;
   }
   lexsize = cl_max_id(attr);
   corpsize = cl_max_cpos(attr);
-  if ((lexsize <= 0) || (corpsize <= 0)) {
-    printf("FAILED (corpus access error)\n");
+  if (lexsize <= 0 || corpsize <= 0) {
+    Rprintf("FAILED (corpus access error)\n");
     return 0;
   }
   if (revcorp->size != corpsize) {
-    printf("FAILED (wrong size)\n");
+    Rprintf("FAILED (wrong size)\n");
     return 0;
   }
 
   /* init offsets by calculating REVIDX component from token frequencies */
-  ptab = (int *) cl_calloc(lexsize, sizeof(int));
+  ptab = (int *)cl_calloc(lexsize, sizeof(int));
   offset = 0;
   for (i = 0; i < lexsize; i++) {
     ptab[i] = offset;
@@ -141,12 +148,12 @@ validate_revcorp(Attribute *attr)
   for (cpos = 0; cpos < corpsize; cpos++) {
     id = cl_cpos2id(attr, cpos);
     if ((id < 0) || (id >= lexsize)) {
-      printf("FAILED (inconsistency in token stream)\n");
+      Rprintf("FAILED (inconsistency in token stream)\n");
       cl_free(ptab);
       return 0;
     }
     if (ntohl(revcorp->data.data[ptab[id]]) != cpos) {
-      printf("FAILED\n");
+      Rprintf("FAILED\n");
       cl_free(ptab);
       return 0;
     }
@@ -158,15 +165,14 @@ validate_revcorp(Attribute *attr)
   for (i = 0; i < lexsize; i++) {
     offset += cl_id2freq(attr, i);
     if (ptab[i] != offset) {
-      printf("FAILED (token frequencies incorrect)\n");
+      Rprintf("FAILED (token frequencies incorrect)\n");
       cl_free(ptab);
       return 0;
     }
   }
 
   cl_free(ptab);
-
-  printf("OK\n");
+  Rprintf("OK\n");
   return 1;
 }
 
@@ -180,285 +186,97 @@ validate_revcorp(Attribute *attr)
  * @param validate  boolean - if true, validate_revcorp is called to check
  *                  the resulting revcorp.
  */
-void
+int
 makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
 {
   assert(attr);
 
   if (cid == CompLast) {
-    printf("ATTRIBUTE %s\n", attr->any.name);
+    Rprintf("ATTRIBUTE %s\n", attr->any.name);
     /* automatically create all necessary components */
 
     /* check whether directory for data files exists (may be misspelt in registry) */
     if (! is_directory(attr->any.path)) {
-      fprintf(stderr, "WARNING. I cannot find the data directory of the '%s' attribute.\n",
-              attr->any.name);
-      fprintf(stderr, "WARNING  Directory: %s/ \n", attr->any.path);
-      fprintf(stderr, "WARNING  Perhaps you misspelt the directory name in the registry file?\n");
+      Rprintf("WARNING. I cannot find the data directory of the '%s' attribute.\n", attr->any.name);
+      Rprintf("WARNING  Directory: %s/ \n", attr->any.path);
+      Rprintf("WARNING  Perhaps you misspelt the directory name in the registry file?\n");
     }
 
     /* lexicon and lexicon offsets must have been created by encode */
     if (! (component_ok(attr, CompLexicon) && component_ok(attr, CompLexiconIdx))) {
       /* if none of the components exists, we assume that the attribute will be created later & skip it */
-      if (!component_ok(attr, CompLexicon) && !component_ok(attr, CompLexiconIdx) &&
-          !component_ok(attr, CompLexiconSrt) &&
-          !component_ok(attr, CompCorpus) && !component_ok(attr, CompCorpusFreqs) &&
-          !component_ok(attr, CompHuffSeq) && !component_ok(attr, CompHuffCodes) &&
-          !component_ok(attr, CompHuffSync) &&
-          !component_ok(attr, CompRevCorpus) && !component_ok(attr, CompRevCorpusIdx) &&
-          !component_ok(attr, CompCompRF) && !component_ok(attr, CompCompRFX
-          ))  {
+      if (!component_ok(attr, CompLexicon)      &&
+          !component_ok(attr, CompLexiconIdx)   &&
+          !component_ok(attr, CompLexiconSrt)   &&
+          !component_ok(attr, CompCorpus)       &&
+          !component_ok(attr, CompCorpusFreqs)  &&
+          !component_ok(attr, CompHuffSeq)      &&
+          !component_ok(attr, CompHuffCodes)    &&
+          !component_ok(attr, CompHuffSync)     &&
+          !component_ok(attr, CompRevCorpus)    &&
+          !component_ok(attr, CompRevCorpusIdx) &&
+          !component_ok(attr, CompCompRF)       &&
+          !component_ok(attr, CompCompRFX)
+          )  {
         /* issue a warning message & return */
-        printf(" ! attribute not created yet (skipped)\n");
-        if (strcmp(attr->any.name, "word") == 0) {
-          fprintf(stderr, "WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
-        }
-        return;
+        Rprintf(" ! attribute not created yet (skipped)\n");
+        if (cl_str_is(attr->any.name, "word"))
+          Rprintf("WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
+        return 0;
       }
       else {
-        fprintf(stderr, "ERROR. Lexicon is missing. You must use the 'encode' tool first!\n");
-        exit(1);
+        Rprintf("ERROR. Lexicon is missing. You must use the 'encode' tool first!\n");
+        return 1;
       }
     }
     else {
       /* may need to create "alphabetically" sorted lexicon */
       makeall_make_component(attr, CompLexiconSrt);
-      printf(" - lexicon      OK\n");
+      Rprintf(" - lexicon      OK\n");
     }
 
     /* create token frequencies if necessary (must be able to do so if they aren't already there) */
     makeall_make_component(attr, CompCorpusFreqs);
-    printf(" - frequencies  OK\n");
+    Rprintf(" - frequencies  OK\n");
 
     /* check if token sequence has been compressed, otherwise create CompCorpus (if necessary) */
-    if (component_ok(attr, CompHuffSeq) && component_ok(attr, CompHuffCodes) && component_ok(attr, CompHuffSync)) {
-      printf(" - token stream OK (COMPRESSED)\n");
-    }
+    if (component_ok(attr, CompHuffSeq) && component_ok(attr, CompHuffCodes) && component_ok(attr, CompHuffSync))
+      Rprintf(" - token stream OK (COMPRESSED)\n");
     else {
       makeall_make_component(attr, CompCorpus);
-      printf(" - token stream OK\n");
+      Rprintf(" - token stream OK\n");
     }
 
     /* same for index (check if compressed, otherwise create if not already there) */
-    if (component_ok(attr, CompCompRF) && component_ok(attr, CompCompRFX)) {
-      printf(" - index        OK (COMPRESSED)\n");
-    }
+    if (component_ok(attr, CompCompRF) && component_ok(attr, CompCompRFX))
+      Rprintf(" - index        OK (COMPRESSED)\n");
     else {
       makeall_make_component(attr, CompRevCorpusIdx);
-      if (! component_ok(attr, CompRevCorpus)) { /* need this check to avoid validation of existing revcorp  */
+      if (!component_ok(attr, CompRevCorpus)) { /* need this check to avoid validation of existing revcorp  */
         makeall_make_component(attr, CompRevCorpus);
         if (validate) {
           /* validate the index, i.e. the REVCORP component we just created */
-          if (! validate_revcorp(attr)) {
-            fprintf(stderr, "ERROR. Validation failed.\n");
-            exit(1);
+          if (!validate_revcorp(attr)) {
+            Rprintf("ERROR. Validation failed.\n");
+            return 1;
           }
         }
       }
-      printf(" - index        OK\n");
+      Rprintf(" - index        OK\n");
     }
   }
   else {
     /* cid != CompLast; so, create requested component only */
-    printf("Processing component %s of ATTRIBUTE %s\n",
-           cid_name(cid), attr->any.name);
+    Rprintf("Processing component %s of ATTRIBUTE %s\n", cid_name(cid), attr->any.name);
     makeall_make_component(attr, cid);
-    if (validate && (cid == CompRevCorpus)) { /* validates even if REVCORP already existed -> useful trick for validating later */
-      if (! validate_revcorp(attr)) {
-        fprintf(stderr, "ERROR. Validation failed.\n");
-        exit(1);
+    if (validate && cid == CompRevCorpus) {
+      /* validates even if REVCORP already existed -> useful trick for validating later */
+      if (!validate_revcorp(attr)) {
+        Rprintf("ERROR. Validation failed.\n");
+        return 1;
       }
     }
   }
+    return 0;
 
-}
-
-/**
- * Prints a usage message and exits the program.
- */
-void
-makeall_usage(void)
-{
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Usage:  %s [options] <corpus> [<attribute> ...] \n", progname);
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Creates a lexicon and index for each p-attribute of an encoded CWB corpus.\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -D        debug mode\n");
-  fprintf(stderr, "  -r <dir>  use registry directory <dir>\n");
-  fprintf(stderr, "  -c <comp> create component <comp> only\n");
-  fprintf(stderr, "  -P <att>  work on attribute <att> [default: ALL attributes]\n");
-  fprintf(stderr, "  -M <size> limit memory usage to approx. <size> MBytes\n");
-  fprintf(stderr, "  -V        validate index after creating it\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
-  exit(2);
-}
-/* TODO  it is a but confusing that there is both a -P option for attributes, AND you can list attributes
- * after the corpus name. (Or is there a difference between these two ways of specifying attributes? Either
- * way, it needs to be documented in the usage message, and in the manfile too.
- * NB the normally parallel huffcode does not have attributes after the corpus!
- */
-
-
-/* *************** *\
- *      MAIN()     *
-\* *************** */
-
-/**
- * Main function for cwb-makeall.
- *
- * @param argc   Number of command-line arguments.
- * @param argv   Command-line arguments.
- */
-int
-main(int argc, char **argv)
-{
-  char *attr_name = NULL;
-  Attribute *attribute;
-
-  char *registry_directory = NULL;
-  char *corpus_id = NULL;
-
-  extern int optind;
-  extern char *optarg;
-  int c;
-
-  int validate = 0;
-
-  char *component = NULL;
-
-  ComponentID cid;
-  int i = 0;
-
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
-  progname = argv[0];
-
-  /* parse arguments */
-  while ((c = getopt(argc, argv, "+r:c:P:hDM:V")) != EOF) {
-    switch (c) {
-
-    /* r: registry directory */
-    case 'r':
-      if (registry_directory == NULL)
-        registry_directory = optarg;
-      else {
-        fprintf(stderr, "%s: -r option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-    case 'P':
-      if (attr_name == NULL)
-        attr_name = optarg;
-      else {
-        fprintf(stderr, "%s: -P option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-    case 'c':
-      if (component == NULL)
-        component = optarg;
-      else {
-        fprintf(stderr, "%s: -c option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-    case 'D':
-      cl_set_debug_level(1);
-      break;
-
-    case 'M':
-      i = atoi(optarg);
-      cl_set_memory_limit(i);
-      break;
-
-    case 'V':
-      validate++;
-      break;
-
-    case 'h':
-    default:
-      makeall_usage();
-    }
   }
-
-  if (optind >= argc) {
-    fprintf(stderr, "Missing argument, try \"%s -h\" for more information.\n", progname);
-    exit(1);
-  }
-
-  /* first argument: corpus id */
-  corpus_id = argv[optind++];
-
-  if (component != NULL) {
-    cid = component_id(component);
-    if (cid == CompLast) {
-      fprintf(stderr, "Illegal component name: ``%s''\n", component);
-      exit(1);
-    }
-  }
-  else {
-    cid = CompLast;
-  }
-
-
-  if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
-    fprintf(stderr, "Corpus %s not found in registry %s . Aborted.\n",
-            corpus_id,
-            (registry_directory ? registry_directory
-             : central_corpus_directory()));
-    exit(1);
-  }
-
-  printf("=== Makeall: processing corpus %s ===\n", corpus_id);
-  printf("Registry directory: %s\n", corpus->registry_dir);
-
-  if (optind < argc) {
-    /* process each specified atttribute (at the end of the invocation) */
-    for (i = optind; i < argc; i++) {
-      if ((attribute = cl_new_attribute(corpus, argv[i], ATT_POS)) != NULL) {
-        makeall_do_attribute(attribute, cid, validate);
-        /* TODO why do we not need to drop components here, when the for-loop below needs to?? */
-      }
-      else {
-        fprintf(stderr, "p-attribute %s.%s not defined. Aborted.\n", corpus_id, argv[i]);
-        exit(1);
-      }
-    }
-  }
-  else if (attr_name != NULL) {
-    /* process a specified attribute (via the -P option) */
-    if ((attribute = cl_new_attribute(corpus, attr_name, ATT_POS)) != NULL) {
-      makeall_do_attribute(attribute, cid, validate);
-    }
-    else {
-      fprintf(stderr, "p-attribute %s.%s not defined. Aborted.\n", corpus_id, attr_name);
-      exit(1);
-    }
-  }
-  else {
-    /* process each p-attribute of the corpus in turn */
-    for (attribute = corpus->attributes; attribute; attribute = attribute->any.next)
-      if (attribute->type == ATT_POS) {
-        ComponentID my_cid;
-
-        makeall_do_attribute(attribute, cid, validate);
-        /* now destoy all components; this makes the attribute unusable,
-           but it is currently the only way to free allocated and memory-mapped data */
-        for (my_cid = CompDirectory; my_cid < CompLast; my_cid++) { /* ordering gleaned from attributes.h */
-          drop_component(attribute, my_cid);
-        }
-      }
-  }
-
-  printf("========================================\n");
-  exit(0);
-}
-
-
-
-

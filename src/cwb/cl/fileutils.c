@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -22,8 +22,10 @@ void Rprintf(const char *, ...);
 
 #include <glib.h>
 
+#ifndef __MINGW__
 #include <signal.h> /* added by Andreas Blaette  */
 #include <sys/socket.h> /* added by Andreas Blaette */
+#endif
 
 #include "globals.h"
 #include "fileutils.h"
@@ -39,10 +41,10 @@ off_t
 file_length(char *filename)
 {
   struct stat stat_buf;
-  if(stat(filename, &stat_buf) == EOF)
-    return(EOF);
+  if (EOF == stat(filename, &stat_buf))
+    return EOF;
   else
-    return(stat_buf.st_size);
+    return stat_buf.st_size;
 }
 
 /**
@@ -50,15 +52,18 @@ file_length(char *filename)
  *
  * As file_length, but the file is specified by file handle, not name.
  *
- * @param fd  The file to size up.
+ * @see file_length
+ * @param fh  The file to size up.
  * @return    Size of file in bytes.
  */
 off_t
-fd_file_length(FILE *fd)
+fh_file_length(FILE *fh)
 {
   struct stat stat_buf;
-  if (fstat(fileno(fd), &stat_buf) == EOF) return(EOF);
-  else return(stat_buf.st_size);
+  if (EOF == fstat(fileno(fh), &stat_buf))
+    return EOF;
+  else
+    return stat_buf.st_size;
 }
 
 /**
@@ -67,17 +72,17 @@ fd_file_length(FILE *fd)
  * As file_length, but the file is specified by number, not name.
  *
  * @see file_length
- * @param fileno  The file to size up.
- * @return        Size of file in bytes.
+ * @param fd    The file to size up.
+ * @return      Size of file in bytes.
  */
 off_t
-fi_file_length(int fileno)
+fd_file_length(int fd)
 {
   struct stat stat_buf;
-  if(fstat(fileno, &stat_buf) == EOF)
-    return(EOF);
+  if (EOF == fstat(fd, &stat_buf))
+    return EOF ;
   else
-    return(stat_buf.st_size);
+    return stat_buf.st_size;
 }
 
 /**
@@ -94,13 +99,9 @@ long
 fprobe(char *fname)
 {
   struct stat stat_buf;
-  
-  if(stat(fname, &stat_buf) == EOF) {
+  if (EOF == stat(fname, &stat_buf))
     return (long) EOF;
-  }
   else
-    /* stat_buf->st_mode holds the permission */
-    /* we return the file size */
     return stat_buf.st_size;
 }
 
@@ -114,14 +115,11 @@ fprobe(char *fname)
 int
 is_directory(char *path)
 {
-  struct stat sBuf;
-
-  if (stat(path, &sBuf) < 0) {
+  struct stat stat_buf;
+  if (0 > stat(path, &stat_buf))
     return 0;
-  }
-  else {
-    return S_ISDIR(sBuf.st_mode) ? 1 : 0;
-  }
+  else
+    return S_ISDIR(stat_buf.st_mode) ;
 }
 
 /**
@@ -133,14 +131,11 @@ is_directory(char *path)
 int
 is_file(char *path)
 {
-  struct stat sBuf;
-
-  if (stat(path, &sBuf) < 0) {
+  struct stat stat_buf;
+  if (0 > stat(path, &stat_buf))
     return 0;
-  }
-  else {
-    return S_ISREG(sBuf.st_mode) ? 1 : 0;
-  }
+  else
+    return S_ISREG(stat_buf.st_mode);
 }
 
 /**
@@ -149,6 +144,15 @@ is_file(char *path)
  * Note this function always returns false in Windows, because Windows
  * doesn't have Unix-style links. (.lnk files don't count.)
  *
+ * As of 2020: Windows 10 does have symlinks. They were added in Vista but
+ * required elevated permissions to work with. Windows 10 makes it possible
+ * to use symlinks without elevated permissions (but it might be necessary
+ * to dop some configuration twiddling to get that to work; it's not 100%
+ * clear). Even so, though, it's not clear whether stat() in MinGW will
+ * correctly report what is and is not a symlink.
+ *
+ * See https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/
+ *
  * @param path  Path to check.
  * @return      Boolean. (Also false if there's an error.)
  */
@@ -156,14 +160,11 @@ int
 is_link(char *path)
 {
 #ifndef __MINGW__
-  struct stat sBuf;
-  
-  if (stat(path, &sBuf) < 0) {
+  struct stat stat_buf;
+  if (0 > stat(path, &stat_buf))
     return 0;
-  }
-  else {
-    return S_ISLNK(sBuf.st_mode) ? 1 : 0;
-  }
+  else
+    return S_ISLNK(stat_buf.st_mode);
 #else
   return 0;
 #endif
@@ -183,17 +184,20 @@ CLStream open_streams;
  */
 int cl_broken_pipe = 0;
 
+#ifndef __MINGW__
 static void
-cl_handle_sigpipe(int signum) {
+cl_handle_sigpipe(int signum)
+{
 #ifndef __MINGW__
   cl_broken_pipe = 1;
   /* Rprintf("Handle broken pipe signal\n"); */
 
-  if (signal(SIGPIPE, cl_handle_sigpipe) == SIG_ERR)
+  if (SIG_ERR == signal(SIGPIPE, cl_handle_sigpipe))
     perror("CL: Can't reinstall SIGPIPE handler (ignored)"); /* Is this still necessary on modern platforms? */
 #endif
 }
 
+#endif
 /** check whether stream type involves a pipe */
 #define STREAM_IS_PIPE(type) (type == CL_STREAM_PIPE || type == CL_STREAM_GZIP || type == CL_STREAM_BZIP2)
 
@@ -204,12 +208,13 @@ cl_handle_sigpipe(int signum) {
  *
  * @param filename  Filename or shell command
  * @param mode      Open for reading (CL_STREAM_READ) or writing (CL_STREAM_WRITE)
- * @param type      Type of stream (see above), or guess automagically from <filename> (CL_STREAM_MAGIC)
+ * @param type      Type of stream (see above), or guess automagically from [filename] (CL_STREAM_MAGIC)
  *
- * @return          Standard C stream, or NULL on error
+ * @return          Standard C stream, or NULL on error (with details available via cl_errno or cl_error())
  */
 FILE *
-cl_open_stream(const char *filename, int mode, int type) {
+cl_open_stream(const char *filename, int mode, int type)
+{
   char *point, *mode_spec;
   int l = strlen(filename);
   FILE *handle;
@@ -234,6 +239,25 @@ cl_open_stream(const char *filename, int mode, int type) {
   case CL_STREAM_APPEND:
     mode_spec = "a";
     break;
+#ifdef __MINGW__
+  /* Binary modes only take effect on Windows.
+   * Their only effect is to add "b" to the spec,
+   * thereafter, they collapse back to the
+   * same thing as the constants without _BIN.
+   */
+  case CL_STREAM_READ_BIN:
+    mode_spec = "rb";
+    mode = CL_STREAM_READ;
+    break;
+  case CL_STREAM_WRITE_BIN:
+    mode_spec = "wb";
+    mode = CL_STREAM_WRITE;
+    break;
+  case CL_STREAM_APPEND_BIN:
+    mode_spec = "ab";
+    mode = CL_STREAM_APPEND;
+    break;
+#endif
   default:
     Rprintf("CL: invalid I/O stream mode = %d\n", mode);
     cl_errno = CDA_EARGS;
@@ -243,7 +267,7 @@ cl_open_stream(const char *filename, int mode, int type) {
   /* apply magic */
   if (type == CL_STREAM_MAGIC || type == CL_STREAM_MAGIC_NOPIPE) {
     /* expand ~/ or $HOME/ */
-    if ((strncmp(filename, "~/", 2) == 0) || (strncasecmp(filename, "$home/", 6) == 0)) {
+    if (0 == strncmp(filename, "~/", 2) || 0 == strncasecmp(filename, "$home/", 6)) {
       char *home = getenv("HOME");
       if (home && home[0] != '\0') {
         filename = (filename[0] == '~') ? filename + 2 : filename + 6;
@@ -254,12 +278,13 @@ cl_open_stream(const char *filename, int mode, int type) {
     }
     /* guess type of stream */
     type = CL_STREAM_FILE; /* default */
+
     /* "-" = STDIN or STDOUT */
-    if (strcmp(filename, "-") == 0) {
+    if (cl_str_is(filename, "-"))
       type = CL_STREAM_STDIO;
-    }
     else {
       point = (char *) filename + strspn(filename, " \t");
+
       /* " | ..." = read or write pipe to shell command */
       if (*point == '|') {
         if (type == CL_STREAM_MAGIC_NOPIPE) {
@@ -270,14 +295,14 @@ cl_open_stream(const char *filename, int mode, int type) {
         point++;
         filename = point + strspn(point, " \t");
       }
+
       /* *.gz = gzip-compressed file */
-      else if (l > 3 && strcasecmp(filename + l - 3, ".gz") == 0) {
+      else if (l > 3 && 0 == strcasecmp(filename + l - 3, ".gz"))
         type = CL_STREAM_GZIP;
-      }
+
       /* *.bz2 = bzip2-compressed file */
-      else if (l > 4 && strcasecmp(filename + l - 4, ".bz2") == 0) {
+      else if (l > 4 && 0 == strcasecmp(filename + l - 4, ".bz2"))
         type = CL_STREAM_BZIP2;
-      }
     }
   }
 
@@ -302,7 +327,7 @@ cl_open_stream(const char *filename, int mode, int type) {
     point = g_shell_quote(filename);
     if (mode == CL_STREAM_APPEND) {
       sprintf(command, "gzip >> %s", point);
-      mode_spec = "w";
+      mode_spec = (mode_spec[1] == 'b' ? "wb" : "w");
     }
     else if (mode == CL_STREAM_WRITE)
       sprintf(command, "gzip > %s", point);
@@ -315,7 +340,7 @@ cl_open_stream(const char *filename, int mode, int type) {
     point = g_shell_quote(filename);
     if (mode == CL_STREAM_APPEND) {
       sprintf(command, "bzip2 >> %s", point);
-      mode_spec = "w";
+      mode_spec = (mode_spec[1] == 'b' ? "wb" : "w");
     }
     else if (mode == CL_STREAM_WRITE)
       sprintf(command, "bzip2 > %s", point);
@@ -325,7 +350,8 @@ cl_open_stream(const char *filename, int mode, int type) {
     g_free(point);
     break;
   case CL_STREAM_PIPE:
-    if (mode == CL_STREAM_APPEND) mode_spec = "w";
+    if (mode == CL_STREAM_APPEND)
+      mode_spec = (mode_spec[1] == 'b' ? "wb" : "w");
     handle = popen(filename, mode_spec);
     break;
   case CL_STREAM_STDIO:
@@ -342,7 +368,7 @@ cl_open_stream(const char *filename, int mode, int type) {
   }
 
   /* add to list of managed streams */
-  stream = (CLStream) cl_malloc(sizeof(struct _CLStream));
+  stream = (CLStream) cl_malloc(sizeof(struct CLStream));
   stream->handle = handle;
   stream->mode = mode;
   stream->type = type;
@@ -351,10 +377,9 @@ cl_open_stream(const char *filename, int mode, int type) {
 
   /* install SIGPIPE handler if opening a pipe stream */
 #ifndef __MINGW__
-  if (STREAM_IS_PIPE(type)) {
-    if (signal(SIGPIPE, cl_handle_sigpipe) == SIG_ERR)
+  if (STREAM_IS_PIPE(type))
+    if (SIG_ERR == signal(SIGPIPE, cl_handle_sigpipe))
       perror("CL: can't install SIGPIPE handler (ignored)");
-  }
 #endif
 
   cl_broken_pipe = 0;
@@ -363,24 +388,26 @@ cl_open_stream(const char *filename, int mode, int type) {
 }
 
 /**
- * Close I/O stream
+ * Close I/O stream.
  *
  * This function can only be used for FILE* objects opened with cl_open_stream()!
  *
- * @param stream    An I/O stream that has been opened with cl_open_stream()
- *
+ * @param handle    An I/O stream that has been opened with cl_open_stream()
  * @return          0 on success, otherwise the error code returned by fclose() or pclose()
  */
 int
-cl_close_stream(FILE *handle) {
-  CLStream stream = open_streams, point;
-  int res = 0, was_pipe = 0;
+cl_close_stream(FILE *handle)
+{
+  CLStream stream, point;
+#ifndef __MINGW__
+int was_pipe;
+#endif
+  int result = 0;
 
-  while (stream) {
+  for (stream = open_streams ; stream ; stream = stream->next)
     if (stream->handle == handle)
       break;
-    stream = stream->next;
-  }
+
   if (!stream) {
     Rprintf("CL: attempt to close non-managed I/O stream with cl_close_stream() [ignored]\n");
     return CDA_EATTTYPE;
@@ -391,13 +418,15 @@ cl_close_stream(FILE *handle) {
   case CL_STREAM_STDIO:
     break;
   case CL_STREAM_FILE:
-    res = fclose(stream->handle);
+    result = fclose(stream->handle);
     break;
   case CL_STREAM_GZIP:
   case CL_STREAM_BZIP2:
   case CL_STREAM_PIPE:
-    res = pclose(stream->handle);
+    result = pclose(stream->handle);
+#ifndef __MINGW__
     was_pipe = 1;
+#endif
     break;
   default:
     Rprintf("CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);
@@ -405,12 +434,11 @@ cl_close_stream(FILE *handle) {
   }
 
   /* remove stream from list */
-  if (stream == open_streams) {
+  if (stream == open_streams)
     open_streams = stream->next;
-  }
   else {
     for (point = open_streams; point->next != stream; point = point->next)
-      /* pass */;
+      /* pass */ ;
     point->next = stream->next;
   }
   cl_free(stream);
@@ -419,18 +447,40 @@ cl_close_stream(FILE *handle) {
 #ifndef __MINGW__
   if (was_pipe) {
     int any_pipe = 0;
+
     for (point = open_streams; point; point = point->next)
       if (STREAM_IS_PIPE(point->type))
         any_pipe = 1;
-    if (!any_pipe) {
-      /* last pipe stream closed, uninstall SIGPIPE handler */
+
+    /* if last pipe stream closed, uninstall SIGPIPE handler */
+    if (!any_pipe)
       if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         perror("CL: can't uninstall SIGPIPE handler (ignored)");
-    }
   }
 #endif
 
   cl_broken_pipe = 0;
-  cl_errno = (res) ? CDA_EPOSIX : CDA_OK;
-  return res;
+  cl_errno = result ? CDA_EPOSIX : CDA_OK;
+
+  return result;
 }
+
+
+
+/**
+ * Tests whether a file handle has been opened via cl_test_stream.
+ *
+ * @param handle  The FILE pointer to check.
+ * @return        Boolean. True iff the "cl_stream" knows about this handle.
+ */
+int
+cl_test_stream(FILE *handle)
+{
+  CLStream stream;
+  for (stream = open_streams ; stream ; stream = stream->next)
+    if (stream->handle == handle)
+      return 1;
+  return 0;
+}
+
+

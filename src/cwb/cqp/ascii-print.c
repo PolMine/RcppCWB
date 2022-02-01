@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -16,12 +16,10 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "../cl/macros.h"
-#include "../cl/corpus.h"
-#include "../cl/attributes.h"
-#include "../cl/cdaccess.h"
-
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/time.h>
 #include <time.h>
 
@@ -35,10 +33,7 @@
 #endif /* USE_TERMCAP */
 
 
-
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include "../cl/cl.h"
 
 #include "ascii-print.h"
 
@@ -52,29 +47,10 @@
 
 #include "print-modes.h"
 
-/* ---------------------------------------------------------------------- */
 
-/** [TODO get rid?] doesn't currently appear to be used anywhere? */
-#define USE_OLD_COMPOSE  
 
-/* ---------------------------------------------------------------------- */
+static char *ascii_print_field(FieldType field, int at_end);
 
-/**
- * Convert string function for ASCII mode.
- *
- * This is used for the "printToken" function in the relevant PDR.
- *
- * @param s  The string to convert.
- * @return   s (ie no change).
- */
-/* inline */
-char *
-ascii_convert_string(char *s)
-{
-  return s;
-}
-
-char *ascii_print_field(FieldType field, int at_end);
 
 /* ---------------------------------------------------------------------- */
 
@@ -83,7 +59,7 @@ char *ascii_print_field(FieldType field, int at_end);
  */
 PrintDescriptionRecord ASCIIPrintDescriptionRecord = {
   "%9d: ",                            /* CPOSPrintFormat */
-  
+
   NULL,                               /* BeforePrintStructures */
   " ",                                /* PrintStructureSeparator */
   ": ",                               /* AfterPrintStructures */
@@ -100,7 +76,6 @@ PrintDescriptionRecord ASCIIPrintDescriptionRecord = {
   NULL,                               /* AfterToken */
 
   NULL,                               /* BeforeField */
-  NULL,                               /* FieldSeparator */
   NULL,                               /* AfterField */
 
   NULL,                               /* BeforeLine */
@@ -108,7 +83,7 @@ PrintDescriptionRecord ASCIIPrintDescriptionRecord = {
 
   NULL,                               /* BeforeConcordance */
   NULL,                               /* AfterConcordance */
-  ascii_convert_string,
+  ascii_convert_string,               /* printToken */
   NULL                                /* don't highlight anchor points */
 };
 
@@ -117,7 +92,7 @@ PrintDescriptionRecord ASCIIPrintDescriptionRecord = {
  */
 PrintDescriptionRecord ASCIIHighlightedPrintDescriptionRecord = {
   "%9d: ",                            /* CPOSPrintFormat */
-  
+
   NULL,                               /* BeforePrintStructures */
   " ",                                /* PrintStructureSeparator */
   ": ",                               /* AfterPrintStructures */
@@ -134,7 +109,6 @@ PrintDescriptionRecord ASCIIHighlightedPrintDescriptionRecord = {
   NULL,                               /* AfterToken */
 
   NULL,                               /* BeforeField */
-  NULL,                               /* FieldSeparator */
   NULL,                               /* AfterField */
 
   NULL,                               /* BeforeLine */
@@ -153,6 +127,7 @@ PrintDescriptionRecord ASCIIHighlightedPrintDescriptionRecord = {
  */
 static int escapes_initialized = 0;
 
+/* strings with the terminal escape codes for highlight, underline, bold, etc. */
 static char
   *sc_s_in,                           /**< Enter standout (highlighted) mode */
   *sc_s_out,                          /**< Exit standout mode */
@@ -173,7 +148,7 @@ int sc_b_mode = 0;                    /**< Boolean: following tokens will be sho
 #ifndef USE_TERMCAP
 
 /**
- * Dummy function
+ * Dummy function for when USE_TERMCAP is not defined
  */
 char *
 get_colour_escape(char colour, int foreground)
@@ -182,7 +157,7 @@ get_colour_escape(char colour, int foreground)
 }
 
 /**
- * Dummy function
+ * Dummy function for when USE_TERMCAP is not defined
  */
 char *
 get_typeface_escape(char typeface)
@@ -191,9 +166,10 @@ get_typeface_escape(char typeface)
 }
 
 /**
- * Dummy function
+ * Dummy function for when USE_TERMCAP is not defined
  */
-void get_screen_escapes(void)
+void
+get_screen_escapes(void)
 {
   sc_s_in = NULL;
   sc_s_out = NULL;
@@ -208,7 +184,7 @@ void get_screen_escapes(void)
   escapes_initialized++;
 }
 
-#else /* USE_TERMCAP */
+#else /* USE_TERMCAP *is* defined */
 
 
 void
@@ -226,16 +202,16 @@ get_screen_escapes(void)
   sc_bl_in = "";
   sc_bl_out = "";
 
-  if ((term = getenv("TERM")) == NULL)
+  if (!(term = getenv("TERM")))
     return;
 
-  if ((setupterm(term, 1, &status) == ERR) || (status != 1)) {
+  if ((setupterm(term, 1, &status) == ERR) || (status != 1))
     return;
-  }  
 
   /* turn off all attributes */
   sc_all_out = tigetstr("sgr0");
-  if (sc_all_out == NULL) sc_all_out = "";
+  if (!sc_all_out)
+    sc_all_out = "";
 
   /* Linux terminfo bug? fix: tigetstr("sgr0") returns an extra ^O (\x0f) character appended to the escape sequence
      (this may be some code used internally by the ncurses library).
@@ -258,7 +234,7 @@ get_screen_escapes(void)
   if (sc_u_in == NULL) sc_u_in = sc_s_in;
   sc_u_out = tigetstr("rmul");
   if (sc_u_out == NULL) sc_u_out = sc_s_out;
-  
+
   /* bold */
   sc_b_in = tigetstr("bold");
   if (sc_b_in == NULL) {
@@ -276,12 +252,11 @@ get_screen_escapes(void)
     sc_bl_in = sc_s_in;
     sc_bl_out = sc_s_out;
   }
-  else {
+  else
     sc_bl_out = sc_all_out;      /* can't turn off blinking mode explicitly */
-  }
 
   escapes_initialized++;
-  
+
   /* in highlighted mode, switch off display attributes at end of line (to be on the safe side) */
   ASCIIHighlightedPrintDescriptionRecord.AfterLine = cl_malloc(strlen(sc_all_out) + 2);
   sprintf(ASCIIHighlightedPrintDescriptionRecord.AfterLine,
@@ -331,7 +306,7 @@ get_typeface_escape(char typeface)
 char *
 get_colour_escape(char colour, int foreground) {
   if (use_colour) {
-    if (*(get_typeface_escape('n')) == 0) 
+    if (*(get_typeface_escape('n')) == 0)
       return "";                /* don't try colour if terminal doesn't support typefaces */
     if (foreground) {
       switch(colour) {
@@ -369,7 +344,6 @@ get_colour_escape(char colour, int foreground) {
 #endif /* USE_TERMCAP */
 
 
-/* ---------------------------------------------------------------------- */
 
 /*
  * ======================================================================
@@ -377,20 +351,38 @@ get_colour_escape(char colour, int foreground) {
  * ======================================================================
  */
 
+
+/**
+ * Convert string function for ASCII mode; a NOP.
+ *
+ * This is used for the "printToken" function in the relevant PDR.
+ *
+ * @param s  The string to convert.
+ * @return   s (ie no change).
+ */
+const char *ascii_convert_string(const char *s)
+{
+  return s;
+}
+
+
 /**< 'static' return value of ascii_print_field() */
 char sc_before_token[256];
 
-char *
+/**
+ * Print the string required before or after the representation of a token that is
+ * at one of the anchor points (match, matchend, target, keyword).
+ */
+static char *
 ascii_print_field(FieldType field, int at_end)
 {
-
   sc_before_token[0] = '\0';                /* sets sc_before_token to "" */
 
   /* if targets are shown, print target number at end of target/keyword fields */
   if (show_targets && at_end && (field==TargetField || field==KeywordField)) {
     char *red = get_colour_escape('r', 1);
     /* if colours are activated & seem to work, print target number in red, otherwise print in parens */
-    if (*red != 0) {
+    if (*red) {
       /* must set colour first, then all other current attributes */
       sprintf(sc_before_token + strlen(sc_before_token),
               "%s%s%s%s%s%d",
@@ -401,11 +393,8 @@ ascii_print_field(FieldType field, int at_end)
               (sc_b_mode) ? sc_b_in : "",
               field - TargetField);       /* should yield 0 .. 9  */
     }
-    else {
-      sprintf(sc_before_token + strlen(sc_before_token),
-               "(%d)", field - TargetField /* should yield 0 .. 9 */
-        );
-    }
+    else
+      sprintf(sc_before_token + strlen(sc_before_token), "(%d)", field - TargetField ); /* should yield 0 .. 9 */
   }
 
   /* set the display attribute flags */
@@ -417,7 +406,7 @@ ascii_print_field(FieldType field, int at_end)
     else
       sc_s_mode = 1;
     break;
-    
+
   case KeywordField:
     if (at_end)
       sc_u_mode = 0;
@@ -436,7 +425,7 @@ ascii_print_field(FieldType field, int at_end)
   default:
     break;
   }
-  
+
   /* now compose escape sequence which has to be sent to the terminal (setting _all_ attributes to their current values) */
   sprintf(sc_before_token + strlen(sc_before_token),
           "%s%s%s%s",
@@ -454,22 +443,20 @@ ascii_print_field(FieldType field, int at_end)
  * start-of-line flag ("-->$att_name: ").
  *
  * @param stream          Destination for the output.
- * @param highlighting    Boolean: if true, use colour/bold highlighting for the leading indicator on the line.
+ * @param highlighting    Boolean: if true, use colour/bold highlighting for the marker at the beginning of the flag.
  * @param attribute_name  The name of the aligned corpus: printed in the leading indicator
  * @param line            Character data of the line of aligned-corpus data to print. This is treated as opaque.
  */
 void
-ascii_print_aligned_line(FILE *stream, 
-                         int highlighting,
-                         char *attribute_name,
-                         char *line)
+ascii_print_aligned_line(FILE *stream, int highlighting, char *attribute_name, char *line)
 {
   if (highlighting) {
-    char *red = get_colour_escape('r', 1);
-    char *bold = get_typeface_escape('b');
+    char *red    = get_colour_escape('r', 1);
+    char *bold   = get_typeface_escape('b');
     char *normal = get_typeface_escape('n');
-    Rprintf("%s%s-->%s:%s %s\n", 
-            red, bold,
+    Rprintf("%s%s-->%s:%s %s\n",
+            red,
+            bold,
             attribute_name,
             normal,
             line);
@@ -479,108 +466,97 @@ ascii_print_aligned_line(FILE *stream,
 }
 
 
-/* print the concordance line for the target_word on the screen */
 /**
- * Prints a concordance line.
- * (documentation not complete)_
- *
- *
+ * Prints a concordance line in ascii mode.
  */
-void 
-print_concordance_line(FILE *outfd,
-                       CorpusList *cl,
-                       int element,
-                       int apply_highlighting,
-                       AttributeList *strucs)
+static void
+ascii_print_concordance_line(FILE *dest,
+                             CorpusList *cl,
+                             int range_ix,
+                             int apply_highlighting,
+                             AttributeList *strucs)
 {
   char *outstr;
-  int length, string_match_begin_pos, string_match_end_pos;
-  ConcLineField clf[NoField];        /* NoField is largest field code (not used by us) */
+  ConcLineField clf[NoField];        /* NoField is largest field code (not used) */
   PrintDescriptionRecord *pdr;
 
-  if ((cl == NULL) || (outfd == NULL)) {
-    cqpmessage(Error, "Empty corpus or empty output file");
+  if (!(cl && dest)) {
+    cqpmessage(Error, "Empty corpus or empty output stream");
     return;
   }
-  
-  if (element < 0 || element >= cl->size) {
-    cqpmessage(Error, "Illegal element in print_concordance_line");
+  if (range_ix < 0 || range_ix >= cl->size) {
+    cqpmessage(Error, "Illegal line index %d in ascii_print_concordance_line", range_ix);
     return;
   }
 
   if (escapes_initialized == 0)
     get_screen_escapes();
 
-  sc_s_mode = 0;                /* reset display flags */
+  /* reset display flags */
+  sc_s_mode = 0;
   sc_u_mode = 0;
   sc_b_mode = 0;
 
-  /* ---------------------------------------- concordance fields */
+  /* ---------------------------------------- concordance fields, IE anchors */
 
   clf[MatchField].type = MatchField;
-  clf[MatchField].start_position = cl->range[element].start;
-  clf[MatchField].end_position = cl->range[element].end;
-      
+  clf[MatchField].start_position = cl->range[range_ix].start;
+  clf[MatchField].end_position = cl->range[range_ix].end;
+
   clf[MatchEndField].type = MatchEndField; /* unused, because we use MatchField for the entire match */
   clf[MatchEndField].start_position = -1;
   clf[MatchEndField].end_position = -1;
-      
+
   clf[KeywordField].type = KeywordField;
   if (cl->keywords) {
-    clf[KeywordField].start_position = cl->keywords[element];
-    clf[KeywordField].end_position = cl->keywords[element];
+    clf[KeywordField].start_position = cl->keywords[range_ix];
+    clf[KeywordField].end_position = cl->keywords[range_ix];
   }
   else {
     clf[KeywordField].start_position = -1;
     clf[KeywordField].end_position = -1;
   }
-      
+
   clf[TargetField].type = TargetField;
   if (cl->targets) {
-    clf[TargetField].start_position = cl->targets[element];
-    clf[TargetField].end_position = cl->targets[element];
+    clf[TargetField].start_position = cl->targets[range_ix];
+    clf[TargetField].end_position = cl->targets[range_ix];
   }
   else {
     clf[TargetField].start_position = -1;
     clf[TargetField].end_position = -1;
   }
 
-  if (apply_highlighting)
-    pdr = &ASCIIHighlightedPrintDescriptionRecord;
-  else
-    pdr = &ASCIIPrintDescriptionRecord;
+  pdr = apply_highlighting ? &ASCIIHighlightedPrintDescriptionRecord : &ASCIIPrintDescriptionRecord;
 
-  outstr = compose_kwic_line(cl->corpus, 
-                             cl->range[element].start, cl->range[element].end,
+  /* pdr->BeforeLine is not printed in ASCII mode (it's NULL in both PDRs) */
+  outstr = compose_kwic_line(cl->corpus,
+                             cl->range[range_ix].start, cl->range[range_ix].end,
                              &CD,
-                             &length,
-                             &string_match_begin_pos, &string_match_end_pos,
                              left_delimiter, right_delimiter,
-                             NULL, 0, NULL,
                              clf, NoField, /* NoField = # of entries in clf[] */
-                             ConcLineHorizontal,
-                             pdr,
-                             0, NULL);
-
-  fputs(outstr, outfd);
-  free(outstr);
-  
+                             pdr);
+  fputs(outstr, dest);
+  cl_free(outstr);
   if (pdr->AfterLine)
-    fputs(pdr->AfterLine, outfd);
-  
-  if (CD.alignedCorpora != NULL)
-    printAlignedStrings(cl->corpus, 
+    fputs(pdr->AfterLine, dest);
+
+  if (CD.alignedCorpora)
+    print_all_aligned_lines(cl->corpus,
                         &CD,
-                        cl->range[element].start, cl->range[element].end,
+                        cl->range[range_ix].start, cl->range[range_ix].end,
                         apply_highlighting,
-                        outfd);
+                        dest);
 }
 
 
-
-void 
-ascii_print_corpus_header(CorpusList *cl, 
-                          FILE *stream)
+/**
+ * Prints a header for a "cat" command.
+ *
+ * Note that the "corpus" here refers to a subcorpus IE query result.
+ */
+void
+ascii_print_corpus_header(CorpusList *cl, FILE *dest)
 {
   time_t now;
 
@@ -589,16 +565,16 @@ ascii_print_corpus_header(CorpusList *cl,
 #endif
 
   int i;
-  
+
   time(&now);
   /*   pwd = getpwuid(geteuid()); */
   /* disabled because of incompatibilities between different Linux versions */
 
-  fputc('#', stream);
+  fputc('#', dest);
   for (i = 0; i < 75; i++)
-    fputc('-', stream);
-  fputc('\n', stream);
-  
+    fputc('-', dest);
+  fputc('\n', dest);
+
   Rprintf(
           "#\n"
           "# User:    %s (%s)\n"
@@ -622,66 +598,64 @@ ascii_print_corpus_header(CorpusList *cl,
           "# Context: %d %s left, %d %s right\n"
           "#\n",
           CD.left_width,
-          (CD.left_type == CHAR_CONTEXT) ? "characters" :
-          ((CD.left_type == WORD_CONTEXT) ? "words" :
-           (CD.left_structure_name) ? CD.left_structure_name : "???"),
+          (CD.left_type == char_context) ? "characters" :
+              ((CD.left_type == word_context) ? "words" :
+                  (CD.left_structure_name) ? CD.left_structure_name : "???"),
           CD.right_width,
-          (CD.right_type == CHAR_CONTEXT) ? "characters" :
-          ((CD.right_type == WORD_CONTEXT) ? "words" :
-           (CD.right_structure_name) ? CD.right_structure_name : "???"));
-  
-  if (cl->query_corpus && cl->query_text) {
+          (CD.right_type == char_context) ? "characters" :
+              ((CD.right_type == word_context) ? "words" :
+                  (CD.right_structure_name) ? CD.right_structure_name : "???")
+          );
+
+  if (cl->query_corpus && cl->query_text)
     Rprintf("# Query: %s; %s\n", cl->query_corpus, cl->query_text);
-  }
-  
-  
-  fputc('#', stream);
+
+  fputc('#', dest);
   for (i = 0; i < 75; i++)
-    fputc('-', stream);
-  fputc('\n', stream);
+    fputc('-', dest);
+  fputc('\n', dest);
 }
 
-void 
-ascii_print_output(CorpusList *cl, 
-                   FILE *outfd,
+/**
+ * Prints out the body of a concordance, ASCII style.
+ * @see print_concordance_body
+ */
+void
+ascii_print_output(CorpusList *cl,
+                   FILE *dest,
                    int interactive,
                    ContextDescriptor *cd,
-                   int first, int last)
+                   int first,
+                   int last)
 {
   int real_line, i;
   int output_line = 1;
 
   if (first < 0)
     first = 0;
-  if ((last >= cl->size) || (last < 0))
+  if (last >= cl->size || last < 0)
     last = cl->size - 1;
 
   for (i = first; (i <= last) && !cl_broken_pipe; i++) {
-    
-    if (cl->sortidx)
-      real_line = cl->sortidx[i];
-    else
-      real_line = i;
+    real_line = cl->sortidx ? cl->sortidx[i] : i;
 
-    if (GlobalPrintOptions.number_lines) {
-      Rprintf("%6d.\t", output_line);
-      output_line++;
-    }
+    if (GlobalPrintOptions.number_lines)
+      Rprintf("%6d.\t", output_line++);
 
-    print_concordance_line(outfd, cl, real_line,
+    ascii_print_concordance_line(dest, cl, real_line,
                            interactive && highlighting,
                            cd->printStructureTags);
   }
 }
 
-void 
-ascii_print_group(Group *group, int expand, FILE *fd)
+void
+ascii_print_group(Group *group, FILE *dest)
 {
   int source_id, target_id, count;
   int has_source = (group->source_attribute != NULL);
 
-  char *source_s = "(null)";
-  char *target_s = "(null)";
+  const char *source_s = "(null)";
+  const char *target_s = "(null)";
 
   int cell, last_source_id;
   int nr_targets;
@@ -691,12 +665,12 @@ ascii_print_group(Group *group, int expand, FILE *fd)
   nr_targets = 0;
 
   for (cell = 0; (cell < group->nr_cells) && !cl_broken_pipe; cell++) {
-
     source_id = group->count_cells[cell].s;
-    source_s = Group_id2str(group, source_id, 0);
-   
+    source_s  = Group_id2str(group, source_id, 0);
+
     target_id = group->count_cells[cell].t;
-    target_s = Group_id2str(group, target_id, 1);
+    target_s  = Group_id2str(group, target_id, 1);
+
     count     = group->count_cells[cell].freq;
 
     if (pretty_print) {
@@ -704,26 +678,36 @@ ascii_print_group(Group *group, int expand, FILE *fd)
         last_source_id = source_id;
         nr_targets = 0;
       }
-
       /* separator bar between groups */
       if (cell == 0 || (group->is_grouped && nr_targets == 0))
         Rprintf(SEPARATOR);
-      
-      Rprintf("%-28s  %-28s\t%6d\n",
-              (nr_targets == 0) ? source_s : " ", target_s, count);
+      Rprintf("%-28s  %-28s\t%6d\n", nr_targets == 0 ? source_s : " ", target_s, count);
     }
     else {
-      if (source_id < 0) source_s = "";        /* don't print "(none)" or "(all)" in plain mode (just empty string) */
-      if (target_id < 0) target_s = "";
-      if (has_source) 
+      if (source_id < 0)
+        source_s = "";        /* don't print "(none)" or "(all)" in plain mode (just empty string) */
+      if (target_id < 0)
+        target_s = "";
+      if (has_source)
         Rprintf("%s\t%s\t%d\n", source_s, target_s, count);
-      else 
+      else
         Rprintf("%s\t%d\n", target_s, count);
     }
-    
+
+#if 0
     if (expand) {
+      /* comment below indicates something should be here - that expand should cause "output of the corresponding concordance lines" */
+      /* the Boolean parameter "expand" is passed through several layers of functions from the parser rule for "GroupCmd".
+       * This has an "OptExpand", IE if the word "expand" is present, it gets set to 1, and if not, it is set to zero.
+       * That's the source of the expand param. In the parser we find this comment: "the 'expand' flag is not implemented in the group command "
+       * and indeed, the CQP tutorial makes no mention of the possibility of using "expand" with a group command.
+       */
+      /* The grammar allows a keyword "expand" in group statements; the question marks suggest that no-one knows
+       * what this was intended for. Someone seems to have guessed that it should print concordance lines for
+       * each counted item or pair, but the information is not available in the Group data structure -- SE 2020 */
       /* Ausgabe der entsprechenden Konkordanzzeilen??? */
     }
+#endif
 
     nr_targets++;
   }

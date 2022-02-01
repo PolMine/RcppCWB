@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -20,9 +20,10 @@
 
 #include <sys/types.h>
 
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
 /* byte order handling taken from Corpus Library */
 #include "../cl/endian.h"
-#include "../cl/globals.h"
 
 /**
  * boolean: is the byte-order little-endian?
@@ -36,21 +37,23 @@ int little_endian = 0;
  * Reads from a stream one integer-representing string per line,
  * and writes the corresponding integer to STDOUT.
  *
-  * @param fd  The file handle.
+  * @param stream  The file handle.
  */
 void
-process_fd(FILE *fd)
+atoi_process_stream(FILE *stream)
 {
   char buf[CL_MAX_LINE_LENGTH];
   int i;
 
-  while(fgets(buf, CL_MAX_LINE_LENGTH, fd)) {
+  while(fgets(buf, CL_MAX_LINE_LENGTH, stream)) {
     i = htonl(atoi(buf));
-    if (little_endian) 
+    if (little_endian)
       i = cl_bswap32(i);        /* explicit conversion */
     fwrite(&i, 4, 1, stdout);   /* always write 4 bytes ! */
   }
 }
+
+
 
 /**
  * Main function for cwb-atoi.
@@ -61,12 +64,14 @@ process_fd(FILE *fd)
 int
 main(int argc, char **argv)
 {
-  FILE *fd; 
+  FILE *src;
   int i;
   char *progname = argv[0];
 
+  cl_startup();
+
   /* default case: we are reading from stdin */
-  fd = stdin;
+  src = stdin;
 
   for (i = 1; i < argc; i++) {
     if (argv[i][0] == '-') {
@@ -87,16 +92,17 @@ main(int argc, char **argv)
         fprintf(stderr, "Options:\n");
         fprintf(stderr, "  -n  convert to network format [default]\n");
         fprintf(stderr, "  -l  convert to little endian format\n");
-        fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+        fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
         exit(1);
       }
     }
-    else if ((fd = fopen(argv[i], "rb")) == NULL) {
+    else if (!(src = fopen(argv[i], "rb"))) {
       fprintf(stderr, "%s: Couldn't open %s\n", progname, argv[i]);
       exit(1);
     }
   }
+
   /* now process either input file or stdin */
-  process_fd(fd);
+  atoi_process_stream(src);
   return 0;
 }

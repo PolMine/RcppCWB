@@ -24,22 +24,28 @@
 # PLATFORM-SPECIFIC CONFIGURATION (OS and CPU type)
 #
 # Pre-defined platform configuration files:
-#       unix          generic Unix / GCC configuration (should work on most Unix platforms)
-#       linux         i386-Linux (generic)
-#         linux-64       - configuration for 64-bit CPUs
-#         linux-opteron  - with optimimzation for AMD Opteron processor
-#       darwin        Mac OS X / Darwin [use one of the more specific entries below]
-#         darwin-brew       - 64-bit, natively tuned, prerequisites installed with HomeBrew (recommended)
-#         darwin-universal  - universal build on Mac OS X 10.6 and newer
-#         darwin-64         - 64-bit build on Mac OS X 10.6 and newer
-#         darwin-port-core2  - universal build optimized for Core2 CPUs, prerequisites installed with MacPorts (deprecated)
-#       solaris       SUN Solaris 8 for SPARC CPU
-#       cygwin        Win32 build using Cygwin emulation layer (experimental)
-#       mingw-cross   Cross-compile for Win32-on-i586 from a *nix system with MinGW installed (experimental)
-#       mingw-native  Build natively on Win32 using MinGW (new, at research stage only, does not work yet)
+#       unix                generic Unix / GCC configuration (should work on most Unix platforms)
+#       linux               i386-Linux (generic)
+#           linux-native        - Linux default build (usually 64-bit), natively tuned
+#           linux-64            - configuration for 64-bit CPUs
+#           linux-opteron       - with optimimzation for AMD Opteron processor
+#       darwin              MacOS / Darwin [use one of the more specific entries below]
+#           darwin-brew         - Intel 64-bit, natively tuned, prerequisites installed with HomeBrew (recommended)
+#           darwin-brew-m1          - same for ARM 64-bit (M1 and other Apple Silicon)
+#           darwin-brew-release - Intel 64-bit (Core2 and newer), statically linked for binary release
+#           darwin-brew-release-m1  - same for ARM 64-bit (M1 and other Apple Silicon)
+#           darwin-64           - Intel 64-bit, natively tunes, prerequisites installed by user
+#           darwin-universal    - universal 64-bit/32-bit build on Mac OS X 10.6 - 10.13 (deprecated)
+#           darwin-port         - generic build, prerequisites installed with MacPorts (deprecated)
+#       solaris             SUN Solaris 8 for SPARC CPU (unsupported)
+#       cygwin              Win32 build using Cygwin emulation layer (experimental)
+#       mingw-cross         Cross-compile for Win32-on-i586 from a *nix system with MinGW installed (experimental)
+#       mingw-native        Build natively on Win32 using MinGW (new, at research stage only, does not work yet)
+#       homebrew-formula    configuration for HomeBrew package manager
+#                               - set HOMEBREW_ROOT to base of HomeBrew tree on command line
 #
 ifndef PLATFORM
-PLATFORM=darwin-64
+PLATFORM=mingw-native
 endif
 include $(TOP)/config/platform/$(PLATFORM)
 
@@ -47,23 +53,24 @@ include $(TOP)/config/platform/$(PLATFORM)
 # SITE-SPECIFIC CONFIGURATION (installation path and other local settings)
 #
 # Pre-defined site configuration files:
-#       standard        standard configuration (installation in /usr/local tree)
-#         beta-install    ... install into separate tree /usr/local/cwb-<VERSION> (unless CWB_LIVE_DANGEROUSLY is set)
-#       classic         "classic" configuration (CWB v2.2, uses /corpora/c1/registry)
-#       osx-fink        Mac OS X installation in Fink's /sw tree
-#       binary-release  Build binary package for release (static if possible, use with "make release")
-#         osx-release     ... for Mac OS X
-#         linux-release   ... for i386 Linux
-#         solaris-release ... for SUN Solaris 2.x
-#         linux-rpm       ... build binary RPM package on Linux (together with rpm-linux.spec)
-#         windows-release ... for Windows binaries cross-compiled with MinGW; use with "mingw" platform
-#       cygwin          Win32 / Cygwin configuration (experimental)
-#       
+#       standard            standard configuration (installation in /usr/local tree)
+#           beta-install        - install into separate tree /usr/local/cwb-<VERSION> (unless CWB_LIVE_DANGEROUSLY is set)
+#       classic             "classic" configuration (CWB v2.2, uses /corpora/c1/registry)
+#       binary-release      Build binary package for release (static if possible, use with "make release")
+#           darwin-release      - for MacOS
+#           linux-release       - for i386 Linux
+#           solaris-release     - for SUN Solaris 2.x
+#           linux-rpm           - build binary RPM package on Linux (together with rpm-linux.spec)
+#           windows-release     - for Windows binaries cross-compiled with MinGW; use with "mingw" platform
+#       cygwin              Win32 / Cygwin configuration (experimental)
+#       homebrew-formula    configuration for HomeBrew package manager
+#                               - set HOMEBREW_ROOT to base of HomeBrew tree on command line
+#                               - must set PREFIX to formula's keg directory
+#
 ifndef SITE
 SITE=beta-install
 endif
 include $(TOP)/config/site/$(SITE)
-
 
 #
 # MANUAL CONFIGURATION (override individual platform and site settings)
@@ -77,6 +84,16 @@ include $(TOP)/config/site/$(SITE)
 # below.  The values shown are the "typical" defaults, but may be changed in the 
 # platform and site configuration files you selected.
 #
+
+
+## SPECIAL: enable full output
+## ---------------------------
+## Normally, the complex output from the build process is hidden.
+## But if you would like to see ALL the output, you can uncomment the line below.
+FULL_MESSAGES = 1
+
+
+
 
 ## Directory tree for software installation
 # PREFIX = /usr/local
@@ -100,7 +117,7 @@ include $(TOP)/config/site/$(SITE)
 # RELEASE_OS = ???    # e.g. linux-2.6 or osx-10.4
 
 ## C compiler to use (GCC is highly recommended, others may not work)
-# CC = gcc
+CC = gcc
 
 ## Override options for C compiler and linker (complete override)
 # CFLAGS = -O2 -Wall
@@ -108,6 +125,9 @@ include $(TOP)/config/site/$(SITE)
 
 ## Include debugging information in binaries (for developers only, not enabled by default)
 # DEBUG_FLAGS = -g
+## Preparing executables for use in Valgrind requires more complex manipulation of the gcc flags than just -g.
+## Define VALGRIND_READY, and they'll be set up at time of make. 
+# VALGRIND_READY = 
 
 ## Side-specific options are added to the standard CFLAGS and LDFLAGS (e.g. additional paths)
 # SITE_CFLAGS =
@@ -160,6 +180,13 @@ include $(TOP)/config/site/$(SITE)
 
 ## In the unlikely event that "date" does not work properly, or if you want to lie about the date
 # COMPILE_DATE = $(shell date)
+
+## CFLAGS and LDFLAGS for linking against binary releases
+# RELEASE_CFLAGS = 
+# RELEASE_LDFLAGS = -l cl
+
+## Extra libraries to be included in a binary release
+# RELEASE_EXTRA_LIBS = 
 
 
 #

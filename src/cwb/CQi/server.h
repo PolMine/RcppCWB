@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,10 +15,13 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#include "../cl/cl.h"
-#include "../cqp/corpmanag.h"
+#ifndef _cqi_server_h_
+#define _cqi_server_h_
 
-typedef unsigned char cqi_byte;
+#include "../cl/cl.h"
+#include "../cqp/corpmanag.h"   /* for CorpusList */
+
+typedef char cqi_byte;
 
 /* global errno variable; the error code is a CQi error message */
 /* utility functions such as cqi_lookup_attribute() set cqi_errno, so
@@ -33,8 +36,12 @@ extern int cqi_errno;
 extern char cqi_error_string[];
 void cqi_general_error(char *errstring);
 
+/* server-side console debug / snooping (on stderr) */
+void cqiserver_snoop(const char *format, ...);
+void cqiserver_debug_msg(const char *format, ...);
+
 /* accept_connection returns the SOCKSTREAM connection file descriptor,
-   or a negative value if an error occurred 
+   or a negative value if an error occurred
    port  ...  bind to this port; uses CQI_PORT if port==0 */
 int accept_connection(int port);
 
@@ -43,8 +50,8 @@ int cqi_flush(void);
 int cqi_send_byte(int n, int nosnoop);
 int cqi_send_word(int n);
 int cqi_send_int(int n);
-int cqi_send_string(char *str);	/* NULL pointer sends "" */
-int cqi_send_byte_list(cqi_byte *list, int length);
+int cqi_send_string(const char *str);	/* NULL pointer sends "" */
+int cqi_send_byte_list(cqi_byte *list, int length, int as_boolean);
 int cqi_send_int_list(int *list, int length);
 int cqi_send_string_list(char **list, int length);
 
@@ -53,7 +60,7 @@ void cqi_command(int command);        /* simple command (no args) */
 void cqi_data_byte(int n);
 void cqi_data_bool(int n);
 void cqi_data_int(int n);
-void cqi_data_string(char *str);
+void cqi_data_string(const char *str);
 void cqi_data_byte_list(cqi_byte *list, int length);
 void cqi_data_bool_list(cqi_byte *list, int length);
 void cqi_data_int_list(int *list, int length);
@@ -66,8 +73,8 @@ int cqi_recv_bytes(cqi_byte *buf, int n); /* receive exactly n bytes */
 int cqi_recv_byte(void);             /* receive 1 byte from client (returns EOF on error*/
 
 /* advanced functions which read chunks of data [exit on error] */
-int cqi_read_byte(void); 
-int cqi_read_bool(void); 
+int cqi_read_byte(void);
+int cqi_read_bool(void);
 int cqi_read_word(void);
 int cqi_read_int(void);
 char *cqi_read_string(void);	/* allocates string */
@@ -77,16 +84,21 @@ int cqi_read_int_list(int **list);	 /* .. */
 int cqi_read_string_list(char ***list);  /* allocates list & individual strings */
 int cqi_read_command(void);	/* reads a word, skipping CQI_PAD bytes if necessary */
 
-/* naming conventions */
-int check_corpus_name(char *name);       /* make sure identifiers conform to naming conventions */
-int check_attribute_name(char *name);    /* return 0 & set cqi_errno if <name> does not conform */
-int check_subcorpus_name(char *name);
+/* naming conventions : one function accessed via 3 convenience macros */
+/* make sure identifiers conform to naming conventions; return false & set cqi_errno if <name> does not conform */
+int check_identifier_convention(char *name, int init_cap, int rest_cap, int rest_any);
+/** Checks a corpus name for validity of format (not whether or not it actually exists!), i.e. ALL-UPPER_CASE */
+#define check_corpus_name(name)    (check_identifier_convention((name), 1, 1, 0))
+/** Checks an attribute name for validity of format (not whether or not it actually exists!), i.e. all-lower_case */
+#define check_attribute_name(name) (check_identifier_convention((name), 0, 0, 0))
+/** Checks a subcorpus/NQR name for validity of format (not whether or not it actually exists!), i.e. First_upper-rest_EiThEr */
+#define check_subcorpus_name(name) (check_identifier_convention((name), 1, 0, 1))
 
 /* splitting/combining full attribute & subcorpus specifiers */
 /* these functions return 0 & set cqi_errno if format is invalid */
 int split_attribute_spec(char *spec, char **corpus_name, char **attribute_name);
 /* if <spec> denotes a root corpus, <subcorpus_name> is set to NULL */
-int split_subcorpus_spec(char *spec, char **corpus_name, char **subcorpus_name); 
+int split_subcorpus_spec(char *spec, char **corpus_name, char **subcorpus_name);
 char *combine_subcorpus_spec(char *corpus_name, char *subcorpus_name);
 
 
@@ -102,3 +114,5 @@ int cqi_drop_attribute(char *name);      /* returns True/False */
 CorpusList *cqi_find_corpus(char *name); /* either root corpus or subcorpus */
 int cqi_activate_corpus(char *name);
 
+
+#endif

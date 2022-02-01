@@ -131,9 +131,6 @@ h4. cl/macros.h ; cl/macros.c
 
 * lots of miscellaneous stuff is to be found here
 * as you might expect, some macros are #defined here:
-** new() and New() are a quick way of getting a structure malloc'ed (wrapping round cl_malloc() )
-** STREQ() compares strings for equality
-** MIN(x,y) and MAX(x,y) returns the (lesser/greater) of two numbers
 * the cl_-prefix memory allocation functions (-malloc, -calloc, -realloc, -strdup) are defined here
 * the cl_-prefix built-in random-number-generator functions (most notably, -randomize, -random, -runif) are defined here
 * four functions for progress bars are defined and declared here

@@ -1,0 +1,27 @@
+var structs__att__builder =
+[
+    [ "annot", "structs__att__builder.html#a3b3be9087a468fe688fe72b348317b70", null ],
+    [ "automatic", "structs__att__builder.html#aa4e355c888f7b11b0e3695b01b361a58", null ],
+    [ "avs_fh", "structs__att__builder.html#a3cc39b64d1ec420206f0bd4a2e236c95", null ],
+    [ "avx_fh", "structs__att__builder.html#a49831d8e50aa101caaa5c04fc2f2c306", null ],
+    [ "dir", "structs__att__builder.html#a73da71b9c136e698a3ccaa1366e455a8", null ],
+    [ "el_attributes", "structs__att__builder.html#a015f02a34bc9fa09f2f3d83f02541c5a", null ],
+    [ "el_atts_list", "structs__att__builder.html#a3f6c95ba6fdb3e510206a81228b22c81", null ],
+    [ "el_undeclared_attributes", "structs__att__builder.html#a20fb9a5816393db2d1681565f9e359d6", null ],
+    [ "element_drop_count", "structs__att__builder.html#af69647958cbe1931821113efeb7fb5af", null ],
+    [ "feature_set", "structs__att__builder.html#a973869c7e89b0b0b4124de78f05b2acd", null ],
+    [ "has_children", "structs__att__builder.html#abb239165b69928cd5f437ee058b1eda8", null ],
+    [ "in_registry", "structs__att__builder.html#ae0f3c18d491d1a51574f45b4b9e5593f", null ],
+    [ "is_open", "structs__att__builder.html#af8a5d0f09d921a5e376e09536bb48eb2", null ],
+    [ "lh", "structs__att__builder.html#ac76b62d6b0e85ad3157ebd69613a63be", null ],
+    [ "max_recursion", "structs__att__builder.html#a431cfba1205405fb43a6d645af4474bd", null ],
+    [ "name", "structs__att__builder.html#a5ac083a645d964373f022d03df4849c8", null ],
+    [ "null_attribute", "structs__att__builder.html#a362eb1d1b10c2817ad667170f368a0d8", null ],
+    [ "num", "structs__att__builder.html#a86cf672daa4e0ad11ad10efc894d19c8", null ],
+    [ "offset", "structs__att__builder.html#aed7ea92f45bd273dde380a45ddced592", null ],
+    [ "recursion_children", "structs__att__builder.html#a7fe9f8bfe5ef91ccc74caf6b4d3eeb0c", null ],
+    [ "recursion_level", "structs__att__builder.html#abf23e1bc2707763a1f3d81923752358c", null ],
+    [ "rng_fh", "structs__att__builder.html#a2481b3258a4986be278335e496fda34f", null ],
+    [ "start_pos", "structs__att__builder.html#a9715e2df77829e54cb078a298fd6c434", null ],
+    [ "store_values", "structs__att__builder.html#a840e275845c4374a4384021cb20a3eb4", null ]
+];

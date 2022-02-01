@@ -34,20 +34,15 @@ void Rprintf(const char *, ...);
 #include "globals.h"
 
 #include "endian2.h"
-#include "macros.h"
 #include "storage.h"
 #include "fileutils.h"
 #include "corpus.h"
 #include "attributes.h"
-#include "cdaccess.h"
 
 #include "makecomps.h"
 
 
 #define BUFSIZE 0x10000
-
-/* seems not ever to be used? */
-/* char errmsg[CL_MAX_LINE_LENGTH]; */
 
 
 
@@ -97,22 +92,21 @@ creat_sort_lexicon(Component *lexsrt)
   assert(lexsrt && "creat_sort_lexicon called with NULL component");
   assert(lexsrt->attribute && "attribute of component is null");
 
-  assert(comp_component_state(lexsrt) == ComponentDefined && "component is not set to Defined state");
+  assert(component_state(lexsrt->attribute, lexsrt->id) == ComponentDefined && "component is not set to Defined state");
 
   /* make sure both the lexicon and the lexicon index components for this Att are in memory */
   lex    = ensure_component(lexsrt->attribute, CompLexicon,    1);
   lexidx = ensure_component(lexsrt->attribute, CompLexiconIdx, 1);
 
-  assert(lex != NULL);
-  assert(lexidx != NULL);
+  assert(lex && lexidx);
 
   assert(lexsrt->path != NULL);
   assert(lexidx->data.size > 0);
   assert(lexidx->data.data != NULL);
 
   /* read the contents of the lexidx component into the blob of the lexsrt component
-   * (note use of MALLOCED to duplicate the content). */
-  if (!read_file_into_blob(lexidx->path, MALLOCED, sizeof(int), &(lexsrt->data))) {
+   * (note use of CL_MEMBLOB_MALLOCED to duplicate the content). */
+  if (!read_file_into_blob(lexidx->path, CL_MEMBLOB_MALLOCED, sizeof(int), &(lexsrt->data))) {
     Rprintf("Can't open %s, can't create lexsrt component\n", lexidx->path);
     perror(lexidx->path);
     return 0;
@@ -181,8 +175,8 @@ creat_freqs(Component *freqs)
   }
 
   /* load a copy of the CompLexiconIdx file into the CompCorpusFreqs data block.
-   * (NB note the use of MALLOCED to enforce operation on a *copy*, not the original... */
-  if (!read_file_into_blob(lexidx->path, MALLOCED, sizeof(int), &(freqs->data))) {
+   * (NB note the use of CL_MEMBLOB_MALLOCED to enforce operation on a *copy*, not the original... */
+  if (!read_file_into_blob(lexidx->path, CL_MEMBLOB_MALLOCED, sizeof(int), &(freqs->data))) {
     Rprintf("Can't open %s, can't create freqs component\n", lexidx->path);
     perror(lexidx->path);
     return 0;
@@ -400,16 +394,16 @@ creat_rev_corpus_idx(Component *revcidx)
 
   /* directly manipulate the MemBlob internals of the new component ... */
   revcidx->data.size = freqs->data.size;
-  revcidx->data.item_size = SIZE_INT;
+  revcidx->data.item_size = sizeof(int);
   revcidx->data.nr_items = freqs->data.nr_items;
-  revcidx->data.allocation_method = MALLOCED;
+  revcidx->data.allocation_method = CL_MEMBLOB_MALLOCED;
   revcidx->data.writeable = 1;
   revcidx->data.changed = 0;
   revcidx->data.fname = NULL;
   revcidx->data.fsize = 0;
   revcidx->data.offset = 0;
 
-  /* equivalent to using MALLOCED when calling one of the MemBlob functions... */
+  /* equivalent to using CL_MEMBLOB_MALLOCED when calling one of the MemBlob functions... */
   revcidx->data.data = (int *)cl_malloc(sizeof(int) * revcidx->data.nr_items);
   memset(revcidx->data.data, '\0', revcidx->data.size);
   revcidx->size = revcidx->data.nr_items;

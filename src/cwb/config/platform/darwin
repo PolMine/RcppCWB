@@ -32,5 +32,6 @@ READLINE_DEFINES =
 READLINE_LIBS =
 
 ## CPU architecture and operating system used to name binary releases
-RELEASE_OS = osx-10.6
-
+RELEASE_ARCH := $(shell uname -m)
+RELEASE_OS_VERSION := $(shell sw_vers -productVersion | sed -Ee 's/^([0-9]+\.[0-9]+).*$$/\1/')
+RELEASE_OS = macos-$(RELEASE_OS_VERSION)

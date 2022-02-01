@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -17,10 +17,6 @@
 
 
 #include "globals.h"
-#include "macros.h"
-#include "lexhash.h"
-#include "ngram-hash.h"
-
 #include <math.h>
 void Rprintf(const char *, ...);
 
@@ -48,15 +44,15 @@ void Rprintf(const char *, ...);
  * basic utility functions
  */
 
-/* find_prime() has been imported from "lexhash.h" */
-
-/** Computes 32bit hash value for n-gram */
+/** Computes 32bit hash value for an n-gram (of integers). NB: this functifon could be re-usable for other kinds of hash.  */
 unsigned int
 hash_ngram(int N, int *tuple)
 {
   unsigned int result = 5381; /* seed value from DJB2, seems slightly better than original seed 0 */
   unsigned char *buffer = (unsigned char *)tuple;
   int i;
+
+  /* See discussion of alternative hash functions (see lexhash.h) */
 
   /* hash function is designed for byte sequence and has poor distribution if applied directly to ints */
   for(i = 0 ; i < N * sizeof(int); i++)
@@ -65,16 +61,7 @@ hash_ngram(int N, int *tuple)
 }
 
 
-/** TODO: consider alternative hash functions (see cl/lexhash.h) */
 
-
-/*
- * cl_ngram_hash / cl_ngram_hash_entry  object definition
- */
-
-/* cl_ngram_hash_entry is in <cl.h> */
-
-/* typedef struct _cl_ngram_hash *cl_ngram_hash; in <cl.h> */
 
 
 /**
@@ -88,6 +75,7 @@ struct _cl_ngram_hash {
   cl_ngram_hash_entry *table;   /**< table of buckets; each "bucket" is a pointer to the list of entries that make up that bucket */
   unsigned int buckets;         /**< number of buckets in the hash table */
   int N;                        /**< n-gram size */
+  int payload_size;             /**< number of ints embedded as additional payload after n-gram */
   int entries;                  /**< current number of entries in this hash */
   int auto_grow;                /**< boolean: whether to expand this hash automatically; true by default */
   double fillrate_limit;        /**< fillrate limit that triggers expansion of bucket table (with auto_grow) */
@@ -104,23 +92,27 @@ struct _cl_ngram_hash {
 /**
  * Creates a new cl_ngram_hash object.
  *
- * @param N          N-gram size
- * @param buckets    The number of buckets in the newly-created cl_ngram_hash;
- *                   set to 0 to use the default number of buckets.
- * @return           The new cl_ngram_hash.
+ * @param N             N-gram size
+ * @param buckets       The number of buckets in the newly-created cl_ngram_hash;
+ *                      set to 0 to use the default number of buckets.
+ * @param payload_size  Number of ints embedded in hash entries as user payload (0 = no payload);
+ *                      use cl_ngram_hash_payload() for read/write access to payload.
+ * @return              The new cl_ngram_hash.
  */
-cl_ngram_hash 
-cl_new_ngram_hash(int N, int buckets)
+cl_ngram_hash
+cl_new_ngram_hash(int N, int buckets, int payload_size)
 {
   cl_ngram_hash hash;
-  
+
   assert(N >= 1 && "cl_new_ngram_hash(): invalid N-gram size");
   if (buckets <= 0)
     buckets = DEFAULT_NR_OF_BUCKETS;
-  
+
   hash = (cl_ngram_hash) cl_malloc(sizeof(struct _cl_ngram_hash));
   hash->N = N;
-  hash->buckets = find_prime(buckets);
+  assert(payload_size >= 0);
+  hash->payload_size = payload_size;
+  hash->buckets = cl_find_prime(buckets);
   hash->table = cl_calloc(hash->buckets, sizeof(cl_ngram_hash_entry));
   hash->entries = 0;
   hash->auto_grow = 1;
@@ -140,19 +132,20 @@ cl_new_ngram_hash(int N, int buckets)
  *
  * @param hash  The cl_ngram_hash to delete.
  */
-void 
+void
 cl_delete_ngram_hash(cl_ngram_hash hash)
 {
   int i;
-  cl_ngram_hash_entry entry;
-  
+  cl_ngram_hash_entry entry, temp;
+
   if (hash != NULL && hash->table != NULL) {
     for (i = 0; i < hash->buckets; i++) {
       entry = hash->table[i];
       while (entry != NULL) {
-        /* temp = entry; */
+        temp = entry;
         entry = entry->next;
-        cl_free(entry);
+        /* cl_free(entry); -- changed to line below cos otherwise mem does not get freed. */
+        cl_free(temp);
       }
     }
   }
@@ -177,7 +170,7 @@ cl_delete_ngram_hash(cl_ngram_hash hash)
 void
 cl_ngram_hash_auto_grow(cl_ngram_hash hash, int flag)
 {
-  if (hash != NULL)
+  if (hash)
     hash->auto_grow = flag;
 }
 
@@ -188,15 +181,15 @@ cl_ngram_hash_auto_grow(cl_ngram_hash hash, int flag)
  *
  * The decision to expand the bucket table of a ngram_hash is based
  * on its fill rate, i.e. the average number of entries in each
- * bucket. Under normal circumstances, this value corresponds to 
- * the average number of comparisons required to insert a new 
+ * bucket. Under normal circumstances, this value corresponds to
+ * the average number of comparisons required to insert a new
  * entry into the hash (locating an existing value should require
  * roughly half as many comparisons).
  *
  * Auto-growing is triggered if the fill rate exceeds a specified
  * limit.  The new number of buckets is chosen so that the fill
  * rate after expansion corresponds to the specified target value.
- * 
+ *
  * The two fill rate parameters represent a trade-off between memory
  * overhead (8 bytes for each bucket) and performance (average number
  * of entries that have been checked for each hash access), which
@@ -210,11 +203,11 @@ cl_ngram_hash_auto_grow(cl_ngram_hash hash, int flag)
  *
  * Note that the ratio limit / target determines how often the bucket
  * table has to be reallocated; it should not be smaller than 4.0.
- * 
+ *
  * A reasonable values for the fill rate limit seems to be around 5.0;
- * if speed is crucial, N is relatively large, and memory footprint 
+ * if speed is crucial, N is relatively large, and memory footprint
  * isn't a concern, smaller values down to 2.0 might be chosen.
- * The target fill rate should not be set too low for small N. 
+ * The target fill rate should not be set too low for small N.
  * If N=1, a target fill rate of 0.5 results in 100% memory overhead
  * after expansion of the bucket table (16 bytes per entry vs. 8 bytes
  * each for twice as many buckets as there are entries).
@@ -222,7 +215,7 @@ cl_ngram_hash_auto_grow(cl_ngram_hash hash, int flag)
  * When working on very large data sets, it is recommended to disable
  * auto-grow and initialise the n-gram hash with a sufficiently large
  * number of buckets.
- *  
+ *
  * @see          cl_ngram_hash_auto_grow, cl_ngram_hash_check_grow
  * @param hash   The hash that will be affected.
  * @param limit  Fill rate limit, which triggers expansion of the n-gram hash
@@ -231,10 +224,10 @@ cl_ngram_hash_auto_grow(cl_ngram_hash hash, int flag)
 void
 cl_ngram_hash_auto_grow_fillrate(cl_ngram_hash hash, double limit, double target)
 {
-  if (hash != NULL) {
+  if (hash) {
     /* set parameters with basic sanity checks */
     hash->fillrate_target = (target > 0.01) ? target : 0.01;
-    hash->fillrate_limit = (limit > 2 * hash->fillrate_target) ? limit : 2 * hash->fillrate_target;
+    hash->fillrate_limit  = (limit > 2 * hash->fillrate_target) ? limit : 2 * hash->fillrate_target;
   }
 }
 
@@ -244,7 +237,7 @@ cl_ngram_hash_auto_grow_fillrate(cl_ngram_hash hash, double limit, double target
  * Grows a ngram_hash table, increasing the number of buckets, if necessary.
  *
  * This functions is called after inserting a new entry into the n-gram hash.
- * If checks whether the current fill rate exceeds the specified limit. 
+ * If checks whether the current fill rate exceeds the specified limit.
  * If this is the case, and auto_grow is enabled, then the hash is expanded
  * by increasing the number of buckets, such that the new average fill rate
  * corresponds to the specified target value.  This gives the
@@ -264,7 +257,7 @@ cl_ngram_hash_auto_grow_fillrate(cl_ngram_hash hash, double limit, double target
  * @param hash  The cl_ngram_hash to autogrow.
  * @return      Always 0.
  */
-int
+static int
 cl_ngram_hash_check_grow(cl_ngram_hash hash)
 {
   double fill_rate, target_size;
@@ -278,30 +271,26 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
     /* auto-grow is triggered */
     target_size = floor(((double) hash->entries) / hash->fillrate_target);
     if (target_size > MAX_BUCKETS) {
-      if (cl_debug) {
-        Rprintf("[n-gram hash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n",
-                (double) MAX_BUCKETS, target_size);
-      }
+      if (cl_debug)
+        Rprintf("[n-gram hash autogrow: size limit %f exceeded by new target size %f, auto-growing will be disabled]\n", (double) MAX_BUCKETS, target_size);
+
       hash->auto_grow = 0; /* disable auto-grow to avoid further unnecessary attempts */
       /* grow ngram_hash to maximum size, but not if this would extend bucket vector by less than 2x (to avoid large reallocation for little benefit) */
-      if (old_buckets > target_size / 2.0) {
+      if (old_buckets > target_size / 2.0)
         return 0;
-      }
-      else {
+      else
         target_size = MAX_BUCKETS;
-      }
     }
     /* now grow bucket table from old_buckets entries to new_buckets entries */
     new_buckets = (int) target_size;
     old_buckets = hash->buckets;
     if (cl_debug) {
-      Rprintf("[n-gram hash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n",
-              fill_rate, hash->entries, old_buckets);
+      Rprintf("[n-gram hash autogrow: triggered by fill rate = %3.1f (%d/%d)]\n", fill_rate, hash->entries, old_buckets);
       if (cl_debug >= 2)
         cl_ngram_hash_print_stats(hash, 12);
     }
     N = hash->N;
-    temp = cl_new_ngram_hash(N, new_buckets); /* create new hash with target fill rate */
+    temp = cl_new_ngram_hash(N, new_buckets, hash->payload_size); /* create new hash with target fill rate */
     new_buckets = temp->buckets; /* the actual number of entries (next prime number) */
     /* move all entries from hash to the appropriate bucket in temp */
     for (idx = 0; idx < old_buckets; idx++) {
@@ -322,8 +311,7 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
     cl_free(temp);                      /* we can simply deallocate temp now, having stolen its hash table */
     if (cl_debug) {
       fill_rate = ((double) hash->entries) / hash->buckets;
-      Rprintf("[n-gram hash autogrow: new fill rate = %3.1f (%d/%d)]\n",
-              fill_rate, hash->entries, hash->buckets);
+      Rprintf("[n-gram hash autogrow: new fill rate = %3.1f (%d/%d)]\n", fill_rate, hash->entries, hash->buckets);
     }
     return 1;
   }
@@ -340,7 +328,7 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
  * the hashtable), unless *ret_offset == NULL.
  *
  * Note that this function hides the hashing algorithm details from the
- * rest of the n-gram hash implementation (except cl_ngram_hash_check_grow, which 
+ * rest of the n-gram hash implementation (except cl_ngram_hash_check_grow, which
  * re-implements the hashing algorithm for performance reasons).
  *
  * Usage: entry = cl_ngram_hash_find_i(cl_ngram_hash hash, char *token, unsigned int *ret_offset);
@@ -354,14 +342,14 @@ cl_ngram_hash_check_grow(cl_ngram_hash hash)
  * @return            The entry that is found (or NULL if the string is not
  *                    in the hash).
  */
-cl_ngram_hash_entry
+static cl_ngram_hash_entry
 cl_ngram_hash_find_i(cl_ngram_hash hash, int *ngram, unsigned int *ret_offset)
 {
   unsigned int offset;
   int N;
   cl_ngram_hash_entry entry;
 
-  assert((hash != NULL && hash->table != NULL && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised");
+  assert( (hash && hash->table && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised" );
   N = hash->N;
 
   /* get the offset of the bucket to look in by computing the hash of the string */
@@ -370,7 +358,7 @@ cl_ngram_hash_find_i(cl_ngram_hash hash, int *ngram, unsigned int *ret_offset)
     *ret_offset = offset;
   /* check all entries in this bucket against the specified key */
   entry = hash->table[offset];
-  while (entry != NULL && memcmp(entry->ngram, ngram, N * sizeof(int)) != 0)
+  while (entry != NULL && 0 != memcmp(entry->ngram, ngram, N * sizeof(int)))
     entry = entry->next;
   return entry;
 }
@@ -383,7 +371,7 @@ cl_ngram_hash_find_i(cl_ngram_hash hash, int *ngram, unsigned int *ret_offset)
  *
  * @see               cl_ngram_hash_find_i
  * @param hash        The hash to search.
- * @param n-gram      The n-gram to look for.
+ * @param ngram       The n-gram to look for.
  * @return            The entry that is found (or NULL if the n-gram is not
  *                    in the hash).
  */
@@ -404,6 +392,7 @@ cl_ngram_hash_find(cl_ngram_hash hash, int *ngram)
  * Otherwise, a new entry is created and its frequency count
  * is set to f.  The n-gram is embedded in the new hash entry,
  * so the original array does not need to be kept in memory.
+ * An optional user payload is initialized to -1 values.
  *
  * @param hash   The hash table to add to.
  * @param ngram  The n-gram to add.
@@ -417,29 +406,34 @@ cl_ngram_hash_add(cl_ngram_hash hash, int *ngram, unsigned int f)
   unsigned int offset;          /* this will be set to the index of the bucket this token should go in
                                    by the call to cl_ngram_hash_find_i                                     */
   int N;
-  
+
   entry = cl_ngram_hash_find_i(hash, ngram, &offset);
   N = hash->N;
 
-  if (entry != NULL) {
+  if (entry)
     /* token already in hash -> increment frequency count */
     entry->freq += f;
-  }
+
   else {
     /* token not in hash -> add new entry for this token */
-    assert((hash->entries < MAX_ENTRIES) && "ngram-hash.c: maximum capacity of n-gram hash exceeded -- program abort");
-    
+    assert(hash->entries < MAX_ENTRIES && "ngram-hash.c: maximum capacity of n-gram hash exceeded -- program abort");
+
     /* allocate enough space for n-gram appended to the struct */
-    entry = (cl_ngram_hash_entry) cl_malloc(sizeof(struct _cl_ngram_hash_entry) + (N - 1) * sizeof(int));
+    entry = (cl_ngram_hash_entry) cl_malloc(sizeof(struct _cl_ngram_hash_entry) + (N + hash->payload_size - 1) * sizeof(int));
     memcpy(entry->ngram, ngram, N * sizeof(int)); /* embed copy of n-gram in struct */
+    if (hash->payload_size > 0) {
+      int k;
+      for (k = 0; k < hash->payload_size; k++)
+        entry->ngram[N + k] = -1;
+    }
     entry->freq = f;
     entry->next = NULL;
 
     /* insert entry into its bucket in the hash table */
     insert_point = hash->table[offset];
-    if (insert_point == NULL) {
-      hash->table[offset] = entry;      /* only entry in this bucket so far */
-    }
+    if (insert_point == NULL)
+      /* only entry in this bucket so far */
+      hash->table[offset] = entry;
     else {
       /* always insert a new entry as the last entry in its bucket (because of Zipf's Law:
        * frequent lexemes tend to occur early in the corpus and should be first in their buckets for faster access) */
@@ -448,7 +442,7 @@ cl_ngram_hash_add(cl_ngram_hash hash, int *ngram, unsigned int f)
       insert_point->next = entry;
     }
     hash->entries++;
-    
+
     /* check whether hash needs to auto-grow */
     if (hash->auto_grow && hash->entries > (hash->fillrate_limit * hash->buckets))
       cl_ngram_hash_check_grow(hash);
@@ -457,20 +451,49 @@ cl_ngram_hash_add(cl_ngram_hash hash, int *ngram, unsigned int f)
 }
 
 /**
+ * Returns pointer to user payload of entry in n-gram hash.
+ *
+ * The pointer can be used to read or set the payload of the entry.
+ * The hash argument is needed to determine the correct offset of the payload in the entry;
+ * no attempt is made to verify that the entry actually belongs to this hash.
+ *
+ * If the hash has no payload, a NULL pointer is returned.
+ *
+ * @param hash          A cl_ngram_hash table.
+ * @param entry         An entry from this hash table.
+ * @param payload_size  If not NULL, the size of the payload (= number of ints)
+ *                      is written to *payload_size.
+ * @return              Pointer to the first int of the payload.
+ */
+int *
+cl_ngram_hash_payload(cl_ngram_hash hash, cl_ngram_hash_entry entry, int *payload_size)
+{
+  int psize = hash->payload_size;
+  int N = hash->N;
+
+  if (payload_size)
+    *payload_size = psize;
+  if (psize > 0)
+    return entry->ngram + N;
+  else
+    return NULL;
+}
+
+
+
+/**
  * Gets the frequency of a particular n-gram within a cl_ngram_hash.
  *
  * @param hash   The hash to look in.
  * @param ngram  The ngram to look for.
  * @return       The frequency of that n-gram, or 0 if it is not in the hash
  */
-int 
+int
 cl_ngram_hash_freq(cl_ngram_hash hash, int *ngram)
 {
-  cl_ngram_hash_entry entry;
-
-  entry = cl_ngram_hash_find_i(hash, ngram, NULL);
-  return (entry != NULL) ? entry->freq : 0;
-} 
+  cl_ngram_hash_entry entry = cl_ngram_hash_find_i(hash, ngram, NULL);
+  return entry ? entry->freq : 0;
+}
 
 
 /**
@@ -484,21 +507,19 @@ cl_ngram_hash_freq(cl_ngram_hash hash, int *ngram)
  * @param ngram  The n-gram to remove.
  * @return       The frequency of the deleted entry (0 if not found).
  */
-int 
+int
 cl_ngram_hash_del(cl_ngram_hash hash, int *ngram)
 {
   cl_ngram_hash_entry entry, previous;
   unsigned int offset, f;
 
   entry = cl_ngram_hash_find_i(hash, ngram, &offset);
-  if (entry == NULL) {
-    return 0;                   /* not in n-gram hash */
-  }
+  if (entry == NULL)
+    return 0;    /* not in n-gram hash */
   else {
     f = entry->freq;
-    if (hash->table[offset] == entry) {
+    if (hash->table[offset] == entry)
       hash->table[offset] = entry->next;
-    }
     else {
       previous = hash->table[offset];
       while (previous->next != entry)
@@ -521,10 +542,10 @@ cl_ngram_hash_del(cl_ngram_hash hash, int *ngram)
  *
  * @param hash  The hash to size up.
  */
-int 
+int
 cl_ngram_hash_size(cl_ngram_hash hash)
 {
-  return (hash != NULL) ? hash->entries : 0;
+  return hash ? hash->entries : 0;
 }
 
 
@@ -536,7 +557,7 @@ cl_ngram_hash_size(cl_ngram_hash hash)
  *
  * @param hash      The n-gram hash to operate on.
  * @param ret_size  If not NULL, the number of entries in the returned
- *                  array will be stored in this location. 
+ *                  array will be stored in this location.
  */
 cl_ngram_hash_entry *
 cl_ngram_hash_get_entries(cl_ngram_hash hash, int *ret_size)
@@ -544,15 +565,15 @@ cl_ngram_hash_get_entries(cl_ngram_hash hash, int *ret_size)
   cl_ngram_hash_entry *result, entry;
   int size, point;
   unsigned int offset;
-  
-  assert((hash != NULL && hash->table != NULL && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised");
+
+  assert( (hash && hash->table && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised" );
 
   /* allocate memory for enumeration of entries */
   size = hash->entries;
   result = cl_malloc(size * sizeof(cl_ngram_hash_entry));
-  if (ret_size != NULL)
+  if (ret_size)
     *ret_size = size;
-  
+
   /* traverse hash and insert all entries into the array */
   point = 0;
   for (offset = 0; offset < hash->buckets; offset++) {
@@ -564,7 +585,7 @@ cl_ngram_hash_get_entries(cl_ngram_hash hash, int *ret_size)
     }
   }
   assert((point == size) && "ngram-hash.c: major internal inconsistency");
-  
+
   return result;
 }
 
@@ -584,7 +605,7 @@ cl_ngram_hash_get_entries(cl_ngram_hash hash, int *ret_size)
 void
 cl_ngram_hash_iterator_reset(cl_ngram_hash hash)
 {
-  assert((hash != NULL && hash->table != NULL && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised");
+  assert( (hash && hash->table && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised" );
   hash->iter_bucket = -1;
   hash->iter_point = NULL;
 }
@@ -596,7 +617,7 @@ cl_ngram_hash_iterator_reset(cl_ngram_hash hash)
  * so different parts of the application code must not try to iterate through
  * the hash at the same time.
  *
- * This function returns the next entry from the hash, or NULL if there are 
+ * This function returns the next entry from the hash, or NULL if there are
  * no more entries.  Keep in mind that the hash is traversed in an unspecified order.
  *
  * @param hash      The n-gram hash to iterate over.
@@ -605,11 +626,11 @@ cl_ngram_hash_entry
 cl_ngram_hash_iterator_next(cl_ngram_hash hash)
 {
   cl_ngram_hash_entry point;
-  
+
   point = hash->iter_point;
   while (point == NULL) {
     hash->iter_bucket++;
-    if (hash->iter_bucket >= hash->buckets) 
+    if (hash->iter_bucket >= hash->buckets)
       return NULL; /* we've reached the end of the hash */
     point = hash->table[hash->iter_bucket];
   }
@@ -634,7 +655,7 @@ cl_ngram_hash_stats(cl_ngram_hash hash, int max_n)
   int *stats;
   int i, n;
   cl_ngram_hash_entry point;
-  
+
   assert(max_n > 0);
   assert((hash != NULL && hash->table != NULL && hash->buckets > 0) && "cl_ngram_hash object was not properly initialised");
   stats = cl_calloc(max_n + 1, sizeof(int));
@@ -670,10 +691,9 @@ cl_ngram_hash_print_stats(cl_ngram_hash hash, int max_n)
   int *stats = cl_ngram_hash_stats(hash, max_n);  /* also performs sanity checks */
   double rate, p;
   int i;
-  
+
   rate = ((double) hash->entries) / hash->buckets;
-  Rprintf("N-gram hash fill rate: %5.2f (%d entries in %d buckets)\n",
-          rate, hash->entries, hash->buckets);
+  Rprintf("N-gram hash fill rate: %5.2f (%d entries in %d buckets)\n", rate, hash->entries, hash->buckets);
   Rprintf("# entries: ");
   for (i = 0; i <= max_n; i++)
     Rprintf("%8d", i);

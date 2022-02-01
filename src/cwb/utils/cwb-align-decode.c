@@ -15,9 +15,13 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#include "../cl/globals.h"
 #include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
 
 /** Name of the program (from the shell) */
 char *progname;
@@ -38,7 +42,7 @@ aligndecode_usage(void)
           "Output format:\n"
           "HEADER   <source_corpus> TAB s TAB <target_corpus> TAB s\n"
           "LINES    <source_start> TAB <source_end> TAB <target_start> TAB <target_end>\n\n"
-          "Part of the IMS Open Corpus Workbench v" VERSION "\n\n"
+          "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n"
           , progname);
   exit(1);
 }
@@ -73,17 +77,18 @@ main(int argc, char **argv)
   extern char *optarg;
   int c;
 
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
+  cl_startup();
   progname = argv[0];
 
-  /* parse arguments */
+  /* ------------------------------------------------- PARSE ARGUMENTS */
+
   while ((c = getopt(argc, argv, "+r:h")) != EOF) {
     switch (c) {
 
     /* r: registry directory */
     case 'r':
-      if (registry_directory == NULL) registry_directory = optarg;
+      if (registry_directory == NULL)
+          registry_directory = optarg;
       else {
         fprintf(stderr, "%s: -r option used twice\n", progname);
         exit(2);
@@ -105,12 +110,11 @@ main(int argc, char **argv)
   /* first argument: corpus id */
   corpus_id = argv[optind++];
   cl_id_toupper(corpus_id);
-  if ((corpus = cl_new_corpus(registry_directory, corpus_id)) == NULL) {
+  if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
     fprintf(stderr, "%s: Corpus <%s> not registered in %s\n",
               progname,
               corpus_id,
-              (registry_directory ? registry_directory
-               : central_corpus_directory()));
+              registry_directory ? registry_directory : cl_standard_registry());
     exit(1);
   }
 
@@ -121,10 +125,8 @@ main(int argc, char **argv)
   /* third argument: attribute name */
   attr_name = argv[optind];
   cl_id_tolower(attr_name);
-  if ((att = cl_new_attribute(corpus, attr_name, ATT_ALIGN)) == NULL) {
-    fprintf(stderr, "%s: Can't access a-attribute <%s.%s>\n",
-              progname,
-              corpus_id, attr_name);
+  if (!(att = cl_new_attribute(corpus, attr_name, ATT_ALIGN))) {
+    fprintf(stderr, "%s: Can't access a-attribute <%s.%s>\n", progname, corpus_id, attr_name);
     exit(1);
   }
 

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -20,7 +20,7 @@
  *
  * This file contains the API for the CWB "Corpus Library" (CL).
  *
- * If you are programming against the CL, you should #include ONLY this header file,
+ * If you are programming against the CL, you should include ONLY this header file,
  * and make use of ONLY the functions declared here.
  *
  * Other functions in the CL should ONLY be used within the CWB itself by CWB developers.
@@ -119,6 +119,8 @@
 
 
 
+char* cl_get_version();
+
 /* The actual code of the header file begins here. */
 
 #ifndef _cwb_cl_h
@@ -170,6 +172,9 @@
 /* a global variable which will always be set to one of the above constants! */
 extern int cl_errno;
 
+/** A macro which collapses cl_errno's values to a bool: is everything OK or not? true/false respectively.  */
+#define cl_all_ok() (cl_errno == CDA_OK)
+
 /* error handling functions */
 void cl_error(char *message);
 char *cl_error_string(int error_num);
@@ -193,8 +198,9 @@ void *cl_malloc(size_t bytes);
 void *cl_calloc(size_t nr_of_elements, size_t element_size);
 void *cl_realloc(void *block, size_t bytes);
 char *cl_strdup(const char *string);
+char *cl_strdup_to(char *str, char *end);
 /**
- * Safely frees memory.
+ * Safely frees memory. Has no effect if called on a  NULL pointer.
  *
  * @see cl_malloc
  * @param p  Pointer to memory to be freed.
@@ -254,7 +260,9 @@ void cl_randomize(void);
 void cl_get_rng_state(unsigned int *i1, unsigned int *i2);
 void cl_set_rng_state(unsigned int i1, unsigned int i2);
 unsigned int cl_random(void);
-double cl_runif(void);
+double cl_random_fraction(void);
+/** old name for cl_random_fraction() */
+#define cl_runif() cl_random_fraction()
 
 
 
@@ -266,12 +274,14 @@ double cl_runif(void);
  */
 
 /*
- *  Functions for setting global CL configuration options
+ *  Functions for setting/getting global CL configuration options
  */
 void cl_set_debug_level(int level);       /* 0 = none (default), 1 = some, 2 = all */
+int cl_get_debug_level(void);
 void cl_set_optimize(int state);          /* 0 = off, 1 = on */
+int cl_get_optimize(void);
 void cl_set_memory_limit(int megabytes);  /* 0 or less turns limit off */
-
+int cl_get_memory_limit(void);
 
 
 
@@ -293,7 +303,8 @@ void cl_set_memory_limit(int megabytes);  /* 0 or less turns limit off */
  * cwb-encode will abort once this limit has been reaching, discarding any
  * further input data. The precise value of the limit is 2^32 - 1 tokens,
  * i.e. hex 0x7FFFFFFF and decimal 2147483647.
- * Note that the largest valid cpos 2^32 - 1 would allow a theoretical corpus
+ *
+ * Note that the largest valid cpos (2^32 - 1) would allow a theoretical corpus
  * size of 2^32 tokens. But in some places, the corpus size itself is stored
  * in a signed 32-bit integer variable, hence the lower limit.
  */
@@ -333,6 +344,31 @@ void cl_set_memory_limit(int megabytes);  /* 0 or less turns limit off */
  *  misc CL utility objects/functions
  */
 
+/* all programs that use the CL should call this on startup (sets the locale and other boring stuff) */
+void cl_startup(void);
+
+
+/* Make sure that the MIN and MAX macros exist (defined as in Glib and commonly) */
+
+#ifndef MIN
+/** Evaluates to the smaller of two numeric arguments. */
+#define MIN(a,b) ((a)<(b) ? (a) : (b))
+#endif
+
+#ifndef MAX
+/** Evaluates to the larger of two numberic arguments.*/
+#define MAX(a,b) ((a)>(b) ? (a) : (b))
+#endif
+
+
+/* hash-table utility functions */
+int cl_is_prime(int n);
+int cl_find_prime(int n);
+unsigned int cl_hash_string(const char *str);
+unsigned int cl_hash_string_with_init(const char *str, unsigned int result_init);
+
+
+
 /**
  * Underlying structure for the ClAutoString object.
  *
@@ -351,7 +387,9 @@ struct ClAutoString {
 /**
  * A single-string object whose memory allocation grows automatically.
  */
+#ifndef __cplusplus 
 typedef struct ClAutoString *ClAutoString;
+#endif
 /* the ClAutoString object API */
 ClAutoString cl_autostring_new(const char *data, size_t init_bytes);
 void cl_autostring_delete(ClAutoString string);
@@ -365,7 +403,7 @@ void cl_autostring_truncate(ClAutoString string, int new_length);
 void cl_autostring_dump(ClAutoString string);
 
 
-/**
+/*
  * I/O streams with magic for compressed files (.gz, .bz2) and pipes
  *
  * These functions can be used to open input and output FILE* streams to compressed files, pipes, and stdin/stdout.
@@ -376,6 +414,7 @@ void cl_autostring_dump(ClAutoString string);
  *   - if filename ends in ".gz" or ".bz2", it is read/written as a compressed file (through a pipe to external gzip and bzip2 utilities)
  *   - otherwise it is read/written as a plain uncompressed file
  *   - if filename starts with "~/" or "$HOME/", the prefix is expanded to the current user's home directory
+ *
  * Unless automagic type guessing is explicitly enabled, filenames will always be used literally without any normalization.
  * Read or write mode is controlled by a separate flag and cannot be set automatically (unlike Perl's "redirect"-style notation).
  *
@@ -388,79 +427,144 @@ void cl_autostring_dump(ClAutoString string);
  * even if they did not explicitly open a pipe stream.
  */
 
-/** Mode and type flags for I/O streams (NB: these are mutually exclusive and must not be combined with "|") */
+/* Mode and type flags for I/O streams (NB: these are mutually exclusive and must not be combined with "|") */
 
 /** open in read mode */
-#define CL_STREAM_READ 0
+#define CL_STREAM_READ       0
+/** open in binary read mode (on *nix, a synonym for the normal read) */
+#ifndef __MINGW__
+#define CL_STREAM_READ_BIN   0
+#endif
+
 /** open in write mode */
-#define CL_STREAM_WRITE 1
+#define CL_STREAM_WRITE      1
+/** open in binary write mode (on *nix, a synonym for the normal write) */
+#ifndef __MINGW__
+#define CL_STREAM_WRITE_BIN  1
+#endif
+
 /** open in append mode (except for pipe) */
-#define CL_STREAM_APPEND 2
+#define CL_STREAM_APPEND     2
+/** open in binary append mode (on *nix, a synonym for the normal append) */
+#ifndef __MINGW__
+#define CL_STREAM_APPEND_BIN 2
+#endif
+
+#ifdef __MINGW__
+/* only on Windows are the binary flags any different ... */
+#define CL_STREAM_READ_BIN   4
+#define CL_STREAM_WRITE_BIN  5
+#define CL_STREAM_APPEND_BIN 6
+/* the binary flag is the third lowest bit, so (XX & 4) == XX_BIN */
+#endif
+
+
 /** enable automagic recognition of stream type */
-#define CL_STREAM_MAGIC 0
+#define CL_STREAM_MAGIC        0
 /** enable automagic, but fail on attempt to open pipe (safe mode for filenames from external sources) */
 #define CL_STREAM_MAGIC_NOPIPE 1
 /** read/write plain uncompressed file */
-#define CL_STREAM_FILE 2
+#define CL_STREAM_FILE         2
 /** read/write gzip-compressed file */
-#define CL_STREAM_GZIP 3
+#define CL_STREAM_GZIP         3
 /** read/write bzip2-compressed file */
-#define CL_STREAM_BZIP2 4
+#define CL_STREAM_BZIP2        4
 /** read/write pipe to shell command */
-#define CL_STREAM_PIPE 5
-/** read from stdin or write to stdout (<filename> is ignored) */
-#define CL_STREAM_STDIO 6
+#define CL_STREAM_PIPE         5
+/** read from stdin or write to stdout ([filename] parameter is ignored in this case) */
+#define CL_STREAM_STDIO        6
 
 
-/** This variable will be set to True if a SIGPIPE has been caught and ignored.
- *
+/**
+ * This variable will be set to True if a SIGPIPE has been caught and ignored.
  * It is reset to False whenever a stream is opened or closed, so it is safe to check while writing to a plain file stream.
  * If multiple pipes are active, there is no way to indicate which one caused the SIGPIPE.
  */
 extern int cl_broken_pipe;
 
-/**
- * Open stream of specified (or guessed) type for reading or writing
- *
- * I/O streams opened with this function must always be closed with cl_close_stream()!
- *
- * @param filename  Filename or shell command
- * @param mode      Open for reading (CL_STREAM_READ) or writing (CL_STREAM_WRITE)
- * @param type      Type of stream (see above), or guess automagically from <filename> (CL_STREAM_MAGIC)
- *
- * @return          Standard C stream, or NULL on error (with details from <cl_errno> or cl_error())
- */
+/* Open an I/O stream wiht the assorted auto-magic described above; return must be closed with cl_close_stream()! */
 FILE *cl_open_stream(const char *filename, int mode, int type);
 
-/**
- * Close I/O stream
- *
- * This function can only be used for FILE* objects opened with cl_open_stream()!
- *
- * @param stream    An I/O stream that has been opened with cl_open_stream()
- *
- * @return          0 on success, otherwise the error code returned by fclose() or pclose(); <cl_errno> is set accordingly
- */
-int cl_close_stream(FILE *stream);
+/* Close an I/O stream originally opened with cl_open_stream(); returns 0 on success or an fclose/pclose error code.  */
+int cl_close_stream(FILE *handle);
 
+/* Determine whether an I/O stream (FILE* handle) was opened with cl_open_stream -- returns true if so. */
+int cl_test_stream(FILE *handle);
 
 /* CL-specific version of strcpy. Don't use unless you know what you're doing. */
 char *cl_strcpy(char *buf, const char *src);
 
-int cl_strcmp(char *s1, char *s2);
+int cl_strcmp(const char *s1, const char *s2);
+
+
+
+/**
+ * Tests two strings for equality.
+ *
+ * This macro evaluates to 1 if the strings are equal, 0 otherwise.
+ * Be careful: strings are considered equal if they are both NULL,
+ * they are considered non-equal when one of the two is NULL.
+ * The macro can only be used with two allocated strings, not to
+ * compare a char[] with a string literal. Use cl_str_is in that case.
+ *
+ * The underlying function used is cl_strcmp (which does signed
+ * char comparison).
+ *
+ * @see       cl_strcmp
+ * @param  a  the first string
+ * @param  b  the second string
+ * @return    Boolean
+ */
+#define cl_streq(a,b) (((a) == (b)) || ((a) && (b) && (0 == cl_strcmp((a), (b)))))
+
+/**
+ * Compares a char * string with a string literal.
+ *
+ * This macro evaluates to 1 if the string is equal to the literal, 0 otherwise.
+ * If the string is NULL, it is never equal to the literal.
+ *
+ * The underlying function used is cl_strcmp (which does signed char comparison).
+ *
+ * @see       cl_strcmp
+ * @param  a  the string to be compared
+ * @param  b  a string literal
+ * @return    Boolean
+ */
+#define cl_str_is(a,b) (NULL != (a) && (0 == cl_strcmp((a), (b))))
+/* NB. The use of cl_str_is() may raise a compiler warning that (a) is always true if
+   a is an array variable (since array addresses, unlike pointer variables, aren't ever
+   NULL. This is not a problem. */
+
+/**
+ * Tests two strings for equality, case-insensitive (non-charset-aware)
+ *
+ * This macro evaluates to 1 if the strings are equal, 0 otherwise.
+ * Be careful: strings are considered NOT equal if both are NULL.
+ * This function is mostly used to compare a string with a string literal
+ * in a case-insensitive manner.
+ *
+ * The underlying function used is strcasecmp.
+ *
+ * @param  a  the first string
+ * @param  b  the second string or a string literal
+ * @return    Boolean
+ */
+#define cl_streq_ci(a,b) (NULL != (a) && NULL != (b) && (0 == strcasecmp((a), (b))))
+
 
 char *cl_string_latex2iso(char *str, char *result, int target_len);
 /* <result> points to buffer of appropriate size; auto-allocated if NULL;
    str == result is explicitly allowed; conveniently returns <result> */
 extern int cl_allow_latex2iso; /* cl_string_latex2iso will only change a string if this is true, it is false by default*/
 
-char *cl_xml_entity_decode(char *s); /* removes the four default XML entities from the string, in situ */
+char *cl_xml_entity_decode(char *s); /* removes the 5 default XML entities from the string, in situ */
+
 /**
  * For a given character, say whether it is legal for an XML name.
  *
- * TODO: Currently, anything in the upper half of the 8-bit range is
- * allowed (in the old Latin1 days this was anything from 0xa0 to
- * 0xff). This will work with any non-ascii character set, but
+ * Anything in the upper half of the 8-bit range is allowed
+ * (in the old Latin1 days this was anything from 0xa0 to 0xff).
+ * This will work with any non-ascii character set, but
  * is almost certainly too lax.
  *
  * @param c  Character to check. (It is expected to be a char,
@@ -478,13 +582,10 @@ char *cl_xml_entity_decode(char *s); /* removes the four default XML entities fr
                                  )
 
 /* functions that do things with paths */
-void cl_path_adjust_os(char *path);  /* normalises a path to Windowslike or Unixlike, depending on the build;
-                                        string changed in place. */
+void cl_path_adjust_os(char *path);  /* normalises a path to Windowslike or Unixlike, depending on the build; string changed in place. */
 void cl_path_adjust_independent(char *path); /* makes a path Unixlike, regardless of the OS; string changed in place. */
-
 char *cl_path_registry_quote(char *path); /* adds registry-format quotes and slashes to a path where necessary;
                                              a newly-allocated string is returned. */
-
 char *cl_path_get_component(char *s); /* tokeniser for string containing many paths separated by : or ; */
 
 /* validate and manipulate strings that are (sub)corpus identifiers */
@@ -537,8 +638,6 @@ cl_string_list cl_corpus_list_attributes(Corpus *corpus, int attribute_type);
  *
  */
 
-/* TODO ... wouldn't it be nice if the Attribute methods returned int/string list objects instead of
- * char ** and int *?  But that would involve re-engineering EVERYTHING.  */
 /**
  * The Attribute object: an entire segment of a corpus, such as an
  * annotation field, an XML structure, or a set
@@ -553,7 +652,7 @@ cl_string_list cl_corpus_list_attributes(Corpus *corpus, int attribute_type);
  */
 typedef union _Attribute Attribute;
 
-/* constants indicating attribute types */
+/* constants indicating attribute types; each is a single bit so they can be binary OR'd together */
 
 /** No type of attribute */
 #define ATT_NONE       0
@@ -587,24 +686,20 @@ typedef union _Attribute Attribute;
  * of the Corpus object; this function simply locates it and returns a pointer
  * to it.
  *
- * This "function" is implemented as a macro wrapped round the depracated function,
- * making the means of calling it more in line with the rest of the CL.
+ * This is reproduction of the old type of call, using a macro to the new type.
  *
- * @see                   cl_new_attribute_oldstyle
+ * @see                   cl_new_attribute
  *
  * @param corpus          The corpus in which to search for the attribute.
- * @param attribute_name  The name of the attribute (i.e. the handle it has in the registry file).
+ * @param name            The name of the attribute (i.e. the handle it has in the registry file).
  * @param type            Type of attribute to be searched for.
+ * @param data            *** UNUSED ***.
  *
  * @return                Pointer to Attribute object, or NULL if not found.
  */
-#define cl_new_attribute(c, name, type) cl_new_attribute_oldstyle(c, name, type, NULL)
+#define cl_new_attribute_oldstyle(corpus, name, type, data) cl_new_attribute(corpus, name, type)
 
-/* depracated */
-Attribute *cl_new_attribute_oldstyle(Corpus *corpus,
-                                     char *attribute_name,
-                                     int type,
-                                     char *data);        /* *** UNUSED *** */
+Attribute *cl_new_attribute(Corpus *corpus, const char *attribute_name, int type);
 int cl_delete_attribute(Attribute *attribute);
 int cl_sequence_compressed(Attribute *attribute);
 int cl_index_compressed(Attribute *attribute);
@@ -631,8 +726,9 @@ int cl_id2freq(Attribute *attribute, int id);
  * @see         cl_id2cpos_oldstyle
  * @param a     The P-attribute to look on.
  * @param id    The id of the item to look for.
- * @param freq  The frequency of the specified item is written here. This will be 0 in the
- *              case of errors.
+ * @param freq  The frequency of the specified item is written here.
+ *              This will be 0 in the case of errors.
+ * @return      Integer pointer (to the list of corpus positions); NULL in case of error.
  */
 #define cl_id2cpos(a, id, freq) cl_id2cpos_oldstyle(a, id, freq, NULL, 0)
 
@@ -654,9 +750,7 @@ int *cl_regex2id(Attribute *attribute,
                  int flags,
                  int *number_of_matches);
 
-int cl_idlist2freq(Attribute *attribute,
-                   int *ids,
-                   int number_of_ids);
+int cl_idlist2freq(Attribute *attribute, int *ids, int number_of_ids);
 
 /**
  * Gets a list of corpus positions matching a list of ids.
@@ -666,6 +760,7 @@ int cl_idlist2freq(Attribute *attribute,
  * @param idlist_size  The length of this list.
  * @param sort         boolean: return sorted list?
  * @param size         The size of the allocated table will be placed here.
+ * @return             Pointer to the list of corpus positions. NULL in case of error.
  */
 #define cl_idlist2cpos(a, idlist, idlist_size, sort, size) cl_idlist2cpos_oldstyle(a, idlist, idlist_size, sort, size, NULL, 0)
 
@@ -736,8 +831,11 @@ int cl_cpos2alg2cpos_oldstyle(Attribute *attribute,
 
 /**
  *  maximum size of 'dynamic' strings
+ *
+ *  NOTE that this must at least be long enough to contain all valid annotation strings in a CWB corpus.
+ *  CWB tools should refuse to encode any values above CL_MAX_LINE_LENGTH.
  */
-#define CL_DYN_STRING_SIZE 2048
+#define CL_DYN_STRING_SIZE CL_MAX_LINE_LENGTH
 
 /**
  *  The DynCallResult object (needed to allocate space for dynamic function arguments)
@@ -759,7 +857,6 @@ typedef struct _DCR {
    * @see CL_DYN_STRING_SIZE
    */
   char dynamic_string_buffer[CL_DYN_STRING_SIZE];
-  /* TODO - use a ClAutoString instead? */
 } DynCallResult;
 
 /* result and argument types of CQP functions (historically: dynamic attributes); ATTAT = attribute argument type */
@@ -776,10 +873,7 @@ typedef struct _DCR {
  * ...: parameters (of *int or *char) and structure
  * which gets the result (*int or *char)
  */
-int cl_dynamic_call(Attribute *attribute,
-                    DynCallResult *dcr,
-                    DynCallResult *args,
-                    int nr_args);
+int cl_dynamic_call(Attribute *attribute, DynCallResult *dcr, DynCallResult *args, int nr_args);
 int cl_dynamic_numargs(Attribute *attribute);
 
 
@@ -787,21 +881,20 @@ int cl_dynamic_numargs(Attribute *attribute);
 
 /*
  *
- * SECTION 2.3 -- THE PositionStream OBJECT
+ * SECTION 2.3 -- THE ClPositionStream OBJECT
  *
  */
 
 /**
- * The PositionStream object: gives stream-like reading of an Attribute.
+ * The ClPositionStream object: gives stream-like reading of an Attribute.
  */
-typedef struct _position_stream_rec_ *PositionStream;
+#define PositionStream ClPositionStream  /* old name, depracated */
+typedef struct _position_stream_rec_ *ClPositionStream;
 
 /* Functions for attribute access using a position stream */
-PositionStream cl_new_stream(Attribute *attribute, int id);
-int cl_delete_stream(PositionStream *ps);
-int cl_read_stream(PositionStream ps,
-                   int *buffer,
-                   int buffer_size);
+ClPositionStream cl_new_stream(Attribute *attribute, int id);
+int cl_delete_stream(ClPositionStream *ps);
+int cl_read_stream(ClPositionStream ps, int *buffer, int buffer_size);
 
 
 
@@ -878,9 +971,9 @@ typedef enum ECorpusCharset {
 
 /* ... and related functions */
 CorpusCharset cl_corpus_charset(Corpus *corpus);
-char *cl_charset_name(CorpusCharset id);
-CorpusCharset cl_charset_from_name(char *name);
-char *cl_charset_name_canonical(char *name_to_check);
+const char *cl_charset_name(CorpusCharset id);
+CorpusCharset cl_charset_from_name(const char *name);
+const char *cl_charset_name_canonical(char *name_to_check);
 size_t cl_charset_strlen(CorpusCharset charset, char *s);
 
 /* the main functions for which CorpusCharset "matters" are the following... */
@@ -905,11 +998,7 @@ int cl_string_validate_encoding(char *s, CorpusCharset charset, int repair);
 char *cl_string_reverse(const char *s, CorpusCharset charset); /* creates a new string */
 
 /* string comparison suitable as qsort() callback */
-int cl_string_qsort_compare(const char *s1,
-                            const char *s2,
-                            CorpusCharset charset,
-                            int flags,
-                            int reverse);
+int cl_string_qsort_compare(const char *s1, const char *s2, CorpusCharset charset, int flags, int reverse);
 
 /* remove any trailing LF (\n) and CR (\r) characters from string (modified in-place, similar to Perl's chomp operator); */
 /* the main purpose of this function is to help CWB read text files in Windows (CR-LF) format correctly; */
@@ -955,7 +1044,7 @@ void cl_string_chomp(char *s);
  *
  * @see cl_regex2id
  */
-typedef struct _CL_Regex *CL_Regex;
+typedef struct _cl_regex *CL_Regex;
 
 /** Flag: ignore-case in regular expression engine; fold case in cl_string_canonical. */
 #define IGNORE_CASE  1
@@ -1011,11 +1100,11 @@ int cl_regopt_count_get(void);
  *  These lexicon hashes are used, notably, in the encoding of corpora
  *  to CWB-index-format.
  *
- *  WARNING: cl_lexhash objects are intended for data sets ranging from 
+ *  WARNING: cl_lexhash objects are intended for data sets ranging from
  *  a few dozen entries to several million entries. Do not try to store
  *  more than a billion (distinct) strings in a lexicon hash, otherwise
  *  bad (and unpredictable) things will happen. You have been warned!
- * 
+ *
  */
 typedef struct _cl_lexhash *cl_lexhash;
 /**
@@ -1099,13 +1188,18 @@ cl_lexhash_entry cl_lexhash_iterator_next(cl_lexhash hash);
  *
  *  The implementation of the cl_ngram_hash class is similar to
  *  cl_lexhash.  However, at the current time there is no mapping to
- *  unique n-gram IDs and no support for user data (a "payload").
+ *  unique n-gram IDs and no user data field (the "data" union in cl_lexhash).
  *  The sole purpose of the implementation is to enable fast and
  *  memory-efficient frequency counts for very large sets of n-grams.
+ *  Entries can include an optional "payload" of one or more ints of
+ *  user data. The payload size must be set when creating the n-gram hash.
+ *  Note that there is no separate payload field in the cl_ngram_hash_entry
+ *  struct, so safe access to the payload is only possible via a special
+ *  function.
  *
  *  WARNING: cl_ngram_hash objects cannot store more than 2^32 - 1
  *  entries. Bad things will happen if you try to do so!
- * 
+ *
  */
 typedef struct _cl_ngram_hash *cl_ngram_hash;
 
@@ -1116,6 +1210,8 @@ typedef struct _cl_ngram_hash *cl_ngram_hash;
  *
  * Access the frequency count with entry->freq, and the type IDs
  * of the tuple members with entry->ngram[0], entry->ngram[1], ...
+ * A payload of ints may be appended to the ngram[] array. It should
+ * only be accessed via the function cl_ngram_hash_payload().
  *
  * Entries MUST NOT be allocated, copied or modified directly by
  * an application!
@@ -1123,22 +1219,23 @@ typedef struct _cl_ngram_hash *cl_ngram_hash;
 typedef struct _cl_ngram_hash_entry {
   struct _cl_ngram_hash_entry *next; /**< next entry on the linked-list (i.e. in the bucket) */
   unsigned int freq;                 /**< frequency of this type */
-  int ngram[1];                      /**< ngram data embedded in struct */
+  int ngram[1];                      /**< ngram data (and optional payload) embedded in struct */
 } *cl_ngram_hash_entry;
 
 /*
  * ... and its API ...
  */
-cl_ngram_hash cl_new_ngram_hash(int N, int buckets);
+cl_ngram_hash cl_new_ngram_hash(int N, int buckets, int payload_size);
 void cl_delete_ngram_hash(cl_ngram_hash hash);
 void cl_ngram_hash_auto_grow(cl_ngram_hash hash, int flag);
 void cl_ngram_hash_auto_grow_fillrate(cl_ngram_hash hash, double limit, double target);
 cl_ngram_hash_entry cl_ngram_hash_add(cl_ngram_hash hash, int *ngram, unsigned int f);
 cl_ngram_hash_entry cl_ngram_hash_find(cl_ngram_hash hash, int *ngram);
+int *cl_ngram_hash_payload(cl_ngram_hash hash, cl_ngram_hash_entry entry, int *payload_size);
 int cl_ngram_hash_del(cl_ngram_hash hash, int *ngram);
 int cl_ngram_hash_freq(cl_ngram_hash hash, int *ngram);
 int cl_ngram_hash_size(cl_ngram_hash hash);
-/** 
+/**
  * Returns allocated vector of pointers to all entries of the n-gram hash.
  * Must be freed by the application and can be modified, e.g. for sorting.
  * Use cl_ngram_hash_size() to find out how many entries there are.
@@ -1170,52 +1267,53 @@ void cl_ngram_hash_print_stats(cl_ngram_hash hash, int max_n);
  * the core corpus-data-access functionality in the Corpus and Attribute
  * classes.
  *
- * The macros are given here in order of old name.
+ * The macros are given here in order of old name. The ones marked "unused"
+ * are no longer in use in the CWB core itself. (That's all of them now.)
  *
  * As noted in the file intro, all these old function names are DEPRACATED
  * and will be removed completely in CWB v 3.9 and above.
  */
-#define ClosePositionStream(ps) cl_delete_stream(ps)
-#define OpenPositionStream(a, id) cl_new_stream(a, id)
-#define ReadPositionStream(ps, buf, size) cl_read_stream(ps, buf, size)
-#define attr_drop_attribute(a) cl_delete_attribute(a)
-#define call_dynamic_attribute(a, dcr, args, nr_args) cl_dynamic_call(a, dcr, args, nr_args)
-#define cderrno cl_errno
-#define cdperror(message) cl_error(message)
-#define cdperror_string(no) cl_error_string(no)
-#define central_corpus_directory() cl_standard_registry()
-#define collect_matches(a, idlist, idlist_size, sort, size, rl, rls) cl_idlist2cpos_oldstyle(a, idlist, idlist_size, sort, size, rl, rls)
-#define collect_matching_ids(a, re, flags, size) cl_regex2id(a, re, flags, size)
-#define cumulative_id_frequency(a, list, size) cl_idlist2freq(a, list, size)
-#define drop_corpus(c) cl_delete_corpus(c)
-#define find_attribute(c, name, type, data) cl_new_attribute_oldstyle(c, name, type, data)
-#define get_alg_attribute(a, p, start1, end1, start2, end2) cl_cpos2alg2cpos_oldstyle(a, p, start1, end1, start2, end2)
-#define get_attribute_size(a) cl_max_cpos(a)
-#define get_bounds_of_nth_struc(a, struc, start, end) cl_struc2cpos(a, struc, start, end)
-#define get_id_at_position(a, cpos) cl_cpos2id(a, cpos)
-#define get_id_of_string(a, str) cl_str2id(a, str)
-#define get_id_frequency(a, id) cl_id2freq(a, id)
-#define get_id_from_sortidx(a, sid) cl_sort2id(a, sid)
-#define get_id_info(a, sid, freq, len) cl_id2all(a, sid, freq, len)
-#define get_id_range(a) cl_max_id(a)
-#define get_id_string_len(a, id) cl_id2strlen(a, id)
-#define get_nr_of_strucs(a, nr) cl_max_struc_oldstyle(a, nr)
-#define get_num_of_struc(a, p, num) cl_cpos2struc_oldstyle(a, p, num)
-#define get_positions(a, id, freq, rl, rls) cl_id2cpos_oldstyle(a, id, freq, rl, rls)
-#define get_sortidxpos_of_id(a, id) cl_id2sort(a, id)
-#define get_string_at_position(a, cpos) cl_cpos2str(a, cpos)
-#define get_string_of_id(a, id) cl_id2str(a, id)
-#define get_struc_attribute(a, cpos, start, end) cl_cpos2struc2cpos(a, cpos, start, end)
-#define inverted_file_is_compressed(a) cl_index_compressed(a)
-#define item_sequence_is_compressed(a) cl_sequence_compressed(a)
-#define nr_of_arguments(a) cl_dynamic_numargs(a)
-#define setup_corpus(reg, name) cl_new_corpus(reg, name)
-#define structure_has_values(a) cl_struc_values(a)
-#define structure_value(a, struc) cl_struc2str(a, struc)
-#define structure_value_at_position(a, cpos) cl_cpos2struc2str(a, cpos)
+#define ClosePositionStream(ps) cl_delete_stream(ps) /* macro now unused */
+#define OpenPositionStream(a, id) cl_new_stream(a, id) /* macro now unused */
+#define ReadPositionStream(ps, buf, size) cl_read_stream(ps, buf, size) /* macro now unused */
+#define attr_drop_attribute(a) cl_delete_attribute(a) /* macro now unused */
+#define call_dynamic_attribute(a, dcr, args, nr_args) cl_dynamic_call(a, dcr, args, nr_args) /* macro now unused */
+#define cderrno cl_errno /* macro now unused */
+#define cdperror(message) cl_error(message) /* macro now unused */
+#define cdperror_string(no) cl_error_string(no) /* macro now unused */
+#define central_corpus_directory() cl_standard_registry() /* macro now unused */
+#define collect_matches(a, idlist, idlist_size, sort, size, rl, rls) cl_idlist2cpos_oldstyle(a, idlist, idlist_size, sort, size, rl, rls) /* macro now unused */
+#define collect_matching_ids(a, re, flags, size) cl_regex2id(a, re, flags, size) /* macro now unused */
+#define cumulative_id_frequency(a, list, size) cl_idlist2freq(a, list, size) /* macro now unused */
+#define drop_corpus(c) cl_delete_corpus(c) /* macro now unused */
+#define find_attribute(c, name, type, data) cl_new_attribute(c, name, type) /* macro now unused */
+#define get_alg_attribute(a, p, start1, end1, start2, end2) cl_cpos2alg2cpos_oldstyle(a, p, start1, end1, start2, end2) /* macro now unused */
+#define get_attribute_size(a) cl_max_cpos(a) /* macro now unused */
+#define get_bounds_of_nth_struc(a, struc, start, end) cl_struc2cpos(a, struc, start, end) /* macro now unused */
+#define get_id_at_position(a, cpos) cl_cpos2id(a, cpos) /* macro now unused */
+#define get_id_of_string(a, str) cl_str2id(a, str) /* macro now unused */
+#define get_id_frequency(a, id) cl_id2freq(a, id) /* macro now unused */
+#define get_id_from_sortidx(a, sid) cl_sort2id(a, sid) /* macro now unused */
+#define get_id_info(a, sid, freq, len) cl_id2all(a, sid, freq, len) /* macro now unused */
+#define get_id_range(a) cl_max_id(a) /* macro now unused */
+#define get_id_string_len(a, id) cl_id2strlen(a, id) /* macro now unused */
+#define get_nr_of_strucs(a, nr) cl_max_struc_oldstyle(a, nr)/* macro now unused */
+#define get_num_of_struc(a, p, num) cl_cpos2struc_oldstyle(a, p, num) /* macro now unused */
+#define get_positions(a, id, freq, rl, rls) cl_id2cpos_oldstyle(a, id, freq, rl, rls) /* macro now unused */
+#define get_sortidxpos_of_id(a, id) cl_id2sort(a, id) /* macro now unused */
+#define get_string_at_position(a, cpos) cl_cpos2str(a, cpos) /* macro now unused */
+#define get_string_of_id(a, id) cl_id2str(a, id) /* macro now unused */
+#define get_struc_attribute(a, cpos, start, end) cl_cpos2struc2cpos(a, cpos, start, end) /* macro now unused */
+#define inverted_file_is_compressed(a) cl_index_compressed(a) /* macro now unused */
+#define item_sequence_is_compressed(a) cl_sequence_compressed(a) /* macro now unused */
+#define nr_of_arguments(a) cl_dynamic_numargs(a) /* macro now unused */
+#define setup_corpus(reg, name) cl_new_corpus(reg, name) /* macro now unused */
+#define structure_has_values(a) cl_struc_values(a) /* macro now unused */
+#define structure_value(a, struc) cl_struc2str(a, struc) /* macro now unused */
+#define structure_value_at_position(a, cpos) cl_cpos2struc2str(a, cpos) /* macro now unused */
 
 /* formerly a CQP function, now in CL */
-#define get_path_component cl_path_get_component
+#define get_path_component cl_path_get_component /* macro now unused */
 
 /*
  * Some "old" functions have gone altogether; they are not just depracated, but vanished!
@@ -1242,39 +1340,5 @@ void cl_ngram_hash_print_stats(cl_ngram_hash hash, int max_n);
  * function called by cl_new_corpus().
  *
  */
-
-/* new style function names implemented as macros mapping to the old names : retained as a record of how it was done pre-v3.2.0
-
-#define cl_new_corpus(reg, name) setup_corpus(reg, name)
-#define cl_delete_corpus(c) drop_corpus(c)
-#define cl_standard_registry() central_corpus_directory()
-#define cl_new_attribute(c, name, type) find_attribute(c, name, type, NULL)
-#define cl_delete_attribute(a) attr_drop_attribute(a)
-#define cl_sequence_compressed(a) item_sequence_is_compressed(a)
-#define cl_index_compressed(a) inverted_file_is_compressed(a)
-#define cl_new_stream(a, id) OpenPositionStream(a, id)
-#define cl_delete_stream(ps) ClosePositionStream(ps)
-#define cl_read_stream(ps, buf, size) ReadPositionStream(ps, buf, size)
-#define cl_id2str(a, id) get_string_of_id(a, id)
-#define cl_str2id(a, str) get_id_of_string(a, str)
-#define cl_id2strlen(a, id) get_id_string_len(a, id)
-#define cl_sort2id(a, sid) get_id_from_sortidx(a, sid)
-#define cl_id2sort(a, id) get_sortidxpos_of_id(a, id)
-#define cl_max_cpos(a) get_attribute_size(a)
-#define cl_max_id(a) get_id_range(a)
-#define cl_id2freq(a, id) get_id_frequency(a, id)
-#define cl_id2cpos(a, id, freq) get_positions(a, id, freq, NULL, 0)
-#define cl_cpos2id(a, cpos) get_id_at_position(a, cpos)
-#define cl_cpos2str(a, cpos) get_string_at_position(a, cpos)
-#define cl_id2all(a, sid, freq, len) get_id_info(a, sid, freq, len)
-#define cl_regex2id(a, re, flags, size) collect_matching_ids(a, re, flags, size)
-#define cl_idlist2freq(a, list, size) cumulative_id_frequency(a, list, size)
-#define cl_idlist2cpos(a, idlist, idlist_size, sort, size) collect_matches(a, idlist, idlist_size, sort, size, NULL, 0)
-#define cl_cpos2struc2cpos(a, cpos, start, end) get_struc_attribute(a, cpos, start, end)
-#define cl_struc2cpos(a, struc, start, end) get_bounds_of_nth_struc(a, struc, start, end)
-#define cl_struc_values(a) structure_has_values(a)
-#define cl_struc2str(a, struc) structure_value(a, struc)
-#define cl_cpos2struc2str(a, cpos) structure_value_at_position(a, cpos)
-*/
 
 #endif /* ifndef _cwb_cl_h_ */

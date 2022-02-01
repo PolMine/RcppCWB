@@ -1,0 +1,194 @@
+
+        IMS Open Corpus Workbench (CWB)
+        Release 3.5 (PRE-RELEASE)
+
+        Installation Guide -- MacOS Supplement
+
+
+This file describes how to build and install the CWB from source code for
+MacOS (or its pre-decessor OS X), as well as how to create binary releases.
+You should first read the instructions in the main INSTALL file with 
+information on the general build process.
+
+
+        RECOMMENDED INSTALLATION PROCEDURE
+
+On recent versions of MacOS (10.9 "Mavericks" and newer), it is quite easy
+to compile and install CWB, using the HomeBrew package manager to provide
+the required libraries and support programs.  Earlier versions of OS X are
+no longer supported officially, but you can try a generic Unix installation.
+
+
+1) Install Xcode Command Line Tools
+
+Enter 
+
+        xcode-select --install
+
+in a terminal window and follow the instructions on screen. It may be necessary
+to install Xcode from the Mac App store first (especially on old versions of OS X).
+
+
+2) Install HomeBrew package manager from https://brew.sh/
+
+Make sure that the HomeBrew paths have been added to your shell configuration during
+installation and that no other package managers (Fink, MacPorts) are installed on
+your system, as they might conflict with the manual build process described below.
+
+
+3) Install prerequisite libraries
+
+Enter the following shell commands:
+
+        brew install glib
+        brew install pcre
+        brew install readline
+        brew install subversion
+
+
+4) Install CWB
+
+Enter the following shell command:
+
+        brew install cwb
+        
+You're done! CQP and all CWB command-line tools should now be available in your
+shell, and cwb-config shows you how to link your own C code against CWB.
+
+You can also install the cutting-edge CWB source code from its subversion repository
+rather than the latest stable release:
+
+        brew install cwb --HEAD
+
+
+        COMPILING FROM SOURCE
+
+Alternatively, you can compile CWB from source code yourself, using HomeBrew only
+to provide the prerequisite libraries.  This will enable you to install in a different
+location than the HomeBrew tree and to fine-tune code optimisation to your CPU.
+
+Start with steps 1) - 3) shown above, then continue as follows:
+
+4) Select a suitable CWB configuration file
+
+Edit the file "config.mk", setting the platform entry to either of
+
+        PLATFORM=darwin-brew      # 64-bit Intel CPU 
+        PLATFORM=darwin-brew-m1   # 64-bit ARM CPU (M1 or other Apple Silicon)
+
+and the site configuration to
+
+        SITE=standard
+
+for the recommended installation in the /usr/local tree (or choose another suitable
+SITE entry).  Instead of editing "config.mk", you can also append 
+
+       PLATFORM=darwin-brew[-m1] SITE=standard
+
+or similar to all make commands shown below.
+
+These settings will link CWB against the HomeBrew-provided libraries, make sure
+that installed binaries don't break when HomeBrew packages are upgraded, and 
+compile and optimize the source code for the CPU architecture on the build system.
+
+
+5) Compile and install CWB
+
+Enter the shell commands
+
+        make clean
+        make depend
+        make all
+        make install
+
+Depending on your access permissions, you might need to type "sudo make install"
+on the last line and enter your password.  If you are somewhat impatient, use
+"make -j4 all" or "make -j8 all" for faster compilation (depending on how many
+CPU cores you have available).
+
+
+        MANUAL INSTALLATION
+
+If you want to build universal binaries or another configuration that is not
+tuned to the hardware of the build machine, you cannot use HomeBrew to install
+the required libraries.  It is also possible that you prefer another package
+manager (such as MacPorts) that does not interfere with /usr/local or that you
+want to install prerequisites manually.
+
+In any of these cases, follow the generic build and install instructions in
+file INSTALL.  Either use the auto-install script
+
+        ./install-scripts/install-mac-osx
+
+(possibly prefixed with "sudo"), or set the platform in "config.mk" accordingly.
+If you've used the MacPorts package manager, specify
+
+        PLATFORM=darwin-port
+
+Otherwise, make sure that the prerequisite libraries have been installed into 
+the /usr/local tree and then specify either
+
+        PLATFORM=darwin-64
+
+for an Intel 64-bit build or
+
+        PLATFORM=darwin
+
+for a generic build (which should compile for the physical architecture of your
+computer).
+
+A non-HomeBrew platform configuration will attempt to auto-detect a version of
+GNU Readline installed manually or with a package manager such as HomeBrew or
+MacPorts.  It will fall back on the system-provided Editline library only if no
+installation of GNU Readline can be found.  In order to check which library CQP
+will use for command-line editing, type
+
+        instutils/find_readline.perl --check
+
+The other libraries have to be set up so that configuration information can
+be determined with pkg-config (Glib) and pcre-config (PCRE).
+
+
+        BUILDING BINARY RELEASES
+
+Binary releases on MacOS are a bit tricky because many pre-installed libraries
+are intended for use as DLLs and have not been prepared for static linking.
+As a consequence, end users would have to install compatible versions of the
+DLLS on their machine in order to run the binary CWB release.
+
+The easiest solution so far is to obtain static libraries from the HomeBrew
+package manager and use the "darwin-brew-release" configuration for static
+linking.
+
+IMPORTANT NOTICE: Statically linked binary releases created in this way are
+usually not compatible with earlier versions of MacOS than running on the build
+machine.  Binaries for general release thus have to be compiled on a machine
+running a relatively old version of MacOS!  It is also not possible to compile
+universal binaries directly with HomeBrew.
+
+In order to make a binary release with HomeBrew, follow steps 1) -- 3) above,
+then edit "config.mk" as follows:
+
+        PLATFORM=darwin-brew-release[-m1]
+        SITE=darwin-release
+
+Then issue the usual "make" commands, but install with "make release":
+      
+        make clean
+        make depend
+        make all
+        make release
+
+Note that "sudo" will not be required (and should not be used) in this case.
+
+
+        DEVELOPER DOCUMENTATION
+
+In order to build the source code documentation as a MacOS docset, you will 
+need both doxygen and the command-line tool "docsetutil", which can easily 
+be installed with HomeBrew
+
+        brew install doxygen
+        brew install swiftdocorg/formulae/docsetutil
+
+Then run "make docset", which will create a Dash-compatible docset in "build/".

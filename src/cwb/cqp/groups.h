@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,18 +15,17 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#ifndef _GROUPS_H_
-#define _GROUPS_H_
+#ifndef _cqp_groups_h_
+#define _cqp_groups_h_
 
-#include "../cl/attributes.h"
 #include <stdio.h>
+
+#include "../cl/cl.h"
+
 #include "corpmanag.h"
 #include "output.h"
 
-#define SEPARATOR \
-"#---------------------------------------------------------------------\n"
-#define SEPARATOR2 \
-"#=====================================================================\n"
+#define SEPARATOR  "#---------------------------------------------------------------------\n" /**< used by ascii_print_group */
 
 #define ANY_ID -2
 
@@ -36,7 +35,6 @@ typedef struct _id_cnt_mapping {
 } ID_Count_Mapping;
 
 typedef struct _grouptable {
-
   CorpusList *my_corpus;
 
   Attribute *source_attribute;
@@ -51,29 +49,31 @@ typedef struct _grouptable {
   FieldType target_field;
   int target_offset;
 
+  Attribute *within_attribute;
+
   int cutoff_frequency;
   int is_grouped;
 
   int nr_cells;
   ID_Count_Mapping *count_cells;
-
 } Group;
 
 Group *compute_grouping(CorpusList *cl,
-			FieldType source_field,
-			int source_offset,
-			char *source_attr_name,
-			FieldType target_field,
-			int target_offset,
-			char *target_attr_name,
-			int cutoff_freq,
-      int is_grouped);
+                        FieldType source_field,
+                        int source_offset,
+                        const char *source_attr_name,
+                        FieldType target_field,
+                        int target_offset,
+                        const char *target_attr_name,
+                        int cutoff_freq,
+                        int is_grouped,
+                        const char *within);
 
 void free_group(Group **group);
 
-void print_group(Group *group, int expand, struct Redir *rd);
+void print_group(Group *group, struct Redir *rd);
 
-char *Group_id2str(Group *group, int i, int target);
+const char *Group_id2str(Group *group, int i, int target);
 
 
 #endif

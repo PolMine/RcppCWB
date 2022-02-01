@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -19,7 +19,7 @@
 #include "../cl/cl.h"
 
 
-#define MAXBLOCKS 10 
+#define MAXBLOCKS 10
 
 /** Data structure for the vstack member of the FMS object. @see FMS */
 typedef struct vstack_t {
@@ -40,7 +40,7 @@ typedef struct feature_maps_t {
   int *fweight;                 /**< array of feature weights */
 
   vstack_t *vstack;             /**< a stack (implemented as linked list) of integer vectors,
-                                     each containing <n_features> integers. */
+                                     each containing [n_features] integers. */
 
 } feature_maps_t;
 
@@ -60,8 +60,7 @@ typedef feature_maps_t *FMS;
 
 FMS create_feature_maps(char **config, int config_lines,
                         Attribute *w_attr1, Attribute *w_attr2,
-                        Attribute *s_attr1, Attribute *s_attr2
-                        );
+                        Attribute *s_attr1, Attribute *s_attr2);
 
 
 int *get_fvector(FMS fms);
@@ -71,12 +70,9 @@ void release_fvector(int *fvector, FMS fms);
 void check_fvectors(FMS fms);
 
 
-
 int feature_match(FMS fms, int f1, int l1, int f2, int l2);
 
-
 void show_features(FMS fms, int which, char *word);
-
 
 
 void best_path(FMS fms,

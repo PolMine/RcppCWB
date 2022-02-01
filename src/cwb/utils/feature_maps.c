@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -20,9 +20,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-
-/* #include <sys/types.h> */
-/* #include <sys/stat.h> */
 
 #include "feature_maps.h"
 #include "barlib.h"
@@ -62,7 +59,7 @@ init_char_map()
   /* this isn't really needed any more since we apply %cd folding beforehand, but what the heck */
   for(i = 'A'; i <= 'Z'; i++)
     map[i] = i + 0x20;
-  
+
   for(i = 1; i < 256; i++) {
     /* anything which HAS been assigned an output has (0x61 - 2) = 95 subtracted from it,
      * so the map output now = the alphabet offset where 'a' -> 2, 'b' -> 3, etc. */
@@ -71,7 +68,7 @@ init_char_map()
     /* anything which HASN'T got an output yet (i.e. all non-letters) is mapped to 1 */
     else
       map[i] = 1;
-    
+
     /* increase char_map_range from its start value of zero to the highest possible value.
      * Note this is deterministic. */
     if (map[i] >= char_map_range) {
@@ -128,7 +125,7 @@ create_feature_maps(char **config,
                     Attribute *w_attr2,
                     Attribute *s_attr1,
                     Attribute *s_attr2
-                    ) 
+                    )
 {
   FMS r;
 
@@ -146,7 +143,7 @@ create_feature_maps(char **config,
   int need_to_abort;                  /* boolean used during pointer check */
 
   /* after we have counted up features, these will become arrays of ints, with one entry per feature */
-  int *fs1, *fs2; 
+  int *fs1, *fs2;
 
   int i;
   int nw1;  /* number of types on the word-attribute of the source corpus */
@@ -167,7 +164,7 @@ create_feature_maps(char **config,
   r->s2 = s_attr2;
 
   init_char_map();
-  
+
   /* find out how many different word-types occur on each of the p-attributes */
   nw1 = cl_max_id(w_attr1);
   if (nw1 <= 0) {
@@ -179,7 +176,7 @@ create_feature_maps(char **config,
     fprintf(stderr, "ERROR: can't access lexicon of target corpus\n");
     exit(1);
   }
-  
+
   printf("LEXICON SIZE: %d / %d\n", nw1, nw2);
 
   fcount1 = (unsigned int*) calloc(nw1 + 1, sizeof(unsigned int));
@@ -240,7 +237,7 @@ create_feature_maps(char **config,
                   fcount1[i1]++;
                   fcount2[i2]++;
                   n_shared++;
-                  r->n_features++; 
+                  r->n_features++;
                 }
               }
             }
@@ -249,12 +246,12 @@ create_feature_maps(char **config,
           break;
         }
         /* -1 to -4 : shared character sequences (of 1 letter to 4 letters in length) as features */
-        case '1': 
+        case '1':
         case '2':
         case '3':
-        case '4': { 
+        case '4': {
           int n; /* length of the n-gram, obviously */
-          
+
           if (sscanf(config[config_pointer], "%1s%d:%d %s", command, &n, &weight, dummy) !=3 ) {
             fprintf(stderr,"ERROR: wrong # of args: %s\n",config[config_pointer]);
             fprintf(stderr,"Usage: -<n>:<weight>  (n = 1..4)\n");
@@ -268,7 +265,6 @@ create_feature_maps(char **config,
           }
           else {
             int i,f,l; /* temp storage for lexicon index, n of possible features and word length */
-            unsigned char *s;
 
             printf("FEATURE: %d-grams, weight=%d ... ", n, weight);
             fflush(stdout);
@@ -276,14 +272,14 @@ create_feature_maps(char **config,
             /* for each entry in source-corpus lexicon, add all possible n-grams contained in this word
              * to its feature count; note that we have to apply case/accent-folding first to obtain accurate counts */
             for(i = 0; i < nw1; i++) {
-              strcpy(word1, cl_id2str(w_attr1, i));
+              cl_strcpy(word1, cl_id2str(w_attr1, i));
               cl_string_canonical(word1, charset, IGNORE_CASE | IGNORE_DIAC, sizeof(word1));
               l = strlen(word1);
               fcount1[i] += (l >= n) ? l - n + 1 : 0;
             }
             /* same for target corpus */
             for(i = 0; i < nw2; i++) {
-              strcpy(word2, cl_id2str(w_attr2, i));
+              cl_strcpy(word2, cl_id2str(w_attr2, i));
               cl_string_canonical(word2, charset, IGNORE_CASE | IGNORE_DIAC, sizeof(word2));
               l = strlen(word2);
               fcount2[i] += (l >= n) ? l - n + 1 : 0;
@@ -352,12 +348,12 @@ create_feature_maps(char **config,
             }
             fclose(wordlist);
             printf("[%d]\n", n_matched);
-          }         
+          }
           break;
         }
         /* -C: the character count type of feature.
          * This feature exists for EVERY word type. */
-        case 'C': 
+        case 'C':
           if(sscanf(config[config_pointer],"%2s:%d %s",command,&weight,dummy)!=2) {
             fprintf(stderr, "ERROR: wrong # of args: %s\n",config[config_pointer]);
             fprintf(stderr, "Usage: -C:<weight>\n");
@@ -408,7 +404,7 @@ create_feature_maps(char **config,
   assert(fs1);
   fs2 = (int *)malloc(sizeof(int) * fcount2[nw2]);
   assert(fs2);
-  
+
   r->w2f1=(int **)malloc(sizeof(unsigned int *)*(nw1+1));
   assert(r->w2f1);
   r->w2f2=(int **)malloc(sizeof(unsigned int *)*(nw2+1));
@@ -441,7 +437,7 @@ create_feature_maps(char **config,
         case 'S': {
           int i1, i2, f1, f2;
           float threshold;
-          
+
           if (sscanf(config[config_pointer],"%2s:%d:%f %s",command,&weight,&threshold,dummy) == 3) {
             printf("PASS 2: Processing shared words (th=%4.1f%c).\n", threshold * 100, '\%');
             /* for each word in the lexicon of the source corpus.... check it exists, get
@@ -467,7 +463,7 @@ create_feature_maps(char **config,
         case '1':
         case '2':
         case '3':
-        case '4': { 
+        case '4': {
           int n;
 
           if (
@@ -489,11 +485,11 @@ create_feature_maps(char **config,
 
             /* for each word in the SOURCE lexicon, acquire the possible n-gram features */
             for (i = 0; i < nw1; i++) {
-              strcpy(word1, cl_id2str(w_attr1, i));
+              cl_strcpy(word1, cl_id2str(w_attr1, i));
               cl_string_canonical(word1, charset, IGNORE_CASE | IGNORE_DIAC, sizeof(word1));
               ng = 0;
               l = 0;
-              s = word1;
+              s = (unsigned char *)word1;
               while (*s) {
                 /* read and process 1 character */
                 ng = ((ng * char_map_range) + char_map[*s]) % f;
@@ -507,11 +503,11 @@ create_feature_maps(char **config,
 
             /* same again for words in the TARGET lexicon */
             for (i = 0; i < nw2; i++) {
-              strcpy(word2, cl_id2str(w_attr2, i));
+              cl_strcpy(word2, cl_id2str(w_attr2, i));
               cl_string_canonical(word2, charset, IGNORE_CASE | IGNORE_DIAC, sizeof(word2));
               ng = 0;
               l = 0;
-              s = word2;
+              s = (unsigned char *)word2;
               while (*s) {
                 /* read and process 1 character */
                 ng = ((ng * char_map_range) + char_map[*s]) % f;
@@ -522,7 +518,7 @@ create_feature_maps(char **config,
                   *(--r->w2f2[i]) = current_feature + ng;
               }
             }
-            
+
             current_feature += f;
           }
           break;
@@ -552,7 +548,7 @@ create_feature_maps(char **config,
               else {
                 if((i1 = cl_str2id(w_attr1,word1))>=0
                    && (i2 = cl_str2id(w_attr2,word2)) >=0) {
-                  *(--r->w2f1[i1])=*(--r->w2f2[i2])=current_feature; 
+                  *(--r->w2f1[i1])=*(--r->w2f2[i2])=current_feature;
                   r->fweight[current_feature]=weight;
                   current_feature++;
                 }
@@ -562,7 +558,7 @@ create_feature_maps(char **config,
           }
           break;
         }
-        case 'C': 
+        case 'C':
           if (sscanf(config[config_pointer],"%2s:%d %s",command,&weight,dummy) == 2) {
             printf("PASS 2: Setting character count weight.\n");
             if (r->fweight[0] != 0) {
@@ -594,7 +590,7 @@ create_feature_maps(char **config,
       fprintf(stderr,"ERROR: fcount1[%d]=%d r->w2f1[%d]-r->w2f1[%d]=%ld w=``%s''\n",
               i,fcount1[i]-fcount1[i-1], i+1, i,(long int)(r->w2f1[i+1]-r->w2f1[i]),
               cl_id2str(w_attr1,i));
-      need_to_abort=1;
+      need_to_abort = 1;
     }
   }
 
@@ -603,7 +599,7 @@ create_feature_maps(char **config,
       fprintf(stderr,"ERROR: fcount2[%d]=%d r->w2f2[%d]-r->w2f2[%d]=%ld w=``%s''\n",
               i,fcount2[i]-fcount2[i-1], i+1, i,(long int)(r->w2f2[i+1]-r->w2f2[i]),
               cl_id2str(w_attr2,i));
-      need_to_abort=1;
+      need_to_abort = 1;
     }
   }
 
@@ -654,8 +650,8 @@ feature_match(FMS fms,
   int match, j, i, id, *f;
   int cc1 = 0, cc2 = 0;         /* character count */
   int from, to;                 /* sentence boundaries (as cpos) */
-  
- 
+
+
   /* get a feature vector from the vstack */
   fcount = get_fvector(fms);
 
@@ -692,7 +688,7 @@ feature_match(FMS fms,
       }
     }
   }
-  
+
   /* add character count value to match quality */
   match += fms->fweight[0] * ((cc1 <= cc2) ? cc1 : cc2);
 
@@ -700,8 +696,8 @@ feature_match(FMS fms,
 
 
   /* clear feature count vector (selectively) */
-  
-  for (j = f1; j <= l1; j++) {  
+
+  for (j = f1; j <= l1; j++) {
     if (cl_struc2cpos(fms->s1, j, &from, &to))
       for(i = from; i <= to; i++) {
         id = cl_cpos2id(fms->att1,i);
@@ -763,7 +759,7 @@ void
 release_fvector(int *fvector, FMS fms)
 {
   vstack_t *new;
-  
+
   new = (vstack_t*)malloc(sizeof(vstack_t));
   assert(new);
   new->fcount = fvector;
@@ -783,7 +779,6 @@ release_fvector(int *fvector, FMS fms)
 void
 check_fvectors(FMS fms)
 {
-
   int i, n;
   vstack_t * agenda;
 
@@ -800,7 +795,7 @@ check_fvectors(FMS fms)
 
     agenda=agenda->next;
   }
-  
+
   printf("[check_fvectors: All %d feature vectors empty]\n",n);
 }
 
@@ -826,7 +821,7 @@ show_features(FMS fms, int which, char *word)
 
   att = (which==1) ? (fms->att1) : (fms->att2);
   w2f = (which==1) ? (fms->w2f1) : (fms->w2f2);
-  
+
   id = cl_str2id(att, word);
 
   printf("FEATURES of '%s', id=%d :\n", word, id);
@@ -893,7 +888,7 @@ best_path(FMS fms,
 {
 
   BARdesc quality, next_x, next_y;  /* three arrays of ints, basically */
-  
+
   static int max_out_pos = 0;
   static int *x_out = NULL;
   static int *y_out = NULL;
@@ -910,7 +905,7 @@ best_path(FMS fms,
     x_out = (int*)realloc(x_out, sizeof(int) * (x_ranges + y_ranges + 1));
     y_out = (int*)realloc(y_out, sizeof(int) * (x_ranges + y_ranges + 1));
     q_out = (int*)realloc(q_out, sizeof(int) * (x_ranges + y_ranges + 1));
-    max_out_pos = x_ranges+y_ranges+1; 
+    max_out_pos = x_ranges+y_ranges+1;
   }
   /* allocate data array for dynamic programming */
   quality = BAR_new(x_ranges+1, y_ranges+1, beam_width);
@@ -936,10 +931,10 @@ best_path(FMS fms,
       iy = id - ix;
       if ((iy < 0) || (iy > y_ranges) || (ix > x_ranges))
         continue;
-      
+
       /* initialise to 1:0 or 0:1 alignment (whichever is better) */
       if (ix >= 1) {            /* 1:0 if possible */
-        BAR_write(quality, ix,iy, BAR_read(quality, ix-1,iy)); 
+        BAR_write(quality, ix,iy, BAR_read(quality, ix-1,iy));
         BAR_write(next_x, ix,iy, ix - 1);
         BAR_write(next_y, ix,iy, iy);
       }
@@ -948,7 +943,7 @@ best_path(FMS fms,
         BAR_write(quality, ix,iy, BAR_read(quality, ix,iy-1));
         BAR_write(next_x, ix,iy, ix);
         BAR_write(next_y, ix,iy, iy-1);
-      } 
+      }
 
       /* scan through all possible alignment steps */
       for(dx = 1; dx <= 2; dx++) {
@@ -956,7 +951,7 @@ best_path(FMS fms,
           /*      if ((dx == 2) && (dy == 2)) continue; */ /* 2:2 now allowed again */
           if ((ix - dx >= 0) && (iy - dy >= 0)) {
             aux = BAR_read(quality, ix-dx,iy-dy)
-              + feature_match(fms, 
+              + feature_match(fms,
                               f1 + ix - dx, f1 + ix - 1,
                               f2 + iy - dy, f2 + iy - 1);
             if (aux > BAR_read(quality, ix,iy)) {
@@ -967,7 +962,7 @@ best_path(FMS fms,
           }
         }
       }
-      
+
       /* find best path on current diagonal */
       if (BAR_read(quality, ix,iy) > q_max) {
         x_max = ix;
@@ -975,7 +970,7 @@ best_path(FMS fms,
       }
     } /* end of x coordinate loop (diagonal parametrisation) */
     /* new x_max is predicted to be the same as x_max determined for current diagonal */
-    if (verbose) { 
+    if (verbose) {
       printf("BEST_PATH: scanning diagonal #%d of %d [max sim = %d]        \r",
              id, idmax, q_max);
       fflush(stdout);
@@ -984,14 +979,14 @@ best_path(FMS fms,
   /* end of DP loop */
   if (verbose)
     printf("\n");
-  
+
   /* read best path from DP array (backward) */
-  ix = x_ranges; 
+  ix = x_ranges;
   iy = y_ranges;
   iq = BAR_read(quality, ix, iy);
-  
+
   *steps = 0;
-  index = max_out_pos - 1; 
+  index = max_out_pos - 1;
   while ((ix >= 0) && (iy >= 0)) { /* the while() condition is just a safety check */
     x_out[index] = ix + f1;
     y_out[index] = iy + f2;
@@ -1006,7 +1001,7 @@ best_path(FMS fms,
     iy = BAR_read(next_y, aux, iy);
     index--;
   }
-  
+
   *out1 = x_out + index;
   *out2 = y_out + index;
   *out_quality = q_out + index;

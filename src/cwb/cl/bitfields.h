@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -26,22 +26,26 @@
 typedef unsigned char BFBaseType;
 
 /**
- * The Bitfield object.
+ * Underlying storage of Bitfield object.
  */
-typedef struct {
+typedef struct BFBuf {
   int elements;         /**< The number of bits in the bitfield */
   int bytes;            /**< The number of bytes the bitfield occupies */
   int nr_bits_set;      /**< The number of bits whose value has been assigned. Initialised to 0. */
   BFBaseType *field;    /**< the bitfield data itself. All elements initialised to 0. */
-} BFBuf, *Bitfield;
+} BFBuf;
 
 
+/**
+ * The Bitfield object.
+ */
+typedef struct BFBuf *Bitfield;
 
 Bitfield create_bitfield(int nr_of_elements);
 
 Bitfield copy_bitfield(Bitfield source);
 
-int destroy_bitfield(Bitfield *bptr);
+void destroy_bitfield(Bitfield *bptr);
 
 int set_bit(Bitfield bitfield, int element);
 

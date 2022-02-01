@@ -18,12 +18,6 @@
 
 ##  This is the Makefile for the CWB Corpus Query Processor programs. 
 
-
-
-## Read configuration settings and standard definitions
-TOP = $(R_PACKAGE_SOURCE)
-include $(TOP)/config.mk
-
 ## The following targets are available:
 #
 #  all          create binaries cqp, cqpcl, and cqpserver
@@ -35,6 +29,18 @@ include $(TOP)/config.mk
 #  release      install to binary release dir
 #  size         print size of source code (line counts)
 #
+
+
+## Read configuration settings and standard definitions
+TOP = $(R_PACKAGE_SOURCE)
+include $(TOP)/config.mk
+
+## This is an extra flag for this folder. It is used in the CQP parser; 
+## normally it is not defined, but if it is, the synchronize#() function 
+## becomes a no-op.
+ifdef CQP_COMPILE_WITHOUT_SYNCHRONIZE
+CFLAGS_ALL := -DCQP_COMPILE_WITHOUT_SYNCHRONIZE $(CFLAGS_ALL) 
+endif
 
 .PHONY: all clean realclean depend install uninstall size
 
@@ -54,9 +60,8 @@ SRCS =  llquery.c cqp.c cqpcl.c symtab.c eval.c tree.c options.c corpmanag.c \
 	parse_actions.c attlist.c context_descriptor.c \
 	print-modes.c ascii-print.c sgml-print.c html-print.c latex-print.c \
 	variables.c print_align.c \
-	macro.c hash.c \
-	table.c \
-	../CQi/server.c ../CQi/auth.c \
+	macro.c \
+	../CQi/server.c ../CQi/auth.c ../CQi/log.c \
 	$(PARSES)
 
 OBJS =  cqp.o symtab.o eval.o tree.o options.o \
@@ -66,15 +71,14 @@ OBJS =  cqp.o symtab.o eval.o tree.o options.o \
 	parse_actions.o attlist.o context_descriptor.o \
 	print-modes.o ascii-print.o sgml-print.o html-print.o latex-print.o \
 	variables.o print_align.o \
-	macro.o hash.o \
-	table.o \
+	macro.o \
 	$(PARSEO)
 
 ## CQPserver needs additional objects. These are not in the general list, so we can exclude them when linking CQP
 ## (otherwise CQP needs to be linked against network libraries and we've just had a compatibility problem with that). 
 ## However, since the parser uses functions from <auth.h> (in the 'user' and 'host' commands), 
 ## we must provide dummy implementations of those functions for CQP. 
-CQI_OBJS = ../CQi/server.o ../CQi/auth.o
+CQI_OBJS = ../CQi/server.o ../CQi/auth.o ../CQi/log.o
 CQP_OBJS = dummy_auth.o
 
 HDRS =  cqp.h options.h symtab.h tree.h eval.h corpmanag.h \
@@ -85,8 +89,7 @@ HDRS =  cqp.h options.h symtab.h tree.h eval.h corpmanag.h \
 	parse_actions.h attlist.h context_descriptor.h \
 	print-modes.h ascii-print.h sgml-print.h html-print.h latex-print.h \
 	variables.h print_align.h \
-	macro.h hash.h \
-	table.h \
+	macro.h \
 	../CQi/server.h ../CQi/auth.h ../CQi/cqi.h \
 	$(PARSEH)
 
@@ -96,19 +99,23 @@ PROGRAMS = cqp$(EXEC_SUFFIX) cqpcl$(EXEC_SUFFIX) cqpserver$(EXEC_SUFFIX)
 
 all: libcqp.a
 
+parser.tab.c parser.tab.h: parser.y
 libcqp.a: $(OBJS) $(CQI_OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
 
 cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
+	@$(ECHO) "    .... link executable" $@
 	$(RM) $@
 	$(CC) $(CFLAGS_ALL) -o $@ llquery.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
 
 cqpcl$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) cqpcl.o $(LIBCL_PATH)
+	@$(ECHO) "    .... link executable" $@ 
 	$(RM) $@
 	$(CC) $(CFLAGS_ALL) -o $@ cqpcl.o $(OBJS) $(CQP_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP)
 
 cqpserver$(EXEC_SUFFIX): $(OBJS) $(CQI_OBJS) ../CQi/cqpserver.o $(LIBCL_PATH)
+	@$(ECHO) "    .... link executable" $@ 
 	$(RM) $@
 	$(CC) $(CFLAGS_ALL) -o $@ ../CQi/cqpserver.o $(OBJS) $(CQI_OBJS) $(CL_LIBS) $(LIB_REGEX) $(LDFLAGS_ALL) $(LDFLAGS_CQP) $(NETWORK_LIBS)
 
@@ -135,12 +142,15 @@ release: $(PROGRAMS)
 
 clean:
 	-$(RM) $(PROGRAMS) $(NO_INSTALL) *.o ../CQi/*.o parser.output *~ ../CQi/*~
+	# TODO what is "parser.output" ? 
 
 realclean:	clean
 	-$(RM) depend.mk
 
 # create parser C source, if necessary
 size: $(SRCS) $(HDRS)
+# I am not sure if the following line will work to make these print even with .SILENT turned on ...
+	@$(ECHO) `$(WC) $(SRCS) $(HDRS)` 
 	$(WC) $(SRCS) $(HDRS)
 
 

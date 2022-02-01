@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -16,10 +16,11 @@
  */
 
 
-#include "../cl/globals.h"
+#include "../cl/cl.h"
+#include "../cl/cwb-globals.h"
 #include "../cl/corpus.h"
 #include "../cl/attributes.h"
-#include "../cl/macros.h"
+#include "../cl/ui-helpers.h"
 
 /** String set to the name of this program. */
 char *progname = NULL;
@@ -37,7 +38,7 @@ describecorpus_usage(void)
   fprintf(stderr, "  -s        show statistics (attribute & lexicon size)\n");
   fprintf(stderr, "  -d        show details (about component files)\n");
   fprintf(stderr, "  -h        this help page\n");
-  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" VERSION "\n\n");
+  fprintf(stderr, "Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
   exit(2);
 }
 
@@ -55,13 +56,13 @@ describecorpus_show_attribute_names (Corpus *corpus, int type)
 {
   Attribute *a;
 
-  start_indented_list(64, 16, 6); /* indent by 6 chars */
+  ilist_start(64, 16, 6); /* indent by 6 chars */
   for (a = corpus->attributes; a; a = a->any.next) {
     if (a->any.type == type) {
-      print_indented_list_item(a->any.name);
+      ilist_print_item(a->any.name);
     }
   }
-  /* don't end_indented_list() because that might print "\r" */
+  /* don't ilist_end() because that might print "\r" */
   printf("\n\n");
 }
 
@@ -92,12 +93,12 @@ describecorpus_show_basic_info (Corpus *corpus, int with_attribute_names)
   }
   size = cl_max_cpos(word);
   printf("size (tokens):  ");
-  if (size >= 0) 
+  if (size >= 0)
     printf("%d\n", size);
   else
     printf("ERROR\n");
   printf("\n");
-  
+
   for (a = corpus->attributes; a; a = a->any.next) {
     switch(a->any.type) {
     case ATT_POS:   p_atts++; break;
@@ -128,7 +129,7 @@ describecorpus_show_basic_info (Corpus *corpus, int with_attribute_names)
  *
  * @param corpus  The corpus to analyse.
  */
-void 
+void
 describecorpus_show_statistics (Corpus *corpus)
 {
   Attribute *a;
@@ -136,28 +137,31 @@ describecorpus_show_statistics (Corpus *corpus)
 
   for (a = corpus->attributes; a; a = a->any.next) {
     switch(a->any.type) {
+
     case ATT_POS:
       printf("p-ATT %-16s ", a->any.name);
       tokens = cl_max_cpos(a);
       types = cl_max_id(a);
       if ((tokens > 0) && (types > 0))
         printf("%10d tokens, %8d types", tokens, types);
-      else 
+      else
         printf("           NO DATA");
       break;
+
     case ATT_STRUC:
-      printf("s-ATT %-16s ", a->any.name); 
+      printf("s-ATT %-16s ", a->any.name);
       regions = cl_max_struc(a);
       if (regions >= 0) {
         printf("%10d regions", regions);
         if (cl_struc_values(a))
           printf(" (with annotations)");
       }
-      else 
+      else
         printf("           NO DATA");
       break;
+
     case ATT_ALIGN:
-      printf("a-ATT %-16s ", a->any.name); 
+      printf("a-ATT %-16s ", a->any.name);
       blocks = cl_max_alg(a);
       if (blocks >= 0) {
         printf("%10d alignment blocks", blocks);
@@ -167,19 +171,21 @@ describecorpus_show_statistics (Corpus *corpus)
       else
         printf("           NO DATA");
       break;
+
     default:
-      printf("???   %-16s (unknown attribute type)", a->any.name); 
+      printf("???   %-16s (unknown attribute type)", a->any.name);
       break;
     }
+
     printf("\n");
   }
 
   printf("\n");
 }
 
-/* *************** *\
- *      MAIN()     *
-\* *************** */
+
+
+
 
 /**
  * Main function for cwb-describe-corpus.
@@ -204,10 +210,12 @@ main(int argc, char **argv)
 
   char *registry = NULL;
 
+  cl_startup();
   progname = argv[0];
+
   while ((c = getopt(argc, argv, "+r:sdh")) != EOF) {
     switch(c) {
-      
+
       /* -r <dir>: change registry directory */
     case 'r':
       if (registry == NULL)
@@ -217,7 +225,7 @@ main(int argc, char **argv)
         exit(2);
       }
       break;
-      
+
       /* -s: show statistics */
     case 's':
       show_stats++;
@@ -234,7 +242,6 @@ main(int argc, char **argv)
       describecorpus_usage();
       break;
     }
-
   }
 
   if (optind >= argc) {
@@ -243,7 +250,7 @@ main(int argc, char **argv)
   }
 
   for (i = optind; i < argc; i++) {
-    if ((corpus = cl_new_corpus(registry, argv[i])) == NULL) {
+    if (!(corpus = cl_new_corpus(registry, argv[i]))) {
       fprintf(stderr, "ERROR. Can't access corpus %s !\n", argv[i]);
       exit(1);
     }
@@ -255,14 +262,12 @@ main(int argc, char **argv)
     describecorpus_show_basic_info(corpus, !(show_stats || show_details));
     /* show attribute names only if no other options are selected */
 
-    if (show_stats) {
+    if (show_stats)
       describecorpus_show_statistics(corpus);
-    }
 
-    if (show_details) {
+    if (show_details)
       describe_corpus(corpus);
-    }
-  
+
     cl_delete_corpus(corpus);
   }
 

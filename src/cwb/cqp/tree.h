@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -25,15 +25,13 @@
 
 char *evaltree2searchstr(Evaltree etptr, int *length);
 
-void print_evaltree(int envidx, Evaltree, int);
+void print_evaltree(int envidx, Evaltree etptr, int indent);
 
-void free_evaltree(Evaltree *);
+void free_evaltree(Evaltree *tree_ptr);
 
-void init_booltree(Constrainttree *);
+void print_booltree(Constrainttree ctptr, int indent);
 
-void print_booltree(Constrainttree, int);
-
-void free_booltree(Constrainttree);
+void free_booltree(Constrainttree ctptr);
 
 void show_patternlist(int eidx);
 

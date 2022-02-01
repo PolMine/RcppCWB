@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -44,7 +44,7 @@ main(int argc, char *argv[])
 
   if (!initialize_cqp(argc, argv)) {
     Rprintf("Can't initialize CQP\n");
-    exit(1);
+    return cqp_error_status ? cqp_error_status : 1;
   }
 
   paging = 0;
@@ -53,16 +53,16 @@ main(int argc, char *argv[])
   if (query_string) {
     if (!cqp_parse_string(query_string)) {
       Rprintf("Syntax error in %s, exiting\n", query_string);
-      exit(1);
+      return cqp_error_status ? cqp_error_status : 1;
     }
   }
-  else {
+  else
     for (i = optind; i < argc; i++)
       if (!cqp_parse_string(argv[i])) {
         Rprintf("Syntax error, exiting\n");
-        exit(1);
+        return cqp_error_status ? cqp_error_status : 1;
       }
-  }
 
-  return 0;
+  cqp_cleanup_memory();
+  return cqp_error_status;
 }

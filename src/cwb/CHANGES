@@ -1,4 +1,4 @@
-Version 3.4 (in progress)
+Version 3.4 (current series of versions leading up to stable 3.5)
 -----------
 
 New features:
@@ -72,6 +72,55 @@ New features:
  - [2018-04-25: v3.4.14] CWB no longer breaks on input files with Windows-style (CRLF) line endings. In
    particular, cwb-encode, cwb-s-encode, CQP word lists, macro definition files and CQP scripts handle
    CRLF files correctly and delete the extra CR characters.
+   
+ - [2018-06-26: v3.4.15] New "subcorpus" output mode for cwb-decode, which can be used to materialize a
+   physical subcorpus based on a CQP query dump. The CWB/Perl package includes a convenient command-line
+   tool "cwb-make-subcorpus" for this purpose.
+
+ - [2019-05-07: v3.4.16] Experimental feature allowing multiple target markers @0 .. @9. Only two of these
+   markers are "active" at the same time, as determined by the AnchorNumberTarget and AnchorNumberKeyword
+   options; they set the target (equivalent to @) and keyword anchors, respectively.
+   This allows front-end wrappers to emulate up to 10 target positions by re-running a query with different
+   settings of AnchorNumberTarget and AnchorNumberKeyword; see "Undocumented CQP" in the CQP tutorial for details.
+   
+ - [2020-04-04: v3.4.22] CQP can now include other script files with "source" command (which was already 
+   defined in the grammar but "not yet implemented" because of issues with saving & restoring parser state).
+   
+ - [2020-10-26: v3.4.27] New input format for cwb-encode where token lines are numbered in a first TAB-separated
+   column (CoNLL style). The actual numbering is ignored, but avoids ambiguities between XML tags and token lines.
+   
+ - [2021-02-24: v3.4.28] New input format extended to fully CoNLL-compatible mode: (i) token numbers can optionally
+   be encoded; (ii) comment lines starting with "#" are skipped; (iii) blank lines can be interpreted as sentence breaks.
+ 
+ - [2021-03-04: v3.4.29] Improved CoNLL-support: (i) cwb-decode can insert blank lines for sentence breaks; detailed
+   code examples in the manpage show different strategies for generating CoNLL-like output. (ii) cwb-encode recognises
+   and discards multiword ("3-4") and trace ("5.1") tokens. (iii) More lenient feature set notation (see next item). 
+   
+ - [2021-03-04: v3.4.29] Validation of feature sets is more lenient now, so CoNLL-style sets without the surrounding
+   '|' delimiters are also accepted and converted into CWB notation. An empty string or single underscore '_'
+   is translated into an empty set. Drawback: plain string values are no longer rejected by the validation and 
+   instead turned into single-element sets, so an erroneous feature set specification in cwb-encode may go unnoticed. 
+ 
+ - [2021-04-05: v3.4.31] CQP now supports new "region element" syntax to match a complete s-attribute region (<<np>>)
+   or a matching range from a named query result (<<NamedEntities>>). Region elements provide support for ad-hoc
+   structural annotation in a NQR (without having to index it as a new s-attribute and reload the corpus), as well
+   as annotation with nesting and overlapping ranges (which is allowed for a NQR, either as a union of multiple 
+   individual NQRs or undumped from an external source). Target markers and labels can be set on the first and last
+   token of the region. See "Finite State Queries in CWB3", Sec. 2.5 for details on the implementation.
+   This new feature is considered experimental at least until CWB v3.4.32.
+   
+ - [2021-04-10] Region elements can also be zero-width (<<NamedEntities/>>), i.e. only test whether they are at the
+   start of a suitable region or span. This is particularly useful in initial position to create anchored queries. 
+ 
+ - [2021-04-15: v3.4.32] Standard queries can now include an optional match selector clause, which returns only
+   a subspan of the full query match based on labels (so target and keyword markers can be used to extract additional
+   information). The general syntax "show a[<off1>] .. b[<off2>]" allows the additonal specification of token offsets
+   to shift match start and end by a fixed number of tokens. Match selectors are particularly useful in Web-based
+   GUIs that do not allow users to post-process the result with interactive commands.
+
+ - [2021-08-20: v3.4.33] cwb-decode can now reconstruct attribute-value pairs in XML start tags and nested XML elements
+   broken up by cwb-encode, allowing for a full reconstruction of the .vrt input file (in most cases). This makes
+   CWB-indexed corpora much more suitable as an intermediate representation format.
 
 Bug fixes:
 
@@ -164,6 +213,31 @@ Bug fixes:
  - [2018-01-13: v3.4.13] bare reference to s-attribute incorrectly returned an evaluation error (which is
    interpreted as false in most contexts) if not in a corresponding region, whereas it should have returned the code 0
 
+ - [2019-03-02: v3.4.15] contrary to the CQP Tutorial (Sec. 3.6), the "cut" command did not respect the sort order
+   of a NQR, but always selected items based on the original corpus order; fixed to match documentation
+   
+ - [2019-05-05: v3.4.16] fix handling of parsing errors in CQP queries, which was broken by r1075 (2018-09-26). 
+ 
+ - [2019-08-01: v3.4.18] activating a new corpus in CQP no longer affects the ordering of attributes in "show cd"
+   and kwic output ("cat"); they are now guaranteed always to be in the same order as in the registry file;
+   "show cd" in non-PrettyPrint mode also indicates whether an attribute is activated for display
+
+ - [2020-05-05: v3.4.23] removed reliance on the linker "common symbols" mechanism for compatibility with 
+   GCC v10+ where this mechanism is disabled by default.
+
+ - [2020-06-13: v3.4.26] CL_DYN_STRING_SIZE was smaller than CL_MAX_LINE_LENGTH (which limits the size of annotation
+   strings in CWB corpora), resulting in buffer overflow when processing long string with CQP built-in functions
+   
+ - [2020-06-14: v3.4.26] fixed small bug in "group" command where anchor points with offset beyond end of corpus
+   are counted separately from undefined anchor points and offset before start of corpus. This could lead to 
+   multiple identical entries (with an item "(none)") in the group output, but is rare enough to go unnoticed.
+   
+ - [2021-03-26: v3.4.30] fix nasty bug in implementation of TAB queries, which used to ignore right-hand side of
+   every logical & operator in the token patterns. TAB queries can now also be interrupted with Ctrl-C.
+   
+ - [2021-04-13] multiple matches with same start point were sorted incorrectly after "undump", "set match ..."
+   or "set target ..." command (wrong sort order used by RangeSort() function). 
+
 Enhancements:
 
  - [2014-06-18] Revised implementation of cl_lexhash class. Auto-growing is now based on fill rate statistic
@@ -205,6 +279,46 @@ Enhancements:
    in CQP output, which is convenient for communicating with output post-processor scripts and for prepending
    a header row to a TAB-delimited output file. Escape sequences \n, \r and \t are interpreted, but no other
    substitutions are made in the string to be printed.
+   
+ - [2018-09-25: v3.4.15] Extended the CQP "show" command to allow "show active"/"show current" to print the
+   name of the presently-active corpus. (In interactive mode, this info is visible in the prompt; but in child
+   mode it's nice to have a direct way to ask this.)
+   
+ - [2018-05-06: v3.4.16] Command-line completion now also works for option names after the "set" keyword at 
+   the start of a line. Option abbreviations are deliberately not supported.
+   
+ - [2019-08-01: v3.4.18] CQP option AttributeSeparator modifies separator between p-attributes in CQP kwic display.
+
+ - [2019-12-07: v3.4.19] String normalisation now uses a different Glib function which produces slightly more
+   intuitive results when uppercase strings become lowercase (especially for German).
+
+ - [2020-02-03: v3.4.20] Command "show active"/"show current" has been tweaked a bit so that it also prints 
+   an activated subcorpus, if there is one.
+   
+ - [2020-03-06: v3.4.21] cwb-encode gains new "-9" option to ignore XML tags that haven't explicitly been
+   declared as s-attribute (i.e. they are automatically declared as null attributes)
+   
+ - [2020-05-18: v3.4.24] CQP option TokenSeparator modifies separator between tokens in CQP kwic display.
+ 
+ - [2020-05-28: v3.4.25] CQP option StructureDelimiter adds a string around s-attribute tags in CQP kwic display.
+
+ - [2020-06-13: v3.4.26] cwb-scan-corpus allows users to constrain n-grams to fall within a single s-attribute
+   region (-w option) and to compute document frequencies instead of token frequencies (-d option) 
+
+ - [2020-06-14: v3.4.26] CQP "group" command optionally computes document frequencies (for user-specified 
+   s-attribute regions), using the same implementation as cwb-scan-corpus. Anchors points to be counted must
+   traverse regions in corpus order for the algorithm to work, otherwise grouping is aborted with an error.
+
+ - [2021-03-25: v3.4.30] MU queries enhanced to allow negated "meet" constraints, i.e. preserve only those
+   items for which there is no instance of the second element in the specified context window.
+   
+ - [2021-04-08: v3.4.31] copying of anchor positions with "set NQR <anchor> <anchor>" has been consolidated and
+   extended: (i) an offset can be added to the source anchor using the same notation as in "group";
+   (ii) a soft copy (default) updates the destination only if the source anchor is defined and in valid range
+   (with an offset), a hard copy (with trailing "!") always overwrites the destination with the source anchor;
+   (iii) if matching ranges are modified by the operation and an invalid range would be generated (because 
+   source is undefined or matchend < match), the update is ignored (soft copy) or the match is discarded (hard copy)  
+
 
 Version 3.2
 -----------

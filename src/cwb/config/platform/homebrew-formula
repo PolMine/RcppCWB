@@ -1,0 +1,67 @@
+##   -*-Makefile-*-
+## 
+##  IMS Open Corpus Workbench (CWB)
+##  Copyright (C) 1993-2006 by IMS, University of Stuttgart
+##  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
+## 
+##  This program is free software; you can redistribute it and/or modify it
+##  under the terms of the GNU General Public License as published by the
+##  Free Software Foundation; either version 2, or (at your option) any later
+##  version.
+## 
+##  This program is distributed in the hope that it will be useful, but
+##  WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+##  Public License for more details (in the file "COPYING", or available via
+##  WWW at http://www.gnu.org/copyleft/gpl.html).
+
+##
+##  PLATFORM CONFIGURATION FILE:
+##  Natively tuned binaries for HomeBrew formula (MacOS + Linux)
+##  with prerequisite libraries provided by HomeBrew package manager
+##  NB: make variable HOMEBREW_ROOT should be set on command line
+##
+
+ifndef HOMEBREW_ROOT
+HOMEBREW_ROOT := $(shell brew --prefix)
+endif
+
+## Set up basic unix configuration (but don't override CC, CFLAGS, LDFLAGS)
+YACC = bison -d -t
+LEX = flex -8
+AR = ar cq
+RANLIB = ranlib
+INSTALL = install
+INSTFLAGS_FILE = -p # MacOS refuses to load archives/libraries if toc seems to be out of date
+ETAGS = etags
+
+## Compiler setup
+# -> CC and CFLAGS are inherited from HomeBrew environment
+CFLAGS += -Wall -O3 # standard compiler optimization
+LDFLAGS += -lm
+# NB: CPU tuning is not only complicated (Mac M1 doesn't support -march=native and -mtune=native)
+#     but would also prevent HomeBrew from building suitable bottles
+DEPEND_CFLAGS = $(CFLAGS)
+DEPEND = $(CC) -MM -MG
+
+## The ncurses library is provided by MacOS
+TERMCAP_LIBS = -lncurses
+TERMCAP_DEFINES = 
+
+## Use stable paths to HomeBrew-installed Glib, PCRE and Readline libraries,
+## so binaries will continue to work if prerequisites are updated.
+READLINE_DEFINES = -I$(HOMBREW_ROOT)/opt/readline/include
+READLINE_LIBS = -L$(HOMEBREW_ROOT)/opt/readline/lib -lreadline -lhistory
+
+PCRE_DEFINES = -I$(HOMEBREW_ROOT)/opt/pcre/include
+PCRE_LIBS = -L$(HOMEBREW_ROOT)/opt/pcre/lib -lpcre
+
+GLIB_DEFINES = -I$(HOMEBREW_ROOT)/opt/glib/include/glib-2.0 -I$(HOMEBREW_ROOT)/opt/glib/lib/glib-2.0/include -I$(HOMEBREW_ROOT)/opt/gettext/include
+GLIB_LIBS = -L$(HOMEBREW_ROOT)/opt/glib/lib -L$(HOMEBREW_ROOT)/opt/gettext/lib -lglib-2.0 -lintl
+
+## This configuration should not be used for binary releases
+RELEASE_ARCH = unknown
+RELEASE_OS = unknown
+
+## Optionally use newer Bison from HomeBrew (MacOS ships bison 2.3, which is > 15 years old)
+# YACC = "$(HOMEBREW_ROOT)/opt/bison/bin/bison" -d -t

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -15,8 +15,8 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
-#ifndef _PARSE_ACTIONS_H_
-#define _PARSE_ACTIONS_H_
+#ifndef _cqp_parse_actions_h_
+#define _cqp_parse_actions_h_
 
 
 #include <stdio.h>
@@ -69,7 +69,7 @@ void addHistoryLine(void);
 
 void resetQueryBuffer(void);
 
-void prepare_parse();
+void prepare_parse(void);
 
 CorpusList *in_CorpusCommand(char *id, CorpusList *cl);
 
@@ -81,15 +81,15 @@ CorpusList *ActivateCorpus(CorpusList *cl);
 
 CorpusList *after_CorpusSetExpr(CorpusList *cl);
 
-void prepare_Query();
+void prepare_Query(void);
 
 CorpusList *after_Query(CorpusList *cl);
 
-void do_cat(CorpusList *cl, struct Redir *r, int first, int last);
+void do_cat(CorpusList *cl, struct Redir *dst, int first, int last);
 
-void do_echo(char *s, struct Redir *rd);
+void do_catString(const char *str, struct Redir *dst);
 
-void do_save(CorpusList *cl, struct Redir *r);
+void do_save(CorpusList *cl, struct Redir *dst);
 
 void do_attribute_show(char *name, int status);
 
@@ -104,7 +104,7 @@ CorpusList *do_subset(FieldType field, Constrainttree boolt);
 
 
 
-void do_set_target(CorpusList *cl, FieldType goal, FieldType source);
+void do_set_target(CorpusList *cl, FieldType goal, FieldType source, int source_offset, int overwrite);
 
 void do_set_complex_target(CorpusList *cl,
                            FieldType goal,
@@ -131,37 +131,31 @@ void do_info(CorpusList *cl);
 void do_group(CorpusList *cl,
               FieldType target, int target_offset, char *t_att,
               FieldType source, int source_offset, char *s_att,
-              int cut, int expand, int is_grouped, struct Redir *redir);
+              int cut, int expand, int is_grouped, struct Redir *dst, char *within);
 
-void do_group2(CorpusList *cl,
+void do_group_nosource(CorpusList *cl,
                FieldType target, int target_offset, char *t_att,
-               int cut, int expand, struct Redir *r);
+               int cut, int expand, struct Redir *dst, char *within);
 
 CorpusList *do_StandardQuery(int cut_value, int keep_flag, char *modifier);
 
 CorpusList *do_MUQuery(Evaltree evalt, int keep_flag, int cut_value);
 
-void do_SearchPattern(Evaltree expr,
-                      Constrainttree constraint);
+void do_SearchPattern(Evaltree expr, Constrainttree constraint);
 
 /* ======================================== Regular Expressions */
 
-Evaltree
-reg_disj(Evaltree left, Evaltree right);
+Evaltree reg_disj(Evaltree left, Evaltree right);
 
-Evaltree
-reg_seq(Evaltree left, Evaltree right);
+Evaltree reg_seq(Evaltree left, Evaltree right);
 
-int 
-do_AnchorPoint(FieldType field, int is_closing);
+int do_AnchorPoint(FieldType field, int is_closing);
 
-int 
-do_XMLTag(char *s_name, int is_closing, int op, char *regex, int flags);
+int do_XMLTag(char *s_name, int is_closing, int op, char *regex, int flags);
 
-int 
-do_NamedWfPattern(int is_target,
-                  char *label,
-                  int pat_idx);
+Evaltree do_RegionElement(char *name, target_nature start_target, char *start_label, target_nature end_target, char *end_label, int zero_width);
+
+int do_NamedWfPattern(target_nature is_target, char *label, int pat_idx);
 
 int do_WordformPattern(Constrainttree boolt, int lookahead);
 
@@ -170,6 +164,8 @@ Constrainttree do_StringConstraint(char *s, int flags);
 Constrainttree do_VariableReference(char *s);
 
 Constrainttree do_SimpleVariableReference(char *varName);
+
+void do_MatchSelector(char *start, int start_offset, char *end, int end_offset);
 
 void prepare_AlignmentConstraints(char *id);
 
@@ -183,10 +179,7 @@ Constrainttree bool_and(Constrainttree left, Constrainttree right);
 
 Constrainttree bool_not(Constrainttree left);
 
-Constrainttree
-do_RelExpr(Constrainttree left, 
-           enum b_ops op,
-           Constrainttree right);
+Constrainttree do_RelExpr(Constrainttree left, enum b_ops op, Constrainttree right);
 
 Constrainttree do_RelExExpr(Constrainttree left);
 
@@ -198,32 +191,23 @@ Constrainttree do_flagged_re_variable(char *varname, int flags);
 
 Constrainttree do_flagged_string(char *s, int flags);
 
-Constrainttree do_mval_string(char *s, int op, int flags);
+Constrainttree do_feature_set_string(char *s, int op, int flags);
 
-Constrainttree FunctionCall(char *f_name, ActualParamList *apl);
+Constrainttree do_FunctionCall(char *f_name, ActualParamList *apl);
 
 void do_Description(Context *context, int nr, char *name);
 
-Evaltree do_MeetStatement(Evaltree left,
-                          Evaltree right,
-                          Context *context);
+Evaltree do_MeetStatement(Evaltree left, Evaltree right, Context *context, int negated);
 
-Evaltree do_UnionStatement(Evaltree left,
-                           Evaltree right);
-
+Evaltree do_UnionStatement(Evaltree left, Evaltree right);
 
 void do_StructuralContext(Context *context, char *name);
 
-
 CorpusList *do_TABQuery(Evaltree patterns);
-
 
 Evaltree make_first_tabular_pattern(int pattern_index, Evaltree next);
 
-Evaltree
-add_tabular_pattern(Evaltree patterns, 
-                    Context *context,
-                    int pattern_index);
+Evaltree add_tabular_pattern(Evaltree patterns, Context *context, int pattern_index);
 
 void do_OptDistance(Context *context, int l_bound, int u_bound);
 
@@ -241,8 +225,6 @@ void do_AddSubVariables(char *var1Name, int add, char *var2Name);
 
 /* ======================================== PARSER UTILS */
 
-void push_regchr(char c);
-
 void prepare_input(void);
 
 void expand_dataspace(CorpusList *ds);
@@ -254,12 +236,12 @@ void do_start_timer(void);        /* call this to start the timer */
 void do_timing(char *msg);        /* call this to print elapsed time with msg (if timing == True) */
 
 
-/* ====================================== CQP Child mode:  Size & Dump */
+/* ======================================  Size & Dump */
 
 void do_size(CorpusList *cl, FieldType field);
 
 void do_dump(CorpusList *cl, int first, int last, struct Redir *rd);
 
-int do_undump(char *corpname, int extension_fields, int sort_ranges, struct InputRedir *rd);
+int do_undump(char *corpname, int extension_fields, int sort_ranges, struct InputRedir *src);
 
 #endif

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -16,8 +16,8 @@
  */
 
 
-#ifndef _TARGET_H_
-#define _TARGET_H_
+#ifndef _cqp_targets_h_
+#define _cqp_targets_h_
 
 #include "eval.h"
 #include "corpmanag.h"
@@ -27,9 +27,9 @@ typedef enum _search_strategy {
 } SearchStrategy;
 
 /* will usually be provided as SEARCH_STRATEGY token by flex */
-SearchStrategy string_to_strategy(char *s);
+SearchStrategy string_to_strategy(const char *s);
 
-int set_target(CorpusList *corp, FieldType goal, FieldType source);
+int set_target(CorpusList *corp, FieldType dest, FieldType source, int source_offset, int overwrite);
 
 int evaluate_target(CorpusList *corp,          /* the corpus */
                     FieldType goal,            /* the field to set */

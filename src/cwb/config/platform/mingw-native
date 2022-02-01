@@ -30,7 +30,7 @@
 CC = gcc
 
 ## C compiler flags (optimisation, warning, additional include directories)
-CFLAGS = -O2 -Wall
+CFLAGS = -O2 -Wall -D__MINGW__ -DEMULATE_SETENV
 
 ## Linker flags (libraries to link against, search path, static linkage)
 LDFLAGS = -lm
@@ -41,7 +41,7 @@ LEX = flex -8
 
 ## How to combine object files into a library archive (*.a) and build a table of contents
 ## (ranlib is optional, simply set to "echo" or so to skip
-AR = ar cq
+AR = ar
 RANLIB = ranlib
 
 #

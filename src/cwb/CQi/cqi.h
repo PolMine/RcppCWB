@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -24,14 +24,17 @@
  * Corpus Query Interface.
  *
  * They are broken down into (a) CQi responses that can be sent by the server
- * (b) CQi requests that the clienyt can send to the server (c) some other
+ * (b) CQi requests that the client can send to the server (c) some other
  * bits and pieces.
  *
- * This file should be #included into any program that wishes to use CQi
+ * This file should be included into any program that wishes to use CQi
  * but note that as there are no functions defined for a CQi client program,
  * there are no accompanying source, object or library files.
  */
 
+
+#ifndef _cqi_cqi_h_
+#define _cqi_cqi_h_
 
 /* default port for CQi services                                         */
 #define CQI_PORT 4877
@@ -405,4 +408,4 @@
 
 
 
-
+#endif /* _cqi_cqi_h_ */

@@ -1,13 +1,13 @@
-/* 
+/*
  *  IMS Open Corpus Workbench (CWB)
  *  Copyright (C) 1993-2006 by IMS, University of Stuttgart
  *  Copyright (C) 2007-     by the respective contributers (see file AUTHORS)
- * 
+ *
  *  This program is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
  *  Free Software Foundation; either version 2, or (at your option) any later
  *  version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
@@ -19,44 +19,22 @@
 #include <stdlib.h>
 
 #include "../cl/cl.h"
-#include "../cl/corpus.h"
-#include "../cl/attributes.h"
-#include "../cl/cdaccess.h"
-#include "../cl/macros.h"
 
 #include "context_descriptor.h"
 #include "output.h"
 #include "options.h"
 
-/* TODO replace these macros with new equiv non-exported functions (allow compiler to inline if appropriate). (AH 2012-07-14) */
-#define RESET_LEFT_CONTEXT \
-    cd->left_width = 25; \
-    cd->left_type = CHAR_CONTEXT; \
-    if (cd->left_structure_name) { \
-      free(cd->left_structure_name); \
-      cd->left_structure_name = NULL; \
-    } \
-    cd->left_structure = NULL
 
-
-#define RESET_RIGHT_CONTEXT \
-    cd->right_width = 25; \
-    cd->right_type = CHAR_CONTEXT; \
-    if (cd->right_structure_name) { \
-      free(cd->right_structure_name); \
-      cd->right_structure_name = NULL; \
-    } \
-    cd->right_structure = NULL
 
 /**
  * Resets left context scope of a ContextDescriptor to default (25 chars).
  */
-void
+static void
 context_descriptor_reset_left_context(ContextDescriptor *cd)
 {
   if (cd) {
     cd->left_width = 25;
-    cd->left_type = CHAR_CONTEXT;
+    cd->left_type = char_context;
     cl_free(cd->left_structure_name);
   }
 }
@@ -64,12 +42,12 @@ context_descriptor_reset_left_context(ContextDescriptor *cd)
 /**
  * Resets right context scope of a ContextDescriptor to default (25 chars).
  */
-void
+static void
 context_descriptor_reset_right_context(ContextDescriptor *cd)
 {
   if (cd) {
     cd->right_width = 25;
-    cd->right_type = CHAR_CONTEXT;
+    cd->right_type = char_context;
     cl_free(cd->right_structure_name);
   }
 }
@@ -81,49 +59,40 @@ context_descriptor_reset_right_context(ContextDescriptor *cd)
  * string fields in CD are supposed to be malloced and freed.
  */
 int
-verify_context_descriptor(Corpus *corpus,
-                          ContextDescriptor *cd,
-                          int remove_illegal_entries)
+verify_context_descriptor(Corpus *corpus, ContextDescriptor *cd, int remove_illegal_entries)
 {
   int result = 1;
 
-  if (cd == NULL) {
+  if (!cd) {
     Rprintf("verify_context_descriptor(): WARNING: Context Descriptor empty!\n");
     result = 0;
   }
-  else if (corpus == NULL) {
+  else if (!corpus) {
     Rprintf("verify_context_descriptor(): WARNING: Corpus Descriptor empty!\n");
-    RESET_LEFT_CONTEXT;
-    RESET_RIGHT_CONTEXT;
+    context_descriptor_reset_left_context(cd);
+    context_descriptor_reset_right_context(cd);
     cd->attributes = NULL;
     result = 0;
   }
   else {
-
     /* check left attribute */
-    if (cd->left_type == STRUC_CONTEXT) {
+    if (cd->left_type == s_att_context) {
       if (cd->left_structure_name == NULL) {
-        RESET_LEFT_CONTEXT;
+        context_descriptor_reset_left_context(cd);
         result = 0;
       }
       else {
         /* find (structural) attribute */
-        if ((cd->left_structure = find_attribute(corpus,
-                                                 cd->left_structure_name,
-                                                 ATT_STRUC, NULL))
-            == NULL) {
+        if (!(cd->left_structure = cl_new_attribute(corpus, cd->left_structure_name, ATT_STRUC))) {
           /* not defined -> try alignment attribute */
-          if ((cd->left_structure = find_attribute(corpus,
-                                                   cd->left_structure_name,
-                                                   ATT_ALIGN, NULL))
-              == NULL) {
+          if (!(cd->left_structure = cl_new_attribute(corpus, cd->left_structure_name, ATT_ALIGN))) {
             /* error -> reset to default context */
-            RESET_LEFT_CONTEXT;
+            context_descriptor_reset_left_context(cd);
             result = 0;
           }
           else {
-            /* alignment attribute found -> change context type to ALIGN_CONTEXT */
-            cd->left_type = ALIGN_CONTEXT;
+            /* alignment attribute found -> change context type to a_att_context */
+            cd->left_type = a_att_context;
             if (cd->left_width != 1) {
               cqpmessage(Warning,
                          "Left Context '%d %s' changed to '1 %s' (alignment attribute).",
@@ -143,29 +112,23 @@ verify_context_descriptor(Corpus *corpus,
     }
 
     /* check right attribute */
-    if (cd->right_type == STRUC_CONTEXT) {
+    if (cd->right_type == s_att_context) {
       if (cd->right_structure_name == NULL) {
-        RESET_RIGHT_CONTEXT;
+          context_descriptor_reset_right_context(cd);
         result = 0;
       }
       else {
         /* find (structural) attribute */
-        if ((cd->right_structure = find_attribute(corpus,
-                                                 cd->right_structure_name,
-                                                 ATT_STRUC, NULL))
-            == NULL) {
+        if (!(cd->right_structure = cl_new_attribute(corpus, cd->right_structure_name, ATT_STRUC))) {
           /* not defined -> try alignment attribute */
-          if ((cd->right_structure = find_attribute(corpus,
-                                                   cd->right_structure_name,
-                                                   ATT_ALIGN, NULL))
-              == NULL) {
+          if (!(cd->right_structure = cl_new_attribute(corpus, cd->right_structure_name, ATT_ALIGN))) {
             /* error -> reset to default context */
-            RESET_RIGHT_CONTEXT;
+            context_descriptor_reset_right_context(cd);
             result = 0;
           }
           else {
-            /* alignment attribute found -> change context type to ALIGN_CONTEXT */
-            cd->right_type = ALIGN_CONTEXT;
+            /* alignment attribute found -> change context type to a_att_context */
+            cd->right_type = a_att_context;
             if (cd->right_width != 1) {
               cqpmessage(Warning,
                          "Right Context '%d %s' changed to '1 %s' (alignment attribute).",
@@ -185,7 +148,7 @@ verify_context_descriptor(Corpus *corpus,
     }
 
     /* cd->print_cpos = 0; */
-    
+
     VerifyList(cd->attributes, corpus, remove_illegal_entries);
     if (cd->attributes && cd->attributes->list == NULL)
       DestroyAttributeList(&(cd->attributes));
@@ -201,25 +164,10 @@ verify_context_descriptor(Corpus *corpus,
     VerifyList(cd->alignedCorpora, corpus, remove_illegal_entries);
     if (cd->alignedCorpora && cd->alignedCorpora->list == NULL)
       DestroyAttributeList(&(cd->alignedCorpora));
-      
   }
+
   return result;
 }
-
-/**
- * Creates (and initialises) a ContextDescriptor object.
- */
-ContextDescriptor *
-NewContextDescriptor(void)
-{
-  ContextDescriptor *cd;
-
-  cd = (ContextDescriptor *)cl_malloc(sizeof(ContextDescriptor));
-  initialize_context_descriptor(cd);
-
-  return cd;
-}
-
 
 /**
  * Initialises the member variables of a ContextDescriptor object to zero.
@@ -227,24 +175,22 @@ NewContextDescriptor(void)
  * Initial settings are: no attributes for printing, no right context,
  * no left context, no cpos printing.
  *
- * TODO since this should never be called except when a new context descriptor
- * is being created (structure names can memleak if it is called on one
- * already used, it would make sense ot merge this into the NewC.D. function.
- * (it is, in fact, used in options.c to set up the static global variable CD,
- * which is not malloc'd - perhaps change this to modularise the ContextDescirptor object better?)
+ * This can be called on either a statically or dynamically allocated CD.
  *
  * @see ContextDescriptor
+ * @param  cd      The settings container to
+ * @return         Always 1.
  */
 int
 initialize_context_descriptor(ContextDescriptor *cd)
 {
   cd->left_width = 0;
-  cd->left_type  = CHAR_CONTEXT;
+  cd->left_type  = char_context;
   cd->left_structure = NULL;
   cd->left_structure_name = NULL;
 
   cd->right_width = 0;
-  cd->right_type  = CHAR_CONTEXT;
+  cd->right_type  = char_context;
   cd->right_structure = NULL;
   cd->right_structure_name = NULL;
 
@@ -276,52 +222,65 @@ update_context_descriptor(Corpus *corpus, ContextDescriptor *cd)
     cd->attributes = NewAttributeList(ATT_POS);
     /* cd->print_cpos = 0; */
   }
-  RecomputeAL(cd->attributes, corpus, 0);
+  cd->attributes = RecomputeAL(cd->attributes, corpus, 0);
 
   if (!cd->strucAttributes)
     cd->strucAttributes = NewAttributeList(ATT_STRUC);
-  RecomputeAL(cd->strucAttributes, corpus, 0);
+  cd->strucAttributes = RecomputeAL(cd->strucAttributes, corpus, 0);
 
   if (!cd->printStructureTags)
     cd->printStructureTags = NewAttributeList(ATT_STRUC);
-  RecomputeAL(cd->printStructureTags, corpus, 0);
-  
+  cd->printStructureTags = RecomputeAL(cd->printStructureTags, corpus, 0);
+
   if (!cd->alignedCorpora)
     cd->alignedCorpora = NewAttributeList(ATT_ALIGN);
-  RecomputeAL(cd->alignedCorpora, corpus, 0);
-  
-  for (ai = cd->printStructureTags->list; ai; ) {
+  cd->alignedCorpora = RecomputeAL(cd->alignedCorpora, corpus, 0);
 
-    /* das Merken des Nachfolgers ist notwendig, weil RemoveName.. die
-     * Liste destruktiv zerstoert. */
-
+  /* remove s-attributes without annotation from printStructureTags */
+  ai = cd->printStructureTags->list;
+  while (ai) {
     Attribute *attr;
-    AttributeInfo *next_ai;
+    AttributeInfo *next_ai = ai->next; /* removing the offending s-attribute invalidates ai, so need to remember ai->next now */
 
-    next_ai = ai->next;
-
-    attr = find_attribute(corpus, ai->name, ATT_STRUC, NULL);
-    if (!attr || !structure_has_values(attr))
+    attr = (cd->printStructureTags->list_valid) ? ai->attribute : cl_new_attribute(corpus, ai->name, ATT_STRUC);
+    if (!attr || !cl_struc_values(attr))
       RemoveNameFromAL(cd->printStructureTags, ai->name);
-    
+
     ai = next_ai;
   }
-  
+
   return 1;
 }
 
-/** attribute (selected/unselected) print helper routine  */
-void 
-PrintAttributes(FILE *fd, char *header, AttributeList *al, int show_if_annot)
+
+/**
+ * This function implements the printing of a block of p
+ * or s or a attributes used when a ContextDescriptor is
+ * printed and pretty-print is active ("show cd").
+ *
+ * It is a non-exported function.
+ *
+ * The output to the stream is human readably, but not
+ * easily parseable; the non-pretty version is what you
+ * want on that front.
+ *
+ * @param fd             Stream to write to.
+ * @param header         String with the header for the block of attributes.
+ * @param al             The attribute list we are going to print out.
+ * @param show_if_annot  Boolean; set to 1 if we are printing s-attributes
+ *                       (to place "[A]" as a flag next to annotated s-atts).
+ */
+static void
+PrintAttributesPretty(FILE *fd, char *header, AttributeList *al, int show_if_annot)
 {
   int line = 0, i;
   AttributeInfo *current;
 
   if (al && al->list) {
     for (current = al->list; current; current = current->next) {
-      if (line++ == 0) 
+      if (line++ == 0)
         Rprintf("%s", header);
-      else 
+      else
         for (i = strlen(header); i; i--)
           Rprintf(" ");
       if (current->status)
@@ -341,85 +300,113 @@ PrintAttributes(FILE *fd, char *header, AttributeList *al, int show_if_annot)
     Rprintf("%s    <none>\n", header);
 }
 
-/** attribute print helper routine (non pretty-printing mode)
- *  ( TODO desperately needs a better name ) */
-void 
-PrintAttributesSimple(FILE *fd, char *type, AttributeList *al, int show_if_annot)
+/**
+ * This function implements the printing of a block of p
+ * or s or a attributes used when a ContextDescriptor is
+ * printed in non-pretty-print mode ("show cd").
+ *
+ * It is a non-exported function.
+ *
+ * The output to the stream is actually TSV in 4 columns:
+ * (1) a caller-specified type label, invariant per call;
+ * (2) the identifier of the attribute;
+ * (3) an indicator of whether an s-attribute has values ;
+ *     "-V" if it does, "" if it doesn't; always empty for
+ *     a and p-attributes;
+ * (4) whether the ContextDescriptor is currently set to print
+ *     this attribute ("*" if yes, "" if no; the newline follows directly).
+ *
+ * @param fd             Stream to write to.
+ * @param type           String that will be printed per line to label the attribute type.
+ * @param al             The attribute list we are going to print out.
+ * @param show_if_annot  Boolean; set to 1 if we are printing s-attributes
+ *                       (to get a "-V" or "" in col. 3)
+ */
+static void
+PrintAttributesUnpretty(FILE *fd, char *type, AttributeList *al, int show_if_annot)
 {
   AttributeInfo *ai;
 
-  if (al && al->list) {
-    for (ai = al->list; ai; ai = ai->next) {
-      Rprintf("%s\t%s", type, ai->attribute->any.name);
-      if (show_if_annot) {
-        Rprintf("\t%s", (cl_struc_values(ai->attribute)) ? "-V" : "");
-      }
-      Rprintf("\n");
-    }
-  }
+  if (al)
+    for (ai = al->list; ai ; ai = ai->next)
+      Rprintf("%s\t%s\t%s\t%s\n",
+          type,
+          ai->attribute->any.name,
+          ((show_if_annot && cl_struc_values(ai->attribute)) ? "-V" : ""),
+          (ai->status ? "*" : "")
+          );
 }
 
 /**
  * Prints the contents of a ContextDescriptor either to stdout or a pager
  * (NB this uses its own internal stream).
+ *
+ * @param cdp       Context descriptor to print.
  */
 void
-PrintContextDescriptor(ContextDescriptor *cdp)
+print_context_descriptor(ContextDescriptor *cdp)
 {
-  FILE *fd;
-  struct Redir rd = { NULL, NULL, NULL, 0 };        /* for paging (with open_stream()) */
+  FILE *fh;
+  struct Redir dst = { NULL, NULL, NULL, 0 };        /* for paging (with open_stream()) */
   int stream_ok;
 
   if (cdp) {
-    stream_ok = open_stream(&rd, ascii);
-    fd = (stream_ok) ? rd.stream : stdout; /* use pager, or simply print to stdout if it fails */
+    stream_ok = open_rd_output_stream(&dst, ascii);
+    fh = (stream_ok) ? dst.stream : stdout; /* use pager, or simply print to stdout if it fails */
 
     if (pretty_print) {
       Rprintf("===Context Descriptor=======================================\n");
       Rprintf("\n");
       Rprintf("left context:     %d ", cdp->left_width);
+
       switch (cdp->left_type) {
-      case CHAR_CONTEXT: 
-        Rprintf("characters\n"); break;
-      case WORD_CONTEXT: 
-        Rprintf("tokens\n"); break;
-      case STRUC_CONTEXT: 
-      case ALIGN_CONTEXT:
-        Rprintf("%s\n",
-                cdp->left_structure_name ? cdp->left_structure_name : "???");
+      case char_context:
+        Rprintf("characters\n");
+        break;
+      case word_context:
+        Rprintf("tokens\n");
+        break;
+      case s_att_context:
+      case a_att_context:
+        Rprintf("%s\n", cdp->left_structure_name ? cdp->left_structure_name : "???");
+        break;
       }
+
       Rprintf("right context:    %d ", cdp->right_width);
+
       switch (cdp->right_type) {
-      case CHAR_CONTEXT: 
-        Rprintf("characters\n"); break;
-      case WORD_CONTEXT: 
-        Rprintf("tokens\n"); break;
-      case STRUC_CONTEXT: 
-      case ALIGN_CONTEXT:
-        Rprintf("%s\n",
-                cdp->right_structure_name ? cdp->right_structure_name : "???");
+      case char_context:
+        Rprintf("characters\n");
+        break;
+      case word_context:
+        Rprintf("tokens\n");
+        break;
+      case s_att_context:
+      case a_att_context:
+        Rprintf("%s\n", cdp->right_structure_name ? cdp->right_structure_name : "???");
+        break;
       }
       Rprintf("corpus position:  %s\n", cdp->print_cpos ? "shown" : "not shown");
-      Rprintf("target anchors:   %s\n", show_targets ? "shown" : "not shown");
+      Rprintf("target anchors:   %s\n", show_targets    ? "shown" : "not shown");
       Rprintf("\n");
-      PrintAttributes(fd, "Positional Attributes:", cdp->attributes, 0);
+      PrintAttributesPretty(fh, "Positional Attributes:", cdp->attributes, 0);
       Rprintf("\n");
-      PrintAttributes(fd, "Structural Attributes:", cdp->strucAttributes, 1);
+      PrintAttributesPretty(fh, "Structural Attributes:", cdp->strucAttributes, 1);
       Rprintf("\n");
       /*     PrintAttributes(fd, "Structure Values:     ", cdp->printStructureTags); */
       /*     Rprintf("\n"); */
-      PrintAttributes(fd, "Aligned Corpora:      ", cdp->alignedCorpora, 0);
+      PrintAttributesPretty(fh, "Aligned Corpora:      ", cdp->alignedCorpora, 0);
       Rprintf("\n");
       Rprintf("============================================================\n");
     }
     else {
-      PrintAttributesSimple(fd, "p-Att", cdp->attributes, 0);
-      PrintAttributesSimple(fd, "s-Att", cdp->strucAttributes, 1);
-      PrintAttributesSimple(fd, "a-Att", cdp->alignedCorpora, 0);
+      PrintAttributesUnpretty(fh, "p-Att", cdp->attributes, 0);
+      PrintAttributesUnpretty(fh, "s-Att", cdp->strucAttributes, 1);
+      PrintAttributesUnpretty(fh, "a-Att", cdp->alignedCorpora, 0);
     }
 
-    if (stream_ok) 
-      close_stream(&rd);        /* close pipe to pager if we were using it */
+    if (stream_ok)
+      close_rd_output_stream(&dst);        /* close pipe to pager if we were using it */
   }
 }
 
