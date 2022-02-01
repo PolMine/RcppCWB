@@ -1,8 +1,8 @@
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5778285.svg)](https://doi.org/10.5281/zenodo.5778285)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5939368.svg)](https://doi.org/10.5281/zenodo.5939368)
 [![License: GPL
 v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![R build
 status](https://github.com/PolMine/RcppCWB/workflows/R-CMD-check/badge.svg)](https://github.com/PolMine/RcppCWB/actions)
 [![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
