@@ -16,6 +16,9 @@
  */
 
 
+void Rprintf(const char *, ...);
+#include <strings.h>
+
 #include "../cl/cl.h"
 #include "../cl/cwb-globals.h"
 #include "../cl/corpus.h"
@@ -34,9 +37,9 @@ FILE *protocol;
 
 /* ---------------------------------------------------------------------- */
 
-char *progname;
+/* char *progname; */
 
-Corpus *corpus;
+extern Corpus *corpus;
 char *corpus_id = NULL;
 
 int debug = 0;
@@ -109,11 +112,11 @@ print_binary_integer(unsigned int i, int width, FILE *stream)
 static void
 dump_heap(unsigned int *heap, int heap_size, int node, int indent)
 {
-  int i;
+  /* int i; */
 
   if (node <= heap_size) {
-    for (i = 0; i < indent * 3; i++)
-      putc((i % 3) == 0 ? '|' : ' ', protocol);
+    /* for (i = 0; i < indent * 3; i++)
+      putc((i % 3) == 0 ? '|' : ' ', protocol); */
 
     Rprintf("Node %d (p: %d, f: %d)\n",
             node,
@@ -277,7 +280,7 @@ ReadHCD(char *filename, HCD *hc)
  * @param hc    Location for the resulting Huffmann code descriptor block.
  * @param fname Base filename for the resulting files.
  */
-static int
+int
 compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 {
   int id, i, h;
@@ -307,21 +310,21 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
    */
   if (!(comp = ensure_component(attr, CompCorpus, 0))) {
     Rprintf("Computation of huffman codes needs the CORPUS component\n");
-    exit(1);
+    return 1;
   }
   if (!(comp = ensure_component(attr, CompLexicon, 0))) {
     Rprintf("Computation of huffman codes needs the LEXION component\n");
-    exit(1);
+    return 1;
   }
   if (!(comp = ensure_component(attr, CompLexiconIdx, 0))) {
     Rprintf("Computation of huffman codes needs the LEXIDX component\n");
-    exit(1);
+    return 1;
   }
   if (!(comp = ensure_component(attr, CompCorpusFreqs, 0))) {
     Rprintf("Computation of huffman codes needs the FREQS component.\n"
             "Run 'makeall -r %s -c FREQS %s %s' in order to create it.\n",
             corpus->registry_dir, corpus->registry_name, attr->any.name);
-    exit(1);
+    return 1;
   }
 
 
@@ -331,13 +334,13 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   hc->size = cl_max_id(attr);                /* the size of the attribute (nr of items) */
   if (hc->size <= 0 || !cl_all_ok()) {
     cl_error("(aborting) cl_max_id() failed");
-    exit(1);
+    return 1;
   }
 
   hc->length = cl_max_cpos(attr); /* the length of the attribute (nr of tokens) */
   if (hc->length <= 0 || !cl_all_ok()) {
     cl_error("(aborting) cl_max_cpos() failed");
-    exit(1);
+    return 1;
   }
 
   hc->symbols = NULL;
@@ -519,7 +522,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
   if (hc->max_codelen >= MAXCODELEN) {
     Rprintf("Error: Huffman codes too long (%d bits, current maximum is %d bits).\n", hc->max_codelen, MAXCODELEN-1);
     Rprintf("       Please contact the CWB development team for assistance.\n");
-    exit(1);
+    return 1;
   }
 
   if (hc->max_codelen == 0 && hc->min_codelen == 100)
@@ -637,7 +640,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
       Rprintf("- writing code descriptor block to %s\n",  hcd_path);
       if (!WriteHCD(hcd_path, hc)) {
         Rprintf("ERROR: writing %s failed. Aborted.\n", hcd_path);
-        exit(1);
+        return 1;
       }
 
       Rprintf("- writing compressed item sequence to %s\n", huf_path);
@@ -645,7 +648,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
       if (!BFopen(huf_path, "w", &bfd)) {
         Rprintf("ERROR: can't create file %s\n", huf_path);
         perror(huf_path);
-        exit(1);
+        return 1;
       }
 
       Rprintf("- writing sync (every %d tokens) to %s\n", SYNCHRONIZATION, sync_path);
@@ -653,9 +656,10 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
       if ((sync = fopen(sync_path, "w")) == NULL) {
         Rprintf("ERROR: can't create file %s\n", sync_path);
         perror(sync_path);
-        exit(1);
+        return 1;
       }
 
+      int word, success;
       for (i = 0; i < hc->length; i++) {
 
         /* SYNCHRONIZE */
@@ -663,13 +667,15 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
           if (i > 0)
             BFflush(&bfd);
           pos = BFposition(&bfd);
-          NwriteInt(pos, sync);
+          word = htonl(pos);
+          success = fwrite(&word, sizeof(int), 1, sync);
+          if (success != 1) Rprintf("File write error!\n");
         }
 
         id = cl_cpos2id(attr, i);
         if (id < 0 || !cl_all_ok()) {
           cl_error("(aborting) cl_cpos2id() failed");
-          exit(1);
+          return 1;
         }
         else {
           assert((id >= 0) && (id < hc->size) && "Internal Error");
@@ -679,7 +685,7 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
           if (!BFwriteWord((unsigned int)code, cl, &bfd)) {
             Rprintf("Error writing code for ID %d (%d, %d bits) at position %d. Aborted.\n", id, code, cl, i);
-            exit(1);
+            return 1;
           }
         }
       }
@@ -712,8 +718,8 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
  * @param fname Base filename to use for the three compressed-attribute files.
  *              Can be NULL, in which case the filenames in the attribute are used.
  */
-static void
-decode_check_huff(Attribute *attr, char *fname)
+int 
+decode_check_huff(Attribute *attr, char *corpus_id, char *fname)
 {
   BFile bfd;
   FILE *sync;
@@ -757,28 +763,28 @@ decode_check_huff(Attribute *attr, char *fname)
   Rprintf("- reading code descriptor block from %s\n", hcd_path);
   if (!ReadHCD(hcd_path, &hc)) {
     Rprintf("ERROR: reading %s failed. Aborted.\n",  hcd_path);
-    exit(1);
+    return 1;
   }
 
   Rprintf("- reading compressed item sequence from %s\n", huf_path);
   if (!BFopen(huf_path, "r", &bfd)) {
     Rprintf("ERROR: can't open file %s. Aborted.\n", huf_path);
     perror(huf_path);
-    exit(1);
+    return 1;
   }
 
   Rprintf("- reading sync (mod %d) from %s\n", SYNCHRONIZATION, sync_path);
   if (!(sync = fopen(sync_path, "r"))) {
     Rprintf("ERROR: can't open file %s. Aborted.\n", sync_path);
     perror(sync_path);
-    exit(1);
+    return 1;
   }
 
   size = cl_max_cpos(attr);
   if (size != hc.length) {
     Rprintf("ERROR: wrong corpus size (%d tokens) in %s (correct size: %d)\n",
             hc.length, hcd_path, size);
-    exit(1);
+    return 1;
   }
 
   for (pos = 0; pos < hc.length; pos++) {
@@ -790,13 +796,13 @@ decode_check_huff(Attribute *attr, char *fname)
       NreadInt(&sync_offset, sync);
       if (offset != sync_offset) {
         Rprintf("ERROR: wrong sync offset %d (true offset %d) at cpos %d. Aborted.\n",sync_offset, offset, pos);
-        exit(1);
+        return 1;
       }
     }
 
     if (!BFread(&bit, 1, &bfd)) {
       Rprintf("ERROR reading file %s. Aborted.\n", huf_path);
-      exit(1);
+      return 1;
     }
 
     v = (bit ? 1 : 0);
@@ -804,7 +810,7 @@ decode_check_huff(Attribute *attr, char *fname)
     while (v < hc.min_code[l]) {
       if (!BFread(&bit, 1, &bfd)) {
         Rprintf("ERROR reading file %s. Aborted.\n", huf_path);
-        return;
+        return 0;
       }
       v <<= 1;
       if (bit)
@@ -822,168 +828,7 @@ decode_check_huff(Attribute *attr, char *fname)
 
   /* tell the user it's safe to delete the uncompressed CORPUS component now */
   Rprintf("!! You can delete the file <%s> now.\n", component_full_name(attr, CompCorpus, NULL));
+  return 1;
 }
 
 
-
-
-/**
- * Prints a usage message and exits the program.
- *
- * @param msg         A message about the error.
- * @param error_code  Value to be returned by the program when it exits.
- */
-static void
-huffcode_usage(char *msg, int error_code)
-{
-  if (msg)
-    Rprintf("Usage error: %s\n", msg);
-  Rprintf("\n");
-  Rprintf("Usage:  %s [options] <corpus>\n\n", progname);
-  Rprintf("Compress the token sequence of a positional attribute. Creates .huf, .hcd,\n");
-  Rprintf("and .huf.syn files, which replace the corresponding .corpus files. After\n");
-  Rprintf("running this tool successfully, the .corpus files can be deleted.\n");
-  Rprintf("\n");
-  Rprintf("Options:\n");
-  Rprintf("  -P <att>  compress attribute <att> [default: word]\n");
-  Rprintf("  -A        compress all positional attributes\n");
-  Rprintf("  -r <dir>  set registry directory\n");
-  Rprintf("  -f <file> set output file prefix (creates <file>.huf, ...)\n");
-  Rprintf("  -v        increase verbosity (prints protocol); \n"
-                  "            may be repeated up to 4 times\n");
-/*   Rprintf("  -d        debug mode (not implemented)\n"); *//* TODO -d / -D distinct as in cwb-compress-rdx? */
-  Rprintf("  -T        skip validation pass ('I trust you')\n");
-  Rprintf("  -h        this help page\n\n");
-  Rprintf("Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
-
-  if (corpus)
-    cl_delete_corpus(corpus);
-
-  exit(error_code);
-}
-
-/* *************** *
- *      MAIN()     *
- * *************** */
-
-/**
- * Main function for cwb-huffcode.
- *
- * @param argc   Number of command-line arguments.
- * @param argv   Command-line arguments.
- */
-int
-main(int argc, char **argv)
-{
-  char *registry_directory = NULL;
-  char *output_fn = NULL;
-  char *attr_name = CWB_DEFAULT_ATT_NAME;
-  Attribute *attr;
-
-  HCD hc;
-
-  extern int optind;
-  extern char *optarg;
-  int c;
-
-  int all_attributes = 0;
-
-  /* initialise the protocol (ie informational) stream. There is no mechanism to use anything other than stdout. */
-  protocol = stdout;
-
-  cl_startup();
-  progname = argv[0];
-
-
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
-  while (EOF != (c = getopt(argc, argv, "+TvP:r:f:dAh"))) {
-    switch (c) {
-
-      /* T: skip decompression / error checking pass ("I trust you")  */
-    case 'T':
-      i_want_to_believe++;
-      break;
-
-      /* v: verbose -> displays protocol of compression process & other info on stdout */
-    case 'v':
-      the_truth_is_out_there++;
-      break;
-
-      /* P: attribute to compress */
-    case 'P':
-      attr_name = optarg;
-      break;
-
-      /* r: registry directory */
-    case 'r':
-      if (!registry_directory)
-        registry_directory = optarg;
-      else {
-        Rprintf("%s: -r option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-      /* f: filename prefix for compressed data files */
-    case 'f':
-      output_fn = optarg;
-      break;
-
-      /* d: debug mode  --- unused */
-    case 'd':
-      debug++;
-      break;
-
-      /* A: compress all attributes */
-    case 'A':
-      all_attributes++;
-      break;
-
-      /* h: help page */
-    case 'h':
-      huffcode_usage(NULL, 2);
-      break;
-
-    default:
-      huffcode_usage("illegal option.", 2);
-      break;
-    }
-  }
-
-  /* single argument: corpus id */
-  if (optind < argc)
-    corpus_id = argv[optind++];
-  else
-    huffcode_usage("corpus not specified (missing argument)", 1);
-
-  if (optind < argc)
-    huffcode_usage("Too many arguments", 1);
-
-  if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
-    Rprintf("Corpus %s not found in registry %s . Aborted.\n", corpus_id, (registry_directory ? registry_directory: cl_standard_registry()));
-    exit(1);
-  }
-
-  if (all_attributes) {
-    for (attr = corpus->attributes; attr; attr = attr->any.next)
-      if (attr->any.type == ATT_POS) {
-        compute_code_lengths(attr, &hc, output_fn);
-        if (!i_want_to_believe)
-          decode_check_huff(attr, output_fn);
-      }
-  }
-  else {
-    if (!(attr = cl_new_attribute(corpus, attr_name, ATT_POS))) {
-      Rprintf("Attribute %s.%s doesn't exist. Aborted.\n", corpus_id, attr_name);
-      exit(1);
-    }
-    compute_code_lengths(attr, &hc, output_fn);
-    if (!i_want_to_believe)
-      decode_check_huff(attr, output_fn);
-  }
-
-  cl_delete_corpus(corpus);
-
-  return 0;
-}

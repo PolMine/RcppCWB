@@ -14,6 +14,10 @@
  *  Public License for more details (in the file "COPYING", or available via
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
+#ifdef __MINGW__
+#include <winsock2.h>
+#define socklen_t int
+#endif
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
@@ -28,9 +32,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#else
-#include <winsock2.h>
-#define socklen_t int
 #endif
 
 
@@ -47,6 +48,8 @@
 
 /** the att hash is initially sized to 2 to the power of 14 */
 #define ATTHASHSIZE 16384
+
+void Rprintf(const char *, ...);
 
 /** Error strings are limited to this many bytes. @see cqi_error_string */
 #define GENERAL_ERROR_SIZE 1024
@@ -400,8 +403,8 @@ int
 cqi_send_byte(int n, int nosnoop)
 {
 #ifdef __MINGW__
-  unsigned char prep;
-  prep = (unsigned char) 0xff & n;
+  const char prep = (const char) 0xff & n;
+  /* prep = (unsigned char) 0xff & n; */
 #endif
 
   if (!nosnoop)
