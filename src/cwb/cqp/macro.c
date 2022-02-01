@@ -124,9 +124,9 @@ macro_debug_newline_indent(void)
 {
   InputBuffer buf = InputBufferList;
 
-  fprintf(stderr, "\n");
+  Rprintf("\n");
   while (buf != NULL) {
-    fprintf(stderr, "  ");
+    Rprintf("  ");
     buf = buf->next;
   }
 }
@@ -381,7 +381,7 @@ yy_input_char(void)
   }
 
   if (macro_debug && InputBufferList)
-    fprintf(stderr, "%c", character);
+    Rprintf("%c", character);
   return character;
 }
 
@@ -569,12 +569,12 @@ expand_macro(const char *name)
 
     if (macro_debug) {
       if (InputBufferList == NULL) {
-        fprintf(stderr, "EXPAND MACRO %s(", name);
+        Rprintf("EXPAND MACRO %s(", name);
         for (i = 0; i < args; i++) {
-          fprintf(stderr, "%s", macro_arg[i]);
-          if (i < (args-1)) fprintf(stderr, ", ");
+          Rprintf("%s", macro_arg[i]);
+          if (i < (args-1)) Rprintf(", ");
         }
-        fprintf(stderr, ")");
+        Rprintf(")");
       }
     }
 
@@ -589,7 +589,7 @@ expand_macro(const char *name)
     }
     buffer = PushInputBuffer(len); /* allocate & fill buffer with macro replacement */
     if (macro_debug) {
-      fprintf(stderr, " ==>");            /* symbolises macro expansion into next line */
+      Rprintf(" ==>");            /* symbolises macro expansion into next line */
       macro_debug_newline_indent(); /* if debugging macro expansion, start new line & indent */
     }
     buffer->macro = macro;
@@ -653,7 +653,7 @@ define_macro(char *name, int n_args, char *argstr, char *definition)
   }
   if (NULL != (macro = MacroHashLookup(name, n_args))) {
     if (!silent)
-      fprintf(stderr, "WARNING Macro %s(%d) redefined\n", name, n_args);
+      Rprintf("WARNING Macro %s(%d) redefined\n", name, n_args);
     MacroHashDelete(macro);
   }
 
@@ -1022,14 +1022,14 @@ delete_macro_buffers(int trace)
   int n = 0, i;
 
   if (trace && InputBufferList)
-    fprintf(stderr, "MACRO STACK TRACE:\n");
+    Rprintf("MACRO STACK TRACE:\n");
 
   while (InputBufferList) {
     if (trace) {
-      fprintf(stderr, "%s(%d): ", InputBufferList->macro->name, InputBufferList->macro->args);
+      Rprintf("%s(%d): ", InputBufferList->macro->name, InputBufferList->macro->args);
       for (i = 0; i < InputBufferList->position; i++)
-        fprintf(stderr, "%c", InputBufferList->data[i]);
-      fprintf(stderr, " <--\n");
+        Rprintf("%c", InputBufferList->data[i]);
+      Rprintf(" <--\n");
     }
     PopInputBuffer();
     n++;
@@ -1230,7 +1230,7 @@ list_macros(const char *prefix)
     }
     else
       /* unpretty */
-      printf("\t%s\n", list[i]);
+      Rprintf("\t%s\n", list[i]);
   }
   if (pretty_print)
     ilist_end();
@@ -1261,32 +1261,32 @@ print_macro_definition(const char *name, const int n_args)
   }
 
   if (!(macro = MacroHashLookup(name, n_args)))
-    printf("Macro %s(%d) not defined.\n", name, n_args);
+    Rprintf("Macro %s(%d) not defined.\n", name, n_args);
   else {
-    printf("/%s[", name);
+    Rprintf("/%s[", name);
     for (i = 0; i < n_args; i++) {
       if (macro->argnames[i] != NULL)
-        printf("<%s>", macro->argnames[i]);
+        Rprintf("<%s>", macro->argnames[i]);
       else
-        printf("<%d>", i);
+        Rprintf("<%d>", i);
       if (i < n_args-1)
-        printf(", ");
+        Rprintf(", ");
     }
-    printf("] = \n");
+    Rprintf("] = \n");
     for (seg = macro->replacement; seg != NULL; seg = seg->next) {
       if (seg->arg >= 0) {
         i = seg->arg;
         if (macro->argnames[i])
-          printf("<%s>", macro->argnames[i]);
+          Rprintf("<%s>", macro->argnames[i]);
         else
-          printf("<%d>", i);
+          Rprintf("<%d>", i);
       }
       else if (seg->string != NULL)
-        printf("%s", seg->string);
+        Rprintf("%s", seg->string);
       else
-        printf("<$$>");
+        Rprintf("<$$>");
     }
-    printf("\n");
+    Rprintf("\n");
   }
 }
 
@@ -1305,7 +1305,7 @@ macro_statistics(void)
   int i, count;
 
   if (MacroHash == NULL)
-    fprintf(stderr, "Macro hash was not initialised.\n");
+    Rprintf("Macro hash was not initialised.\n");
   else {
     for (i = 0; i < MacroHash->size; i++) {
       for (count = 0, m = MacroHash->hash[i] ; m ; m = m->next)
@@ -1314,10 +1314,10 @@ macro_statistics(void)
         count = 3;
       stat[count]++;
     }
-    fprintf(stderr, "Macro hash statistics:\n");
-    fprintf(stderr, "\t%-6d empty buckets\n", stat[0]);
-    fprintf(stderr, "\t%-6d buckets hold 1 macro\n", stat[1]);
-    fprintf(stderr, "\t%-6d buckets hold 2 macros\n", stat[2]);
-    fprintf(stderr, "\t%-6d buckets hold 3 or more macros\n", stat[3]);
+    Rprintf("Macro hash statistics:\n");
+    Rprintf("\t%-6d empty buckets\n", stat[0]);
+    Rprintf("\t%-6d buckets hold 1 macro\n", stat[1]);
+    Rprintf("\t%-6d buckets hold 2 macros\n", stat[2]);
+    Rprintf("\t%-6d buckets hold 3 or more macros\n", stat[3]);
   }
 }
