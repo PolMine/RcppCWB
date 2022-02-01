@@ -523,7 +523,22 @@ PatchCWB <- R6Class(
 
           list(
             # This will work for r1690 too
-            insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", ""))
+            insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
+            insert_after = list(
+              '^#include\\s+"makecomps\\.h".*?$',
+              c(
+                "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
+                "",
+                "#ifdef __MINGW__",
+                "#undef SUBDIR_SEPARATOR",
+                "#undef SUBDIR_SEP_STRING",
+                "#define SUBDIR_SEPARATOR '/'",
+                '#define SUBDIR_SEP_STRING "/"',
+                "#endif",
+                ""
+              ),
+              1L
+            )
           ),
           
           # Cannot find the dollar variabl in r1690 - seems to be gone
@@ -679,6 +694,7 @@ PatchCWB <- R6Class(
           # All of this is stable r1069-1690
           insert_before = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
           delete_line_beginning_with = list('#include "endian2.h"', 1L, 0L),
+          replace = list("^(\\s*)exit\\(1\\);", "\\1return;", NA),
           insert_after = list('^#include\\s<sys/types\\.h>', '#include "endian2.h"'),
 
           # storage.c: In function ???mmapfile???:
