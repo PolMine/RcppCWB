@@ -1790,7 +1790,7 @@ PatchCWB <- R6Class(
             replace = list("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "word = htonl(pos);", 1L),
             insert_after = list(
               "^\\s*word\\s=\\shtonl\\(pos\\);\\s*$",
-              c("success = fwrite(&word, sizeof(int), 1, sync);", 'if (success != 1) Rprintf("File write error!\n");'),
+              c("success = fwrite(&word, sizeof(int), 1, sync);", 'if (success != 1) Rprintf("File write error!\\n");'),
               1L
             )
             
