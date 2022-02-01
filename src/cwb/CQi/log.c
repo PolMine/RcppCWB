@@ -44,9 +44,9 @@
 void
 cqiserver_welcome(void)
 {
-  Rprintf("** WELCOME TO CQPserver v" CWB_VERSION "\n");
-  Rprintf("   implementing version %d.%d of the CQi\n", CQI_MAJOR_VERSION, CQI_MINOR_VERSION);
-  Rprintf("   for copyright and other info, see `cqp -v`%s", server_log ? "\n" : "\n\n"); /* if writing to log, skip decorative newline */
+  printf("** WELCOME TO CQPserver v" CWB_VERSION "\n");
+  printf("   implementing version %d.%d of the CQi\n", CQI_MAJOR_VERSION, CQI_MINOR_VERSION);
+  printf("   for copyright and other info, see `cqp -v`%s", server_log ? "\n" : "\n\n"); /* if writing to log, skip decorative newline */
 }
 
 /**
@@ -67,18 +67,18 @@ cqiserver_log(MessageType msg_type, const char *msg, ...)
   /* if logging is on, print to stdout, which is the logging dest */
   if (server_log || Error == msg_type) {
     va_start(vector, msg);
-    Rprintf("CQPserver: ");
+    printf("CQPserver: ");
     vprintf(msg, vector);
-    Rprintf("\n");
+    printf("\n");
     va_end(vector);
   }
 
   /* if it's an error or if debug is on, print to stderr, which is where all debug messages go */
   if (Error == msg_type || server_debug) {
     va_start(vector, msg);
-    Rprintf("CQPserver: ");
-    Rprintf(msg, vector);
-    Rprintf("\n");
+    fprintf(stderr, "CQPserver: ");
+    vfprintf(stderr, msg, vector);
+    fprintf(stderr, "\n");
     va_end(vector);
     return Error == msg_type;
   }
@@ -107,9 +107,9 @@ cqiserver_snoop(const char *format, ...)
   if (snoop) {
     va_list vector;
     va_start(vector, format);
-    Rprintf("CQi ");
-    Rprintf(format, vector);
-    Rprintf("\n");
+    fprintf(stderr, "CQi ");
+    vfprintf(stderr, format, vector);
+    fprintf(stderr, "\n");
     va_end(vector);
   }
 }
@@ -146,7 +146,7 @@ cqiserver_debug_arglist(const char *arg_list, int n_args, int int_args)
         sprintf(mark += strlen(mark), "%d ", (int)arg_list[i]);
       else
         /* super creaky typecasting needed to get the compiler to not complain here */
-        sprintf(mark += strlen(mark), "'%s' ", arg_list);
+        sprintf(mark += strlen(mark), "'%s' ", (char *)((long)arg_list[i]));
   }
   return buf;
 }
@@ -165,9 +165,9 @@ cqiserver_debug_msg(const char *format, ...)
   if (server_debug) {
     va_list vector;
     va_start(vector, format);
-    Rprintf("CQi: ");
-    Rprintf(format, vector);
-    Rprintf("\n");
+    fprintf(stderr, "CQi: ");
+    vfprintf(stderr, format, vector);
+    fprintf(stderr, "\n");
     va_end(vector);
   }
 }

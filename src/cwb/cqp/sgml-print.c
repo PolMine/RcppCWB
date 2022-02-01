@@ -237,7 +237,7 @@ sgml_print_context(ContextDescriptor *cd, FILE *dest)
     s = "error";
     break;
   }
-  Rprintf("<leftContext size=%d base=\"%s\">\n", cd->left_width, s);
+  fprintf(dest, "<leftContext size=%d base=\"%s\">\n", cd->left_width, s);
 
   switch(cd->right_type) {
   case char_context:
@@ -253,7 +253,7 @@ sgml_print_context(ContextDescriptor *cd, FILE *dest)
     s = "error";
     break;
   }
-  Rprintf("<rightContext size=%d base=\"%s\">\n",cd->right_width, s);
+  fprintf(dest, "<rightContext size=%d base=\"%s\">\n",cd->right_width, s);
 }
 
 void
@@ -269,7 +269,7 @@ sgml_print_corpus_header(CorpusList *cl, FILE *dest)
   /*   pwd = getpwuid(geteuid()); */
   /* disabled because of incompatibilities between different Linux versions */
 
-  Rprintf(
+  fprintf(dest,
           "<concordanceInfo>\n"
           "<user><userID>%s</userID><userName>%s</userName></user>\n"
           "<date>%s</date>\n"
@@ -314,7 +314,7 @@ sgml_print_output(CorpusList *cl,
   /* print each p-attribute's name and number */
   for (ai = cd->attributes->list; ai; ai = ai->next)
     if (ai->attribute && ai->status)
-      Rprintf("<attribute type=positional name=\"%s\" anr=%d>\n", ai->attribute->any.name, anr++);
+      fprintf(dest, "<attribute type=positional name=\"%s\" anr=%d>\n", ai->attribute->any.name, anr++);
 
   if (first < 0)
     first = 0;
@@ -401,10 +401,10 @@ sgml_print_group(Group *group, FILE *dest)
   last_source_id = -999;
   nr_targets = 0;
 
-  Rprintf("<TABLE>\n");
+  fprintf(dest, "<TABLE>\n");
 
   for (cell = 0; cell < group->nr_cells && !cl_broken_pipe; cell++) {
-    Rprintf("<TR><TD>");
+    fprintf(dest, "<TR><TD>");
 
     source_id = group->count_cells[cell].s;
 
@@ -414,21 +414,21 @@ sgml_print_group(Group *group, FILE *dest)
       nr_targets = 0;
     }
     else
-      Rprintf("&nbsp;");
+      fprintf(dest, "&nbsp;");
 
     target_id = group->count_cells[cell].t;
     target_s  = Group_id2str(group, target_id, 1);
     count     = group->count_cells[cell].freq;
 
-    Rprintf("<TD>");
+    fprintf(dest, "<TD>");
     sgml_puts(dest, target_s, SUBST_ALL);
 
-    Rprintf("<TD>%d</TR>\n", count);
+    fprintf(dest, "<TD>%d</TR>\n", count);
 
     nr_targets++;
   }
 
-  Rprintf("</TABLE>\n");
+  fprintf(dest, "</TABLE>\n");
 }
 
 
