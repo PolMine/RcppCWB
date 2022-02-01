@@ -527,7 +527,6 @@ PatchCWB <- R6Class(
             insert_after = list(
               '^#include\\s+"makecomps\\.h".*?$',
               c(
-                "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
                 "",
                 "#ifdef __MINGW__",
                 "#undef SUBDIR_SEPARATOR",
