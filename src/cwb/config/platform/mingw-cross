@@ -29,11 +29,11 @@ __MINGW__ = 1
 UNIX2DOS = unix2dos
 
 ## C compiler
-CC = i586-mingw32msvc-gcc
+CC = x86_64-w64-mingw32-gcc
 
 ## we also MAY need the following sub-programs...
-LD = i586-mingw32msvc-ld
-RC = i586-mingw32msvc-windres
+LD = x86_64-w64-mingw32-ld
+RC = x86_64-w64-mingw32-windres
 
 ## C compiler flags (optimisation, warning, additional include directories)
 ## in this case, we also have the __MINGW__ macro-constant that is "ifdef" checked in the C code 
@@ -53,8 +53,8 @@ LEX = flex -8
 
 ## How to combine object files into a library archive (*.a) and build a table of contents
 ## (ranlib is optional, simply set to "echo" or so to skip
-AR = i586-mingw32msvc-ar cq
-RANLIB = i586-mingw32msvc-ranlib
+AR = x86_64-w64-mingw32-ar
+RANLIB = x86_64-w64-mingw32-ranlib
 
 
 ## Windows binaries must end in .EXE
@@ -65,7 +65,7 @@ RELEASE_ARCH = i586
 RELEASE_OS = windows
 
 ## How to update dependencies between source code files ("make depend" requires this option to be set)
-DEPEND = i586-mingw32msvc-gcc -MM -MG
+DEPEND = x86_64-w64-mingw32-gcc -MM -MG
 
 ## How to index source code symbols for Emacs editor ("make tags" requires this option to be set)
 ETAGS = etags
