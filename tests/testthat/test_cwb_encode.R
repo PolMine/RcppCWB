@@ -5,7 +5,7 @@ testthat::context("cwb_encode")
 test_that(
   "cwb_encode",
   {
-    data_dir <- file.path(normalizePath(tempdir(), winslash = "/"), "tmp_data_dir", fsep = "/")
+    data_dir <- file.path(tempdir(), "tmp_data_dir")
     dir.create(data_dir)
 
     cwb_encode(

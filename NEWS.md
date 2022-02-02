@@ -1,3 +1,8 @@
+# RcppCWB 0.5.0.9001
+
+* The `cwb_encode()` function did not declare structural attributes in the registry
+file (#49). Fixed.
+
 # RcppCWB 0.5.0
 
 ## New Features

@@ -20,10 +20,10 @@
 #' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 #' 
-#' tmpdir <- normalizePath(tempdir(), winslash = "/")
-#' tmp_regdir <- file.path(tmpdir, "registry_tmp", fsep = "/")
-#' tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = "/")
-#' tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = "/")
+#' tmpdir <- tempdir()
+#' tmp_regdir <- file.path(tmpdir, "registry_tmp")
+#' tmp_data_dir <- file.path(tmpdir, "indexed_corpora")
+#' tmp_unga_dir <- file.path(tmp_data_dir, "unga")
 #' if (!file.exists(tmp_regdir)) dir.create(tmp_regdir)
 #' if (!file.exists(tmp_data_dir)) dir.create(tmp_data_dir)
 #' if (!file.exists(tmp_unga_dir)){
@@ -102,8 +102,8 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'   vector using `character()` - see examples.
 #' @rdname cwb_utils
 #' @export cwb_encode
+#' @importFrom fs path
 #' @examples
-#' if (.Platform$OS.type != "windows"){
 #' data_dir <- file.path(tempdir(), "tmp_data_dir")
 #' dir.create(data_dir)
 #' 
@@ -128,7 +128,6 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' 
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
-#' }
 cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes){
   
   s_attributes_noanno <- unlist(lapply(
@@ -145,10 +144,13 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
     )
   )
   
+  # Ensure that paths are standardized
+  regfile <- as.character(fs::path(file.path(registry, tolower(corpus))))
+  data_dir <- as.character(fs::path(data_dir))
+  vrt_dir <- as.character(fs::path(vrt_dir))
+  
   .cwb_encode(
-    regfile = file.path(registry, tolower(corpus)),
-    data_dir = data_dir,
-    vrt_dir = vrt_dir,
+    regfile = regfile, data_dir = data_dir, vrt_dir = vrt_dir,
     encoding = encoding,
     p_attributes = p_attributes,
     s_attributes_anno = s_attributes_anno,
