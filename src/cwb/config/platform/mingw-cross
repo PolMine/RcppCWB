@@ -32,7 +32,7 @@ UNIX2DOS = unix2dos
 CC = x86_64-w64-mingw32-gcc
 
 ## we also MAY need the following sub-programs...
-LD = x86_64-w64-mingw32-ld
+LD = ld
 RC = x86_64-w64-mingw32-windres
 
 ## C compiler flags (optimisation, warning, additional include directories)
@@ -53,7 +53,7 @@ LEX = flex -8
 
 ## How to combine object files into a library archive (*.a) and build a table of contents
 ## (ranlib is optional, simply set to "echo" or so to skip
-AR = x86_64-w64-mingw32-ar
+AR = ar
 RANLIB = x86_64-w64-mingw32-ranlib
 
 

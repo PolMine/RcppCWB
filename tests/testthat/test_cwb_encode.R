@@ -46,6 +46,7 @@ test_that(
     
     tmp_registry <- file.path(tempdir(), "tmp_registry")
     dir.create(tmp_registry)
+    old_env <- Sys.getenv("CORPUS_REGISTRY")
     Sys.setenv(CORPUS_REGISTRY = tmp_registry)
     cqp_reset_registry(tmp_registry)
     
@@ -141,6 +142,9 @@ test_that(
     # cat(words, file = wordfile)
     # expect_equal(unname(tools::md5sum(wordfile)), "c3983b7c7f142692f0d177ffc3079536")
 
+    Sys.setenv(CORPUS_REGISTRY = old_env)
+    cqp_reset_registry(old_env)
+    
     unlink(tmp_registry)
     unlink(tmp_data_dir)
   }
