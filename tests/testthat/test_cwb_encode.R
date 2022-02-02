@@ -38,3 +38,39 @@ test_that(
     unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
   }
 )
+
+test_that(
+  "identity of RcppCWB and CWB encoding result",
+  {
+    testthat::skip_if_not()
+    
+    utils_zipfile <- tempfile()
+    utils_dir <- file.path(tempdir(), "cwb_win-0.0.1", "utils")
+    download.file("https://github.com/PolMine/cwb_win/archive/refs/tags/v0.0.1.zip", destfile = utils_zipfile)
+    unzip(utils_zipfile, exdir = tempdir())
+    
+    utils <- Sys.glob(sprintf("%s/*.exe", utils_dir))
+    names(utils) <- gsub("\\.exe$", "", basename(utils))
+    
+    tmp_registry <- file.path(tempdir(), "tmp_registry")
+    tmp_data_dir <- file.path(tempdir(), "bt_data_dir")
+    tmp_corpus_id <- "BT"
+    
+    cmd_encode <- sprintf(
+      "%s -d %s -xsB -f %s -r %s -P pos -P lemma -S %s -S %s -S %s",
+      utils[["cwb-encode"]],
+      system.file(package = "RcppCWB", "extdata", "vrt"),
+      tmp_data_dir,
+      tmp_registry,
+      "plenary_protocol:0+lp+protocol_no+date+year+birthday+version+url+filetype",                            
+      "speaker:0+id+type+lp+protocol_no+date+year+ai_no+ai_id+ai_type+who+name+parliamentary_group+party+role",
+      "p:0+"        
+    )
+    system(command = cmd_encode)
+    
+    unlink(tmp_registry)
+    unlink(tmp_data_dir)
+  }
+)
+
+
