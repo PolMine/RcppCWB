@@ -1755,8 +1755,15 @@ PatchCWB <- R6Class(
         "src/cwb/utils/cwb-huffcode.c" = c(
           list(
             insert_before = list(
-              if (revision >= 1690) '#include "../cl/cl.h"' else '#include\\s"\\.\\./cl/globals\\.h"',
-              c("void Rprintf(const char *, ...);", "#include <strings.h>", ""),
+              '#include "../cl/cl.h"' else '#include\\s"\\.\\./cl/globals\\.h"',
+              c(
+                "void Rprintf(const char *, ...);",
+                "#include <strings.h>",
+                "#ifdef __MINGW__",
+                '#include "../cl/endian2.h"',
+                "#endif",
+                ""
+              ),
               1L
             ),
             
@@ -1786,14 +1793,30 @@ PatchCWB <- R6Class(
             # Functions usage() and main() deleted
             delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, NA),
             
-            insert_before = list("^(\\s*)for\\s*\\(i\\s=\\s0;\\si\\s<\\shc->length;\\si\\+\\+\\)\\s\\{\\s*$", "      int word, success;", 1L),
-            replace = list("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "          word = htonl(pos);", 1L),
-            insert_after = list(
-              "^\\s*word\\s=\\shtonl\\(pos\\);\\s*$",
-              c("          success = fwrite(&word, sizeof(int), 1, sync);",
-                '          if (success != 1) Rprintf("File write error!\\n");'),
+            # This is an awkward workaround because calling NwriteInt() leaves file empty, 
+            # for whatever reason
+            insert_before = list(
+              "^(\\s*)for\\s*\\(i\\s=\\s0;\\si\\s<\\shc->length;\\si\\+\\+\\)\\s\\{\\s*$",
+              c(
+                "      #ifdef __MINGW__",
+                "      int word, success;",
+                "      #endif"
+              ),
               1L
-            )
+            ),
+            replace = insert_before("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "          #ifndef __MINGW__",1L),
+            insert_after = list(
+              "^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$",
+              c(
+                "          #else",
+                "          word = htonl(pos);",
+                "          success = fwrite(&word, sizeof(int), 1, sync);",
+                '          if (success != 1) Rprintf("File write error!\\n");',
+                "          #endif"
+              ),
+              1L
+            ),
+            
             
           ),
           if (revision < 1690) list(
