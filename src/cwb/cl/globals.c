@@ -29,19 +29,9 @@
  * a couple of other utilities.
  */
 
-/* #include <locale.h> */
+#include <locale.h>
 
 #include "globals.h"
-void Rprintf(const char *, ...);
-
-char* cl_get_version(){
-  #ifdef CWB_VERSION
-  char* version = CWB_VERSION;
-  #else
-  char* version = "";
-  #endif
-  return version;
-}
 
 /**
  *  Global configuration variable: debug level.
@@ -80,7 +70,7 @@ cl_startup(void)
 {
   /* setting the locale to C makes the use of locale-sensitive Glib functions
    * behave as if they are locale insensitive; result is constant behaviour. */
-  /* setlocale(LC_ALL, "C"); */
+  setlocale(LC_ALL, "C");
 }
 
 
@@ -128,7 +118,7 @@ void
 cl_set_debug_level(int level)
 {
   if (level < 0 || level > 2)
-    Rprintf("cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
+    fprintf(stderr, "cl_set_debug_level(): non-existent level #%d (ignored)\n", level);
   else
     cl_debug = level;
 }
