@@ -20,6 +20,7 @@
  */
 %{
 
+void Rprintf(const char *, ...);
 #include <ctype.h>
 
 #include "globals.h"

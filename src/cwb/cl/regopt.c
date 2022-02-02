@@ -32,6 +32,7 @@
 #include <pcre.h>
 
 #include "globals.h"
+void Rprintf(const char *, ...);
 
 
 /**
