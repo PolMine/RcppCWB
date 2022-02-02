@@ -1755,7 +1755,7 @@ PatchCWB <- R6Class(
         "src/cwb/utils/cwb-huffcode.c" = c(
           list(
             insert_before = list(
-              '#include "../cl/cl.h"' else '#include\\s"\\.\\./cl/globals\\.h"',
+              '#include "../cl/cl.h"',
               c(
                 "void Rprintf(const char *, ...);",
                 "#include <strings.h>",
@@ -1804,7 +1804,7 @@ PatchCWB <- R6Class(
               ),
               1L
             ),
-            replace = insert_before("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "          #ifndef __MINGW__",1L),
+            insert_before = list("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "          #ifndef __MINGW__",1L),
             insert_after = list(
               "^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$",
               c(
@@ -1815,9 +1815,7 @@ PatchCWB <- R6Class(
                 "          #endif"
               ),
               1L
-            ),
-            
-            
+            )
           ),
           if (revision < 1690) list(
             replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),
