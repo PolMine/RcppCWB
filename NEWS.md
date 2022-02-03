@@ -5,7 +5,8 @@ file (#49). Fixed.
 * Difficulties of `cwb_encode()` to digest variations of path statements between
 macOS and Windows are addressed using a reliable normalization of paths with
 `fs::path()` (#48).
-
+* Argument `encoding` is checked for the validity of the encoding passed in (#34).
+* New auxiliary function `cwb_charsets()` reports charsets supported by CWB.
 
 # RcppCWB 0.5.0
 

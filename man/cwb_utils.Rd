@@ -37,7 +37,9 @@ files of the indexed corpus.}
 \item{vrt_dir}{Directory with input corpus files (verticalised format / file
 ending *.vrt).}
 
-\item{encoding}{The encoding of the files to be encoded, defaults to "utf8".}
+\item{encoding}{The encoding of the files to be encoded. Needs to be an
+encoding supported by CWB, see \code{cwb_charsets()}. "UTF-8" is taken as
+"utf8". Defaults to "utf8" (recommended charset).}
 
 \item{p_attributes}{Positional attributes (p-attributes) to be declared.}
 

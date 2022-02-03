@@ -93,7 +93,9 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'   files of the indexed corpus.
 #' @param vrt_dir Directory with input corpus files (verticalised format / file
 #'   ending *.vrt).
-#' @param encoding The encoding of the files to be encoded, defaults to "utf8".
+#' @param encoding The encoding of the files to be encoded. Needs to be an
+#'   encoding supported by CWB, see `cwb_charsets()`. "UTF-8" is taken as
+#'   "utf8". Defaults to "utf8" (recommended charset).
 #' @param s_attributes A `list` of named `character` vectors to declare
 #'   structural attributes that shall be encoded. The names of the list are the
 #'   XML elements present in the corpus. Character vectors making up the list
@@ -129,6 +131,25 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
 cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes){
+  
+  if (encoding == "UTF-8") encoding <- "utf8"
+  if (encoding %in% cwb_charsets()) stop(
+    sprintf(
+      "enoding is not a valid CWB character set, see cwb_charsets() for options",
+      cwb_charsets
+    )
+  )
+  
+  stopifnot(
+    is.character(corpus), length(corpus) == 1L,
+    is.character(registry), length(registry) == 1L, dir.exists(registry),
+    is.character(data_dir), length(data_dir) == 1L,
+    dir.exists(data_dir), length(list.files(data_dir)) == 0L,
+    is.character(vrt_dir), length(vrt_dir) == 1L, dir.exists(vrt_dir),
+    length(list.files(vrt_dir)) > 0L,
+    is.character(encoding), length(encoding) == 1L,
+    is.character(p_attributes)
+  )
   
   s_attributes_noanno <- unlist(lapply(
     names(s_attributes),
@@ -167,3 +188,36 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
 #' @examples
 #' cwb_version()
 cwb_version <- function() as.numeric_version(.cwb_version())
+
+
+
+
+#' Character sets supported by CWB
+#' 
+#' The function returns a `character` vector with characters sets (charsets)
+#' supported by the Corpus Workbench (CWB). The vector is derived from the the
+#' `CorpusCharset` object defined in the header file of the corpus library (CL).
+#' 
+#' Early versions of the CWB were developed for "latin1", "utf8" support has been
+#' introduced with CWB v3.2. Note that RcppCWB is tested only for "latin1" and
+#' "utf8" and that R uses "UTF-8" rather than utf8" (CWB) by convention.
+#' @export
+#' @examples
+#' cwb_charsets()
+cwb_charsets <- function() c(
+  "ascii",
+  "latin1",
+  "latin2",
+  "latin3",
+  "latin4",
+  "cyrillic",
+  "arabic",
+  "greek",
+  "hebrew",
+  "latin5",
+  "latin6",
+  "latin7",
+  "latin8",
+  "latin9",
+  "utf8"
+)
