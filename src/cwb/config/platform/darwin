@@ -28,8 +28,8 @@ INSTALL = install
 INSTFLAGS_FILE = -p
 
 ## try to auto-detect GNU readline (or fall back on system-provided Editline)
-READLINE_DEFINES =
-READLINE_LIBS =
+READLINE_DEFINES := $(shell '$(TOP)/instutils/find_readline.perl' --cflags)
+READLINE_LIBS := $(shell '$(TOP)/instutils/find_readline.perl' --ldflags)
 
 ## CPU architecture and operating system used to name binary releases
 RELEASE_ARCH := $(shell uname -m)
