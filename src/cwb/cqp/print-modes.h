@@ -61,7 +61,7 @@ typedef struct {
  * @see ContextDescriptor
  */
 typedef struct {
-  char *CPOSPrintFormat;              /**< printf()-Formatting String for display of a corpus position
+  char *CPOSPrintFormat;              /**< Rprintf()-Formatting String for display of a corpus position
                                            at the start of a concordance line (needs a %d or %x or
                                            similar in it somewhere)    */
 
