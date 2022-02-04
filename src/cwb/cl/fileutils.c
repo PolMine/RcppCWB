@@ -16,10 +16,16 @@
  */
 
 
+void Rprintf(const char *, ...);
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include <glib.h>
+
+#ifndef __MINGW__
+#include <signal.h> /* added by Andreas Blaette  */
+#include <sys/socket.h> /* added by Andreas Blaette */
+#endif
 
 #include "globals.h"
 #include "fileutils.h"
@@ -178,6 +184,7 @@ CLStream open_streams;
  */
 int cl_broken_pipe = 0;
 
+#ifndef __MINGW__
 static void
 cl_handle_sigpipe(int signum)
 {
@@ -190,6 +197,7 @@ cl_handle_sigpipe(int signum)
 #endif
 }
 
+#endif
 /** check whether stream type involves a pipe */
 #define STREAM_IS_PIPE(type) (type == CL_STREAM_PIPE || type == CL_STREAM_GZIP || type == CL_STREAM_BZIP2)
 
@@ -391,7 +399,10 @@ int
 cl_close_stream(FILE *handle)
 {
   CLStream stream, point;
-  int result = 0, was_pipe = 0;
+#ifndef __MINGW__
+int was_pipe;
+#endif
+  int result = 0;
 
   for (stream = open_streams ; stream ; stream = stream->next)
     if (stream->handle == handle)
@@ -413,7 +424,9 @@ cl_close_stream(FILE *handle)
   case CL_STREAM_BZIP2:
   case CL_STREAM_PIPE:
     result = pclose(stream->handle);
+#ifndef __MINGW__
     was_pipe = 1;
+#endif
     break;
   default:
     Rprintf("CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);

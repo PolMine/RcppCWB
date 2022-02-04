@@ -15,6 +15,7 @@
  *  WWW at http://www.gnu.org/copyleft/gpl.html).
  */
 
+void Rprintf(const char *, ...);
 #include <ctype.h>
 #include <sys/types.h>
 #ifndef __MINGW__
@@ -33,7 +34,9 @@
 
 /* ---------------------------------------------------------------------- IDLIST.*/
 static void FreeIDList(IDList *list);
+#ifndef __MINGW__
 static int memberIDList(char *s, IDList l);
+#endif
 
 
 
@@ -578,6 +581,7 @@ FreeIDList(IDList *list)
  * @param  l  The IDList to search.
  * @return    Boolean: true if s is a member of the list, else false.
  */
+#ifndef __MINGW__
 static int
 memberIDList(char *s, IDList l)
 {
@@ -587,6 +591,7 @@ memberIDList(char *s, IDList l)
   return 0;
 }
 
+#endif
 /* ---------------------------------------------------------------------- */
 
 /*
