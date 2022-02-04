@@ -23,7 +23,7 @@
 include $(TOP)/config/platform/linux
 
 ## Override standard CFLAGS for better optimisation and Opteron tuning 
-CFLAGS = -O3 -march=opteron -mtune=opteron
+CFLAGS = -O3 -mtune=opteron
 
 # 64-bit CPUs seem to require position-independent code
 CFLAGS += -fPIC -m64

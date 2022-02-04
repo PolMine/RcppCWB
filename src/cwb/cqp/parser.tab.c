@@ -75,7 +75,7 @@
      TAGSTART = 264,
      TAGEND = 265,
      VARIABLE = 266,
-     IPAddress = 267,
+     _IPAddress = 267,
      IPSubnet = 268,
      INTEGER = 269,
      DOUBLEFLOAT = 270,
@@ -174,7 +174,7 @@
 #define TAGSTART 264
 #define TAGEND 265
 #define VARIABLE 266
-#define IPAddress 267
+#define _IPAddress 267
 #define IPSubnet 268
 #define INTEGER 269
 #define DOUBLEFLOAT 270
@@ -289,6 +289,8 @@
 #include <sys/time.h>
 #ifndef __MINGW__
 #include <sys/resource.h>
+#else
+# include<winsock2.h>
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -341,7 +343,7 @@ extern int yylex(void);
 void 
 yyerror(const char *s)
 {
-  cqpmessage(Error, "CQP Syntax Error: %s\n\t%s <--", s, QueryBuffer);
+  cqpmessage(Error, "CQP Syntax Error: %s", s);
   generate_code = 0;
 }
 

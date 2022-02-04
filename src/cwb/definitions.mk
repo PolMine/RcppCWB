@@ -68,7 +68,7 @@ $(error Configuration variable AR is not set (for building archive from .o files
 endif
 
 ifndef RANLIB
-$(error Configuration variable RANLIB is not set (make table of contents for .a files))
+# $(error Configuration variable RANLIB is not set (make table of contents for .a files))
 endif
 
 
@@ -80,9 +80,9 @@ ifndef ETAGS
 ETAGS = $(error Cannot build TAGS file, no ETAGS program given in configuration)
 endif
 
-ifndef DEPEND
-DEPEND = $(error Cannot update dependencies, no DEPEND program call given in configuration)
-endif
+#ifndef DEPEND
+#DEPEND = $(error Cannot update dependencies, no DEPEND program call given in configuration)
+#endif
 
 ifndef DEPEND_CFLAGS
 DEPEND_CFLAGS = $(CFLAGS)
@@ -239,12 +239,13 @@ MINGW_CROSS_HOME := $(subst install: ,,$(shell $(CC) --print-search-dirs | grep 
 # The above will usually produce the correct result - usually something like
 # /usr/lib/gcc/i586-mingw32msvc/4.2.1-sjlj.  If necessary, override in config.mk
 endif
-PCRE_DEFINES := $(shell $(MINGW_CROSS_HOME)/bin/pcre-config --cflags)
-GLIB_DEFINES := $(shell export PKG_CONFIG_PATH=$(MINGW_CROSS_HOME)/lib/pkgconfig ; pkg-config --cflags glib-2.0) $(shell pkg-config  --cflags glib-2.0)
+#PCRE_DEFINES := $(shell $(MINGW_CROSS_HOME)/bin/pcre-config --cflags)
+PCRE_DEFINES := -DPCRE_STATIC
+#GLIB_DEFINES := $(shell export PKG_CONFIG_PATH=$(MINGW_CROSS_HOME)/lib/pkgconfig ; pkg-config --cflags glib-2.0) $(shell pkg-config  --cflags glib-2.0)
 endif
 
 # define macro variables for some global settings
-INTERNAL_DEFINES = -DCWB_REGISTRY_DEFAULT_PATH=\""$(DEFAULT_REGISTRY)"\" -DCOMPILE_DATE=\"$(COMPILE_DATE)\" -DCWB_VERSION=\"$(VERSION)\"
+INTERNAL_DEFINES = -DCOMPILE_DATE=\"$(COMPILE_DATE)\" -DCWB_VERSION=\"$(VERSION)\"
 
 # path to locally compiled CL library and linker command
 LIBCL_PATH = $(TOP)/cl/libcl.a
@@ -283,9 +284,7 @@ GLIB_LIBS := $(shell pkg-config --libs glib-2.0)
 endif
 LDFLAGS_LIBS = $(PCRE_LIBS) $(GLIB_LIBS) 
 else
-LDFLAGS_LIBS := -L$(MINGW_CROSS_HOME)/lib  -lpcre -lpcre.dll -lglib-2.0               \
-    $(shell $(MINGW_CROSS_HOME)/bin/pcre-config --libs)   \
-    $(shell export PKG_CONFIG_PATH=$(MINGW_CROSS_HOME)/lib/pkgconfig ; pkg-config --libs glib-2.0)
+LDFLAGS_LIBS = -lpcre -lglib-2.0
 endif 
 
 # complete sets of compiler and linker flags (allows easy specification of specific build rules)
@@ -339,6 +338,4 @@ MANEXT = 1
 #
 
 %.o : %.c
-	@$(ECHO) "    .... compile source file" $< 
-	$(RM) $@
 	$(CC) -c  -o $@ $(CFLAGS_ALL) $<

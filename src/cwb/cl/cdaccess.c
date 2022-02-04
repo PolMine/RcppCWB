@@ -28,6 +28,7 @@
 #include "special-chars.h"
 #include "bitio.h"
 #include "compression.h"
+void Rprintf(const char *, ...);
 
 /**
  * If COMPRESS_DEBUG is set to a positive integer, cl_cpos2id() will
@@ -749,7 +750,10 @@ cl_id2cpos_oldstyle(Attribute *attribute, int id, int *freq, int *restrictor_lis
       return NULL;
     }
 
-    memcpy(buffer, revcorp->data.data + ntohl(revcidx->data.data[id]), *freq * sizeof(int));
+  size_t k;
+  k =  items_to_read * sizeof(int);
+  if (k < PTRDIFF_MAX){
+  memcpy(buffer, ps->base + ps->nr_items, k);
 
     /* convert network byte order to native integers */
     for (i = 0; i < *freq; i++)
@@ -986,6 +990,7 @@ cl_read_stream(PositionStream ps, int *buffer, int buffer_size)
       buffer[i] = ntohl(buffer[i]);
   }
 
+  }
   return items_to_read;
 }
 
@@ -2497,7 +2502,7 @@ cl_dynamic_call(Attribute *attribute,
       break;
 
     case ATTAT_STRING:          /* copy output */
-      fgets(call, CL_MAX_LINE_LENGTH, pipe);
+      if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");
       dcr->value.charres = (char *)cl_strdup(call);
       break;
 

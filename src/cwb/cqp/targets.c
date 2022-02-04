@@ -94,6 +94,7 @@ int
 set_target(CorpusList *corp, FieldType dest, FieldType source, int source_offset, int overwrite)
 {
   int i, cpos, size, n_tokens;
+  cpos = -1;
 
   assert(dest != NoField);
   if (dest == source && source_offset == 0) {
