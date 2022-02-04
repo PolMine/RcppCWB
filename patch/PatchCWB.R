@@ -2008,7 +2008,7 @@ PatchCWB <- R6Class(
           list(
             # use mingw-native as default because on any other system, this can be changed
             # but on Windows, this is hard
-            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=mingw-cross", 1L),
+            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=mingw-native", 1L),
             replace = list("^#\\s*CC\\s*=\\s*gcc\\s*$", "CC = gcc", 1L)
           ),
           if (revision >= 1690) list(

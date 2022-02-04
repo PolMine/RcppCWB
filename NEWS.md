@@ -7,11 +7,14 @@ Fixed.
 macOS and Windows are addressed using a reliable normalization of paths with
 `fs::path()` (#48).
 * New auxiliary function `cwb_charsets()` reports charsets supported by CWB.
-* Argument `encoding` is checked for the validity of the encoding passed in (#34).
-* The default platform defined in `config.mk` is now mingw-cross (not
-mingw-native).
-- A patch introducing a sanity check omits 'stringop-overflow'  compiler warning
+* Argument `encoding` is checked for the validity of the encoding passed in
+(#34).
+* A patch introducing a sanity check omits 'stringop-overflow'  compiler warning
 thrown by file cl/cdaccess.c on Windows (#45).
+* An update of Xcode command line developer tools includes flex 2.6.4
+Apple(flex-34), and this is the version used not, resulting and extensive code
+changes in cl/lex.creg.c and cqp/lex.yy.c, yet without causing new errors or
+changing the functionality.
 
 
 # RcppCWB 0.5.0
