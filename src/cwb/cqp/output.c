@@ -574,9 +574,9 @@ cqpmessage(MessageType type, const char *format, ...)
     }
 
     if (!silent || type == Error) {
-      Rprintf("%s:\n\t", msg);
-      Rprintf(format, ap);
-      Rprintf("\n");
+      fprintf(stderr, "%s:\n\t", msg);
+      vfprintf(stderr, format, ap);
+      fprintf(stderr, "\n");
     }
   }
 
@@ -611,25 +611,25 @@ corpus_info(CorpusList *cl)
 
     /* print name for child mode (added v3.4.15)  */
     if (child_process)
-      Rprintf("Name:    %s\n", cl->name);
+      fprintf(outfh, "Name:    %s\n", cl->name);
     /* print size (should be the mother_size entry) */
-    Rprintf("Size:    %d\n", cl->mother_size);
+    fprintf(outfh, "Size:    %d\n", cl->mother_size);
     /* print charset */
-    Rprintf("Charset: ");
+    fprintf(outfh, "Charset: ");
 
     if (cl->corpus->charset == unknown_charset)
-      Rprintf("<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
+      fprintf(outfh, "<unsupported> (%s)\n", cl_corpus_property(cl->corpus, "charset"));
     else
-      Rprintf("%s\n", cl_charset_name(cl->corpus->charset));
+      fprintf(outfh, "%s\n", cl_charset_name(cl->corpus->charset));
 
     /* print properties */
-    Rprintf("Properties:\n");
+    fprintf(outfh, "Properties:\n");
     if (!(p = cl_first_corpus_property(cl->corpus)))
-      Rprintf("\t<none>\n");
+      fprintf(outfh, "\t<none>\n");
     else
       for ( ; p != NULL; p = cl_next_corpus_property(p))
-        Rprintf("\t%s = '%s'\n", p->property, p->value);
-    Rprintf("\n");
+        fprintf(outfh, "\t%s = '%s'\n", p->property, p->value);
+    fprintf(outfh, "\n");
 
     /* do we have further info in a .INFO file? */
     if (
@@ -639,7 +639,7 @@ corpus_info(CorpusList *cl)
         /* most of the time this is NOT a problem - it just means the default HOME/.info
          * has not been created. Just another way that there can be no more info. */
         )
-      Rprintf("No further information available about %s\n", cl->name);
+      fprintf(outfh, "No further information available about %s\n", cl->name);
 
     else {
       /* we do have some info to print out. */
@@ -651,7 +651,7 @@ corpus_info(CorpusList *cl)
       /* if the .info file didn't end in a newline, prit one,
        * to ensure that output from "info;" always does end thus.*/
       if (buf[strlen(buf)-1] != '\n')
-        Rprintf("\n");
+        fprintf(outfh, "\n");
 
       cl_close_stream(fh);
     }
@@ -738,7 +738,6 @@ static int
 pt_get_anchor_cpos(CorpusList *cl, int n, FieldType anchor, int offset)
 {
   int real_n, cpos;
-  cpos = -1;
 
   real_n = (cl->sortidx) ? cl->sortidx[n] : n; /* get anchor for n-th match */
 
