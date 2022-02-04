@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+void Rprintf(const char *, ...);
+
 #include "cl.h"
 #include "ui-helpers.h"
 

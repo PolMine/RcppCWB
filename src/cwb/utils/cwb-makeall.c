@@ -17,17 +17,25 @@
 
 
 #include "../cl/cl.h"
+void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
+
+/* included by AB to ensure that winsock2.h is included before windows.h */
+#ifdef __MINGW__
+#include <winsock2.h> /* AB reversed order, in original CWB code windows.h is included first */
+#endif
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../cl/cwb-globals.h"
-#include "../cl/corpus.h"
 #include "../cl/attributes.h"
-#include "../cl/endian.h"
+#include "../cl/endian2.h"
 #include "../cl/fileutils.h"
 
-/** The corpus we are working on */
 Corpus *corpus;
 
-/** Name of this program */
-char *progname = NULL;
 
 
 /**
@@ -48,7 +56,7 @@ component_ok(Attribute *attr, ComponentID cid)
 
   if (state != ComponentDefined) {
     Rprintf("Internal Error: Illegal state %d/component ID %d ???\n", state, cid);
-    exit(1);
+    return 1;
   }
 
   return 0;
@@ -66,26 +74,28 @@ component_ok(Attribute *attr, ComponentID cid)
  * @param attr  The attribute of the component to create.
  * @param cid   The component ID of the component to create.
  */
-void
+int
 makeall_make_component(Attribute *attr, ComponentID cid)
 {
   int state;
 
   if (!component_ok(attr, cid)) {
     Rprintf(" + creating %s ... ", cid_name(cid));
-    fflush(stdout);
+/* fflush(stdout); */
     create_component(attr, cid);
 
     state = component_state(attr, cid);
     if ( !(state == ComponentLoaded || state == ComponentUnloaded) ) {
       Rprintf("FAILED\n");
       Rprintf("ERROR. Aborted.\n");
-      exit(1);
+      return 1;
     }
 
     Rprintf("OK\n");
   }
-}
+  return 0;
+
+  }
 
 
 
@@ -109,7 +119,7 @@ validate_revcorp(Attribute *attr)
   int i, offset, cpos, id;
 
   Rprintf(" ? validating %s ... ", cid_name(CompRevCorpus));
-  fflush(stdout);
+/* fflush(stdout); */
 
   if (!revcorp) {
     Rprintf("FAILED (no data)\n");
@@ -176,7 +186,7 @@ validate_revcorp(Attribute *attr)
  * @param validate  boolean - if true, validate_revcorp is called to check
  *                  the resulting revcorp.
  */
-void
+int
 makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
 {
   assert(attr);
@@ -212,11 +222,11 @@ makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
         Rprintf(" ! attribute not created yet (skipped)\n");
         if (cl_str_is(attr->any.name, "word"))
           Rprintf("WARNING. The 'word' attribute must be created before using CQP on this corpus!\n");
-        return;
+        return 0;
       }
       else {
         Rprintf("ERROR. Lexicon is missing. You must use the 'encode' tool first!\n");
-        exit(1);
+        return 1;
       }
     }
     else {
@@ -248,7 +258,7 @@ makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
           /* validate the index, i.e. the REVCORP component we just created */
           if (!validate_revcorp(attr)) {
             Rprintf("ERROR. Validation failed.\n");
-            exit(1);
+            return 1;
           }
         }
       }
@@ -263,197 +273,10 @@ makeall_do_attribute(Attribute *attr, ComponentID cid, int validate)
       /* validates even if REVCORP already existed -> useful trick for validating later */
       if (!validate_revcorp(attr)) {
         Rprintf("ERROR. Validation failed.\n");
-        exit(1);
+        return 1;
       }
     }
   }
+    return 0;
 
-}
-
-/**
- * Prints a usage message and exits the program.
- */
-void
-makeall_usage(void)
-{
-  Rprintf("\n");
-  Rprintf("Usage:  %s [options] <corpus> [<attribute> ...] \n", progname);
-  Rprintf("\n");
-  Rprintf("Creates a lexicon and index for each p-attribute of an encoded CWB corpus.\n");
-  Rprintf("\n");
-  Rprintf("Options:\n");
-  Rprintf("  -D        debug mode\n");
-  Rprintf("  -r <dir>  use registry directory <dir>\n");
-  Rprintf("  -c <comp> create component <comp> only\n");
-  Rprintf("  -P <att>  work on attribute <att> [default: ALL attributes]\n");
-  Rprintf("  -M <size> limit memory usage to approx. <size> MBytes\n");
-  Rprintf("  -V        validate index after creating it\n");
-  Rprintf("Part of the IMS Open Corpus Workbench v" CWB_VERSION "\n\n");
-  exit(2);
-}
-/* TODO  it is a bit confusing that there is both a -P option for attributes, AND you can list attributes
- * after the corpus name. (Or is there a difference between these two ways of specifying attributes? Either
- * way, it needs to be documented in the usage message, and in the manfile too.
- * NB the normally parallel huffcode does not have attributes after the corpus!
- */
-
-
-/* *************** *
- *      MAIN()     *
- * *************** */
-
-/**
- * Main function for cwb-makeall.
- *
- * @param argc   Number of command-line arguments.
- * @param argv   Command-line arguments.
- */
-int
-main(int argc, char **argv)
-{
-  char *attr_name = NULL;
-  Attribute *attribute = NULL;
-
-  char *registry_directory = NULL;
-  char *corpus_id = NULL;
-
-  extern int optind;
-  extern char *optarg;
-  int c;
-
-  int validate = 0;
-
-  char *component = NULL;
-
-  ComponentID cid;
-  ComponentID my_cid;    /* used to free up RAM used by an Attribute when looping over numerous Attributes. */
-
-  int i = 0;
-
-  cl_startup();
-  progname = argv[0];
-
-  /* ------------------------------------------------- PARSE ARGUMENTS */
-
-  while ((c = getopt(argc, argv, "+r:c:P:hDM:V")) != EOF) {
-    switch (c) {
-
-    /* r: registry directory */
-    case 'r':
-      if (!registry_directory)
-        registry_directory = optarg;
-      else {
-        Rprintf("%s: -r option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-    case 'P':
-      if (!attr_name)
-        attr_name = optarg;
-      else {
-        Rprintf("%s: -P option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-    case 'c':
-      if (!component)
-        component = optarg;
-      else {
-        Rprintf("%s: -c option used twice\n", progname);
-        exit(2);
-      }
-      break;
-
-    case 'D':
-      cl_set_debug_level(1);
-      break;
-
-    case 'M':
-      i = atoi(optarg);
-      cl_set_memory_limit(i);
-      break;
-
-    case 'V':
-      validate++;
-      break;
-
-    case 'h':
-    default:
-      makeall_usage();
-    }
   }
-
-  if (optind >= argc) {
-    Rprintf("Missing argument, try \"%s -h\" for more information.\n", progname);
-    exit(1);
-  }
-
-  /* first argument: corpus id */
-  corpus_id = argv[optind++];
-
-  if (component) {
-    cid = component_id(component);
-    if (cid == CompLast) {
-      Rprintf("Illegal component name: ``%s''\n", component);
-      exit(1);
-    }
-  }
-  else
-    cid = CompLast;
-
-  if (!(corpus = cl_new_corpus(registry_directory, corpus_id))) {
-    Rprintf("Corpus %s not found in registry %s . Aborted.\n", corpus_id, registry_directory ? registry_directory : cl_standard_registry());
-    exit(1);
-  }
-
-  Rprintf("=== Makeall: processing corpus %s ===\n", corpus_id);
-  Rprintf("Registry directory: %s\n", corpus->registry_dir);
-
-  if (optind < argc) {
-    /* process each specified atttribute (at the end of the invocation) */
-    for (i = optind; i < argc; i++) {
-      if ( NULL != (attribute = cl_new_attribute(corpus, argv[i], ATT_POS)) ) {
-        makeall_do_attribute(attribute, cid, validate);
-        /* now destoy all components; this makes the attribute unusable,
-           but it is currently the only way to free allocated and memory-mapped data
-           ready for the next of the corpus attributes. */
-        for (my_cid = CompDirectory; my_cid < CompLast; my_cid++)
-          drop_component(attribute, my_cid);
-      }
-      else {
-        Rprintf("p-attribute %s.%s not defined. Aborted.\n", corpus_id, argv[i]);
-        exit(1);
-      }
-    }
-  }
-  else if (attr_name != NULL) {
-    /* process a specified attribute (via the -P option) */
-    if ( NULL != (attribute = cl_new_attribute(corpus, attr_name, ATT_POS)) )
-      makeall_do_attribute(attribute, cid, validate);
-    else {
-      Rprintf("p-attribute %s.%s not defined. Aborted.\n", corpus_id, attr_name);
-      exit(1);
-    }
-  }
-  else {
-    /* process each p-attribute of the corpus in turn */
-    for (attribute = corpus->attributes; attribute; attribute = attribute->any.next) {
-      if (attribute->type == ATT_POS) {
-        makeall_do_attribute(attribute, cid, validate);
-        /* see comment above on using "drop_comnponent". */
-        for (my_cid = CompDirectory; my_cid < CompLast; my_cid++)
-          drop_component(attribute, my_cid);
-          /* ordering gleaned from attributes.h */
-      }
-    }
-  }
-
-  Rprintf("========================================\n");
-  exit(0);
-}
-
-
-
-
