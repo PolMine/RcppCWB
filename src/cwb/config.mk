@@ -45,7 +45,7 @@
 #                               - set HOMEBREW_ROOT to base of HomeBrew tree on command line
 #
 ifndef PLATFORM
-PLATFORM=mingw-cross
+PLATFORM=mingw-native
 endif
 include $(TOP)/config/platform/$(PLATFORM)
 
