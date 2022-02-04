@@ -133,9 +133,9 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes){
   
   if (encoding == "UTF-8") encoding <- "utf8"
-  if (encoding %in% cwb_charsets()) stop(
+  if (!encoding %in% cwb_charsets()) stop(
     sprintf(
-      "enoding is not a valid CWB character set, see cwb_charsets() for options",
+      "encoding '%' is not a valid CWB character set, see cwb_charsets() for options",
       cwb_charsets
     )
   )
