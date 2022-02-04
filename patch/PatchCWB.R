@@ -738,7 +738,7 @@ PatchCWB <- R6Class(
             #   cdaccess.c:982:5: warning: 'memcpy' specified bound between 18446744065119617024 and 18446744073709551612 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
             # 982 |     memcpy(buffer, ps->base + ps->nr_items, items_to_read * sizeof(int));
             insert_before = list(
-              "^\\s*memcpy\\(buffer,\\srevcorp->data.data\\s\\+\\sntohl\\(revcidx->data.data\\[id\\]\\),\\s\\*freq\\s\\*\\ssizeof\\(int\\)\\);",
+              "^\\s*memcpy\\(buffer,\\sps->base\\s\\+\\sps->nr_items,\\sitems_to_read\\s\\*\\ssizeof\\(int\\)\\);\\s*$",
               c(
                 "  size_t k;",
                 "  k =  items_to_read * sizeof(int);",
@@ -746,7 +746,7 @@ PatchCWB <- R6Class(
               )
             ),
             replace = list(
-              "^\\s*memcpy\\(buffer,\\srevcorp->data.data\\s\\+\\sntohl\\(revcidx->data.data\\[id\\]\\),\\s\\*freq\\s\\*\\ssizeof\\(int\\)\\);",
+              "^\\s*memcpy\\(buffer,\\sps->base\\s\\+\\sps->nr_items,\\sitems_to_read\\s\\*\\ssizeof\\(int\\)\\);\\s*$",
               "  memcpy(buffer, ps->base + ps->nr_items, k);", 1L
             ),
             insert_before = list("^(\\s*)return\\sitems_to_read;\\s*$", "  }", 1L)
