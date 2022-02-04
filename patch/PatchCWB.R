@@ -1622,8 +1622,8 @@ PatchCWB <- R6Class(
             insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list input_files){"), 1L),
             delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
             
-            replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
-            replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA)
+            replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L)
+            # replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA)
           ),
           if (revision == 1069) list(
             replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
@@ -1681,8 +1681,8 @@ PatchCWB <- R6Class(
             replace = list("^(\\s*)const\\schar\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern const char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
             replace = list("^(\\s*)int\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
-            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L),
-            replace = list('Rprintf\\(encoder->avs_fh', 'fprintf(encoder->avs_fh', 1L)
+            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L)
+#            replace = list('Rprintf\\(encoder->avs_fh', 'fprintf(encoder->avs_fh', 1L)
           )
         ),
         
