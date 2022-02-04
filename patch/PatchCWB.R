@@ -732,7 +732,25 @@ PatchCWB <- R6Class(
             
             # cdaccess.c:2697:12: warning: ignoring return value of ???fgets???, declared with attribute warn_unused_result [-Wunused-result]
             # fgets(call, CL_MAX_LINE_LENGTH, pipe);
-            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1)
+            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
+            
+            # cdaccess.c: In function 'cl_read_stream':
+            #   cdaccess.c:982:5: warning: 'memcpy' specified bound between 18446744065119617024 and 18446744073709551612 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+            # 982 |     memcpy(buffer, ps->base + ps->nr_items, items_to_read * sizeof(int));
+            insert_before = list(
+              "^\\s*memcpy\\(buffer,\\srevcorp->data.data\\s\\+\\sntohl\\(revcidx->data.data\\[id\\]\\),\\s\\*freq\\s\\*\\ssizeof\\(int\\)\\);",
+              c(
+                "  size_t k;",
+                "  k =  items_to_read * sizeof(int);",
+                "  if (k < PTRDIFF_MAX){"
+              )
+            ),
+            replace = list(
+              "^\\s*memcpy\\(buffer,\\srevcorp->data.data\\s\\+\\sntohl\\(revcidx->data.data\\[id\\]\\),\\s\\*freq\\s\\*\\ssizeof\\(int\\)\\);",
+              "  memcpy(buffer, ps->base + ps->nr_items, k);", 1L
+              )
+            ),
+            insert_before = list("^(\\s*)return\\sitems_to_read;\\s*$", "  }", 1L)
           ),
           
           # These are patches to omit 'unused variable' warnings gone with r1690 (vars commented out, for instance)
@@ -1991,7 +2009,7 @@ PatchCWB <- R6Class(
           list(
             # use mingw-native as default because on any other system, this can be changed
             # but on Windows, this is hard
-            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=mingw-native", 1L),
+            replace = list("^PLATFORM=darwin-brew\\s*$", "PLATFORM=mingw-cross", 1L),
             replace = list("^#\\s*CC\\s*=\\s*gcc\\s*$", "CC = gcc", 1L)
           ),
           if (revision >= 1690) list(
