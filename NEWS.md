@@ -1,15 +1,18 @@
 # RcppCWB 0.5.0.9001 and later
 
-* The `cwb_encode()` function did not declare structural attributes in the registry
-file (#49). Fixed.
+* The `cwb_encode()` function did not declare structural attributes in the
+registry and mistakenly channeled output for the file to the terminal (#49).
+Fixed.
 * Difficulties of `cwb_encode()` to digest variations of path statements between
 macOS and Windows are addressed using a reliable normalization of paths with
 `fs::path()` (#48).
-* Argument `encoding` is checked for the validity of the encoding passed in (#34).
 * New auxiliary function `cwb_charsets()` reports charsets supported by CWB.
+* Argument `encoding` is checked for the validity of the encoding passed in (#34).
 * The default platform defined in `config.mk` is now mingw-cross (not
-mingw-native)
-- Omit 'stringop-overflow' compiler warning on Windows ().
+mingw-native).
+- A patch introducing a sanity check omits 'stringop-overflow'  compiler warning
+thrown by file cl/cdaccess.c on Windows (#45).
+
 
 # RcppCWB 0.5.0
 
