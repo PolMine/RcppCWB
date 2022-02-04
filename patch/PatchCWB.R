@@ -748,7 +748,6 @@ PatchCWB <- R6Class(
             replace = list(
               "^\\s*memcpy\\(buffer,\\srevcorp->data.data\\s\\+\\sntohl\\(revcidx->data.data\\[id\\]\\),\\s\\*freq\\s\\*\\ssizeof\\(int\\)\\);",
               "  memcpy(buffer, ps->base + ps->nr_items, k);", 1L
-              )
             ),
             insert_before = list("^(\\s*)return\\sitems_to_read;\\s*$", "  }", 1L)
           ),

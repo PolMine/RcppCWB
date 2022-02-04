@@ -9,7 +9,7 @@ macOS and Windows are addressed using a reliable normalization of paths with
 * New auxiliary function `cwb_charsets()` reports charsets supported by CWB.
 * The default platform defined in `config.mk` is now mingw-cross (not
 mingw-native)
-
+- Omit 'stringop-overflow' compiler warning on Windows ().
 
 # RcppCWB 0.5.0
 
