@@ -130,6 +130,8 @@ check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv
     stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
   if (any(is.na(cpos)))
     stop("there are NA values among the corpus positions")
+  if (is.null(cpos))
+    warning("vector of corpus positions (cpos) is NULL")
   return( TRUE )
 }
 

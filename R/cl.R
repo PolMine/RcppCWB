@@ -92,7 +92,10 @@ cl_cpos2struc <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORP
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  
+  if (length(cpos) == 0L) return(integer())
   check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
+  
   .cl_cpos2struc(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
 }
 
@@ -119,7 +122,10 @@ cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  
+  if (length(cpos) == 0L) return(integer())
   check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
+  
   .cl_cpos2lbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
 }
 
@@ -128,7 +134,10 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
   check_registry(registry)
   check_corpus(corpus, registry)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
+  
   check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
+  if (length(cpos) == 0L) return(integer())
+  
   .cl_cpos2rbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
 }
 
@@ -212,6 +221,7 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
   check_registry(registry)
   check_corpus(corpus, registry)
+  if (length(cpos) == 0L) return(integer())
   .cl_cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 
@@ -219,6 +229,7 @@ cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
   check_registry(registry)
   check_corpus(corpus, registry)
+  if (length(cpos) == 0L) return(integer())
   .cl_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 

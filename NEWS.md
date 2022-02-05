@@ -15,6 +15,10 @@ thrown by file cl/cdaccess.c on Windows (#45).
 Apple(flex-34), and this is the version used not, resulting and extensive code
 changes in cl/lex.creg.c and cqp/lex.yy.c, yet without causing new errors or
 changing the functionality.
+* `check_cpos()` issues a warning if argument `cpos` is `NULL` (#21).
+* Functions `cl_cpos2id()`, `cl_cpos2lbound()`, `cl_cpos2rbound()`,
+`cl_cpos2str()` and `cl_cpo2struc()` will return an empty, zero-length integer
+vector if argument `cpos` is `NULL` (#21).
 
 
 # RcppCWB 0.5.0
