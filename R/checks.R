@@ -31,7 +31,10 @@ check_registry <- function(registry){
 
 #' @rdname checks
 #' @export check_corpus
+#' @importFrom fs path
 check_corpus <- function(corpus, registry){
+  
+  registry <- fs::path(registry)
   
   if (length(corpus) != 1L)
     stop("corpus needs to be a vector of length 1")
@@ -39,13 +42,16 @@ check_corpus <- function(corpus, registry){
   if (!is.character(corpus))
     stop("corpus needs to be a character vector")
   
-  registry <- normalizePath(registry, winslash = "/")
   if (isFALSE(dir.exists(registry)))
     stop(sprintf("Registry directory '%s' does not exist.", registry))
   
   if (isFALSE(cqp_is_initialized())) cqp_initialize(registry = registry)
   if (cqp_get_registry() != registry){
-    warning(sprintf("Resetting registry directory from '%s' to '%s'", cqp_get_registry(), registry))
+    warning(
+      sprintf(
+        "Resetting registry directory from '%s' to '%s'",
+        cqp_get_registry(), registry)
+      )
     cqp_reset_registry(registry = registry)
   }
   

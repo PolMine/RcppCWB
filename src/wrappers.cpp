@@ -782,3 +782,24 @@ Rcpp::StringVector cwb_version(){
   result(0) = cl_get_version();
   return result;
 }
+
+
+// [[Rcpp::export(name=".cl_load_corpus")]]
+int cl_load_corpus(SEXP corpus, SEXP registry_dir) {
+  
+  char *corpus_id = strdup(Rcpp::as<std::string>(corpus).c_str());
+  char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
+
+  Corpus * c;
+  
+  c = cl_new_corpus(registry_directory, corpus_id);
+
+  if (c == NULL) {
+    return 0;
+  } else {
+    return 1;
+  }
+  return 0;
+}
+
+

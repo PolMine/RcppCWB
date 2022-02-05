@@ -19,6 +19,12 @@ changing the functionality.
 * Functions `cl_cpos2id()`, `cl_cpos2lbound()`, `cl_cpos2rbound()`,
 `cl_cpos2str()` and `cl_cpo2struc()` will return an empty, zero-length integer
 vector if argument `cpos` is `NULL` (#21).
+* Warnings issued by `check_corpus()` (used internally by many functions)
+resulted from slightly differing representations of otherwise identical 
+paths. Using `fs::path()` for path for normalization internally will omit
+misleading warning messages.
+* `cqp_get_registry()` will now return a `fs::path` object, as a safeguard for
+a consistent normalization of paths.
 
 
 # RcppCWB 0.5.0

@@ -544,6 +544,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cl_load_corpus
+int cl_load_corpus(SEXP corpus, SEXP registry_dir);
+RcppExport SEXP _RcppCWB_cl_load_corpus(SEXP corpusSEXP, SEXP registry_dirSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
+    rcpp_result_gen = Rcpp::wrap(cl_load_corpus(corpus, registry_dir));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},
@@ -588,6 +600,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
     {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 7},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
+    {"_RcppCWB_cl_load_corpus", (DL_FUNC) &_RcppCWB_cl_load_corpus, 2},
     {NULL, NULL, 0}
 };
 

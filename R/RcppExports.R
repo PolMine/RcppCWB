@@ -169,3 +169,7 @@
     .Call(`_RcppCWB_cwb_version`)
 }
 
+.cl_load_corpus <- function(corpus, registry_dir) {
+    .Call(`_RcppCWB_cl_load_corpus`, corpus, registry_dir)
+}
+

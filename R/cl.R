@@ -368,3 +368,14 @@ corpus_data_dir <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 corpus_is_loaded <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   as.logical(.corpus_is_loaded(corpus = corpus, registry = registry))
 }
+
+#' Load corpus
+#' 
+#' @inheritParams corpus_data_dir
+#' @return `TRUE` if corpus could be loaded and `FALSE` if not.
+#' @export corpus_is_loaded
+#' @examples
+#' cl_load_corpus("REUTERS")
+cl_load_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  as.logical(.cl_load_corpus(corpus = corpus, registry = registry))
+}

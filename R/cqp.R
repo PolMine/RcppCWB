@@ -62,7 +62,7 @@ cqp_is_initialized <- function(){
 
 #' @export cqp_get_registry
 #' @rdname cqp_initialize
-cqp_get_registry <- function() .cqp_get_registry()
+cqp_get_registry <- function() fs::path(.cqp_get_registry())
 
 #' @export cqp_reset_registry
 #' @rdname cqp_initialize
@@ -74,7 +74,7 @@ cqp_reset_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
   } else {
     check_registry(registry_dir)
     Sys.setenv(CORPUS_REGISTRY = registry_dir)
-    if (nchar(registry_dir) > 255){
+    if (nchar(registry_dir) > 255L){
       stop("cannot assign new registry: maximum nchar(registry) is 255")
     } else {
       .cqp_set_registry(registry_dir = registry_dir)
