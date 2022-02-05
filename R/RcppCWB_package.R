@@ -20,9 +20,10 @@
 #'   The CWB is a classical tool which has inspired a set of developments. A
 #'   persisting advantage of the CWB is its mature, open source code base that
 #'   is actively maintained by a community of developers. It is used as a robust
-#'   and efficient backend for widely used tools such as TXM or CQPweb
-#'   (\url{https://cwb.sourceforge.io/cqpweb.php}). Its uncompromising C
-#'   implementation guarantees speed and makes it well suited to be integrated
+#'   and efficient backend for widely used tools such as
+#'   TXM(\url{HEAD("https://txm.gitpages.huma-num.fr/textometrie/", verbose())})
+#'   or CQPweb (\url{https://cwb.sourceforge.io/cqpweb.php}). Its uncompromising
+#'   C implementation guarantees speed and makes it well suited to be integrated
 #'   with R at the same time.
 #'
 #'   The package \code{RcppCWB} is a follow-up on the \code{rcqp} package that
