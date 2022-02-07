@@ -25,6 +25,8 @@ paths. Using `fs::path()` for path for normalization internally will omit
 misleading warning messages.
 * `cqp_get_registry()` will now return a `fs::path` object, as a safeguard for
 a consistent normalization of paths.
+* New function `cl_load_corpus()` does what the function suggests (load corpus,
+yet not available for CQP).
 
 
 # RcppCWB 0.5.0

@@ -379,3 +379,13 @@ corpus_is_loaded <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 cl_load_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   as.logical(.cl_load_corpus(corpus = corpus, registry = registry))
 }
+
+#' Show CL corpora
+#' 
+#' @return A `character` vector.
+#' @export corpus_is_loaded
+#' @examples
+#' cl_load_corpus("REUTERS")
+cl_corpora <- function(){
+  .cl_corpora()
+}

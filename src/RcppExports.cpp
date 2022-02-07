@@ -556,6 +556,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cl_corpora
+Rcpp::StringVector cl_corpora();
+RcppExport SEXP _RcppCWB_cl_corpora() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(cl_corpora());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_decode_s_attribute", (DL_FUNC) &_RcppCWB_decode_s_attribute, 3},
@@ -601,6 +611,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 7},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
     {"_RcppCWB_cl_load_corpus", (DL_FUNC) &_RcppCWB_cl_load_corpus, 2},
+    {"_RcppCWB_cl_corpora", (DL_FUNC) &_RcppCWB_cl_corpora, 0},
     {NULL, NULL, 0}
 };
 

@@ -803,3 +803,19 @@ int cl_load_corpus(SEXP corpus, SEXP registry_dir) {
 }
 
 
+// [[Rcpp::export(name=".cl_corpora")]]
+Rcpp::StringVector cl_corpora(){
+  
+  int n = 0;
+  Corpus *c;
+  for (c = loaded_corpora; c != NULL; c = c->next) n++;
+  
+  Rcpp::StringVector result(n);
+  int i = 0;
+  for (c = loaded_corpora; c != NULL; c = c->next){
+    result(i) = c->registry_name;
+    i++;
+  };
+  
+  return result;
+}
