@@ -141,23 +141,27 @@ GLIB_LINKER_FLAGS="`pkg-config --libs glib-2.0`"
 printf "%s\n" "$GLIB_LINKER_FLAGS"
 
 # Check availability of ncurses
-printf "* using pkg-config to check whether ncurses is available ... ";
-pkg-config --exists ncurses
-PKG_CONFIG_NCURSES_INFO=$?
-if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
-  printf "yes\n";
-else
-  printf "no\n";
-  echo "--------------------------------- WARNING ----------------------------"
-  echo "Package ncurses was not found in the pkg-config search path. This does"
-  echo "not necessarily meant that ncurses is not installed. Ensure that ncurses "
-  echo "is installed and can be found by pkg-config by installing:"
-  echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
-  echo " * yum: ncurses-devel (Fedora, CentOS, etc)"
-  echo " * csw: libncurses_dev (Solaris)"
-  echo "----------------------------------------------------------------------"
-  # no abort because pkg-config will not find ncurses on Solaris
-fi
+#
+# This check is omitted because ncurses is only a dependency of editline and 
+# editline is not compiled or used in this package.
+#
+# printf "* using pkg-config to check whether ncurses is available ... ";
+# pkg-config --exists ncurses
+# PKG_CONFIG_NCURSES_INFO=$?
+# if [ $PKG_CONFIG_NCURSES_INFO = 0 ]; then
+#   printf "yes\n";
+# else
+#   printf "no\n";
+#   echo "--------------------------------- WARNING ----------------------------"
+#   echo "Package ncurses was not found in the pkg-config search path. This does"
+#   echo "not necessarily meant that ncurses is not installed. Ensure that ncurses "
+#   echo "is installed and can be found by pkg-config by installing:"
+#   echo " * deb: libncurses5-dev libncursesw5-dev (Debian, Ubuntu, etc)"
+#   echo " * yum: ncurses-devel (Fedora, CentOS, etc)"
+#   echo " * csw: libncurses_dev (Solaris)"
+#   echo "----------------------------------------------------------------------"
+#   # no abort because pkg-config will not find ncurses on Solaris
+# fi
 
 # Check availability of pcre
 printf "* check whether pcre is available ... ";

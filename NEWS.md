@@ -30,6 +30,12 @@ yet not available for CQP).
 * New function `cl_list_corpora()` complements existing function
 `cqp_list_corpora()` for the CL context.
 * Function `cl_delete_corpus()` will now (visibly) return a `logial` value.
+* Re-running `cwb_encode()` did not reset global variables, which resulted in a
+set of errors. Solved. (#51)
+* The check for the availability of ncurses is omitted in the configure file
+and the editline subdirectory of src/cwb is included in .Rbuildignore to 
+minimize the size of the tarball. The ncurses library is a dependency of 
+editline, but editline is not built in the context of this package (#26).
 
 
 # RcppCWB 0.5.0
