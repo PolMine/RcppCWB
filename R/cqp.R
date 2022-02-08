@@ -165,5 +165,5 @@ cqp_list_subcorpora <- function(corpus){
 #' @export cqp_load_corpus
 #' @rdname cqp_query
 cqp_load_corpus <- function(corpus, registry){
-  .cqp_load_corpus(corpus = corpus, registry = registry)
+  as.logical(.cqp_load_corpus(corpus = corpus, registry = registry))
 }
