@@ -10,6 +10,8 @@ extern "C" {
   #include <pcre.h>
   #include "server.h"
   
+#include "cwb/cqp/corpmanag.h"
+  
   #include "_globalvars.h"
   #include "_eval.h"
 
@@ -803,8 +805,8 @@ int cl_load_corpus(SEXP corpus, SEXP registry_dir) {
 }
 
 
-// [[Rcpp::export(name=".cl_corpora")]]
-Rcpp::StringVector cl_corpora(){
+// [[Rcpp::export(name=".cl_list_corpora")]]
+Rcpp::StringVector cl_list_corpora(){
   
   int n = 0;
   Corpus *c;
@@ -818,4 +820,19 @@ Rcpp::StringVector cl_corpora(){
   };
   
   return result;
+}
+
+
+// [[Rcpp::export(name=".cqp_load_corpus")]]
+int cqp_load_corpus(SEXP corpus, SEXP registry){
+  char          *entry;
+  char          *dirname;
+  CorpusList * cl;
+
+  entry = strdup(Rcpp::as<std::string>(corpus).c_str());
+  dirname = strdup(Rcpp::as<std::string>(registry).c_str());
+  
+  cl = ensure_syscorpus(dirname, entry);
+  
+  return 1;
 }

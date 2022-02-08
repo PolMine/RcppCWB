@@ -1354,7 +1354,21 @@ PatchCWB <- R6Class(
         ),
         
         "src/cwb/cqp/corpmanag.c" = c(
-          list(),
+          list(
+            # The ensure_syscorpus function is static (not exported) by default.
+            # By removing the keyword 'static' and including a definition in 
+            # corpmanag.h, it can by used by a Rcpp header
+            delete_line_before(
+              "^\\s*ensure_syscorpus\\(char\\s\\*registry,\\schar\\s\\*name\\)",
+              2L, 1L
+            ),
+            insert_before(
+              "^\\s*ensure_syscorpus\\(char\\s\\*registry,\\schar\\s\\*name\\)",
+              "CorpusList *",
+              1L
+            )
+            
+          ),
           
           # In r1690, this is not "extern" but "static"
           if (revision == 1069) list(
@@ -1365,7 +1379,10 @@ PatchCWB <- R6Class(
         ),
         
         "src/cwb/cqp/corpmanag.h" = c(
-          list(),
+          list(
+            # the ensure_syscorpus() function is static (not available externally) by default.
+            insert_before = list("^#endif\\s*$", "CorpusList * ensure_syscorpus(char *registry, char *name);", 1L)
+          ),
           
           # extern'ed in original CWB code
           if (revision == 1069) list(

@@ -173,7 +173,11 @@
     .Call(`_RcppCWB_cl_load_corpus`, corpus, registry_dir)
 }
 
-.cl_corpora <- function() {
-    .Call(`_RcppCWB_cl_corpora`)
+.cl_list_corpora <- function() {
+    .Call(`_RcppCWB_cl_list_corpora`)
+}
+
+.cqp_load_corpus <- function(corpus, registry) {
+    .Call(`_RcppCWB_cqp_load_corpus`, corpus, registry)
 }
 

@@ -27,6 +27,8 @@ misleading warning messages.
 a consistent normalization of paths.
 * New function `cl_load_corpus()` does what the function suggests (load corpus,
 yet not available for CQP).
+* New function `cl_list_corpora()` complements existing function
+`cqp_list_corpora()` for the CL context.
 
 
 # RcppCWB 0.5.0

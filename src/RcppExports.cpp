@@ -556,13 +556,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cl_corpora
-Rcpp::StringVector cl_corpora();
-RcppExport SEXP _RcppCWB_cl_corpora() {
+// cl_list_corpora
+Rcpp::StringVector cl_list_corpora();
+RcppExport SEXP _RcppCWB_cl_list_corpora() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(cl_corpora());
+    rcpp_result_gen = Rcpp::wrap(cl_list_corpora());
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_load_corpus
+int cqp_load_corpus(SEXP corpus, SEXP registry);
+RcppExport SEXP _RcppCWB_cqp_load_corpus(SEXP corpusSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_load_corpus(corpus, registry));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -611,7 +623,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 7},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
     {"_RcppCWB_cl_load_corpus", (DL_FUNC) &_RcppCWB_cl_load_corpus, 2},
-    {"_RcppCWB_cl_corpora", (DL_FUNC) &_RcppCWB_cl_corpora, 0},
+    {"_RcppCWB_cl_list_corpora", (DL_FUNC) &_RcppCWB_cl_list_corpora, 0},
+    {"_RcppCWB_cqp_load_corpus", (DL_FUNC) &_RcppCWB_cqp_load_corpus, 2},
     {NULL, NULL, 0}
 };
 
