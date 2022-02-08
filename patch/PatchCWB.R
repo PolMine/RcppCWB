@@ -1360,7 +1360,7 @@ PatchCWB <- R6Class(
             # corpmanag.h, it can by used by a Rcpp header
             delete_line_before= list(
               "^\\s*ensure_syscorpus\\(char\\s+\\*registry,\\s+char\\s+\\*name\\)\\s*$",
-              2L, 1L
+              1L, 2L
             ),
             insert_before = list(
               "^\\s*ensure_syscorpus\\(char\\s+\\*registry,\\s+char\\s+\\*name\\)\\s*$",
