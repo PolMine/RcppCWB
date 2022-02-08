@@ -20,7 +20,10 @@ cwb_encode(
   vrt_dir,
   encoding = "utf8",
   p_attributes = c("word", "pos", "lemma"),
-  s_attributes
+  s_attributes,
+  skip_blank_lines = TRUE,
+  strip_whitespace = TRUE,
+  xml = TRUE
 )
 }
 \arguments{
@@ -49,6 +52,14 @@ XML elements present in the corpus. Character vectors making up the list
 declare the attributes that include the metadata of regions. To declare a
 structural attribute without annotations, provide a zero-length character
 vector using \code{character()} - see examples.}
+
+\item{skip_blank_lines}{A \code{logical} value, whether to skip blank lines in the
+input.}
+
+\item{strip_whitespace}{A \code{logical} value, whether to strip whitespace from
+tokens}
+
+\item{xml}{A \code{logical} value, whether input is XML.}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},

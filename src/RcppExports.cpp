@@ -518,8 +518,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // cwb_encode
-int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno);
-RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP encodingSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP) {
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno, int skip_blank_lines, int strip_whitespace, int xml);
+RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP encodingSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP, SEXP skip_blank_linesSEXP, SEXP strip_whitespaceSEXP, SEXP xmlSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -530,7 +530,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::StringVector >::type p_attributes(p_attributesSEXP);
     Rcpp::traits::input_parameter< Rcpp::StringVector >::type s_attributes_anno(s_attributes_annoSEXP);
     Rcpp::traits::input_parameter< Rcpp::StringVector >::type s_attributes_noanno(s_attributes_noannoSEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno));
+    Rcpp::traits::input_parameter< int >::type skip_blank_lines(skip_blank_linesSEXP);
+    Rcpp::traits::input_parameter< int >::type strip_whitespace(strip_whitespaceSEXP);
+    Rcpp::traits::input_parameter< int >::type xml(xmlSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -620,7 +623,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
     {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
-    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 7},
+    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 10},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
     {"_RcppCWB_cl_load_corpus", (DL_FUNC) &_RcppCWB_cl_load_corpus, 2},
     {"_RcppCWB_cl_list_corpora", (DL_FUNC) &_RcppCWB_cl_list_corpora, 0},

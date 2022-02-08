@@ -36,6 +36,9 @@ set of errors. Solved. (#51)
 and the editline subdirectory of src/cwb is included in .Rbuildignore to 
 minimize the size of the tarball. The ncurses library is a dependency of 
 editline, but editline is not built in the context of this package (#26).
+* New arguments `skip_blank_lines`, `strip_whitespace` and `xml` of
+`cwb_encode()` open configuration options of `cwb_encode()`, overcoming the
+previously hard-coded equivalent to the command-line option "-xsB".(#38)
 
 
 # RcppCWB 0.5.0
