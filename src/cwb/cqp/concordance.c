@@ -455,7 +455,7 @@ compose_kwic_line(Corpus *corpus,
     if ((ai = FindInAL(cd->attributes, CWB_DEFAULT_ATT_NAME)))
       ai->status = 1;
     else {
-      Rprintf("ERROR: Failed to activate printing of default attribute ('show +%s')\n", CWB_DEFAULT_ATT_NAME);
+      fprintf(stderr, "ERROR: Failed to activate printing of default attribute ('show +%s')\n", CWB_DEFAULT_ATT_NAME);
       return NULL;
     }
   }
@@ -586,13 +586,13 @@ compose_kwic_line(Corpus *corpus,
     /* Now we need to reverse order of characters of the left co-text assembled in the preceding code;
      * but we DON'T flip any printStructures */
 #if 0
-    Rprintf("line before srev(): >>%s<<\n", line + begin_reverse_ix);
+    fprintf(stderr, "line before srev(): >>%s<<\n", line + begin_reverse_ix);
 #endif
 
     srev(line->data + begin_reverse_ix);
 
 #if 0
-    Rprintf("line after srev(): >>%s<<\n", line + begin_reverse_ix);
+    fprintf(stderr, "line after srev(): >>%s<<\n", line + begin_reverse_ix);
 #endif
     break; /* endcase CHAR_CONTEXT */
 
@@ -615,7 +615,7 @@ compose_kwic_line(Corpus *corpus,
   case s_att_context:
   case a_att_context:
     if (!cd->left_structure) {
-      Rprintf("concordance.o/compose_kwic_line: left context attribute pointer is NULL\n");
+      fprintf(stderr, "concordance.o/compose_kwic_line: left context attribute pointer is NULL\n");
       start = match_start - 20;
       if (start < 0)
         start = 0;
@@ -759,7 +759,7 @@ compose_kwic_line(Corpus *corpus,
   case s_att_context:
   case a_att_context:
     if (!cd->right_structure) {
-      Rprintf("concordance.o/compose_kwic_line: right context attribute pointer is NULL\n");
+      fprintf(stderr, "concordance.o/compose_kwic_line: right context attribute pointer is NULL\n");
       end = match_end + 20;
     }
     else {
