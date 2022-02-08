@@ -349,7 +349,7 @@ void
 warn_query_lock_violation(void) 
 {
   if (which_app != cqpserver)
-    fprintf(stderr, "WARNING: query lock violation attempted\n");
+    Rprintf("WARNING: query lock violation attempted\n");
   query_lock_violation++;       /* this is for the CQPserver */
 }
 
@@ -381,12 +381,12 @@ synchronize(void)
   /* read and throw away characters till we have cleared away the rest 
      of the current command (which is non-actionable) to get back on track. */
   if (cqp_input_string) {
-    fprintf(stderr, "Ignoring subsequent input until end of line ... \n");
+    Rprintf("Ignoring subsequent input until end of line ... \n");
     while (!(yychar <= 0))
       yychar = yylex();
   }
   else {
-    fprintf(stderr, "Ignoring subsequent input until next ';'...\n");
+    Rprintf("Ignoring subsequent input until next ';'...\n");
     while (!(yychar <= 0 || yychar == ';'))
       yychar = yylex();
   }
@@ -1563,7 +1563,7 @@ while (YYID (0))
 #ifndef YY_LOCATION_PRINT
 # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
-     fprintf (File, "%d.%d-%d.%d",			\
+     Rprintf("%d.%d-%d.%d",			\
 	      (Loc).first_line, (Loc).first_column,	\
 	      (Loc).last_line,  (Loc).last_column)
 # else
@@ -1585,7 +1585,7 @@ while (YYID (0))
 
 # ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
-#  define YYFPRINTF fprintf
+#  define YYFPRINTF Rprintf
 # endif
 
 # define YYDPRINTF(Args)			\
@@ -1598,10 +1598,10 @@ do {						\
 do {									  \
   if (yydebug)								  \
     {									  \
-      YYFPRINTF (stderr, "%s ", Title);					  \
+      YYFPRINTF ("%s ", Title);					  \
       yy_symbol_print (stderr,						  \
 		  Type, Value); \
-      YYFPRINTF (stderr, "\n");						  \
+      YYFPRINTF ("\n");						  \
     }									  \
 } while (YYID (0))
 
@@ -1656,12 +1656,12 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 #endif
 {
   if (yytype < YYNTOKENS)
-    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
+    YYFPRINTF ("token %s (", yytname[yytype]);
   else
-    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
+    YYFPRINTF ("nterm %s (", yytname[yytype]);
 
   yy_symbol_value_print (yyoutput, yytype, yyvaluep);
-  YYFPRINTF (yyoutput, ")");
+  YYFPRINTF (")");
 }
 
 /*------------------------------------------------------------------.
@@ -1680,10 +1680,10 @@ yy_stack_print (bottom, top)
     yytype_int16 *top;
 #endif
 {
-  YYFPRINTF (stderr, "Stack now");
+  YYFPRINTF ("Stack now");
   for (; bottom <= top; ++bottom)
-    YYFPRINTF (stderr, " %d", *bottom);
-  YYFPRINTF (stderr, "\n");
+    YYFPRINTF (" %d", *bottom);
+  YYFPRINTF ("\n");
 }
 
 # define YY_STACK_PRINT(Bottom, Top)				\
@@ -1711,16 +1711,16 @@ yy_reduce_print (yyvsp, yyrule)
   int yynrhs = yyr2[yyrule];
   int yyi;
   unsigned long int yylno = yyrline[yyrule];
-  YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
+  YYFPRINTF ("Reducing stack by rule %d (line %lu):\n",
 	     yyrule - 1, yylno);
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      fprintf (stderr, "   $%d = ", yyi + 1);
+      Rprintf("   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      fprintf (stderr, "\n");
+      Rprintf("\n");
     }
 }
 
@@ -2105,7 +2105,7 @@ yyparse ()
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  YYDPRINTF ((stderr, "Starting parse\n"));
+  YYDPRINTF (("Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
@@ -2191,14 +2191,14 @@ yyparse ()
       yyvsp = yyvs + yysize - 1;
 
 
-      YYDPRINTF ((stderr, "Stack size increased to %lu\n",
+      YYDPRINTF (("Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
 	YYABORT;
     }
 
-  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
+  YYDPRINTF (("Entering state %d\n", yystate));
 
   goto yybackup;
 
@@ -2220,14 +2220,14 @@ yybackup:
   /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
   if (yychar == YYEMPTY)
     {
-      YYDPRINTF ((stderr, "Reading a token: "));
+      YYDPRINTF (("Reading a token: "));
       yychar = YYLEX;
     }
 
   if (yychar <= YYEOF)
     {
       yychar = yytoken = YYEOF;
-      YYDPRINTF ((stderr, "Now at end of input.\n"));
+      YYDPRINTF (("Now at end of input.\n"));
     }
   else
     {
@@ -2343,8 +2343,8 @@ yyreduce:
                                           if ((yyvsp[(2) - (2)].ival) == query_lock)
                                             query_lock = 0;
                                           else {
-                                            fprintf(stderr, "ALERT! Query lock violation.\n");
-                                            printf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
+                                            Rprintf("ALERT! Query lock violation.\n");
+                                            Rprintf("\n"); /* so CQP.pm won't block -- should no longer be needed after switching to .EOL. mechanism */
                                             exit(1);
                                           }
                                         ;}
@@ -2443,7 +2443,7 @@ yyreduce:
 #line 523 "parser.y"
     {
                                           /* print special code ``-::-EOL-::-'' marking end-of-command in child mode */
-                                          printf("-::-EOL-::-\n"); 
+                                          Rprintf("-::-EOL-::-\n"); 
                                           fflush(stdout); 
                                         ;}
     break;

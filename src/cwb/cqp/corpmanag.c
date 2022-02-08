@@ -458,7 +458,7 @@ findcorpus(char *s, CorpusType type, int try_recursive_search)
       tmp = duplicate_corpus(sp, real_name, True);
 
       if (!tmp) {
-        fprintf(stderr, "Internal error in findcorpus() -- this should not happen!\n");
+        Rprintf("Internal error in findcorpus() -- this should not happen!\n");
         return NULL;
       }
 
@@ -510,7 +510,7 @@ dropcorpus(CorpusList *cl, CorpusList *search_from)
     return NULL;
 
   if (!corpuslist) {
-    fprintf(stderr, "%s:dropcorpus(): cl is not in list of loaded corpora (list empty)\n", __FILE__);
+    Rprintf("%s:dropcorpus(): cl is not in list of loaded corpora (list empty)\n", __FILE__);
     return NULL;
   }
 
@@ -533,7 +533,7 @@ dropcorpus(CorpusList *cl, CorpusList *search_from)
     }
     if (!prev) {
       /* loop went across whole of the list! */
-      fprintf(stderr, "%s:dropcorpus(): cl is not in %slist of loaded corpora\n", __FILE__, search_from ? "the searched-through part of " : "");
+      Rprintf("%s:dropcorpus(): cl is not in %slist of loaded corpora\n", __FILE__, search_from ? "the searched-through part of " : "");
       return NULL;
     }
   }
@@ -576,7 +576,7 @@ duplicate_corpus(CorpusList *cl, char *new_name, Boolean force_overwrite)
   CorpusList *newc; /* the (existent or non existent) corplist to be overwritten) */
 
   if (cl == NULL) {
-    fprintf(stderr, "%s:duplicate_corpus(): WARNING: Called with NULL corpus\n", __FILE__);
+    Rprintf("%s:duplicate_corpus(): WARNING: Called with NULL corpus\n", __FILE__);
     return NULL;
   }
 
@@ -699,7 +699,7 @@ make_temp_corpus(CorpusList *cl, char *new_name)
   CorpusList *newc;
 
   if (!cl) {
-    fprintf(stderr, "%s:duplicate_corpus(): WARNING: Called with NULL corpus\n", __FILE__);
+    Rprintf("%s:duplicate_corpus(): WARNING: Called with NULL corpus\n", __FILE__);
     return NULL;
   }
 
@@ -798,7 +798,7 @@ assign_temp_to_sub(CorpusList *tmp, char *subname)
   CorpusList *cl;
 
   if (!tmp) {
-    fprintf(stderr, "%s:assign_temp_to_sub(): WARNING: Called with NULL corpus\n", __FILE__);
+    Rprintf("%s:assign_temp_to_sub(): WARNING: Called with NULL corpus\n", __FILE__);
     return NULL;
   }
   assert(tmp->type == TEMP);
@@ -1028,7 +1028,7 @@ load_corpusnames(enum corpus_type ct)
   else if (SUB == ct)
     strcpy(dirlist, data_directory);
   else {
-    fprintf(stderr, "Can't load corpus names for type %d\n", ct);
+    Rprintf("Can't load corpus names for type %d\n", ct);
     return;
   }
 
@@ -1173,7 +1173,7 @@ GetSystemCorpus(char *name, char *registry)
     else if (registry)
       cl->registry = cl_strdup(registry);
     else {
-      fprintf(stderr, "Warning: no registry directory for %s\n", name);
+      Rprintf("Warning: no registry directory for %s\n", name);
       cl->registry = NULL;
     }
 
@@ -1276,19 +1276,19 @@ attach_subcorpus(CorpusList *cl, char *advertised_directory, char *advertised_fi
     }
 
     if (!src)
-      fprintf(stderr, "Subcorpus %s not accessible (can't open %s for reading)\n", cl->name, fullname);
+      Rprintf("Subcorpus %s not accessible (can't open %s for reading)\n", cl->name, fullname);
     else {
       if (0 >= (len = file_length(fullname)))
-        fprintf(stderr, "ERROR: File length of subcorpus is <= 0\n");
+        Rprintf("ERROR: File length of subcorpus is <= 0\n");
       else {
         /* the subcorpus is treated as a byte array */
         field = (char *)cl_malloc(len);
 
         /* read the subcorpus */
         if (len != fread(field, 1, len, src))
-          fprintf(stderr, "Read error while reading subcorpus %s\n", cl->name);
+          Rprintf("Read error while reading subcorpus %s\n", cl->name);
         else if ( CWB_SUBCORPMAGIC_ORIG > (magic = *((int *)field)) || CWB_SUBCORPMAGIC_ORIG+1 < magic )
-          fprintf(stderr, "Magic number incorrect in %s\n", fullname);
+          Rprintf("Magic number incorrect in %s\n", fullname);
         else {
           p = field + sizeof(int);
           cl->registry = cl_strdup(p);
@@ -1377,7 +1377,7 @@ attach_subcorpus(CorpusList *cl, char *advertised_directory, char *advertised_fi
 #if subcorpload_debug
             {
               int j;
-              fprintf(stderr,
+              Rprintf(
                       "Header size: %ld\n"
                       "Nr Matches: %d\n"
                       "regdir: %s\n"
@@ -1387,7 +1387,7 @@ attach_subcorpus(CorpusList *cl, char *advertised_directory, char *advertised_fi
                       cl->registry,
                       cl->mother_name);
               for (j = 0; j < cl->size; j++)
-                fprintf(stderr,
+                Rprintf(
                         "range[%d].start = %d\n"
                         "range[%d].end   = %d\n",
                         j, cl->range[j].start, j, cl->range[j].end);
@@ -1510,7 +1510,7 @@ save_subcorpus(CorpusList *cl, char *fname)
       return True;
     }
     else {
-      fprintf(stderr, "cannot open output file %s\n", fname);
+      Rprintf("cannot open output file %s\n", fname);
       return False;
     }
   }
@@ -1796,7 +1796,7 @@ show_corpora_backend(CorpusType ct, int only_active_corpus)
     if (current_corpus)
       ct = current_corpus->type;
     else {
-      printf("\n");
+      Rprintf("\n");
       return;
     }
   }
@@ -1829,7 +1829,7 @@ show_corpora_backend(CorpusType ct, int only_active_corpus)
     }
 
     if (pretty_print) {
-      printf(only_active_corpus ? "Active Corpus:\n" : "System corpora:\n");
+      Rprintf(only_active_corpus ? "Active Corpus:\n" : "System corpora:\n");
       ilist_start(0,0,0);
     }
 
@@ -1844,7 +1844,7 @@ show_corpora_backend(CorpusType ct, int only_active_corpus)
         ilist_print_item(list[i]);
       }
       else
-        printf("%s\n", list[i]);
+        Rprintf("%s\n", list[i]);
     }
 
     if (pretty_print)
@@ -1855,20 +1855,20 @@ show_corpora_backend(CorpusType ct, int only_active_corpus)
 
   case SUB:
     if (pretty_print)
-      printf(only_active_corpus ? "Active Subcorpus:\n" : "Named Query Results:\n");
+      Rprintf(only_active_corpus ? "Active Subcorpus:\n" : "Named Query Results:\n");
 
     for (cl = corpuslist; cl; cl = cl->next) {
       if (only_active_corpus) {
         if (cl != current_corpus)
           continue;
         else if (!pretty_print) {
-          printf("%s:%s\n", cl->mother_name ? cl->mother_name : "???", cl->name);
+          Rprintf("%s:%s\n", cl->mother_name ? cl->mother_name : "???", cl->name);
           continue;
         }
         /* else: continue into the prettyprint branch below */
       }
       if (cl->type == SUB)
-        printf(pretty_print ? "   %c%c%c  %s:%s [%d]\n" : "%c%c%c\t%s:%s\t%d\n",
+        Rprintf(pretty_print ? "   %c%c%c  %s:%s [%d]\n" : "%c%c%c\t%s:%s\t%d\n",
                cl->loaded       ? 'm' : '-',
                cl->saved        ? 'd' : '-',
                cl->needs_update ? '*' : '-',
