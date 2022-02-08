@@ -725,7 +725,10 @@ PatchCWB <- R6Class(
             # The include of 'cdaccess.h' is gone with r1690 so we use another anchor
             insert_after = list(
               if (revision == 1069) '^#include\\s"cdaccess\\.h"' else '^#include\\s+"compression\\.h"',
-              "void Rprintf(const char *, ...);"
+              c(
+                "#include <stdint.h>",
+                "void Rprintf(const char *, ...);"
+              )
             ),
             
             # This code is unchanged with r1690
