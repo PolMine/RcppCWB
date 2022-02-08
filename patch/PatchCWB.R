@@ -1359,11 +1359,11 @@ PatchCWB <- R6Class(
             # By removing the keyword 'static' and including a definition in 
             # corpmanag.h, it can by used by a Rcpp header
             delete_line_before= list(
-              "^\\s*ensure_syscorpus\\(char\\s\\*registry,\\schar\\s\\*name\\)",
+              "^\\s*ensure_syscorpus\\(char\\s+\\*registry,\\s+char\\s+\\*name\\)\\s*$",
               2L, 1L
             ),
             insert_before = list(
-              "^\\s*ensure_syscorpus\\(char\\s\\*registry,\\schar\\s\\*name\\)",
+              "^\\s*ensure_syscorpus\\(char\\s+\\*registry,\\s+char\\s+\\*name\\)\\s*$",
               "CorpusList *",
               1L
             )
