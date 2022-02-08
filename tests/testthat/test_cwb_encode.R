@@ -46,8 +46,7 @@ testthat::context("cwb_encode")
 test_that(
   "identity of RcppCWB and CWB encoding result",
   {
-    tmp_registry <- file.path(tempdir(), "Rcpp_test_encode_registry")
-    dir.create(tmp_registry)
+    tmp_registry <- Sys.getenv("CORPUS_REGISTRY")
     tmp_registry_file <- fs::path(file.path(tmp_registry, "bt"))
     tmp_data_dir <- file.path(tempdir(), "bt")
     dir.create(tmp_data_dir)
@@ -100,12 +99,8 @@ test_that(
     words <- cl_id2str("BT", p_attribute = "word", registry = tmp_registry, id = ids)
     expect_equal(table(words == "Liebe")[["TRUE"]], 6)
     expect_equal(table(words == "SPD")[["TRUE"]], 31)
-    Encoding(words) <- "UTF-8"
-    wordfile <- tempfile()
-    
-    cqp_reset_registry(old_env)
-    
-    unlink(tmp_registry)
+
+    # unlink(tmp_registry)
     unlink(tmp_data_dir)
   }
 )

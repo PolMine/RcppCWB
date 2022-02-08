@@ -299,7 +299,7 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
 #' cl_delete_corpus("UNGA")
 #' corpus_is_loaded("UNGA")
 cl_delete_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  invisible(.cl_delete_corpus(corpus = corpus, registry = registry))
+  as.logical(.cl_delete_corpus(corpus = corpus, registry = registry))
 }
 
 #' Get charset of a corpus.

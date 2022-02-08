@@ -545,14 +545,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // cl_load_corpus
-int cl_load_corpus(SEXP corpus, SEXP registry_dir);
-RcppExport SEXP _RcppCWB_cl_load_corpus(SEXP corpusSEXP, SEXP registry_dirSEXP) {
+int cl_load_corpus(SEXP corpus, SEXP registry);
+RcppExport SEXP _RcppCWB_cl_load_corpus(SEXP corpusSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type registry_dir(registry_dirSEXP);
-    rcpp_result_gen = Rcpp::wrap(cl_load_corpus(corpus, registry_dir));
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(cl_load_corpus(corpus, registry));
     return rcpp_result_gen;
 END_RCPP
 }

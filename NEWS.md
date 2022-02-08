@@ -29,6 +29,7 @@ a consistent normalization of paths.
 yet not available for CQP).
 * New function `cl_list_corpora()` complements existing function
 `cqp_list_corpora()` for the CL context.
+* Function `cl_delete_corpus()` will now (visibly) return a `logial` value.
 
 
 # RcppCWB 0.5.0
