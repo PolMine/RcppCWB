@@ -162,8 +162,9 @@ cqp_list_subcorpora <- function(corpus){
   .cqp_list_subcorpora(inCorpus = corpus)
 }
 
+#' @param corpus ID of a CWB corpus (length-one `character`).
 #' @export cqp_load_corpus
-#' @rdname cqp_query
+#' @rdname cqp_initialize
 cqp_load_corpus <- function(corpus, registry){
   as.logical(.cqp_load_corpus(corpus = corpus, registry = registry))
 }

@@ -5,6 +5,7 @@
 \alias{cqp_is_initialized}
 \alias{cqp_get_registry}
 \alias{cqp_reset_registry}
+\alias{cqp_load_corpus}
 \title{Initialize Corpus Query Processor (CQP).}
 \usage{
 cqp_initialize(registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -14,9 +15,13 @@ cqp_is_initialized()
 cqp_get_registry()
 
 cqp_reset_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
+
+cqp_load_corpus(corpus, registry)
 }
 \arguments{
 \item{registry}{the registry directory}
+
+\item{corpus}{ID of a CWB corpus (length-one \code{character}).}
 }
 \description{
 CQP needs to know where to look for CWB indexed corpora. To initialize CQP,
