@@ -726,7 +726,10 @@ int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute) {
 
 
 // [[Rcpp::export(name=".cwb_encode")]]
-int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno){
+int cwb_encode(
+    SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes,
+    Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno,
+    int skip_blank_lines, int strip_whitespace, int xml){
   
   directory = strdup(Rcpp::as<std::string>(data_dir).c_str());
   registry_file = strdup(Rcpp::as<std::string>(regfile).c_str());
@@ -740,9 +743,10 @@ int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::S
   current_input_file_name = NULL; 
   
   /* configure encoder */
-  xml_aware = 1;
-  skip_empty_lines = 1;
-  strip_blanks = 1;
+  xml_aware = xml;
+  skip_empty_lines = skip_blank_lines;
+  strip_blanks = strip_whitespace;
+  
   verbose = 1;
   quietly = 0;
 

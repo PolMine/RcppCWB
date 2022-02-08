@@ -102,6 +102,11 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'   declare the attributes that include the metadata of regions. To declare a
 #'   structural attribute without annotations, provide a zero-length character
 #'   vector using `character()` - see examples.
+#' @param skip_blank_lines A `logical` value, whether to skip blank lines in the
+#'   input.
+#' @param strip_whitespace A `logical` value, whether to strip whitespace from
+#'   tokens
+#' @param xml A `logical` value, whether input is XML.
 #' @rdname cwb_utils
 #' @export cwb_encode
 #' @importFrom fs path
@@ -130,7 +135,11 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' 
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
-cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes){
+cwb_encode <- function(
+  corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir,
+  encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes,
+  skip_blank_lines = TRUE, strip_whitespace = TRUE, xml = TRUE
+){
   
   if (encoding == "UTF-8") encoding <- "utf8"
   if (!encoding %in% cwb_charsets()) stop(
@@ -148,7 +157,10 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
     is.character(vrt_dir), length(vrt_dir) == 1L, dir.exists(vrt_dir),
     length(list.files(vrt_dir)) > 0L,
     is.character(encoding), length(encoding) == 1L,
-    is.character(p_attributes)
+    is.character(p_attributes),
+    is.logical(skip_blank_lines), length(skip_blank_lines) == 1L,
+    is.logical(strip_whitespace), length(strip_whitespace) == 1L,
+    is.logical(xml), length(xml) == 1L
   )
   
   s_attributes_noanno <- unlist(lapply(
@@ -175,7 +187,10 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
     encoding = encoding,
     p_attributes = p_attributes,
     s_attributes_anno = s_attributes_anno,
-    s_attributes_noanno = s_attributes_noanno
+    s_attributes_noanno = s_attributes_noanno,
+    skip_blank_lines = skip_blank_lines,
+    xml = xml,
+    strip_whitespace = strip_whitespace
   )
 }
 
