@@ -187,7 +187,7 @@ static void
 set_corpus_matchlists(CorpusList *cp,
                       Matchlist *matchlist,
                       int nr_lists,
-                      bool keep_old_ranges)
+                      int keep_old_ranges)
 {
   int i;
   int rp = 0, mp = 0; /* indexes into the range array in cp, and into the start element of the matchlist array. */
@@ -471,6 +471,7 @@ static Boolean
 eval_constraint(AVS avs, int corppos, RefTab labelrefs, RefTab target_labelrefs, int *out_cpos)
 {
   int start, end, struc, anchor, n, zero_width;
+  anchor = -1;
   Boolean result = False;
   CorpusList *corpus;
 
@@ -801,7 +802,7 @@ get_leaf_value(Constrainttree ctptr,
 
       dcr->type = ATTAT_POS;
       dcr->value.intres = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
-      if (ctptr->pa_ref.delete) {
+      if (ctptr->pa_ref.del) {
         if (eval_debug)
           Rprintf("** AUTO-DELETING LABEL %s = %d\n",
                  ctptr->pa_ref.label->name, dcr->value.intres);
@@ -816,7 +817,7 @@ get_leaf_value(Constrainttree ctptr,
         referenced_position = corppos;
       else {
         referenced_position = get_label_referenced_position(ctptr->pa_ref.label, rt, corppos);
-        if (ctptr->pa_ref.delete) {
+        if (ctptr->pa_ref.del) {
           if (eval_debug)
             Rprintf("** AUTO-DELETING LABEL %s = %d\n", ctptr->pa_ref.label->name, referenced_position);
           set_reftab(rt, ctptr->pa_ref.label->ref, -1);
@@ -871,7 +872,7 @@ get_leaf_value(Constrainttree ctptr,
     else {
       /* label reference to S-attribute -> return value of containing region */
       int referenced_position = get_label_referenced_position(ctptr->sa_ref.label, rt, corppos);
-      if (ctptr->sa_ref.delete) {
+      if (ctptr->sa_ref.del) {
         if (eval_debug)
           Rprintf("** AUTO-DELETING LABEL %s = %d\n", ctptr->sa_ref.label->name, referenced_position);
         set_reftab(rt, ctptr->sa_ref.label->ref, -1);
@@ -1289,7 +1290,7 @@ eval_bool(Constrainttree ctptr, RefTab rt, int curr_cpos)
 
       if (ctptr->idlist.label) {
         referenced_corppos = get_label_referenced_position(ctptr->idlist.label, rt, curr_cpos);
-        if (ctptr->idlist.delete) {
+        if (ctptr->idlist.del) {
           if (eval_debug)
             Rprintf("** AUTO-DELETING LABEL %s = %d\n", ctptr->idlist.label->name, referenced_corppos);
           set_reftab(rt, ctptr->idlist.label->ref, -1);
@@ -1860,6 +1861,7 @@ static Boolean
 match_first_pattern(AVS pattern, Matchlist *matchlist, CorpusList *corpus)
 {
   int nr_strucs, nr_ok, ok, i, k, n, start, end, cpos;
+  cpos = -1;
   Range* matches;
   Bitfield bf;
   char *val;
@@ -2812,7 +2814,7 @@ run_standard_query_dfa(int envidx, int cut, int keep_old_ranges)
     set_corpus_matchlists(evalenv->query_corpus,
                           &matchlist, /* total_matchlist may be uninitialised */
                           1,
-                          false);
+                          0);
     free_matchlist(&matchlist);
   }
   else if (0 ==evalenv->query_corpus->size) {
@@ -3246,7 +3248,7 @@ cqp_run_tab_query()
     if (evalenv->patternlist[col->tab_el.patindex].type != Pattern) {
       cqpmessage(Error, "matchall [] (or another token pattern matching the entire corpus) is not allowed in TAB query (column #%d)\n", nr_columns + 1);
       init_matchlist(&result);
-      set_corpus_matchlists(evalenv->query_corpus, &result, 1, false); /* return empty result set */
+      set_corpus_matchlists(evalenv->query_corpus, &result, 1, 0); /* return empty result set */
       return;
     }
     nr_columns++;
@@ -3394,7 +3396,7 @@ cqp_run_tab_query()
   if (!running)
     cqpmessage(Error, "Evaluation of TAB query has failed (or been interrupted by user)");
 
-  set_corpus_matchlists(evalenv->query_corpus, &result, 1, false);
+  set_corpus_matchlists(evalenv->query_corpus, &result, 1, 0);
 
   /* cleanup */
   cl_free(positions);

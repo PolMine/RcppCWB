@@ -37,7 +37,7 @@ RC = i586-mingw32msvc-windres
 
 ## C compiler flags (optimisation, warning, additional include directories)
 ## in this case, we also have the __MINGW__ macro-constant that is "ifdef" checked in the C code 
-CFLAGS = -O2 -Wall -D__MINGW__ -DEMULATE_SETENV -DG_OS_WIN32
+CFLAGS = -O2 -Wall -D__MINGW__ -DEMULATE_SETENV 
 ## MinGW doesn't have setenv() for manipulating environment variables, so we need to emulate it with putenv()
 ## this is controlled by EMULATE_SETENV, created for Solaris but also useful here.
 ## Note that we need "G_OS_WIN32" in order to stop glib.h from attempting to pull in

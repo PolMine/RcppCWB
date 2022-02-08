@@ -1203,8 +1203,7 @@ GetSystemCorpus(char *name, char *registry)
 }
 
 
-
-static CorpusList *
+CorpusList *
 ensure_syscorpus(char *registry, char *name)
 {
   CorpusList *cl;
