@@ -41,7 +41,9 @@ editline, but editline is not built in the context of this package (#26).
 previously hard-coded equivalent to the command-line option "-xsB".(#38)
 * Disaggregated `wrappers.cpp` into `cl.cpp`, `cqp.cpp` and `utils.cpp`, so that
 the code is organized more coherently corresponding to the different logics.
-
+* Unexported functions `.cpos_to_id()`, `.cl_find_corpus()` and
+`.cl_new_attribute()` are an entry to passing around pointers, rather than
+re-creating objects whenever switching from R to C.
 
 
 # RcppCWB 0.5.0
