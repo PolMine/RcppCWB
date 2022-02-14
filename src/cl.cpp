@@ -122,6 +122,20 @@ Rcpp::IntegerVector _cl_cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rc
   return( ids );
 }
 
+
+// [[Rcpp::export(name=".cpos_to_id")]]
+Rcpp::IntegerVector _cpos_to_id(SEXP p_attr, Rcpp::IntegerVector cpos){
+  Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
+  int i;
+  int len = cpos.length();
+  Rcpp::IntegerVector ids(len);
+  for (i = 0; i < len; i++){
+    ids(i) = cl_cpos2id(att, cpos(i));
+  }
+  return( ids );
+}
+
+
 // [[Rcpp::export(name=".cl_struc2cpos")]]
 Rcpp::IntegerVector _cl_struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
@@ -257,6 +271,42 @@ Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::Integer
   }
   
   return( result );
+}
+
+
+// [[Rcpp::export(name=".cl_find_corpus")]]
+SEXP _cl_find_corpus(SEXP corpus, SEXP registry){
+  
+  char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  char* registry_name  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  
+  Corpus * c;
+  c = find_corpus(registry_dir, registry_name); 
+  
+  if (c){
+    SEXP p = R_MakeExternalPtr(c, R_NilValue, R_NilValue);
+    return p;
+  } else {
+    return R_NilValue;
+  }
+  return( R_NilValue );
+}
+
+// [[Rcpp::export(name=".cl_new_attribute")]]
+SEXP _cl_new_attribute(SEXP corpus_pointer, SEXP s_attribute, int type){
+  
+  Corpus * c = (Corpus*)R_ExternalPtrAddr(corpus_pointer);
+  char* s_attr = strdup(Rcpp::as<std::string>(s_attribute).c_str());
+
+  Attribute* att = cl_new_attribute(c, s_attr, type);
+  
+  if (att){
+    SEXP a = R_MakeExternalPtr(att, R_NilValue, R_NilValue);
+    return a;
+  } else {
+    return R_NilValue;
+  }
+  return( R_NilValue );
 }
 
 
@@ -401,3 +451,5 @@ Rcpp::StringVector cl_list_corpora(){
   
   return result;
 }
+
+
