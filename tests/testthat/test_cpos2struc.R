@@ -1,5 +1,5 @@
 library(RcppCWB)
-
+use_tmp_registry()
 testthat::context("cpos2struc")
 
 test_that(

@@ -1,5 +1,5 @@
 library(RcppCWB)
-
+use_tmp_registry()
 testthat::context("s_attribute_decode")
 
 test_that(
@@ -28,11 +28,14 @@ test_that(
 test_that(
   "s_attr_regions",
   {
-    m1 <- s_attr_regions("REUTERS", "id")
+    m1 <- s_attr_regions("REUTERS", "id", registry = get_tmp_registry())
+    
+    n_strucs <- cl_attribute_size("REUTERS", attribute = "id", attribute_type = "s", registry = get_tmp_registry())
     m2 <- get_region_matrix(
       corpus = "REUTERS",
       s_attribute = "id",
-      strucs = 0L:(cl_attribute_size("REUTERS", attribute = "id", attribute_type = "s") - 1L)
+      strucs = 0L:(n_strucs - 1L),
+      registry = get_tmp_registry()
     )
     expect_identical(m1, m2)
   }

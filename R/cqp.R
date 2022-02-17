@@ -15,9 +15,6 @@
 #' if (!cqp_is_initialized()) cqp_initialize()
 #' cqp_is_initialized() # check initialization status (TRUE now?)
 #' cqp_get_registry() # get registry dir used by CQP
-#' 
-#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-#' if (cqp_get_registry() != registry) cqp_reset_registry(registry = registry)
 #' cqp_list_corpora() # get list of corpora
 cqp_initialize <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
   registry_new <- registry
@@ -91,10 +88,6 @@ cqp_reset_registry <- function(registry = Sys.getenv("CORPUS_REGISTRY")){
 #' 
 #' @export cqp_list_corpora
 #' @examples
-#' if (!cqp_is_initialized()){
-#'   registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-#'   cqp_initialize(registry)
-#' }
 #' cqp_list_corpora()
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_list_corpora <- function() .cqp_list_corpora()
@@ -120,13 +113,6 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' Evert, S. 2005. The CQP Query Language Tutorial. Available online at
 #' \url{https://cwb.sourceforge.io/files/CWB_Encoding_Tutorial.pdf}
 #' @examples 
-#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-#' 
-#' if (!cqp_is_initialized()){
-#'   cqp_initialize(registry = registry)
-#' } else {
-#'   if (cqp_get_registry() != registry) cqp_reset_registry(registry)
-#' }
 #' cqp_query(corpus = "REUTERS", query = '"oil";')
 #' cqp_subcorpus_size("REUTERS")
 #' cqp_dump_subcorpus("REUTERS")
@@ -137,7 +123,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_query <- function(corpus, query, subcorpus = "QUERY"){
   stopifnot(corpus %in% cqp_list_corpora())
-  query <- check_cqp_query(query)
+  query <- check_query(query)
   .cqp_query(corpus = corpus, subcorpus = subcorpus, query = query)
 }
 

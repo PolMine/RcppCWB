@@ -29,14 +29,31 @@ zero-based, i.e. the maximum position of a positional / structural
 attribute is attribute size minus 1 (see examples).
 }
 \examples{
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-
-Sys.setenv(CORPUS_REGISTRY = registry)
-token_no <- cl_attribute_size("REUTERS", attribute = "word", attribute_type = "p")
+token_no <- cl_attribute_size(
+  "REUTERS",
+  attribute = "word",
+  attribute_type = "p",
+  registry = get_tmp_registry()
+)
 corpus_positions <- seq.int(from = 0, to = token_no - 1)
-cl_cpos2id("REUTERS", "word", cpos = corpus_positions)
+cl_cpos2id(
+  "REUTERS",
+  "word",
+  cpos = corpus_positions,
+  registry = get_tmp_registry()
+)
 
-places_no <- cl_attribute_size("REUTERS", attribute = "places", attribute_type = "s")
+places_no <- cl_attribute_size(
+  "REUTERS",
+  attribute = "places",
+  attribute_type = "s",
+  registry = get_tmp_registry()
+)
 strucs <- seq.int(from = 0, to = places_no - 1)
-cl_struc2str("REUTERS", "places", struc = strucs)
+cl_struc2str(
+  "REUTERS",
+  "places",
+  struc = strucs,
+  registry = get_tmp_registry()
+)
 }

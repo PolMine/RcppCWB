@@ -1,4 +1,5 @@
 library(RcppCWB)
+use_tmp_registry()
 
 testthat::context("struc2str")
 

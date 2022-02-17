@@ -75,45 +75,55 @@ positional attribute, and produce all components.
 # The first step in the following example is to copy the raw
 # corpus to a temporary place.
 
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 
-tmpdir <- tempdir()
-tmp_regdir <- file.path(tmpdir, "registry_tmp")
-tmp_data_dir <- file.path(tmpdir, "indexed_corpora")
-tmp_unga_dir <- file.path(tmp_data_dir, "unga")
-if (!file.exists(tmp_regdir)) dir.create(tmp_regdir)
+tmp_data_dir <- file.path(tempdir(), "indexed_corpora")
+tmp_unga_dir <- file.path(tmp_data_dir, "unga2")
 if (!file.exists(tmp_data_dir)) dir.create(tmp_data_dir)
 if (!file.exists(tmp_unga_dir)){
   dir.create(tmp_unga_dir)
 } else {
   file.remove(list.files(tmp_unga_dir, full.names = TRUE))
 }
-regfile <- readLines(file.path(registry, "unga"))
+
+regfile <- readLines(
+  system.file(package = "RcppCWB", "extdata", "cwb", "registry", "unga")
+)
 regfile[grep("^HOME", regfile)] <- sprintf('HOME "\%s"', tmp_unga_dir)
-writeLines(text = regfile, con = file.path(tmp_regdir, "unga"))
+regfile[grep("^ID", regfile)] <- "ID unga2"
+writeLines(text = regfile, con = file.path(get_tmp_registry(), "unga2"))
 for (x in list.files(home_dir, full.names = TRUE)){
   file.copy(from = x, to = tmp_unga_dir)
 }
 
 # perform cwb_makeall (equivalent to cwb-makeall command line utility)
-cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+cwb_makeall(corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry())
+cl_load_corpus("UNGA2", registry = get_tmp_registry())
+cqp_load_corpus("UNGA2", registry = get_tmp_registry())
 
 # see whether it works
 ids_sentence_1 <- cl_cpos2id(
-  corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
+  corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry(),
   cpos = 0:83
   )
 tokens_sentence_1 <- cl_id2str(
-  corpus = "UNGA", p_attribute = "word",
-  registry = tmp_regdir, id = ids_sentence_1
+  corpus = "UNGA2", p_attribute = "word",
+  registry = get_tmp_registry(), id = ids_sentence_1
   )
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
 
 # perform cwb_huffcode (equivalent to cwb-makeall command line utility)
-cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-data_dir <- file.path(tempdir(), "tmp_data_dir")
+cwb_huffcode(
+  corpus = "UNGA2",
+  p_attribute = "word",
+  registry = get_tmp_registry()
+)
+cwb_compress_rdx(
+  corpus = "UNGA2",
+  p_attribute = "word",
+  registry = get_tmp_registry()
+)
+data_dir <- file.path(tempdir(), "bt_data_dir")
 dir.create(data_dir)
 
 cwb_encode(

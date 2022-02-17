@@ -1,5 +1,5 @@
 library(RcppCWB)
-
+use_tmp_registry()
 testthat::context("region_matrix_to_count_matrix")
 
 test_that(

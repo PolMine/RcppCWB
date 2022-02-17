@@ -44,9 +44,6 @@ the directory specified by \code{data_dir}. An implementation using Rcpp will us
 registry file for \code{corpus} to find the data directory.
 }
 \examples{
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-Sys.setenv(CORPUS_REGISTRY = registry)
-
 # pure R implementation (Rcpp implementation fails on Windows in vanilla mode)
 b <- s_attribute_decode(
   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
@@ -58,6 +55,6 @@ b <- s_attribute_decode(
   corpus = "REUTERS",
   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
   s_attribute = "places",
-  method = "Rcpp"
+  method = "Rcpp", registry = get_tmp_registry()
 )
 }

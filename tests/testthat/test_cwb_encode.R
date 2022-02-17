@@ -1,5 +1,5 @@
 library(RcppCWB)
-
+use_tmp_registry()
 testthat::context("cwb_encode")
 
 # utils_zipfile <- tempfile()
@@ -46,14 +46,13 @@ testthat::context("cwb_encode")
 test_that(
   "identity of RcppCWB and CWB encoding result",
   {
-    tmp_registry <- Sys.getenv("CORPUS_REGISTRY")
-    tmp_registry_file <- fs::path(file.path(tmp_registry, "bt"))
+    
     tmp_data_dir <- file.path(tempdir(), "bt")
     dir.create(tmp_data_dir)
 
     cwb_encode(
       corpus = "BT",
-      registry = tmp_registry,
+      registry = get_tmp_registry(),
       vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
       data_dir = tmp_data_dir,
       encoding = "utf8",
@@ -72,35 +71,33 @@ test_that(
     )
     
     for (p_attr in c("word", "pos", "lemma")){
-      cwb_makeall(corpus = "BT", p_attribute = p_attr, registry = tmp_registry)
-      cwb_huffcode(corpus = "BT", p_attribute = p_attr, registry = tmp_registry)
-      cwb_compress_rdx(corpus = "BT", p_attribute = p_attr, registry = tmp_registry)
+      cwb_makeall(corpus = "BT", p_attribute = p_attr, registry = get_tmp_registry())
+      cwb_huffcode(corpus = "BT", p_attribute = p_attr, registry = get_tmp_registry())
+      cwb_compress_rdx(corpus = "BT", p_attribute = p_attr, registry = get_tmp_registry())
     }
     
-    expect_true(cl_load_corpus(corpus = "BT", registry = tmp_registry))
+    expect_true(cl_load_corpus(corpus = "BT", registry = get_tmp_registry()))
     expect_true(tolower("BT") %in% cl_list_corpora())
-    expect_false("BT" %in% cqp_list_corpora())
-    expect_true(cqp_load_corpus(corpus = "BT", registry = tmp_registry))
+    expect_true(cqp_load_corpus(corpus = "BT", registry = get_tmp_registry()))
     expect_true("BT" %in% cqp_list_corpora())
     
     for (p_attr in c("word", "pos", "lemma")){
       expect_equal(
-        cl_attribute_size(corpus = "BT", attribute = p_attr, attribute_type = "p", registry = tmp_registry),
+        cl_attribute_size(corpus = "BT", attribute = p_attr, attribute_type = "p", registry = get_tmp_registry()),
         8402
       )
     }
     
-    n <- cl_attribute_size(corpus = "BT", attribute = "word", attribute_type = "p", registry = tmp_registry)
+    n <- cl_attribute_size(corpus = "BT", attribute = "word", attribute_type = "p", registry = get_tmp_registry())
     ids <- cl_cpos2id(
-      "BT", p_attribute = "word", registry = tmp_registry,
+      "BT", p_attribute = "word", registry = get_tmp_registry(),
       cpos = 0L:(n-1L)
     )
     
-    words <- cl_id2str("BT", p_attribute = "word", registry = tmp_registry, id = ids)
+    words <- cl_id2str("BT", p_attribute = "word", registry = get_tmp_registry(), id = ids)
     expect_equal(table(words == "Liebe")[["TRUE"]], 6)
     expect_equal(table(words == "SPD")[["TRUE"]], 31)
 
-    # unlink(tmp_registry)
     unlink(tmp_data_dir)
   }
 )

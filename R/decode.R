@@ -22,9 +22,6 @@
 #' @export s_attribute_decode
 #' @rdname s_attribute_decode
 #' @examples 
-#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-#' Sys.setenv(CORPUS_REGISTRY = registry)
-#' 
 #' # pure R implementation (Rcpp implementation fails on Windows in vanilla mode)
 #' b <- s_attribute_decode(
 #'   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
@@ -36,7 +33,7 @@
 #'   corpus = "REUTERS",
 #'   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
 #'   s_attribute = "places",
-#'   method = "Rcpp"
+#'   method = "Rcpp", registry = get_tmp_registry()
 #' )
 s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, registry = Sys.getenv("CORPUS_REGISTRY"), method = c("R", "Rcpp")){
   
@@ -125,7 +122,7 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
 #'   attribute: Column 1 defines left corpus positions and column 2 right corpus
 #'   positions of regions.
 #' @examples 
-#' s_attr_regions("REUTERS", s_attr = "id")
+#' s_attr_regions("REUTERS", s_attr = "id", registry = get_tmp_registry())
 s_attr_regions <- function(corpus, s_attr, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir = corpus_data_dir(corpus = corpus, registry = registry)){
   rng_file <- file.path(data_dir, paste(s_attr, "rng", sep = "."))
   rng_file_size <- file.info(rng_file)[["size"]]

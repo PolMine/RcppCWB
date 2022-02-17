@@ -47,6 +47,13 @@ re-creating objects whenever switching from R to C.
 * Functions `.s_attr()` and `.p_attr()` return pointers for a s- or
 p-attribute.d
 * Functions `cl_*` are now available with pointer as input (e.g. `cpos_to_id()`).
+* The `check_corpus()` does not re-set the registry directory and more, but tries
+to load the checked corpus if it has not yet been loaded.
+* Function `check_cqp_query()` renamed to `check_query()` to avoid a conflict
+with a function defined in the polmineR package.
+* The CORPUS_REGISTRY environment variable is not set to the temporary registry,
+to avoid often confusing behavior and collissions whent loading RcppCWB and 
+polmineR at the same time (#13).
 
 
 # RcppCWB 0.5.0

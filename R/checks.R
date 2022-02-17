@@ -18,10 +18,10 @@
 #' @export check_registry
 check_registry <- function(registry){
   if (length(registry) != 1)
-    stop("registry needs to be a character vector length 1")
+    stop("registry needs to be a length-one character vector")
   if (!is.character(registry))
     stop("registry needs to be a character vector (is.character not TRUE)")
-  if(!file.exists(registry))
+  if(!dir.exists(registry))
     stop("the registry directory provided does not exist")
   if (!file.info(registry)$isdir)
     stop("registry exists, but is not a directory")
@@ -46,15 +46,19 @@ check_corpus <- function(corpus, registry){
     stop(sprintf("Registry directory '%s' does not exist.", registry))
   
   if (isFALSE(cqp_is_initialized())) cqp_initialize(registry = registry)
-  if (cqp_get_registry() != registry){
-    warning(
-      sprintf(
-        "Resetting registry directory from '%s' to '%s'",
-        cqp_get_registry(), registry)
-      )
-    cqp_reset_registry(registry = registry)
-  }
   
+  if (!tolower(corpus) %in% cl_list_corpora()){
+    
+    success_cl <- cl_load_corpus(corpus = corpus, registry = registry)
+    if (isFALSE(success_cl))
+      warning(sprintf("corpus '%s' is not loaded and cannot be loaded", corpus))
+    
+    success_cqp <- cqp_load_corpus(corpus = toupper(corpus), registry = registry)
+    if (isFALSE(success_cqp))
+      warning(sprintf("corpus '%s' is not loaded and cannot be loaded", corpus))
+    
+  }
+
   if (.check_corpus(toupper(corpus)) == 0L)
     stop(sprintf("corpus %s is not available (check whether there is a typo)", sQuote(corpus)))
   
@@ -112,9 +116,9 @@ check_region_matrix <- function(region_matrix){
   return( TRUE )
 }
 
-#' @export check_cqp_query
+#' @export check_query
 #' @rdname checks
-check_cqp_query <- function(query){
+check_query <- function(query){
   if (!substr(query, start = nchar(query), stop = nchar(query)) == ";"){
     encoding_query <- Encoding(query)
     retval <- paste0(query, ";", sep = "")

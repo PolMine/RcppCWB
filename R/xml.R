@@ -11,7 +11,7 @@
 #'   of `x` and `y` are idential. Attributes will be siblings in this case, 
 #'   and not in an ancestor-sibling relationship.
 #' @examples 
-#' s_attr_is_descendent("id", "places", corpus = "REUTERS")
+#' s_attr_is_descendent("id", "places", corpus = "REUTERS", registry = get_tmp_registry())
 #' @export
 #' @rdname xml
 #' @param x A structural attribute, stated as length-one `character` vector.
@@ -41,8 +41,8 @@ s_attr_is_descendent <- function(x, y, corpus, registry = Sys.getenv("CORPUS_REG
     descendent_regions <- s_attr_regions(s_attr = x, corpus = corpus, registry = registry)
   }
   
-  s <- cl_cpos2struc(corpus = corpus, s_attribute = y, cpos = descendent_regions[,1])
-  ancestor_regions <- get_region_matrix(corpus = corpus, s_attribute = y, strucs = s)
+  s <- cl_cpos2struc(corpus = corpus, s_attribute = y, cpos = descendent_regions[,1], registry = registry)
+  ancestor_regions <- get_region_matrix(corpus = corpus, s_attribute = y, strucs = s, registry = registry)
 
   if (identical(descendent_regions, ancestor_regions)){
     FALSE
@@ -60,7 +60,7 @@ s_attr_is_descendent <- function(x, y, corpus, registry = Sys.getenv("CORPUS_REG
 #' @rdname xml
 #' @export
 #' @examples
-#' s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS")
+#' s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS", registry = get_tmp_registry())
 s_attr_is_sibling <- function(x, y, corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   
   x_regions <- s_attr_regions(s_attr = x, corpus = corpus, registry = registry)

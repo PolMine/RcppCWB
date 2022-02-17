@@ -47,6 +47,6 @@ yes, \code{TRUE} is returned, assuming that both attributes are at the same
 level (siblings). If not, \code{FALSE} is returned.
 }
 \examples{
-s_attr_is_descendent("id", "places", corpus = "REUTERS")
-s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS")
+s_attr_is_descendent("id", "places", corpus = "REUTERS", registry = get_tmp_registry())
+s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS", registry = get_tmp_registry())
 }

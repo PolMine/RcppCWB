@@ -34,5 +34,5 @@ reads the binary *.rng file for the structural attribute directly. The corpus
 library (CL) is not used in this case.
 }
 \examples{
-s_attr_regions("REUTERS", s_attr = "id")
+s_attr_regions("REUTERS", s_attr = "id", registry = get_tmp_registry())
 }
