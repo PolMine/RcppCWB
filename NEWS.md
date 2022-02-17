@@ -44,6 +44,8 @@ the code is organized more coherently corresponding to the different logics.
 * Unexported functions `.cpos_to_id()`, `.cl_find_corpus()` and
 `.cl_new_attribute()` are an entry to passing around pointers, rather than
 re-creating objects whenever switching from R to C.
+* Unexported function `.s_attr()` and `.p_attr()` return pointers for a s- or
+p-attribute.
 
 
 # RcppCWB 0.5.0

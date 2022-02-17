@@ -33,8 +33,24 @@
     .Call(`_RcppCWB_cwb_version`)
 }
 
+.s_attr <- function(corpus, s_attribute, registry) {
+    .Call(`_RcppCWB__s_attr`, corpus, s_attribute, registry)
+}
+
+.p_attr <- function(corpus, p_attribute, registry) {
+    .Call(`_RcppCWB__p_attr`, corpus, p_attribute, registry)
+}
+
 .cl_attribute_size <- function(corpus, attribute, attribute_type, registry) {
     .Call(`_RcppCWB__cl_attribute_size`, corpus, attribute, attribute_type, registry)
+}
+
+.p_attr_size <- function(p_attr) {
+    .Call(`_RcppCWB__p_attr_size`, p_attr)
+}
+
+.s_attr_size <- function(s_attr) {
+    .Call(`_RcppCWB__s_attr_size`, s_attr)
 }
 
 .cl_lexicon_size <- function(corpus, p_attribute, registry) {

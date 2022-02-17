@@ -44,6 +44,12 @@ Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry){
   return att;
 }
 
+// [[Rcpp::export(name=".s_attr")]]
+SEXP _s_attr(SEXP corpus, SEXP s_attribute, SEXP registry){
+  Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
+  SEXP ptr = R_MakeExternalPtr(s_attr, R_NilValue, R_NilValue);
+  return(ptr);
+}
 
 Attribute* make_p_attribute(SEXP corpus, SEXP p_attribute, SEXP registry){
   
@@ -56,6 +62,14 @@ Attribute* make_p_attribute(SEXP corpus, SEXP p_attribute, SEXP registry){
   
   return att;
 }
+
+// [[Rcpp::export(name=".p_attr")]]
+SEXP _p_attr(SEXP corpus, SEXP p_attribute, SEXP registry){
+  Attribute* p_attr = make_p_attribute(corpus, p_attribute, registry);
+  SEXP ptr = R_MakeExternalPtr(p_attr, R_NilValue, R_NilValue);
+  return(ptr);
+}
+
 
 /* these are the wrappers for the functions of the corpus library (CL) */
 
@@ -73,6 +87,21 @@ int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP re
   }
   return(size);
 }
+
+// [[Rcpp::export(name=".p_attr_size")]]
+int _p_attr_size(SEXP p_attr) {
+  Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
+  int size = cl_max_cpos(att);
+  return(size);
+}
+
+// [[Rcpp::export(name=".s_attr_size")]]
+int _s_attr_size(SEXP s_attr) {
+  Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
+  int size = cl_max_struc(att);
+  return(size);
+}
+
 
 
 // [[Rcpp::export(name=".cl_lexicon_size")]]

@@ -389,3 +389,44 @@ cl_load_corpus <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 cl_list_corpora <- function(){
   .cl_list_corpora()
 }
+
+############### experimental functionality ##########################
+
+#' Experimental low-level CL access.
+#' 
+#' Set of functions with same functionality as cl_* functions to improve the
+#' ease of writing code.
+#' 
+#' @name cl_rework
+#' @rdname cl_rework
+NULL
+
+#' @param corpus ID of a CWB corpus (length-one `character` vector).
+#' @param s_attribute A structural attribute (length-one `character` vector).
+#' @param registry Registry directory.
+#' @rdname cl_rework
+#' @export
+s_attr <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .s_attr(corpus = corpus, s_attribute = s_attribute, registry = registry)
+}
+
+#' @param p_attribute A positional attribute (length-one `character` vector).
+#' @rdname cl_rework
+#' @export
+p_attr <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+  .p_attr(corpus = corpus, p_attribute = p_attribute, registry = registry)
+}
+
+#' @param p_attr A `externalptr` referencing a p-attribute.
+#' @rdname cl_rework
+#' @export
+p_attr_size <- function(p_attr){
+  .p_attr_size(p_attr)
+}
+
+#' @param s_attr A `externalptr` referencing a p-attribute.
+#' @rdname cl_rework
+#' @export
+s_attr_size <- function(s_attr){
+  .s_attr_size(s_attr)
+}
