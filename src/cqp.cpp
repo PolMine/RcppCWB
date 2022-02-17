@@ -108,6 +108,7 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   char * q = (char*)CHAR(STRING_ELT(query,0));
   char * cqp_query;
   CorpusList *cl;
+  SEXP result;
   
   /* is this necessary */
   char	*c, *sc;
@@ -132,6 +133,7 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   
   if (!cqp_parse_string(cqp_query)){
     Rprintf("ERROR: Cannot parse the CQP query.\n");
+    result = R_NilValue;
   } else {
     char *			full_child;
     CorpusList *	childcl;
@@ -141,13 +143,44 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
     childcl = cqi_find_corpus(full_child);
     if ((childcl) == NULL) {
       Rprintf("subcorpus not found\n");
-    } 
+      result = R_NilValue;
+    } else {
+      result = R_MakeExternalPtr(childcl, R_NilValue, R_NilValue);
+    }
   }
 
-  
-  SEXP result = R_NilValue;
   return result;
 }
+
+
+// [[Rcpp::export(name=".cqp_subcorpus_query")]]
+SEXP cqp_subcorpus_query(SEXP subcorpus, SEXP name, SEXP query){
+  
+  CorpusList * cl = (CorpusList*)R_ExternalPtrAddr(subcorpus);
+  char * full_child = (char*)CHAR(STRING_ELT(name,0));
+  char * q = (char*)CHAR(STRING_ELT(query,0));
+
+  SEXP result;
+  
+  set_current_corpus(cl, 0);
+  
+  if (!cqp_parse_string(q)){
+    Rprintf("ERROR: Cannot parse the CQP query.\n");
+    result = R_NilValue;
+  } else {
+    CorpusList *	childcl;
+    
+    childcl = findcorpus(full_child, SUB, 0);
+    if ((childcl) == NULL) {
+      Rprintf("subcorpus not found\n");
+      result = R_NilValue;
+    } else {
+      result = R_MakeExternalPtr(childcl, R_NilValue, R_NilValue);
+    }
+  }
+  return result;
+}
+
 
 
 // [[Rcpp::export(name=".cqp_subcorpus_size")]]
@@ -227,6 +260,25 @@ Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus)
   
   return result;
 }
+
+
+// [[Rcpp::export(name=".cqp_subcorpus_regions")]]
+Rcpp::IntegerMatrix cqp_subcorpus_regions(SEXP subcorpus)
+{
+  CorpusList * cl = (CorpusList*)R_ExternalPtrAddr(subcorpus);
+  int nrows = cl->size;
+  int i;
+
+  Rcpp::IntegerMatrix result(nrows,2);
+  
+  for (i = 0; i < nrows; i++) {
+    result(i,0) = cl->range[i].start;
+    result(i,1) = cl->range[i].end;
+  }
+  
+  return result;
+}
+
 
 // [[Rcpp::export(name=".cqp_drop_subcorpus")]]
 SEXP cqp_drop_subcorpus(SEXP inSubcorpus)

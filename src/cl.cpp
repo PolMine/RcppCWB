@@ -110,30 +110,32 @@ Rcpp::StringVector _cl_cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rc
 }
 
 
-// [[Rcpp::export(name=".cl_cpos2id")]]
-Rcpp::IntegerVector _cl_cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
-  Attribute* att = make_p_attribute(corpus, p_attribute, registry);
+/* this is the worker */
+Rcpp::IntegerVector _cl_cpos2id(Attribute * att, Rcpp::IntegerVector cpos){
   int i;
   int len = cpos.length();
   Rcpp::IntegerVector ids(len);
+  
   for (i = 0; i < len; i++){
     ids(i) = cl_cpos2id(att, cpos(i));
   }
   return( ids );
+}
+
+// [[Rcpp::export(name=".cl_cpos2id")]]
+Rcpp::IntegerVector _cl_cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+  Attribute* att = make_p_attribute(corpus, p_attribute, registry);
+  return(_cl_cpos2id(att, cpos));
 }
 
 
 // [[Rcpp::export(name=".cpos_to_id")]]
 Rcpp::IntegerVector _cpos_to_id(SEXP p_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
-  int i;
-  int len = cpos.length();
-  Rcpp::IntegerVector ids(len);
-  for (i = 0; i < len; i++){
-    ids(i) = cl_cpos2id(att, cpos(i));
-  }
-  return( ids );
+  return(_cl_cpos2id(att, cpos));
 }
+
+
 
 
 // [[Rcpp::export(name=".cl_struc2cpos")]]

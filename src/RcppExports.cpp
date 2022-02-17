@@ -492,6 +492,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cqp_subcorpus_query
+SEXP cqp_subcorpus_query(SEXP subcorpus, SEXP name, SEXP query);
+RcppExport SEXP _RcppCWB_cqp_subcorpus_query(SEXP subcorpusSEXP, SEXP nameSEXP, SEXP querySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type subcorpus(subcorpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type name(nameSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_subcorpus_query(subcorpus, name, query));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cqp_subcorpus_size
 int cqp_subcorpus_size(SEXP scorpus);
 RcppExport SEXP _RcppCWB_cqp_subcorpus_size(SEXP scorpusSEXP) {
@@ -522,6 +535,17 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type inSubcorpus(inSubcorpusSEXP);
     rcpp_result_gen = Rcpp::wrap(cqp_dump_subcorpus(inSubcorpus));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cqp_subcorpus_regions
+Rcpp::IntegerMatrix cqp_subcorpus_regions(SEXP subcorpus);
+RcppExport SEXP _RcppCWB_cqp_subcorpus_regions(SEXP subcorpusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type subcorpus(subcorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(cqp_subcorpus_regions(subcorpus));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -658,9 +682,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cqp_set_registry", (DL_FUNC) &_RcppCWB_cqp_set_registry, 1},
     {"_RcppCWB_cqp_list_corpora", (DL_FUNC) &_RcppCWB_cqp_list_corpora, 0},
     {"_RcppCWB_cqp_query", (DL_FUNC) &_RcppCWB_cqp_query, 3},
+    {"_RcppCWB_cqp_subcorpus_query", (DL_FUNC) &_RcppCWB_cqp_subcorpus_query, 3},
     {"_RcppCWB_cqp_subcorpus_size", (DL_FUNC) &_RcppCWB_cqp_subcorpus_size, 1},
     {"_RcppCWB_cqp_list_subcorpora", (DL_FUNC) &_RcppCWB_cqp_list_subcorpora, 1},
     {"_RcppCWB_cqp_dump_subcorpus", (DL_FUNC) &_RcppCWB_cqp_dump_subcorpus, 1},
+    {"_RcppCWB_cqp_subcorpus_regions", (DL_FUNC) &_RcppCWB_cqp_subcorpus_regions, 1},
     {"_RcppCWB_cqp_drop_subcorpus", (DL_FUNC) &_RcppCWB_cqp_drop_subcorpus, 1},
     {"_RcppCWB_check_corpus", (DL_FUNC) &_RcppCWB_check_corpus, 1},
     {"_RcppCWB_cqp_load_corpus", (DL_FUNC) &_RcppCWB_cqp_load_corpus, 2},
