@@ -9,7 +9,7 @@ test_that(
       corpus = "REUTERS",
       s_attribute = "places",
       cpos = 5L,
-      registry = use_tmp_registry()
+      registry = get_tmp_registry()
     )
     expect_equal(cpos, 0)
   }
@@ -22,7 +22,7 @@ test_that(
       corpus = "REUTERS",
       s_attribute = "places",
       cpos = 5L,
-      registry = use_tmp_registry()
+      registry = get_tmp_registry()
     )
     s <- s_attr(corpus = "REUTERS", s_attribute = "places", registry = get_tmp_registry())
     cpos_new <- cpos_to_lbound(cpos = 5L, s_attr = s)
@@ -51,7 +51,7 @@ test_that(
       corpus = "REUTERS",
       s_attribute = "places",
       cpos = 5L,
-      registry = use_tmp_registry()
+      registry = get_tmp_registry()
     )
     s <- s_attr(corpus = "REUTERS", s_attribute = "places", registry = get_tmp_registry())
     cpos_new <- cpos_to_rbound(cpos = 5L, s_attr = s)

@@ -9,7 +9,7 @@ test_that(
       corpus = "REUTERS",
       p_attribute = "word",
       id = 15,
-      registry = use_tmp_registry()
+      registry = get_tmp_registry()
     )
     expect_equal(N, 78L)
   }
@@ -22,7 +22,7 @@ test_that(
       corpus = "REUTERS",
       p_attribute = "word",
       id = 15,
-      registry = use_tmp_registry()
+      registry = get_tmp_registry()
     )
     
     p <- p_attr(corpus = "REUTERS", p_attribute = "word", registry = get_tmp_registry())

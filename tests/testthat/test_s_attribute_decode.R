@@ -8,7 +8,7 @@ test_that(
     s_attr_df_r <- s_attribute_decode(
       corpus = "REUTERS",
       s_attribute = "places",
-      registry = use_tmp_registry(),
+      registry = get_tmp_registry(),
       method = "Rcpp"
     )
     expect_equal(s_attr_df_r[["value"]][1:4], c("usa", "usa", "canada", "usa"))
@@ -17,7 +17,7 @@ test_that(
     s_attr_df_rcpp <- s_attribute_decode(
       corpus = "REUTERS",
       s_attribute = "places",
-      registry = use_tmp_registry(),
+      registry = get_tmp_registry(),
       method = "Rcpp"
     )
     

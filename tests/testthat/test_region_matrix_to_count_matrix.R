@@ -8,7 +8,7 @@ test_that(
     M <- region_matrix_to_count_matrix(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = use_tmp_registry(),
+      registry = get_tmp_registry(),
       matrix = matrix(c(0, 91), nrow = 1)
     )
     expect_equal(M[16,2], 5L)

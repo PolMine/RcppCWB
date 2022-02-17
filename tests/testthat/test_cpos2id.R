@@ -8,7 +8,7 @@ test_that(
     ids <- cl_cpos2id(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = use_tmp_registry(),
+      registry = get_tmp_registry(),
       cpos = 0L:15L
     )
     expect_equal(ids, 0L:15L)
@@ -21,7 +21,7 @@ test_that(
     ids_old <- cl_cpos2id(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = use_tmp_registry(),
+      registry = get_tmp_registry(),
       cpos = 0L:15L
     )
     
