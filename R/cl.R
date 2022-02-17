@@ -430,3 +430,36 @@ p_attr_size <- function(p_attr){
 s_attr_size <- function(s_attr){
   .s_attr_size(s_attr)
 }
+
+#' @rdname cl_rework
+#' @export
+p_attr_lexicon_size <- function(p_attr){
+  .p_attr_lexicon_size(p_attr)
+}
+
+#' @param cpos An `integer` vector of corpus positions.
+#' @rdname cl_rework
+#' @export
+cpos_to_struc <- function(cpos, s_attr){
+  .cpos_to_struc(s_attr = s_attr, cpos = cpos) # reverse order!
+}
+
+#' @rdname cl_rework
+#' @export
+cpos_to_str <- function(cpos, p_attr){
+  .cpos_to_str(p_attr = p_attr, cpos = cpos) # reverse order!
+}
+
+#' @rdname cl_rework
+#' @export
+cpos_to_id <- function(cpos, p_attr){
+  .cpos_to_id(p_attr = p_attr, cpos = cpos) # reverse order!
+}
+
+
+#' @param struc A length-one `integer` vector with a struc.
+#' @rdname cl_rework
+#' @export
+struc_to_cpos <- function(struc, s_attr){
+  .struc_to_cpos(s_attr = s_attr, struc = struc) # reverse order!
+}

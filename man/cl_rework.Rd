@@ -6,6 +6,11 @@
 \alias{p_attr}
 \alias{p_attr_size}
 \alias{s_attr_size}
+\alias{p_attr_lexicon_size}
+\alias{cpos_to_struc}
+\alias{cpos_to_str}
+\alias{cpos_to_id}
+\alias{struc_to_cpos}
 \title{Experimental low-level CL access.}
 \usage{
 s_attr(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -15,6 +20,16 @@ p_attr(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
 p_attr_size(p_attr)
 
 s_attr_size(s_attr)
+
+p_attr_lexicon_size(p_attr)
+
+cpos_to_struc(cpos, s_attr)
+
+cpos_to_str(cpos, p_attr)
+
+cpos_to_id(cpos, p_attr)
+
+struc_to_cpos(struc, s_attr)
 }
 \arguments{
 \item{corpus}{ID of a CWB corpus (length-one \code{character} vector).}
@@ -28,6 +43,10 @@ s_attr_size(s_attr)
 \item{p_attr}{A \code{externalptr} referencing a p-attribute.}
 
 \item{s_attr}{A \code{externalptr} referencing a p-attribute.}
+
+\item{cpos}{An \code{integer} vector of corpus positions.}
+
+\item{struc}{A length-one \code{integer} vector with a struc.}
 }
 \description{
 Set of functions with same functionality as cl_* functions to improve the

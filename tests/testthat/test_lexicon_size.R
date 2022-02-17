@@ -13,3 +13,18 @@ test_that(
     expect_equal(N, 1192)
   }
 )
+
+test_that(
+  "lexicon size works for experimental functionality",
+  {
+    old <- cl_lexicon_size(
+      corpus = "REUTERS",
+      p_attribute = "word",
+      registry = get_tmp_registry()
+    )
+    new <- RcppCWB:::.p_attr_lexicon_size(
+      p_attr("REUTERS", "word", registry = get_tmp_registry())
+    )
+    expect_identical(old, new)
+  }
+)
