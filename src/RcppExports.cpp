@@ -332,6 +332,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _struc_to_str
+Rcpp::StringVector _struc_to_str(SEXP s_attr, Rcpp::IntegerVector struc);
+RcppExport SEXP _RcppCWB__struc_to_str(SEXP s_attrSEXP, SEXP strucSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type s_attr(s_attrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type struc(strucSEXP);
+    rcpp_result_gen = Rcpp::wrap(_struc_to_str(s_attr, struc));
+    return rcpp_result_gen;
+END_RCPP
+}
 // _cl_regex2id
 Rcpp::IntegerVector _cl_regex2id(SEXP corpus, SEXP p_attribute, SEXP regex, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_regex2id(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP regexSEXP, SEXP registrySEXP) {
@@ -343,6 +355,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type regex(regexSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     rcpp_result_gen = Rcpp::wrap(_cl_regex2id(corpus, p_attribute, regex, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _regex_to_id
+Rcpp::IntegerVector _regex_to_id(SEXP p_attr, SEXP regex);
+RcppExport SEXP _RcppCWB__regex_to_id(SEXP p_attrSEXP, SEXP regexSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type p_attr(p_attrSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type regex(regexSEXP);
+    rcpp_result_gen = Rcpp::wrap(_regex_to_id(p_attr, regex));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -360,6 +384,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _str_to_id
+Rcpp::IntegerVector _str_to_id(SEXP p_attr, Rcpp::StringVector str);
+RcppExport SEXP _RcppCWB__str_to_id(SEXP p_attrSEXP, SEXP strSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type p_attr(p_attrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type str(strSEXP);
+    rcpp_result_gen = Rcpp::wrap(_str_to_id(p_attr, str));
+    return rcpp_result_gen;
+END_RCPP
+}
 // _cl_id2freq
 Rcpp::IntegerVector _cl_id2freq(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVector id, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_id2freq(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP idSEXP, SEXP registrySEXP) {
@@ -371,6 +407,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type id(idSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     rcpp_result_gen = Rcpp::wrap(_cl_id2freq(corpus, p_attribute, id, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _id_to_freq
+Rcpp::IntegerVector _id_to_freq(SEXP p_attr, Rcpp::IntegerVector id);
+RcppExport SEXP _RcppCWB__id_to_freq(SEXP p_attrSEXP, SEXP idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type p_attr(p_attrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type id(idSEXP);
+    rcpp_result_gen = Rcpp::wrap(_id_to_freq(p_attr, id));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -388,6 +436,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _id_to_cpos
+Rcpp::IntegerVector _id_to_cpos(SEXP p_attr, Rcpp::IntegerVector id);
+RcppExport SEXP _RcppCWB__id_to_cpos(SEXP p_attrSEXP, SEXP idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type p_attr(p_attrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type id(idSEXP);
+    rcpp_result_gen = Rcpp::wrap(_id_to_cpos(p_attr, id));
+    return rcpp_result_gen;
+END_RCPP
+}
 // _cl_cpos2lbound
 Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_cpos2lbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
@@ -402,6 +462,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _cpos_to_lbound
+Rcpp::IntegerVector _cpos_to_lbound(SEXP s_attr, Rcpp::IntegerVector cpos);
+RcppExport SEXP _RcppCWB__cpos_to_lbound(SEXP s_attrSEXP, SEXP cposSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type s_attr(s_attrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
+    rcpp_result_gen = Rcpp::wrap(_cpos_to_lbound(s_attr, cpos));
+    return rcpp_result_gen;
+END_RCPP
+}
 // _cl_cpos2rbound
 Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
 RcppExport SEXP _RcppCWB__cl_cpos2rbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
@@ -413,6 +485,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     rcpp_result_gen = Rcpp::wrap(_cl_cpos2rbound(corpus, s_attribute, cpos, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _cpos_to_rbound
+Rcpp::IntegerVector _cpos_to_rbound(SEXP s_attr, Rcpp::IntegerVector cpos);
+RcppExport SEXP _RcppCWB__cpos_to_rbound(SEXP s_attrSEXP, SEXP cposSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type s_attr(s_attrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
+    rcpp_result_gen = Rcpp::wrap(_cpos_to_rbound(s_attr, cpos));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -764,12 +848,19 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__struc_to_cpos", (DL_FUNC) &_RcppCWB__struc_to_cpos, 2},
     {"_RcppCWB__cl_id2str", (DL_FUNC) &_RcppCWB__cl_id2str, 4},
     {"_RcppCWB__cl_struc2str", (DL_FUNC) &_RcppCWB__cl_struc2str, 4},
+    {"_RcppCWB__struc_to_str", (DL_FUNC) &_RcppCWB__struc_to_str, 2},
     {"_RcppCWB__cl_regex2id", (DL_FUNC) &_RcppCWB__cl_regex2id, 4},
+    {"_RcppCWB__regex_to_id", (DL_FUNC) &_RcppCWB__regex_to_id, 2},
     {"_RcppCWB__cl_str2id", (DL_FUNC) &_RcppCWB__cl_str2id, 4},
+    {"_RcppCWB__str_to_id", (DL_FUNC) &_RcppCWB__str_to_id, 2},
     {"_RcppCWB__cl_id2freq", (DL_FUNC) &_RcppCWB__cl_id2freq, 4},
+    {"_RcppCWB__id_to_freq", (DL_FUNC) &_RcppCWB__id_to_freq, 2},
     {"_RcppCWB__cl_id2cpos", (DL_FUNC) &_RcppCWB__cl_id2cpos, 4},
+    {"_RcppCWB__id_to_cpos", (DL_FUNC) &_RcppCWB__id_to_cpos, 2},
     {"_RcppCWB__cl_cpos2lbound", (DL_FUNC) &_RcppCWB__cl_cpos2lbound, 4},
+    {"_RcppCWB__cpos_to_lbound", (DL_FUNC) &_RcppCWB__cpos_to_lbound, 2},
     {"_RcppCWB__cl_cpos2rbound", (DL_FUNC) &_RcppCWB__cl_cpos2rbound, 4},
+    {"_RcppCWB__cpos_to_rbound", (DL_FUNC) &_RcppCWB__cpos_to_rbound, 2},
     {"_RcppCWB__cl_find_corpus", (DL_FUNC) &_RcppCWB__cl_find_corpus, 2},
     {"_RcppCWB__cl_new_attribute", (DL_FUNC) &_RcppCWB__cl_new_attribute, 3},
     {"_RcppCWB__cl_delete_corpus", (DL_FUNC) &_RcppCWB__cl_delete_corpus, 2},

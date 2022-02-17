@@ -463,3 +463,49 @@ cpos_to_id <- function(cpos, p_attr){
 struc_to_cpos <- function(struc, s_attr){
   .struc_to_cpos(s_attr = s_attr, struc = struc) # reverse order!
 }
+
+#' @rdname cl_rework
+#' @export
+struc_to_str <- function(struc, s_attr){
+  .struc_to_str(s_attr = s_attr, struc = struc) # reverse order!
+}
+
+#' @param regex A regular expression.
+#' @rdname cl_rework
+#' @export
+regex_to_id <- function(regex, p_attr){
+  .regex_to_id(p_attr = p_attr, regex = regex) # reverse order!
+}
+
+#' @param str A `character` vector.
+#' @rdname cl_rework
+#' @export
+str_to_id <- function(str, p_attr){
+  .str_to_id(p_attr = p_attr, str = str) # reverse order!
+}
+
+#' @param id An `integer` vector with token ids.
+#' @rdname cl_rework
+#' @export
+id_to_freq <- function(id, p_attr){
+  .id_to_freq(p_attr = p_attr, id = id) # reverse order!
+}
+
+#' @rdname cl_rework
+#' @export
+id_to_cpos <- function(id, p_attr){
+  .id_to_cpos(p_attr = p_attr, id = id) # reverse order!
+}
+
+#' @rdname cl_rework
+#' @export
+cpos_to_lbound <- function(cpos, s_attr){
+  .cpos_to_lbound(s_attr = s_attr, cpos = cpos) # reverse order!
+}
+
+
+#' @rdname cl_rework
+#' @export
+cpos_to_rbound <- function(cpos, s_attr){
+  .cpos_to_rbound(s_attr = s_attr, cpos = cpos) # reverse order!
+}

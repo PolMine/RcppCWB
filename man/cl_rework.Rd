@@ -11,6 +11,13 @@
 \alias{cpos_to_str}
 \alias{cpos_to_id}
 \alias{struc_to_cpos}
+\alias{struc_to_str}
+\alias{regex_to_id}
+\alias{str_to_id}
+\alias{id_to_freq}
+\alias{id_to_cpos}
+\alias{cpos_to_lbound}
+\alias{cpos_to_rbound}
 \title{Experimental low-level CL access.}
 \usage{
 s_attr(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -30,6 +37,20 @@ cpos_to_str(cpos, p_attr)
 cpos_to_id(cpos, p_attr)
 
 struc_to_cpos(struc, s_attr)
+
+struc_to_str(struc, s_attr)
+
+regex_to_id(regex, p_attr)
+
+str_to_id(str, p_attr)
+
+id_to_freq(id, p_attr)
+
+id_to_cpos(id, p_attr)
+
+cpos_to_lbound(cpos, s_attr)
+
+cpos_to_rbound(cpos, s_attr)
 }
 \arguments{
 \item{corpus}{ID of a CWB corpus (length-one \code{character} vector).}
@@ -47,6 +68,12 @@ struc_to_cpos(struc, s_attr)
 \item{cpos}{An \code{integer} vector of corpus positions.}
 
 \item{struc}{A length-one \code{integer} vector with a struc.}
+
+\item{regex}{A regular expression.}
+
+\item{str}{A \code{character} vector.}
+
+\item{id}{An \code{integer} vector with token ids.}
 }
 \description{
 Set of functions with same functionality as cl_* functions to improve the
