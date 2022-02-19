@@ -143,8 +143,6 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
     } else {
       full_child = combine_subcorpus_spec(mother, child);
     }
-    
-    Rprintf("full child: %s\n", full_child);
 
     childcl = cqi_find_corpus(full_child);
     if ((childcl) == NULL) {
@@ -320,8 +318,8 @@ int cqp_load_corpus(SEXP corpus, SEXP registry){
 }
 
 
-// [[Rcpp::export(name=".cqp_subcorpus")]]
-SEXP cqp_subcorpus(SEXP name, SEXP corpus, Rcpp::IntegerMatrix region_matrix){
+// [[Rcpp::export(name=".region_matrix_to_subcorpus")]]
+SEXP region_matrix_to_subcorpus(Rcpp::IntegerMatrix region_matrix, SEXP corpus, SEXP subcorpus){
   
   int i, n, corpus_size;
   SEXP sc;
@@ -331,7 +329,7 @@ SEXP cqp_subcorpus(SEXP name, SEXP corpus, Rcpp::IntegerMatrix region_matrix){
   CorpusList *cl;
   
   c = (Corpus*)R_ExternalPtrAddr(corpus);
-  id = strdup(Rcpp::as<std::string>(name).c_str());
+  id = strdup(Rcpp::as<std::string>(subcorpus).c_str());
   n = region_matrix.nrow();
   
   cl = (CorpusList *)cl_malloc(sizeof(CorpusList));

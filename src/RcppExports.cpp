@@ -749,16 +749,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cqp_subcorpus
-SEXP cqp_subcorpus(SEXP name, SEXP corpus, Rcpp::IntegerMatrix region_matrix);
-RcppExport SEXP _RcppCWB_cqp_subcorpus(SEXP nameSEXP, SEXP corpusSEXP, SEXP region_matrixSEXP) {
+// region_matrix_to_subcorpus
+SEXP region_matrix_to_subcorpus(Rcpp::IntegerMatrix region_matrix, SEXP corpus, SEXP subcorpus);
+RcppExport SEXP _RcppCWB_region_matrix_to_subcorpus(SEXP region_matrixSEXP, SEXP corpusSEXP, SEXP subcorpusSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type name(nameSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type region_matrix(region_matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(cqp_subcorpus(name, corpus, region_matrix));
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type subcorpus(subcorpusSEXP);
+    rcpp_result_gen = Rcpp::wrap(region_matrix_to_subcorpus(region_matrix, corpus, subcorpus));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -883,7 +883,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cqp_drop_subcorpus", (DL_FUNC) &_RcppCWB_cqp_drop_subcorpus, 1},
     {"_RcppCWB_check_corpus", (DL_FUNC) &_RcppCWB_check_corpus, 1},
     {"_RcppCWB_cqp_load_corpus", (DL_FUNC) &_RcppCWB_cqp_load_corpus, 2},
-    {"_RcppCWB_cqp_subcorpus", (DL_FUNC) &_RcppCWB_cqp_subcorpus, 3},
+    {"_RcppCWB_region_matrix_to_subcorpus", (DL_FUNC) &_RcppCWB_region_matrix_to_subcorpus, 3},
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
     {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},

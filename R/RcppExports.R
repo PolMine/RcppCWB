@@ -241,8 +241,8 @@
     .Call(`_RcppCWB_cqp_load_corpus`, corpus, registry)
 }
 
-.cqp_subcorpus <- function(name, corpus, region_matrix) {
-    .Call(`_RcppCWB_cqp_subcorpus`, name, corpus, region_matrix)
+.region_matrix_to_subcorpus <- function(region_matrix, corpus, subcorpus) {
+    .Call(`_RcppCWB_region_matrix_to_subcorpus`, region_matrix, corpus, subcorpus)
 }
 
 .cwb_makeall <- function(x, registry_dir, p_attribute) {
