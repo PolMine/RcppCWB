@@ -45,7 +45,7 @@
 #                               - set HOMEBREW_ROOT to base of HomeBrew tree on command line
 #
 ifndef PLATFORM
-PLATFORM=darwin-arm64
+PLATFORM=darwin-brew
 endif
 include $(TOP)/config/platform/$(PLATFORM)
 
@@ -90,7 +90,7 @@ include $(TOP)/config/site/$(SITE)
 ## ---------------------------
 ## Normally, the complex output from the build process is hidden.
 ## But if you would like to see ALL the output, you can uncomment the line below.
-FULL_MESSAGES = 1
+# FULL_MESSAGES = 1
 
 
 
@@ -117,7 +117,7 @@ FULL_MESSAGES = 1
 # RELEASE_OS = ???    # e.g. linux-2.6 or osx-10.4
 
 ## C compiler to use (GCC is highly recommended, others may not work)
-CC = gcc
+# CC = gcc
 
 ## Override options for C compiler and linker (complete override)
 # CFLAGS = -O2 -Wall

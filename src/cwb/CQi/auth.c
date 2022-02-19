@@ -23,8 +23,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-void Rprintf(const char *, ...);
-
 #include "auth.h"
 #include "../cl/cl.h"
 
@@ -90,7 +88,7 @@ add_user_to_list(char *user, char *passwd)
   UserEntry *new_user;
 
   if (find_user(user))
-    Rprintf("WARNING: user '%s' already in list (ignored)\n", user);
+    fprintf(stderr, "WARNING: user '%s' already in list (ignored)\n", user);
   else {
     new_user = (UserEntry *)cl_malloc(sizeof(UserEntry));
     new_user->name   = cl_strdup(user);
@@ -128,7 +126,7 @@ add_host_to_list(char *ipaddr)
   }
 
   if (host->address.s_addr == -1) {
-    Rprintf("WARNING: '%s' isn't a valid IP address (ignored)\n", ipaddr);
+    fprintf(stderr, "WARNING: '%s' isn't a valid IP address (ignored)\n", ipaddr);
     cl_free(host);
   }
   else {
@@ -197,13 +195,13 @@ show_grants(void)
   Grant *grant;
 
   for (host = authorized_hosts; host; host = host->next)
-    Rprintf("HOST: %s\n", inet_ntoa(host->address));
+    printf("HOST: %s\n", inet_ntoa(host->address));
 
   for (user = authorized_users; user; user = user->next) {
-    Rprintf("USER: %s, pass='%s'  (", user->name, user->passwd);
+    printf("USER: %s, pass='%s'  (", user->name, user->passwd);
     for (grant = user->grants; grant; grant = grant->next)
-      Rprintf("%s ", grant->corpus);
-    Rprintf(")\n");
+      printf("%s ", grant->corpus);
+    printf(")\n");
   }
 }
 

@@ -179,5 +179,4 @@ void show_corpora(CorpusType type);
 
 void show_corpus_active(void);
 
-CorpusList * ensure_syscorpus(char *registry, char *name);
 #endif
