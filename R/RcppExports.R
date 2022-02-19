@@ -213,10 +213,6 @@
     .Call(`_RcppCWB_cqp_query`, corpus, subcorpus, query)
 }
 
-.cqp_subcorpus_query <- function(subcorpus, name, query) {
-    .Call(`_RcppCWB_cqp_subcorpus_query`, subcorpus, name, query)
-}
-
 .cqp_subcorpus_size <- function(scorpus) {
     .Call(`_RcppCWB_cqp_subcorpus_size`, scorpus)
 }
@@ -243,6 +239,10 @@
 
 .cqp_load_corpus <- function(corpus, registry) {
     .Call(`_RcppCWB_cqp_load_corpus`, corpus, registry)
+}
+
+.cqp_subcorpus <- function(name, corpus, region_matrix) {
+    .Call(`_RcppCWB_cqp_subcorpus`, name, corpus, region_matrix)
 }
 
 .cwb_makeall <- function(x, registry_dir, p_attribute) {

@@ -327,7 +327,7 @@ cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
 #' @return A `externalptr` referencing the C representation of the corpus.
 #' @export
 cl_find_corpus <- function(corpus, registry){
-  .cl_find_corpus(corpus = corpus, registry = registry)
+  .cl_find_corpus(corpus = tolower(corpus), registry = registry)
 }
 
 #' Drop loaded corpus.

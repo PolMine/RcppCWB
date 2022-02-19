@@ -122,7 +122,7 @@ cqp_list_corpora <- function() .cqp_list_corpora()
 #' cqp_dump_subcorpus("REUTERS")
 #' @author Andreas Blaette, Bernard Desgraupes, Sylvain Loiseau
 cqp_query <- function(corpus, query, subcorpus = "QUERY"){
-  stopifnot(corpus %in% cqp_list_corpora())
+  # stopifnot(corpus %in% cqp_list_corpora())
   query <- check_query(query)
   .cqp_query(corpus = corpus, subcorpus = subcorpus, query = query)
 }
@@ -147,6 +147,14 @@ cqp_list_subcorpora <- function(corpus){
   stopifnot(corpus %in% cqp_list_corpora())
   .cqp_list_subcorpora(inCorpus = corpus)
 }
+
+#' @export cqp_drop_subcorpus
+#' @rdname cqp_query
+cqp_drop_subcorpus <- function(corpus){
+  stopifnot(corpus %in% cqp_list_corpora())
+  .cqp_drop_subcorpus(inSubcorpus = corpus)
+}
+
 
 #' @param corpus ID of a CWB corpus (length-one `character`).
 #' @export cqp_load_corpus

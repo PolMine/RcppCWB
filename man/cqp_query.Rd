@@ -5,6 +5,7 @@
 \alias{cqp_dump_subcorpus}
 \alias{cqp_subcorpus_size}
 \alias{cqp_list_subcorpora}
+\alias{cqp_drop_subcorpus}
 \title{Execute CQP Query and Retrieve Results.}
 \usage{
 cqp_query(corpus, query, subcorpus = "QUERY")
@@ -14,6 +15,8 @@ cqp_dump_subcorpus(corpus, subcorpus = "QUERY")
 cqp_subcorpus_size(corpus, subcorpus = "QUERY")
 
 cqp_list_subcorpora(corpus)
+
+cqp_drop_subcorpus(corpus)
 }
 \arguments{
 \item{corpus}{a CWB corpus}

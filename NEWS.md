@@ -54,7 +54,11 @@ with a function defined in the polmineR package.
 * The CORPUS_REGISTRY environment variable is not set to the temporary registry,
 to avoid often confusing behavior and collissions whent loading RcppCWB and 
 polmineR at the same time (#13).
-
+* The `cqp_drop_subcorpus()` function that has been disabled temporarily is
+usable again (#34).
+* `cqp_query()` is now able to process subcorpora.
+* `RcppCWB:::.cqp_subcropus()` will construct a subcorpus from a region matrix.
+* `cqp_list_subcorpora()` returns a proper vector.
 
 # RcppCWB 0.5.0
 

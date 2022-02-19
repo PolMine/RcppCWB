@@ -49,7 +49,7 @@ static CorpusList *GetSystemCorpus(char *name, char *registry);
 /**
  * Global pointer to the head of CQP's linked list of the currently-loaded corpora (and NQRs).
  */
-static CorpusList *corpuslist = NULL;
+extern CorpusList *corpuslist;
 
 
 /**

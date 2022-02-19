@@ -20,11 +20,11 @@ extern "C" {
 }
 
 #include <Rcpp.h>
-using namespace Rcpp;
+/* do not use namespace - would create conflict with Range type */
+/* using namespace Rcpp; */
 
 int cqp_initialization_status = 0;
-
-
+CorpusList *corpuslist = NULL;
 
 // [[Rcpp::export(name=".init_cqp")]]
 void init_cqp() {
@@ -138,7 +138,13 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
     char *			full_child;
     CorpusList *	childcl;
     
-    full_child = combine_subcorpus_spec(mother, child); /* c is the 'physical' part of the mother corpus */
+    if (strlen(c) > 0){
+      full_child = combine_subcorpus_spec(c, child);
+    } else {
+      full_child = combine_subcorpus_spec(mother, child);
+    }
+    
+    Rprintf("full child: %s\n", full_child);
 
     childcl = cqi_find_corpus(full_child);
     if ((childcl) == NULL) {
@@ -152,34 +158,6 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   return result;
 }
 
-
-// [[Rcpp::export(name=".cqp_subcorpus_query")]]
-SEXP cqp_subcorpus_query(SEXP subcorpus, SEXP name, SEXP query){
-  
-  CorpusList * cl = (CorpusList*)R_ExternalPtrAddr(subcorpus);
-  char * full_child = (char*)CHAR(STRING_ELT(name,0));
-  char * q = (char*)CHAR(STRING_ELT(query,0));
-
-  SEXP result;
-  
-  set_current_corpus(cl, 0);
-  
-  if (!cqp_parse_string(q)){
-    Rprintf("ERROR: Cannot parse the CQP query.\n");
-    result = R_NilValue;
-  } else {
-    CorpusList *	childcl;
-    
-    childcl = findcorpus(full_child, SUB, 0);
-    if ((childcl) == NULL) {
-      Rprintf("subcorpus not found\n");
-      result = R_NilValue;
-    } else {
-      result = R_MakeExternalPtr(childcl, R_NilValue, R_NilValue);
-    }
-  }
-  return result;
-}
 
 
 
@@ -207,13 +185,13 @@ Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus)
   char * corpus;
   CorpusList *cl, *mother;
   int i = 0, n = 0;
-  Rcpp::StringVector result;
 
   corpus = (char*)CHAR(STRING_ELT(inCorpus,0));
   
   mother = cqi_find_corpus(corpus);
   if (!check_corpus_name(corpus) || mother == NULL) {
-    /* Rcpp::StringVector result(1); */
+    Rcpp::StringVector result;
+    return result;
   } else {
     /* First count subcorpora */
     for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
@@ -221,20 +199,17 @@ Rcpp::StringVector cqp_list_subcorpora(SEXP inCorpus)
         n++;
       }
     }
-    Rprintf("number of subcorpora: %d\n", n);
     Rcpp::StringVector result(n);
     
     /* Then build list of names */
     for (cl = FirstCorpusFromList(); cl != NULL; cl = NextCorpusFromList(cl)) {
       if (cl->type == SUB && cl->corpus == mother->corpus) {
         result(i) = cl->name;
-        Rprintf("subcorpus name: %s\n", cl->name);
-        /* printf("added to result: %s", result(i)); */
         i++;
       }
     }
+    return result;
   }
-  return result;
 }
 
 // [[Rcpp::export(name=".cqp_dump_subcorpus")]]
@@ -250,7 +225,6 @@ Rcpp::IntegerMatrix cqp_dump_subcorpus(SEXP inSubcorpus)
   if (cl == NULL) {
     Rprintf("subcorpus not found\n");
   }
-  
   Rcpp::IntegerMatrix result(nrows,2);
 
   for (i = 0; i < nrows; i++) {
@@ -284,7 +258,6 @@ Rcpp::IntegerMatrix cqp_subcorpus_regions(SEXP subcorpus)
 SEXP cqp_drop_subcorpus(SEXP inSubcorpus)
 {
   SEXP			result = R_NilValue;
-  /*
   char *			subcorpus;
   char 			*c, *sc;
   CorpusList *	cl;
@@ -304,12 +277,11 @@ SEXP cqp_drop_subcorpus(SEXP inSubcorpus)
     if (cl == NULL) {
       UNPROTECT(1);
     } else {
-      dropcorpus(cl);
+      dropcorpus(cl, corpuslist);
     }
   }
   
   UNPROTECT(1);
-  */
   return result;
 }
 
@@ -345,4 +317,65 @@ int cqp_load_corpus(SEXP corpus, SEXP registry){
   cl = ensure_syscorpus(dirname, entry);
   
   return 1;
+}
+
+
+// [[Rcpp::export(name=".cqp_subcorpus")]]
+SEXP cqp_subcorpus(SEXP name, SEXP corpus, Rcpp::IntegerMatrix region_matrix){
+  
+  int i, n, corpus_size;
+  SEXP sc;
+  char* id;
+  Corpus* c;
+  Attribute *attr;
+  CorpusList *cl;
+  
+  c = (Corpus*)R_ExternalPtrAddr(corpus);
+  id = strdup(Rcpp::as<std::string>(name).c_str());
+  n = region_matrix.nrow();
+  
+  cl = (CorpusList *)cl_malloc(sizeof(CorpusList));
+  
+  cl->name = id;
+  
+  char* mum = cl_strdup(c->registry_name);
+  cl_id_toupper(mum);
+  cl->mother_name = mum;
+  
+  attr = cl_new_attribute(c, CWB_DEFAULT_ATT_NAME, ATT_POS);
+  corpus_size = cl_max_cpos(attr);
+  cl->mother_size = corpus_size;
+  
+  cl->registry = c->registry_dir;
+  cl->abs_fn = NULL;
+  cl->type = SUB;
+  
+  cl->local_dir = NULL;
+  
+  cl->query_corpus = NULL;
+  cl->query_text = NULL;
+  
+  cl->saved = False;
+  cl->loaded = True;
+  cl->needs_update = False;
+  cl->corpus = c;
+  
+  cl->range = (Range *)cl_malloc(sizeof(Range) * n);
+  for (i = 0; i < n; i++) {
+    cl->range[i].start = region_matrix(i,0);
+    cl->range[i].end   = region_matrix(i,1);
+  }
+  
+  cl->size = n;
+  cl->sortidx = NULL;
+  cl->targets = NULL;
+  cl->keywords = NULL;
+  
+  cl->cd = NULL;
+  cl->next = NULL;
+  cl->next = corpuslist;
+  corpuslist = cl;
+
+  sc = R_MakeExternalPtr(cl, R_NilValue, R_NilValue);
+  return(sc);
 }
