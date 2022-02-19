@@ -2890,7 +2890,7 @@ YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, yy_size_t  _yybytes_len )
 
 static void yynoreturn yy_fatal_error (const char* msg )
 {
-			fprintf( stderr, "%s\n", msg );
+			Rprintf("%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 
