@@ -1358,6 +1358,16 @@ PatchCWB <- R6Class(
         
         "src/cwb/cqp/corpmanag.c" = c(
           list(
+            
+            # The global variable corpuslist needs to be available in cpp.cpp,
+            # so it is defined there. So in corpmanag.c, it shall not be static
+            # but extern, without a value.
+            replace = list(
+              "^\\s*static\\s+CorpusList\\s+\\*corpuslist\\s=\\sNULL;\\s*$",
+              "extern CorpusList *corpuslist;",
+              1L
+            ),
+            
             # The ensure_syscorpus function is static (not exported) by default.
             # By removing the keyword 'static' and including a definition in 
             # corpmanag.h, it can by used by a Rcpp header
