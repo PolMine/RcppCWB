@@ -35,6 +35,7 @@ void init_cqp() {
 	av[0] = (char *)"RcppCWB";
 	which_app = cqp;
 	silent = 1; 
+	verbose_parser = 0;
 	paging = 0;
 	autoshow = 0;
 	auto_save = 0;
