@@ -21,6 +21,7 @@ extern "C" {
 
 #include <Rcpp.h>
 using namespace Rcpp;
+// [[Rcpp::interfaces(r, cpp)]]
 
 char* cl_get_version();
 

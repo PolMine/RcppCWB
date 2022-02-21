@@ -23,6 +23,7 @@ extern "C" {
 
 #include <Rcpp.h>
 using namespace Rcpp;
+// [[Rcpp::interfaces(r, cpp)]]
 
 
 // [[Rcpp::export(name=".cwb_makeall")]]

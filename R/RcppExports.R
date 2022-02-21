@@ -261,3 +261,7 @@
     .Call(`_RcppCWB_cwb_encode`, regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml)
 }
 
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call('_RcppCWB_RcppExport_registerCCallable', PACKAGE = 'RcppCWB')
+})

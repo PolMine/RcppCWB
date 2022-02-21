@@ -23,6 +23,8 @@ extern "C" {
 /* do not use namespace - would create conflict with Range type */
 /* using namespace Rcpp; */
 
+// [[Rcpp::interfaces(r, cpp)]]
+
 int cqp_initialization_status = 0;
 CorpusList *corpuslist = NULL;
 
