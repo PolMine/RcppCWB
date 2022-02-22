@@ -29,24 +29,27 @@ stored.}
 implementation for decoding structural attribute.}
 }
 \value{
-A \code{data.frame} with three columns. Column \code{cpos_left} are
-the start corpus positions of a structural annotation, \code{cpos_right}
-the end corpus positions. Column \code{value} is the value of the
-annotation.
+A \code{data.frame} with three columns, if the s-attribute has
+values, or two columns, if not. Column \code{cpos_left} are the start
+corpus positions of a structural annotation, \code{cpos_right} the end
+corpus positions. Column \code{value} is the value of the annotation.
 }
 \description{
-Get \code{data.frame} with left and right corpus positions (cpos) for structural
-attributes and values.
+Get \code{data.frame} with left and right corpus positions (cpos) for
+structural attributes and values.
 }
 \details{
-Two approaches are implemented: A pure R solution will decode the files directly in
-the directory specified by \code{data_dir}. An implementation using Rcpp will use the
-registry file for \code{corpus} to find the data directory.
+Two approaches are implemented: A pure R solution will decode the files
+directly in the directory specified by \code{data_dir}. An implementation
+using Rcpp will use the registry file for \code{corpus} to find the data
+directory.
 }
 \examples{
 # pure R implementation (Rcpp implementation fails on Windows in vanilla mode)
 b <- s_attribute_decode(
+  corpus = "REUTERS",
   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
+  registry = get_tmp_registry(),
   s_attribute = "places", method = "R"
 )
 
@@ -55,6 +58,7 @@ b <- s_attribute_decode(
   corpus = "REUTERS",
   data_dir = system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "reuters"),
   s_attribute = "places",
-  method = "Rcpp", registry = get_tmp_registry()
+  method = "Rcpp",
+  registry = get_tmp_registry()
 )
 }

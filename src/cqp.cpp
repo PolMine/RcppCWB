@@ -34,7 +34,7 @@ void init_cqp() {
 	char *		av[1];
 	av[0] = (char *)"RcppCWB";
 	which_app = cqp;
-	silent = 1; 
+	silent = 0; 
 	verbose_parser = 0;
 	paging = 0;
 	autoshow = 0;
@@ -45,6 +45,13 @@ void init_cqp() {
 	initialize_cqp(ac, av);
 	cqp_initialization_status = 1;
 	make_attribute_hash(16384);
+}
+
+// [[Rcpp::export(name=".cqp_verbosity")]]
+void cqp_verbosity(int quietly, int verbose) {
+  silent = quietly; 
+  verbose_parser = verbose;
+  return;
 }
 
 

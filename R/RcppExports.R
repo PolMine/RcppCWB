@@ -193,6 +193,10 @@
     invisible(.Call(`_RcppCWB_init_cqp`))
 }
 
+.cqp_verbosity <- function(quietly, verbose) {
+    invisible(.Call(`_RcppCWB_cqp_verbosity`, quietly, verbose))
+}
+
 .cqp_get_registry <- function() {
     .Call(`_RcppCWB_cqp_get_registry`)
 }

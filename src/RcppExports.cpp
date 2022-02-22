@@ -1563,6 +1563,40 @@ RcppExport SEXP _RcppCWB_init_cqp() {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// cqp_verbosity
+void cqp_verbosity(int quietly, int verbose);
+static SEXP _RcppCWB_cqp_verbosity_try(SEXP quietlySEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< int >::type quietly(quietlySEXP);
+    Rcpp::traits::input_parameter< int >::type verbose(verboseSEXP);
+    cqp_verbosity(quietly, verbose);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RcppCWB_cqp_verbosity(SEXP quietlySEXP, SEXP verboseSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RcppCWB_cqp_verbosity_try(quietlySEXP, verboseSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // cqp_get_registry
 Rcpp::StringVector cqp_get_registry();
 static SEXP _RcppCWB_cqp_get_registry_try() {
@@ -2204,6 +2238,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
         signatures.insert("int(*.cl_load_corpus)(SEXP,SEXP)");
         signatures.insert("Rcpp::StringVector(*.cl_list_corpora)()");
         signatures.insert("void(*.init_cqp)()");
+        signatures.insert("void(*.cqp_verbosity)(int,int)");
         signatures.insert("Rcpp::StringVector(*.cqp_get_registry)()");
         signatures.insert("int(*.cqp_get_status)()");
         signatures.insert("SEXP(*.cqp_set_registry)(SEXP)");
@@ -2268,6 +2303,7 @@ RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() {
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_load_corpus", (DL_FUNC)_RcppCWB_cl_load_corpus_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_list_corpora", (DL_FUNC)_RcppCWB_cl_list_corpora_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.init_cqp", (DL_FUNC)_RcppCWB_init_cqp_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cqp_verbosity", (DL_FUNC)_RcppCWB_cqp_verbosity_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cqp_get_registry", (DL_FUNC)_RcppCWB_cqp_get_registry_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cqp_get_status", (DL_FUNC)_RcppCWB_cqp_get_status_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cqp_set_registry", (DL_FUNC)_RcppCWB_cqp_set_registry_try);
@@ -2338,6 +2374,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cl_load_corpus", (DL_FUNC) &_RcppCWB_cl_load_corpus, 2},
     {"_RcppCWB_cl_list_corpora", (DL_FUNC) &_RcppCWB_cl_list_corpora, 0},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},
+    {"_RcppCWB_cqp_verbosity", (DL_FUNC) &_RcppCWB_cqp_verbosity, 2},
     {"_RcppCWB_cqp_get_registry", (DL_FUNC) &_RcppCWB_cqp_get_registry, 0},
     {"_RcppCWB_cqp_get_status", (DL_FUNC) &_RcppCWB_cqp_get_status, 0},
     {"_RcppCWB_cqp_set_registry", (DL_FUNC) &_RcppCWB_cqp_set_registry, 1},

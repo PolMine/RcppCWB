@@ -58,7 +58,10 @@ polmineR at the same time (#13).
 usable again (#34).
 * `cqp_query()` is now able to process subcorpora.
 * `RcppCWB:::.cqp_subcropus()` will construct a subcorpus from a region matrix.
-* `cqp_list_subcorpora()` returns a proper vector.
+* `cqp_list_subcorpora()` returns a `character` vector. Previously, we just had
+obscure printed messages.
+* `s_attribute_decode()` will not break if s-attribute has no values (#54).
+
 
 # RcppCWB 0.5.0
 

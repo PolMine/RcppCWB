@@ -57,6 +57,16 @@ cqp_is_initialized <- function(){
   if (.cqp_get_status() == 0) return(FALSE) else return(TRUE)
 }
 
+#' @param silent A single `logical` value, whether to be silent and suppress CQP
+#'   messages (`TRUE`), or not (`FALSE`).
+#' @param verbose A single `logical` value, whether to show verbose parser
+#'   output (`TRUE`) or not (`FALSE`).
+#' @export cqp_verbosity
+#' @rdname cqp_initialize
+cqp_verbosity <- function(silent, verbose){
+  .cqp_verbosity(quietly = silent, verbose = verbose)
+}
+
 #' @export cqp_get_registry
 #' @rdname cqp_initialize
 cqp_get_registry <- function() fs::path(.cqp_get_registry())

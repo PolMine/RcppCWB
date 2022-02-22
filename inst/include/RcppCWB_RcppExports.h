@@ -884,6 +884,26 @@ namespace RcppCWB {
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
     }
 
+    inline void _cqp_verbosity(int quietly, int verbose) {
+        typedef SEXP(*Ptr__cqp_verbosity)(SEXP,SEXP);
+        static Ptr__cqp_verbosity p__cqp_verbosity = NULL;
+        if (p__cqp_verbosity == NULL) {
+            validateSignature("void(*_cqp_verbosity)(int,int)");
+            p__cqp_verbosity = (Ptr__cqp_verbosity)R_GetCCallable("RcppCWB", "_RcppCWB__cqp_verbosity");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p__cqp_verbosity(Shield<SEXP>(Rcpp::wrap(quietly)), Shield<SEXP>(Rcpp::wrap(verbose)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+    }
+
     inline Rcpp::StringVector _cqp_get_registry() {
         typedef SEXP(*Ptr__cqp_get_registry)();
         static Ptr__cqp_get_registry p__cqp_get_registry = NULL;

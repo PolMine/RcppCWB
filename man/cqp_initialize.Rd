@@ -3,6 +3,7 @@
 \name{cqp_initialize}
 \alias{cqp_initialize}
 \alias{cqp_is_initialized}
+\alias{cqp_verbosity}
 \alias{cqp_get_registry}
 \alias{cqp_reset_registry}
 \alias{cqp_load_corpus}
@@ -12,6 +13,8 @@ cqp_initialize(registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cqp_is_initialized()
 
+cqp_verbosity(silent, verbose)
+
 cqp_get_registry()
 
 cqp_reset_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -20,6 +23,12 @@ cqp_load_corpus(corpus, registry)
 }
 \arguments{
 \item{registry}{the registry directory}
+
+\item{silent}{A single \code{logical} value, whether to be silent and suppress CQP
+messages (\code{TRUE}), or not (\code{FALSE}).}
+
+\item{verbose}{A single \code{logical} value, whether to show verbose parser
+output (\code{TRUE}) or not (\code{FALSE}).}
 
 \item{corpus}{ID of a CWB corpus (length-one \code{character}).}
 }
