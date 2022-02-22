@@ -98,9 +98,7 @@ check_p_attribute <- function(p_attribute, corpus, registry = Sys.getenv("CORPUS
 check_strucs <- function(corpus, s_attribute, strucs, registry){
   if (!is.numeric(strucs))
     stop("strucs needs to be a integer vector")
-  if (min(strucs) < 0)
-    stop("all values of vector strucs need to be >= 0")
-  if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1))
+  if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1L))
     stop("highest value of strucs may not be larger than size of structural attribute")
   if (any(is.na(strucs)))
     stop("there is an NA value among strucs")

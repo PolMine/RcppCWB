@@ -61,6 +61,9 @@ usable again (#34).
 * `cqp_list_subcorpora()` returns a `character` vector. Previously, we just had
 obscure printed messages.
 * `s_attribute_decode()` will not break if s-attribute has no values (#54).
+* Functions `cl_struc2str()` and `cl_struc2cpos()` may now include negative
+values, the vectors returned will have `NA` values at respective positions. The
+check against negative values in `check_strucs` is dropped accordingly.
 
 
 # RcppCWB 0.5.0

@@ -197,9 +197,14 @@ Rcpp::IntegerVector _cpos_to_id(SEXP p_attr, Rcpp::IntegerVector cpos){
 Rcpp::IntegerVector _cl_struc2cpos(Attribute * att, int struc){
   Rcpp::IntegerVector cpos(2);
   int lb, rb;
-  cl_struc2cpos(att, struc, &lb, &rb);
-  cpos(0) = lb;
-  cpos(1) = rb;
+  if (struc >= 0){
+    cl_struc2cpos(att, struc, &lb, &rb);
+    cpos(0) = lb;
+    cpos(1) = rb;
+  } else {
+    cpos(0) = NA_INTEGER;
+    cpos(1) = NA_INTEGER;
+  }
   return( cpos );
 }
 
@@ -237,7 +242,11 @@ Rcpp::StringVector _cl_struc2str(Attribute* att, Rcpp::IntegerVector struc){
   if ( cl_struc_values(att) ){
     int i;
     for (i = 0; i < len; i++){
-      result(i) = cl_struc2str(att, struc(i));
+      if (struc(i) >= 0){
+        result(i) = cl_struc2str(att, struc(i));
+      } else {
+        result(i) = NA_STRING;
+      }
     }
   }
   return ( result );
