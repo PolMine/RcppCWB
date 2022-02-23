@@ -64,6 +64,8 @@ obscure printed messages.
 * Functions `cl_struc2str()` and `cl_struc2cpos()` may now include negative
 values, the vectors returned will have `NA` values at respective positions. The
 check against negative values in `check_strucs` is dropped accordingly.
+* A new function `s_attr_relationship()` will detect whether two s-attributes are
+siblings, or in a descendent or ancestor relationship.
 
 
 # RcppCWB 0.5.0

@@ -23,8 +23,6 @@
 #' @param registry The directory with the registry file for the corpus.
 s_attr_is_descendent <- function(x, y, corpus, registry = Sys.getenv("CORPUS_REGISTRY"), sample = NULL){
   
-  data_dir <- corpus_data_dir(corpus = corpus, registry = registry)
-  
   if (!is.null(sample)){
     sample <- as.integer(sample)
     if (is.na(sample)){
@@ -67,4 +65,32 @@ s_attr_is_sibling <- function(x, y, corpus, registry = Sys.getenv("CORPUS_REGIST
   y_regions <- s_attr_regions(s_attr = y, corpus = corpus, registry = registry)
   
   if (identical(x_regions, y_regions)) TRUE else FALSE
+}
+
+
+#' @details `s_attr_relationship()` will return `0` if s-attributes `x` and `y`
+#'   are siblings in the sense that they define identical regions. The return
+#'   value is `0` if `x` is an ancestor of `y` and `1` if `x` is a descencdent
+#'   of `y`.
+#' @rdname xml
+#' @export
+#' @examples
+#' s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS", registry = get_tmp_registry())
+s_attr_relationship <- function(x, y, corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  
+  data_dir <- corpus_data_dir(corpus = corpus, registry = registry)
+  x_regions <- s_attr_regions(s_attr = x, corpus = corpus, data_dir = data_dir, registry = registry)
+  y_regions <- s_attr_regions(s_attr = y, corpus = corpus, data_dir = data_dir, registry = registry)
+  
+  if (identical(x_regions, y_regions)) return(0L)
+
+  y_strucs <- cl_cpos2struc(corpus = corpus, s_attribute = y, cpos = x_regions[,1], registry = registry)
+  y_regions <- get_region_matrix(corpus = corpus, s_attribute = y, strucs = y_strucs, registry = registry)
+  
+  if (all(x_regions[,1] >= y_regions[,1]) && all(x_regions[,2] <= y_regions[,2])){
+    return(-1L)
+  } else {
+    return(1L)
+  }
+  NA_integer_
 }
