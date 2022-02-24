@@ -29,6 +29,10 @@
     .Call(`_RcppCWB_region_matrix_to_count_matrix`, corpus, p_attribute, registry, matrix)
 }
 
+.region_matrix_context <- function(corpus, registry, region_matrix, s_attribute, boundary, left, right) {
+    .Call(`_RcppCWB_region_matrix_context`, corpus, registry, region_matrix, s_attribute, boundary, left, right)
+}
+
 .cwb_version <- function() {
     .Call(`_RcppCWB_cwb_version`)
 }

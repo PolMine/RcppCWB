@@ -176,3 +176,58 @@ Rcpp::IntegerVector region_matrix_to_count_matrix(SEXP corpus, SEXP p_attribute,
   return count_matrix;
 }
 
+
+// [[Rcpp::export(name=".region_matrix_context")]]
+Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP s_attribute, SEXP boundary, int left, int right){
+  
+  int i, size, struc_node, struc_left, struc_right, lb, rb;
+  int struc_boundary_node, lb_boundary, rb_boundary;
+
+  Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
+  Attribute* limit = make_s_attribute(corpus, boundary, registry);
+  size = cl_max_struc(s_attr);
+
+  Rcpp::IntegerMatrix context_matrix(region_matrix.nrow(), 2);
+
+  for (i = 0; i < region_matrix.nrow(); i++){
+    
+    struc_node = cl_cpos2struc(s_attr, region_matrix(i, 0));
+    struc_boundary_node = cl_cpos2struc(limit, region_matrix(i, 0));
+
+    struc_left = struc_node - left;
+    if (struc_left >= 0){
+      
+      cl_struc2cpos(s_attr, struc_left, &lb, &rb);
+      cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+      
+      if (lb_boundary == region_matrix(i,0)){
+        context_matrix(i,0) = NA_INTEGER;
+      } else if (lb_boundary > lb){
+        context_matrix(i,0) = lb_boundary;
+      } else {
+        context_matrix(i,0) = lb;
+      }
+    } else {
+      context_matrix(i,0) = NA_INTEGER;
+    }
+    
+    struc_right = struc_node + right;
+    if (struc_right <= size){
+      
+      cl_struc2cpos(s_attr, struc_right, &lb, &rb);
+      cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+      
+      if (rb_boundary == region_matrix(i,1)){
+        context_matrix(i,1) = NA_INTEGER;
+      } else if (rb_boundary < rb){
+        context_matrix(i,1) = rb_boundary;
+      } else {
+        context_matrix(i,1) = rb;
+      }
+    } else {
+      context_matrix(i,3) = NA_INTEGER;
+    }
+
+  }
+  return context_matrix;
+}

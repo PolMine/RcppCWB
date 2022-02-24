@@ -82,3 +82,22 @@ region_matrix_to_count_matrix <- function(corpus, p_attribute, registry = Sys.ge
   .region_matrix_to_count_matrix(corpus = corpus, p_attribute = p_attribute, registry = registry, matrix = matrix)
 }
 
+#' @rdname region_matrix_ops
+#' @param s_attribute Structural attribute (length-one `character` vector),
+#'   typically indicating a sentence ("s")
+#' @param boundary Structural attribute (length-one `character` vector) that
+#'   serves as a boundary and that shall not be transgressed.
+#' @param left An `integer` value, number of strucs to move to the left.
+#' @param right An `integer` value, number of strucs to move to the right.
+#' @export
+region_matrix_context <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), matrix, s_attribute, boundary, left, right){
+  .region_matrix_context(
+    corpus = corpus,
+    registry = registry,
+    region_matrix = matrix,
+    s_attribute = s_attribute,
+    boundary = boundary,
+    left = as.integer(left),
+    right = as.integer(right)
+  )
+}

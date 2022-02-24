@@ -4,6 +4,7 @@
 \alias{region_matrix_ops}
 \alias{region_matrix_to_ids}
 \alias{region_matrix_to_count_matrix}
+\alias{region_matrix_context}
 \title{Get IDs and Counts for Region Matrices.}
 \usage{
 region_matrix_to_ids(
@@ -19,6 +20,16 @@ region_matrix_to_count_matrix(
   registry = Sys.getenv("CORPUS_REGISTRY"),
   matrix
 )
+
+region_matrix_context(
+  corpus,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  matrix,
+  s_attribute,
+  boundary,
+  left,
+  right
+)
 }
 \arguments{
 \item{corpus}{a CWB corpus}
@@ -28,6 +39,16 @@ region_matrix_to_count_matrix(
 \item{registry}{registry directory}
 
 \item{matrix}{a regions matrix}
+
+\item{s_attribute}{Structural attribute (length-one \code{character} vector),
+typically indicating a sentence ("s")}
+
+\item{boundary}{Structural attribute (length-one \code{character} vector) that
+serves as a boundary and that shall not be transgressed.}
+
+\item{left}{An \code{integer} value, number of strucs to move to the left.}
+
+\item{right}{An \code{integer} value, number of strucs to move to the right.}
 }
 \description{
 Get IDs and Counts for Region Matrices.
