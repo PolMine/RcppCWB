@@ -66,6 +66,10 @@ values, the vectors returned will have `NA` values at respective positions. The
 check against negative values in `check_strucs` is dropped accordingly.
 * A new function `s_attr_relationship()` will detect whether two s-attributes are
 siblings, or in a descendent or ancestor relationship.
+* Functions `cwb_encode()`, `cwb_huffcode()`, `cwb_makeall()` and
+`cwb_compress_rdx()` now have an argument `quietly` to control display of output
+messages. `cwb_encode()` has an argument `verbose` to control whether counter on
+the number of tokens processed is dislpayed.
 
 
 # RcppCWB 0.5.0

@@ -9,6 +9,10 @@
 #' @param p_attribute name p-attribute
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
+#' @param quietly A `logical` value, whether to turn off messages (including
+#'   warnings).
+#' @param verbose A `logical` value, whether to show progress information
+#'   (counter of tokens processed).
 #' @examples
 #' # The package includes and 'unfinished' corpus of debates in the UN General 
 #' # Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is
@@ -62,7 +66,8 @@
 #' )
 #' @rdname cwb_utils
 #' @export cwb_makeall
-cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+#' @importFrom utils capture.output
+cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
   check_registry(registry)
   regfile <- file.path(normalizePath(registry, winslash = "/"), tolower(corpus), fsep = "/")
   if (!file.exists(regfile)){
@@ -76,14 +81,29 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
     cqp_reset_registry(registry = registry)
   }
   
-  .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  makeall <- function() .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  if (quietly){
+    capture.output({success <- makeall()}, type = "output")
+  } else {
+    success <- makeall()
+  }
+  success
 }
 
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
-cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+  huffcode <- function()
+    .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  
+  if (quietly){
+    capture.output({success <- huffcode()}, type = "output")
+  } else {
+    success <- huffcode()
+  }
+  success
+  
 }
 
 #' @rdname cwb_utils
@@ -94,8 +114,16 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 #'   p_attribute = "word",
 #'   registry = get_tmp_registry()
 #' )
-cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+  compress_rdx <-function()
+    .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  
+  if (quietly){
+    capture.output({success <- compress_rdx()}, type = "output")
+  } else {
+    success <- compress_rdx()
+  }
+  success
 }
 
 #' @param p_attributes Positional attributes (p-attributes) to be declared.
@@ -148,7 +176,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 cwb_encode <- function(
   corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir,
   encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes,
-  skip_blank_lines = TRUE, strip_whitespace = TRUE, xml = TRUE
+  skip_blank_lines = TRUE, strip_whitespace = TRUE, xml = TRUE, quietly = FALSE, verbose = FALSE
 ){
   
   if (encoding == "UTF-8") encoding <- "utf8"
@@ -200,7 +228,9 @@ cwb_encode <- function(
     s_attributes_noanno = s_attributes_noanno,
     skip_blank_lines = skip_blank_lines,
     xml = xml,
-    strip_whitespace = strip_whitespace
+    strip_whitespace = strip_whitespace,
+    quiet = quietly,
+    verbosity = verbose
   )
 }
 

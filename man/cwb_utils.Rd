@@ -7,11 +7,26 @@
 \alias{cwb_encode}
 \title{CWB Tools for Creating Corpora}
 \usage{
-cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_makeall(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  quietly = FALSE
+)
 
-cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_huffcode(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  quietly = FALSE
+)
 
-cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_compress_rdx(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  quietly = FALSE
+)
 
 cwb_encode(
   corpus,
@@ -23,7 +38,9 @@ cwb_encode(
   s_attributes,
   skip_blank_lines = TRUE,
   strip_whitespace = TRUE,
-  xml = TRUE
+  xml = TRUE,
+  quietly = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -33,6 +50,9 @@ cwb_encode(
 
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
+
+\item{quietly}{A \code{logical} value, whether to turn off messages (including
+warnings).}
 
 \item{data_dir}{The data directory where \code{cwb_encode} will put the binary
 files of the indexed corpus.}
@@ -60,6 +80,9 @@ input.}
 tokens}
 
 \item{xml}{A \code{logical} value, whether input is XML.}
+
+\item{verbose}{A \code{logical} value, whether to show progress information
+(counter of tokens processed).}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},

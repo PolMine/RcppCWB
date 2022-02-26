@@ -1240,17 +1240,17 @@ namespace RcppCWB {
         return Rcpp::as<int >(rcpp_result_gen);
     }
 
-    inline int _cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno, int skip_blank_lines, int strip_whitespace, int xml) {
-        typedef SEXP(*Ptr__cwb_encode)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline int _cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno, int skip_blank_lines, int strip_whitespace, int xml, int quiet, int verbosity) {
+        typedef SEXP(*Ptr__cwb_encode)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr__cwb_encode p__cwb_encode = NULL;
         if (p__cwb_encode == NULL) {
-            validateSignature("int(*_cwb_encode)(SEXP,SEXP,SEXP,SEXP,Rcpp::StringVector,Rcpp::StringVector,Rcpp::StringVector,int,int,int)");
+            validateSignature("int(*_cwb_encode)(SEXP,SEXP,SEXP,SEXP,Rcpp::StringVector,Rcpp::StringVector,Rcpp::StringVector,int,int,int,int,int)");
             p__cwb_encode = (Ptr__cwb_encode)R_GetCCallable("RcppCWB", "_RcppCWB__cwb_encode");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p__cwb_encode(Shield<SEXP>(Rcpp::wrap(regfile)), Shield<SEXP>(Rcpp::wrap(data_dir)), Shield<SEXP>(Rcpp::wrap(vrt_dir)), Shield<SEXP>(Rcpp::wrap(encoding)), Shield<SEXP>(Rcpp::wrap(p_attributes)), Shield<SEXP>(Rcpp::wrap(s_attributes_anno)), Shield<SEXP>(Rcpp::wrap(s_attributes_noanno)), Shield<SEXP>(Rcpp::wrap(skip_blank_lines)), Shield<SEXP>(Rcpp::wrap(strip_whitespace)), Shield<SEXP>(Rcpp::wrap(xml)));
+            rcpp_result_gen = p__cwb_encode(Shield<SEXP>(Rcpp::wrap(regfile)), Shield<SEXP>(Rcpp::wrap(data_dir)), Shield<SEXP>(Rcpp::wrap(vrt_dir)), Shield<SEXP>(Rcpp::wrap(encoding)), Shield<SEXP>(Rcpp::wrap(p_attributes)), Shield<SEXP>(Rcpp::wrap(s_attributes_anno)), Shield<SEXP>(Rcpp::wrap(s_attributes_noanno)), Shield<SEXP>(Rcpp::wrap(skip_blank_lines)), Shield<SEXP>(Rcpp::wrap(strip_whitespace)), Shield<SEXP>(Rcpp::wrap(xml)), Shield<SEXP>(Rcpp::wrap(quiet)), Shield<SEXP>(Rcpp::wrap(verbosity)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

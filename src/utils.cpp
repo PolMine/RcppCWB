@@ -29,8 +29,6 @@ using namespace Rcpp;
 // [[Rcpp::export(name=".cwb_makeall")]]
 int cwb_makeall(SEXP x, SEXP registry_dir, SEXP p_attribute){
   
-  /* char *progname = "RcppCWB"; */
-  
   char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
   char *attr_name = strdup(Rcpp::as<std::string>(p_attribute).c_str());
   char * corpus_id = strdup(Rcpp::as<std::string>(x).c_str());
@@ -141,7 +139,7 @@ int cwb_compress_rdx(SEXP x, SEXP registry_dir, SEXP p_attribute) {
 int cwb_encode(
     SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes,
     Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno,
-    int skip_blank_lines, int strip_whitespace, int xml){
+    int skip_blank_lines, int strip_whitespace, int xml, int quiet, int verbosity){
   
   directory = strdup(Rcpp::as<std::string>(data_dir).c_str());
   registry_file = strdup(Rcpp::as<std::string>(regfile).c_str());
@@ -159,8 +157,8 @@ int cwb_encode(
   skip_empty_lines = skip_blank_lines;
   strip_blanks = strip_whitespace;
   
-  verbose = 1;
-  quietly = 0;
+  verbose = verbosity;
+  quietly = quiet;
 
   /* declare p-attributes */
   

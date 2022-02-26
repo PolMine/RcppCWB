@@ -2167,8 +2167,8 @@ RcppExport SEXP _RcppCWB_cwb_compress_rdx(SEXP xSEXP, SEXP registry_dirSEXP, SEX
     return rcpp_result_gen;
 }
 // cwb_encode
-int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno, int skip_blank_lines, int strip_whitespace, int xml);
-static SEXP _RcppCWB_cwb_encode_try(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP encodingSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP, SEXP skip_blank_linesSEXP, SEXP strip_whitespaceSEXP, SEXP xmlSEXP) {
+int cwb_encode(SEXP regfile, SEXP data_dir, SEXP vrt_dir, SEXP encoding, Rcpp::StringVector p_attributes, Rcpp::StringVector s_attributes_anno, Rcpp::StringVector s_attributes_noanno, int skip_blank_lines, int strip_whitespace, int xml, int quiet, int verbosity);
+static SEXP _RcppCWB_cwb_encode_try(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP encodingSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP, SEXP skip_blank_linesSEXP, SEXP strip_whitespaceSEXP, SEXP xmlSEXP, SEXP quietSEXP, SEXP verbositySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type regfile(regfileSEXP);
@@ -2181,15 +2181,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type skip_blank_lines(skip_blank_linesSEXP);
     Rcpp::traits::input_parameter< int >::type strip_whitespace(strip_whitespaceSEXP);
     Rcpp::traits::input_parameter< int >::type xml(xmlSEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml));
+    Rcpp::traits::input_parameter< int >::type quiet(quietSEXP);
+    Rcpp::traits::input_parameter< int >::type verbosity(verbositySEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_encode(regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml, quiet, verbosity));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP encodingSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP, SEXP skip_blank_linesSEXP, SEXP strip_whitespaceSEXP, SEXP xmlSEXP) {
+RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vrt_dirSEXP, SEXP encodingSEXP, SEXP p_attributesSEXP, SEXP s_attributes_annoSEXP, SEXP s_attributes_noannoSEXP, SEXP skip_blank_linesSEXP, SEXP strip_whitespaceSEXP, SEXP xmlSEXP, SEXP quietSEXP, SEXP verbositySEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB_cwb_encode_try(regfileSEXP, data_dirSEXP, vrt_dirSEXP, encodingSEXP, p_attributesSEXP, s_attributes_annoSEXP, s_attributes_noannoSEXP, skip_blank_linesSEXP, strip_whitespaceSEXP, xmlSEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_cwb_encode_try(regfileSEXP, data_dirSEXP, vrt_dirSEXP, encodingSEXP, p_attributesSEXP, s_attributes_annoSEXP, s_attributes_noannoSEXP, skip_blank_linesSEXP, strip_whitespaceSEXP, xmlSEXP, quietSEXP, verbositySEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2272,7 +2274,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
         signatures.insert("int(*.cwb_makeall)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*.cwb_huffcode)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*.cwb_compress_rdx)(SEXP,SEXP,SEXP)");
-        signatures.insert("int(*.cwb_encode)(SEXP,SEXP,SEXP,SEXP,Rcpp::StringVector,Rcpp::StringVector,Rcpp::StringVector,int,int,int)");
+        signatures.insert("int(*.cwb_encode)(SEXP,SEXP,SEXP,SEXP,Rcpp::StringVector,Rcpp::StringVector,Rcpp::StringVector,int,int,int,int,int)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -2409,7 +2411,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_makeall", (DL_FUNC) &_RcppCWB_cwb_makeall, 3},
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
     {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
-    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 10},
+    {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 12},
     {"_RcppCWB_RcppExport_registerCCallable", (DL_FUNC) &_RcppCWB_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };

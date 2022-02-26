@@ -265,8 +265,8 @@
     .Call(`_RcppCWB_cwb_compress_rdx`, x, registry_dir, p_attribute)
 }
 
-.cwb_encode <- function(regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml) {
-    .Call(`_RcppCWB_cwb_encode`, regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml)
+.cwb_encode <- function(regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml, quiet, verbosity) {
+    .Call(`_RcppCWB_cwb_encode`, regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml, quiet, verbosity)
 }
 
 # Register entry points for exported C++ functions
