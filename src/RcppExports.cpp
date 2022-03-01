@@ -108,19 +108,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // region_matrix_context
-Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP s_attribute, SEXP boundary, int left, int right);
-RcppExport SEXP _RcppCWB_region_matrix_context(SEXP corpusSEXP, SEXP registrySEXP, SEXP region_matrixSEXP, SEXP s_attributeSEXP, SEXP boundarySEXP, SEXP leftSEXP, SEXP rightSEXP) {
+Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP p_attribute, SEXP s_attribute, SEXP boundary, int left, int right);
+RcppExport SEXP _RcppCWB_region_matrix_context(SEXP corpusSEXP, SEXP registrySEXP, SEXP region_matrixSEXP, SEXP p_attributeSEXP, SEXP s_attributeSEXP, SEXP boundarySEXP, SEXP leftSEXP, SEXP rightSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type region_matrix(region_matrixSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type boundary(boundarySEXP);
     Rcpp::traits::input_parameter< int >::type left(leftSEXP);
     Rcpp::traits::input_parameter< int >::type right(rightSEXP);
-    rcpp_result_gen = Rcpp::wrap(region_matrix_context(corpus, registry, region_matrix, s_attribute, boundary, left, right));
+    rcpp_result_gen = Rcpp::wrap(region_matrix_context(corpus, registry, region_matrix, p_attribute, s_attribute, boundary, left, right));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -2352,7 +2353,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_region_matrix_to_ids", (DL_FUNC) &_RcppCWB_region_matrix_to_ids, 4},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
-    {"_RcppCWB_region_matrix_context", (DL_FUNC) &_RcppCWB_region_matrix_context, 7},
+    {"_RcppCWB_region_matrix_context", (DL_FUNC) &_RcppCWB_region_matrix_context, 8},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
     {"_RcppCWB__s_attr", (DL_FUNC) &_RcppCWB__s_attr, 3},
     {"_RcppCWB__p_attr", (DL_FUNC) &_RcppCWB__p_attr, 3},

@@ -179,18 +179,19 @@ Rcpp::IntegerVector region_matrix_to_count_matrix(SEXP corpus, SEXP p_attribute,
 
 
 // [[Rcpp::export(name=".region_matrix_context")]]
-Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP s_attribute, SEXP boundary, int left, int right){
+Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP p_attribute, SEXP s_attribute, SEXP boundary, int left, int right){
   
-  int i, size;
+  int i, cpos, size;
+  int ncpos = 0;
   int lb, rb;
   Rcpp::IntegerMatrix context_matrix(region_matrix.nrow(), 2);
+  
+  Attribute* p_attr = make_p_attribute(corpus, p_attribute, registry);
 
   if (boundary == R_NilValue){
     
     if (s_attribute == R_NilValue){
       
-      SEXP default_p_attr = Rf_mkChar(CWB_DEFAULT_ATT_NAME);
-      Attribute* p_attr = make_p_attribute(corpus, default_p_attr, registry);
       size = cl_max_cpos(p_attr);
       int cpos_left, cpos_right;
       
@@ -202,6 +203,7 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
         } else {
           context_matrix(i,0) = 0;
         }
+        ncpos += region_matrix(i,0) - context_matrix(i,0);
         
         cpos_right = region_matrix(i,1) + right;
         if (cpos_right < size){
@@ -209,6 +211,8 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
         } else {
           context_matrix(i,1) = size - 1;
         }
+        ncpos += context_matrix(i,1) - region_matrix(i,1);
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
       }
       
     } else {
@@ -230,6 +234,7 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
             context_matrix(i,0) = NA_INTEGER;
           } else {
             context_matrix(i,0) = lb;
+            ncpos += region_matrix(i,0) - lb;
           }
         } else {
           context_matrix(i,0) = NA_INTEGER;
@@ -244,10 +249,13 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
             context_matrix(i,1) = NA_INTEGER;
           } else {
             context_matrix(i,1) = rb;
+            ncpos += rb - region_matrix(i,1);
           }
         } else {
           context_matrix(i,3) = NA_INTEGER;
         }
+        
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
       }
       
     }
@@ -275,8 +283,10 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
             context_matrix(i,0) = NA_INTEGER;
           } else if (lb_boundary > cpos_left){
             context_matrix(i,0) = lb_boundary;
+            ncpos += region_matrix(i,0) - lb_boundary;
           } else {
             context_matrix(i,0) = cpos_left;
+            ncpos += region_matrix(i,0) - cpos_left;
           }
         } else {
           context_matrix(i,0) = NA_INTEGER;
@@ -289,13 +299,15 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
             context_matrix(i,1) = NA_INTEGER;
           } else if (rb_boundary < cpos_right){
             context_matrix(i,1) = rb_boundary;
+            ncpos += rb_boundary - context_matrix(i,1);
           } else {
             context_matrix(i,1) = cpos_right;
+            ncpos += cpos_right - context_matrix(i,1);
           }
         } else {
           context_matrix(i,1) = NA_INTEGER;
         }
-        
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
       }
       
     } else {
@@ -319,8 +331,10 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
             context_matrix(i,0) = NA_INTEGER;
           } else if (lb_boundary > lb){
             context_matrix(i,0) = lb_boundary;
+            ncpos += context_matrix(i,0) - lb_boundary;
           } else {
             context_matrix(i,0) = lb;
+            ncpos += context_matrix(i,0) - lb;
           }
         } else {
           context_matrix(i,0) = NA_INTEGER;
@@ -336,15 +350,46 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
             context_matrix(i,1) = NA_INTEGER;
           } else if (rb_boundary < rb){
             context_matrix(i,1) = rb_boundary;
+            ncpos += rb_boundary - context_matrix(i,1);
           } else {
             context_matrix(i,1) = rb;
+            ncpos += rb - context_matrix(i,1);
           }
         } else {
           context_matrix(i,3) = NA_INTEGER;
         }
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
+      }
+    }
+  }
+  
+  Rcpp::IntegerMatrix cpos_matrix(ncpos, 3);
+  int k = 0;
+  
+  for (i = 0; i < region_matrix.nrow(); i++){
+    if (context_matrix(i,0) != NA_INTEGER){
+      for (cpos = context_matrix(i,0); cpos < region_matrix(i,0); cpos++){
+        cpos_matrix(k,0) = cpos - region_matrix(i,0);
+        cpos_matrix(k,1) = cpos;
+        cpos_matrix(k,2) = cl_cpos2id(p_attr, cpos);
+        k++;
+      }
+    }
+    for (cpos = region_matrix(i,0); cpos <= region_matrix(i,1); cpos++){
+      cpos_matrix(k,0) = 0;
+      cpos_matrix(k,1) = cpos;
+      cpos_matrix(k,2) = cl_cpos2id(p_attr, cpos);
+      k++;
+    }
+    if (context_matrix(i,1) != NA_INTEGER){
+      for (cpos = region_matrix(i,1) + 1; cpos <= context_matrix(i,1); cpos++){
+        cpos_matrix(k,0) = cpos - region_matrix(i,1);
+        cpos_matrix(k,1) = cpos;
+        cpos_matrix(k,2) = cl_cpos2id(p_attr, cpos);
+        k++;
       }
     }
   }
 
-  return context_matrix;
+  return cpos_matrix;
 }
