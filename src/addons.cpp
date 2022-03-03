@@ -362,7 +362,7 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
       }
     }
   }
-  
+
   Rcpp::IntegerMatrix cpos_matrix(ncpos, 4);
   int k = 0;
   

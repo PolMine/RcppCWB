@@ -25,6 +25,7 @@ region_matrix_context(
   corpus,
   registry = Sys.getenv("CORPUS_REGISTRY"),
   matrix,
+  p_attribute,
   s_attribute,
   boundary,
   left,
@@ -40,8 +41,8 @@ region_matrix_context(
 
 \item{matrix}{a regions matrix}
 
-\item{s_attribute}{Structural attribute (length-one \code{character} vector),
-typically indicating a sentence ("s")}
+\item{s_attribute}{If not \code{NULL}, a structural attribute (length-one
+\code{character} vector), typically indicating a sentence ("s").}
 
 \item{boundary}{Structural attribute (length-one \code{character} vector) that
 serves as a boundary and that shall not be transgressed.}
