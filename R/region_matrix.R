@@ -90,11 +90,12 @@ region_matrix_to_count_matrix <- function(corpus, p_attribute, registry = Sys.ge
 #' @param left An `integer` value, number of strucs to move to the left.
 #' @param right An `integer` value, number of strucs to move to the right.
 #' @export
-region_matrix_context <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), matrix, s_attribute, boundary, left, right){
+region_matrix_context <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), matrix, p_attribute, s_attribute, boundary, left, right){
   .region_matrix_context(
     corpus = corpus,
     registry = registry,
     region_matrix = matrix,
+    p_attribute = p_attribute,
     s_attribute = s_attribute,
     boundary = boundary,
     left = as.integer(left),

@@ -363,7 +363,7 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
     }
   }
   
-  Rcpp::IntegerMatrix cpos_matrix(ncpos, 3);
+  Rcpp::IntegerMatrix cpos_matrix(ncpos, 4);
   int k = 0;
   
   for (i = 0; i < region_matrix.nrow(); i++){
@@ -371,21 +371,24 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
       for (cpos = context_matrix(i,0); cpos < region_matrix(i,0); cpos++){
         cpos_matrix(k,0) = cpos - region_matrix(i,0);
         cpos_matrix(k,1) = cpos;
-        cpos_matrix(k,2) = cl_cpos2id(p_attr, cpos);
+        cpos_matrix(k,2) = i + 1;
+        cpos_matrix(k,3) = cl_cpos2id(p_attr, cpos);
         k++;
       }
     }
     for (cpos = region_matrix(i,0); cpos <= region_matrix(i,1); cpos++){
       cpos_matrix(k,0) = 0;
       cpos_matrix(k,1) = cpos;
-      cpos_matrix(k,2) = cl_cpos2id(p_attr, cpos);
+      cpos_matrix(k,2) = i + 1;
+      cpos_matrix(k,3) = cl_cpos2id(p_attr, cpos);
       k++;
     }
     if (context_matrix(i,1) != NA_INTEGER){
       for (cpos = region_matrix(i,1) + 1; cpos <= context_matrix(i,1); cpos++){
         cpos_matrix(k,0) = cpos - region_matrix(i,1);
         cpos_matrix(k,1) = cpos;
-        cpos_matrix(k,2) = cl_cpos2id(p_attr, cpos);
+        cpos_matrix(k,2) = i + 1;
+        cpos_matrix(k,3) = cl_cpos2id(p_attr, cpos);
         k++;
       }
     }
