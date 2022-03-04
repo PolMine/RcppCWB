@@ -20,6 +20,7 @@ subcorpus.}
 Create CWB subcorpus from matrix with regions.
 }
 \examples{
+\dontrun{
 # First we generate a subcorpus from a query result
 oil_context <- cqp_query("REUTERS", subcorpus = "OIL", query = '[]{3}"oil" []{3}')
 m <- subcorpus_get_ranges(oil_context)
@@ -34,4 +35,5 @@ subcorpus_get_ranges(x)
 cqp_drop_subcorpus("REUTERS:OIL")
 cqp_drop_subcorpus("REUTERS:OIL2")
 cqp_drop_subcorpus("REUTERS:CRUDEOIL")
+}
 }

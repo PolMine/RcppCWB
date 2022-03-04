@@ -5,6 +5,9 @@ testthat::context("subcorpus")
 test_that(
   "create subcorpus from R",
   {
+    skip_on_ci()
+    skip_on_cran()
+    
     oil_context <- cqp_query("REUTERS", subcorpus = "OIL", query = '[]{3}"oil" []{3}')
     m <- subcorpus_get_ranges(oil_context)
     reuters <- cl_find_corpus("REUTERS", registry = get_tmp_registry())
