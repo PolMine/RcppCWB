@@ -25,7 +25,7 @@ jobs:
       matrix:
         config:
           - {os: windows-latest, r: 'release'}
-          - {os: windows-2022, r: 'devel'}
+#          - {os: windows-2022, r: 'devel'}
           - {os: macOS-latest, r: 'release'}
           - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
           - {os: ubuntu-20.04, r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
@@ -45,18 +45,18 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Setup R (Windows UCRT)
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/ucrt3/actions/r-install@main
+#      - name: Setup R (Windows UCRT)
+#        if: matrix.config.os == 'windows-2022'
+#        uses: kalibera/ucrt3/actions/r-install@main
         
-      - name: Install UCRT toolchain
-        if: matrix.config.os == 'windows-2022'
-        uses: kalibera/ucrt3/actions/toolchain-install@main
-        with:
-          # base ... toolchain has the compilers and libraries to build R and recommended packages
-          # full ... additional libraries to build CRAN packages
-          # none ... no toolchain is needed (no native code) 
-         toolchain-type: full      
+#      - name: Install UCRT toolchain
+#        if: matrix.config.os == 'windows-2022'
+#        uses: kalibera/ucrt3/actions/toolchain-install@main
+#        with:
+#          # base ... toolchain has the compilers and libraries to build R and recommended packages
+#          # full ... additional libraries to build CRAN packages
+#          # none ... no toolchain is needed (no native code) 
+#         toolchain-type: full      
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -106,19 +106,19 @@ jobs:
           rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
-      - name: Whereabouts of gcc and g++
-        if: matrix.config.os == 'windows-2022'
-        run: |
-          echo %PATH%
-          where gcc
-          where g++
+#      - name: Whereabouts of gcc and g++
+#        if: matrix.config.os == 'windows-2022'
+#        run: |
+#          echo %PATH%
+#          where gcc
+#          where g++
 
-      - name: Check package (UCRT)
-        if: matrix.config.os == 'windows-2022'
-        env:
-          _R_INSTALL_TIME_PATCHES_: no
-          TZ: UTC
-        uses: kalibera/R-actions/pkg-check@master
+#      - name: Check package (UCRT)
+#        if: matrix.config.os == 'windows-2022'
+#        env:
+#          _R_INSTALL_TIME_PATCHES_: no
+#          TZ: UTC
+#        uses: kalibera/R-actions/pkg-check@master
 
       - name: Build Windows binary package
         if: matrix.os == 'windows-latest'
