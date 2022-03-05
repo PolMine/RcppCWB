@@ -39,6 +39,10 @@ call \code{cqp_initialize}. To reset the registry, use the function
 \code{cqp_get_registry}. To get the initialization status, use
 \code{cqp_is_initialized}
 }
+\details{
+\code{cqp_load_corpus} will return a \code{logical} value - \code{TRUE} if corpus
+has been loaded successfully, \code{FALSE} if not.
+}
 \examples{
 cqp_is_initialized() # check initialization status
 if (!cqp_is_initialized()) cqp_initialize()

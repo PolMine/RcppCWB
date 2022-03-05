@@ -70,6 +70,8 @@ siblings, or in a descendent or ancestor relationship.
 `cwb_compress_rdx()` now have an argument `quietly` to control display of output
 messages. `cwb_encode()` has an argument `verbose` to control whether counter on
 the number of tokens processed is dislpayed.
+* `cqp_load_corpus()` will return `FALSE` if corpus has not been loaded
+successfully.
 
 
 # RcppCWB 0.5.0

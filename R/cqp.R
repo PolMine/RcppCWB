@@ -207,6 +207,8 @@ matrix_to_subcorpus <- function(region_matrix, corpus, subcorpus){
 
 
 #' @param corpus ID of a CWB corpus (length-one `character`).
+#' @details `cqp_load_corpus` will return a `logical` value - `TRUE` if corpus
+#'   has been loaded successfully, `FALSE` if not.
 #' @export cqp_load_corpus
 #' @rdname cqp_initialize
 cqp_load_corpus <- function(corpus, registry){

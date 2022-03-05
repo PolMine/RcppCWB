@@ -323,7 +323,7 @@ int cqp_load_corpus(SEXP corpus, SEXP registry){
   dirname = strdup(Rcpp::as<std::string>(registry).c_str());
   
   cl = ensure_syscorpus(dirname, entry);
-  
+  if (cl == NULL) return 0;
   return 1;
 }
 
