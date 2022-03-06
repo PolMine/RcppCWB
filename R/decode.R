@@ -46,8 +46,6 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
   if (length(method) != 1L) stop("Argument 'method' needs to be a length 1 vector.")
   if (!method %in% c("Rcpp", "R")) stop("Argument 'method' needs to be either 'R' or 'Rcpp'.")
   
-  s_attr_has_values <- cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
-  
   if (method == "R"){
     
     if (missing(data_dir)) stop("data_dir needs to be specified to use R method")
@@ -56,15 +54,20 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
     rng_file_size <- file.info(rng_file)[["size"]]
     rng <- readBin(rng_file, what = integer(), size = 4L, n = rng_file_size / 4, endian = "big")
     region_matrix <- matrix(rng, ncol = 2, byrow = TRUE)
+    
+    # avs = attribute values
+    avs_file <- fs::path(data_dir, paste(s_attribute, "avs", sep = ".")) 
+    # avx = attribute value index
+    avx_file <- fs::path(data_dir, paste(s_attribute, "avx", sep = ".")) 
 
+    s_attr_has_values <- file.exists(avs_file) && file.exists(avx_file)
+    
     if (s_attr_has_values){
       
-      avs_file <- file.path(data_dir, paste(s_attribute, "avs", sep = ".")) # attribute values
       avs_file_size <- file.info(avs_file)[["size"]]
       avs <- readBin(con = avs_file, what = character(), n = avs_file_size)
       if (!is.null(encoding)) Encoding(avs) <- encoding
       
-      avx_file <- file.path(data_dir, paste(s_attribute, "avx", sep = ".")) # attribute value index
       avx_file_size <- file.info(avx_file)[["size"]]
       avx <- readBin(avx_file, what = integer(), size = 4L, n = avx_file_size / 4, endian = "big")
       avx_matrix <- matrix(avx, ncol = 2, byrow = TRUE)
@@ -90,6 +93,12 @@ s_attribute_decode <- function(corpus, data_dir, s_attribute, encoding = NULL, r
       corpus = corpus, 
       s_attribute = s_attribute,
       strucs = 0L:(s_attr_size - 1L), 
+      registry = registry
+    )
+    
+    s_attr_has_values <- cl_struc_values(
+      corpus = corpus,
+      s_attribute = s_attribute,
       registry = registry
     )
     
