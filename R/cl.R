@@ -444,6 +444,28 @@ corpus_full_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   .corpus_full_name(corpus = corpus, registry = registry)
 }
 
+#' @details `corpus_p_attributes()` returns a `character` vector with the
+#'   positional attributes of a corpus.
+#' @rdname registry_info
+#' @examples
+#' corpus_p_attributes("REUTERS", registry = get_tmp_registry())
+corpus_p_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  .corpus_p_attributes(corpus = corpus, registry = registry)
+}
+
+#' @details `corpus_s_attributes()` returns a `character` vector with the
+#'   structural attributes of a corpus.
+#' @rdname registry_info
+#' @examples
+#' corpus_s_attributes("REUTERS", registry = get_tmp_registry())
+corpus_s_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  .corpus_s_attributes(corpus = corpus, registry = registry)
+}
+
 
 #' Check whether corpus is loaded
 #' 

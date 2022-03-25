@@ -610,6 +610,53 @@ Rcpp::StringVector _corpus_full_name(SEXP corpus, SEXP registry){
 }
 
 
+Rcpp::StringVector corpus_attributes(SEXP corpus, SEXP registry, int attribute_type){
+  
+  Corpus * c;
+  Attribute *att;
+  int n, i;
+  
+  char* corpus_id  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  
+  c = cl_new_corpus(registry_dir, corpus_id);
+  
+  if (c){
+    n = 0;
+    for (att = c->attributes ; att != NULL ; att = (Attribute *)att->any.next){
+      if (0 != (att->any.type & attribute_type)) n++;
+    }
+
+    Rcpp::StringVector result(n);
+    
+    i = 0;
+    for (att = c->attributes ; att != NULL ; att = (Attribute *)att->any.next){
+      if (0 != (att->any.type & attribute_type)){
+        result(i) = cl_strdup(att->any.name);
+        i++;
+      }
+    }
+    return(result);
+  } else {
+    Rcpp::StringVector result(1);
+    result(0) = NA_STRING;
+    return(result);
+  }
+}
+
+// [[Rcpp::export(name=".corpus_p_attributes")]]
+Rcpp::StringVector corpus_p_attributes(SEXP corpus, SEXP registry){
+  Rcpp::StringVector result = corpus_attributes(corpus, registry, ATT_POS);
+  return(result);
+}
+
+
+// [[Rcpp::export(name=".corpus_s_attributes")]]
+Rcpp::StringVector corpus_s_attributes(SEXP corpus, SEXP registry){
+  Rcpp::StringVector result = corpus_attributes(corpus, registry, ATT_STRUC);
+  return(result);
+}
+
 
 // [[Rcpp::export(name=".cl_load_corpus")]]
 int cl_load_corpus(SEXP corpus, SEXP registry) {

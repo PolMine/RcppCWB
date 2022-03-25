@@ -193,6 +193,14 @@
     .Call(`_RcppCWB__corpus_full_name`, corpus, registry)
 }
 
+.corpus_p_attributes <- function(corpus, registry) {
+    .Call(`_RcppCWB_corpus_p_attributes`, corpus, registry)
+}
+
+.corpus_s_attributes <- function(corpus, registry) {
+    .Call(`_RcppCWB_corpus_s_attributes`, corpus, registry)
+}
+
 .cl_load_corpus <- function(corpus, registry) {
     .Call(`_RcppCWB_cl_load_corpus`, corpus, registry)
 }
