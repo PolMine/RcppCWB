@@ -1,3 +1,9 @@
+# RcppCWB 0.5.1.9001ff
+
+* The example for `corpus_data_dir()` dir not work as intended without explicitly setting the `registry` argument. Fixed.
+* New function `corpus_info_file()`.
+
+
 # RcppCWB 0.5.1
 
 ## New Features

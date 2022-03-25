@@ -569,6 +569,27 @@ Rcpp::StringVector _corpus_data_dir(SEXP corpus, SEXP registry){
 
 }
 
+// [[Rcpp::export(name=".corpus_info_file")]]
+Rcpp::StringVector _corpus_info_file(SEXP corpus, SEXP registry){
+  
+  Corpus * c;
+  Rcpp::StringVector result(1);
+  
+  char* corpus_id  = strdup(Rcpp::as<std::string>(corpus).c_str());
+  char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  
+  c = cl_new_corpus(registry_dir, corpus_id);
+  
+  if (c){
+    result(0) = c->info_file;
+  } else {
+    result(0) = NA_STRING;
+  }
+  
+  return( result );
+}
+
+
 
 // [[Rcpp::export(name=".cl_load_corpus")]]
 int cl_load_corpus(SEXP corpus, SEXP registry) {

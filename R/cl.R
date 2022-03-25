@@ -400,21 +400,39 @@ cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_R
   if (i == 1L) TRUE else if (i == 0L) FALSE else if (i < 0L) as.integer(NA)
 }
 
-#' Get data directory of a corpus
+#' Get information from registry file
 #' 
-#' Extract the data directory from the intenal C representation of the content
-#' of the registry file for a corpus.
+#' Extract information from the internal C representation of registry data.
+#' @details `corpus_data_dir()` will return the data directory (class `fs_path`)
+#'   where the binary files of a corpus are kept (a directory also known as
+#'   'home' directory).
 #' @param corpus A length-one `character` vector with the corpus ID.
 #' @param registry A length-one `character` vector with the registry directory.
 #' @return A length-one `character` vector stating the data directory.
 #' @export corpus_data_dir
+#' @rdname registry_info
+#' @importFrom fs path_expand
 #' @examples
-#' corpus_data_dir("REUTERS")
+#' corpus_data_dir("REUTERS", registry = get_tmp_registry())
 corpus_data_dir <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_corpus(corpus = corpus, registry = registry)
-  registry <- normalizePath(path.expand(registry))
-  .corpus_data_dir(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  dir <- .corpus_data_dir(corpus = corpus, registry = registry)
+  path(dir)
 }
+
+#' @details `corpus_info_file()` will return the path to the info file for a
+#'   corpus (class `fs_path` object).
+#' @rdname registry_info
+#' @examples
+#' corpus_info_file("REUTERS", registry = get_tmp_registry())
+corpus_info_file <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  fname <- .corpus_info_file(corpus = corpus, registry = registry)
+  path(fname)
+}
+
 
 #' Check whether corpus is loaded
 #' 
