@@ -906,6 +906,48 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
     }
 
+    inline Rcpp::StringVector _corpus_properties(SEXP corpus, SEXP registry) {
+        typedef SEXP(*Ptr__corpus_properties)(SEXP,SEXP);
+        static Ptr__corpus_properties p__corpus_properties = NULL;
+        if (p__corpus_properties == NULL) {
+            validateSignature("Rcpp::StringVector(*_corpus_properties)(SEXP,SEXP)");
+            p__corpus_properties = (Ptr__corpus_properties)R_GetCCallable("RcppCWB", "_RcppCWB__corpus_properties");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p__corpus_properties(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(registry)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+    }
+
+    inline Rcpp::StringVector _corpus_property(SEXP corpus, SEXP registry, SEXP property) {
+        typedef SEXP(*Ptr__corpus_property)(SEXP,SEXP,SEXP);
+        static Ptr__corpus_property p__corpus_property = NULL;
+        if (p__corpus_property == NULL) {
+            validateSignature("Rcpp::StringVector(*_corpus_property)(SEXP,SEXP,SEXP)");
+            p__corpus_property = (Ptr__corpus_property)R_GetCCallable("RcppCWB", "_RcppCWB__corpus_property");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p__corpus_property(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(registry)), Shield<SEXP>(Rcpp::wrap(property)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+    }
+
     inline int _cl_load_corpus(SEXP corpus, SEXP registry) {
         typedef SEXP(*Ptr__cl_load_corpus)(SEXP,SEXP);
         static Ptr__cl_load_corpus p__cl_load_corpus = NULL;

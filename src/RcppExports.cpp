@@ -1621,6 +1621,77 @@ RcppExport SEXP _RcppCWB_corpus_s_attributes(SEXP corpusSEXP, SEXP registrySEXP)
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// corpus_properties
+Rcpp::StringVector corpus_properties(SEXP corpus, SEXP registry);
+static SEXP _RcppCWB_corpus_properties_try(SEXP corpusSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(corpus_properties(corpus, registry));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RcppCWB_corpus_properties(SEXP corpusSEXP, SEXP registrySEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RcppCWB_corpus_properties_try(corpusSEXP, registrySEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// corpus_property
+Rcpp::StringVector corpus_property(SEXP corpus, SEXP registry, SEXP property);
+static SEXP _RcppCWB_corpus_property_try(SEXP corpusSEXP, SEXP registrySEXP, SEXP propertySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    Rcpp::traits::input_parameter< SEXP >::type property(propertySEXP);
+    rcpp_result_gen = Rcpp::wrap(corpus_property(corpus, registry, property));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RcppCWB_corpus_property(SEXP corpusSEXP, SEXP registrySEXP, SEXP propertySEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RcppCWB_corpus_property_try(corpusSEXP, registrySEXP, propertySEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // cl_load_corpus
 int cl_load_corpus(SEXP corpus, SEXP registry);
 static SEXP _RcppCWB_cl_load_corpus_try(SEXP corpusSEXP, SEXP registrySEXP) {
@@ -2399,6 +2470,8 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::StringVector(*.corpus_full_name)(SEXP,SEXP)");
         signatures.insert("Rcpp::StringVector(*.corpus_p_attributes)(SEXP,SEXP)");
         signatures.insert("Rcpp::StringVector(*.corpus_s_attributes)(SEXP,SEXP)");
+        signatures.insert("Rcpp::StringVector(*.corpus_properties)(SEXP,SEXP)");
+        signatures.insert("Rcpp::StringVector(*.corpus_property)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*.cl_load_corpus)(SEXP,SEXP)");
         signatures.insert("Rcpp::StringVector(*.cl_list_corpora)()");
         signatures.insert("void(*.init_cqp)()");
@@ -2468,6 +2541,8 @@ RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() {
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.corpus_full_name", (DL_FUNC)_RcppCWB__corpus_full_name_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.corpus_p_attributes", (DL_FUNC)_RcppCWB_corpus_p_attributes_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.corpus_s_attributes", (DL_FUNC)_RcppCWB_corpus_s_attributes_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_.corpus_properties", (DL_FUNC)_RcppCWB_corpus_properties_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_.corpus_property", (DL_FUNC)_RcppCWB_corpus_property_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_load_corpus", (DL_FUNC)_RcppCWB_cl_load_corpus_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_list_corpora", (DL_FUNC)_RcppCWB_cl_list_corpora_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.init_cqp", (DL_FUNC)_RcppCWB_init_cqp_try);
@@ -2544,6 +2619,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB__corpus_full_name", (DL_FUNC) &_RcppCWB__corpus_full_name, 2},
     {"_RcppCWB_corpus_p_attributes", (DL_FUNC) &_RcppCWB_corpus_p_attributes, 2},
     {"_RcppCWB_corpus_s_attributes", (DL_FUNC) &_RcppCWB_corpus_s_attributes, 2},
+    {"_RcppCWB_corpus_properties", (DL_FUNC) &_RcppCWB_corpus_properties, 2},
+    {"_RcppCWB_corpus_property", (DL_FUNC) &_RcppCWB_corpus_property, 3},
     {"_RcppCWB_cl_load_corpus", (DL_FUNC) &_RcppCWB_cl_load_corpus, 2},
     {"_RcppCWB_cl_list_corpora", (DL_FUNC) &_RcppCWB_cl_list_corpora, 0},
     {"_RcppCWB_init_cqp", (DL_FUNC) &_RcppCWB_init_cqp, 0},

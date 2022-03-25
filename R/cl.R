@@ -465,6 +465,33 @@ corpus_s_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")
   .corpus_s_attributes(corpus = corpus, registry = registry)
 }
 
+#' @details `corpus_properties()` returns a `character` vector with the corpus
+#'   properties defined in the registry file.
+#' @rdname registry_info
+#' @examples
+#' corpus_properties("REUTERS", registry = get_tmp_registry())
+corpus_properties <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  .corpus_properties(corpus = corpus, registry = registry)
+}
+
+#' @details `corpus_property()` returns the value of a corpus property defined
+#'   in the registry file.
+#' @rdname registry_info
+#' @examples
+#' corpus_property(
+#'   "REUTERS",
+#'   registry = get_tmp_registry(),
+#'   property = "language"
+#' )
+corpus_property <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), property){
+  stopifnot(missing(property))
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  .corpus_property(corpus = corpus, registry = registry, property = property)
+}
+
 
 #' Check whether corpus is loaded
 #' 

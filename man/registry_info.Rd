@@ -6,6 +6,8 @@
 \alias{corpus_full_name}
 \alias{corpus_p_attributes}
 \alias{corpus_s_attributes}
+\alias{corpus_properties}
+\alias{corpus_property}
 \title{Get information from registry file}
 \usage{
 corpus_data_dir(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -17,6 +19,10 @@ corpus_full_name(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 corpus_p_attributes(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 corpus_s_attributes(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+corpus_properties(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+corpus_property(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), property)
 }
 \arguments{
 \item{corpus}{A length-one \code{character} vector with the corpus ID.}
@@ -42,6 +48,12 @@ positional attributes of a corpus.
 
 \code{corpus_s_attributes()} returns a \code{character} vector with the
 structural attributes of a corpus.
+
+\code{corpus_properties()} returns a \code{character} vector with the corpus
+properties defined in the registry file.
+
+\code{corpus_property()} returns the value of a corpus property defined
+in the registry file.
 }
 \examples{
 corpus_data_dir("REUTERS", registry = get_tmp_registry())
@@ -49,4 +61,10 @@ corpus_info_file("REUTERS", registry = get_tmp_registry())
 corpus_full_name("REUTERS", registry = get_tmp_registry())
 corpus_p_attributes("REUTERS", registry = get_tmp_registry())
 corpus_s_attributes("REUTERS", registry = get_tmp_registry())
+corpus_properties("REUTERS", registry = get_tmp_registry())
+corpus_property(
+  "REUTERS",
+  registry = get_tmp_registry(),
+  property = "language"
+)
 }
