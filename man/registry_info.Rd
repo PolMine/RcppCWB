@@ -28,6 +28,8 @@ corpus_property(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), property)
 \item{corpus}{A length-one \code{character} vector with the corpus ID.}
 
 \item{registry}{A length-one \code{character} vector with the registry directory.}
+
+\item{property}{A corpus property defined in the registry file (.}
 }
 \description{
 Extract information from the internal C representation of registry data.
@@ -53,7 +55,7 @@ structural attributes of a corpus.
 properties defined in the registry file.
 
 \code{corpus_property()} returns the value of a corpus property defined
-in the registry file.
+in the registry file, or \code{NA} if the property requested is undefined.
 }
 \examples{
 corpus_data_dir("REUTERS", registry = get_tmp_registry())

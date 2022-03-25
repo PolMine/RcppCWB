@@ -477,7 +477,8 @@ corpus_properties <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 }
 
 #' @details `corpus_property()` returns the value of a corpus property defined
-#'   in the registry file.
+#'   in the registry file, or `NA` if the property requested is undefined.
+#' @param property A corpus property defined in the registry file (.
 #' @rdname registry_info
 #' @examples
 #' corpus_property(
@@ -486,7 +487,11 @@ corpus_properties <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 #'   property = "language"
 #' )
 corpus_property <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), property){
-  stopifnot(missing(property))
+  stopifnot(
+    !missing(property),
+    length(property) == 1L,
+    is.character(property)
+  )
   check_corpus(corpus = corpus, registry = registry)
   registry <- path(path_expand(registry))
   .corpus_property(corpus = corpus, registry = registry, property = property)

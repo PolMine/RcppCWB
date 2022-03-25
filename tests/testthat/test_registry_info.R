@@ -48,3 +48,37 @@ test_that(
   }
 )
 
+test_that(
+  "check result of corpus_properties()",
+  {
+    props <- corpus_properties(corpus = "REUTERS", registry = get_tmp_registry())
+    expect_identical(props, c("language", "charset"))
+  }
+)
+
+
+test_that(
+  "check result of corpus_property()",
+  {
+    lang <- corpus_property(
+      corpus = "REUTERS",
+      registry = get_tmp_registry(),
+      property = "language"
+    )
+    expect_identical(lang, "en")
+    
+    charset <- corpus_property(
+      corpus = "REUTERS",
+      registry = get_tmp_registry(),
+      property = "charset"
+    )
+    expect_identical(charset, "latin1")
+    
+    na <- corpus_property(
+      "REUTERS",
+      registry = get_tmp_registry(),
+      property = "foo"
+    )
+    expect_identical(na, NA_character_)
+  }
+)
