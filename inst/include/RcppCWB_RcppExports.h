@@ -843,6 +843,27 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
     }
 
+    inline Rcpp::StringVector _corpus_full_name(SEXP corpus, SEXP registry) {
+        typedef SEXP(*Ptr__corpus_full_name)(SEXP,SEXP);
+        static Ptr__corpus_full_name p__corpus_full_name = NULL;
+        if (p__corpus_full_name == NULL) {
+            validateSignature("Rcpp::StringVector(*_corpus_full_name)(SEXP,SEXP)");
+            p__corpus_full_name = (Ptr__corpus_full_name)R_GetCCallable("RcppCWB", "_RcppCWB__corpus_full_name");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p__corpus_full_name(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(registry)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+    }
+
     inline int _cl_load_corpus(SEXP corpus, SEXP registry) {
         typedef SEXP(*Ptr__cl_load_corpus)(SEXP,SEXP);
         static Ptr__cl_load_corpus p__cl_load_corpus = NULL;

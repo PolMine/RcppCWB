@@ -189,6 +189,10 @@
     .Call(`_RcppCWB__corpus_info_file`, corpus, registry)
 }
 
+.corpus_full_name <- function(corpus, registry) {
+    .Call(`_RcppCWB__corpus_full_name`, corpus, registry)
+}
+
 .cl_load_corpus <- function(corpus, registry) {
     .Call(`_RcppCWB_cl_load_corpus`, corpus, registry)
 }

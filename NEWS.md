@@ -1,7 +1,11 @@
 # RcppCWB 0.5.1.9001ff
 
-* The example for `corpus_data_dir()` dir not work as intended without explicitly setting the `registry` argument. Fixed.
-* New function `corpus_info_file()`.
+* The example for `corpus_data_dir()` dir not work as intended without
+explicitly setting the `registry` argument. Fixed.
+* New functions `corpus_info_file()`, `corpus_full_name()` to retrieve registry
+file data.
+* The path to the info file in the registry file of the REUTERS corpus was
+broken. Fixed.
 
 
 # RcppCWB 0.5.1

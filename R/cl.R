@@ -433,6 +433,17 @@ corpus_info_file <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
   path(fname)
 }
 
+#' @details `corpus_full_name()` will return the full name of the corpus defined
+#'   in the registry file.
+#' @rdname registry_info
+#' @examples
+#' corpus_full_name("REUTERS", registry = get_tmp_registry())
+corpus_full_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
+  check_corpus(corpus = corpus, registry = registry)
+  registry <- path(path_expand(registry))
+  .corpus_full_name(corpus = corpus, registry = registry)
+}
+
 
 #' Check whether corpus is loaded
 #' 
