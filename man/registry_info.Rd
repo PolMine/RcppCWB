@@ -4,6 +4,8 @@
 \alias{corpus_data_dir}
 \alias{corpus_info_file}
 \alias{corpus_full_name}
+\alias{corpus_p_attributes}
+\alias{corpus_s_attributes}
 \title{Get information from registry file}
 \usage{
 corpus_data_dir(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -11,14 +13,15 @@ corpus_data_dir(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 corpus_info_file(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 corpus_full_name(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+corpus_p_attributes(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+corpus_s_attributes(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{corpus}{A length-one \code{character} vector with the corpus ID.}
 
 \item{registry}{A length-one \code{character} vector with the registry directory.}
-}
-\value{
-A length-one \code{character} vector stating the data directory.
 }
 \description{
 Extract information from the internal C representation of registry data.
@@ -33,9 +36,17 @@ corpus (class \code{fs_path} object).
 
 \code{corpus_full_name()} will return the full name of the corpus defined
 in the registry file.
+
+\code{corpus_p_attributes()} returns a \code{character} vector with the
+positional attributes of a corpus.
+
+\code{corpus_s_attributes()} returns a \code{character} vector with the
+structural attributes of a corpus.
 }
 \examples{
 corpus_data_dir("REUTERS", registry = get_tmp_registry())
 corpus_info_file("REUTERS", registry = get_tmp_registry())
 corpus_full_name("REUTERS", registry = get_tmp_registry())
+corpus_p_attributes("REUTERS", registry = get_tmp_registry())
+corpus_s_attributes("REUTERS", registry = get_tmp_registry())
 }

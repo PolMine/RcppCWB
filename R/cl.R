@@ -408,7 +408,6 @@ cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_R
 #'   'home' directory).
 #' @param corpus A length-one `character` vector with the corpus ID.
 #' @param registry A length-one `character` vector with the registry directory.
-#' @return A length-one `character` vector stating the data directory.
 #' @export corpus_data_dir
 #' @rdname registry_info
 #' @importFrom fs path_expand
