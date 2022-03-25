@@ -21,3 +21,14 @@ test_that(
     expect_identical(length(readLines(f)), 8L)
   }
 )
+
+test_that(
+  "check result of corpus_info_file()",
+  {
+    name <- corpus_full_name("REUTERS", registry = get_tmp_registry())
+    expect_identical(name, "Reuters Sample Corpus")
+  }
+)
+
+
+corpus_full_name("REUTERS", registry = get_tmp_registry())
