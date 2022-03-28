@@ -21,6 +21,10 @@
     .Call(`_RcppCWB_region_matrix_to_ids`, corpus, p_attribute, registry, matrix)
 }
 
+.ranges_to_cpos <- function(ranges) {
+    .Call(`_RcppCWB_ranges_to_cpos`, ranges)
+}
+
 .ids_to_count_matrix <- function(ids) {
     .Call(`_RcppCWB_ids_to_count_matrix`, ids)
 }

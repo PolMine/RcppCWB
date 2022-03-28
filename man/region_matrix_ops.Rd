@@ -5,6 +5,7 @@
 \alias{region_matrix_to_ids}
 \alias{region_matrix_to_count_matrix}
 \alias{region_matrix_context}
+\alias{ranges_to_cpos}
 \title{Get IDs and Counts for Region Matrices.}
 \usage{
 region_matrix_to_ids(
@@ -31,6 +32,8 @@ region_matrix_context(
   left,
   right
 )
+
+ranges_to_cpos(ranges)
 }
 \arguments{
 \item{corpus}{a CWB corpus}
@@ -50,9 +53,16 @@ serves as a boundary and that shall not be transgressed.}
 \item{left}{An \code{integer} value, number of strucs to move to the left.}
 
 \item{right}{An \code{integer} value, number of strucs to move to the right.}
+
+\item{ranges}{A two-column integer \code{matrix} of ranges (left and right corpus
+positions in first and second column, respectively).}
 }
 \description{
 Get IDs and Counts for Region Matrices.
+}
+\details{
+\code{ranges_to_cpos()} will turn a \code{matrix} of ranges into an \code{integer}
+vector with the individual corpus positions covered by the ranges.
 }
 \examples{
 # Scenario 1: Get full text for a subcorpus defined by regions

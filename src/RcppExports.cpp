@@ -82,6 +82,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ranges_to_cpos
+Rcpp::IntegerVector ranges_to_cpos(SEXP ranges);
+RcppExport SEXP _RcppCWB_ranges_to_cpos(SEXP rangesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type ranges(rangesSEXP);
+    rcpp_result_gen = Rcpp::wrap(ranges_to_cpos(ranges));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ids_to_count_matrix
 Rcpp::IntegerMatrix ids_to_count_matrix(Rcpp::IntegerVector ids);
 RcppExport SEXP _RcppCWB_ids_to_count_matrix(SEXP idsSEXP) {
@@ -2610,6 +2621,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_get_region_matrix", (DL_FUNC) &_RcppCWB_get_region_matrix, 4},
     {"_RcppCWB_get_cbow_matrix", (DL_FUNC) &_RcppCWB_get_cbow_matrix, 5},
     {"_RcppCWB_region_matrix_to_ids", (DL_FUNC) &_RcppCWB_region_matrix_to_ids, 4},
+    {"_RcppCWB_ranges_to_cpos", (DL_FUNC) &_RcppCWB_ranges_to_cpos, 1},
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {"_RcppCWB_region_matrix_context", (DL_FUNC) &_RcppCWB_region_matrix_context, 8},

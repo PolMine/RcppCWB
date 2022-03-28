@@ -111,3 +111,25 @@ region_matrix_context <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY
     right = as.integer(right)
   )
 }
+
+#' @details `ranges_to_cpos()` will turn a `matrix` of ranges into an `integer` 
+#'   vector with the individual corpus positions covered by the ranges.
+#' @rdname region_matrix_ops
+#' @param ranges A two-column integer `matrix` of ranges (left and right corpus
+#'   positions in first and second column, respectively).
+#' @export
+ranges_to_cpos <- function(ranges){
+  stopifnot(
+    is.integer(ranges),
+    is.matrix(ranges),
+    all(ranges[,2] >= ranges[,1])
+  )
+  if (nrow(ranges) == 0L) return(integer())
+  if (ncol(ranges) != 2L){
+    warning(
+      "ranges_to_cpos() requires two-column integer matrix as input ",
+      sprintf("but input matrix has %d columns!", ncol(ranges))
+    )
+  }
+  .ranges_to_cpos(ranges)
+}

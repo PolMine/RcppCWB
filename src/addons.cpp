@@ -136,6 +136,26 @@ Rcpp::IntegerVector region_matrix_to_ids(SEXP corpus, SEXP p_attribute, SEXP reg
 }
 
 
+// [[Rcpp::export(name=".ranges_to_cpos")]]
+Rcpp::IntegerVector ranges_to_cpos(SEXP ranges){
+  
+  Rcpp::IntegerMatrix m(ranges);
+  int size = region_matrix_to_size(m);
+  Rcpp::IntegerVector result(size);
+  
+  int n, cpos;
+  int i = 0;
+  for (n = 0; n < m.nrow(); n++){
+    for (cpos = m(n,0); cpos <= m(n,1); cpos++){
+      result(i) = cpos;
+      i++;
+    }
+  }
+  
+  return result;
+}
+
+
 // [[Rcpp::export(name=".ids_to_count_matrix")]]
 Rcpp::IntegerMatrix ids_to_count_matrix(Rcpp::IntegerVector ids){
   
