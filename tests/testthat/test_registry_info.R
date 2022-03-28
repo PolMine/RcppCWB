@@ -82,3 +82,13 @@ test_that(
     expect_identical(na, NA_character_)
   }
 )
+
+
+test_that(
+  "check result of corpus_registry_dir()",
+  {
+    expect_identical(
+      corpus_registry_dir("REUTERS"), get_tmp_registry()
+    )
+  }
+)
