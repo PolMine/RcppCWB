@@ -1,25 +1,24 @@
 ## General remarks
 
-After the previous major release that ensured RcppCWB compatibility with UCRT, 
-this is a "standard" release with some new features, improvements and bug fixes.
-A remaining compiler warning I had seen and reported has been fixed.
+This is a "standard" release with some new functionality. No changes to the 
+setup of the package.
 
-CRAN package check results report 'GNU make is a SystemRequirements'. Using GNU
+Previous aspects I repeat here:
+
+- CRAN package check results report 'GNU make is a SystemRequirements'. Using GNU
 make remains important for the portability of the C code. There would be a great
 cost for dropping GNU make and I would not do it unless it is absolutely
 necessary.
 
-Installed package size is slightly larger than 5MB on macOS and Windows
+- Installed package size is slightly larger than 5MB on macOS and Windows
 release/oldrel. The size of the libs dir is the culprit here, so this is hard to
 change.
 
 
 ## Test environments
 
-* Standard checks with R-hub
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* local macOS R 4.1.2 (arm64)
-* R winbuilder (devel and release)
+* local macOS R 4.1.3 (arm64)
 
 
 ## R CMD check results

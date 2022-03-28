@@ -509,7 +509,11 @@ corpus_property <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), pr
 #' corpus_registry_dir("FOO") # NA returned
 corpus_registry_dir <- function(corpus){
   registry <- .corpus_registry_dir(tolower(corpus))
-  if (is.na(registry)) registry else path(registry)
+  if (length(registry) == 1L){
+    if (is.na(registry)) registry else path(registry)
+  } else {
+    path(registry)
+  }
 }
 
 #' Check whether corpus is loaded
