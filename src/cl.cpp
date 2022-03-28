@@ -751,3 +751,35 @@ Rcpp::StringVector cl_list_corpora(){
 }
 
 
+// [[Rcpp::export(name=".corpus_registry_dir")]]
+Rcpp::StringVector corpus_registry_dir(SEXP corpus){
+  
+  char* registry_name = strdup(Rcpp::as<std::string>(corpus).c_str());
+  Corpus *c;
+  int i, n;
+
+  n = 0;
+  for (c = loaded_corpora; c != NULL; c = c->next){
+    if (cl_streq(registry_name, c->registry_name)) n++;
+  }
+  
+  if (n > 0){
+    
+    Rcpp::StringVector reg(n);
+    
+    i = 0;
+    for (c = loaded_corpora; c != NULL; c = c->next) {
+      if (cl_streq(registry_name, c->registry_name)){
+        reg[i] = c->registry_dir;
+        i++;
+        if (i == n) break; /* stop early when work is done */
+      };
+    }
+    return reg;
+  }
+  
+  Rcpp::StringVector reg(1);
+  reg[0] = NA_STRING;
+  return reg;
+}
+

@@ -8,6 +8,7 @@
 \alias{corpus_s_attributes}
 \alias{corpus_properties}
 \alias{corpus_property}
+\alias{corpus_registry_dir}
 \title{Get information from registry file}
 \usage{
 corpus_data_dir(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
@@ -23,6 +24,8 @@ corpus_s_attributes(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 corpus_properties(corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 
 corpus_property(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), property)
+
+corpus_registry_dir(corpus)
 }
 \arguments{
 \item{corpus}{A length-one \code{character} vector with the corpus ID.}
@@ -56,6 +59,12 @@ properties defined in the registry file.
 
 \code{corpus_property()} returns the value of a corpus property defined
 in the registry file, or \code{NA} if the property requested is undefined.
+
+\code{corpus_get_registry()} will extract the registry directory with the
+registry file defining a corpus from the internal C representation of
+loaded corpora. The \code{character} vector that is returned may be > 1 if there
+are several corpora with the same id defined in registry files in different
+(registry) directories. If the corpus is not found, \code{NA} is returned.
 }
 \examples{
 corpus_data_dir("REUTERS", registry = get_tmp_registry())
@@ -69,4 +78,6 @@ corpus_property(
   registry = get_tmp_registry(),
   property = "language"
 )
+corpus_registry_dir("REUTERS")
+corpus_registry_dir("FOO") # NA returned
 }

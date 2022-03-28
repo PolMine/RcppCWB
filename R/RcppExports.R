@@ -217,6 +217,10 @@
     .Call(`_RcppCWB_cl_list_corpora`)
 }
 
+.corpus_registry_dir <- function(corpus) {
+    .Call(`_RcppCWB_corpus_registry_dir`, corpus)
+}
+
 .init_cqp <- function() {
     invisible(.Call(`_RcppCWB_init_cqp`))
 }

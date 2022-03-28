@@ -990,6 +990,27 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
     }
 
+    inline Rcpp::StringVector _corpus_registry_dir(SEXP corpus) {
+        typedef SEXP(*Ptr__corpus_registry_dir)(SEXP);
+        static Ptr__corpus_registry_dir p__corpus_registry_dir = NULL;
+        if (p__corpus_registry_dir == NULL) {
+            validateSignature("Rcpp::StringVector(*_corpus_registry_dir)(SEXP)");
+            p__corpus_registry_dir = (Ptr__corpus_registry_dir)R_GetCCallable("RcppCWB", "_RcppCWB__corpus_registry_dir");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p__corpus_registry_dir(Shield<SEXP>(Rcpp::wrap(corpus)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+    }
+
     inline void _init_cqp() {
         typedef SEXP(*Ptr__init_cqp)();
         static Ptr__init_cqp p__init_cqp = NULL;

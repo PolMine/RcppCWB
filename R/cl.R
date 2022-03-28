@@ -498,6 +498,20 @@ corpus_property <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), pr
 }
 
 
+#' @details `corpus_get_registry()` will extract the registry directory with the
+#'   registry file defining a corpus from the internal C representation of
+#'   loaded corpora. The `character` vector that is returned may be > 1 if there
+#'   are several corpora with the same id defined in registry files in different
+#'   (registry) directories. If the corpus is not found, `NA` is returned.
+#' @rdname registry_info
+#' @examples
+#' corpus_registry_dir("REUTERS")
+#' corpus_registry_dir("FOO") # NA returned
+corpus_registry_dir <- function(corpus){
+  registry <- .corpus_registry_dir(tolower(corpus))
+  if (is.na(registry)) r else path(registry)
+}
+
 #' Check whether corpus is loaded
 #' 
 #' @inheritParams corpus_data_dir
