@@ -16,3 +16,4 @@
 ^include$
 ^CRAN-RELEASE$
 ^\.github$
+^CRAN-SUBMISSION$
