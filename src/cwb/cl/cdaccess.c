@@ -28,6 +28,7 @@
 #include "special-chars.h"
 #include "bitio.h"
 #include "compression.h"
+#include <stdint.h>
 void Rprintf(const char *, ...);
 
 /**
@@ -979,7 +980,10 @@ cl_read_stream(PositionStream ps, int *buffer, int buffer_size)
     }
   }
   else {
-    memcpy(buffer, ps->base + ps->nr_items, items_to_read * sizeof(int));
+  size_t k;
+  k =  items_to_read * sizeof(int);
+  if (k < PTRDIFF_MAX){
+  memcpy(buffer, ps->base + ps->nr_items, k);
     ps->nr_items += items_to_read;
 
     /* convert network byte order to native integers */
@@ -987,6 +991,7 @@ cl_read_stream(PositionStream ps, int *buffer, int buffer_size)
       buffer[i] = ntohl(buffer[i]);
   }
 
+  }
   return items_to_read;
 }
 

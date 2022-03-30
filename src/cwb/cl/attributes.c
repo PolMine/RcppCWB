@@ -29,6 +29,14 @@ void Rprintf(const char *, ...);
 #include "attributes.h"
 #include "makecomps.h"
 
+#ifdef __MINGW__
+#undef SUBDIR_SEPARATOR
+#undef SUBDIR_SEP_STRING
+#define SUBDIR_SEPARATOR '/'
+#define SUBDIR_SEP_STRING "/"
+#endif
+
+
 
 /*
  *******************************************************************

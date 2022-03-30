@@ -45,6 +45,13 @@
 
 void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */
 
+#ifdef __MINGW__
+#undef SUBDIR_SEPARATOR
+#undef SUBDIR_SEP_STRING
+#define SUBDIR_SEPARATOR '/'
+#define SUBDIR_SEP_STRING "/"
+#endif
+
 /* ---------------------------------------------------------------------- */
 
 /** User privileges of new files (octal format) */
@@ -425,27 +432,27 @@ s_att_print_registry_line(s_att_builder *encoder, FILE *dst, int print_comment)
 
     if (print_comment) {
       /* print comment showing corresponding XML tags */
-      Rprintf("# <%s", encoder->name);
+      fprintf(dst, "# <%s", encoder->name);
       if (encoder->has_children) {  /* if there are element attributes, show them in the order of declaration */
         n_atts = cl_string_list_size(encoder->el_atts_list);
         for (i = 0; i < n_atts; i++)
-          Rprintf(" %s=\"..\"", cl_string_list_get(encoder->el_atts_list, i));
+          fprintf(dst, " %s=\"..\"", cl_string_list_get(encoder->el_atts_list, i));
       }
-      Rprintf("> ... </%s>\n", encoder->name);
+      fprintf(dst, "> ... </%s>\n", encoder->name);
       /* print comment showing hierarchical structure (if not flat) */
       if (encoder->max_recursion == 0)
-        Rprintf("# (no recursive embedding allowed)\n");
+        fprintf(dst, "# (no recursive embedding allowed)\n");
       else if (encoder->max_recursion > 0) {
         n_atts = encoder->max_recursion;
-        Rprintf("# (%d levels of embedding: <%s>", n_atts, encoder->name);
+        fprintf(dst, "# (%d levels of embedding: <%s>", n_atts, encoder->name);
         for (i = 1; i <= n_atts; i++)
-          Rprintf(", <%s>", encoder->recursion_children[i]->name);
-        Rprintf(").\n");
+          fprintf(dst, ", <%s>", encoder->recursion_children[i]->name);
+        fprintf(dst, ").\n");
       }
     }
 
     /* print registry line for this s-attribute */
-    Rprintf(encoder->store_values ? "STRUCTURE %-20s # [annotations]\n" : "STRUCTURE %s\n", encoder->name);
+    fprintf(dst, encoder->store_values ? "STRUCTURE %-20s # [annotations]\n" : "STRUCTURE %s\n", encoder->name);
 
     /* print recursion children, then element attribute children */
     if (encoder->max_recursion > 0) {
@@ -466,7 +473,7 @@ s_att_print_registry_line(s_att_builder *encoder, FILE *dst, int print_comment)
 
     /* print blank line after each att. declaration block headed by comment */
     if (print_comment)
-      Rprintf("\n");
+      fprintf(dst, "\n");
   }
 }
 

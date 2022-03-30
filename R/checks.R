@@ -18,10 +18,10 @@
 #' @export check_registry
 check_registry <- function(registry){
   if (length(registry) != 1)
-    stop("registry needs to be a character vector length 1")
+    stop("registry needs to be a length-one character vector")
   if (!is.character(registry))
     stop("registry needs to be a character vector (is.character not TRUE)")
-  if(!file.exists(registry))
+  if(!dir.exists(registry))
     stop("the registry directory provided does not exist")
   if (!file.info(registry)$isdir)
     stop("registry exists, but is not a directory")
@@ -31,7 +31,10 @@ check_registry <- function(registry){
 
 #' @rdname checks
 #' @export check_corpus
+#' @importFrom fs path
 check_corpus <- function(corpus, registry){
+  
+  registry <- fs::path(registry)
   
   if (length(corpus) != 1L)
     stop("corpus needs to be a vector of length 1")
@@ -39,16 +42,23 @@ check_corpus <- function(corpus, registry){
   if (!is.character(corpus))
     stop("corpus needs to be a character vector")
   
-  registry <- normalizePath(registry, winslash = "/")
   if (isFALSE(dir.exists(registry)))
     stop(sprintf("Registry directory '%s' does not exist.", registry))
   
   if (isFALSE(cqp_is_initialized())) cqp_initialize(registry = registry)
-  if (cqp_get_registry() != registry){
-    warning(sprintf("Resetting registry directory from '%s' to '%s'", cqp_get_registry(), registry))
-    cqp_reset_registry(registry = registry)
-  }
   
+  if (!tolower(corpus) %in% cl_list_corpora()){
+    
+    success_cl <- cl_load_corpus(corpus = corpus, registry = registry)
+    if (isFALSE(success_cl))
+      warning(sprintf("corpus '%s' is not loaded and cannot be loaded", corpus))
+    
+    success_cqp <- cqp_load_corpus(corpus = toupper(corpus), registry = registry)
+    if (isFALSE(success_cqp))
+      warning(sprintf("corpus '%s' is not loaded and cannot be loaded", corpus))
+    
+  }
+
   if (.check_corpus(toupper(corpus)) == 0L)
     stop(sprintf("corpus %s is not available (check whether there is a typo)", sQuote(corpus)))
   
@@ -88,9 +98,7 @@ check_p_attribute <- function(p_attribute, corpus, registry = Sys.getenv("CORPUS
 check_strucs <- function(corpus, s_attribute, strucs, registry){
   if (!is.numeric(strucs))
     stop("strucs needs to be a integer vector")
-  if (min(strucs) < 0)
-    stop("all values of vector strucs need to be >= 0")
-  if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1))
+  if (max(strucs) > (cl_attribute_size(corpus, attribute = s_attribute, "s", registry = registry) - 1L))
     stop("highest value of strucs may not be larger than size of structural attribute")
   if (any(is.na(strucs)))
     stop("there is an NA value among strucs")
@@ -106,9 +114,9 @@ check_region_matrix <- function(region_matrix){
   return( TRUE )
 }
 
-#' @export check_cqp_query
+#' @export check_query
 #' @rdname checks
-check_cqp_query <- function(query){
+check_query <- function(query){
   if (!substr(query, start = nchar(query), stop = nchar(query)) == ";"){
     encoding_query <- Encoding(query)
     retval <- paste0(query, ";", sep = "")
@@ -130,6 +138,8 @@ check_cpos <- function(corpus, p_attribute = "word", cpos, registry = Sys.getenv
     stop("all corpus positions (cpos) need to be <= attribute size, not TRUE")
   if (any(is.na(cpos)))
     stop("there are NA values among the corpus positions")
+  if (is.null(cpos))
+    warning("vector of corpus positions (cpos) is NULL")
   return( TRUE )
 }
 

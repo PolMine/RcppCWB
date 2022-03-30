@@ -1,5 +1,5 @@
 library(RcppCWB)
-
+use_tmp_registry()
 testthat::context("get_cbow_matrix")
 
 test_that(
@@ -8,7 +8,7 @@ test_that(
     M <- get_cbow_matrix(
       corpus = "REUTERS",
       p_attribute = "word",
-      registry = use_tmp_registry(),
+      registry = get_tmp_registry(),
       matrix = matrix(c(0, 91), nrow = 1),
       window = 5
     )

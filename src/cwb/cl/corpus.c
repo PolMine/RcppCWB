@@ -393,7 +393,8 @@ cl_new_corpus(char *registry_dir, char *registry_name)
           loaded_corpora = corpus;
           /* check whether ID field corresponds to name of registry file */
           if (corpus->id && (strcmp(corpus->id, canonical_name) != 0)) {
-            Rprintf(
+            fprintf(
+                stderr,
                 "CL warning: ID field '%s' does not match name of registry file %s/%s\n",
                 corpus->id, real_registry_name, canonical_name);
           }

@@ -11,15 +11,14 @@
 #' @rdname get_count_vector
 #' @export get_count_vector
 #' @examples 
-#' registry <- use_tmp_registry()
 #' y <- get_count_vector(
 #'   corpus = "REUTERS", p_attribute = "word",
-#'   registry = registry
+#'   registry = get_tmp_registry()
 #'   )
 #' df <- data.frame(token_id = 0:(length(y) - 1), count = y)
 #' df[["token"]] <- cl_id2str(
 #'   "REUTERS", p_attribute = "word",
-#'   id = df[["token_id"]], registry = registry
+#'   id = df[["token_id"]], registry = get_tmp_registry()
 #'   )
 #' df <- df[,c("token", "token_id", "count")] # reorder columns
 #' df <- df[order(df[["count"]], decreasing = TRUE),]

@@ -528,7 +528,7 @@ cat_listed_corpus(CorpusList *cl,
     if (printHeader)
       print_corpus_info_header(cl, dst->stream, mode, 1);
     else if (printNrMatches && mode == PrintASCII)
-      Rprintf("%d matches.\n", cl->size);
+      fprintf(dst->stream, "%d matches.\n", cl->size);
 
     print_concordance_body(cl, dst->stream,
                            isatty(fileno(dst->stream)) || dst->is_paging,
@@ -543,7 +543,7 @@ cat_listed_corpus(CorpusList *cl,
  *
  * @see           MessageType
  * @param type    Specifies what type of message (messages of some types are not always printed)
- * @param format  Format string (and ...) are passed as arguments to vRprintf().
+ * @param format  Format string (and ...) are passed as arguments to vfprintf().
  */
 void
 cqpmessage(MessageType type, const char *format, ...)
@@ -869,33 +869,33 @@ print_tabulation(CorpusList *cl, int first, int last, struct Redir *dst)
         if (cpos >= 0 && cpos <= cl->mother_size) {
           /* valid cpos: print cpos or requested attribute */
           if (item->attribute_type == ATT_NONE)
-            Rprintf("%d", cpos);
+            fprintf(dst->stream, "%d", cpos);
           else {
             char *string = item->attribute_type == ATT_POS ?  cl_cpos2str(item->attribute, cpos) : cl_cpos2struc2str(item->attribute, cpos);
             if (string) {
               if (item->flags) {
                 /* get canonical string as newly alloc'ed duplicate, then print */
                 char *copy = cl_string_canonical(string, cl->corpus->charset, item->flags, CL_STRING_CANONICAL_STRDUP);
-                Rprintf("%s", copy);
+                fprintf(dst->stream, "%s", copy);
                 cl_free(copy);
               }
               else
-                Rprintf("%s", string);
+                fprintf(dst->stream, "%s", string);
             }
           }
         }
         else {
           /* cpos out of bounds: print -1 or empty string */
           if (item->attribute_type == ATT_NONE)
-            Rprintf("-1");
+            fprintf(dst->stream, "-1");
         }
         if (cpos < end)         /* tokens in a range item are separated by blanks */
-          Rprintf(" ");
+          fprintf(dst->stream, " ");
       }
       if (item->next)           /* multiple tabulation items are separated by TABs */
-        Rprintf("\t");
+        fprintf(dst->stream, "\t");
     }
-    Rprintf("\n");
+    fprintf(dst->stream, "\n");
   }
 
   close_rd_output_stream(dst);

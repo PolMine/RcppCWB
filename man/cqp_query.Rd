@@ -5,6 +5,7 @@
 \alias{cqp_dump_subcorpus}
 \alias{cqp_subcorpus_size}
 \alias{cqp_list_subcorpora}
+\alias{cqp_drop_subcorpus}
 \title{Execute CQP Query and Retrieve Results.}
 \usage{
 cqp_query(corpus, query, subcorpus = "QUERY")
@@ -14,6 +15,8 @@ cqp_dump_subcorpus(corpus, subcorpus = "QUERY")
 cqp_subcorpus_size(corpus, subcorpus = "QUERY")
 
 cqp_list_subcorpora(corpus)
+
+cqp_drop_subcorpus(corpus)
 }
 \arguments{
 \item{corpus}{a CWB corpus}
@@ -34,13 +37,6 @@ query. The \code{cqp_dump_subcorpus} function will return a two-column matrix
 with the left and right corpus positions of the matches for the CQP query.
 }
 \examples{
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-
-if (!cqp_is_initialized()){
-  cqp_initialize(registry = registry)
-} else {
-  if (cqp_get_registry() != registry) cqp_reset_registry(registry)
-}
 cqp_query(corpus = "REUTERS", query = '"oil";')
 cqp_subcorpus_size("REUTERS")
 cqp_dump_subcorpus("REUTERS")

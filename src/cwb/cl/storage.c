@@ -76,7 +76,7 @@ NwriteInt(int val, FILE *fd)
   word = htonl(val);
   if (1 != fwrite(&word, sizeof(int), 1, fd)) {
     perror("File write error");
-    exit(1);
+    return;
   }
 }
 
@@ -95,7 +95,7 @@ NreadInt(int *val, FILE *fd)
   int word;
   if (1 != fread(&word, sizeof(int), 1, fd)) {
     perror("File read error");
-    exit(1);
+    return;
   }
   *val = ntohl(word);
 }
@@ -121,7 +121,7 @@ NwriteInts(int *vals, int nr_vals, FILE *fd)
     word = htonl(vals[k]);
     if (1 != fwrite(&word, sizeof(int), 1, fd)) {
       perror("File write error");
-      exit(1);
+      return;
     }
   }
 }
@@ -146,7 +146,7 @@ NreadInts(int *vals, int nr_vals, FILE *fd)
   for (k = 0; k < nr_vals; k++) {
     if (1 != fread(&word, sizeof(int), 1, fd)) {
       perror("File read error");
-      exit(1);
+      return;
     }
     vals[k] = ntohl(word);
   }

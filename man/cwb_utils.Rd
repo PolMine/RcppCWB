@@ -7,11 +7,26 @@
 \alias{cwb_encode}
 \title{CWB Tools for Creating Corpora}
 \usage{
-cwb_makeall(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_makeall(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  quietly = FALSE
+)
 
-cwb_huffcode(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_huffcode(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  quietly = FALSE
+)
 
-cwb_compress_rdx(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"))
+cwb_compress_rdx(
+  corpus,
+  p_attribute,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  quietly = FALSE
+)
 
 cwb_encode(
   corpus,
@@ -20,7 +35,12 @@ cwb_encode(
   vrt_dir,
   encoding = "utf8",
   p_attributes = c("word", "pos", "lemma"),
-  s_attributes
+  s_attributes,
+  skip_blank_lines = TRUE,
+  strip_whitespace = TRUE,
+  xml = TRUE,
+  quietly = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -31,13 +51,18 @@ cwb_encode(
 \item{registry}{path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY}
 
+\item{quietly}{A \code{logical} value, whether to turn off messages (including
+warnings).}
+
 \item{data_dir}{The data directory where \code{cwb_encode} will put the binary
 files of the indexed corpus.}
 
 \item{vrt_dir}{Directory with input corpus files (verticalised format / file
 ending *.vrt).}
 
-\item{encoding}{The encoding of the files to be encoded, defaults to "utf8".}
+\item{encoding}{The encoding of the files to be encoded. Needs to be an
+encoding supported by CWB, see \code{cwb_charsets()}. "UTF-8" is taken as
+"utf8". Defaults to "utf8" (recommended charset).}
 
 \item{p_attributes}{Positional attributes (p-attributes) to be declared.}
 
@@ -47,6 +72,17 @@ XML elements present in the corpus. Character vectors making up the list
 declare the attributes that include the metadata of regions. To declare a
 structural attribute without annotations, provide a zero-length character
 vector using \code{character()} - see examples.}
+
+\item{skip_blank_lines}{A \code{logical} value, whether to skip blank lines in the
+input.}
+
+\item{strip_whitespace}{A \code{logical} value, whether to strip whitespace from
+tokens}
+
+\item{xml}{A \code{logical} value, whether input is XML.}
+
+\item{verbose}{A \code{logical} value, whether to show progress information
+(counter of tokens processed).}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
@@ -62,50 +98,55 @@ positional attribute, and produce all components.
 # The first step in the following example is to copy the raw
 # corpus to a temporary place.
 
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 
-tmpdir <- normalizePath(tempdir(), winslash = "/")
-tmp_regdir <- file.path(tmpdir, "registry_tmp", fsep = "/")
-tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = "/")
-tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = "/")
-if (!file.exists(tmp_regdir)) dir.create(tmp_regdir)
+tmp_data_dir <- file.path(tempdir(), "indexed_corpora")
+tmp_unga_dir <- file.path(tmp_data_dir, "unga2")
 if (!file.exists(tmp_data_dir)) dir.create(tmp_data_dir)
 if (!file.exists(tmp_unga_dir)){
   dir.create(tmp_unga_dir)
 } else {
   file.remove(list.files(tmp_unga_dir, full.names = TRUE))
 }
-regfile <- readLines(file.path(registry, "unga"))
+
+regfile <- readLines(
+  system.file(package = "RcppCWB", "extdata", "cwb", "registry", "unga")
+)
 regfile[grep("^HOME", regfile)] <- sprintf('HOME "\%s"', tmp_unga_dir)
-writeLines(text = regfile, con = file.path(tmp_regdir, "unga"))
+regfile[grep("^ID", regfile)] <- "ID unga2"
+writeLines(text = regfile, con = file.path(get_tmp_registry(), "unga2"))
 for (x in list.files(home_dir, full.names = TRUE)){
   file.copy(from = x, to = tmp_unga_dir)
 }
 
 # perform cwb_makeall (equivalent to cwb-makeall command line utility)
-cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+cwb_makeall(corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry())
+cl_load_corpus("UNGA2", registry = get_tmp_registry())
+cqp_load_corpus("UNGA2", registry = get_tmp_registry())
 
 # see whether it works
 ids_sentence_1 <- cl_cpos2id(
-  corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
+  corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry(),
   cpos = 0:83
   )
 tokens_sentence_1 <- cl_id2str(
-  corpus = "UNGA", p_attribute = "word",
-  registry = tmp_regdir, id = ids_sentence_1
+  corpus = "UNGA2", p_attribute = "word",
+  registry = get_tmp_registry(), id = ids_sentence_1
   )
 sentence <- gsub("\\\\s+([\\\\.,])", "\\\\1", paste(tokens_sentence_1, collapse = " "))
 
 # perform cwb_huffcode (equivalent to cwb-makeall command line utility)
-if (.Platform$OS.type != "windows"){
-  cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-}
-if (.Platform$OS.type != "windows"){
-  cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-}
-if (.Platform$OS.type != "windows"){
-data_dir <- file.path(tempdir(), "tmp_data_dir")
+cwb_huffcode(
+  corpus = "UNGA2",
+  p_attribute = "word",
+  registry = get_tmp_registry()
+)
+cwb_compress_rdx(
+  corpus = "UNGA2",
+  p_attribute = "word",
+  registry = get_tmp_registry()
+)
+data_dir <- file.path(tempdir(), "bt_data_dir")
 dir.create(data_dir)
 
 cwb_encode(
@@ -129,5 +170,4 @@ cwb_encode(
 
 unlink(data_dir)
 unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
-}
 }

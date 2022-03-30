@@ -65,26 +65,50 @@ to make the translations between corpus positions (cpos) and strucs
 (struc).
 }
 \examples{
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-
 # get metadata for matches of token
 # scenario: id of the texts with occurrence of 'oil'
 token_to_get <- "oil"
-token_id <- cl_str2id("REUTERS", p_attribute = "word", str = "oil")
-token_cpos <- cl_id2cpos("REUTERS", p_attribute = "word", id = token_id)
-strucs <- cl_cpos2struc("REUTERS", s_attribute = "id", cpos = token_cpos)
+token_id <- cl_str2id("REUTERS", p_attribute = "word", str = "oil", get_tmp_registry())
+token_cpos <- cl_id2cpos("REUTERS", p_attribute = "word", id = token_id, get_tmp_registry())
+strucs <- cl_cpos2struc("REUTERS", s_attribute = "id", cpos = token_cpos, get_tmp_registry())
 strucs_unique <- unique(strucs)
-text_ids <- cl_struc2str("REUTERS", s_attribute = "id", struc = strucs_unique)
+text_ids <- cl_struc2str("REUTERS", s_attribute = "id", struc = strucs_unique, get_tmp_registry())
 
 # get the full text of the first text with match for 'oil'
-left_cpos <- cl_cpos2lbound("REUTERS", s_attribute = "id", cpos = min(token_cpos))
-right_cpos <- cl_cpos2rbound("REUTERS", s_attribute = "id", cpos = min(token_cpos))
-txt <- cl_cpos2str("REUTERS", p_attribute = "word", cpos = left_cpos:right_cpos)
+left_cpos <- cl_cpos2lbound(
+  "REUTERS", s_attribute = "id",
+  cpos = min(token_cpos),
+  registry = get_tmp_registry()
+)
+right_cpos <- cl_cpos2rbound(
+  "REUTERS",
+  s_attribute = "id",
+  cpos = min(token_cpos),
+  registry = get_tmp_registry()
+)
+txt <- cl_cpos2str(
+  "REUTERS", p_attribute = "word",
+  cpos = left_cpos:right_cpos,
+  registry = get_tmp_registry()
+)
 fulltext <- paste(txt, collapse = " ")
 
 # alternativ approach to achieve same result
-first_struc_match_oil <- cl_cpos2struc("REUTERS", s_attribute = "id", cpos = min(token_cpos))
-cpos_struc <- cl_struc2cpos("REUTERS", s_attribute = "id", struc = first_struc_match_oil)
-txt <- cl_cpos2str("REUTERS", p_attribute = "word", cpos = cpos_struc[1]:cpos_struc[2])
+first_struc_match_oil <- cl_cpos2struc(
+  "REUTERS", s_attribute = "id",
+  cpos = min(token_cpos),
+  registry = get_tmp_registry()
+  )
+cpos_struc <- cl_struc2cpos(
+  "REUTERS", s_attribute = "id",
+  struc = first_struc_match_oil,
+  registry = get_tmp_registry()
+)
+txt <- cl_cpos2str(
+  "REUTERS",
+  p_attribute = "word",
+  cpos = cpos_struc[1]:cpos_struc[2],
+  registry = get_tmp_registry()
+)
 fulltext <- paste(txt, collapse = " ")
 }

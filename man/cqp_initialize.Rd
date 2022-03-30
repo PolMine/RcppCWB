@@ -3,20 +3,34 @@
 \name{cqp_initialize}
 \alias{cqp_initialize}
 \alias{cqp_is_initialized}
+\alias{cqp_verbosity}
 \alias{cqp_get_registry}
 \alias{cqp_reset_registry}
+\alias{cqp_load_corpus}
 \title{Initialize Corpus Query Processor (CQP).}
 \usage{
 cqp_initialize(registry = Sys.getenv("CORPUS_REGISTRY"))
 
 cqp_is_initialized()
 
+cqp_verbosity(silent, verbose)
+
 cqp_get_registry()
 
 cqp_reset_registry(registry = Sys.getenv("CORPUS_REGISTRY"))
+
+cqp_load_corpus(corpus, registry)
 }
 \arguments{
 \item{registry}{the registry directory}
+
+\item{silent}{A single \code{logical} value, whether to be silent and suppress CQP
+messages (\code{TRUE}), or not (\code{FALSE}).}
+
+\item{verbose}{A single \code{logical} value, whether to show verbose parser
+output (\code{TRUE}) or not (\code{FALSE}).}
+
+\item{corpus}{ID of a CWB corpus (length-one \code{character}).}
 }
 \description{
 CQP needs to know where to look for CWB indexed corpora. To initialize CQP,
@@ -25,14 +39,15 @@ call \code{cqp_initialize}. To reset the registry, use the function
 \code{cqp_get_registry}. To get the initialization status, use
 \code{cqp_is_initialized}
 }
+\details{
+\code{cqp_load_corpus} will return a \code{logical} value - \code{TRUE} if corpus
+has been loaded successfully, \code{FALSE} if not.
+}
 \examples{
 cqp_is_initialized() # check initialization status
 if (!cqp_is_initialized()) cqp_initialize()
 cqp_is_initialized() # check initialization status (TRUE now?)
 cqp_get_registry() # get registry dir used by CQP
-
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-if (cqp_get_registry() != registry) cqp_reset_registry(registry = registry)
 cqp_list_corpora() # get list of corpora
 }
 \author{

@@ -18,6 +18,9 @@
 
 void Rprintf(const char *, ...);
 #include <strings.h>
+#ifdef __MINGW__
+#include "../cl/endian2.h"
+#endif
 
 #include "../cl/cl.h"
 #include "../cl/cwb-globals.h"
@@ -659,6 +662,9 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
         return 1;
       }
 
+      #ifdef __MINGW__
+      int word, success;
+      #endif
       for (i = 0; i < hc->length; i++) {
 
         /* SYNCHRONIZE */
@@ -666,7 +672,13 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
           if (i > 0)
             BFflush(&bfd);
           pos = BFposition(&bfd);
+          #ifndef __MINGW__
           NwriteInt(pos, sync);
+          #else
+          word = htonl(pos);
+          success = fwrite(&word, sizeof(int), 1, sync);
+          if (success != 1) Rprintf("File write error!\n");
+          #endif
         }
 
         id = cl_cpos2id(attr, i);

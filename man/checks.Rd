@@ -8,7 +8,7 @@
 \alias{check_p_attribute}
 \alias{check_strucs}
 \alias{check_region_matrix}
-\alias{check_cqp_query}
+\alias{check_query}
 \alias{check_cpos}
 \alias{check_id}
 \title{Check Input to Rcpp Functions.}
@@ -33,7 +33,7 @@ check_strucs(corpus, s_attribute, strucs, registry)
 
 check_region_matrix(region_matrix)
 
-check_cqp_query(query)
+check_query(query)
 
 check_cpos(
   corpus,

@@ -7,6 +7,7 @@
 ^src/cwb/doc$
 ^src/cwb/man$
 ^src/cwb/instutils$
+^src/cwb/editline$
 ^_pkgdown\.yml$
 ^docs$
 ^CONDUCT.md$
@@ -15,3 +16,4 @@
 ^include$
 ^CRAN-RELEASE$
 ^\.github$
+^CRAN-SUBMISSION$

@@ -9,7 +9,7 @@ Automated patches are not performed using the `PatchEngine` R6 class defined in 
 
 - [bison](https://www.gnu.org/software/bison/): The PatchCWB mechanism has been developed using GNU Bison 2.3. The latest version installable via `brew` is v3.7.4. Note that the latest version available would be v3.8.
 
-- [flex](): The PatchCWB mechanism has been developed using flex 2.5.35 Apple(flex-32). A new version (v2.6.4) can be installed using `brew`. The latest version available is at https://github.com/westes/flex. 
+- [flex](https://github.com/westes/flex): The PatchCWB mechanism has been developed using flex 2.5.35 Apple(flex-32). An Update of the Xcode command line developer tools includes flex 2.6.4 Apple(flex-34), which is the latest version to date. This (v2.6.4) is the version used for the patches.
 
 - [makeheaders](): Utility to generate a C header file from the original C code. Available via [Fossil](https://fossil-scm.org/home/file/src/makeheaders.c) and at [GitHub](https://github.com/bjconlan/makeheaders.git). To build the executable, cd into the directory with `makeheaders.c` and run:
 

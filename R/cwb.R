@@ -9,6 +9,10 @@
 #' @param p_attribute name p-attribute
 #' @param registry path to the registry directory, defaults to the value of the
 #'   environment variable CORPUS_REGISTRY
+#' @param quietly A `logical` value, whether to turn off messages (including
+#'   warnings).
+#' @param verbose A `logical` value, whether to show progress information
+#'   (counter of tokens processed).
 #' @examples
 #' # The package includes and 'unfinished' corpus of debates in the UN General 
 #' # Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is
@@ -17,48 +21,53 @@
 #' # The first step in the following example is to copy the raw
 #' # corpus to a temporary place.
 #' 
-#' registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
 #' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
 #' 
-#' tmpdir <- normalizePath(tempdir(), winslash = "/")
-#' tmp_regdir <- file.path(tmpdir, "registry_tmp", fsep = "/")
-#' tmp_data_dir <- file.path(tmpdir, "indexed_corpora", fsep = "/")
-#' tmp_unga_dir <- file.path(tmp_data_dir, "unga", fsep = "/")
-#' if (!file.exists(tmp_regdir)) dir.create(tmp_regdir)
+#' tmp_data_dir <- file.path(tempdir(), "indexed_corpora")
+#' tmp_unga_dir <- file.path(tmp_data_dir, "unga2")
 #' if (!file.exists(tmp_data_dir)) dir.create(tmp_data_dir)
 #' if (!file.exists(tmp_unga_dir)){
 #'   dir.create(tmp_unga_dir)
 #' } else {
 #'   file.remove(list.files(tmp_unga_dir, full.names = TRUE))
 #' }
-#' regfile <- readLines(file.path(registry, "unga"))
+#' 
+#' regfile <- readLines(
+#'   system.file(package = "RcppCWB", "extdata", "cwb", "registry", "unga")
+#' )
 #' regfile[grep("^HOME", regfile)] <- sprintf('HOME "%s"', tmp_unga_dir)
-#' writeLines(text = regfile, con = file.path(tmp_regdir, "unga"))
+#' regfile[grep("^ID", regfile)] <- "ID unga2"
+#' writeLines(text = regfile, con = file.path(get_tmp_registry(), "unga2"))
 #' for (x in list.files(home_dir, full.names = TRUE)){
 #'   file.copy(from = x, to = tmp_unga_dir)
 #' }
 #' 
 #' # perform cwb_makeall (equivalent to cwb-makeall command line utility)
-#' cwb_makeall(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
+#' cwb_makeall(corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry())
+#' cl_load_corpus("UNGA2", registry = get_tmp_registry())
+#' cqp_load_corpus("UNGA2", registry = get_tmp_registry())
 #' 
 #' # see whether it works
 #' ids_sentence_1 <- cl_cpos2id(
-#'   corpus = "UNGA", p_attribute = "word", registry = tmp_regdir,
+#'   corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry(),
 #'   cpos = 0:83
 #'   )
 #' tokens_sentence_1 <- cl_id2str(
-#'   corpus = "UNGA", p_attribute = "word",
-#'   registry = tmp_regdir, id = ids_sentence_1
+#'   corpus = "UNGA2", p_attribute = "word",
+#'   registry = get_tmp_registry(), id = ids_sentence_1
 #'   )
 #' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
 #' 
 #' # perform cwb_huffcode (equivalent to cwb-makeall command line utility)
-#' if (.Platform$OS.type != "windows"){
-#'   cwb_huffcode(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-#' }
+#' cwb_huffcode(
+#'   corpus = "UNGA2",
+#'   p_attribute = "word",
+#'   registry = get_tmp_registry()
+#' )
 #' @rdname cwb_utils
 #' @export cwb_makeall
-cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
+#' @importFrom utils capture.output
+cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
   check_registry(registry)
   regfile <- file.path(normalizePath(registry, winslash = "/"), tolower(corpus), fsep = "/")
   if (!file.exists(regfile)){
@@ -72,24 +81,49 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
     cqp_reset_registry(registry = registry)
   }
   
-  .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  makeall <- function() .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  if (quietly){
+    capture.output({success <- makeall()}, type = "output")
+  } else {
+    success <- makeall()
+  }
+  success
 }
 
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
-cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+  huffcode <- function()
+    .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  
+  if (quietly){
+    capture.output({success <- huffcode()}, type = "output")
+  } else {
+    success <- huffcode()
+  }
+  success
+  
 }
 
 #' @rdname cwb_utils
 #' @export cwb_compress_rdx
 #' @examples 
-#' if (.Platform$OS.type != "windows"){
-#'   cwb_compress_rdx(corpus = "UNGA", p_attribute = "word", registry = tmp_regdir)
-#' }
-cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+#' cwb_compress_rdx(
+#'   corpus = "UNGA2",
+#'   p_attribute = "word",
+#'   registry = get_tmp_registry()
+#' )
+cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+  compress_rdx <-function()
+    .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  
+  if (quietly){
+    capture.output({success <- compress_rdx()}, type = "output")
+  } else {
+    success <- compress_rdx()
+  }
+  success
 }
 
 #' @param p_attributes Positional attributes (p-attributes) to be declared.
@@ -97,18 +131,25 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #'   files of the indexed corpus.
 #' @param vrt_dir Directory with input corpus files (verticalised format / file
 #'   ending *.vrt).
-#' @param encoding The encoding of the files to be encoded, defaults to "utf8".
+#' @param encoding The encoding of the files to be encoded. Needs to be an
+#'   encoding supported by CWB, see `cwb_charsets()`. "UTF-8" is taken as
+#'   "utf8". Defaults to "utf8" (recommended charset).
 #' @param s_attributes A `list` of named `character` vectors to declare
 #'   structural attributes that shall be encoded. The names of the list are the
 #'   XML elements present in the corpus. Character vectors making up the list
 #'   declare the attributes that include the metadata of regions. To declare a
 #'   structural attribute without annotations, provide a zero-length character
 #'   vector using `character()` - see examples.
+#' @param skip_blank_lines A `logical` value, whether to skip blank lines in the
+#'   input.
+#' @param strip_whitespace A `logical` value, whether to strip whitespace from
+#'   tokens
+#' @param xml A `logical` value, whether input is XML.
 #' @rdname cwb_utils
 #' @export cwb_encode
+#' @importFrom fs path
 #' @examples
-#' if (.Platform$OS.type != "windows"){
-#' data_dir <- file.path(tempdir(), "tmp_data_dir")
+#' data_dir <- file.path(tempdir(), "bt_data_dir")
 #' dir.create(data_dir)
 #' 
 #' cwb_encode(
@@ -132,8 +173,33 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 #' 
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
-#' }
-cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir, encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes){
+cwb_encode <- function(
+  corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir,
+  encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes,
+  skip_blank_lines = TRUE, strip_whitespace = TRUE, xml = TRUE, quietly = FALSE, verbose = FALSE
+){
+  
+  if (encoding == "UTF-8") encoding <- "utf8"
+  if (!encoding %in% cwb_charsets()) stop(
+    sprintf(
+      "encoding '%' is not a valid CWB character set, see cwb_charsets() for options",
+      cwb_charsets
+    )
+  )
+  
+  stopifnot(
+    is.character(corpus), length(corpus) == 1L,
+    is.character(registry), length(registry) == 1L, dir.exists(registry),
+    is.character(data_dir), length(data_dir) == 1L,
+    dir.exists(data_dir), length(list.files(data_dir)) == 0L,
+    is.character(vrt_dir), length(vrt_dir) == 1L, dir.exists(vrt_dir),
+    length(list.files(vrt_dir)) > 0L,
+    is.character(encoding), length(encoding) == 1L,
+    is.character(p_attributes),
+    is.logical(skip_blank_lines), length(skip_blank_lines) == 1L,
+    is.logical(strip_whitespace), length(strip_whitespace) == 1L,
+    is.logical(xml), length(xml) == 1L
+  )
   
   s_attributes_noanno <- unlist(lapply(
     names(s_attributes),
@@ -149,14 +215,22 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
     )
   )
   
+  # Ensure that paths are standardized
+  regfile <- as.character(fs::path(file.path(registry, tolower(corpus))))
+  data_dir <- as.character(fs::path(data_dir))
+  vrt_dir <- as.character(fs::path(vrt_dir))
+  
   .cwb_encode(
-    regfile = file.path(registry, tolower(corpus)),
-    data_dir = data_dir,
-    vrt_dir = vrt_dir,
+    regfile = regfile, data_dir = data_dir, vrt_dir = vrt_dir,
     encoding = encoding,
     p_attributes = p_attributes,
     s_attributes_anno = s_attributes_anno,
-    s_attributes_noanno = s_attributes_noanno
+    s_attributes_noanno = s_attributes_noanno,
+    skip_blank_lines = skip_blank_lines,
+    xml = xml,
+    strip_whitespace = strip_whitespace,
+    quiet = quietly,
+    verbosity = verbose
   )
 }
 
@@ -169,3 +243,36 @@ cwb_encode <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_di
 #' @examples
 #' cwb_version()
 cwb_version <- function() as.numeric_version(.cwb_version())
+
+
+
+
+#' Character sets supported by CWB
+#' 
+#' The function returns a `character` vector with characters sets (charsets)
+#' supported by the Corpus Workbench (CWB). The vector is derived from the the
+#' `CorpusCharset` object defined in the header file of the corpus library (CL).
+#' 
+#' Early versions of the CWB were developed for "latin1", "utf8" support has been
+#' introduced with CWB v3.2. Note that RcppCWB is tested only for "latin1" and
+#' "utf8" and that R uses "UTF-8" rather than utf8" (CWB) by convention.
+#' @export
+#' @examples
+#' cwb_charsets()
+cwb_charsets <- function() c(
+  "ascii",
+  "latin1",
+  "latin2",
+  "latin3",
+  "latin4",
+  "cyrillic",
+  "arabic",
+  "greek",
+  "hebrew",
+  "latin5",
+  "latin6",
+  "latin7",
+  "latin8",
+  "latin9",
+  "utf8"
+)

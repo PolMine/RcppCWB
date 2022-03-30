@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.5.0
-Date: 2022-01-31
+Version: 0.5.2
+Date: 2022-03-28
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -40,13 +40,13 @@ License: GPL-3
 Encoding: UTF-8
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: GNU make, ncurses, pcre (>= 7 < 10), GLib (>= 2.0.0). On Windows, no prior 
-  installations are necessary, as pre-built (i.e. cross-compiled) binaries of required libraries are 
-  downloaded from a GitHub repository (<https://github.com/PolMine/libcl>) during installation. On 
-  macOS, static libraries of Glib are downloaded (<https://github.com/PolMine/libglib>) if Glib is 
-  not present.
+SystemRequirements: GNU make, pcre (>= 7 < 10), GLib (>= 2.0.0). On Windows, no prior installations are necessary,
+  as pre-built (i.e. cross-compiled) binaries of required libraries are downloaded from a GitHub repository 
+  (<https://github.com/PolMine/libcl>) during installation. On macOS, static libraries of Glib are downloaded
+  (<https://github.com/PolMine/libglib>) if Glib is not present.
 Imports:
-    Rcpp (>= 1.0.7)
+    Rcpp (>= 1.0.7),
+    fs
 Suggests:
     knitr,
     testthat
@@ -54,7 +54,7 @@ LinkingTo: Rcpp
 Biarch: true
 URL: https://github.com/PolMine/RcppCWB
 BugReports: https://github.com/PolMine/RcppCWB/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 Collate:
   'RcppCWB_package.R'

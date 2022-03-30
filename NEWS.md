@@ -1,3 +1,102 @@
+# RcppCWB 0.5.2
+
+* The example for `corpus_data_dir()` dir not work as intended without
+explicitly setting the `registry` argument. Fixed.
+* New functions `corpus_info_file()`, `corpus_full_name()`,
+`corpus_p_attributes()`, `corpus_s_attributes()`, `corpus_properties()` and
+`corpus_property()` to retrieve registry file data.
+* New function `corpus_registry_dir()`.
+* The path to the info file in the registry file of the REUTERS corpus was
+broken. Fixed.
+
+
+# RcppCWB 0.5.1
+
+## New Features
+
+* New auxiliary function `cwb_charsets()` reports the charsets supported by CWB.
+* New functions `cl_load_corpus()` and `cqp_load_corpus()` do what the functions
+suggests.
+* New function `cl_list_corpora()` complements existing function
+`cqp_list_corpora()` for the CL context.
+* New arguments `skip_blank_lines`, `strip_whitespace` and `xml` of
+`cwb_encode()` open configuration options of `cwb_encode()`, overcoming the
+previously hard-coded equivalent to the command-line option "-xsB".(#38)
+* Unexported functions `.cpos_to_id()`, `.cl_find_corpus()` and
+`.cl_new_attribute()` are an entry to passing around pointers, rather than
+re-creating objects whenever switching from R to C.
+* Functions `.s_attr()` and `.p_attr()` return pointers for a s- or
+p-attribute.
+* Functions `cl_*` are now available with pointer as input (e.g. `cpos_to_id()`).
+* The CORPUS_REGISTRY environment variable is not set to the temporary registry,
+to avoid often confusing behavior and collissions whent loading RcppCWB and 
+polmineR at the same time (#13).
+* The `cqp_drop_subcorpus()` function that has been disabled temporarily is
+usable again (#34).
+* `cqp_query()` is now able to process subcorpora.
+* `RcppCWB:::.cqp_subcropus()` will construct a subcorpus from a region matrix.
+* The `check_corpus()` does not re-set the registry directory and more, but tries
+to load the checked corpus if it has not yet been loaded.
+* A new function `s_attr_relationship()` will detect whether two s-attributes are
+siblings, or in a descendent or ancestor relationship.
+* Functions `cwb_encode()`, `cwb_huffcode()`, `cwb_makeall()` and
+`cwb_compress_rdx()` now have an argument `quietly` to control display of output
+messages. `cwb_encode()` has an argument `verbose` to control whether counter on
+the number of tokens processed is dislpayed.
+
+
+## Minor improvements
+
+* Difficulties of `cwb_encode()` to digest variations of path statements between
+macOS and Windows are addressed using a reliable normalization of paths with
+`fs::path()` (#48).
+* Argument `encoding` is checked for the validity of the encoding passed in
+(#34).
+* A patch introducing a sanity check omits 'stringop-overflow'  compiler warning
+thrown by file cl/cdaccess.c on Windows (#45).
+* An update of Xcode command line developer tools includes flex 2.6.4
+Apple(flex-34), and this is the version used not, resulting and extensive code
+changes in cl/lex.creg.c and cqp/lex.yy.c, yet without causing new errors or
+changing the functionality.
+* `check_cpos()` issues a warning if argument `cpos` is `NULL` (#21).
+* Functions `cl_cpos2id()`, `cl_cpos2lbound()`, `cl_cpos2rbound()`,
+`cl_cpos2str()` and `cl_cpo2struc()` will return an empty, zero-length integer
+vector if argument `cpos` is `NULL` (#21).
+* Warnings issued by `check_corpus()` (used internally by many functions)
+resulted from slightly differing representations of otherwise identical 
+paths. Using `fs::path()` for path for normalization internally will omit
+misleading warning messages.
+* `cqp_get_registry()` will now return a `fs::path` object, as a safeguard for
+a consistent normalization of paths.
+* Function `cl_delete_corpus()` will now (visibly) return a `logial` value.
+* The check for the availability of ncurses is omitted in the configure file
+and the editline subdirectory of src/cwb is included in .Rbuildignore to 
+minimize the size of the tarball. The ncurses library is a dependency of 
+editline, but editline is not built in the context of this package (#26).
+* `cqp_load_corpus()` will return `FALSE` if corpus has not been loaded
+successfully.
+* Disaggregated `wrappers.cpp` into `cl.cpp`, `cqp.cpp` and `utils.cpp`, so that
+the code is organized more coherently corresponding to the different logics.
+* Function `check_cqp_query()` renamed to `check_query()` to avoid a conflict
+with a function defined in the polmineR package.
+* `cqp_list_subcorpora()` returns a `character` vector. Previously, we just had
+obscure printed messages.
+* `s_attribute_decode()` will not break if s-attribute has no values (#54).
+* Functions `cl_struc2str()` and `cl_struc2cpos()` may now include negative
+values, the vectors returned will have `NA` values at respective positions. The
+check against negative values in `check_strucs` is dropped accordingly.
+
+
+## Bux fixes
+
+* The `cwb_encode()` function did not declare structural attributes in the
+registry and mistakenly channeled output for the file to the terminal (#49).
+Fixed.
+* Re-running `cwb_encode()` did not reset global variables, which resulted in a
+set of errors. Solved. (#51)
+
+
+
 # RcppCWB 0.5.0
 
 ## New Features

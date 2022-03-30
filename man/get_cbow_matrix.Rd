@@ -28,16 +28,14 @@ Get matrix with moving windows. Negative integer values indicate absence of a
 token at the respective position.
 }
 \examples{
-registry <- if (!check_pkg_registry_files()) use_tmp_registry() else get_pkg_registry()
-
 m <- get_region_matrix(
   corpus = "REUTERS", s_attribute = "places",
-  strucs = 0L:5L, registry = registry
+  strucs = 0L:5L, registry = get_tmp_registry()
   )
 windowsize <- 3L
 m2 <- get_cbow_matrix(
   corpus = "REUTERS", p_attribute = "word",
-  registry = registry, matrix = m, window = windowsize
+  registry = get_tmp_registry(), matrix = m, window = windowsize
   )
 colnames(m2) <- c(-windowsize:-1, "node", 1:windowsize)
 }

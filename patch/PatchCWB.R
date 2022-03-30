@@ -430,11 +430,11 @@ PatchCWB <- R6Class(
         if (revision == 1069){
           c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|File|rd->stream|redir->stream|debug_output|protocol),\\s*", "Rprintf(")
         } else if (revision >= 1690){
-          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|dst->stream|outfh|tmp|fh|dest|dst|protocol|tmp_dst),\\s*", "Rprintf(")
+          c("(vf|f|v)printf\\s*\\(\\s*(stderr|stream|stdout|outfd|fd|File|rd->stream|redir->stream|debug_output|outfh|tmp|fh|dest|protocol|tmp_dst),\\s*", "Rprintf(")
         },
         if (revision == 1069) c("(vf|f|v)printf\\s*\\(\\s*fd,\\s*", "Rprintf(", "cwb-encode.c"),
         c("YY(F|D)PRINTF\\s*(\\({1,2})\\s*(stderr|yyoutput),\\s*" , "YY\\1PRINTF \\2"),
-        c("fprintf\\s*\\(", "Rprintf("),
+#        c("fprintf\\s*\\(", "Rprintf("),
         c("(\\s+)printf\\(", "\\1Rprintf("),
         c("#(\\s*)define\\sYYFPRINTF\\sfprintf", "#\\1define YYFPRINTF Rprintf"),
         
@@ -523,7 +523,21 @@ PatchCWB <- R6Class(
 
           list(
             # This will work for r1690 too
-            insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", ""))
+            insert_before = list("^#include\\s<ctype\\.h>", c("void Rprintf(const char *, ...);", "")),
+            insert_after = list(
+              '^#include\\s+"makecomps\\.h".*?$',
+              c(
+                "",
+                "#ifdef __MINGW__",
+                "#undef SUBDIR_SEPARATOR",
+                "#undef SUBDIR_SEP_STRING",
+                "#define SUBDIR_SEPARATOR '/'",
+                '#define SUBDIR_SEP_STRING "/"',
+                "#endif",
+                ""
+              ),
+              1L
+            )
           ),
           
           # Cannot find the dollar variabl in r1690 - seems to be gone
@@ -594,7 +608,7 @@ PatchCWB <- R6Class(
             remove_lines = list("(\\s+)stderr,", 2)
           ),
           list(
-            remove_lines = list("(\\s+)stderr,", 1),
+#            remove_lines = list("(\\s+)stderr,", 1),
             delete_line_before = list("^\\s*memberIDList\\(char\\s\\*s,\\sIDList\\sl\\)\\s*$", 1L, 1L),
             insert_before = list("^\\s*memberIDList\\(char\\s\\*s,\\sIDList\\sl\\)\\s*$", c("#ifndef __MINGW__", "static int"), 1L),
             insert_before = list("^\\s*/\\*\\s-+\\s\\*/\\s*$", "#endif", 7L)
@@ -679,6 +693,7 @@ PatchCWB <- R6Class(
           # All of this is stable r1069-1690
           insert_before = list('^#include\\s<sys/types\\.h>', "void Rprintf(const char *, ...);"),
           delete_line_beginning_with = list('#include "endian2.h"', 1L, 0L),
+          replace = list("^(\\s*)exit\\(1\\);", "\\1return;", NA),
           insert_after = list('^#include\\s<sys/types\\.h>', '#include "endian2.h"'),
 
           # storage.c: In function ???mmapfile???:
@@ -710,14 +725,34 @@ PatchCWB <- R6Class(
             # The include of 'cdaccess.h' is gone with r1690 so we use another anchor
             insert_after = list(
               if (revision == 1069) '^#include\\s"cdaccess\\.h"' else '^#include\\s+"compression\\.h"',
-              "void Rprintf(const char *, ...);"
+              c(
+                "#include <stdint.h>",
+                "void Rprintf(const char *, ...);"
+              )
             ),
             
             # This code is unchanged with r1690
             
             # cdaccess.c:2697:12: warning: ignoring return value of ???fgets???, declared with attribute warn_unused_result [-Wunused-result]
             # fgets(call, CL_MAX_LINE_LENGTH, pipe);
-            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1)
+            replace = list("^(\\s*)fgets\\(call,\\sCL_MAX_LINE_LENGTH,\\spipe\\);", '\\1if (fgets(call, CL_MAX_LINE_LENGTH, pipe) == NULL) Rprintf("fgets failure");', 1),
+            
+            # cdaccess.c: In function 'cl_read_stream':
+            #   cdaccess.c:982:5: warning: 'memcpy' specified bound between 18446744065119617024 and 18446744073709551612 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+            # 982 |     memcpy(buffer, ps->base + ps->nr_items, items_to_read * sizeof(int));
+            insert_before = list(
+              "^\\s*memcpy\\(buffer,\\sps->base\\s\\+\\sps->nr_items,\\sitems_to_read\\s\\*\\ssizeof\\(int\\)\\);\\s*$",
+              c(
+                "  size_t k;",
+                "  k =  items_to_read * sizeof(int);",
+                "  if (k < PTRDIFF_MAX){"
+              )
+            ),
+            replace = list(
+              "^\\s*memcpy\\(buffer,\\sps->base\\s\\+\\sps->nr_items,\\sitems_to_read\\s\\*\\ssizeof\\(int\\)\\);\\s*$",
+              "  memcpy(buffer, ps->base + ps->nr_items, k);", 1L
+            ),
+            insert_before = list("^(\\s*)return\\sitems_to_read;\\s*$", "  }", 1L)
           ),
           
           # These are patches to omit 'unused variable' warnings gone with r1690 (vars commented out, for instance)
@@ -1322,7 +1357,31 @@ PatchCWB <- R6Class(
         ),
         
         "src/cwb/cqp/corpmanag.c" = c(
-          list(),
+          list(
+            
+            # The global variable corpuslist needs to be available in cpp.cpp,
+            # so it is defined there. So in corpmanag.c, it shall not be static
+            # but extern, without a value.
+            replace = list(
+              "^\\s*static\\s+CorpusList\\s+\\*corpuslist\\s=\\sNULL;\\s*$",
+              "extern CorpusList *corpuslist;",
+              1L
+            ),
+            
+            # The ensure_syscorpus function is static (not exported) by default.
+            # By removing the keyword 'static' and including a definition in 
+            # corpmanag.h, it can by used by a Rcpp header
+            delete_line_before= list(
+              "^\\s*ensure_syscorpus\\(char\\s+\\*registry,\\s+char\\s+\\*name\\)\\s*$",
+              1L, 2L
+            ),
+            insert_before = list(
+              "^\\s*ensure_syscorpus\\(char\\s+\\*registry,\\s+char\\s+\\*name\\)\\s*$",
+              "CorpusList *",
+              1L
+            )
+            
+          ),
           
           # In r1690, this is not "extern" but "static"
           if (revision == 1069) list(
@@ -1333,7 +1392,10 @@ PatchCWB <- R6Class(
         ),
         
         "src/cwb/cqp/corpmanag.h" = c(
-          list(),
+          list(
+            # the ensure_syscorpus() function is static (not available externally) by default.
+            insert_before = list("^#endif\\s*$", "CorpusList * ensure_syscorpus(char *registry, char *name);", 1L)
+          ),
           
           # extern'ed in original CWB code
           if (revision == 1069) list(
@@ -1507,7 +1569,17 @@ PatchCWB <- R6Class(
             delete_line_before = list("^/\\*\\s-*\\s\\*/", 1L, 1L), # purely cosmetic
             insert_before = list(
               "^/\\*\\s-*\\s\\*/",
-              c("void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */", ""),
+              c(
+                "void Rprintf(const char *, ...); /* alternative to include R_ext/Print.h */",
+                "",
+                "#ifdef __MINGW__",
+                "#undef SUBDIR_SEPARATOR",
+                "#undef SUBDIR_SEP_STRING",
+                "#define SUBDIR_SEPARATOR '/'",
+                '#define SUBDIR_SEP_STRING "/"',
+                "#endif",
+                ""
+                ),
               1L
             ),
             
@@ -1580,8 +1652,8 @@ PatchCWB <- R6Class(
             insert_before = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", c("int cwb_encode_worker(cl_string_list input_files){"), 1L),
             delete_line_beginning_with = list("^\\s*\\*\\s+MAIN\\(\\)\\s+\\*\\s*$", 1L, 17),
             
-            replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L),
-            replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA)
+            replace = list("^(\\s*)encode_parse_options\\(argc,\\sargv\\);", "\\1/* encode_parse_options(argc, argv); */", 1L)
+            # replace = list("Rprintf\\(registry_f(d|h),", "fprintf(registry_f\\1,", NA)
           ),
           if (revision == 1069) list(
             replace = list('^#include\\s"\\.\\./cl/lexhash\\.h"\\s*$', '/* #include "../cl/lexhash.h" */ ', 1L),
@@ -1639,8 +1711,8 @@ PatchCWB <- R6Class(
             replace = list("^(\\s*)const\\schar\\s\\*encoding_charset_name\\s*=.*?;", "\\1extern const char *encoding_charset_name;", 1L), # 1069 encoding_character_set!
             replace = list("^(\\s*)int\\snumbered\\s=\\s0;", "\\1extern int numbered;", 1L),
             replace = list("^(\\s*)int\\sencode_token_numbers\\s=\\s0;", "\\1extern int encode_token_numbers;", 1L),
-            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L),
-            replace = list('Rprintf\\(encoder->avs_fh', 'fprintf(encoder->avs_fh', 1L)
+            replace = list("^(\\s*)char\\s\\*conll_sentence_attribute\\s=\\sNULL;", "\\1extern char *conll_sentence_attribute;", 1L)
+#            replace = list('Rprintf\\(encoder->avs_fh', 'fprintf(encoder->avs_fh', 1L)
           )
         ),
         
@@ -1730,8 +1802,15 @@ PatchCWB <- R6Class(
         "src/cwb/utils/cwb-huffcode.c" = c(
           list(
             insert_before = list(
-              if (revision >= 1690) '#include "../cl/cl.h"' else '#include\\s"\\.\\./cl/globals\\.h"',
-              c("void Rprintf(const char *, ...);", "#include <strings.h>", ""),
+              '#include "../cl/cl.h"',
+              c(
+                "void Rprintf(const char *, ...);",
+                "#include <strings.h>",
+                "#ifdef __MINGW__",
+                '#include "../cl/endian2.h"',
+                "#endif",
+                ""
+              ),
               1L
             ),
             
@@ -1759,7 +1838,31 @@ PatchCWB <- R6Class(
             delete_line_before = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, 37L),
             
             # Functions usage() and main() deleted
-            delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, NA)
+            delete_line_beginning_with = list("^\\s*/\\*\\s\\*+\\s\\*(\\\\|)\\s*$", 1L, NA),
+            
+            # This is an awkward workaround because calling NwriteInt() leaves file empty, 
+            # for whatever reason
+            insert_before = list(
+              "^(\\s*)for\\s*\\(i\\s=\\s0;\\si\\s<\\shc->length;\\si\\+\\+\\)\\s\\{\\s*$",
+              c(
+                "      #ifdef __MINGW__",
+                "      int word, success;",
+                "      #endif"
+              ),
+              1L
+            ),
+            insert_before = list("^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$", "          #ifndef __MINGW__",1L),
+            insert_after = list(
+              "^\\s*NwriteInt\\(pos,\\ssync\\);\\s*$",
+              c(
+                "          #else",
+                "          word = htonl(pos);",
+                "          success = fwrite(&word, sizeof(int), 1, sync);",
+                '          if (success != 1) Rprintf("File write error!\\n");',
+                "          #endif"
+              ),
+              1L
+            )
           ),
           if (revision < 1690) list(
             replace = list("^(\\s*)bprintf\\(heap\\[i\\],\\scodelength\\[i\\],\\sprotocol\\);", "\\1/* bprintf(heap[i], codelength[i], protocol); */", 1L),

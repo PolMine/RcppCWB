@@ -4,6 +4,7 @@ extern "C" {
   #include <unistd.h>
   #include <string.h>
   #include "cl.h"
+  #include "cwb/cl/cwb-globals.h" 
   #include <pcre.h>
 }
 
@@ -135,6 +136,26 @@ Rcpp::IntegerVector region_matrix_to_ids(SEXP corpus, SEXP p_attribute, SEXP reg
 }
 
 
+// [[Rcpp::export(name=".ranges_to_cpos")]]
+Rcpp::IntegerVector ranges_to_cpos(SEXP ranges){
+  
+  Rcpp::IntegerMatrix m(ranges);
+  int size = region_matrix_to_size(m);
+  Rcpp::IntegerVector result(size);
+  
+  int n, cpos;
+  int i = 0;
+  for (n = 0; n < m.nrow(); n++){
+    for (cpos = m(n,0); cpos <= m(n,1); cpos++){
+      result(i) = cpos;
+      i++;
+    }
+  }
+  
+  return result;
+}
+
+
 // [[Rcpp::export(name=".ids_to_count_matrix")]]
 Rcpp::IntegerMatrix ids_to_count_matrix(Rcpp::IntegerVector ids){
   
@@ -176,3 +197,222 @@ Rcpp::IntegerVector region_matrix_to_count_matrix(SEXP corpus, SEXP p_attribute,
   return count_matrix;
 }
 
+
+// [[Rcpp::export(name=".region_matrix_context")]]
+Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP p_attribute, SEXP s_attribute, SEXP boundary, int left, int right){
+  
+  int i, cpos, size;
+  int ncpos = 0;
+  int lb, rb;
+  Rcpp::IntegerMatrix context_matrix(region_matrix.nrow(), 2);
+  
+  Attribute* p_attr = make_p_attribute(corpus, p_attribute, registry);
+
+  if (boundary == R_NilValue){
+    
+    if (s_attribute == R_NilValue){
+      
+      size = cl_max_cpos(p_attr);
+      int cpos_left, cpos_right;
+      
+      for (i = 0; i < region_matrix.nrow(); i++){
+        
+        cpos_left = region_matrix(i,0) - left;
+        if (cpos_left >= 0){
+          context_matrix(i,0) = cpos_left;
+        } else {
+          context_matrix(i,0) = 0;
+        }
+        ncpos += region_matrix(i,0) - context_matrix(i,0);
+        
+        cpos_right = region_matrix(i,1) + right;
+        if (cpos_right < size){
+          context_matrix(i,1) = cpos_right;
+        } else {
+          context_matrix(i,1) = size - 1;
+        }
+        ncpos += context_matrix(i,1) - region_matrix(i,1);
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
+      }
+      
+    } else {
+      
+      Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
+      size = cl_max_struc(s_attr);
+      int struc_node, struc_left, struc_right;
+      
+      for (i = 0; i < region_matrix.nrow(); i++){
+        
+        struc_node = cl_cpos2struc(s_attr, region_matrix(i, 0));
+
+        struc_left = struc_node - left;
+        if (struc_left >= 0){
+          
+          cl_struc2cpos(s_attr, struc_left, &lb, &rb);
+
+          if (lb == region_matrix(i,0)){
+            context_matrix(i,0) = NA_INTEGER;
+          } else {
+            context_matrix(i,0) = lb;
+            ncpos += region_matrix(i,0) - lb;
+          }
+        } else {
+          context_matrix(i,0) = NA_INTEGER;
+        }
+        
+        struc_right = struc_node + right;
+        if (struc_right <= size){
+          
+          cl_struc2cpos(s_attr, struc_right, &lb, &rb);
+
+          if (rb == region_matrix(i,1)){
+            context_matrix(i,1) = NA_INTEGER;
+          } else {
+            context_matrix(i,1) = rb;
+            ncpos += rb - region_matrix(i,1);
+          }
+        } else {
+          context_matrix(i,3) = NA_INTEGER;
+        }
+        
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
+      }
+      
+    }
+    
+  } else {
+    
+    int struc_boundary_node, lb_boundary, rb_boundary;
+    Attribute* limit = make_s_attribute(corpus, boundary, registry);
+
+    if (s_attribute == R_NilValue){
+      
+      SEXP default_p_attr = Rf_mkChar(CWB_DEFAULT_ATT_NAME);
+      Attribute* p_attr = make_p_attribute(corpus, default_p_attr, registry);
+      size = cl_max_cpos(p_attr);
+      int cpos_left, cpos_right;
+      
+      for (i = 0; i < region_matrix.nrow(); i++){
+        
+        cpos_left = region_matrix(i,0) - left;
+        
+        struc_boundary_node = cl_cpos2struc(limit, region_matrix(i, 0));
+        if (cpos_left >= 0){
+          cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+          if (lb_boundary == region_matrix(i,0)){
+            context_matrix(i,0) = NA_INTEGER;
+          } else if (lb_boundary > cpos_left){
+            context_matrix(i,0) = lb_boundary;
+            ncpos += region_matrix(i,0) - lb_boundary;
+          } else {
+            context_matrix(i,0) = cpos_left;
+            ncpos += region_matrix(i,0) - cpos_left;
+          }
+        } else {
+          context_matrix(i,0) = NA_INTEGER;
+        }
+        
+        cpos_right = region_matrix(i,1) + right;
+        if (cpos_right < size){
+          cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+          if (rb_boundary == region_matrix(i,1)){
+            context_matrix(i,1) = NA_INTEGER;
+          } else if (rb_boundary < cpos_right){
+            context_matrix(i,1) = rb_boundary;
+            ncpos += rb_boundary - region_matrix(i,1);
+          } else {
+            context_matrix(i,1) = cpos_right;
+            ncpos += cpos_right - region_matrix(i,1);
+          }
+        } else {
+          context_matrix(i,1) = NA_INTEGER;
+        }
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
+      }
+      
+    } else {
+      
+      Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
+      size = cl_max_struc(s_attr);
+      int struc_node, struc_left, struc_right;
+      
+      for (i = 0; i < region_matrix.nrow(); i++){
+        
+        struc_node = cl_cpos2struc(s_attr, region_matrix(i, 0));
+        struc_boundary_node = cl_cpos2struc(limit, region_matrix(i, 0));
+        
+        struc_left = struc_node - left;
+        if (struc_left >= 0){
+          
+          cl_struc2cpos(s_attr, struc_left, &lb, &rb);
+          cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+          
+          if (lb_boundary == region_matrix(i,0)){
+            context_matrix(i,0) = NA_INTEGER;
+          } else if (lb_boundary > lb){
+            context_matrix(i,0) = lb_boundary;
+            ncpos += region_matrix(i,0) - lb_boundary;
+          } else {
+            context_matrix(i,0) = lb;
+            ncpos += region_matrix(i,0) - lb;
+          }
+        } else {
+          context_matrix(i,0) = NA_INTEGER;
+        }
+        
+        struc_right = struc_node + right;
+        if (struc_right <= size){
+          
+          cl_struc2cpos(s_attr, struc_right, &lb, &rb);
+          cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+          
+          if (rb_boundary == region_matrix(i,1)){
+            context_matrix(i,1) = NA_INTEGER;
+          } else if (rb_boundary < rb){
+            context_matrix(i,1) = rb_boundary;
+            ncpos += rb_boundary - region_matrix(i,1);
+          } else {
+            context_matrix(i,1) = rb;
+            ncpos += rb - region_matrix(i,1);
+          }
+        } else {
+          context_matrix(i,3) = NA_INTEGER;
+        }
+        ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
+      }
+    }
+  }
+
+  Rcpp::IntegerMatrix cpos_matrix(ncpos, 4);
+  int k = 0;
+  
+  for (i = 0; i < region_matrix.nrow(); i++){
+    if (context_matrix(i,0) != NA_INTEGER){
+      for (cpos = context_matrix(i,0); cpos < region_matrix(i,0); cpos++){
+        cpos_matrix(k,0) = cpos - region_matrix(i,0);
+        cpos_matrix(k,1) = cpos;
+        cpos_matrix(k,2) = i + 1;
+        cpos_matrix(k,3) = cl_cpos2id(p_attr, cpos);
+        k++;
+      }
+    }
+    for (cpos = region_matrix(i,0); cpos <= region_matrix(i,1); cpos++){
+      cpos_matrix(k,0) = 0;
+      cpos_matrix(k,1) = cpos;
+      cpos_matrix(k,2) = i + 1;
+      cpos_matrix(k,3) = cl_cpos2id(p_attr, cpos);
+      k++;
+    }
+    if (context_matrix(i,1) != NA_INTEGER){
+      for (cpos = region_matrix(i,1) + 1; cpos <= context_matrix(i,1); cpos++){
+        cpos_matrix(k,0) = cpos - region_matrix(i,1);
+        cpos_matrix(k,1) = cpos;
+        cpos_matrix(k,2) = i + 1;
+        cpos_matrix(k,3) = cl_cpos2id(p_attr, cpos);
+        k++;
+      }
+    }
+  }
+
+  return cpos_matrix;
+}

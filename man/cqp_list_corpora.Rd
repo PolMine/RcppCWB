@@ -11,10 +11,6 @@ List the corpora described by the registry files in the registry directory
 that is currently set.
 }
 \examples{
-if (!cqp_is_initialized()){
-  registry <- system.file(package = "RcppCWB", "extdata", "cwb", "registry")
-  cqp_initialize(registry)
-}
 cqp_list_corpora()
 }
 \author{

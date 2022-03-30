@@ -533,7 +533,7 @@ do_catString(const char *str, struct Redir *dst)
   }
   *w = '\0'; /* terminate modified string */
 
-  Rprintf("%s", s);
+  fprintf(dst->stream, "%s", s);
   cl_free(s);
 
   close_rd_output_stream(dst);
@@ -3257,7 +3257,7 @@ do_dump(CorpusList *cl, int first, int last, struct Redir *dst)
       target  = (cl->targets)  ? cl->targets[j]  : -1;
       keyword = (cl->keywords) ? cl->keywords[j] : -1;
       rg = cl->range + j;
-      Rprintf("%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
+      fprintf(dst->stream, "%d\t%d\t%d\t%d\n", rg->start, rg->end, target, keyword);
     }
 
     close_rd_output_stream(dst);

@@ -3,6 +3,7 @@
 \name{s_attr_is_descendent}
 \alias{s_attr_is_descendent}
 \alias{s_attr_is_sibling}
+\alias{s_attr_relationship}
 \title{Explore XML structure of CWB corpus}
 \usage{
 s_attr_is_descendent(
@@ -14,6 +15,8 @@ s_attr_is_descendent(
 )
 
 s_attr_is_sibling(x, y, corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
+
+s_attr_relationship(x, y, corpus, registry = Sys.getenv("CORPUS_REGISTRY"))
 }
 \arguments{
 \item{x}{A structural attribute, stated as length-one \code{character} vector.}
@@ -45,8 +48,14 @@ and not in an ancestor-sibling relationship.
 structural attribute \code{x} and structural attribute \code{y} are identical. If
 yes, \code{TRUE} is returned, assuming that both attributes are at the same
 level (siblings). If not, \code{FALSE} is returned.
+
+\code{s_attr_relationship()} will return \code{0} if s-attributes \code{x} and \code{y}
+are siblings in the sense that they define identical regions. The return
+value is \code{0} if \code{x} is an ancestor of \code{y} and \code{1} if \code{x} is a descencdent
+of \code{y}.
 }
 \examples{
-s_attr_is_descendent("id", "places", corpus = "REUTERS")
-s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS")
+s_attr_is_descendent("id", "places", corpus = "REUTERS", registry = get_tmp_registry())
+s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS", registry = get_tmp_registry())
+s_attr_is_sibling(x = "id", y = "places", corpus = "REUTERS", registry = get_tmp_registry())
 }
