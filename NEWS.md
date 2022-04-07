@@ -1,3 +1,8 @@
+# RcppCWB 0.5.2.9001ff
+
+* Fixed a bug in the `region_matrix_corpus()` C++ code that would not show any
+context at all if s_attribute expansion transgressed start or end of corpus.
+
 # RcppCWB 0.5.2
 
 * The example for `corpus_data_dir()` dir not work as intended without
