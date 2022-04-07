@@ -2,6 +2,10 @@
 
 * Fixed a bug in the `region_matrix_corpus()` C++ code that would not show any
 context at all if s_attribute expansion transgressed start or end of corpus.
+* Fixed a bug in the `region_matrix_corpus()` C++ code that would result from 
+not considering that query matches may go cover more than one strucs of a 
+structural attribute.
+
 
 # RcppCWB 0.5.2
 
