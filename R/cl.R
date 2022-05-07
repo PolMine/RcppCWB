@@ -421,7 +421,8 @@ corpus_data_dir <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 }
 
 #' @details `corpus_info_file()` will return the path to the info file for a
-#'   corpus (class `fs_path` object).
+#'   corpus (class `fs_path` object). If info file does not exist or INFO line
+#'   is missing in the registry file, `NA` is returned.
 #' @rdname registry_info
 #' @examples
 #' corpus_info_file("REUTERS", registry = get_tmp_registry())
