@@ -581,7 +581,11 @@ Rcpp::StringVector _corpus_info_file(SEXP corpus, SEXP registry){
   c = cl_new_corpus(registry_dir, corpus_id);
   
   if (c){
-    result(0) = c->info_file;
+    if (c->info_file){
+      result(0) = c->info_file;
+    } else {
+      result(0) = NA_STRING;
+    }
   } else {
     result(0) = NA_STRING;
   }
