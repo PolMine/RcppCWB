@@ -93,7 +93,7 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
-cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
   huffcode <- function()
     .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
@@ -102,6 +102,7 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
   } else {
     success <- huffcode()
   }
+  
   success
   
 }
