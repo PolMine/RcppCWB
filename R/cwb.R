@@ -93,6 +93,8 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
+#' @param delete A `logical` value, whether to remove redundant files after
+#'   compression.
 cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
   huffcode <- function()
     .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
@@ -102,6 +104,8 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
   } else {
     success <- huffcode()
   }
+  
+  
   
   success
   

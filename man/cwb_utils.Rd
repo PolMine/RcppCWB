@@ -18,7 +18,8 @@ cwb_huffcode(
   corpus,
   p_attribute,
   registry = Sys.getenv("CORPUS_REGISTRY"),
-  quietly = FALSE
+  quietly = FALSE,
+  delete = TRUE
 )
 
 cwb_compress_rdx(
@@ -53,6 +54,9 @@ environment variable CORPUS_REGISTRY}
 
 \item{quietly}{A \code{logical} value, whether to turn off messages (including
 warnings).}
+
+\item{delete}{A \code{logical} value, whether to remove redundant files after
+compression.}
 
 \item{data_dir}{The data directory where \code{cwb_encode} will put the binary
 files of the indexed corpus.}

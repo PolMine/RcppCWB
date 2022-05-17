@@ -10,6 +10,8 @@ file (#62).
 * Implicit processing of arguments `sAttribute` and `pAttribute` as `s_attribute`
 or `p_attribute` respectively is now accompanied by a warning that arguments 
 are deprectated.
+* The `check_corpus()` function distinguishes between whether a corpus is loaded
+in the CL and/or CQP context.
 
 # RcppCWB 0.5.2
 

@@ -55,11 +55,11 @@ check_corpus <- function(corpus, registry, cl = TRUE, cqp = TRUE){
   if (cqp){
     if (isFALSE(cqp_is_initialized())) cqp_initialize(registry = registry)
     if (!toupper(corpus) %in% cqp_list_corpora()){
-      success_cqp <- cqp_load_corpus(corpus = toupper(corpus), registry = registry)
-      cqp_availability <- as.logical(
-        .check_corpus(corpus = touppser(corpus), registry = registry)
-      )
+      cqp_load_corpus(corpus = toupper(corpus), registry = registry)
     }
+    cqp_availability <- as.logical(
+      .check_corpus(corpus = toupper(corpus))
+    )
   }
   
   if (!any(cl, cqp)) return(TRUE)

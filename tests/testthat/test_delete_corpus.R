@@ -10,7 +10,7 @@ test_that(
     )
     expect_true(corpus_is_loaded("UNGA", registry = get_tmp_registry()))
     expect_true(cl_delete_corpus("UNGA", registry = get_tmp_registry()))
-    expect_false(corpus_is_loaded("UNGA"))
-    expect_false(cl_delete_corpus("UNGA"))
+    expect_false(corpus_is_loaded("UNGA", registry = get_tmp_registry()))
+    expect_false(cl_delete_corpus("UNGA", registry = get_tmp_registry()))
   }
 )
