@@ -26,7 +26,8 @@ cwb_compress_rdx(
   corpus,
   p_attribute,
   registry = Sys.getenv("CORPUS_REGISTRY"),
-  quietly = FALSE
+  quietly = FALSE,
+  delete = TRUE
 )
 
 cwb_encode(
