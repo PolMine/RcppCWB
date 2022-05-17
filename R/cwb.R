@@ -147,10 +147,8 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
     if (!file.exists(rdx_file)) warning("cwb_huffcode: file to delete missing")
     removed <- file.remove(rdx_file)
     if (removed) if (!quietly) message("redundant file deleted: ", rdx_file)
-    
   }
-  
-  
+
   success
 }
 
