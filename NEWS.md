@@ -12,6 +12,8 @@ or `p_attribute` respectively is now accompanied by a warning that arguments
 are deprectated.
 * The `check_corpus()` function distinguishes between whether a corpus is loaded
 in the CL and/or CQP context.
+* `cwb_huffcode()` and `cwb_compress_rdx()` have argument `delete` to trigger
+deleting redundant files after compression (#60).
 
 # RcppCWB 0.5.2
 
