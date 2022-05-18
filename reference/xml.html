@@ -19,7 +19,7 @@ are nested or at the same level (i.e. defining the same regions)."><!-- mathjax 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -65,7 +65,9 @@ are nested or at the same level (i.e. defining the same regions).</p>
   sample <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span>
 
-<span class="fu">s_attr_is_sibling</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu">s_attr_is_sibling</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">s_attr_relationship</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -95,13 +97,19 @@ and not in an ancestor-sibling relationship.</p>
 structural attribute <code>x</code> and structural attribute <code>y</code> are identical. If
 yes, <code>TRUE</code> is returned, assuming that both attributes are at the same
 level (siblings). If not, <code>FALSE</code> is returned.</p>
+<p><code>s_attr_relationship()</code> will return <code>0</code> if s-attributes <code>x</code> and <code>y</code>
+are siblings in the sense that they define identical regions. The return
+value is <code>0</code> if <code>x</code> is an ancestor of <code>y</code> and <code>1</code> if <code>x</code> is a descencdent
+of <code>y</code>.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">s_attr_is_descendent</span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"places"</span>, corpus <span class="op">=</span> <span class="st">"REUTERS"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">s_attr_is_descendent</span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"places"</span>, corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-in"><span class="fu">s_attr_is_sibling</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"id"</span>, y <span class="op">=</span> <span class="st">"places"</span>, corpus <span class="op">=</span> <span class="st">"REUTERS"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">s_attr_is_sibling</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"id"</span>, y <span class="op">=</span> <span class="st">"places"</span>, corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span class="fu">s_attr_is_sibling</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"id"</span>, y <span class="op">=</span> <span class="st">"places"</span>, corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
@@ -117,7 +125,7 @@ level (siblings). If not, <code>FALSE</code> is returned.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

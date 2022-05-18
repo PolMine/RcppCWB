@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -48,7 +48,65 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.5.0" id="rcppcwb-050">RcppCWB 0.5.0<a class="anchor" aria-label="anchor" href="#rcppcwb-050"></a></h2>
+<h2 class="page-header" data-toc-text="0.5.2" id="rcppcwb-052">RcppCWB 0.5.2<small>2022-03-29</small><a class="anchor" aria-label="anchor" href="#rcppcwb-052"></a></h2>
+<ul><li>The example for <code><a href="../reference/registry_info.html">corpus_data_dir()</a></code> dir not work as intended without explicitly setting the <code>registry</code> argument. Fixed.</li>
+<li>New functions <code><a href="../reference/registry_info.html">corpus_info_file()</a></code>, <code><a href="../reference/registry_info.html">corpus_full_name()</a></code>, <code><a href="../reference/registry_info.html">corpus_p_attributes()</a></code>, <code><a href="../reference/registry_info.html">corpus_s_attributes()</a></code>, <code><a href="../reference/registry_info.html">corpus_properties()</a></code> and <code><a href="../reference/registry_info.html">corpus_property()</a></code> to retrieve registry file data.</li>
+<li>New function <code><a href="../reference/registry_info.html">corpus_registry_dir()</a></code>.</li>
+<li>The path to the info file in the registry file of the REUTERS corpus was broken. Fixed.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.1" id="rcppcwb-051">RcppCWB 0.5.1<small>2022-03-06</small><a class="anchor" aria-label="anchor" href="#rcppcwb-051"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-5-1">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-5-1"></a></h3>
+<ul><li>New auxiliary function <code><a href="../reference/cwb_charsets.html">cwb_charsets()</a></code> reports the charsets supported by CWB.</li>
+<li>New functions <code><a href="../reference/cl_load_corpus.html">cl_load_corpus()</a></code> and <code><a href="../reference/cqp_initialize.html">cqp_load_corpus()</a></code> do what the functions suggests.</li>
+<li>New function <code><a href="../reference/cl_list_corpora.html">cl_list_corpora()</a></code> complements existing function <code><a href="../reference/cqp_list_corpora.html">cqp_list_corpora()</a></code> for the CL context.</li>
+<li>New arguments <code>skip_blank_lines</code>, <code>strip_whitespace</code> and <code>xml</code> of <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> open configuration options of <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code>, overcoming the previously hard-coded equivalent to the command-line option “-xsB”.(<a href="https://github.com/PolMine/RcppCWB/issues/38" class="external-link">#38</a>)</li>
+<li>Unexported functions <code>.cpos_to_id()</code>, <code>.cl_find_corpus()</code> and <code>.cl_new_attribute()</code> are an entry to passing around pointers, rather than re-creating objects whenever switching from R to C.</li>
+<li>Functions <code>.s_attr()</code> and <code>.p_attr()</code> return pointers for a s- or p-attribute.</li>
+<li>Functions <code>cl_*</code> are now available with pointer as input (e.g. <code><a href="../reference/cl_rework.html">cpos_to_id()</a></code>).</li>
+<li>The CORPUS_REGISTRY environment variable is not set to the temporary registry, to avoid often confusing behavior and collissions whent loading RcppCWB and polmineR at the same time (<a href="https://github.com/PolMine/RcppCWB/issues/13" class="external-link">#13</a>).</li>
+<li>The <code><a href="../reference/cqp_query.html">cqp_drop_subcorpus()</a></code> function that has been disabled temporarily is usable again (<a href="https://github.com/PolMine/RcppCWB/issues/34" class="external-link">#34</a>).</li>
+<li>
+<code><a href="../reference/cqp_query.html">cqp_query()</a></code> is now able to process subcorpora.</li>
+<li>
+<code>RcppCWB:::.cqp_subcropus()</code> will construct a subcorpus from a region matrix.</li>
+<li>The <code><a href="../reference/checks.html">check_corpus()</a></code> does not re-set the registry directory and more, but tries to load the checked corpus if it has not yet been loaded.</li>
+<li>A new function <code><a href="../reference/xml.html">s_attr_relationship()</a></code> will detect whether two s-attributes are siblings, or in a descendent or ancestor relationship.</li>
+<li>Functions <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code>, <code><a href="../reference/cwb_utils.html">cwb_huffcode()</a></code>, <code><a href="../reference/cwb_utils.html">cwb_makeall()</a></code> and <code><a href="../reference/cwb_utils.html">cwb_compress_rdx()</a></code> now have an argument <code>quietly</code> to control display of output messages. <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> has an argument <code>verbose</code> to control whether counter on the number of tokens processed is dislpayed.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-0-5-1">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-0-5-1"></a></h3>
+<ul><li>Difficulties of <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> to digest variations of path statements between macOS and Windows are addressed using a reliable normalization of paths with <code><a href="https://fs.r-lib.org/reference/path.html" class="external-link">fs::path()</a></code> (<a href="https://github.com/PolMine/RcppCWB/issues/48" class="external-link">#48</a>).</li>
+<li>Argument <code>encoding</code> is checked for the validity of the encoding passed in (<a href="https://github.com/PolMine/RcppCWB/issues/34" class="external-link">#34</a>).</li>
+<li>A patch introducing a sanity check omits ‘stringop-overflow’ compiler warning thrown by file cl/cdaccess.c on Windows (<a href="https://github.com/PolMine/RcppCWB/issues/45" class="external-link">#45</a>).</li>
+<li>An update of Xcode command line developer tools includes flex 2.6.4 Apple(flex-34), and this is the version used not, resulting and extensive code changes in cl/lex.creg.c and cqp/lex.yy.c, yet without causing new errors or changing the functionality.</li>
+<li>
+<code><a href="../reference/checks.html">check_cpos()</a></code> issues a warning if argument <code>cpos</code> is <code>NULL</code> (<a href="https://github.com/PolMine/RcppCWB/issues/21" class="external-link">#21</a>).</li>
+<li>Functions <code><a href="../reference/p_attributes.html">cl_cpos2id()</a></code>, <code><a href="../reference/s_attributes.html">cl_cpos2lbound()</a></code>, <code><a href="../reference/s_attributes.html">cl_cpos2rbound()</a></code>, <code><a href="../reference/p_attributes.html">cl_cpos2str()</a></code> and <code>cl_cpo2struc()</code> will return an empty, zero-length integer vector if argument <code>cpos</code> is <code>NULL</code> (<a href="https://github.com/PolMine/RcppCWB/issues/21" class="external-link">#21</a>).</li>
+<li>Warnings issued by <code><a href="../reference/checks.html">check_corpus()</a></code> (used internally by many functions) resulted from slightly differing representations of otherwise identical paths. Using <code><a href="https://fs.r-lib.org/reference/path.html" class="external-link">fs::path()</a></code> for path for normalization internally will omit misleading warning messages.</li>
+<li>
+<code><a href="../reference/cqp_initialize.html">cqp_get_registry()</a></code> will now return a <code><a href="https://fs.r-lib.org/reference/path.html" class="external-link">fs::path</a></code> object, as a safeguard for a consistent normalization of paths.</li>
+<li>Function <code><a href="../reference/cl_delete_corpus.html">cl_delete_corpus()</a></code> will now (visibly) return a <code>logial</code> value.</li>
+<li>The check for the availability of ncurses is omitted in the configure file and the editline subdirectory of src/cwb is included in .Rbuildignore to minimize the size of the tarball. The ncurses library is a dependency of editline, but editline is not built in the context of this package (<a href="https://github.com/PolMine/RcppCWB/issues/26" class="external-link">#26</a>).</li>
+<li>
+<code><a href="../reference/cqp_initialize.html">cqp_load_corpus()</a></code> will return <code>FALSE</code> if corpus has not been loaded successfully.</li>
+<li>Disaggregated <code>wrappers.cpp</code> into <code>cl.cpp</code>, <code>cqp.cpp</code> and <code>utils.cpp</code>, so that the code is organized more coherently corresponding to the different logics.</li>
+<li>Function <code>check_cqp_query()</code> renamed to <code><a href="../reference/checks.html">check_query()</a></code> to avoid a conflict with a function defined in the polmineR package.</li>
+<li>
+<code><a href="../reference/cqp_query.html">cqp_list_subcorpora()</a></code> returns a <code>character</code> vector. Previously, we just had obscure printed messages.</li>
+<li>
+<code><a href="../reference/s_attribute_decode.html">s_attribute_decode()</a></code> will not break if s-attribute has no values (<a href="https://github.com/PolMine/RcppCWB/issues/54" class="external-link">#54</a>).</li>
+<li>Functions <code><a href="../reference/s_attributes.html">cl_struc2str()</a></code> and <code><a href="../reference/s_attributes.html">cl_struc2cpos()</a></code> may now include negative values, the vectors returned will have <code>NA</code> values at respective positions. The check against negative values in <code>check_strucs</code> is dropped accordingly.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bux-fixes-0-5-1">Bux fixes<a class="anchor" aria-label="anchor" href="#bux-fixes-0-5-1"></a></h3>
+<ul><li>The <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> function did not declare structural attributes in the registry and mistakenly channeled output for the file to the terminal (<a href="https://github.com/PolMine/RcppCWB/issues/49" class="external-link">#49</a>). Fixed.</li>
+<li>Re-running <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> did not reset global variables, which resulted in a set of errors. Solved. (<a href="https://github.com/PolMine/RcppCWB/issues/51" class="external-link">#51</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.0" id="rcppcwb-050">RcppCWB 0.5.0<small>2022-02-01</small><a class="anchor" aria-label="anchor" href="#rcppcwb-050"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-5-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-5-0"></a></h3>
 <ul><li>The CWB code is updated to v3.4.33 / r1690 (<a href="https://github.com/PolMine/RcppCWB/issues/29" class="external-link">#29</a>). Automated patches that have been developed are a safeguard that it will be painless in the future to align RcppCWB with upstream CWB development.</li>
@@ -62,7 +120,7 @@
 <ul><li>Encoding a cropus using <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> now assumes implicitly that input files are XML files and remove blank lines and leading and trailing whitespace. This is equivalent to the option “-xsB” of the command line utility <code>cwb-encode</code>.</li>
 <li>The C++ code of <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> is now a patch of the <code>main()</code> function of <code>cwb-encode.c</code>, so that code in the *.cpp file can be limited to a slim wrapper, limiting the risk that the code in RcppCWB looses touch with CWB upstream development.</li>
 <li>Header files <code>_eval.h</code>, <code>_globalvars.h</code> and <code>_cl.h</code> in the <code>./src</code> directory are autogenerated files now, not to be edited by hand.</li>
-<li>The C++ code of the <code>cqp_drop_subcorpus()</code> function is temporarily disabled to ensure that the package can be built (<a href="https://github.com/PolMine/RcppCWB/issues/34" class="external-link">#34</a>).</li>
+<li>The C++ code of the <code><a href="../reference/cqp_query.html">cqp_drop_subcorpus()</a></code> function is temporarily disabled to ensure that the package can be built (<a href="https://github.com/PolMine/RcppCWB/issues/34" class="external-link">#34</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -101,7 +159,7 @@
 <ul><li>Encode XML (vrt file format) with new function <code><a href="../reference/cwb_utils.html">cwb_encode()</a></code> that exposes functionality of cwb-encode CWB utility.</li>
 <li>Functions <code><a href="../reference/s_attributes.html">cl_cpos2lbound()</a></code> and <code><a href="../reference/s_attributes.html">cl_cpos2rbound()</a></code> will now accept an integer vector with length &gt; 1 as argument <code>cpos</code> and return a vector with the same length. Useful to speed up iterated queries for left and right boundaries of regions (<a href="https://github.com/PolMine/RcppCWB/issues/19" class="external-link">#19</a>).</li>
 <li>A new function <code><a href="../reference/cl_struc_values.html">cl_struc_values()</a></code> exposes the corresponding C function of the Corpus Library (CL). The previous implicit assumption that all structural attributes have values can thus be tested. Intended to work with annotations of sentences and paragraphs, i.e. common structural attributes that do usually not have values.</li>
-<li>A new function <code><a href="../reference/corpus_data_dir.html">corpus_data_dir()</a></code> will derive the data directory from the internal C representation of a corpus.</li>
+<li>A new function <code><a href="../reference/registry_info.html">corpus_data_dir()</a></code> will derive the data directory from the internal C representation of a corpus.</li>
 <li>New function <code><a href="../reference/s_attr_regions.html">s_attr_regions()</a></code> will derive regions defined by a structural attribute from the *.rng file. Fastest option for large corpora.</li>
 <li>New functions <code><a href="../reference/xml.html">s_attr_is_sibling()</a></code> and <code><a href="../reference/xml.html">s_attr_is_descendent()</a></code> test the sibling/descendent relationship of structural attributes.</li>
 </ul></div>
@@ -209,8 +267,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.6" id="rcppcwb-016">RcppCWB 0.1.6<a class="anchor" aria-label="anchor" href="#rcppcwb-016"></a></h2>
-<ul><li>now using configure/configure.win script in combination with setpaths.R</li>
-</ul></div>
+<ul><li>now using configure/configure.win script in combination with setpaths.R</li></ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.1" id="rcppcwb-011">RcppCWB 0.1.1<a class="anchor" aria-label="anchor" href="#rcppcwb-011"></a></h2>
 <ul><li>vignette included that explains cross-compiling CWB for Windows</li>
@@ -218,8 +275,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="rcppcwb-010">RcppCWB 0.1.0<a class="anchor" aria-label="anchor" href="#rcppcwb-010"></a></h2>
-<ul><li>Windows compatibility (potentially still limited)</li>
-</ul></div>
+<ul><li>Windows compatibility (potentially still limited)</li></ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -234,7 +290,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

@@ -37,13 +37,22 @@
     <loc>/reference/cl_delete_corpus.html</loc>
   </url>
   <url>
+    <loc>/reference/cl_find_corpus.html</loc>
+  </url>
+  <url>
     <loc>/reference/cl_lexicon_size.html</loc>
   </url>
   <url>
-    <loc>/reference/cl_struc_values.html</loc>
+    <loc>/reference/cl_list_corpora.html</loc>
   </url>
   <url>
-    <loc>/reference/corpus_data_dir.html</loc>
+    <loc>/reference/cl_load_corpus.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cl_rework.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cl_struc_values.html</loc>
   </url>
   <url>
     <loc>/reference/corpus_is_loaded.html</loc>
@@ -56,6 +65,9 @@
   </url>
   <url>
     <loc>/reference/cqp_query.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cwb_charsets.html</loc>
   </url>
   <url>
     <loc>/reference/cwb_utils.html</loc>
@@ -82,10 +94,16 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/matrix_to_subcorpus.html</loc>
+  </url>
+  <url>
     <loc>/reference/p_attributes.html</loc>
   </url>
   <url>
     <loc>/reference/region_matrix_ops.html</loc>
+  </url>
+  <url>
+    <loc>/reference/registry_info.html</loc>
   </url>
   <url>
     <loc>/reference/s_attr_regions.html</loc>
@@ -95,6 +113,9 @@
   </url>
   <url>
     <loc>/reference/s_attributes.html</loc>
+  </url>
+  <url>
+    <loc>/reference/subcorpus_get_ranges.html</loc>
   </url>
   <url>
     <loc>/reference/tmp_registry.html</loc>

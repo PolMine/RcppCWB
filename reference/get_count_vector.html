@@ -19,7 +19,7 @@ corresponds to the number of ids."><!-- mathjax --><script src="https://cdnjs.cl
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -76,15 +76,14 @@ corresponds to the number of ids.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">registry</span> <span class="op">&lt;-</span> <span class="fu"><a href="tmp_registry.html">use_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">get_count_vector</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">get_count_vector</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="va">registry</span></span>
+<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>token_id <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, count <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">df</span><span class="op">[[</span><span class="st">"token"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span>
 <span class="r-in">  <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  id <span class="op">=</span> <span class="va">df</span><span class="op">[[</span><span class="st">"token_id"</span><span class="op">]</span><span class="op">]</span>, registry <span class="op">=</span> <span class="va">registry</span></span>
+<span class="r-in">  id <span class="op">=</span> <span class="va">df</span><span class="op">[[</span><span class="st">"token_id"</span><span class="op">]</span><span class="op">]</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"token"</span>, <span class="st">"token_id"</span>, <span class="st">"count"</span><span class="op">)</span><span class="op">]</span> <span class="co"># reorder columns</span></span>
 <span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">df</span><span class="op">[[</span><span class="st">"count"</span><span class="op">]</span><span class="op">]</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,<span class="op">]</span></span>
@@ -110,7 +109,7 @@ corresponds to the number of ids.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

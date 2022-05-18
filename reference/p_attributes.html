@@ -21,7 +21,7 @@ between corpus positions, token ids, and the character string of tokens."><!-- m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -108,45 +108,43 @@ environment variable CORPUS_REGISTRY</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># registry directory and cpos_total will be needed in examples</span></span>
-<span class="r-in"><span class="va">registry</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="check_pkg_registry_files.html">check_pkg_registry_files</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="tmp_registry.html">use_tmp_registry</a></span><span class="op">(</span><span class="op">)</span> <span class="kw">else</span> <span class="fu"><a href="get_pkg_registry.html">get_pkg_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>CORPUS_REGISTRY <span class="op">=</span> <span class="va">registry</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">cpos_total</span> <span class="op">&lt;-</span> <span class="fu"><a href="cl_attribute_size.html">cl_attribute_size</a></span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  attribute_type <span class="op">=</span> <span class="st">"p"</span>, registry <span class="op">=</span> <span class="va">registry</span></span>
+<span class="r-in">  attribute_type <span class="op">=</span> <span class="st">"p"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># decode the token stream of the corpus (the quick way)</span></span>
 <span class="r-in"><span class="va">token_stream_str</span> <span class="op">&lt;-</span> <span class="fu">cl_cpos2str</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
 <span class="r-in">  cpos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">cpos_total</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="va">registry</span></span>
+<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in">  </span>
 <span class="r-in"><span class="co"># decode the token stream (cpos2id first, then id2str)</span></span>
 <span class="r-in"><span class="va">token_stream_ids</span> <span class="op">&lt;-</span> <span class="fu">cl_cpos2id</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
 <span class="r-in">  cpos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">cpos_total</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="va">registry</span></span>
+<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"><span class="va">token_stream_str</span> <span class="op">&lt;-</span> <span class="fu">cl_id2str</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  id <span class="op">=</span> <span class="va">token_stream_ids</span>, registry <span class="op">=</span> <span class="va">registry</span></span>
+<span class="r-in">  id <span class="op">=</span> <span class="va">token_stream_ids</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get corpus positions of a token</span></span>
 <span class="r-in"><span class="va">token_to_get</span> <span class="op">&lt;-</span> <span class="st">"oil"</span></span>
 <span class="r-in"><span class="va">id_oil</span> <span class="op">&lt;-</span> <span class="fu">cl_str2id</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  str <span class="op">=</span> <span class="va">token_to_get</span></span>
+<span class="r-in">  str <span class="op">=</span> <span class="va">token_to_get</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">)</span></span>
 <span class="r-in"><span class="va">cpos_oil</span> <span class="op">&lt;-</span> <span class="va">cl_id2cpos</span> <span class="op">&lt;-</span> <span class="fu">cl_id2cpos</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  id <span class="op">=</span> <span class="va">id_oil</span></span>
+<span class="r-in">  id <span class="op">=</span> <span class="va">id_oil</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get frequency of token</span></span>
 <span class="r-in"><span class="va">oil_freq</span> <span class="op">&lt;-</span> <span class="fu">cl_id2freq</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">id_oil</span></span>
+<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, id <span class="op">=</span> <span class="va">id_oil</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cpos_oil</span><span class="op">)</span> <span class="co"># needs to be the same as oil_freq</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 78</span>
@@ -154,11 +152,11 @@ environment variable CORPUS_REGISTRY</p></dd>
 <span class="r-in"><span class="co"># use regular expressions </span></span>
 <span class="r-in"><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu">cl_regex2id</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  regex <span class="op">=</span> <span class="st">"M.*"</span></span>
+<span class="r-in">  regex <span class="op">=</span> <span class="st">"M.*"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="va">m_words</span> <span class="op">&lt;-</span> <span class="fu">cl_id2str</span><span class="op">(</span></span>
 <span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  id <span class="op">=</span> <span class="va">ids</span></span>
+<span class="r-in">  id <span class="op">=</span> <span class="va">ids</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">)</span></span>
 <span class="r-in"></span>
 </code></pre></div>
@@ -175,7 +173,7 @@ environment variable CORPUS_REGISTRY</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -59,7 +59,7 @@
         </td>
         <td><p>Check Paths in Registry Files</p></td>
       </tr><tr><td>
-          <p><code><a href="checks.html">check_registry()</a></code> <code><a href="checks.html">check_corpus()</a></code> <code><a href="checks.html">check_s_attribute()</a></code> <code><a href="checks.html">check_p_attribute()</a></code> <code><a href="checks.html">check_strucs()</a></code> <code><a href="checks.html">check_region_matrix()</a></code> <code><a href="checks.html">check_cqp_query()</a></code> <code><a href="checks.html">check_cpos()</a></code> <code><a href="checks.html">check_id()</a></code> </p>
+          <p><code><a href="checks.html">check_registry()</a></code> <code><a href="checks.html">check_corpus()</a></code> <code><a href="checks.html">check_s_attribute()</a></code> <code><a href="checks.html">check_p_attribute()</a></code> <code><a href="checks.html">check_strucs()</a></code> <code><a href="checks.html">check_region_matrix()</a></code> <code><a href="checks.html">check_query()</a></code> <code><a href="checks.html">check_cpos()</a></code> <code><a href="checks.html">check_id()</a></code> </p>
         </td>
         <td><p>Check Input to Rcpp Functions.</p></td>
       </tr><tr><td>
@@ -75,23 +75,35 @@
         </td>
         <td><p>Drop loaded corpus.</p></td>
       </tr><tr><td>
+          <p><code><a href="cl_find_corpus.html">cl_find_corpus()</a></code> </p>
+        </td>
+        <td><p>Load corpus.</p></td>
+      </tr><tr><td>
           <p><code><a href="cl_lexicon_size.html">cl_lexicon_size()</a></code> </p>
         </td>
         <td><p>Get Lexicon Size.</p></td>
+      </tr><tr><td>
+          <p><code><a href="cl_list_corpora.html">cl_list_corpora()</a></code> </p>
+        </td>
+        <td><p>Show CL corpora</p></td>
+      </tr><tr><td>
+          <p><code><a href="cl_load_corpus.html">cl_load_corpus()</a></code> </p>
+        </td>
+        <td><p>Load corpus</p></td>
+      </tr><tr><td>
+          <p><code><a href="cl_rework.html">s_attr()</a></code> <code><a href="cl_rework.html">p_attr()</a></code> <code><a href="cl_rework.html">p_attr_size()</a></code> <code><a href="cl_rework.html">s_attr_size()</a></code> <code><a href="cl_rework.html">p_attr_lexicon_size()</a></code> <code><a href="cl_rework.html">cpos_to_struc()</a></code> <code><a href="cl_rework.html">cpos_to_str()</a></code> <code><a href="cl_rework.html">cpos_to_id()</a></code> <code><a href="cl_rework.html">struc_to_cpos()</a></code> <code><a href="cl_rework.html">struc_to_str()</a></code> <code><a href="cl_rework.html">regex_to_id()</a></code> <code><a href="cl_rework.html">str_to_id()</a></code> <code><a href="cl_rework.html">id_to_freq()</a></code> <code><a href="cl_rework.html">id_to_cpos()</a></code> <code><a href="cl_rework.html">cpos_to_lbound()</a></code> <code><a href="cl_rework.html">cpos_to_rbound()</a></code> </p>
+        </td>
+        <td><p>Experimental low-level CL access.</p></td>
       </tr><tr><td>
           <p><code><a href="cl_struc_values.html">cl_struc_values()</a></code> </p>
         </td>
         <td><p>Check whether structural attribute has values</p></td>
       </tr><tr><td>
-          <p><code><a href="corpus_data_dir.html">corpus_data_dir()</a></code> </p>
-        </td>
-        <td><p>Get data directory of a corpus</p></td>
-      </tr><tr><td>
           <p><code><a href="corpus_is_loaded.html">corpus_is_loaded()</a></code> </p>
         </td>
         <td><p>Check whether corpus is loaded</p></td>
       </tr><tr><td>
-          <p><code><a href="cqp_initialize.html">cqp_initialize()</a></code> <code><a href="cqp_initialize.html">cqp_is_initialized()</a></code> <code><a href="cqp_initialize.html">cqp_get_registry()</a></code> <code><a href="cqp_initialize.html">cqp_reset_registry()</a></code> </p>
+          <p><code><a href="cqp_initialize.html">cqp_initialize()</a></code> <code><a href="cqp_initialize.html">cqp_is_initialized()</a></code> <code><a href="cqp_initialize.html">cqp_verbosity()</a></code> <code><a href="cqp_initialize.html">cqp_get_registry()</a></code> <code><a href="cqp_initialize.html">cqp_reset_registry()</a></code> <code><a href="cqp_initialize.html">cqp_load_corpus()</a></code> </p>
         </td>
         <td><p>Initialize Corpus Query Processor (CQP).</p></td>
       </tr><tr><td>
@@ -99,9 +111,13 @@
         </td>
         <td><p>List Available CWB Corpora.</p></td>
       </tr><tr><td>
-          <p><code><a href="cqp_query.html">cqp_query()</a></code> <code><a href="cqp_query.html">cqp_dump_subcorpus()</a></code> <code><a href="cqp_query.html">cqp_subcorpus_size()</a></code> <code><a href="cqp_query.html">cqp_list_subcorpora()</a></code> </p>
+          <p><code><a href="cqp_query.html">cqp_query()</a></code> <code><a href="cqp_query.html">cqp_dump_subcorpus()</a></code> <code><a href="cqp_query.html">cqp_subcorpus_size()</a></code> <code><a href="cqp_query.html">cqp_list_subcorpora()</a></code> <code><a href="cqp_query.html">cqp_drop_subcorpus()</a></code> </p>
         </td>
         <td><p>Execute CQP Query and Retrieve Results.</p></td>
+      </tr><tr><td>
+          <p><code><a href="cwb_charsets.html">cwb_charsets()</a></code> </p>
+        </td>
+        <td><p>Character sets supported by CWB</p></td>
       </tr><tr><td>
           <p><code><a href="cwb_utils.html">cwb_makeall()</a></code> <code><a href="cwb_utils.html">cwb_huffcode()</a></code> <code><a href="cwb_utils.html">cwb_compress_rdx()</a></code> <code><a href="cwb_utils.html">cwb_encode()</a></code> </p>
         </td>
@@ -131,13 +147,21 @@
         </td>
         <td><p>Perform Count for Vector of IDs.</p></td>
       </tr><tr><td>
+          <p><code><a href="matrix_to_subcorpus.html">matrix_to_subcorpus()</a></code> </p>
+        </td>
+        <td><p>Create CWB subcorpus from matrix with regions.</p></td>
+      </tr><tr><td>
           <p><code><a href="p_attributes.html">cl_cpos2str()</a></code> <code><a href="p_attributes.html">cl_cpos2id()</a></code> <code><a href="p_attributes.html">cl_id2str()</a></code> <code><a href="p_attributes.html">cl_regex2id()</a></code> <code><a href="p_attributes.html">cl_str2id()</a></code> <code><a href="p_attributes.html">cl_id2freq()</a></code> <code><a href="p_attributes.html">cl_id2cpos()</a></code> </p>
         </td>
         <td><p>Using Positional Attributes.</p></td>
       </tr><tr><td>
-          <p><code><a href="region_matrix_ops.html">region_matrix_to_ids()</a></code> <code><a href="region_matrix_ops.html">region_matrix_to_count_matrix()</a></code> </p>
+          <p><code><a href="region_matrix_ops.html">region_matrix_to_ids()</a></code> <code><a href="region_matrix_ops.html">region_matrix_to_count_matrix()</a></code> <code><a href="region_matrix_ops.html">region_matrix_context()</a></code> <code><a href="region_matrix_ops.html">ranges_to_cpos()</a></code> </p>
         </td>
         <td><p>Get IDs and Counts for Region Matrices.</p></td>
+      </tr><tr><td>
+          <p><code><a href="registry_info.html">corpus_data_dir()</a></code> <code><a href="registry_info.html">corpus_info_file()</a></code> <code><a href="registry_info.html">corpus_full_name()</a></code> <code><a href="registry_info.html">corpus_p_attributes()</a></code> <code><a href="registry_info.html">corpus_s_attributes()</a></code> <code><a href="registry_info.html">corpus_properties()</a></code> <code><a href="registry_info.html">corpus_property()</a></code> <code><a href="registry_info.html">corpus_registry_dir()</a></code> </p>
+        </td>
+        <td><p>Get information from registry file</p></td>
       </tr><tr><td>
           <p><code><a href="s_attr_regions.html">s_attr_regions()</a></code> </p>
         </td>
@@ -151,11 +175,15 @@
         </td>
         <td><p>Using Structural Attributes.</p></td>
       </tr><tr><td>
+          <p><code><a href="subcorpus_get_ranges.html">subcorpus_get_ranges()</a></code> </p>
+        </td>
+        <td><p>Get ranges of subcorpus</p></td>
+      </tr><tr><td>
           <p><code><a href="tmp_registry.html">use_tmp_registry()</a></code> <code><a href="tmp_registry.html">get_tmp_registry()</a></code> </p>
         </td>
         <td><p>Use Temporary Registry</p></td>
       </tr><tr><td>
-          <p><code><a href="xml.html">s_attr_is_descendent()</a></code> <code><a href="xml.html">s_attr_is_sibling()</a></code> </p>
+          <p><code><a href="xml.html">s_attr_is_descendent()</a></code> <code><a href="xml.html">s_attr_is_sibling()</a></code> <code><a href="xml.html">s_attr_relationship()</a></code> </p>
         </td>
         <td><p>Explore XML structure of CWB corpus</p></td>
       </tr></tbody></table></div>
@@ -171,7 +199,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>
