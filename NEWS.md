@@ -14,6 +14,8 @@ are deprectated.
 in the CL and/or CQP context.
 * `cwb_huffcode()` and `cwb_compress_rdx()` have argument `delete` to trigger
 deleting redundant files after compression (#60).
+* `cqp_load_corpus` will internally upper corpus ID as required in the CQP
+context (#64).
 
 # RcppCWB 0.5.2
 
