@@ -1,9 +1,9 @@
 ## General remarks
 
-This is a "standard" release with some new functionality. No changes to the 
+This is a maintenance release with bug fixes. No changes to the 
 setup of the package.
 
-Previous aspects I repeat here:
+Previous aspects I repeat:
 
 - CRAN package check results report 'GNU make is a SystemRequirements'. Using GNU
 make remains important for the portability of the C code. There would be a great
@@ -18,7 +18,8 @@ change.
 ## Test environments
 
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* local macOS R 4.1.3 (arm64)
+* R winbuilder (R 4.2 release and devel)
+* local macOS, still R 4.1.3 (arm64)
 
 
 ## R CMD check results
