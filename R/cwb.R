@@ -93,7 +93,9 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
-cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+#' @param delete A `logical` value, whether to remove redundant files after
+#'   compression.
+cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
   huffcode <- function()
     .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
@@ -102,6 +104,15 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
   } else {
     success <- huffcode()
   }
+  
+  if (delete){
+    data_dir <- corpus_data_dir(corpus = corpus, registry = registry)
+    fname <- path(data_dir, sprintf("%s.corpus", p_attribute))
+    if (!file.exists(fname)) warning("cwb_huffcode: file to delete missing")
+    removed <- file.remove(fname)
+    if (removed) if (!quietly) message("redundant file deleted: ", fname)
+  }
+  
   success
   
 }
@@ -114,7 +125,7 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 #'   p_attribute = "word",
 #'   registry = get_tmp_registry()
 #' )
-cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
   compress_rdx <-function()
     .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
@@ -123,6 +134,21 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
   } else {
     success <- compress_rdx()
   }
+  
+  if (delete){
+    data_dir <- corpus_data_dir(corpus = corpus, registry = registry)
+    
+    rev_file <- path(data_dir, sprintf("%s.corpus.rev", p_attribute))
+    if (!file.exists(rev_file)) warning("cwb_huffcode: file to delete missing")
+    removed <- file.remove(rev_file)
+    if (removed) if (!quietly) message("redundant file deleted: ", rev_file)
+    
+    rdx_file <- path(data_dir, sprintf("%s.corpus.rdx", p_attribute))
+    if (!file.exists(rdx_file)) warning("cwb_huffcode: file to delete missing")
+    removed <- file.remove(rdx_file)
+    if (removed) if (!quietly) message("redundant file deleted: ", rdx_file)
+  }
+
   success
 }
 

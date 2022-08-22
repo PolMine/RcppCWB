@@ -23,6 +23,20 @@ test_that(
 )
 
 test_that(
+  "corpus_info_file() returns NA if INFO missing in registry file",
+  {
+    # If INFO is not defined in registry file, no crash (#62) but NA as
+    # return value
+    expect_true(
+      is.na(
+        corpus_info_file("UNGA", registry = get_tmp_registry())
+      )
+    )
+  }
+)
+
+
+test_that(
   "check result of corpus_info_file()",
   {
     name <- corpus_full_name("REUTERS", registry = get_tmp_registry())

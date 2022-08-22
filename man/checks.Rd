@@ -15,7 +15,7 @@
 \usage{
 check_registry(registry)
 
-check_corpus(corpus, registry)
+check_corpus(corpus, registry, cl = TRUE, cqp = TRUE)
 
 check_s_attribute(
   s_attribute,
@@ -48,6 +48,12 @@ check_id(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY"))
 \item{registry}{path to registry directory}
 
 \item{corpus}{name of a CWB corpus}
+
+\item{cl}{A \code{logical} value, whether CL availability of corpus is required
+for positive result.}
+
+\item{cqp}{A \code{logical} value, whether CQP availability of corpus is required
+for positive result.}
 
 \item{s_attribute}{a structural attribute}
 

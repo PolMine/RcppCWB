@@ -78,7 +78,10 @@ test_that(
     
     expect_true(cl_load_corpus(corpus = "BT", registry = get_tmp_registry()))
     expect_true(tolower("BT") %in% cl_list_corpora())
-    expect_true(cqp_load_corpus(corpus = "BT", registry = get_tmp_registry()))
+    
+    # In the CQP context, corpus IDs are uppered - here we knowingly provide
+    # a lowercase ID that is uppered internally #64
+    expect_true(cqp_load_corpus(corpus = "bt", registry = get_tmp_registry()))
     expect_true("BT" %in% cqp_list_corpora())
     
     for (p_attr in c("word", "pos", "lemma")){

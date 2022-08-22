@@ -1,3 +1,22 @@
+# RcppCWB 0.5.2.9001ff
+
+* Fixed a bug in the `region_matrix_corpus()` C++ code that would not show any
+context at all if s_attribute expansion transgressed start or end of corpus.
+* Fixed a bug in the `region_matrix_corpus()` C++ code that would result from 
+not considering that query matches may go cover more than one strucs of a 
+structural attribute.
+* `corpus_info_file()` does not crash if INFO is not defined in the registry
+file (#62).
+* Implicit processing of arguments `sAttribute` and `pAttribute` as `s_attribute`
+or `p_attribute` respectively is now accompanied by a warning that arguments 
+are deprectated.
+* The `check_corpus()` function distinguishes between whether a corpus is loaded
+in the CL and/or CQP context.
+* `cwb_huffcode()` and `cwb_compress_rdx()` have argument `delete` to trigger
+deleting redundant files after compression (#60).
+* `cqp_load_corpus` will internally upper corpus ID as required in the CQP
+context (#64).
+
 # RcppCWB 0.5.2
 
 * The example for `corpus_data_dir()` dir not work as intended without

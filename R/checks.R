@@ -32,37 +32,42 @@ check_registry <- function(registry){
 #' @rdname checks
 #' @export check_corpus
 #' @importFrom fs path
-check_corpus <- function(corpus, registry){
+#' @param cl A `logical` value, whether CL availability of corpus is required
+#'   for positive result.
+#' @param cqp A `logical` value, whether CQP availability of corpus is required
+#'   for positive result.
+check_corpus <- function(corpus, registry, cl = TRUE, cqp = TRUE){
+  
+  if (length(corpus) != 1L) stop("corpus needs to be a vector of length 1")
+  if (!is.character(corpus)) stop("corpus needs to be a character vector")
   
   registry <- fs::path(registry)
-  
-  if (length(corpus) != 1L)
-    stop("corpus needs to be a vector of length 1")
-  
-  if (!is.character(corpus))
-    stop("corpus needs to be a character vector")
-  
   if (isFALSE(dir.exists(registry)))
     stop(sprintf("Registry directory '%s' does not exist.", registry))
   
-  if (isFALSE(cqp_is_initialized())) cqp_initialize(registry = registry)
-  
-  if (!tolower(corpus) %in% cl_list_corpora()){
-    
-    success_cl <- cl_load_corpus(corpus = corpus, registry = registry)
-    if (isFALSE(success_cl))
-      warning(sprintf("corpus '%s' is not loaded and cannot be loaded", corpus))
-    
-    success_cqp <- cqp_load_corpus(corpus = toupper(corpus), registry = registry)
-    if (isFALSE(success_cqp))
-      warning(sprintf("corpus '%s' is not loaded and cannot be loaded", corpus))
-    
+  if (cl){
+    if (!tolower(corpus) %in% cl_list_corpora()){
+      cl_load_corpus(corpus = corpus, registry = registry)
+    }
+    cl_availability <- corpus_is_loaded(corpus = corpus, registry = registry)
   }
-
-  if (.check_corpus(toupper(corpus)) == 0L)
-    stop(sprintf("corpus %s is not available (check whether there is a typo)", sQuote(corpus)))
   
-  return( TRUE )
+  if (cqp){
+    if (isFALSE(cqp_is_initialized())) cqp_initialize(registry = registry)
+    if (!toupper(corpus) %in% cqp_list_corpora()){
+      cqp_load_corpus(corpus = toupper(corpus), registry = registry)
+    }
+    cqp_availability <- as.logical(
+      .check_corpus(corpus = toupper(corpus))
+    )
+  }
+  
+  if (!any(cl, cqp)) return(TRUE)
+  if (all(cl, cqp)) return(all(cqp_availability, cl_availability))
+  if (cl && !cqp) return(cl_availability)
+  if (!cl && cqp) return(cqp_availability)
+
+  return(FALSE)
 }
 
 #' @export check_s_attribute

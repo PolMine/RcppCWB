@@ -139,7 +139,7 @@ cl_lexicon_size <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_R
 #' fulltext <- paste(txt, collapse = " ")
 cl_cpos2struc <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   
   if (length(cpos) == 0L) return(integer())
@@ -151,7 +151,7 @@ cl_cpos2struc <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORP
 #' @rdname s_attributes
 cl_struc2cpos <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), struc){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = struc, registry = registry)
   .cl_struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
@@ -160,7 +160,7 @@ cl_struc2cpos <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REG
 #' @rdname s_attributes
 cl_struc2str <- function(corpus, s_attribute, struc, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = struc, registry = registry)
   .cl_struc2str(corpus = corpus, s_attribute = s_attribute, struc = struc, registry = registry)
@@ -169,7 +169,7 @@ cl_struc2str <- function(corpus, s_attribute, struc, registry = Sys.getenv("CORP
 #' @rdname s_attributes
 cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   
   if (length(cpos) == 0L) return(integer())
@@ -181,7 +181,7 @@ cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 #' @rdname s_attributes
 cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   
   check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
@@ -267,7 +267,7 @@ cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("COR
 #' 
 cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   if (length(cpos) == 0L) return(integer())
   .cl_cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
@@ -275,7 +275,7 @@ cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 #' @rdname p_attributes
 cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), cpos){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   if (length(cpos) == 0L) return(integer())
   .cl_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
@@ -283,7 +283,7 @@ cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIST
 #' @rdname p_attributes
 cl_id2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), id){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
   .cl_id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
 }
@@ -291,21 +291,21 @@ cl_id2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTR
 #' @rdname p_attributes
 cl_regex2id <- function(corpus, p_attribute, regex, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   .cl_regex2id(corpus = corpus, p_attribute = p_attribute, regex = regex, registry = registry)
 }
 
 #' @rdname p_attributes
 cl_str2id <- function(corpus, p_attribute, str, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   .cl_str2id(corpus = corpus, p_attribute = p_attribute, str = str, registry = registry)
 }
 
 #' @rdname p_attributes
 cl_id2freq <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
   check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
   .cl_id2freq(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
@@ -315,7 +315,7 @@ cl_id2freq <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_RE
 #' @rdname p_attributes
 cl_id2cpos <- function(corpus, p_attribute, id, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
-  check_corpus(corpus, registry)
+  check_corpus(corpus, registry, cqp = FALSE)
   check_p_attribute(p_attribute = p_attribute, corpus = corpus, registry = registry)
   check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
   .cl_id2cpos(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
@@ -394,7 +394,7 @@ cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 #' cl_struc_values("REUTERS", "places") # TRUE - attribute has values
 #' cl_struc_values("REUTERS", "date") # NA - attribute does not exist
 cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- normalizePath(path.expand(registry))
   i <- .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
   if (i == 1L) TRUE else if (i == 0L) FALSE else if (i < 0L) as.integer(NA)
@@ -414,19 +414,20 @@ cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_R
 #' @examples
 #' corpus_data_dir("REUTERS", registry = get_tmp_registry())
 corpus_data_dir <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   dir <- .corpus_data_dir(corpus = corpus, registry = registry)
   path(dir)
 }
 
 #' @details `corpus_info_file()` will return the path to the info file for a
-#'   corpus (class `fs_path` object).
+#'   corpus (class `fs_path` object). If info file does not exist or INFO line
+#'   is missing in the registry file, `NA` is returned.
 #' @rdname registry_info
 #' @examples
 #' corpus_info_file("REUTERS", registry = get_tmp_registry())
 corpus_info_file <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   fname <- .corpus_info_file(corpus = corpus, registry = registry)
   path(fname)
@@ -438,7 +439,7 @@ corpus_info_file <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 #' @examples
 #' corpus_full_name("REUTERS", registry = get_tmp_registry())
 corpus_full_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   .corpus_full_name(corpus = corpus, registry = registry)
 }
@@ -449,7 +450,7 @@ corpus_full_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 #' @examples
 #' corpus_p_attributes("REUTERS", registry = get_tmp_registry())
 corpus_p_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   .corpus_p_attributes(corpus = corpus, registry = registry)
 }
@@ -460,7 +461,7 @@ corpus_p_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")
 #' @examples
 #' corpus_s_attributes("REUTERS", registry = get_tmp_registry())
 corpus_s_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   .corpus_s_attributes(corpus = corpus, registry = registry)
 }
@@ -471,7 +472,7 @@ corpus_s_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")
 #' @examples
 #' corpus_properties("REUTERS", registry = get_tmp_registry())
 corpus_properties <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   .corpus_properties(corpus = corpus, registry = registry)
 }
@@ -492,7 +493,7 @@ corpus_property <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY"), pr
     length(property) == 1L,
     is.character(property)
   )
-  check_corpus(corpus = corpus, registry = registry)
+  check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- path(path_expand(registry))
   .corpus_property(corpus = corpus, registry = registry, property = property)
 }

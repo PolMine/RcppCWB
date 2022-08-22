@@ -201,7 +201,7 @@ Rcpp::IntegerVector region_matrix_to_count_matrix(SEXP corpus, SEXP p_attribute,
 // [[Rcpp::export(name=".region_matrix_context")]]
 Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::IntegerMatrix region_matrix, SEXP p_attribute, SEXP s_attribute, SEXP boundary, int left, int right){
   
-  int i, cpos, size;
+  int i, cpos, size, struc_max;
   int ncpos = 0;
   int lb, rb;
   Rcpp::IntegerMatrix context_matrix(region_matrix.nrow(), 2);
@@ -238,42 +238,43 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
     } else {
       
       Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
-      size = cl_max_struc(s_attr);
-      int struc_node, struc_left, struc_right;
+      struc_max = cl_max_struc(s_attr);
+      int struc_match_left, struc_match_right, struc_left, struc_right;
       
       for (i = 0; i < region_matrix.nrow(); i++){
         
-        struc_node = cl_cpos2struc(s_attr, region_matrix(i, 0));
-
-        struc_left = struc_node - left;
-        if (struc_left >= 0){
-          
-          cl_struc2cpos(s_attr, struc_left, &lb, &rb);
-
-          if (lb == region_matrix(i,0)){
-            context_matrix(i,0) = NA_INTEGER;
-          } else {
-            context_matrix(i,0) = lb;
-            ncpos += region_matrix(i,0) - lb;
-          }
+        struc_match_left = cl_cpos2struc(s_attr, region_matrix(i, 0));
+        if (region_matrix(i,0) == region_matrix(i,1)){
+          struc_match_right = struc_match_left;
         } else {
+          struc_match_right = cl_cpos2struc(s_attr, region_matrix(i, 1));
+        }
+
+        struc_left = struc_match_left - left;
+        if (struc_left < 0) struc_left = 0;
+        
+        cl_struc2cpos(s_attr, struc_left, &lb, &rb);
+        
+        if (lb == region_matrix(i,0)){
           context_matrix(i,0) = NA_INTEGER;
+        } else {
+          context_matrix(i,0) = lb;
+          ncpos += region_matrix(i,0) - lb;
         }
         
-        struc_right = struc_node + right;
-        if (struc_right <= size){
+        
+        struc_right = struc_match_right + right;
+        if (struc_right > struc_max) struc_right = struc_max;
           
-          cl_struc2cpos(s_attr, struc_right, &lb, &rb);
-
-          if (rb == region_matrix(i,1)){
-            context_matrix(i,1) = NA_INTEGER;
-          } else {
-            context_matrix(i,1) = rb;
-            ncpos += rb - region_matrix(i,1);
-          }
+        cl_struc2cpos(s_attr, struc_right, &lb, &rb);
+        
+        if (rb == region_matrix(i,1)){
+          context_matrix(i,1) = NA_INTEGER;
         } else {
-          context_matrix(i,3) = NA_INTEGER;
+          context_matrix(i,1) = rb;
+          ncpos += rb - region_matrix(i,1);
         }
+        
         
         ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
       }
@@ -333,51 +334,53 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
     } else {
       
       Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
-      size = cl_max_struc(s_attr);
-      int struc_node, struc_left, struc_right;
+      struc_max = cl_max_struc(s_attr);
+      int struc_match_left, struc_match_right, struc_left, struc_right;
       
       for (i = 0; i < region_matrix.nrow(); i++){
         
-        struc_node = cl_cpos2struc(s_attr, region_matrix(i, 0));
+        struc_match_left = cl_cpos2struc(s_attr, region_matrix(i, 0));
+        if (region_matrix(i,0) == region_matrix(i,1)){
+          struc_match_right = struc_match_left;
+        } else {
+          struc_match_right = cl_cpos2struc(s_attr, region_matrix(i, 1));
+        }
+        
         struc_boundary_node = cl_cpos2struc(limit, region_matrix(i, 0));
         
-        struc_left = struc_node - left;
-        if (struc_left >= 0){
-          
-          cl_struc2cpos(s_attr, struc_left, &lb, &rb);
-          cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
-          
-          if (lb_boundary == region_matrix(i,0)){
-            context_matrix(i,0) = NA_INTEGER;
-          } else if (lb_boundary > lb){
-            context_matrix(i,0) = lb_boundary;
-            ncpos += region_matrix(i,0) - lb_boundary;
-          } else {
-            context_matrix(i,0) = lb;
-            ncpos += region_matrix(i,0) - lb;
-          }
-        } else {
+        struc_left = struc_match_left - left;
+        if (struc_left < 0) struc_left = 0;
+        
+        cl_struc2cpos(s_attr, struc_left, &lb, &rb);
+        cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+        
+        if (lb_boundary == region_matrix(i,0)){
           context_matrix(i,0) = NA_INTEGER;
+        } else if (lb_boundary > lb){
+          context_matrix(i,0) = lb_boundary;
+          ncpos += region_matrix(i,0) - lb_boundary;
+        } else {
+          context_matrix(i,0) = lb;
+          ncpos += region_matrix(i,0) - lb;
         }
         
-        struc_right = struc_node + right;
-        if (struc_right <= size){
-          
-          cl_struc2cpos(s_attr, struc_right, &lb, &rb);
-          cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
-          
-          if (rb_boundary == region_matrix(i,1)){
-            context_matrix(i,1) = NA_INTEGER;
-          } else if (rb_boundary < rb){
-            context_matrix(i,1) = rb_boundary;
-            ncpos += rb_boundary - region_matrix(i,1);
-          } else {
-            context_matrix(i,1) = rb;
-            ncpos += rb - region_matrix(i,1);
-          }
+        struc_right = struc_match_right + right;
+        if (struc_right > struc_max) struc_right = struc_max;
+        
+        cl_struc2cpos(s_attr, struc_right, &lb, &rb);
+        cl_struc2cpos(limit, struc_boundary_node, &lb_boundary, &rb_boundary);
+        
+        if (rb_boundary == region_matrix(i,1)){
+          context_matrix(i,1) = NA_INTEGER;
+        } else if (rb_boundary < rb){
+          context_matrix(i,1) = rb_boundary;
+          ncpos += rb_boundary - region_matrix(i,1);
         } else {
-          context_matrix(i,3) = NA_INTEGER;
+          context_matrix(i,1) = rb;
+          ncpos += rb - region_matrix(i,1);
         }
+        
+        
         ncpos += region_matrix(i,1) - region_matrix(i,0) + 1;
       }
     }

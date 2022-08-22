@@ -212,5 +212,5 @@ matrix_to_subcorpus <- function(region_matrix, corpus, subcorpus){
 #' @export cqp_load_corpus
 #' @rdname cqp_initialize
 cqp_load_corpus <- function(corpus, registry){
-  as.logical(.cqp_load_corpus(corpus = corpus, registry = registry))
+  as.logical(.cqp_load_corpus(corpus = toupper(corpus), registry = registry))
 }

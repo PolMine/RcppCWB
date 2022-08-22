@@ -43,7 +43,8 @@ where the binary files of a corpus are kept (a directory also known as
 'home' directory).
 
 \code{corpus_info_file()} will return the path to the info file for a
-corpus (class \code{fs_path} object).
+corpus (class \code{fs_path} object). If info file does not exist or INFO line
+is missing in the registry file, \code{NA} is returned.
 
 \code{corpus_full_name()} will return the full name of the corpus defined
 in the registry file.
