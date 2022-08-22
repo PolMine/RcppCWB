@@ -21,7 +21,7 @@ cqp_is_initialized"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -61,31 +61,38 @@ call <code>cqp_initialize</code>. To reset the registry, use the function
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cqp_initialize</span><span class="op">(</span>registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">cqp_verbosity</span><span class="op">(</span><span class="va">silent</span>, <span class="va">verbose</span><span class="op">)</span>
-
-<span class="fu">cqp_get_registry</span><span class="op">(</span><span class="op">)</span>
-
-<span class="fu">cqp_reset_registry</span><span class="op">(</span>registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">cqp_load_corpus</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">registry</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cqp_initialize</span><span class="op">(</span>registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cqp_verbosity</span><span class="op">(</span><span class="va">silent</span>, <span class="va">verbose</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cqp_get_registry</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cqp_reset_registry</span><span class="op">(</span>registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cqp_load_corpus</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">registry</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>registry</dt>
 <dd><p>the registry directory</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>A single <code>logical</code> value, whether to be silent and suppress CQP
 messages (<code>TRUE</code>), or not (<code>FALSE</code>).</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>A single <code>logical</code> value, whether to show verbose parser
 output (<code>TRUE</code>) or not (<code>FALSE</code>).</p></dd>
+
+
 <dt>corpus</dt>
 <dd><p>ID of a CWB corpus (length-one <code>character</code>).</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -99,14 +106,14 @@ has been loaded successfully, <code>FALSE</code> if not.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span> <span class="co"># check initialization status</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span> <span class="co"># check initialization status</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu">cqp_initialize</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span> <span class="co"># check initialization status (TRUE now?)</span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu">cqp_initialize</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">cqp_is_initialized</span><span class="op">(</span><span class="op">)</span> <span class="co"># check initialization status (TRUE now?)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu">cqp_get_registry</span><span class="op">(</span><span class="op">)</span> <span class="co"># get registry dir used by CQP</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpTJhCoe/registry_tmp</span></span>
-<span class="r-in"><span class="fu"><a href="cqp_list_corpora.html">cqp_list_corpora</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># get list of corpora</span></span>
+<span class="r-in"><span><span class="fu">cqp_get_registry</span><span class="op">(</span><span class="op">)</span> <span class="co"># get registry dir used by CQP</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpqyysgt/registry_tmp</span></span>
+<span class="r-in"><span><span class="fu"><a href="cqp_list_corpora.html">cqp_list_corpora</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># get list of corpora</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "UNGA"    "REUTERS"</span>
 </code></pre></div>
     </div>
@@ -122,7 +129,7 @@ has been loaded successfully, <code>FALSE</code> if not.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

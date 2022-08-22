@@ -20,7 +20,7 @@ a quick access to this information.'><!-- mathjax --><script src="https://cdnjs.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -59,24 +59,27 @@ a quick access to this information.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cl_charset_name</span><span class="op">(</span><span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cl_charset_name</span><span class="op">(</span><span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>Name of a CWB corpus (upper case).</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>Path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY</p></dd>
+
 </dl></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">cl_charset_name</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"cwb"</span>, <span class="st">"registry"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">cl_charset_name</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"cwb"</span>, <span class="st">"registry"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "latin1"</span>
 </code></pre></div>
     </div>
@@ -92,7 +95,7 @@ environment variable CORPUS_REGISTRY</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ ease of writing code."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -55,63 +55,84 @@ ease of writing code.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">s_attr</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">s_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">p_attr</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">p_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu">p_attr_size</span><span class="op">(</span><span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">s_attr_size</span><span class="op">(</span><span class="va">s_attr</span><span class="op">)</span>
-
-<span class="fu">p_attr_lexicon_size</span><span class="op">(</span><span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">cpos_to_struc</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">s_attr</span><span class="op">)</span>
-
-<span class="fu">cpos_to_str</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">cpos_to_id</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">struc_to_cpos</span><span class="op">(</span><span class="va">struc</span>, <span class="va">s_attr</span><span class="op">)</span>
-
-<span class="fu">struc_to_str</span><span class="op">(</span><span class="va">struc</span>, <span class="va">s_attr</span><span class="op">)</span>
-
-<span class="fu">regex_to_id</span><span class="op">(</span><span class="va">regex</span>, <span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">str_to_id</span><span class="op">(</span><span class="va">str</span>, <span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">id_to_freq</span><span class="op">(</span><span class="va">id</span>, <span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">id_to_cpos</span><span class="op">(</span><span class="va">id</span>, <span class="va">p_attr</span><span class="op">)</span>
-
-<span class="fu">cpos_to_lbound</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">s_attr</span><span class="op">)</span>
-
-<span class="fu">cpos_to_rbound</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">s_attr</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">s_attr</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">s_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">p_attr</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">p_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">p_attr_size</span><span class="op">(</span><span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">s_attr_size</span><span class="op">(</span><span class="va">s_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">p_attr_lexicon_size</span><span class="op">(</span><span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cpos_to_struc</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">s_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cpos_to_str</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cpos_to_id</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">struc_to_cpos</span><span class="op">(</span><span class="va">struc</span>, <span class="va">s_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">struc_to_str</span><span class="op">(</span><span class="va">struc</span>, <span class="va">s_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">regex_to_id</span><span class="op">(</span><span class="va">regex</span>, <span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">str_to_id</span><span class="op">(</span><span class="va">str</span>, <span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">id_to_freq</span><span class="op">(</span><span class="va">id</span>, <span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">id_to_cpos</span><span class="op">(</span><span class="va">id</span>, <span class="va">p_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cpos_to_lbound</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">s_attr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cpos_to_rbound</span><span class="op">(</span><span class="va">cpos</span>, <span class="va">s_attr</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>ID of a CWB corpus (length-one <code>character</code> vector).</p></dd>
+
+
 <dt>s_attribute</dt>
 <dd><p>A structural attribute (length-one <code>character</code> vector).</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>Registry directory.</p></dd>
+
+
 <dt>p_attribute</dt>
 <dd><p>A positional attribute (length-one <code>character</code> vector).</p></dd>
+
+
 <dt>p_attr</dt>
 <dd><p>A <code>externalptr</code> referencing a p-attribute.</p></dd>
+
+
 <dt>s_attr</dt>
 <dd><p>A <code>externalptr</code> referencing a p-attribute.</p></dd>
+
+
 <dt>cpos</dt>
 <dd><p>An <code>integer</code> vector of corpus positions.</p></dd>
+
+
 <dt>struc</dt>
 <dd><p>A length-one <code>integer</code> vector with a struc.</p></dd>
+
+
 <dt>regex</dt>
 <dd><p>A regular expression.</p></dd>
+
+
 <dt>str</dt>
 <dd><p>A <code>character</code> vector.</p></dd>
+
+
 <dt>id</dt>
 <dd><p>An <code>integer</code> vector with token ids.</p></dd>
+
 </dl></div>
 
   </div>
@@ -126,7 +147,7 @@ ease of writing code.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

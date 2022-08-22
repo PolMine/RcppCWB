@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -53,57 +53,74 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">region_matrix_to_ids</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  <span class="va">p_attribute</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  <span class="va">matrix</span>
-<span class="op">)</span>
-
-<span class="fu">region_matrix_to_count_matrix</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  <span class="va">p_attribute</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  <span class="va">matrix</span>
-<span class="op">)</span>
-
-<span class="fu">region_matrix_context</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  <span class="va">matrix</span>,
-  <span class="va">p_attribute</span>,
-  <span class="va">s_attribute</span>,
-  <span class="va">boundary</span>,
-  <span class="va">left</span>,
-  <span class="va">right</span>
-<span class="op">)</span>
-
-<span class="fu">ranges_to_cpos</span><span class="op">(</span><span class="va">ranges</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">region_matrix_to_ids</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  <span class="va">p_attribute</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  <span class="va">matrix</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">region_matrix_to_count_matrix</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  <span class="va">p_attribute</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  <span class="va">matrix</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">region_matrix_context</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  <span class="va">matrix</span>,</span>
+<span>  <span class="va">p_attribute</span>,</span>
+<span>  <span class="va">s_attribute</span>,</span>
+<span>  <span class="va">boundary</span>,</span>
+<span>  <span class="va">left</span>,</span>
+<span>  <span class="va">right</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ranges_to_cpos</span><span class="op">(</span><span class="va">ranges</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>a CWB corpus</p></dd>
+
+
 <dt>p_attribute</dt>
 <dd><p>a positional attribute</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>registry directory</p></dd>
+
+
 <dt>matrix</dt>
 <dd><p>a regions matrix</p></dd>
+
+
 <dt>s_attribute</dt>
 <dd><p>If not <code>NULL</code>, a structural attribute (length-one
 <code>character</code> vector), typically indicating a sentence ("s").</p></dd>
+
+
 <dt>boundary</dt>
 <dd><p>Structural attribute (length-one <code>character</code> vector) that
 serves as a boundary and that shall not be transgressed.</p></dd>
+
+
 <dt>left</dt>
 <dd><p>An <code>integer</code> value, number of strucs to move to the left.</p></dd>
+
+
 <dt>right</dt>
 <dd><p>An <code>integer</code> value, number of strucs to move to the right.</p></dd>
+
+
 <dt>ranges</dt>
 <dd><p>A two-column integer <code>matrix</code> of ranges (left and right corpus
 positions in first and second column, respectively).</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -113,35 +130,35 @@ vector with the individual corpus positions covered by the ranges.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># Scenario 1: Get full text for a subcorpus defined by regions</span></span>
-<span class="r-in"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_region_matrix.html">get_region_matrix</a></span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, s_attribute <span class="op">=</span> <span class="st">"places"</span>,</span>
-<span class="r-in">  strucs <span class="op">=</span> <span class="fl">4L</span><span class="op">:</span><span class="fl">5L</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu">region_matrix_to_ids</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, matrix <span class="op">=</span> <span class="va">m</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">tokenstream</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">ids</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">tokenstream</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">txt</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Scenario 1: Get full text for a subcorpus defined by regions</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_region_matrix.html">get_region_matrix</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, s_attribute <span class="op">=</span> <span class="st">"places"</span>,</span></span>
+<span class="r-in"><span>  strucs <span class="op">=</span> <span class="fl">4L</span><span class="op">:</span><span class="fl">5L</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu">region_matrix_to_ids</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, matrix <span class="op">=</span> <span class="va">m</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tokenstream</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">ids</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">tokenstream</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">txt</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Houston Oil Trust said that independent petroleum engineers completed an annual study that estimates the trust's future net revenues from total proved reserves at 88 mln dlrs and its discounted present value of the reserves at 64 mln dlrs Based on the estimate the trust said there may be no money available for cash distributions to unitholders for the remainder of the year It said the estimates reflect a decrease of about 44 pct in net reserve revenues and 39 pct in discounted present value compared with the study made in 1985 Reuter Kuwait s Oil Minister in remarks published today said there were no plans for an emergency OPEC meeting to review oil policies after recent weakness in world oil prices Sheikh Ali al Khalifa al Sabah was quoted by the local daily al Qabas as saying None of the OPEC members has asked for such a meeting He denied Kuwait was pumping above its quota of 948,000 barrels of crude daily bpd set under self imposed production limits of the 13 nation organisation Traders and analysts in international oil markets estimate OPEC is producing up to one mln bpd above a ceiling of 15.8 mln bpd agreed in Geneva last December They named Kuwait and the United Arab Emirates along with the much smaller producer Ecuador among those producing above quota Kuwait they said was pumping 1.2 mln bpd This rumour is baseless It is based on reports which said Kuwait has the ability to exceed its share They suppose that because Kuwait has the ability it will do so the minister said Sheikh Ali has said before that Kuwait had the ability to produce up to 4.0 mln bpd If we can sell more than our quota at official prices while some countries are suffering difficulties marketing their share it means we in Kuwait are unusually clever he said He was referring apparently to the Gulf state of qatar which industry sources said was selling less than 180,000 bpd of its 285,000 bpd quota because buyers were resisting official prices restored by OPEC last month pegged to a marker of 18 dlrs per barrel Prices in New York last week dropped to their lowest levels this year and almost three dollars below a three month high of 19 dollars a barrel Sheikh Ali also delivered a challenge to any international oil company that declared Kuwait sold below official prices Because it was charging its official price of 16.67 dlrs a barrel it had lost custom he said but did not elaborate However Kuwait had guaranteed markets for its oil because of its local and international refining facilities and its own distribution network abroad he added He reaffirmed that the planned meeting March 7 of OPEC s differentials committee has been postponed until the start of April at the request of certain of the body s members Ecuador s deputy energy minister Fernando Santos Alvite said last Wednesday his debt burdened country wanted OPEC to assign a lower official price for its crude and was to seek this at talks this month of opec s pricing committee Referring to pressure by oil companies on OPEC members in apparent reference to difficulties faced by Qatar he said We expected such pressure It will continue through March and April But he expected the situation would later improve REUTER"</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Scenario 2: Get data.frame with counts for region matrix</span></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">region_matrix_to_count_matrix</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, matrix <span class="op">=</span> <span class="va">m</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"token_id"</span>, <span class="st">"count"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">df</span><span class="op">[[</span><span class="st">"token"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">df</span><span class="op">[[</span><span class="st">"token_id"</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">df</span><span class="op">[[</span><span class="st">"count"</span><span class="op">]</span><span class="op">]</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,<span class="op">]</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Scenario 2: Get data.frame with counts for region matrix</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">region_matrix_to_count_matrix</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, matrix <span class="op">=</span> <span class="va">m</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"token_id"</span>, <span class="st">"count"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span><span class="op">[[</span><span class="st">"token"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"REUTERS"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">df</span><span class="op">[[</span><span class="st">"token_id"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">df</span><span class="op">[[</span><span class="st">"count"</span><span class="op">]</span><span class="op">]</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,<span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     token_id count         token</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17        31    23           the</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 21        37    19            of</span>
@@ -439,7 +456,7 @@ vector with the individual corpus positions covered by the ranges.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 294      506     1         later</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 295      507     1       improve</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 296      508     1        REUTER</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   token_id count token</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        3    13  said</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2        4     6  that</span>
@@ -461,7 +478,7 @@ vector with the individual corpus positions covered by the ranges.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

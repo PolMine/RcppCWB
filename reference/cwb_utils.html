@@ -20,7 +20,7 @@ positional attribute, and produce all components."><!-- mathjax --><script src="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -59,67 +59,90 @@ positional attribute, and produce all components.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cwb_makeall</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  <span class="va">p_attribute</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  quietly <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">cwb_huffcode</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  <span class="va">p_attribute</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  quietly <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">cwb_compress_rdx</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  <span class="va">p_attribute</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  quietly <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">cwb_encode</span><span class="op">(</span>
-  <span class="va">corpus</span>,
-  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,
-  <span class="va">data_dir</span>,
-  <span class="va">vrt_dir</span>,
-  encoding <span class="op">=</span> <span class="st">"utf8"</span>,
-  p_attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"word"</span>, <span class="st">"pos"</span>, <span class="st">"lemma"</span><span class="op">)</span>,
-  <span class="va">s_attributes</span>,
-  skip_blank_lines <span class="op">=</span> <span class="cn">TRUE</span>,
-  strip_whitespace <span class="op">=</span> <span class="cn">TRUE</span>,
-  xml <span class="op">=</span> <span class="cn">TRUE</span>,
-  quietly <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cwb_makeall</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  <span class="va">p_attribute</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  quietly <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cwb_huffcode</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  <span class="va">p_attribute</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  quietly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  delete <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cwb_compress_rdx</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  <span class="va">p_attribute</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  quietly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  delete <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cwb_encode</span><span class="op">(</span></span>
+<span>  <span class="va">corpus</span>,</span>
+<span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
+<span>  <span class="va">data_dir</span>,</span>
+<span>  <span class="va">vrt_dir</span>,</span>
+<span>  encoding <span class="op">=</span> <span class="st">"utf8"</span>,</span>
+<span>  p_attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"word"</span>, <span class="st">"pos"</span>, <span class="st">"lemma"</span><span class="op">)</span>,</span>
+<span>  <span class="va">s_attributes</span>,</span>
+<span>  skip_blank_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  strip_whitespace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  xml <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  quietly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>name of a CWB corpus (upper case)</p></dd>
+
+
 <dt>p_attribute</dt>
 <dd><p>name p-attribute</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY</p></dd>
+
+
 <dt>quietly</dt>
 <dd><p>A <code>logical</code> value, whether to turn off messages (including
 warnings).</p></dd>
+
+
+<dt>delete</dt>
+<dd><p>A <code>logical</code> value, whether to remove redundant files after
+compression.</p></dd>
+
+
 <dt>data_dir</dt>
 <dd><p>The data directory where <code>cwb_encode</code> will put the binary
 files of the indexed corpus.</p></dd>
+
+
 <dt>vrt_dir</dt>
 <dd><p>Directory with input corpus files (verticalised format / file
 ending *.vrt).</p></dd>
+
+
 <dt>encoding</dt>
 <dd><p>The encoding of the files to be encoded. Needs to be an
 encoding supported by CWB, see <code><a href="cwb_charsets.html">cwb_charsets()</a></code>. "UTF-8" is taken as
 "utf8". Defaults to "utf8" (recommended charset).</p></dd>
+
+
 <dt>p_attributes</dt>
 <dd><p>Positional attributes (p-attributes) to be declared.</p></dd>
+
+
 <dt>s_attributes</dt>
 <dd><p>A <code>list</code> of named <code>character</code> vectors to declare
 structural attributes that shall be encoded. The names of the list are the
@@ -127,53 +150,62 @@ XML elements present in the corpus. Character vectors making up the list
 declare the attributes that include the metadata of regions. To declare a
 structural attribute without annotations, provide a zero-length character
 vector using <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> - see examples.</p></dd>
+
+
 <dt>skip_blank_lines</dt>
 <dd><p>A <code>logical</code> value, whether to skip blank lines in the
 input.</p></dd>
+
+
 <dt>strip_whitespace</dt>
 <dd><p>A <code>logical</code> value, whether to strip whitespace from
 tokens</p></dd>
+
+
 <dt>xml</dt>
 <dd><p>A <code>logical</code> value, whether input is XML.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>A <code>logical</code> value, whether to show progress information
 (counter of tokens processed).</p></dd>
+
 </dl></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># The package includes and 'unfinished' corpus of debates in the UN General </span></span>
-<span class="r-in"><span class="co"># Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is</span></span>
-<span class="r-in"><span class="co"># not compressed.</span></span>
-<span class="r-in"><span class="co">#</span></span>
-<span class="r-in"><span class="co"># The first step in the following example is to copy the raw</span></span>
-<span class="r-in"><span class="co"># corpus to a temporary place.</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">home_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"cwb"</span>, <span class="st">"indexed_corpora"</span>, <span class="st">"unga"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">tmp_data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"indexed_corpora"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">tmp_unga_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmp_data_dir</span>, <span class="st">"unga2"</span><span class="op">)</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">tmp_data_dir</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">tmp_data_dir</span><span class="op">)</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">tmp_unga_dir</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">tmp_unga_dir</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">tmp_unga_dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">regfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"cwb"</span>, <span class="st">"registry"</span>, <span class="st">"unga"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"><span class="va">regfile</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^HOME"</span>, <span class="va">regfile</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">'HOME "%s"'</span>, <span class="va">tmp_unga_dir</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">regfile</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^ID"</span>, <span class="va">regfile</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"ID unga2"</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">regfile</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"unga2"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">home_dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">x</span>, to <span class="op">=</span> <span class="va">tmp_unga_dir</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perform cwb_makeall (equivalent to cwb-makeall command line utility)</span></span>
-<span class="r-in"><span class="fu">cwb_makeall</span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"UNGA2"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># The package includes and 'unfinished' corpus of debates in the UN General </span></span></span>
+<span class="r-in"><span><span class="co"># Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is</span></span></span>
+<span class="r-in"><span><span class="co"># not compressed.</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span><span class="co"># The first step in the following example is to copy the raw</span></span></span>
+<span class="r-in"><span><span class="co"># corpus to a temporary place.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">home_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"cwb"</span>, <span class="st">"indexed_corpora"</span>, <span class="st">"unga"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">tmp_data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"indexed_corpora"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tmp_unga_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmp_data_dir</span>, <span class="st">"unga2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">tmp_data_dir</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">tmp_data_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">tmp_unga_dir</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">tmp_unga_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">tmp_unga_dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">regfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"cwb"</span>, <span class="st">"registry"</span>, <span class="st">"unga"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">regfile</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^HOME"</span>, <span class="va">regfile</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">'HOME "%s"'</span>, <span class="va">tmp_unga_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">regfile</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^ID"</span>, <span class="va">regfile</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"ID unga2"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">regfile</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"unga2"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">home_dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">x</span>, to <span class="op">=</span> <span class="va">tmp_unga_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perform cwb_makeall (equivalent to cwb-makeall command line utility)</span></span></span>
+<span class="r-in"><span><span class="fu">cwb_makeall</span><span class="op">(</span>corpus <span class="op">=</span> <span class="st">"UNGA2"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> === Makeall: processing corpus UNGA2 ===</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Registry directory: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpTJhCoe/registry_tmp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Registry directory: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpqyysgt/registry_tmp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ATTRIBUTE word</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  + creating LEXSRT ... OK</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - lexicon      OK</span>
@@ -186,77 +218,80 @@ tokens</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - index        OK</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ========================================</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"><span class="fu"><a href="cl_load_corpus.html">cl_load_corpus</a></span><span class="op">(</span><span class="st">"UNGA2"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="cl_load_corpus.html">cl_load_corpus</a></span><span class="op">(</span><span class="st">"UNGA2"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu"><a href="cqp_initialize.html">cqp_load_corpus</a></span><span class="op">(</span><span class="st">"UNGA2"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="cqp_initialize.html">cqp_load_corpus</a></span><span class="op">(</span><span class="st">"UNGA2"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># see whether it works</span></span>
-<span class="r-in"><span class="va">ids_sentence_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_cpos2id</a></span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span class="r-in">  cpos <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">83</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">tokens_sentence_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">ids_sentence_1</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="va">sentence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"\\s+([\\.,])"</span>, <span class="st">"\\1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">tokens_sentence_1</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># perform cwb_huffcode (equivalent to cwb-makeall command line utility)</span></span>
-<span class="r-in"><span class="fu">cwb_huffcode</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>,</span>
-<span class="r-in">  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># see whether it works</span></span></span>
+<span class="r-in"><span><span class="va">ids_sentence_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_cpos2id</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>, registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  cpos <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">83</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tokens_sentence_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>, p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span>, id <span class="op">=</span> <span class="va">ids_sentence_1</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sentence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"\\s+([\\.,])"</span>, <span class="st">"\\1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">tokens_sentence_1</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># perform cwb_huffcode (equivalent to cwb-makeall command line utility)</span></span></span>
+<span class="r-in"><span><span class="fu">cwb_huffcode</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>,</span></span>
+<span class="r-in"><span>  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> COMPRESSING TOKEN STREAM of (null).word</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - writing code descriptor block to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.hcd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - writing compressed item sequence to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.huf</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - writing sync (every 128 tokens) to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.huf.syn</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - writing code descriptor block to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.hcd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - writing compressed item sequence to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.huf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - writing sync (every 128 tokens) to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.huf.syn</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> VALIDATING UNGA2.word</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - reading code descriptor block from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.hcd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - reading compressed item sequence from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.huf</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - reading sync (mod 128) from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.huf.syn</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.corpus&gt; now.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - reading code descriptor block from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.hcd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - reading compressed item sequence from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.huf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - reading sync (mod 128) from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.huf.syn</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.corpus&gt; now.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> redundant file deleted: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpqyysgt/indexed_corpora/unga2/word.corpus</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"><span class="fu">cwb_compress_rdx</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>,</span>
-<span class="r-in">  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">cwb_compress_rdx</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"UNGA2"</span>,</span></span>
+<span class="r-in"><span>  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> COMPRESSING INDEX of UNGA2.word</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - writing compressed index to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.crc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - writing compressed index offsets to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.crx</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - writing compressed index to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.crc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - writing compressed index offsets to /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.crx</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> VALIDATING UNGA2.word</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - reading compressed index from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.crc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - reading compressed index offsets from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.crx</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.corpus.rev&gt; now.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpTJhCoe/indexed_corpora/unga2/word.corpus.rdx&gt; now.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - reading compressed index from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.crc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - reading compressed index offsets from /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.crx</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.corpus.rev&gt; now.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> !! You can delete the file &lt;/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//Rtmpqyysgt/indexed_corpora/unga2/word.corpus.rdx&gt; now.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> redundant file deleted: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpqyysgt/indexed_corpora/unga2/word.corpus.rev</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> redundant file deleted: /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpqyysgt/indexed_corpora/unga2/word.corpus.rdx</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bt_data_dir"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">data_dir</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">cwb_encode</span><span class="op">(</span></span>
-<span class="r-in">  corpus <span class="op">=</span> <span class="st">"BTMIN"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span>
-<span class="r-in">  vrt_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"vrt"</span><span class="op">)</span>,</span>
-<span class="r-in">  data_dir <span class="op">=</span> <span class="va">data_dir</span>,</span>
-<span class="r-in">  p_attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"word"</span>, <span class="st">"pos"</span>, <span class="st">"lemma"</span><span class="op">)</span>,</span>
-<span class="r-in">  s_attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span class="r-in">    plenary_protocol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span class="r-in">      <span class="st">"lp"</span>, <span class="st">"protocol_no"</span>, <span class="st">"date"</span>, <span class="st">"year"</span>, <span class="st">"birthday"</span>, <span class="st">"version"</span>,</span>
-<span class="r-in">      <span class="st">"url"</span>, <span class="st">"filetype"</span></span>
-<span class="r-in">    <span class="op">)</span>,</span>
-<span class="r-in">    speaker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span class="r-in">      <span class="st">"id"</span>, <span class="st">"type"</span>, <span class="st">"lp"</span>, <span class="st">"protocol_no"</span>, <span class="st">"date"</span>, <span class="st">"year"</span>, <span class="st">"ai_no"</span>, <span class="st">"ai_id"</span>,</span>
-<span class="r-in">      <span class="st">"ai_type"</span>, <span class="st">"who"</span>, <span class="st">"name"</span>, <span class="st">"parliamentary_group"</span>, <span class="st">"party"</span>, <span class="st">"role"</span></span>
-<span class="r-in">     <span class="op">)</span>,</span>
-<span class="r-in">    p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in">  <span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bt_data_dir"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">data_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">cwb_encode</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  corpus <span class="op">=</span> <span class="st">"BTMIN"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  vrt_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"RcppCWB"</span>, <span class="st">"extdata"</span>, <span class="st">"vrt"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  data_dir <span class="op">=</span> <span class="va">data_dir</span>,</span></span>
+<span class="r-in"><span>  p_attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"word"</span>, <span class="st">"pos"</span>, <span class="st">"lemma"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  s_attributes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    plenary_protocol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"lp"</span>, <span class="st">"protocol_no"</span>, <span class="st">"date"</span>, <span class="st">"year"</span>, <span class="st">"birthday"</span>, <span class="st">"version"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"url"</span>, <span class="st">"filetype"</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    speaker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"id"</span>, <span class="st">"type"</span>, <span class="st">"lp"</span>, <span class="st">"protocol_no"</span>, <span class="st">"date"</span>, <span class="st">"year"</span>, <span class="st">"ai_no"</span>, <span class="st">"ai_id"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"ai_type"</span>, <span class="st">"who"</span>, <span class="st">"name"</span>, <span class="st">"parliamentary_group"</span>, <span class="st">"party"</span>, <span class="st">"role"</span></span></span>
+<span class="r-in"><span>     <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">data_dir</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>, <span class="st">"btmin"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">data_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span>, <span class="st">"btmin"</span><span class="op">)</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -271,7 +306,7 @@ tokens</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

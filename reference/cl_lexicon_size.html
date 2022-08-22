@@ -19,7 +19,7 @@ that token ids are zero-based, i.e. when iterating through tokens, start at
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -57,35 +57,40 @@ that token ids are zero-based, i.e. when iterating through tokens, start at
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cl_lexicon_size</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">p_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cl_lexicon_size</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">p_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>name of a CWB corpus (upper case)</p></dd>
+
+
 <dt>p_attribute</dt>
 <dd><p>name of positional attribute</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY</p></dd>
+
 </dl></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">lexicon_size</span> <span class="op">&lt;-</span> <span class="fu">cl_lexicon_size</span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"REUTERS"</span>,</span>
-<span class="r-in">  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">token_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">lexicon_size</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span>
-<span class="r-in">  <span class="st">"REUTERS"</span>,</span>
-<span class="r-in">  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span class="r-in">  id <span class="op">=</span> <span class="va">token_ids</span>,</span>
-<span class="r-in">  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">lexicon_size</span> <span class="op">&lt;-</span> <span class="fu">cl_lexicon_size</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"REUTERS"</span>,</span></span>
+<span class="r-in"><span>  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">token_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq.int</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0</span>, to <span class="op">=</span> <span class="va">lexicon_size</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="p_attributes.html">cl_id2str</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"REUTERS"</span>,</span></span>
+<span class="r-in"><span>  p_attribute <span class="op">=</span> <span class="st">"word"</span>,</span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="va">token_ids</span>,</span></span>
+<span class="r-in"><span>  registry <span class="op">=</span> <span class="fu"><a href="tmp_registry.html">get_tmp_registry</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    [1] "Diamond"         "Shamrock"        "Corp"            "said"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    [5] "that"            "effective"       "today"           "it"             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    [9] "had"             "cut"             "its"             "contract"       </span>
@@ -398,7 +403,7 @@ environment variable CORPUS_REGISTRY</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

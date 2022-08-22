@@ -19,7 +19,7 @@ corpus positions. Use this function to test whether an attribute has values."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -57,29 +57,36 @@ corpus positions. Use this function to test whether an attribute has values.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cl_struc_values</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">s_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cl_struc_values</span><span class="op">(</span><span class="va">corpus</span>, <span class="va">s_attribute</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>Corpus ID, a length-one <code>character</code> vector.</p></dd>
+
+
 <dt>s_attribute</dt>
 <dd><p>Structural attribute to check, a length-one <code>character</code> vector.</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>The registry directory of the corpus.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>TRUE</code> if the attribute has values and <code>FALSE</code> if not. <code>NA</code> if the structural
+    
+
+<p><code>TRUE</code> if the attribute has values and <code>FALSE</code> if not. <code>NA</code> if the structural
 attribute is not available.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">cl_struc_values</span><span class="op">(</span><span class="st">"REUTERS"</span>, <span class="st">"places"</span><span class="op">)</span> <span class="co"># TRUE - attribute has values</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">cl_struc_values</span><span class="op">(</span><span class="st">"REUTERS"</span>, <span class="st">"places"</span><span class="op">)</span> <span class="co"># TRUE - attribute has values</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu">cl_struc_values</span><span class="op">(</span><span class="st">"REUTERS"</span>, <span class="st">"date"</span><span class="op">)</span> <span class="co"># NA - attribute does not exist</span></span>
+<span class="r-in"><span><span class="fu">cl_struc_values</span><span class="op">(</span><span class="st">"REUTERS"</span>, <span class="st">"date"</span><span class="op">)</span> <span class="co"># NA - attribute does not exist</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
 </code></pre></div>
     </div>
@@ -95,7 +102,7 @@ attribute is not available.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -47,6 +47,19 @@
       <small>Source: <a href="https://github.com/PolMine/RcppCWB/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.2.9001" id="rcppcwb-0529001ff">RcppCWB 0.5.2.9001ff<a class="anchor" aria-label="anchor" href="#rcppcwb-0529001ff"></a></h2>
+<ul><li>Fixed a bug in the <code>region_matrix_corpus()</code> C++ code that would not show any context at all if s_attribute expansion transgressed start or end of corpus.</li>
+<li>Fixed a bug in the <code>region_matrix_corpus()</code> C++ code that would result from not considering that query matches may go cover more than one strucs of a structural attribute.</li>
+<li>
+<code><a href="../reference/registry_info.html">corpus_info_file()</a></code> does not crash if INFO is not defined in the registry file (<a href="https://github.com/PolMine/RcppCWB/issues/62" class="external-link">#62</a>).</li>
+<li>Implicit processing of arguments <code>sAttribute</code> and <code>pAttribute</code> as <code>s_attribute</code> or <code>p_attribute</code> respectively is now accompanied by a warning that arguments are deprectated.</li>
+<li>The <code><a href="../reference/checks.html">check_corpus()</a></code> function distinguishes between whether a corpus is loaded in the CL and/or CQP context.</li>
+<li>
+<code><a href="../reference/cwb_utils.html">cwb_huffcode()</a></code> and <code><a href="../reference/cwb_utils.html">cwb_compress_rdx()</a></code> have argument <code>delete</code> to trigger deleting redundant files after compression (<a href="https://github.com/PolMine/RcppCWB/issues/60" class="external-link">#60</a>).</li>
+<li>
+<code>cqp_load_corpus</code> will internally upper corpus ID as required in the CQP context (<a href="https://github.com/PolMine/RcppCWB/issues/64" class="external-link">#64</a>).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.2" id="rcppcwb-052">RcppCWB 0.5.2<small>2022-03-29</small><a class="anchor" aria-label="anchor" href="#rcppcwb-052"></a></h2>
 <ul><li>The example for <code><a href="../reference/registry_info.html">corpus_data_dir()</a></code> dir not work as intended without explicitly setting the <code>registry</code> argument. Fixed.</li>
@@ -290,7 +303,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.3</span>
       </span>
     </div>
 
@@ -53,20 +53,25 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cl_delete_corpus</span><span class="op">(</span><span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cl_delete_corpus</span><span class="op">(</span><span class="va">corpus</span>, registry <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CORPUS_REGISTRY"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corpus</dt>
 <dd><p>name of a CWB corpus (upper case)</p></dd>
+
+
 <dt>registry</dt>
 <dd><p>path to the registry directory, defaults to the value of the
 environment variable CORPUS_REGISTRY</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>integer</code> value 1 is returned invisibly if a previously loaded
+    
+
+<p>An <code>integer</code> value 1 is returned invisibly if a previously loaded
 corpus has been deleted, or 0 if the corpus has not been loaded and has not
 been deleted.</p>
     </div>
@@ -83,13 +88,13 @@ been deleted), which will include parsing an updated registry file.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="cl_attribute_size.html">cl_attribute_size</a></span><span class="op">(</span><span class="st">"UNGA"</span>, attribute <span class="op">=</span> <span class="st">"word"</span>, attribute_type <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="cl_attribute_size.html">cl_attribute_size</a></span><span class="op">(</span><span class="st">"UNGA"</span>, attribute <span class="op">=</span> <span class="st">"word"</span>, attribute_type <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 127082</span>
-<span class="r-in"><span class="fu"><a href="corpus_is_loaded.html">corpus_is_loaded</a></span><span class="op">(</span><span class="st">"UNGA"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="corpus_is_loaded.html">corpus_is_loaded</a></span><span class="op">(</span><span class="st">"UNGA"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu">cl_delete_corpus</span><span class="op">(</span><span class="st">"UNGA"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">cl_delete_corpus</span><span class="op">(</span><span class="st">"UNGA"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu"><a href="corpus_is_loaded.html">corpus_is_loaded</a></span><span class="op">(</span><span class="st">"UNGA"</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="corpus_is_loaded.html">corpus_is_loaded</a></span><span class="op">(</span><span class="st">"UNGA"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 </code></pre></div>
     </div>
@@ -105,7 +110,7 @@ been deleted), which will include parsing an updated registry file.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
