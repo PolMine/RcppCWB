@@ -43,6 +43,7 @@ jobs:
         if: matrix.config.os != 'windows-2022'
         with:
           r-version: ${{ matrix.config.r }}
+          rtools-version: ${{ matrix.config.rtools }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
