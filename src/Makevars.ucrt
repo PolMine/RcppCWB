@@ -5,7 +5,7 @@ GLIB_DEFINES=-I$(R_TOOLS_SOFT)/include/glib-2.0 \
 
 PKG_CPPFLAGS=-I$(R_PACKAGE_SOURCE)/cqp -I$(R_PACKAGE_SOURCE)/cl -I$(R_PACKAGE_SOURCE)/CQi $(GLIB_DEFINES) -DPCRE_STATIC
 
-PKG_LIBS=-L$(R_PACKAGE_SOURCE)/cl -L$(R_PACKAGE_SOURCE)/cqp -L$(R_PACKAGE_SOURCE)/utils -lcwb -lcqp -lcl -lglib-2.0 -lintl -liconv -lws2_32 -lpcre -lole32 
+PKG_LIBS=-L$(R_PACKAGE_SOURCE)/cl -L$(R_PACKAGE_SOURCE)/cqp -L$(R_PACKAGE_SOURCE)/utils -lcwb -lcqp -lcl -lglib-2.0 -lintl -liconv -lws2_32 -lpcre -luuid -lole32 
 
 ${SHLIB}: libcl.a libcqp.a libcwb.a
 
