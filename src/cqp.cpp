@@ -1,5 +1,7 @@
 #define _sugar_
 
+#include <glib.h>
+
 extern "C" {
   #include <stdio.h>
   #include <stdlib.h>
