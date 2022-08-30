@@ -67,9 +67,9 @@ jobs:
       - name: Find Rtools
         if: matrix.config.os == 'windows-latest'
         run: |
-          install.packages("installr", repos = "http://cran.rstudio.com")
-          installr::install.Rtools(check = FALSE)
           install.packages("pkgbuild", repos = "http://cran.rstudio.com")
+          install.packages("installr", repos = "http://cran.rstudio.com")
+          installr::install.Rtools(check = FALSE, check_r_update = FALSE, GUI = FALSE)
           pkgbuild::rtools_path()
         shell: Rscript {0}
 
