@@ -71,8 +71,8 @@ jobs:
           install.packages("installr", repos = "http://cran.rstudio.com")
           installr::install.Rtools(check = FALSE, check_r_update = FALSE, GUI = FALSE)
           pkgbuild::rtools_path()
-          list.files("C:/rtools40/x86_64-w64-mingw32.static.posix/include/glib-2.0")
-          list.files("C:/rtools40/ucrt64/x86_64-w64-mingw32.static.posix/include/glib-2.0")
+          list.files("C:/rtools40")
+          list.files("C:/rtools40/ucrt64")
         shell: Rscript {0}
 
       - name: Query dependencies
