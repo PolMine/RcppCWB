@@ -63,6 +63,13 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: rcmdcheck
+          
+      - name: Find Rtools
+        if: matrix.config.os == 'windows-latest'
+        run: |
+          install.packages("pkgbuild", repos = "http://cran.rstudio.com")
+          pkgbuild::rtools_path()
+        shell: Rscript {0}
 
       - name: Query dependencies
         run: |
