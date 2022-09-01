@@ -1,7 +1,12 @@
 ## General remarks
 
-This is a maintenance release with bug fixes. No changes to the 
-setup of the package.
+I realized ERRORS on the macOS and Windows build machines: Fixed as follows:
+
+- For Windows, I add '-luuid' to PKG_FLAGS (necessary to meet new dependency of 
+glib2).
+- For macOS, the CC defined in Makeconf was not passed to the compilation of
+the CWB source files. Changed the configure scripts accordingly.
+
 
 Previous aspects I repeat:
 

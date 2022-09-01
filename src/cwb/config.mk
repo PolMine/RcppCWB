@@ -117,7 +117,7 @@ FULL_MESSAGES = 1
 # RELEASE_OS = ???    # e.g. linux-2.6 or osx-10.4
 
 ## C compiler to use (GCC is highly recommended, others may not work)
-CC = gcc
+# CC = gcc
 
 ## Override options for C compiler and linker (complete override)
 # CFLAGS = -O2 -Wall

@@ -1,4 +1,12 @@
-# RcppCWB 0.5.2.9001ff
+# RcppCWB 0.5.4
+
+* Fixed package configuration that prevented that compiler is used for compiling
+CWB C scripts as intended #66.
+* Adding '-luuid' to PKG_FLAGS in Makevars solves linker issue FOLDERID_ #67.
+* GitHub Actions now working for Windows #47.
+
+
+# RcppCWB 0.5.3
 
 * Fixed a bug in the `region_matrix_corpus()` C++ code that would not show any
 context at all if s_attribute expansion transgressed start or end of corpus.
