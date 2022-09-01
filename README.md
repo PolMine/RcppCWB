@@ -1,5 +1,5 @@
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5939368.svg)](https://doi.org/10.5281/zenodo.5939368)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7040475.svg)](https://doi.org/10.5281/zenodo.7040475)
 [![License: GPL
 v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
@@ -124,11 +124,7 @@ with a temporary registry.
 
 ``` r
 library(RcppCWB)
-if (!check_pkg_registry_files()){
-  registry <- use_tmp_registry()
-} else {
-  registry <- get_pkg_registry()
-} 
+registry <- use_tmp_registry()
 ```
 
 To start with, we get the number of tokens of the corpus.
@@ -157,21 +153,21 @@ To get the corpus positions of a token.
 
 ``` r
 token_to_get <- "oil"
-id_oil <- cl_str2id(corpus = "REUTERS", p_attribute = "word", str = token_to_get)
-cpos_oil <- cl_id2cpos <- cl_id2cpos(corpus = "REUTERS", p_attribute = "word", id = id_oil)
+id_oil <- cl_str2id(corpus = "REUTERS", p_attribute = "word", str = token_to_get, registry = registry)
+cpos_oil <- cl_id2cpos <- cl_id2cpos(corpus = "REUTERS", p_attribute = "word", id = id_oil, registry = registry)
 ```
 
 Get the frequency of token.
 
 ``` r
-oil_freq <- cl_id2freq(corpus = "REUTERS", p_attribute = "word", id = id_oil)
+oil_freq <- cl_id2freq(corpus = "REUTERS", p_attribute = "word", id = id_oil, registry = registry)
 ```
 
 Using regular expressions.
 
 ``` r
-ids <- cl_regex2id(corpus = "REUTERS", p_attribute = "word", regex = "M.*")
-m_words <- cl_id2str(corpus = "REUTERS", p_attribute = "word", id = ids)
+ids <- cl_regex2id(corpus = "REUTERS", p_attribute = "word", regex = "M.*", registry = registry)
+m_words <- cl_id2str(corpus = "REUTERS", p_attribute = "word", id = ids, registry = registry)
 ```
 
 To use the CQP syntax, we need to initialize CQP first.
@@ -189,7 +185,7 @@ cqp_initialize(registry = registry)
 cqp_query(corpus = "REUTERS", query = '"crude" "oil"')
 ```
 
-    ## NULL
+    ## <pointer: 0x600001c743c0>
 
 ``` r
 cpos <- cqp_dump_subcorpus(corpus = "REUTERS")
