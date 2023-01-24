@@ -132,7 +132,7 @@ SEXP cqp_query(SEXP corpus, SEXP subcorpus, SEXP query){
   int len = strlen(child) + strlen(q) + 10;
   cqp_query = (char *) cl_malloc(len);
   
-  sprintf(cqp_query, "%s = %s", child, q);
+  snprintf(cqp_query, len, "%s = %s", child, q);
 
   if (!cqi_activate_corpus(mother)){
     Rprintf("activation failed");

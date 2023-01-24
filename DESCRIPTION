@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.5.4
-Date: 2022-08-30
+Version: 0.5.4.9001
+Date: 2023-01-24
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -45,7 +45,7 @@ SystemRequirements: GNU make, pcre (>= 7 < 10), GLib (>= 2.0.0). On Windows, no 
   (<https://github.com/PolMine/libcl>) during installation. On macOS, static libraries of Glib are downloaded
   (<https://github.com/PolMine/libglib>) if Glib is not present.
 Imports:
-    Rcpp (>= 1.0.7),
+    Rcpp (>= 1.0.10),
     fs
 Suggests:
     knitr,

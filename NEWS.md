@@ -1,3 +1,10 @@
+# RcppCWB 0.5.5
+
+* C++ code replaces `sprintf()` with `snprintf()` to address security issue.
+* Package now depends on Rcpp v1.0.10, which replaces one remaining `sprintf()`
+#70.
+
+
 # RcppCWB 0.5.4
 
 * Fixed package configuration that prevented that compiler is used for compiling
