@@ -5,7 +5,8 @@
 #70.
 * `corpus_properties()` and `corpus_property()` do not crash any more, if corpus
 is not loaded or not present #69.
-
+* New function `p_attr_default()` to programmatically extract default
+p-attribute #63.
 
 # RcppCWB 0.5.4
 

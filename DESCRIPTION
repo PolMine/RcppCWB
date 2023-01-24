@@ -1,14 +1,14 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.5.4.9001
+Version: 0.5.5
 Date: 2023-01-24
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
   Oliver Christ [ctb],
   Bruno Maximilian Schulze [ctb],
-  Stefan Evert [ctb],
+  Stefanie Evert [ctb],
   Arne Fitschen [ctb],
   Jeroen Ooms [ctb],
   Marius Bertram [ctb],
@@ -19,7 +19,7 @@ Authors@R: c(
   person("Sylvain", "Loiseau", role = "aut"),
   person("Oliver", "Christ", role = "ctb"),
   person("Bruno Maximilian", "Schulze", role = "ctb"),
-  person("Stefan", "Evert", role = "ctb"),
+  person("Stefanie", "Evert", role = "ctb"),
   person("Arne", "Fitschen", role = "ctb"),
   person("Jeroen", "Ooms", role = "ctb"),
   person("Marius", "Bertram", role = "ctb"),

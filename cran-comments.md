@@ -1,12 +1,11 @@
 ## General remarks
 
-I realized ERRORS on the macOS and Windows build machines: Fixed as follows:
+This release addresses the deprecation of `sprintf()`. I now use `snprintf()`
+in the C++ code. Warnings I see for R-devel-linux (both clang and GCC) and 
+M1mac are addressed and should disappear. 
 
-- For Windows, I add '-luuid' to PKG_FLAGS (necessary to meet new dependency of 
-glib2).
-- For macOS, the CC defined in Makeconf was not passed to the compilation of
-the CWB source files. Changed the configure scripts accordingly.
-
+Brian Ripley alerted me that the package may be archived on February 6. I hope 
+that I have addressed the issue sufficiently.
 
 Previous aspects I repeat:
 
