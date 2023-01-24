@@ -56,10 +56,12 @@ positional attributes of a corpus.
 structural attributes of a corpus.
 
 \code{corpus_properties()} returns a \code{character} vector with the corpus
-properties defined in the registry file.
+properties defined in the registry file. If the corpus cannot be located,
+\code{NA} is returned.
 
 \code{corpus_property()} returns the value of a corpus property defined
-in the registry file, or \code{NA} if the property requested is undefined.
+in the registry file, or \code{NA} if the corpus does not exist, is not loaded
+of if the property requested is undefined.
 
 \code{corpus_get_registry()} will extract the registry directory with the
 registry file defining a corpus from the internal C representation of

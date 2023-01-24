@@ -672,22 +672,31 @@ Rcpp::StringVector corpus_properties(SEXP corpus, SEXP registry){
   char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
   c = cl_new_corpus(registry_dir, corpus_id);
   
-  p = cl_first_corpus_property(c);
-  
-  
   n = 0;
-  while (p != NULL){
-    p = cl_next_corpus_property(p);
-    n++;
+  if (c){
+    p = cl_first_corpus_property(c);
+    
+    
+    while (p != NULL){
+      p = cl_next_corpus_property(p);
+      n++;
+    }
+  } else {
+    n = 1;
   }
+  
   Rcpp::StringVector properties(n);
   
-  p = cl_first_corpus_property(c);
-  i = 0;
-  while (p != NULL){
-    properties(i) = cl_strdup(p->property);
-    p = cl_next_corpus_property(p);
-    i++;
+  if (c){
+    p = cl_first_corpus_property(c);
+    i = 0;
+    while (p != NULL){
+      properties(i) = cl_strdup(p->property);
+      p = cl_next_corpus_property(p);
+      i++;
+    }
+  } else {
+    properties(0) = NA_STRING;
   }
   
   return(properties);
@@ -701,18 +710,24 @@ Rcpp::StringVector corpus_property(SEXP corpus, SEXP registry, SEXP property){
   Corpus * c;
   char* corpus_id  = strdup(Rcpp::as<std::string>(corpus).c_str());
   char* registry_dir = strdup(Rcpp::as<std::string>(registry).c_str());
+  char* prop = strdup(Rcpp::as<std::string>(property).c_str());
+  
   c = cl_new_corpus(registry_dir, corpus_id);
   
-  char* prop = strdup(Rcpp::as<std::string>(property).c_str());
-
-  CorpusProperty p = cl_first_corpus_property(c);
+  if (c){
+    CorpusProperty p = cl_first_corpus_property(c);
     
-  while (p != NULL && strcmp(prop, p->property)) p = cl_next_corpus_property(p);
-  
-  if (p != NULL)
-    result(0) =  p->value;
-  else
+    while (p != NULL && strcmp(prop, p->property))
+      p = cl_next_corpus_property(p);
+    
+    if (p != NULL)
+      result(0) =  p->value;
+    else
+      result(0) = NA_STRING;
+  } else {
     result(0) = NA_STRING;
+  }
+
 
   return(result);
 }

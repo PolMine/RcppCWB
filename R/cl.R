@@ -467,7 +467,8 @@ corpus_s_attributes <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")
 }
 
 #' @details `corpus_properties()` returns a `character` vector with the corpus
-#'   properties defined in the registry file.
+#'   properties defined in the registry file. If the corpus cannot be located,
+#'   `NA` is returned.
 #' @rdname registry_info
 #' @examples
 #' corpus_properties("REUTERS", registry = get_tmp_registry())
@@ -478,7 +479,8 @@ corpus_properties <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 }
 
 #' @details `corpus_property()` returns the value of a corpus property defined
-#'   in the registry file, or `NA` if the property requested is undefined.
+#'   in the registry file, or `NA` if the corpus does not exist, is not loaded 
+#'   of if the property requested is undefined.
 #' @param property A corpus property defined in the registry file (.
 #' @rdname registry_info
 #' @examples

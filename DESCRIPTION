@@ -54,7 +54,7 @@ LinkingTo: Rcpp
 Biarch: true
 URL: https://github.com/PolMine/RcppCWB
 BugReports: https://github.com/PolMine/RcppCWB/issues
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.2
 Roxygen: list(markdown = TRUE)
 Collate:
   'RcppCWB_package.R'

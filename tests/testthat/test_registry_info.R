@@ -67,6 +67,12 @@ test_that(
   {
     props <- corpus_properties(corpus = "REUTERS", registry = get_tmp_registry())
     expect_identical(props, c("language", "charset"))
+    
+    fail <- corpus_properties(
+      corpus = "NOTEXISTING",
+      registry = Sys.getenv("CORPUS_REGISTRY")
+    )
+    expect_true(is.na(fail))
   }
 )
 
@@ -94,6 +100,14 @@ test_that(
       property = "foo"
     )
     expect_identical(na, NA_character_)
+    
+    na <- corpus_property(
+      "NOTEXISTING",
+      registry = get_tmp_registry(),
+      property = "foo"
+    )
+    expect_identical(na, NA_character_)
+    
   }
 )
 
