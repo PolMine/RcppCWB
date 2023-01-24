@@ -41,6 +41,10 @@
     .Call(`_RcppCWB_cwb_version`)
 }
 
+.p_attr_default <- function() {
+    .Call(`_RcppCWB_p_attr_default`)
+}
+
 .s_attr <- function(corpus, s_attribute, registry) {
     .Call(`_RcppCWB__s_attr`, corpus, s_attribute, registry)
 }

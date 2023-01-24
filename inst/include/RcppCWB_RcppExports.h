@@ -45,6 +45,27 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
     }
 
+    inline Rcpp::StringVector _p_attr_default() {
+        typedef SEXP(*Ptr__p_attr_default)();
+        static Ptr__p_attr_default p__p_attr_default = NULL;
+        if (p__p_attr_default == NULL) {
+            validateSignature("Rcpp::StringVector(*_p_attr_default)()");
+            p__p_attr_default = (Ptr__p_attr_default)R_GetCCallable("RcppCWB", "_RcppCWB__p_attr_default");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p__p_attr_default();
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+    }
+
     inline SEXP _s_attr(SEXP corpus, SEXP s_attribute, SEXP registry) {
         typedef SEXP(*Ptr__s_attr)(SEXP,SEXP,SEXP);
         static Ptr__s_attr p__s_attr = NULL;

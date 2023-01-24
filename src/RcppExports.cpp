@@ -169,6 +169,39 @@ RcppExport SEXP _RcppCWB_cwb_version() {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// p_attr_default
+Rcpp::StringVector p_attr_default();
+static SEXP _RcppCWB_p_attr_default_try() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    rcpp_result_gen = Rcpp::wrap(p_attr_default());
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RcppCWB_p_attr_default() {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RcppCWB_p_attr_default_try());
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // _s_attr
 SEXP _s_attr(SEXP corpus, SEXP s_attribute, SEXP registry);
 static SEXP _RcppCWB__s_attr_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP) {
@@ -2474,6 +2507,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
     static std::set<std::string> signatures;
     if (signatures.empty()) {
         signatures.insert("Rcpp::StringVector(*.cwb_version)()");
+        signatures.insert("Rcpp::StringVector(*.p_attr_default)()");
         signatures.insert("SEXP(*.s_attr)(SEXP,SEXP,SEXP)");
         signatures.insert("SEXP(*.p_attr)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*.cl_attribute_size)(SEXP,SEXP,SEXP,SEXP)");
@@ -2546,6 +2580,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() { 
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cwb_version", (DL_FUNC)_RcppCWB_cwb_version_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr_default", (DL_FUNC)_RcppCWB_p_attr_default_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.s_attr", (DL_FUNC)_RcppCWB__s_attr_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr", (DL_FUNC)_RcppCWB__p_attr_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_attribute_size", (DL_FUNC)_RcppCWB__cl_attribute_size_try);
@@ -2626,6 +2661,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {"_RcppCWB_region_matrix_context", (DL_FUNC) &_RcppCWB_region_matrix_context, 8},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
+    {"_RcppCWB_p_attr_default", (DL_FUNC) &_RcppCWB_p_attr_default, 0},
     {"_RcppCWB__s_attr", (DL_FUNC) &_RcppCWB__s_attr, 3},
     {"_RcppCWB__p_attr", (DL_FUNC) &_RcppCWB__p_attr, 3},
     {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},

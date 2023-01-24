@@ -24,6 +24,7 @@ using namespace Rcpp;
 // [[Rcpp::interfaces(r, cpp)]]
 
 char* cl_get_version();
+char* cl_get_p_attr_default();
 
 // [[Rcpp::export(name=".cwb_version")]]
 Rcpp::StringVector cwb_version(){
@@ -31,6 +32,14 @@ Rcpp::StringVector cwb_version(){
   result(0) = cl_get_version();
   return result;
 }
+
+// [[Rcpp::export(name=".p_attr_default")]]
+Rcpp::StringVector p_attr_default(){
+  Rcpp::StringVector result(1);
+  result(0) = cl_get_p_attr_default();
+  return result;
+}
+
 
 
 Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry){

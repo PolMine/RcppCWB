@@ -793,7 +793,17 @@ PatchCWB <- R6Class(
               '  char* version = "";',
               "  #endif",
               "  return version;",
+              "}",
+              "",
+              "char* cl_get_p_attr_default(){",
+              "  #ifdef CWB_DEFAULT_ATT_NAME",
+              "  char* p_attr = CWB_DEFAULT_ATT_NAME;",
+              "  #else",
+              '  char* p_attr = "";',
+              "  #endif",
+              "  return p_attr;",
               "}"
+              
             )
           ),
           
@@ -2048,7 +2058,7 @@ PatchCWB <- R6Class(
         ),
         
         "src/cwb/cl/cl.h" = list(
-          insert_before = list("\\s*/\\*\\sThe\\sactual\\scode\\sof\\sthe\\sheader\\sfile\\sbegins\\shere\\.\\s\\*/\\s*$", c("char* cl_get_version();", ""), 1L),
+          insert_before = list("\\s*/\\*\\sThe\\sactual\\scode\\sof\\sthe\\sheader\\sfile\\sbegins\\shere\\.\\s\\*/\\s*$", c("char* cl_get_version();", "char* cl_get_p_attr_default();", ""), 1L),
           insert_before = list(
             "^\\s*(typedef\\sstruct\\sClAutoString\\s\\*ClAutoString;)\\s*$",
             "#ifndef __cplusplus ", 1L

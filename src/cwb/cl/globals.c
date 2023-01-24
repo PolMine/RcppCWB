@@ -43,6 +43,16 @@ char* cl_get_version(){
   return version;
 }
 
+char* cl_get_p_attr_default(){
+  #ifdef CWB_DEFAULT_ATT_NAME
+  char* p_attr = CWB_DEFAULT_ATT_NAME;
+  #else
+  char* p_attr = "";
+  #endif
+  return p_attr;
+}
+
+
 /**
  *  Global configuration variable: debug level.
  *

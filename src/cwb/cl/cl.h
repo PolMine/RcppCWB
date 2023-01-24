@@ -120,6 +120,7 @@
 
 
 char* cl_get_version();
+char* cl_get_p_attr_default();
 
 /* The actual code of the header file begins here. */
 
