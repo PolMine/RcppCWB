@@ -40,7 +40,12 @@
 #'   registry = get_tmp_registry()
 #' )
 cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cl_attribute_size(corpus = corpus, attribute = attribute, attribute_type = attribute_type, registry = registry)
+  attribute_size(
+    corpus = corpus,
+    attribute = attribute,
+    attribute_type = attribute_type,
+    registry = registry
+  )
 }
 
 #' Get Lexicon Size.
@@ -154,7 +159,7 @@ cl_struc2cpos <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REG
   check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = struc, registry = registry)
-  .cl_struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
+  struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
 }
 
 #' @rdname s_attributes
@@ -269,7 +274,7 @@ cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
   check_registry(registry)
   check_corpus(corpus, registry, cqp = FALSE)
   if (length(cpos) == 0L) return(integer())
-  .cl_cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 
 #' @rdname p_attributes
@@ -277,7 +282,7 @@ cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIST
   check_registry(registry)
   check_corpus(corpus, registry, cqp = FALSE)
   if (length(cpos) == 0L) return(integer())
-  .cl_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 
 #' @rdname p_attributes
@@ -285,7 +290,7 @@ cl_id2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTR
   check_registry(registry)
   check_corpus(corpus, registry, cqp = FALSE)
   check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
-  .cl_id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
+  id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
 }
 
 #' @rdname p_attributes

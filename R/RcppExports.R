@@ -53,8 +53,11 @@
     .Call(`_RcppCWB__p_attr`, corpus, p_attribute, registry)
 }
 
-.cl_attribute_size <- function(corpus, attribute, attribute_type, registry) {
-    .Call(`_RcppCWB__cl_attribute_size`, corpus, attribute, attribute_type, registry)
+#' @param attribute Either a positional, or a structural attribute.
+#' @param attribute_type Either "p" (positional attribute) or "s" (structural attribute).
+#' @rdname cl_functions
+attribute_size <- function(corpus, attribute, attribute_type, registry) {
+    .Call(`_RcppCWB_attribute_size`, corpus, attribute, attribute_type, registry)
 }
 
 .p_attr_size <- function(p_attr) {
@@ -81,32 +84,45 @@
     .Call(`_RcppCWB__cpos_to_struc`, s_attr, cpos)
 }
 
-.cl_cpos2str <- function(corpus, p_attribute, registry, cpos) {
-    .Call(`_RcppCWB__cl_cpos2str`, corpus, p_attribute, registry, cpos)
+#' Rcpp wrappers for CWB Corpus Library functions
+#' 
+#' @param corpus The ID of a CWB corpus.
+#' @param p_attribute A positional attribute.
+#' @param registry Path to the corpus registry.
+#' @param cpos An integer vector of corpus positions.
+#' @rdname cl_functions
+cpos2str <- function(corpus, p_attribute, registry, cpos) {
+    .Call(`_RcppCWB_cpos2str`, corpus, p_attribute, registry, cpos)
 }
 
 .cpos_to_str <- function(p_attr, cpos) {
     .Call(`_RcppCWB__cpos_to_str`, p_attr, cpos)
 }
 
-.cl_cpos2id <- function(corpus, p_attribute, registry, cpos) {
-    .Call(`_RcppCWB__cl_cpos2id`, corpus, p_attribute, registry, cpos)
+#' @rdname cl_functions
+cpos2id <- function(corpus, p_attribute, registry, cpos) {
+    .Call(`_RcppCWB_cpos2id`, corpus, p_attribute, registry, cpos)
 }
 
 .cpos_to_id <- function(p_attr, cpos) {
     .Call(`_RcppCWB__cpos_to_id`, p_attr, cpos)
 }
 
-.cl_struc2cpos <- function(corpus, s_attribute, registry, struc) {
-    .Call(`_RcppCWB__cl_struc2cpos`, corpus, s_attribute, registry, struc)
+#' @param s_attribute A structural attribute.
+#' @param struc An integer value with struc.
+#' @rdname cl_functions
+struc2cpos <- function(corpus, s_attribute, registry, struc) {
+    .Call(`_RcppCWB_struc2cpos`, corpus, s_attribute, registry, struc)
 }
 
 .struc_to_cpos <- function(s_attr, struc) {
     .Call(`_RcppCWB__struc_to_cpos`, s_attr, struc)
 }
 
-.cl_id2str <- function(corpus, p_attribute, registry, id) {
-    .Call(`_RcppCWB__cl_id2str`, corpus, p_attribute, registry, id)
+#' @param id An `integer` vector with token ids.
+#' @rdname cl_functions
+id2str <- function(corpus, p_attribute, registry, id) {
+    .Call(`_RcppCWB_id2str`, corpus, p_attribute, registry, id)
 }
 
 .cl_struc2str <- function(corpus, s_attribute, struc, registry) {

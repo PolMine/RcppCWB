@@ -1,3 +1,10 @@
+# RcppCWB 0.5.5.9001
+
+* Experimentally, Rcpp wrappers for Corpus Library (CL) functions are exposed
+directly: `attribute_size()`, `cpos2str()`, `cpos2id()`, `struc2cpos()`, 
+`id2str()` can be used in C++ functions imported using `Rcpp::sourceCpp()` or
+`Rcpp::cppFunction()`.
+
 # RcppCWB 0.5.5
 
 * C++ code replaces `sprintf()` with `snprintf()` to address security issue.

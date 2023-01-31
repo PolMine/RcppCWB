@@ -274,24 +274,24 @@ RcppExport SEXP _RcppCWB__p_attr(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP reg
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_attribute_size
-int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry);
-static SEXP _RcppCWB__cl_attribute_size_try(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
+// attribute_size
+int attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry);
+static SEXP _RcppCWB_attribute_size_try(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type attribute(attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type attribute_type(attribute_typeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_attribute_size(corpus, attribute, attribute_type, registry));
+    rcpp_result_gen = Rcpp::wrap(attribute_size(corpus, attribute, attribute_type, registry));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_attribute_size(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
+RcppExport SEXP _RcppCWB_attribute_size(SEXP corpusSEXP, SEXP attributeSEXP, SEXP attribute_typeSEXP, SEXP registrySEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_attribute_size_try(corpusSEXP, attributeSEXP, attribute_typeSEXP, registrySEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_attribute_size_try(corpusSEXP, attributeSEXP, attribute_typeSEXP, registrySEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -521,24 +521,24 @@ RcppExport SEXP _RcppCWB__cpos_to_struc(SEXP s_attrSEXP, SEXP cposSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_cpos2str
-Rcpp::StringVector _cl_cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos);
-static SEXP _RcppCWB__cl_cpos2str_try(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
+// cpos2str
+Rcpp::StringVector cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos);
+static SEXP _RcppCWB_cpos2str_try(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_cpos2str(corpus, p_attribute, registry, cpos));
+    rcpp_result_gen = Rcpp::wrap(cpos2str(corpus, p_attribute, registry, cpos));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_cpos2str(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
+RcppExport SEXP _RcppCWB_cpos2str(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_cpos2str_try(corpusSEXP, p_attributeSEXP, registrySEXP, cposSEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_cpos2str_try(corpusSEXP, p_attributeSEXP, registrySEXP, cposSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -593,24 +593,24 @@ RcppExport SEXP _RcppCWB__cpos_to_str(SEXP p_attrSEXP, SEXP cposSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_cpos2id
-Rcpp::IntegerVector _cl_cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos);
-static SEXP _RcppCWB__cl_cpos2id_try(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
+// cpos2id
+Rcpp::IntegerVector cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos);
+static SEXP _RcppCWB_cpos2id_try(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_cpos2id(corpus, p_attribute, registry, cpos));
+    rcpp_result_gen = Rcpp::wrap(cpos2id(corpus, p_attribute, registry, cpos));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_cpos2id(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
+RcppExport SEXP _RcppCWB_cpos2id(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP cposSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_cpos2id_try(corpusSEXP, p_attributeSEXP, registrySEXP, cposSEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_cpos2id_try(corpusSEXP, p_attributeSEXP, registrySEXP, cposSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -665,24 +665,24 @@ RcppExport SEXP _RcppCWB__cpos_to_id(SEXP p_attrSEXP, SEXP cposSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_struc2cpos
-Rcpp::IntegerVector _cl_struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc);
-static SEXP _RcppCWB__cl_struc2cpos_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP, SEXP strucSEXP) {
+// struc2cpos
+Rcpp::IntegerVector struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc);
+static SEXP _RcppCWB_struc2cpos_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP, SEXP strucSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< int >::type struc(strucSEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_struc2cpos(corpus, s_attribute, registry, struc));
+    rcpp_result_gen = Rcpp::wrap(struc2cpos(corpus, s_attribute, registry, struc));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_struc2cpos(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP, SEXP strucSEXP) {
+RcppExport SEXP _RcppCWB_struc2cpos(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP registrySEXP, SEXP strucSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_struc2cpos_try(corpusSEXP, s_attributeSEXP, registrySEXP, strucSEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_struc2cpos_try(corpusSEXP, s_attributeSEXP, registrySEXP, strucSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -737,24 +737,24 @@ RcppExport SEXP _RcppCWB__struc_to_cpos(SEXP s_attrSEXP, SEXP strucSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_id2str
-Rcpp::StringVector _cl_id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector id);
-static SEXP _RcppCWB__cl_id2str_try(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP idSEXP) {
+// id2str
+Rcpp::StringVector id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector id);
+static SEXP _RcppCWB_id2str_try(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP idSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type p_attribute(p_attributeSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type id(idSEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_id2str(corpus, p_attribute, registry, id));
+    rcpp_result_gen = Rcpp::wrap(id2str(corpus, p_attribute, registry, id));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_id2str(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP idSEXP) {
+RcppExport SEXP _RcppCWB_id2str(SEXP corpusSEXP, SEXP p_attributeSEXP, SEXP registrySEXP, SEXP idSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_id2str_try(corpusSEXP, p_attributeSEXP, registrySEXP, idSEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_id2str_try(corpusSEXP, p_attributeSEXP, registrySEXP, idSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2510,20 +2510,20 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::StringVector(*.p_attr_default)()");
         signatures.insert("SEXP(*.s_attr)(SEXP,SEXP,SEXP)");
         signatures.insert("SEXP(*.p_attr)(SEXP,SEXP,SEXP)");
-        signatures.insert("int(*.cl_attribute_size)(SEXP,SEXP,SEXP,SEXP)");
+        signatures.insert("int(*attribute_size)(SEXP,SEXP,SEXP,SEXP)");
         signatures.insert("int(*.p_attr_size)(SEXP)");
         signatures.insert("int(*.s_attr_size)(SEXP)");
         signatures.insert("int(*.p_attr_lexicon_size)(SEXP)");
         signatures.insert("int(*.cl_lexicon_size)(SEXP,SEXP,SEXP)");
         signatures.insert("Rcpp::IntegerVector(*.cl_cpos2struc)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
         signatures.insert("Rcpp::IntegerVector(*.cpos_to_struc)(SEXP,Rcpp::IntegerVector)");
-        signatures.insert("Rcpp::StringVector(*.cl_cpos2str)(SEXP,SEXP,SEXP,Rcpp::IntegerVector)");
+        signatures.insert("Rcpp::StringVector(*cpos2str)(SEXP,SEXP,SEXP,Rcpp::IntegerVector)");
         signatures.insert("Rcpp::StringVector(*.cpos_to_str)(SEXP,Rcpp::IntegerVector)");
-        signatures.insert("Rcpp::IntegerVector(*.cl_cpos2id)(SEXP,SEXP,SEXP,Rcpp::IntegerVector)");
+        signatures.insert("Rcpp::IntegerVector(*cpos2id)(SEXP,SEXP,SEXP,Rcpp::IntegerVector)");
         signatures.insert("Rcpp::IntegerVector(*.cpos_to_id)(SEXP,Rcpp::IntegerVector)");
-        signatures.insert("Rcpp::IntegerVector(*.cl_struc2cpos)(SEXP,SEXP,SEXP,int)");
+        signatures.insert("Rcpp::IntegerVector(*struc2cpos)(SEXP,SEXP,SEXP,int)");
         signatures.insert("Rcpp::IntegerVector(*.struc_to_cpos)(SEXP,int)");
-        signatures.insert("Rcpp::StringVector(*.cl_id2str)(SEXP,SEXP,SEXP,Rcpp::IntegerVector)");
+        signatures.insert("Rcpp::StringVector(*id2str)(SEXP,SEXP,SEXP,Rcpp::IntegerVector)");
         signatures.insert("Rcpp::StringVector(*.cl_struc2str)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
         signatures.insert("Rcpp::StringVector(*.struc_to_str)(SEXP,Rcpp::IntegerVector)");
         signatures.insert("Rcpp::IntegerVector(*.cl_regex2id)(SEXP,SEXP,SEXP,SEXP)");
@@ -2583,20 +2583,20 @@ RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() {
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr_default", (DL_FUNC)_RcppCWB_p_attr_default_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.s_attr", (DL_FUNC)_RcppCWB__s_attr_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr", (DL_FUNC)_RcppCWB__p_attr_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_attribute_size", (DL_FUNC)_RcppCWB__cl_attribute_size_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_attribute_size", (DL_FUNC)_RcppCWB_attribute_size_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr_size", (DL_FUNC)_RcppCWB__p_attr_size_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.s_attr_size", (DL_FUNC)_RcppCWB__s_attr_size_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr_lexicon_size", (DL_FUNC)_RcppCWB__lexicon_size_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_lexicon_size", (DL_FUNC)_RcppCWB__cl_lexicon_size_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_cpos2struc", (DL_FUNC)_RcppCWB__cl_cpos2struc_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cpos_to_struc", (DL_FUNC)_RcppCWB__cpos_to_struc_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_cpos2str", (DL_FUNC)_RcppCWB__cl_cpos2str_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_cpos2str", (DL_FUNC)_RcppCWB_cpos2str_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cpos_to_str", (DL_FUNC)_RcppCWB__cpos_to_str_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_cpos2id", (DL_FUNC)_RcppCWB__cl_cpos2id_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_cpos2id", (DL_FUNC)_RcppCWB_cpos2id_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cpos_to_id", (DL_FUNC)_RcppCWB__cpos_to_id_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_struc2cpos", (DL_FUNC)_RcppCWB__cl_struc2cpos_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_struc2cpos", (DL_FUNC)_RcppCWB_struc2cpos_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.struc_to_cpos", (DL_FUNC)_RcppCWB__struc_to_cpos_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_id2str", (DL_FUNC)_RcppCWB__cl_id2str_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_id2str", (DL_FUNC)_RcppCWB_id2str_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_struc2str", (DL_FUNC)_RcppCWB__cl_struc2str_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.struc_to_str", (DL_FUNC)_RcppCWB__struc_to_str_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_regex2id", (DL_FUNC)_RcppCWB__cl_regex2id_try);
@@ -2664,20 +2664,20 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_p_attr_default", (DL_FUNC) &_RcppCWB_p_attr_default, 0},
     {"_RcppCWB__s_attr", (DL_FUNC) &_RcppCWB__s_attr, 3},
     {"_RcppCWB__p_attr", (DL_FUNC) &_RcppCWB__p_attr, 3},
-    {"_RcppCWB__cl_attribute_size", (DL_FUNC) &_RcppCWB__cl_attribute_size, 4},
+    {"_RcppCWB_attribute_size", (DL_FUNC) &_RcppCWB_attribute_size, 4},
     {"_RcppCWB__p_attr_size", (DL_FUNC) &_RcppCWB__p_attr_size, 1},
     {"_RcppCWB__s_attr_size", (DL_FUNC) &_RcppCWB__s_attr_size, 1},
     {"_RcppCWB__lexicon_size", (DL_FUNC) &_RcppCWB__lexicon_size, 1},
     {"_RcppCWB__cl_lexicon_size", (DL_FUNC) &_RcppCWB__cl_lexicon_size, 3},
     {"_RcppCWB__cl_cpos2struc", (DL_FUNC) &_RcppCWB__cl_cpos2struc, 4},
     {"_RcppCWB__cpos_to_struc", (DL_FUNC) &_RcppCWB__cpos_to_struc, 2},
-    {"_RcppCWB__cl_cpos2str", (DL_FUNC) &_RcppCWB__cl_cpos2str, 4},
+    {"_RcppCWB_cpos2str", (DL_FUNC) &_RcppCWB_cpos2str, 4},
     {"_RcppCWB__cpos_to_str", (DL_FUNC) &_RcppCWB__cpos_to_str, 2},
-    {"_RcppCWB__cl_cpos2id", (DL_FUNC) &_RcppCWB__cl_cpos2id, 4},
+    {"_RcppCWB_cpos2id", (DL_FUNC) &_RcppCWB_cpos2id, 4},
     {"_RcppCWB__cpos_to_id", (DL_FUNC) &_RcppCWB__cpos_to_id, 2},
-    {"_RcppCWB__cl_struc2cpos", (DL_FUNC) &_RcppCWB__cl_struc2cpos, 4},
+    {"_RcppCWB_struc2cpos", (DL_FUNC) &_RcppCWB_struc2cpos, 4},
     {"_RcppCWB__struc_to_cpos", (DL_FUNC) &_RcppCWB__struc_to_cpos, 2},
-    {"_RcppCWB__cl_id2str", (DL_FUNC) &_RcppCWB__cl_id2str, 4},
+    {"_RcppCWB_id2str", (DL_FUNC) &_RcppCWB_id2str, 4},
     {"_RcppCWB__cl_struc2str", (DL_FUNC) &_RcppCWB__cl_struc2str, 4},
     {"_RcppCWB__struc_to_str", (DL_FUNC) &_RcppCWB__struc_to_str, 2},
     {"_RcppCWB__cl_regex2id", (DL_FUNC) &_RcppCWB__cl_regex2id, 4},
