@@ -6,7 +6,7 @@ on:
       - main
       - master
       - dev
-      - win
+      - pcre2
   pull_request:
     branches:
       - main

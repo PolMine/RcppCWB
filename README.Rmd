@@ -36,10 +36,10 @@ During the installation, cross-compiled versions of the corpus library (CL) are 
 
 ## Installation on Ubuntu
 
-The package includes the source code of the Corpus Workbench (CWB), slightly modified to make it compatible with R requirements. Compiling the CWB requires the pcre and glib libraries to be present. Using the Aptitude package manager (Ubuntu/Debian), running the following command from the shell will fulfill these dependencies.
+The package includes the source code of the Corpus Workbench (CWB), slightly modified to make it compatible with R requirements. Compiling the CWB requires the pcre2 and glib libraries to be present. Using the Aptitude package manager (Ubuntu/Debian), running the following command from the shell will fulfill these dependencies.
 
 ```{sh ubuntu_install_dependencies, eval = FALSE}
-sudo apt-get install libpcre3-dev libglib2.0-dev
+sudo apt-get install libpcre2-dev libglib2.0-dev
 ```
 
 Then, use the conventional R installation mechanism to install R dependencies, and the release of RcppCWB at CRAN.
@@ -59,14 +59,14 @@ devtools::install_github("PolMine/RcppCWB", ref = "dev")
 
 ## Installation on macOS
 
-On macOS, the [pcre](http://www.pcre.org/) and [Glib](https://docs.gtk.org/glib) libraries need to be present. We recommend to use 'Homebrew' as a package manager for macOS. To install Homebrew, follow the instructions on the [Homebrew Website](https://brew.sh/index_de.html). It may also be necessary to also install [Xcode](https://developer.apple.com/xcode/) and [XQuartz](https://www.xquartz.org).
+On macOS, the [pcre2](http://www.pcre.org/) and [Glib](https://docs.gtk.org/glib) libraries need to be present. We recommend to use 'Homebrew' as a package manager for macOS. To install Homebrew, follow the instructions on the [Homebrew Website](https://brew.sh/index_de.html). It may also be necessary to also install [Xcode](https://developer.apple.com/xcode/) and [XQuartz](https://www.xquartz.org).
 
 The following commands then need to be executed from a terminal window. They will install the C libraries the CWB relies on:
 
 ```{sh install_dependencies_macos, eval = FALSE}
 brew -v install pkg-config
 brew -v install glib --universal
-brew -v install pcre --universal
+brew -v install pcre2 --universal
 brew -v install readline
 ```
 
