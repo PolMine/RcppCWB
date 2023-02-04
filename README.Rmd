@@ -53,7 +53,7 @@ To install the development version, using the mechanism offered by the devtools 
 
 ```{r ubuntu_install_RcppCWB_github, eval = FALSE}
 if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
-devtools::install_github("PolMine/RcppCWB")
+devtools::install_github("PolMine/RcppCWB", ref = "dev")
 ```
 
 

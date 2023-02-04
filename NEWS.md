@@ -4,6 +4,10 @@
 directly: `attribute_size()`, `cpos2str()`, `cpos2id()`, `struc2cpos()`, 
 `id2str()` can be used in C++ functions imported using `Rcpp::sourceCpp()` or
 `Rcpp::cppFunction()`.
+* Dependency PCRE has been updated to PCRE2 #68.
+* The README suggested to install the development version of RcppCWB using the 
+snippet `devtools::install_github("PolMine/RcppCWB")`. The missing `ref = "dev"`
+has been inserted.
 
 # RcppCWB 0.5.5
 
