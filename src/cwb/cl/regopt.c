@@ -470,7 +470,7 @@ cl_regex_match(CL_Regex rx, char *str, int normalize_utf8)
   if (1) {
 #endif
     result = pcre2_match(rx->needle, /* rx->extra, */ (PCRE2_SPTR)haystack_pcre2,
-                       len, startoffset, rx->options,
+                       len, startoffset, (uint32_t)0,
                        rx->mdata, NULL);
     if (result < PCRE2_ERROR_NOMATCH && cl_debug)
       /* note, "no match" is a PCRE2 "error", but all actual errors are lower numbers */
