@@ -226,8 +226,8 @@ endif
 
 # Glib and PCRE header file info (added to CFLAGS_ALL below)
 ifndef __MINGW__
-ifndef PCRE_DEFINES
-PCRE_DEFINES := $(shell pcre-config --cflags)
+ifndef PCRE2_DEFINES
+PCRE2_DEFINES := $(shell pcre2-config --cflags)
 endif
 ifndef GLIB_DEFINES
 GLIB_DEFINES := $(shell pkg-config  --cflags glib-2.0)
@@ -240,7 +240,7 @@ MINGW_CROSS_HOME := $(subst install: ,,$(shell $(CC) --print-search-dirs | grep 
 # /usr/lib/gcc/i586-mingw32msvc/4.2.1-sjlj.  If necessary, override in config.mk
 endif
 #PCRE_DEFINES := $(shell $(MINGW_CROSS_HOME)/bin/pcre-config --cflags)
-PCRE_DEFINES := -DPCRE_STATIC
+PCRE2_DEFINES := -DPCRE2_STATIC
 #GLIB_DEFINES := $(shell export PKG_CONFIG_PATH=$(MINGW_CROSS_HOME)/lib/pkgconfig ; pkg-config --cflags glib-2.0) $(shell pkg-config  --cflags glib-2.0)
 endif
 
@@ -263,12 +263,12 @@ ifndef LIBGLIB_DLL_PATH
 LIBGLIB_DLL_PATH = $(MINGW_CROSS_HOME)/bin
 endif
 ifndef LIBPCRE_DLL_PATH
-LIBPCRE_DLL_PATH = $(MINGW_CROSS_HOME)/bin
+LIBPCRE2_DLL_PATH = $(MINGW_CROSS_HOME)/bin
 #$(error Configuration variable LIBPCRE_DLL_PATH is not set (directory containing MinGW-compiled libpcre-0.dll))
 endif
 DLLS_TO_INSTALL =                            \
-    $(LIBPCRE_DLL_PATH)/libpcre-1.dll        \
-    $(LIBPCRE_DLL_PATH)/libpcreposix-0.dll   \
+    $(LIBPCRE2_DLL_PATH)/libpcre-1.dll        \
+    $(LIBPCRE2_DLL_PATH)/libpcreposix-0.dll   \
     $(LIBGLIB_DLL_PATH)/libglib-2.0-0.dll
 else # i.e. if ! def __MINGW__
 DLLS_TO_INSTALL = 
@@ -277,14 +277,14 @@ endif
 # Linker flags for libraries used by the CL (to be added to linking commands for all programs)
 ifndef __MINGW__
 ifndef PCRE_LIBS
-PCRE_LIBS := $(shell pcre-config --libs)
+PCRE2_LIBS := $(shell pcre2-config --libs16)
 endif
 ifndef GLIB_LIBS
 GLIB_LIBS := $(shell pkg-config --libs glib-2.0)
 endif
 LDFLAGS_LIBS = $(PCRE_LIBS) $(GLIB_LIBS) 
 else
-LDFLAGS_LIBS = -lpcre -lglib-2.0
+LDFLAGS_LIBS = -lpcre2 -lglib-2.0
 endif 
 
 # complete sets of compiler and linker flags (allows easy specification of specific build rules)

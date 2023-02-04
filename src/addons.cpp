@@ -5,7 +5,11 @@ extern "C" {
   #include <string.h>
   #include "cl.h"
   #include "cwb/cl/cwb-globals.h" 
-  #include <pcre.h>
+  
+  #ifndef PCRE2_CODE_UNIT_WIDTH
+  #define PCRE2_CODE_UNIT_WIDTH 8
+  #endif
+  #include <pcre2.h>
 }
 
 #include <Rcpp.h>
