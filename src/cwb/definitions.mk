@@ -277,19 +277,19 @@ endif
 # Linker flags for libraries used by the CL (to be added to linking commands for all programs)
 ifndef __MINGW__
 ifndef PCRE_LIBS
-PCRE2_LIBS := $(shell pcre2-config --libs16)
+PCRE2_LIBS := $(shell pcre2-config --libs8)
 endif
 ifndef GLIB_LIBS
 GLIB_LIBS := $(shell pkg-config --libs glib-2.0)
 endif
-LDFLAGS_LIBS = $(PCRE_LIBS) $(GLIB_LIBS) 
+LDFLAGS_LIBS = $(PCRE2_LIBS) $(GLIB_LIBS) 
 else
 LDFLAGS_LIBS = -lpcre2 -lglib-2.0
 endif 
 
 # complete sets of compiler and linker flags (allows easy specification of specific build rules)
-CFLAGS_ALL = $(CFLAGS) $(INTERNAL_DEFINES) $(GLIB_DEFINES) $(PCRE_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
-DEPEND_CFLAGS_ALL = $(DEPEND_CLAGS) $(INTERNAL_DEFINES) $(GLIB_DEFINES) $(PCRE_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
+CFLAGS_ALL = $(CFLAGS) $(INTERNAL_DEFINES) $(GLIB_DEFINES) $(PCRE2_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
+DEPEND_CFLAGS_ALL = $(DEPEND_CLAGS) $(INTERNAL_DEFINES) $(GLIB_DEFINES) $(PCRE2_DEFINES) $(READLINE_DEFINES) $(TERMCAP_DEFINES)
 LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_LIBS)
 
 # readline and termcap libraries are only needed for building CQP
