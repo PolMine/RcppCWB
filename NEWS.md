@@ -1,8 +1,7 @@
 # RcppCWB 0.5.5.9001-.9003
 
-* Experimentally, Rcpp wrappers for Corpus Library (CL) functions are exposed
-directly: `attribute_size()`, `cpos2str()`, `cpos2id()`, `struc2cpos()`, 
-`id2str()` can be used in C++ functions imported using `Rcpp::sourceCpp()` or
+* Rcpp wrappers for Corpus Library (CL) functions are exposed directly and  
+can be used in C++ functions imported using `Rcpp::sourceCpp()` or
 `Rcpp::cppFunction()`.
 * Dependency PCRE has been updated to PCRE2 #68.
 * The README suggested to install the development version of RcppCWB using the 
@@ -10,6 +9,7 @@ snippet `devtools::install_github("PolMine/RcppCWB")`. The missing `ref = "dev"`
 has been inserted.
 * `cwb_encode()` crashed if arguments `data_dir` and `vrt_dir` include a tilde.
 Tilde expansion is now applied to these arguments to avoid this #73.
+* A new vignette explains how to write C++ inline functions.
 
 # RcppCWB 0.5.5
 
