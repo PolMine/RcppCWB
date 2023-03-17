@@ -554,15 +554,37 @@ cl_list_corpora <- function(){
   .cl_list_corpora()
 }
 
-############### experimental functionality ##########################
 
-#' Experimental low-level CL access.
+#' Low-level CL access.
 #' 
-#' Set of functions with same functionality as cl_* functions to improve the
-#' ease of writing code.
+#' Wrappers for CWB Corpus Library functions suited for writing performance
+#' code.
 #' 
+#' The default cl_* R wrappers for the functions of the CWB Corpus Library
+#' involve a lookup of a corpus and its p- or s-attributes (using the corpus ID,
+#' registry and attribute indicated by length-one character vectors) every time
+#' one of these functions is called. It is more efficient looking up an
+#' attribute only once. This set of functions passes "externalptr" classes to
+#' reference attributes that have been looked up. A relevant scenario is writing
+#' functions with a C++ implementation that are compiled and linked using
+#' `Rcpp::cppFunction()` or `Rcpp::sourceCpp()`
 #' @name cl_rework
 #' @rdname cl_rework
+#' @examples
+#' library(Rcpp)
+#' 
+#' cppFunction(
+#'   'Rcpp::StringVector get_str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+#'      SEXP attr;
+#'      Rcpp::StringVector result;
+#'      attr = RcppCWB::p_attr(corpus, p_attribute, registry);
+#'      result = RcppCWB::cpos_to_str(attr, cpos);
+#'      return(result);
+#'   }',
+#'   depends = "RcppCWB"
+#' )
+#'
+#' result <- get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
 NULL
 
 

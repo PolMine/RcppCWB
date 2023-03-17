@@ -18,7 +18,7 @@
 \alias{id_to_cpos}
 \alias{cpos_to_lbound}
 \alias{cpos_to_rbound}
-\title{Experimental low-level CL access.}
+\title{Low-level CL access.}
 \usage{
 s_attr(corpus, s_attribute, registry)
 
@@ -76,6 +76,32 @@ cpos_to_rbound(s_attr, cpos)
 \item{id}{An \code{integer} vector with token ids.}
 }
 \description{
-Set of functions with same functionality as cl_* functions to improve the
-ease of writing code.
+Wrappers for CWB Corpus Library functions suited for writing performance
+code.
+}
+\details{
+The default cl_* R wrappers for the functions of the CWB Corpus Library
+involve a lookup of a corpus and its p- or s-attributes (using the corpus ID,
+registry and attribute indicated by length-one character vectors) every time
+one of these functions is called. It is more efficient looking up an
+attribute only once. This set of functions passes "externalptr" classes to
+reference attributes that have been looked up. A relevant scenario is writing
+functions with a C++ implementation that are compiled and linked using
+\code{Rcpp::cppFunction()} or \code{Rcpp::sourceCpp()}
+}
+\examples{
+library(Rcpp)
+
+cppFunction(
+  'Rcpp::StringVector get_str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+     SEXP attr;
+     Rcpp::StringVector result;
+     attr = RcppCWB::p_attr(corpus, p_attribute, registry);
+     result = RcppCWB::cpos_to_str(attr, cpos);
+     return(result);
+  }',
+  depends = "RcppCWB"
+)
+
+result <- get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
 }

@@ -189,7 +189,6 @@ Rcpp::IntegerVector cpos_to_struc(SEXP s_attr, Rcpp::IntegerVector cpos){
   return(_cl_cpos2struc(att, cpos));
 }
 
-/* worker */
 Rcpp::StringVector rcpp_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
   int i;
   int len;
