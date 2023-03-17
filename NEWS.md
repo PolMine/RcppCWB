@@ -8,6 +8,8 @@ directly: `attribute_size()`, `cpos2str()`, `cpos2id()`, `struc2cpos()`,
 * The README suggested to install the development version of RcppCWB using the 
 snippet `devtools::install_github("PolMine/RcppCWB")`. The missing `ref = "dev"`
 has been inserted.
+* `cwb_encode()` crashed if arguments `data_dir` and `vrt_dir` include a tilde.
+Tilde expansion is now applied to these arguments to avoid this #73.
 
 # RcppCWB 0.5.5
 
