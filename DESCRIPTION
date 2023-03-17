@@ -52,6 +52,7 @@ Suggests:
     testthat
 LinkingTo: Rcpp
 Biarch: true
+VignetteBuilder: knitr
 URL: https://github.com/PolMine/RcppCWB
 BugReports: https://github.com/PolMine/RcppCWB/issues
 RoxygenNote: 7.2.3

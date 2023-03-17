@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Andreas Blaette (andreas.blaette@uni-due.de)" />
+
+<meta name="date" content="2023-03-17" />
+
+<title>Writing performance code with RcppCWB</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Writing performance code with RcppCWB</h1>
+<h4 class="author">Andreas Blaette (<a href="mailto:andreas.blaette@uni-due.de" class="email">andreas.blaette@uni-due.de</a>)</h4>
+<h4 class="date">2023-03-17</h4>
+
+
+
+<div id="rationale" class="section level2">
+<h2>Rationale</h2>
+<p>The RcppCWB exposes the functionality of the Corpus Workbench (CWB)
+to R, so that R users can benefit from the performance of the C code of
+the CWB. Ease of use and performance should be great most of the time.
+But there are scenarios when the R wrappers and going back and forth
+between R and C/C++ involves too much copying of data and loss of
+performance. In this case, using C++ wrappers for CWB functions in C++
+functions exposed to R using <code>Rcpp::cppFunction()</code> or
+<code>Rcpp::sourceCpp()</code> may solve issues with performance and
+memory limitations.</p>
+</div>
+<div id="basics" class="section level2">
+<h2>Basics</h2>
+<p>Writing C++ functions that use CWB functionality requires loading the
+Rcpp and RcppCWB package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Rcpp)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RcppCWB)</span></code></pre></div>
+<p>Then we need to be aware that the default functions for accessing the
+CWB functionality involve passing length-one character vectors used for
+looking up the C representation of structural or positional attributes
+for corpora that have been loaded. It is more efficient to perform this
+lookup only once. Following this rationale, a set of functions exposes
+CWB functionality closer to the C logic, passing pointers to attributes
+that have been looked up.</p>
+<p>This functionality can also be used from R. For instance, we look up
+the p-attribute “word” of the “REUTERS” corpus as follows.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p_attr_word <span class="ot">&lt;-</span> <span class="fu">p_attr</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">corpus =</span> <span class="st">&quot;REUTERS&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_attribute =</span> <span class="st">&quot;word&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">registry =</span> <span class="fu">get_tmp_registry</span>()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>And we use <code>cpos_to_str()</code> to decode the first words of
+the corpus.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cpos_to_str</span>(p_attr_word, <span class="dv">0</span><span class="sc">:</span><span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##  [1] &quot;Diamond&quot;   &quot;Shamrock&quot;  &quot;Corp&quot;      &quot;said&quot;      &quot;that&quot;      &quot;effective&quot;
+##  [7] &quot;today&quot;     &quot;it&quot;        &quot;had&quot;       &quot;cut&quot;       &quot;its&quot;</code></pre>
+<p>While this may also be useful when writing R code, this lower-level
+functionality is particularly well-suited for writing high-performance
+C++ code exposed to R.</p>
+</div>
+<div id="inline-c-functions" class="section level2">
+<h2>Inline C++ functions</h2>
+<p>We start with a first simple scenario, which uses
+<code>cppFunction()</code> to source an inline C++ function in an R
+session.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cppFunction</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;Rcpp::StringVector get_str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="st">     SEXP attr;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="st">     Rcpp::StringVector result;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">     attr = RcppCWB::p_attr(corpus, p_attribute, registry);</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">     result = RcppCWB::cpos_to_str(attr, cpos);</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">     return(result);</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">  }&#39;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">depends =</span> <span class="st">&quot;RcppCWB&quot;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>This is not a very interesting example, but using the function
+works:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_str</span>(<span class="st">&quot;REUTERS&quot;</span>, <span class="st">&quot;word&quot;</span>, RcppCWB<span class="sc">::</span><span class="fu">get_tmp_registry</span>(), <span class="dv">0</span><span class="sc">:</span><span class="dv">50</span>)</span></code></pre></div>
+<pre><code>##  [1] &quot;Diamond&quot;      &quot;Shamrock&quot;     &quot;Corp&quot;         &quot;said&quot;         &quot;that&quot;        
+##  [6] &quot;effective&quot;    &quot;today&quot;        &quot;it&quot;           &quot;had&quot;          &quot;cut&quot;         
+## [11] &quot;its&quot;          &quot;contract&quot;     &quot;prices&quot;       &quot;for&quot;          &quot;crude&quot;       
+## [16] &quot;oil&quot;          &quot;by&quot;           &quot;1.50&quot;         &quot;dlrs&quot;         &quot;a&quot;           
+## [21] &quot;barrel&quot;       &quot;The&quot;          &quot;reduction&quot;    &quot;brings&quot;       &quot;its&quot;         
+## [26] &quot;posted&quot;       &quot;price&quot;        &quot;for&quot;          &quot;West&quot;         &quot;Texas&quot;       
+## [31] &quot;Intermediate&quot; &quot;to&quot;           &quot;16.00&quot;        &quot;dlrs&quot;         &quot;a&quot;           
+## [36] &quot;barrel&quot;       &quot;the&quot;          &quot;copany&quot;       &quot;said&quot;         &quot;The&quot;         
+## [41] &quot;price&quot;        &quot;reduction&quot;    &quot;today&quot;        &quot;was&quot;          &quot;made&quot;        
+## [46] &quot;in&quot;           &quot;the&quot;          &quot;light&quot;        &quot;of&quot;           &quot;falling&quot;     
+## [51] &quot;oil&quot;</code></pre>
+</div>
+<div id="source-c-function" class="section level2">
+<h2>Source C++ function</h2>
+<p>To provide a more interesting real-life example, we demonstrate a
+solution to the following scenario: It may be necessary to decode an
+entire corpus, and to write the tokens of corpus regions to a file in a
+line-by-line fashion. Computing word embeddings may require this input
+format, for instance. But if the corpus is really large, decoding the
+corpus entirely and then writing everything to disk may hit memory
+limitations. Decoding the tokens of the corpus successively and
+instantly creating the output file is an obvious solution, but moving
+data between the R/C++/C interface for every single token is a deal
+breaker. A pure C++ implementation will be much more effective.</p>
+<p>The following C++ file that relies on CWB functions as exposed by
+RcppCWB addresses the scenario.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::depends(RcppCWB)]]</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;RcppCWB.h&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fstream&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cstdlib&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> write_token_stream<span class="op">(</span>SEXP corpus<span class="op">,</span> SEXP p_attribute<span class="op">,</span> SEXP <span class="va">s_attribute</span><span class="op">,</span> SEXP registry<span class="op">,</span> SEXP <span class="dt">attribute_type</span><span class="op">,</span> Rcpp<span class="op">::</span>StringVector filename<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> i<span class="op">,</span> n<span class="op">,</span> region_size<span class="op">;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  Rcpp<span class="op">::</span>IntegerVector region<span class="op">(</span><span class="dv">2</span><span class="op">);</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>ofstream<span class="op"> </span>outdata<span class="op">;</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  n <span class="op">=</span> RcppCWB<span class="op">::</span>attribute_size<span class="op">(</span>corpus<span class="op">,</span> <span class="va">s_attribute</span><span class="op">,</span> <span class="dt">attribute_type</span><span class="op">,</span> registry<span class="op">);</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  outdata<span class="op">.</span>open<span class="op">(</span>filename<span class="op">[</span><span class="dv">0</span><span class="op">]);</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span><span class="op">(</span> <span class="op">!</span>outdata <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cerr<span class="op"> &lt;&lt;</span> <span class="st">&quot;Error: file could not be opened&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    exit<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++){</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    region <span class="op">=</span> RcppCWB<span class="op">::</span>struc2cpos<span class="op">(</span>corpus<span class="op">,</span> <span class="va">s_attribute</span><span class="op">,</span> registry<span class="op">,</span> i<span class="op">);</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    region_size <span class="op">=</span> region<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">-</span> region<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    Rcpp<span class="op">::</span>IntegerVector cpos<span class="op">(</span>region_size<span class="op">);</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    cpos <span class="op">=</span> Rcpp<span class="op">::</span>seq<span class="op">(</span>region<span class="op">[</span><span class="dv">0</span><span class="op">],</span> region<span class="op">[</span><span class="dv">1</span><span class="op">]);</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    Rcpp<span class="op">::</span>StringVector values<span class="op">(</span>region_size<span class="op">);</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> RcppCWB<span class="op">::</span>cpos2str<span class="op">(</span>corpus<span class="op">,</span> p_attribute<span class="op">,</span> registry<span class="op">,</span> cpos<span class="op">);</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> j<span class="op">;</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> values<span class="op">.</span>length<span class="op">();</span> j<span class="op">++){</span> </span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>      outdata <span class="op">&lt;&lt;</span> values<span class="op">(</span>j<span class="op">);</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>j <span class="op">&lt;</span> values<span class="op">.</span>length<span class="op">()</span> <span class="op">-</span> <span class="dv">1</span><span class="op">){</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        outdata <span class="op">&lt;&lt;</span> <span class="st">&quot; &quot;</span><span class="op">;</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    outdata <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>  outdata<span class="op">.</span>close<span class="op">();</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This code can be sourced, compiled and exposed to R using
+<code>sourceCpp()</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sourceCpp</span>(<span class="at">file =</span> <span class="fu">system.file</span>(<span class="at">package =</span> <span class="st">&quot;RcppCWB&quot;</span>, <span class="st">&quot;cpp&quot;</span>, <span class="st">&quot;fastdecode.cpp&quot;</span>))</span></code></pre></div>
+<p>We exemplify that everything works as intended using the smallish
+REUTERS corpus. So we create the output …</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>outfile <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.txt&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_token_stream</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">corpus =</span> <span class="st">&quot;REUTERS&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_attribute =</span> <span class="st">&quot;word&quot;</span>, </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">s_attribute =</span> <span class="st">&quot;id&quot;</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">attribute_type =</span> <span class="st">&quot;s&quot;</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">registry =</span> RcppCWB<span class="sc">::</span><span class="fu">get_tmp_registry</span>(),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">filename =</span> outfile</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<p>… and read it (showing the content selectively) to convey that the
+corpus data has been exported as intended.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(outfile) <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(substr, <span class="dv">1</span>, <span class="dv">75</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unlist</span>()</span></code></pre></div>
+<pre><code>##  [1] &quot;Diamond Shamrock Corp said that effective today it had cut its contract pri&quot;
+##  [2] &quot;OPEC may be forced to meet before a scheduled June session to readdress its&quot;
+##  [3] &quot;Texaco Canada said it lowered the contract price it will pay for crude oil &quot;
+##  [4] &quot;Marathon Petroleum Co said it reduced the contract price it will pay for al&quot;
+##  [5] &quot;Houston Oil Trust said that independent petroleum engineers completed an an&quot;
+##  [6] &quot;Kuwait s Oil Minister in remarks published today said there were no plans f&quot;
+##  [7] &quot;Indonesia appears to be nearing a political crossroads over measures to der&quot;
+##  [8] &quot;Saudi riyal interbank deposits were steady at yesterday&#39;s higher levels in &quot;
+##  [9] &quot;The Gulf oil state of Qatar recovering slightly from last year&#39;s decline in&quot;
+## [10] &quot;Saudi Arabian Oil Minister Hisham Nazer reiterated the kingdom&#39;s commitment&quot;
+## [11] &quot;Saudi crude oil output last month fell to an average of 3.5 mln barrels per&quot;
+## [12] &quot;Deputy oil ministers from six Gulf Arab states will meet in Bahrain today t&quot;
+## [13] &quot;Saudi Arabian Oil Minister Hisham Nazer reiterated the kingdom&#39;s commitment&quot;
+## [14] &quot;Kuwait&#39;s oil minister said in a newspaper interview that there were no plan&quot;
+## [15] &quot;The port of Philadelphia was closed when a Cypriot oil tanker Seapride II r&quot;
+## [16] &quot;A study group said the United States should increase its strategic petroleu&quot;
+## [17] &quot;A study group said the United States should increase its strategic petroleu&quot;
+## [18] &quot;Unocal Corp&#39;s Union Oil Co said it lowered its posted prices for crude oil &quot;
+## [19] &quot;The New York Mercantile Exchange set April one for the debut of a new proce&quot;
+## [20] &quot;Argentine crude oil production was down 10.8 pct in January 1987 to 12.32 m&quot;</code></pre>
+</div>
+<div id="moving-ahead" class="section level2">
+<h2>Moving ahead</h2>
+<p>Quite obviously, writing C++ functions is more demanding than writing
+R code. But using CWB functionality as exposed by RcppCWB in C++
+functions that can be used from R may be a great solution to performance
+and memory issues. Rcpp brings writing C++ code much closer to what R
+users are acquainted with, making writing high-performance C++ close
+much easier. So we encourage considering this option when pure R
+solutions are not fast enough.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

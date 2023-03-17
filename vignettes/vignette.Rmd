@@ -1,0 +1,147 @@
+---
+title: "Writing performance code with RcppCWB"
+author: "Andreas Blaette (andreas.blaette@uni-due.de)"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Writing performance code with RcppCWB}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+## Rationale
+
+The RcppCWB package exposes the functionality of the Corpus Workbench (CWB) to
+R, so that R users can benefit from the performance of the C code of the CWB.
+Ease of use and performance should be great most of the time. But there are
+scenarios when the interface between R and C/C++ is a bottleneck for achieving
+sufficient performance. In this case, using CWB functionality in C++ functions
+exposed to R using `Rcpp::cppFunction()` or `Rcpp::sourceCpp()` may solve issues
+with performance and memory limitations.
+
+
+## Basics
+
+Writing C++ functions that use CWB functionality requires loading the Rcpp and
+RcppCWB package.
+
+```{r}
+library(Rcpp)
+library(RcppCWB)
+```
+
+We need to be aware that the default functions for accessing the CWB
+functionality involve passing length-one character vectors used for looking up
+the C representation of structural or positional attributes for corpora that
+have been loaded. It is more efficient to perform this lookup only once.
+Following this rationale, a set of functions exposes CWB functionality closer to
+the C logic, passing pointers to attributes that have been looked up.
+
+This functionality can also be used from R. For instance, we look up the
+p-attribute "word" of the "REUTERS" corpus as follows.
+
+```{r}
+p_attr_word <- p_attr(
+  corpus = "REUTERS",
+  p_attribute = "word",
+  registry = get_tmp_registry()
+)
+```
+
+And we use `cpos_to_str()` to decode the first words of the corpus.
+
+```{r}
+cpos_to_str(p_attr_word, 0:10)
+```
+
+While this may also be useful when writing R code, this lower-level
+functionality is particularly well-suited for writing high-performance C++ code
+exposed to R.
+
+
+## Inline C++ functions
+
+We start with a first simple scenario, which uses `cppFunction()` to source
+an inline C++ function in an R session.
+
+```{r}
+cppFunction(
+  'Rcpp::StringVector get_str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+     SEXP attr;
+     Rcpp::StringVector result;
+     attr = RcppCWB::p_attr(corpus, p_attribute, registry);
+     result = RcppCWB::cpos_to_str(attr, cpos);
+     return(result);
+  }',
+  depends = "RcppCWB"
+)
+```
+
+This is not a very interesting example, but using the function works:
+
+```{r}
+get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
+```
+
+
+## Source C++ function
+
+To provide a more interesting real-life example, we demonstrate a solution to 
+the following scenario: It may be necessary to decode an entire corpus, and to
+write the tokens of corpus regions to a file in a line-by-line manner. Computing
+word embeddings may require this input format, for instance. 
+
+But if the corpus is really large, decoding the corpus entirely and then writing
+everything to disk may hit memory limitations. Decoding the tokens of the corpus
+successively and writing content to the output file on the spot is an obvious
+solution, but moving data between the R/C++/C interface for every single token
+is excessively slow. A pure C++ implementation will be much more effective.
+
+The following C++ file that relies on CWB functions as exposed by RcppCWB 
+addresses the scenario.
+
+```{Rcpp, file = system.file(package = "RcppCWB", "cpp", "fastdecode.cpp"), eval = FALSE}
+```
+
+This code can be sourced, compiled and exposed to R using `sourceCpp()`.
+
+```{r}
+sourceCpp(file = system.file(package = "RcppCWB", "cpp", "fastdecode.cpp"))
+```
+
+We exemplify that everything works as intended using the (smallish) REUTERS
+corpus. So we create the output ...
+
+```{r}
+outfile <- tempfile(fileext = ".txt")
+
+write_token_stream(
+  corpus = "REUTERS",
+  p_attribute = "word", 
+  s_attribute = "id",
+  attribute_type = "s",
+  registry = RcppCWB::get_tmp_registry(),
+  filename = outfile
+)
+```
+
+... and read it (showing the content selectively) to convey that the corpus
+data has been exported as intended.
+
+```{r}
+readLines(outfile) |>
+  lapply(substr, 1, 75) |>
+  unlist()
+```
+
+
+## Moving ahead
+
+Writing C++ functions is obviously more demanding than writing R code. But using
+CWB functionality as exposed by RcppCWB in C++ functions that can be used from R
+may be a great solution to performance and memory issues. Rcpp brings writing
+C++ code much closer to what R users are acquainted with, making writing
+high-performance C++ close much easier. So we encourage considering this option
+when pure R solutions are not fast enough.
