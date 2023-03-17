@@ -54,12 +54,20 @@ p_attr_default <- function() {
     .Call(`_RcppCWB_p_attr_default`)
 }
 
-.s_attr <- function(corpus, s_attribute, registry) {
-    .Call(`_RcppCWB__s_attr`, corpus, s_attribute, registry)
+#' @param corpus ID of a CWB corpus (length-one `character` vector).
+#' @param s_attribute A structural attribute (length-one `character` vector).
+#' @param registry Registry directory.
+#' @rdname cl_rework
+#' @export
+s_attr <- function(corpus, s_attribute, registry) {
+    .Call(`_RcppCWB_s_attr`, corpus, s_attribute, registry)
 }
 
-.p_attr <- function(corpus, p_attribute, registry) {
-    .Call(`_RcppCWB__p_attr`, corpus, p_attribute, registry)
+#' @param p_attribute A positional attribute (length-one `character` vector).
+#' @rdname cl_rework
+#' @export
+p_attr <- function(corpus, p_attribute, registry) {
+    .Call(`_RcppCWB_p_attr`, corpus, p_attribute, registry)
 }
 
 #' @param attribute Either a positional, or a structural attribute.
@@ -69,16 +77,24 @@ attribute_size <- function(corpus, attribute, attribute_type, registry) {
     .Call(`_RcppCWB_attribute_size`, corpus, attribute, attribute_type, registry)
 }
 
-.p_attr_size <- function(p_attr) {
-    .Call(`_RcppCWB__p_attr_size`, p_attr)
+#' @param p_attr A `externalptr` referencing a p-attribute.
+#' @rdname cl_rework
+#' @export
+p_attr_size <- function(p_attr) {
+    .Call(`_RcppCWB_p_attr_size`, p_attr)
 }
 
-.s_attr_size <- function(s_attr) {
-    .Call(`_RcppCWB__s_attr_size`, s_attr)
+#' @param s_attr A `externalptr` referencing a p-attribute.
+#' @rdname cl_rework
+#' @export
+s_attr_size <- function(s_attr) {
+    .Call(`_RcppCWB_s_attr_size`, s_attr)
 }
 
-.p_attr_lexicon_size <- function(p_attr) {
-    .Call(`_RcppCWB__lexicon_size`, p_attr)
+#' @rdname cl_rework
+#' @export
+p_attr_lexicon_size <- function(p_attr) {
+    .Call(`_RcppCWB_p_attr_lexicon_size`, p_attr)
 }
 
 .cl_lexicon_size <- function(corpus, p_attribute, registry) {
@@ -89,8 +105,11 @@ attribute_size <- function(corpus, attribute, attribute_type, registry) {
     .Call(`_RcppCWB__cl_cpos2struc`, corpus, s_attribute, cpos, registry)
 }
 
-.cpos_to_struc <- function(s_attr, cpos) {
-    .Call(`_RcppCWB__cpos_to_struc`, s_attr, cpos)
+#' @param cpos An `integer` vector of corpus positions.
+#' @rdname cl_rework
+#' @export
+cpos_to_struc <- function(s_attr, cpos) {
+    .Call(`_RcppCWB_cpos_to_struc`, s_attr, cpos)
 }
 
 #' Rcpp wrappers for CWB Corpus Library functions
@@ -104,8 +123,10 @@ cpos2str <- function(corpus, p_attribute, registry, cpos) {
     .Call(`_RcppCWB_cpos2str`, corpus, p_attribute, registry, cpos)
 }
 
-.cpos_to_str <- function(p_attr, cpos) {
-    .Call(`_RcppCWB__cpos_to_str`, p_attr, cpos)
+#' @rdname cl_rework
+#' @export
+cpos_to_str <- function(p_attr, cpos) {
+    .Call(`_RcppCWB_cpos_to_str`, p_attr, cpos)
 }
 
 #' @rdname cl_functions
@@ -113,8 +134,10 @@ cpos2id <- function(corpus, p_attribute, registry, cpos) {
     .Call(`_RcppCWB_cpos2id`, corpus, p_attribute, registry, cpos)
 }
 
-.cpos_to_id <- function(p_attr, cpos) {
-    .Call(`_RcppCWB__cpos_to_id`, p_attr, cpos)
+#' @rdname cl_rework
+#' @export
+cpos_to_id <- function(p_attr, cpos) {
+    .Call(`_RcppCWB_cpos_to_id`, p_attr, cpos)
 }
 
 #' @param s_attribute A structural attribute.
@@ -124,8 +147,11 @@ struc2cpos <- function(corpus, s_attribute, registry, struc) {
     .Call(`_RcppCWB_struc2cpos`, corpus, s_attribute, registry, struc)
 }
 
-.struc_to_cpos <- function(s_attr, struc) {
-    .Call(`_RcppCWB__struc_to_cpos`, s_attr, struc)
+#' @param struc A length-one `integer` vector with a struc.
+#' @rdname cl_rework
+#' @export
+struc_to_cpos <- function(s_attr, struc) {
+    .Call(`_RcppCWB_struc_to_cpos`, s_attr, struc)
 }
 
 #' @param id An `integer` vector with token ids.
@@ -138,56 +164,73 @@ id2str <- function(corpus, p_attribute, registry, id) {
     .Call(`_RcppCWB__cl_struc2str`, corpus, s_attribute, struc, registry)
 }
 
-.struc_to_str <- function(s_attr, struc) {
-    .Call(`_RcppCWB__struc_to_str`, s_attr, struc)
+#' @rdname cl_rework
+#' @export
+struc_to_str <- function(s_attr, struc) {
+    .Call(`_RcppCWB_struc_to_str`, s_attr, struc)
 }
 
 .cl_regex2id <- function(corpus, p_attribute, regex, registry) {
     .Call(`_RcppCWB__cl_regex2id`, corpus, p_attribute, regex, registry)
 }
 
-.regex_to_id <- function(p_attr, regex) {
-    .Call(`_RcppCWB__regex_to_id`, p_attr, regex)
+#' @param regex A regular expression.
+#' @rdname cl_rework
+#' @export
+regex_to_id <- function(p_attr, regex) {
+    .Call(`_RcppCWB_regex_to_id`, p_attr, regex)
 }
 
 .cl_str2id <- function(corpus, p_attribute, str, registry) {
     .Call(`_RcppCWB__cl_str2id`, corpus, p_attribute, str, registry)
 }
 
-.str_to_id <- function(p_attr, str) {
-    .Call(`_RcppCWB__str_to_id`, p_attr, str)
+#' @param str A `character` vector.
+#' @rdname cl_rework
+#' @export
+str_to_id <- function(p_attr, str) {
+    .Call(`_RcppCWB_str_to_id`, p_attr, str)
 }
 
 .cl_id2freq <- function(corpus, p_attribute, id, registry) {
     .Call(`_RcppCWB__cl_id2freq`, corpus, p_attribute, id, registry)
 }
 
-.id_to_freq <- function(p_attr, id) {
-    .Call(`_RcppCWB__id_to_freq`, p_attr, id)
+#' @param id An `integer` vector with token ids.
+#' @rdname cl_rework
+#' @export
+id_to_freq <- function(p_attr, id) {
+    .Call(`_RcppCWB_id_to_freq`, p_attr, id)
 }
 
 .cl_id2cpos <- function(corpus, p_attribute, id, registry) {
     .Call(`_RcppCWB__cl_id2cpos`, corpus, p_attribute, id, registry)
 }
 
-.id_to_cpos <- function(p_attr, id) {
-    .Call(`_RcppCWB__id_to_cpos`, p_attr, id)
+#' @rdname cl_rework
+#' @export
+id_to_cpos <- function(p_attr, id) {
+    .Call(`_RcppCWB_id_to_cpos`, p_attr, id)
 }
 
 .cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry) {
     .Call(`_RcppCWB__cl_cpos2lbound`, corpus, s_attribute, cpos, registry)
 }
 
-.cpos_to_lbound <- function(s_attr, cpos) {
-    .Call(`_RcppCWB__cpos_to_lbound`, s_attr, cpos)
+#' @rdname cl_rework
+#' @export
+cpos_to_lbound <- function(s_attr, cpos) {
+    .Call(`_RcppCWB_cpos_to_lbound`, s_attr, cpos)
 }
 
 .cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry) {
     .Call(`_RcppCWB__cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 
-.cpos_to_rbound <- function(s_attr, cpos) {
-    .Call(`_RcppCWB__cpos_to_rbound`, s_attr, cpos)
+#' @rdname cl_rework
+#' @export
+cpos_to_rbound <- function(s_attr, cpos) {
+    .Call(`_RcppCWB_cpos_to_rbound`, s_attr, cpos)
 }
 
 .cl_find_corpus <- function(corpus, registry) {
