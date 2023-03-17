@@ -74,7 +74,7 @@ Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry){
 //' @param registry Registry directory.
 //' @rdname cl_rework
 //' @export
-// [[Rcpp::export(name="s_attr")]]
+// [[Rcpp::export]]
 SEXP s_attr(SEXP corpus, SEXP s_attribute, SEXP registry){
   Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
   SEXP ptr = R_MakeExternalPtr(s_attr, R_NilValue, R_NilValue);
@@ -190,7 +190,7 @@ Rcpp::IntegerVector cpos_to_struc(SEXP s_attr, Rcpp::IntegerVector cpos){
 }
 
 /* worker */
-Rcpp::StringVector _cl_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
+Rcpp::StringVector rcpp_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
   int i;
   int len;
   len = cpos.length();
@@ -212,7 +212,7 @@ Rcpp::StringVector _cl_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
 // [[Rcpp::export()]]
 Rcpp::StringVector cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
-  return(_cl_cpos2str(att, cpos));
+  return(rcpp_cpos2str(att, cpos));
 }
 
 //' @rdname cl_rework
@@ -220,7 +220,7 @@ Rcpp::StringVector cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::
 // [[Rcpp::export]]
 Rcpp::StringVector cpos_to_str(SEXP p_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
-  return(_cl_cpos2str(att, cpos));
+  return(rcpp_cpos2str(att, cpos));
 }
 
 
