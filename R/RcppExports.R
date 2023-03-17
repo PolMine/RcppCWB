@@ -41,7 +41,16 @@
     .Call(`_RcppCWB_cwb_version`)
 }
 
-.p_attr_default <- function() {
+#' Get default p-attribute
+#' 
+#' Usually the default p-attribute will be "word". Use this function to avoid
+#' a hard-coded solution. Extracts the default attribute defined in the CWB
+#' source code.
+#' 
+#' @rdname p_attr_default
+#' @return A length-one `character` vector.
+#' @export
+p_attr_default <- function() {
     .Call(`_RcppCWB_p_attr_default`)
 }
 

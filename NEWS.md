@@ -1,4 +1,4 @@
-# RcppCWB 0.5.5.9001
+# RcppCWB 0.5.5.9001-.9003
 
 * Experimentally, Rcpp wrappers for Corpus Library (CL) functions are exposed
 directly: `attribute_size()`, `cpos2str()`, `cpos2id()`, `struc2cpos()`, 

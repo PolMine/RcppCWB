@@ -2507,7 +2507,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
     static std::set<std::string> signatures;
     if (signatures.empty()) {
         signatures.insert("Rcpp::StringVector(*.cwb_version)()");
-        signatures.insert("Rcpp::StringVector(*.p_attr_default)()");
+        signatures.insert("Rcpp::StringVector(*p_attr_default)()");
         signatures.insert("SEXP(*.s_attr)(SEXP,SEXP,SEXP)");
         signatures.insert("SEXP(*.p_attr)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*attribute_size)(SEXP,SEXP,SEXP,SEXP)");
@@ -2580,7 +2580,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() { 
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cwb_version", (DL_FUNC)_RcppCWB_cwb_version_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr_default", (DL_FUNC)_RcppCWB_p_attr_default_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_p_attr_default", (DL_FUNC)_RcppCWB_p_attr_default_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.s_attr", (DL_FUNC)_RcppCWB__s_attr_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.p_attr", (DL_FUNC)_RcppCWB__p_attr_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_attribute_size", (DL_FUNC)_RcppCWB_attribute_size_try);

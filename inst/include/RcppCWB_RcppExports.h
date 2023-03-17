@@ -45,17 +45,17 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
     }
 
-    inline Rcpp::StringVector _p_attr_default() {
-        typedef SEXP(*Ptr__p_attr_default)();
-        static Ptr__p_attr_default p__p_attr_default = NULL;
-        if (p__p_attr_default == NULL) {
-            validateSignature("Rcpp::StringVector(*_p_attr_default)()");
-            p__p_attr_default = (Ptr__p_attr_default)R_GetCCallable("RcppCWB", "_RcppCWB__p_attr_default");
+    inline Rcpp::StringVector p_attr_default() {
+        typedef SEXP(*Ptr_p_attr_default)();
+        static Ptr_p_attr_default p_p_attr_default = NULL;
+        if (p_p_attr_default == NULL) {
+            validateSignature("Rcpp::StringVector(*p_attr_default)()");
+            p_p_attr_default = (Ptr_p_attr_default)R_GetCCallable("RcppCWB", "_RcppCWB_p_attr_default");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p__p_attr_default();
+            rcpp_result_gen = p_p_attr_default();
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

@@ -39,7 +39,16 @@ Rcpp::StringVector cwb_version(){
   return result;
 }
 
-// [[Rcpp::export(name=".p_attr_default")]]
+//' Get default p-attribute
+//' 
+//' Usually the default p-attribute will be "word". Use this function to avoid
+//' a hard-coded solution. Extracts the default attribute defined in the CWB
+//' source code.
+//' 
+//' @rdname p_attr_default
+//' @return A length-one `character` vector.
+//' @export
+// [[Rcpp::export(name="p_attr_default")]]
 Rcpp::StringVector p_attr_default(){
   Rcpp::StringVector result(1);
   result(0) = cl_get_p_attr_default();

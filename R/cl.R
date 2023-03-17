@@ -588,18 +588,6 @@ p_attr_size <- function(p_attr){
   .p_attr_size(p_attr)
 }
 
-#' Get default p-attribute
-#' 
-#' Usually the default p-attribute will be "word". Use this function to avoid
-#' a hard-coded solution. Extracts the default attribute defined in the CWB
-#' source code.
-#' 
-#' @rdname p_attr_default
-#' @return A length-one `character` vector.
-#' @export
-p_attr_default <- function(){
-  .p_attr_default()
-}
 
 
 #' @param s_attr A `externalptr` referencing a p-attribute.
