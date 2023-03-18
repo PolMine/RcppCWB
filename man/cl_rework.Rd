@@ -93,7 +93,12 @@ functions with a C++ implementation that are compiled and linked using
 library(Rcpp)
 
 cppFunction(
-  'Rcpp::StringVector get_str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+  'Rcpp::StringVector get_str(
+     SEXP corpus,
+     SEXP p_attribute,
+     SEXP registry,
+     Rcpp::IntegerVector cpos
+   ){
      SEXP attr;
      Rcpp::StringVector result;
      attr = RcppCWB::p_attr(corpus, p_attribute, registry);

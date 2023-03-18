@@ -1,8 +1,8 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.5.5.9004
-Date: 2023-03-17
+Version: 0.5.5.9005
+Date: 2023-03-18
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
@@ -49,7 +49,8 @@ Imports:
     fs
 Suggests:
     knitr,
-    testthat
+    testthat,
+    rmarkdown
 LinkingTo: Rcpp
 Biarch: true
 VignetteBuilder: knitr
