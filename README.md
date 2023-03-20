@@ -5,7 +5,7 @@ v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/lic
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![R build
 status](https://github.com/PolMine/RcppCWB/workflows/R-CMD-check/badge.svg)](https://github.com/PolMine/RcppCWB/actions)
-[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
+[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB)
 
 # Rcpp bindings for the Corpus Workbench (CWB)
 
@@ -185,7 +185,7 @@ cqp_initialize(registry = registry)
 cqp_query(corpus = "REUTERS", query = '"crude" "oil"')
 ```
 
-    ## <pointer: 0x112fde300>
+    ## <pointer: 0x13800bbd0>
 
 ``` r
 cpos <- cqp_dump_subcorpus(corpus = "REUTERS")
