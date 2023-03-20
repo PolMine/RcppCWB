@@ -256,19 +256,19 @@ ifdef __MINGW__
 ifdef LIB_DLL_PATH
 # This general variable, if set (should only be set by user!), overrrides (and makes unnecessary) both the specific variables.
 LIBGLIB_DLL_PATH = $(LIB_DLL_PATH)
-LIBPCRE_DLL_PATH = $(LIB_DLL_PATH)
+LIBPCRE2_DLL_PATH = $(LIB_DLL_PATH)
 endif
 ifndef LIBGLIB_DLL_PATH
 #$(error Configuration variable LIBGLIB_DLL_PATH is not set (directory containing MinGW-compiled libglib-2.0-0.dll))
 LIBGLIB_DLL_PATH = $(MINGW_CROSS_HOME)/bin
 endif
-ifndef LIBPCRE_DLL_PATH
+ifndef LIBPCRE2_DLL_PATH
 LIBPCRE2_DLL_PATH = $(MINGW_CROSS_HOME)/bin
-#$(error Configuration variable LIBPCRE_DLL_PATH is not set (directory containing MinGW-compiled libpcre-0.dll))
+#$(error Configuration variable LIBPCRE2_DLL_PATH is not set (directory containing MinGW-compiled libpcre2-0.dll))
 endif
 DLLS_TO_INSTALL =                            \
-    $(LIBPCRE2_DLL_PATH)/libpcre-1.dll        \
-    $(LIBPCRE2_DLL_PATH)/libpcreposix-0.dll   \
+    $(LIBPCRE2_DLL_PATH)/libpcre2-1.dll        \
+    $(LIBPCRE2_DLL_PATH)/libpcre2posix-0.dll   \
     $(LIBGLIB_DLL_PATH)/libglib-2.0-0.dll
 else # i.e. if ! def __MINGW__
 DLLS_TO_INSTALL = 
