@@ -1,4 +1,4 @@
-VERSION=3.4.33
+VERSION=3.4.33-patched
 
 PKG_CPPFLAGS = -I../windows/libcl-${VERSION}/include -Icwb/cl -Icwb/cqp -Icwb/CQi -Icwb/utils
 
