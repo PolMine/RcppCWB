@@ -7,6 +7,12 @@
     <loc>/CONDUCT.html</loc>
   </url>
   <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/vignette.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -38,6 +44,9 @@
   </url>
   <url>
     <loc>/reference/cl_find_corpus.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cl_functions.html</loc>
   </url>
   <url>
     <loc>/reference/cl_lexicon_size.html</loc>
@@ -95,6 +104,9 @@
   </url>
   <url>
     <loc>/reference/matrix_to_subcorpus.html</loc>
+  </url>
+  <url>
+    <loc>/reference/p_attr_default.html</loc>
   </url>
   <url>
     <loc>/reference/p_attributes.html</loc>

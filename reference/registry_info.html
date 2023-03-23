@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RcppCWB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -25,6 +25,16 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/vignette.html">Writing performance code with RcppCWB</a>
+    </li>
+  </ul></li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -99,9 +109,11 @@ positional attributes of a corpus.</p>
 <p><code>corpus_s_attributes()</code> returns a <code>character</code> vector with the
 structural attributes of a corpus.</p>
 <p><code>corpus_properties()</code> returns a <code>character</code> vector with the corpus
-properties defined in the registry file.</p>
+properties defined in the registry file. If the corpus cannot be located,
+<code>NA</code> is returned.</p>
 <p><code>corpus_property()</code> returns the value of a corpus property defined
-in the registry file, or <code>NA</code> if the property requested is undefined.</p>
+in the registry file, or <code>NA</code> if the corpus does not exist, is not loaded
+of if the property requested is undefined.</p>
 <p><code>corpus_get_registry()</code> will extract the registry directory with the
 registry file defining a corpus from the internal C representation of
 loaded corpora. The <code>character</code> vector that is returned may be &gt; 1 if there
@@ -130,9 +142,9 @@ are several corpora with the same id defined in registry files in different
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "en"</span>
 <span class="r-in"><span><span class="fu">corpus_registry_dir</span><span class="op">(</span><span class="st">"REUTERS"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpHtipUV/registry_tmp</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpk6lOF7/registry_tmp</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/Users/runner/work/_temp/Library/RcppCWB/extdata/cwb/registry</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpHtipUV/registry_tmp</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-weight: bold;">/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/Rtmpk6lOF7/registry_tmp</span></span>
 <span class="r-in"><span><span class="fu">corpus_registry_dir</span><span class="op">(</span><span class="st">"FOO"</span><span class="op">)</span> <span class="co"># NA returned</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] NA</span>
 </code></pre></div>
@@ -149,7 +161,7 @@ are several corpora with the same id defined in registry files in different
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
