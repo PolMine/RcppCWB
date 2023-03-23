@@ -19,3 +19,25 @@ rm -f src/cwb/CQi/*.o
 rm -r src/cwb/utils/libcwb.a
 rm -r src/cwb/utils/*.a
 rm -r src/cwb/utils/*.o
+
+
+PLATFORMFILE=`grep -oh "PLATFORM=.*" ./src/cwb/config.mk | sed "s/PLATFORM=//g"`
+
+echo ${PLATFORMFILE}
+
+sed -e "s/PLATFORM=.*/PLATFORM=mingw-native/" ./src/cwb/config.mk > ./src/cwb/config.mk.mod
+rm ./src/cwb/config.mk
+mv ./src/cwb/config.mk.mod ./src/cwb/config.mk
+
+sed -e "s/CC[[:space:]]=[[:space:]].*?/CC = gcc/" ./src/cwb/config/platform/${PLATFORMFILE} > ./tmpfile
+rm ./src/cwb/config/platform/${PLATFORMFILE}
+mv ./tmpfile ./src/cwb/config/platform/${PLATFORMFILE}
+
+# For darwin/macOS machines, variable CC is not set in the platform files (darwin/darwin-64/darwin-arm64)
+# but in the unix platform file. So we restore gcc as default compiler here too.
+# A better solution would be to set the compiler in the dedicated platorm file! This is a matter
+# of the configure script (TODO).
+
+sed -e "s/^CC[[:space:]]=[[:space:]].*/# CC = gcc/" ./src/cwb/config/platform/unix > ./tmpfile
+rm ./src/cwb/config/platform/unix
+mv ./tmpfile ./src/cwb/config/platform/unix

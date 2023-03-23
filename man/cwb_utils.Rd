@@ -59,11 +59,13 @@ warnings).}
 \item{delete}{A \code{logical} value, whether to remove redundant files after
 compression.}
 
-\item{data_dir}{The data directory where \code{cwb_encode} will put the binary
-files of the indexed corpus.}
+\item{data_dir}{The data directory where \code{cwb_encode} will save the binary
+files of the indexed corpus.  Tilde expansion is performed on \code{data_dir}
+using \code{path.expand()} to avoid a crash.}
 
 \item{vrt_dir}{Directory with input corpus files (verticalised format / file
-ending *.vrt).}
+ending *.vrt). Tilde expansion is performed on \code{vrt_dir} using
+\code{path.expand()} to avoid a crash.}
 
 \item{encoding}{The encoding of the files to be encoded. Needs to be an
 encoding supported by CWB, see \code{cwb_charsets()}. "UTF-8" is taken as

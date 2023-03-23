@@ -57,3 +57,10 @@ test_that(
     expect_identical(conventional, new)
   }
 )
+
+test_that(
+  "p_attr_default()",
+  {
+    expect_identical(p_attr_default(), "word")
+  }
+)

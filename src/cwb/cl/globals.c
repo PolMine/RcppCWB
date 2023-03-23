@@ -59,7 +59,7 @@ char* cl_get_p_attr_default(){
  *  Controls how many debug messages are printed.
  *  0 = none (default), 1 = some, 2 = heavy
  */
-int cl_debug = 0;
+int cl_debug = 1;
 
 /**
  *  Global configuration variable: optimisation.

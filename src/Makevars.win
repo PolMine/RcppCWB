@@ -1,4 +1,4 @@
-VERSION=3.4.33
+VERSION=3.4.33-patched
 
 PKG_CPPFLAGS = -I../windows/libcl-${VERSION}/include -Icwb/cl -Icwb/cqp -Icwb/CQi -Icwb/utils
 
@@ -7,7 +7,7 @@ PKG_CXXFLAGS=-D_LIB
 PKG_LIBS = \
     -L../windows/libcl-${VERSION}/lib${R_ARCH} \
     -Wl,--allow-multiple-definition \
-    -lcwb -lcqp -lcl -lpcre -lglib-2.0 -lintl -liconv \
+    -lcwb -lcqp -lcl -lpcre2-8 -lglib-2.0 -lintl -liconv \
     -lws2_32 -lwinmm -lole32
 
 all: clean winlibs

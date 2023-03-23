@@ -5,7 +5,7 @@ v3](http://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/lic
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RcppCWB)](https://cran.r-project.org/package=RcppCWB)
 [![R build
 status](https://github.com/PolMine/RcppCWB/workflows/R-CMD-check/badge.svg)](https://github.com/PolMine/RcppCWB/actions)
-[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://codecov.io/gh/PolMine/RcppCWB/branch/master)
+[![codecov](https://codecov.io/gh/PolMine/RcppCWB/branch/master/graph/badge.svg)](https://app.codecov.io/gh/PolMine/RcppCWB)
 
 # Rcpp bindings for the Corpus Workbench (CWB)
 
@@ -50,12 +50,12 @@ libraries from the CWB source code.
 
 The package includes the source code of the Corpus Workbench (CWB),
 slightly modified to make it compatible with R requirements. Compiling
-the CWB requires the pcre and glib libraries to be present. Using the
+the CWB requires the pcre2 and glib libraries to be present. Using the
 Aptitude package manager (Ubuntu/Debian), running the following command
 from the shell will fulfill these dependencies.
 
 ``` sh
-sudo apt-get install libpcre3-dev libglib2.0-dev
+sudo apt-get install libpcre2-dev libglib2.0-dev
 ```
 
 Then, use the conventional R installation mechanism to install R
@@ -71,12 +71,12 @@ devtools package is recommended.
 
 ``` r
 if (!"devtools" %in% installed.packages()[,"Package"]) install.packages("devtools")
-devtools::install_github("PolMine/RcppCWB")
+devtools::install_github("PolMine/RcppCWB", ref = "dev")
 ```
 
 ## Installation on macOS
 
-On macOS, the [pcre](http://www.pcre.org/) and
+On macOS, the [pcre2](http://www.pcre.org/) and
 [Glib](https://docs.gtk.org/glib) libraries need to be present. We
 recommend to use ‘Homebrew’ as a package manager for macOS. To install
 Homebrew, follow the instructions on the [Homebrew
@@ -90,7 +90,7 @@ They will install the C libraries the CWB relies on:
 ``` sh
 brew -v install pkg-config
 brew -v install glib --universal
-brew -v install pcre --universal
+brew -v install pcre2 --universal
 brew -v install readline
 ```
 
@@ -185,7 +185,7 @@ cqp_initialize(registry = registry)
 cqp_query(corpus = "REUTERS", query = '"crude" "oil"')
 ```
 
-    ## <pointer: 0x600001c743c0>
+    ## <pointer: 0x143f39de0>
 
 ``` r
 cpos <- cqp_dump_subcorpus(corpus = "REUTERS")

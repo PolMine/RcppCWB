@@ -22,7 +22,7 @@ test_that(
       p_attribute = "word",
       registry = get_tmp_registry()
     )
-    new <- RcppCWB:::.p_attr_lexicon_size(
+    new <- p_attr_lexicon_size(
       p_attr("REUTERS", "word", registry = get_tmp_registry())
     )
     expect_identical(old, new)

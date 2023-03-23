@@ -7,10 +7,15 @@ extern "C" {
   #include <string.h>
   #include "cl.h"
   #include "cqp.h"
-  #include <pcre.h>
+ 
+  #ifndef PCRE2_CODE_UNIT_WIDTH
+  #define PCRE2_CODE_UNIT_WIDTH 8
+  #endif
+  #include <pcre2.h>
+  
   #include "server.h"
   
-#include "cwb/cqp/corpmanag.h"
+  #include "cwb/cqp/corpmanag.h"
   
   #include "_globalvars.h"
   #include "_eval.h"
@@ -26,6 +31,7 @@ using namespace Rcpp;
 char* cl_get_version();
 char* cl_get_p_attr_default();
 
+
 // [[Rcpp::export(name=".cwb_version")]]
 Rcpp::StringVector cwb_version(){
   Rcpp::StringVector result(1);
@@ -33,7 +39,16 @@ Rcpp::StringVector cwb_version(){
   return result;
 }
 
-// [[Rcpp::export(name=".p_attr_default")]]
+//' Get default p-attribute
+//' 
+//' Usually the default p-attribute will be "word". Use this function to avoid
+//' a hard-coded solution. Extracts the default attribute defined in the CWB
+//' source code.
+//' 
+//' @rdname p_attr_default
+//' @return A length-one `character` vector.
+//' @export
+// [[Rcpp::export(name="p_attr_default")]]
 Rcpp::StringVector p_attr_default(){
   Rcpp::StringVector result(1);
   result(0) = cl_get_p_attr_default();
@@ -54,8 +69,13 @@ Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry){
   return att;
 }
 
-// [[Rcpp::export(name=".s_attr")]]
-SEXP _s_attr(SEXP corpus, SEXP s_attribute, SEXP registry){
+//' @param corpus ID of a CWB corpus (length-one `character` vector).
+//' @param s_attribute A structural attribute (length-one `character` vector).
+//' @param registry Registry directory.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+SEXP s_attr(SEXP corpus, SEXP s_attribute, SEXP registry){
   Attribute* s_attr = make_s_attribute(corpus, s_attribute, registry);
   SEXP ptr = R_MakeExternalPtr(s_attr, R_NilValue, R_NilValue);
   return(ptr);
@@ -73,8 +93,11 @@ Attribute* make_p_attribute(SEXP corpus, SEXP p_attribute, SEXP registry){
   return att;
 }
 
-// [[Rcpp::export(name=".p_attr")]]
-SEXP _p_attr(SEXP corpus, SEXP p_attribute, SEXP registry){
+//' @param p_attribute A positional attribute (length-one `character` vector).
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export(name="p_attr")]]
+SEXP p_attr(SEXP corpus, SEXP p_attribute, SEXP registry){
   Attribute* p_attr = make_p_attribute(corpus, p_attribute, registry);
   SEXP ptr = R_MakeExternalPtr(p_attr, R_NilValue, R_NilValue);
   return(ptr);
@@ -83,9 +106,11 @@ SEXP _p_attr(SEXP corpus, SEXP p_attribute, SEXP registry){
 
 /* these are the wrappers for the functions of the corpus library (CL) */
 
-
-// [[Rcpp::export(name=".cl_attribute_size")]]
-int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry) {
+//' @param attribute Either a positional, or a structural attribute.
+//' @param attribute_type Either "p" (positional attribute) or "s" (structural attribute).
+//' @rdname cl_functions
+// [[Rcpp::export(name="attribute_size")]]
+int attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP registry) {
   int size;
   std::string atype = Rcpp::as<std::string>(attribute_type);
   if (atype == "p"){
@@ -98,23 +123,32 @@ int _cl_attribute_size(SEXP corpus, SEXP attribute, SEXP attribute_type, SEXP re
   return(size);
 }
 
-// [[Rcpp::export(name=".p_attr_size")]]
-int _p_attr_size(SEXP p_attr) {
+
+//' @param p_attr A `externalptr` referencing a p-attribute.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+int p_attr_size(SEXP p_attr) {
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   int size = cl_max_cpos(att);
   return(size);
 }
 
-// [[Rcpp::export(name=".s_attr_size")]]
-int _s_attr_size(SEXP s_attr) {
+//' @param s_attr A `externalptr` referencing a p-attribute.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+int s_attr_size(SEXP s_attr) {
   Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
   int size = cl_max_struc(att);
   return(size);
 }
 
 
-// [[Rcpp::export(name=".p_attr_lexicon_size")]]
-int _lexicon_size(SEXP p_attr){
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+int p_attr_lexicon_size(SEXP p_attr){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   int size = cl_max_id(att);
   return( size );
@@ -146,13 +180,16 @@ Rcpp::IntegerVector _cl_cpos2struc(SEXP corpus, SEXP s_attribute, Rcpp::IntegerV
   return(_cl_cpos2struc(att, cpos));
 }
 
-// [[Rcpp::export(name=".cpos_to_struc")]]
-Rcpp::IntegerVector _cpos_to_struc(SEXP s_attr, Rcpp::IntegerVector cpos){
+//' @param cpos An `integer` vector of corpus positions.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector cpos_to_struc(SEXP s_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
   return(_cl_cpos2struc(att, cpos));
 }
 
-Rcpp::StringVector _cl_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
+Rcpp::StringVector rcpp_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
   int i;
   int len;
   len = cpos.length();
@@ -164,16 +201,25 @@ Rcpp::StringVector _cl_cpos2str(Attribute* att, Rcpp::IntegerVector cpos){
 }
 
 
-// [[Rcpp::export(name=".cl_cpos2str")]]
-Rcpp::StringVector _cl_cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+//' Rcpp wrappers for CWB Corpus Library functions
+//' 
+//' @param corpus The ID of a CWB corpus.
+//' @param p_attribute A positional attribute.
+//' @param registry Path to the corpus registry.
+//' @param cpos An integer vector of corpus positions.
+//' @rdname cl_functions
+// [[Rcpp::export()]]
+Rcpp::StringVector cpos2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
-  return(_cl_cpos2str(att, cpos));
+  return(rcpp_cpos2str(att, cpos));
 }
 
-// [[Rcpp::export(name=".cpos_to_str")]]
-Rcpp::StringVector _cpos_to_str(SEXP p_attr, Rcpp::IntegerVector cpos){
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::StringVector cpos_to_str(SEXP p_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
-  return(_cl_cpos2str(att, cpos));
+  return(rcpp_cpos2str(att, cpos));
 }
 
 
@@ -189,15 +235,19 @@ Rcpp::IntegerVector _cl_cpos2id(Attribute * att, Rcpp::IntegerVector cpos){
   return( ids );
 }
 
-// [[Rcpp::export(name=".cl_cpos2id")]]
-Rcpp::IntegerVector _cl_cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
+
+//' @rdname cl_functions
+// [[Rcpp::export()]]
+Rcpp::IntegerVector cpos2id(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector cpos){
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
   return(_cl_cpos2id(att, cpos));
 }
 
 
-// [[Rcpp::export(name=".cpos_to_id")]]
-Rcpp::IntegerVector _cpos_to_id(SEXP p_attr, Rcpp::IntegerVector cpos){
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector cpos_to_id(SEXP p_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   return(_cl_cpos2id(att, cpos));
 }
@@ -217,22 +267,29 @@ Rcpp::IntegerVector _cl_struc2cpos(Attribute * att, int struc){
   return( cpos );
 }
 
-
-// [[Rcpp::export(name=".cl_struc2cpos")]]
-Rcpp::IntegerVector _cl_struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc){
+//' @param s_attribute A structural attribute.
+//' @param struc An integer value with struc.
+//' @rdname cl_functions
+// [[Rcpp::export(name="struc2cpos")]]
+Rcpp::IntegerVector struc2cpos(SEXP corpus, SEXP s_attribute, SEXP registry, int struc){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   return(_cl_struc2cpos(att, struc));
 }
 
-// [[Rcpp::export(name=".struc_to_cpos")]]
-Rcpp::IntegerVector _struc_to_cpos(SEXP s_attr, int struc){
+//' @param struc A length-one `integer` vector with a struc.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector struc_to_cpos(SEXP s_attr, int struc){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
   return(_cl_struc2cpos(att, struc));
 }
 
 
-// [[Rcpp::export(name=".cl_id2str")]]
-Rcpp::StringVector _cl_id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector id){
+//' @param id An `integer` vector with token ids.
+//' @rdname cl_functions
+// [[Rcpp::export()]]
+Rcpp::StringVector id2str(SEXP corpus, SEXP p_attribute, SEXP registry, Rcpp::IntegerVector id){
   /* potentially cpos > max cpos causing a crash */
   int len = id.length();
   Attribute* att = make_p_attribute(corpus, p_attribute, registry);
@@ -268,8 +325,11 @@ Rcpp::StringVector _cl_struc2str(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVec
   return (_cl_struc2str(att, struc));
 }
 
-// [[Rcpp::export(name=".struc_to_str")]]
-Rcpp::StringVector _struc_to_str(SEXP s_attr, Rcpp::IntegerVector struc){
+
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::StringVector struc_to_str(SEXP s_attr, Rcpp::IntegerVector struc){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
   return (_cl_struc2str(att, struc));
 }
@@ -294,8 +354,11 @@ Rcpp::IntegerVector _cl_regex2id(SEXP corpus, SEXP p_attribute, SEXP regex, SEXP
   return(_cl_regex2id(att, regex));
 }
 
-// [[Rcpp::export(name=".regex_to_id")]]
-Rcpp::IntegerVector _regex_to_id(SEXP p_attr, SEXP regex){
+//' @param regex A regular expression.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector regex_to_id(SEXP p_attr, SEXP regex){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   return (_cl_regex2id(att, regex));
 }
@@ -318,8 +381,11 @@ Rcpp::IntegerVector _cl_str2id(SEXP corpus, SEXP p_attribute, Rcpp::StringVector
   return(_cl_str2id(att, str));
 }
 
-// [[Rcpp::export(name=".str_to_id")]]
-Rcpp::IntegerVector _str_to_id(SEXP p_attr, Rcpp::StringVector str){
+//' @param str A `character` vector.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector str_to_id(SEXP p_attr, Rcpp::StringVector str){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   return (_cl_str2id(att, str));
 }
@@ -342,8 +408,11 @@ Rcpp::IntegerVector _cl_id2freq(SEXP corpus, SEXP p_attribute, Rcpp::IntegerVect
 }
 
 
-// [[Rcpp::export(name=".id_to_freq")]]
-Rcpp::IntegerVector _id_to_freq(SEXP p_attr, Rcpp::IntegerVector id){
+//' @param id An `integer` vector with token ids.
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector id_to_freq(SEXP p_attr, Rcpp::IntegerVector id){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   return (_cl_id2freq(att, id));
 }
@@ -369,8 +438,10 @@ Rcpp::IntegerVector _cl_id2cpos(SEXP corpus, SEXP p_attribute, SEXP id, SEXP reg
   return(_cl_id2cpos(att, id));
 }
 
-// [[Rcpp::export(name=".id_to_cpos")]]
-Rcpp::IntegerVector _id_to_cpos(SEXP p_attr, Rcpp::IntegerVector id){
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector id_to_cpos(SEXP p_attr, Rcpp::IntegerVector id){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(p_attr);
   return (_cl_id2cpos(att, id));
 }
@@ -399,8 +470,10 @@ Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::Integer
   return(_cl_cpos2lbound(att, cpos));
 }
 
-// [[Rcpp::export(name=".cpos_to_lbound")]]
-Rcpp::IntegerVector _cpos_to_lbound(SEXP s_attr, Rcpp::IntegerVector cpos){
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector cpos_to_lbound(SEXP s_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
   return (_cl_cpos2lbound(att, cpos));
 }
@@ -430,8 +503,11 @@ Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::Integer
   return(_cl_cpos2rbound(att, cpos));
 }
 
-// [[Rcpp::export(name=".cpos_to_rbound")]]
-Rcpp::IntegerVector _cpos_to_rbound(SEXP s_attr, Rcpp::IntegerVector cpos){
+
+//' @rdname cl_rework
+//' @export
+// [[Rcpp::export]]
+Rcpp::IntegerVector cpos_to_rbound(SEXP s_attr, Rcpp::IntegerVector cpos){
   Attribute* att = (Attribute*)R_ExternalPtrAddr(s_attr);
   return (_cl_cpos2rbound(att, cpos));
 }

@@ -153,10 +153,12 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
 }
 
 #' @param p_attributes Positional attributes (p-attributes) to be declared.
-#' @param data_dir The data directory where `cwb_encode` will put the binary
-#'   files of the indexed corpus.
+#' @param data_dir The data directory where `cwb_encode` will save the binary
+#'   files of the indexed corpus.  Tilde expansion is performed on `data_dir`
+#'   using `path.expand()` to avoid a crash.
 #' @param vrt_dir Directory with input corpus files (verticalised format / file
-#'   ending *.vrt).
+#'   ending *.vrt). Tilde expansion is performed on `vrt_dir` using
+#'   `path.expand()` to avoid a crash.
 #' @param encoding The encoding of the files to be encoded. Needs to be an
 #'   encoding supported by CWB, see `cwb_charsets()`. "UTF-8" is taken as
 #'   "utf8". Defaults to "utf8" (recommended charset).
@@ -213,6 +215,9 @@ cwb_encode <- function(
     )
   )
   
+  data_dir <- path.expand(data_dir)
+  vrt_dir <- path.expand(vrt_dir)
+  
   stopifnot(
     is.character(corpus), length(corpus) == 1L,
     is.character(registry), length(registry) == 1L, dir.exists(registry),
@@ -247,7 +252,9 @@ cwb_encode <- function(
   vrt_dir <- as.character(fs::path(vrt_dir))
   
   .cwb_encode(
-    regfile = regfile, data_dir = data_dir, vrt_dir = vrt_dir,
+    regfile = regfile,
+    data_dir = data_dir,
+    vrt_dir = vrt_dir,
     encoding = encoding,
     p_attributes = p_attributes,
     s_attributes_anno = s_attributes_anno,

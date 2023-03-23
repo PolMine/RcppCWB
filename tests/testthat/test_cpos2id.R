@@ -26,7 +26,7 @@ test_that(
     )
     
     p <- p_attr(corpus = "REUTERS", p_attribute = "word", registry = get_tmp_registry())
-    ids_new <- cpos_to_id(0:15L, p)
+    ids_new <- cpos_to_id(cpos = 0:15L, p_attr = p)
     expect_equal(ids_old, ids_new)
   }
 )

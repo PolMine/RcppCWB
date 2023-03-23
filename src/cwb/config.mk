@@ -203,7 +203,7 @@ FULL_MESSAGES = 1
 ## If its attempt is no good, you can overrride the setting  directly above. 
 #
 ## Path to the directory containing libpcre-0.dll
-# LIBPCRE_DLL_PATH = 
+# LIBPCRE2_DLL_PATH = 
 ## Path to the directory containing libglib-2.0-0.dll
 # LIBGLIB_DLL_PATH =
 ## If they are in the same place, just define this variable (overrides the preceding two)

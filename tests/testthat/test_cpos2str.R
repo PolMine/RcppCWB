@@ -26,7 +26,7 @@ test_that(
     )
     
     p <- p_attr(corpus = "REUTERS", p_attribute = "word", registry = get_tmp_registry())
-    new <- cpos_to_str(0L:3L, p)
+    new <- cpos_to_str(cpos = 0L:3L, p_attr = p)
     expect_identical(old, new)
   }
 )

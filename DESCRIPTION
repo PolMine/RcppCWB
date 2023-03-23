@@ -1,14 +1,14 @@
 Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
-Version: 0.5.5
-Date: 2023-01-24
+Version: 0.6.0
+Date: 2023-03-21
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
   Oliver Christ [ctb],
   Bruno Maximilian Schulze [ctb],
-  Stefanie Evert [ctb],
+  Stephanie Evert [ctb],
   Arne Fitschen [ctb],
   Jeroen Ooms [ctb],
   Marius Bertram [ctb],
@@ -19,7 +19,7 @@ Authors@R: c(
   person("Sylvain", "Loiseau", role = "aut"),
   person("Oliver", "Christ", role = "ctb"),
   person("Bruno Maximilian", "Schulze", role = "ctb"),
-  person("Stefanie", "Evert", role = "ctb"),
+  person("Stephanie", "Evert", role = "ctb"),
   person("Arne", "Fitschen", role = "ctb"),
   person("Jeroen", "Ooms", role = "ctb"),
   person("Marius", "Bertram", role = "ctb"),
@@ -29,7 +29,7 @@ Maintainer: Andreas Blaette <andreas.blaette@uni-due.de>
 Description: 'Rcpp' Bindings for the C code of the 'Corpus Workbench' ('CWB'), an indexing and query 
   engine to efficiently analyze large corpora (<https://cwb.sourceforge.io>). 'RcppCWB' is licensed
   under the GNU GPL-3, in line with the GPL-3 license of the 'CWB' (<https://www.r-project.org/Licenses/GPL-3>).
-  The 'CWB' relies on 'pcre' (BSD license, see <http://www.pcre.org/licence.txt>)
+  The 'CWB' relies on 'pcre2' (BSD license, see <http://www.pcre.org/licence.txt>)
   and 'GLib' (LGPL license, see <https://www.gnu.org/licenses/lgpl-3.0.en.html>).
   See the file LICENSE.note for further information. The package includes modified code of the
   'rcqp' package (GPL-2, see <https://cran.r-project.org/package=rcqp>). The original work of the authors
@@ -40,7 +40,7 @@ License: GPL-3
 Encoding: UTF-8
 Copyright: For the copyrights for the 'Corpus Workbench' (CWB) and acknowledgement of authorship, see file COPYRIGHTS.
 NeedsCompilation: yes
-SystemRequirements: GNU make, pcre (>= 7 < 10), GLib (>= 2.0.0). On Windows, no prior installations are necessary,
+SystemRequirements: GNU make, pcre2 (>= 10.00), GLib (>= 2.0.0). On Windows, no prior installations are necessary,
   as pre-built (i.e. cross-compiled) binaries of required libraries are downloaded from a GitHub repository 
   (<https://github.com/PolMine/libcl>) during installation. On macOS, static libraries of Glib are downloaded
   (<https://github.com/PolMine/libglib>) if Glib is not present.
@@ -49,12 +49,14 @@ Imports:
     fs
 Suggests:
     knitr,
-    testthat
+    testthat,
+    rmarkdown
 LinkingTo: Rcpp
 Biarch: true
+VignetteBuilder: knitr
 URL: https://github.com/PolMine/RcppCWB
 BugReports: https://github.com/PolMine/RcppCWB/issues
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Collate:
   'RcppCWB_package.R'

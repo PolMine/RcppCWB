@@ -40,7 +40,12 @@
 #'   registry = get_tmp_registry()
 #' )
 cl_attribute_size <- function(corpus, attribute, attribute_type, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .cl_attribute_size(corpus = corpus, attribute = attribute, attribute_type = attribute_type, registry = registry)
+  attribute_size(
+    corpus = corpus,
+    attribute = attribute,
+    attribute_type = attribute_type,
+    registry = registry
+  )
 }
 
 #' Get Lexicon Size.
@@ -154,7 +159,7 @@ cl_struc2cpos <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REG
   check_corpus(corpus, registry, cqp = FALSE)
   check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
   check_strucs(corpus = corpus, s_attribute = s_attribute, strucs = struc, registry = registry)
-  .cl_struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
+  struc2cpos(corpus = corpus, s_attribute = s_attribute, registry = registry, struc = struc)
 }
 
 #' @rdname s_attributes
@@ -269,7 +274,7 @@ cl_cpos2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
   check_registry(registry)
   check_corpus(corpus, registry, cqp = FALSE)
   if (length(cpos) == 0L) return(integer())
-  .cl_cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  cpos2str(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 
 #' @rdname p_attributes
@@ -277,7 +282,7 @@ cl_cpos2id <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIST
   check_registry(registry)
   check_corpus(corpus, registry, cqp = FALSE)
   if (length(cpos) == 0L) return(integer())
-  .cl_cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
+  cpos2id(corpus = corpus, p_attribute = p_attribute, registry = registry, cpos = cpos)
 }
 
 #' @rdname p_attributes
@@ -285,7 +290,7 @@ cl_id2str <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTR
   check_registry(registry)
   check_corpus(corpus, registry, cqp = FALSE)
   check_id(corpus = corpus, p_attribute = p_attribute, id = id, registry = registry)
-  .cl_id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
+  id2str(corpus = corpus, p_attribute = p_attribute, registry = registry, id = id)
 }
 
 #' @rdname p_attributes
@@ -549,136 +554,42 @@ cl_list_corpora <- function(){
   .cl_list_corpora()
 }
 
-############### experimental functionality ##########################
 
-#' Experimental low-level CL access.
+#' Low-level CL access.
 #' 
-#' Set of functions with same functionality as cl_* functions to improve the
-#' ease of writing code.
+#' Wrappers for CWB Corpus Library functions suited for writing performance
+#' code.
 #' 
+#' The default cl_* R wrappers for the functions of the CWB Corpus Library
+#' involve a lookup of a corpus and its p- or s-attributes (using the corpus ID,
+#' registry and attribute indicated by length-one character vectors) every time
+#' one of these functions is called. It is more efficient looking up an
+#' attribute only once. This set of functions passes "externalptr" classes to
+#' reference attributes that have been looked up. A relevant scenario is writing
+#' functions with a C++ implementation that are compiled and linked using
+#' `Rcpp::cppFunction()` or `Rcpp::sourceCpp()`
 #' @name cl_rework
 #' @rdname cl_rework
+#' @examples
+#' library(Rcpp)
+#' 
+#' cppFunction(
+#'   'Rcpp::StringVector get_str(
+#'      SEXP corpus,
+#'      SEXP p_attribute,
+#'      SEXP registry,
+#'      Rcpp::IntegerVector cpos
+#'    ){
+#'      SEXP attr;
+#'      Rcpp::StringVector result;
+#'      attr = RcppCWB::p_attr(corpus, p_attribute, registry);
+#'      result = RcppCWB::cpos_to_str(attr, cpos);
+#'      return(result);
+#'   }',
+#'   depends = "RcppCWB"
+#' )
+#'
+#' result <- get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
 NULL
 
-#' @param corpus ID of a CWB corpus (length-one `character` vector).
-#' @param s_attribute A structural attribute (length-one `character` vector).
-#' @param registry Registry directory.
-#' @rdname cl_rework
-#' @export
-s_attr <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .s_attr(corpus = corpus, s_attribute = s_attribute, registry = registry)
-}
 
-#' @param p_attribute A positional attribute (length-one `character` vector).
-#' @rdname cl_rework
-#' @export
-p_attr <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
-  .p_attr(corpus = corpus, p_attribute = p_attribute, registry = registry)
-}
-
-#' @param p_attr A `externalptr` referencing a p-attribute.
-#' @rdname cl_rework
-#' @export
-p_attr_size <- function(p_attr){
-  .p_attr_size(p_attr)
-}
-
-#' Get default p-attribute
-#' 
-#' Usually the default p-attribute will be "word". Use this function to avoid
-#' a hard-coded solution. Extracts the default attribute defined in the CWB
-#' source code.
-#' 
-#' @rdname p_attr_default
-#' @return A length-one `character` vector.
-#' @export
-p_attr_default <- function(){
-  .p_attr_default()
-}
-
-
-#' @param s_attr A `externalptr` referencing a p-attribute.
-#' @rdname cl_rework
-#' @export
-s_attr_size <- function(s_attr){
-  .s_attr_size(s_attr)
-}
-
-#' @rdname cl_rework
-#' @export
-p_attr_lexicon_size <- function(p_attr){
-  .p_attr_lexicon_size(p_attr)
-}
-
-#' @param cpos An `integer` vector of corpus positions.
-#' @rdname cl_rework
-#' @export
-cpos_to_struc <- function(cpos, s_attr){
-  .cpos_to_struc(s_attr = s_attr, cpos = cpos) # reverse order!
-}
-
-#' @rdname cl_rework
-#' @export
-cpos_to_str <- function(cpos, p_attr){
-  .cpos_to_str(p_attr = p_attr, cpos = cpos) # reverse order!
-}
-
-#' @rdname cl_rework
-#' @export
-cpos_to_id <- function(cpos, p_attr){
-  .cpos_to_id(p_attr = p_attr, cpos = cpos) # reverse order!
-}
-
-
-#' @param struc A length-one `integer` vector with a struc.
-#' @rdname cl_rework
-#' @export
-struc_to_cpos <- function(struc, s_attr){
-  .struc_to_cpos(s_attr = s_attr, struc = struc) # reverse order!
-}
-
-#' @rdname cl_rework
-#' @export
-struc_to_str <- function(struc, s_attr){
-  .struc_to_str(s_attr = s_attr, struc = struc) # reverse order!
-}
-
-#' @param regex A regular expression.
-#' @rdname cl_rework
-#' @export
-regex_to_id <- function(regex, p_attr){
-  .regex_to_id(p_attr = p_attr, regex = regex) # reverse order!
-}
-
-#' @param str A `character` vector.
-#' @rdname cl_rework
-#' @export
-str_to_id <- function(str, p_attr){
-  .str_to_id(p_attr = p_attr, str = str) # reverse order!
-}
-
-#' @param id An `integer` vector with token ids.
-#' @rdname cl_rework
-#' @export
-id_to_freq <- function(id, p_attr){
-  .id_to_freq(p_attr = p_attr, id = id) # reverse order!
-}
-
-#' @rdname cl_rework
-#' @export
-id_to_cpos <- function(id, p_attr){
-  .id_to_cpos(p_attr = p_attr, id = id) # reverse order!
-}
-
-#' @rdname cl_rework
-#' @export
-cpos_to_lbound <- function(cpos, s_attr){
-  .cpos_to_lbound(s_attr = s_attr, cpos = cpos) # reverse order!
-}
-
-
-#' @rdname cl_rework
-#' @export
-cpos_to_rbound <- function(cpos, s_attr){
-  .cpos_to_rbound(s_attr = s_attr, cpos = cpos) # reverse order!
-}

@@ -7,10 +7,14 @@ extern "C" {
   #include <string.h>
   #include "cl.h"
   #include "cqp.h"
-  #include <pcre.h>
+  
+  #ifndef PCRE2_CODE_UNIT_WIDTH
+  #define PCRE2_CODE_UNIT_WIDTH 8
+  #endif
+  #include <pcre2.h>
   #include "server.h"
   
-#include "cwb/cqp/corpmanag.h"
+  #include "cwb/cqp/corpmanag.h"
   
   #include "_globalvars.h"
   #include "_eval.h"
