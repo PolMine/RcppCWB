@@ -38,9 +38,11 @@ include $(TOP)/config.mk
 
 SRCS =  cwb-encode.c cwb-makeall.c \
 	cwb-huffcode.c cwb-compress-rdx.c \
+	cwb-decode.c
 
 OBJS =  cwb-encode.o cwb-makeall.o \
 	cwb-huffcode.o cwb-compress-rdx.o \
+	cwb-decode.o
 
 
 all: libcwb.a
@@ -61,6 +63,10 @@ cwb-huffcode.o: cwb-huffcode.c
 
 cwb-compress-rdx.o: cwb-compress-rdx.c
 	${CC} -c $(CFLAGS_ALL) -o cwb-compress-rdx.o cwb-compress-rdx.c
+
+cwb-decode.o: cwb-decode.c
+	${CC} -c $(CFLAGS_ALL) -o cwb-decode.o cwb-decode.c
+
 
 clean:
 	$(RM) *.o *~

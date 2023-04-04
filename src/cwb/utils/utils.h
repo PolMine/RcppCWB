@@ -53,3 +53,67 @@ int validate_revcorp(Attribute *attr);
 int makeall_do_attribute(Attribute *attr,ComponentID cid,int validate);
 
 
+/* functions defined in cwb-decode.c  */
+#undef INTERFACE
+#define MAX_ATTRS 2048
+#define MAX_PRINT_VALUES 1024
+
+typedef struct AVList {
+  char *name;                   /**< name of the XML attribute to be displayed */
+  Attribute *handle;            /**< CWB handle of the attribute */
+  struct AVList *next;          /**< pointer to next element of chain */
+} AVList;
+
+typedef struct {
+  char *name;                   /**< display name (may be different from CWB attribute name for certain s-attributes) */
+  Attribute *handle;            /**< CWB handle of the attribute */
+  int type;                     /**< attribute type, same as handle->type */
+  AVList av_list;               /**< for XML attribute only: linked list of attribute-value pairs to be displayed in start tag */
+} AttSpec;
+
+void decode_print_token_sequence(int start_position,int end_position,Attribute *context,int skip_token);
+void decode_expand_context(int *start,int *end,Attribute *context);
+void decode_print_surrounding_s_att_values(int position);
+void decode_verify_print_value_list(void);
+int decode_add_s_attribute(const char *att_spec);
+int decode_add_attribute(const char *name,int type,const char *display_name,const char *avspec,int recursion);
+Attribute *get_attribute_handle(const char *name,int type);
+int decode_attribute_is_in_list(Attribute *handle,AttSpec *att_list,int att_list_size);
+void decode_sort_s_att_regions(void);
+void decode_print_xml_declaration(void);
+const char *decode_string_escape(const char *s);
+int is_num(char *s);
+void decode_usage(int exit_code);
+void cleanup_and_exit(int error_code);
+extern int xml_compatible;
+
+typedef enum _output_modes {
+  StandardMode, LispMode, EncodeMode, ConclineMode, XMLMode
+} OutputMode;
+extern OutputMode mode;
+
+extern Attribute *conll_delimiter;
+extern int printnum;
+extern int maxlast;
+extern int last_token;
+extern int first_token;
+extern int printValuesIndex;
+extern Attribute *printValues[MAX_PRINT_VALUES];
+extern int N_sar;
+extern int sar_sort_index[MAX_ATTRS];
+
+typedef struct {
+  const char *name;             /**< display name of the s-attribute */
+  int start;                    /**< start and end of region (for sorting) */
+  int end;
+  const char *annot;            /**< NULL if there is no annotation; otherwise the content of the annotation */
+  AVList av_list;               /**< optional linked list of attribute-value pairs to be displayed in a start tag */
+} SAttRegion;
+extern SAttRegion s_att_regions[MAX_ATTRS];
+
+extern int print_list_index;
+extern AttSpec print_list[MAX_ATTRS];
+extern Corpus *corpus;
+extern char *corpus_name;
+extern char *registry_directory;
+extern char *progname;

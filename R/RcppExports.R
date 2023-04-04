@@ -373,6 +373,11 @@ cpos_to_rbound <- function(s_attr, cpos) {
     .Call(`_RcppCWB_cwb_encode`, regfile, data_dir, vrt_dir, encoding, p_attributes, s_attributes_anno, s_attributes_noanno, skip_blank_lines, strip_whitespace, xml, quiet, verbosity)
 }
 
+#' @export
+cwb_decode <- function(x, regfile, first_token, last_token) {
+    .Call(`_RcppCWB_cwb_decode`, x, regfile, first_token, last_token)
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
     .Call('_RcppCWB_RcppExport_registerCCallable', PACKAGE = 'RcppCWB')

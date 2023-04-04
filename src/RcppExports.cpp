@@ -2501,6 +2501,43 @@ RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vr
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// cwb_decode
+int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token);
+static SEXP _RcppCWB_cwb_decode_try(SEXP xSEXP, SEXP regfileSEXP, SEXP first_tokenSEXP, SEXP last_tokenSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type regfile(regfileSEXP);
+    Rcpp::traits::input_parameter< int >::type first_token(first_tokenSEXP);
+    Rcpp::traits::input_parameter< int >::type last_token(last_tokenSEXP);
+    rcpp_result_gen = Rcpp::wrap(cwb_decode(x, regfile, first_token, last_token));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RcppCWB_cwb_decode(SEXP xSEXP, SEXP regfileSEXP, SEXP first_tokenSEXP, SEXP last_tokenSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RcppCWB_cwb_decode_try(xSEXP, regfileSEXP, first_tokenSEXP, last_tokenSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _RcppCWB_RcppExport_validate(const char* sig) { 
@@ -2573,6 +2610,7 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
         signatures.insert("int(*.cwb_huffcode)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*.cwb_compress_rdx)(SEXP,SEXP,SEXP)");
         signatures.insert("int(*.cwb_encode)(SEXP,SEXP,SEXP,SEXP,Rcpp::StringVector,Rcpp::StringVector,Rcpp::StringVector,int,int,int,int,int)");
+        signatures.insert("int(*cwb_decode)(SEXP,SEXP,int,int)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -2646,6 +2684,7 @@ RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() {
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cwb_huffcode", (DL_FUNC)_RcppCWB_cwb_huffcode_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cwb_compress_rdx", (DL_FUNC)_RcppCWB_cwb_compress_rdx_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cwb_encode", (DL_FUNC)_RcppCWB_cwb_encode_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_cwb_decode", (DL_FUNC)_RcppCWB_cwb_decode_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_RcppExport_validate", (DL_FUNC)_RcppCWB_RcppExport_validate);
     return R_NilValue;
 }
@@ -2727,6 +2766,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_cwb_huffcode", (DL_FUNC) &_RcppCWB_cwb_huffcode, 3},
     {"_RcppCWB_cwb_compress_rdx", (DL_FUNC) &_RcppCWB_cwb_compress_rdx, 3},
     {"_RcppCWB_cwb_encode", (DL_FUNC) &_RcppCWB_cwb_encode, 12},
+    {"_RcppCWB_cwb_decode", (DL_FUNC) &_RcppCWB_cwb_decode, 4},
     {"_RcppCWB_RcppExport_registerCCallable", (DL_FUNC) &_RcppCWB_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };

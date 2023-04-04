@@ -203,3 +203,71 @@ int cwb_encode(
   return nr_input_files;
 }
 
+
+//' @export
+// [[Rcpp::export]]
+int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token){
+  Attribute *attr;
+  Attribute *context = NULL;
+  
+  int w, n;
+    
+  cl_startup();
+
+  maxlast = -1;
+  
+  registry_file = strdup(Rcpp::as<std::string>(regfile).c_str());
+
+  mode = XMLMode;
+
+  corpus_name = strdup(Rcpp::as<std::string>(x).c_str());
+      
+  if (!(corpus = cl_new_corpus(registry_directory, corpus_name))) {
+    fprintf(stderr, "Error: Corpus %s not found in registry %s (aborted).\n", corpus_name, (registry_directory ? registry_directory : cl_standard_registry() ) );
+    cleanup_and_exit(1);
+  }
+
+
+  for (attr = corpus->attributes; attr; attr = attr->any.next)
+    if (attr->any.type == ATT_POS) {
+      decode_add_attribute(attr->any.name, ATT_POS, NULL, NULL, 0);
+      n = cl_max_cpos(print_list[print_list_index - 1].handle);
+      if (maxlast < 0)
+        maxlast = n;
+      else if (n != maxlast) {
+        fprintf(stderr, "Error: Inconsistent corpus size\n");
+        cleanup_and_exit(1);
+      }
+    } else if (attr->any.type == ATT_STRUC)
+      decode_add_attribute(attr->any.name, ATT_STRUC, NULL, NULL, 0);
+    
+    
+    decode_verify_print_value_list();
+    
+    if (maxlast < 0) {
+      fprintf(stderr, "Need at least one p-attribute (-P flag). Aborted.\n");
+      cleanup_and_exit(2);
+    }
+    
+    if (first_token < 0 || first_token >= maxlast)
+      first_token = 0;
+    
+    if (last_token < 0 || last_token >= maxlast)
+      last_token = maxlast - 1;
+    
+    if (last_token < first_token) {
+      fprintf(stderr, "Warning: output range #%d..#%d is empty. No output.\n", first_token, last_token);
+      cleanup_and_exit(2);
+    }
+    
+    decode_print_xml_declaration();
+    printf("<corpus name=\"%s\" start=\"%d\" end=\"%d\">\n", corpus_name, first_token, last_token);
+
+    for (w = first_token; w <= last_token; w++)
+      decode_print_token_sequence(w, -1, context, 0);
+    
+    printf("</corpus>\n");
+    
+    cleanup_and_exit(0);
+    return 0;                     /* just to keep gcc from complaining */
+}
