@@ -1429,7 +1429,7 @@ namespace RcppCWB {
         return Rcpp::as<int >(rcpp_result_gen);
     }
 
-    inline int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token) {
+    inline int cwb_decode(SEXP x, SEXP regdir, int first_token, int last_token) {
         typedef SEXP(*Ptr_cwb_decode)(SEXP,SEXP,SEXP,SEXP);
         static Ptr_cwb_decode p_cwb_decode = NULL;
         if (p_cwb_decode == NULL) {
@@ -1439,7 +1439,7 @@ namespace RcppCWB {
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_cwb_decode(Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(regfile)), Shield<SEXP>(Rcpp::wrap(first_token)), Shield<SEXP>(Rcpp::wrap(last_token)));
+            rcpp_result_gen = p_cwb_decode(Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(regdir)), Shield<SEXP>(Rcpp::wrap(first_token)), Shield<SEXP>(Rcpp::wrap(last_token)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

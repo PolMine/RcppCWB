@@ -206,22 +206,19 @@ int cwb_encode(
 
 //' @export
 // [[Rcpp::export]]
-int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token){
+int cwb_decode(SEXP x, SEXP registry_dir, int first_token, int last_token){
   Attribute *attr;
   Attribute *context = NULL;
   
   int w, n;
-    
+  
+  char *registry_directory = strdup(Rcpp::as<std::string>(registry_dir).c_str());
+  char *corpus_name = strdup(Rcpp::as<std::string>(x).c_str());
+
   cl_startup();
 
   maxlast = -1;
   
-  registry_file = strdup(Rcpp::as<std::string>(regfile).c_str());
-
-  mode = XMLMode;
-
-  corpus_name = strdup(Rcpp::as<std::string>(x).c_str());
-      
   if (!(corpus = cl_new_corpus(registry_directory, corpus_name))) {
     fprintf(stderr, "Error: Corpus %s not found in registry %s (aborted).\n", corpus_name, (registry_directory ? registry_directory : cl_standard_registry() ) );
     cleanup_and_exit(1);
@@ -240,8 +237,7 @@ int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token){
       }
     } else if (attr->any.type == ATT_STRUC)
       decode_add_attribute(attr->any.name, ATT_STRUC, NULL, NULL, 0);
-    
-    
+
     decode_verify_print_value_list();
     
     if (maxlast < 0) {
@@ -261,13 +257,14 @@ int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token){
     }
     
     decode_print_xml_declaration();
-    printf("<corpus name=\"%s\" start=\"%d\" end=\"%d\">\n", corpus_name, first_token, last_token);
+    printf("<corpus name=\"%s\" start=\"%d\" end=\"%d\">\n", corpus_name, first_token, last_token); 
 
     for (w = first_token; w <= last_token; w++)
       decode_print_token_sequence(w, -1, context, 0);
-    
+
     printf("</corpus>\n");
     
-    cleanup_and_exit(0);
+
+    /* cleanup_and_exit(0); */
     return 0;                     /* just to keep gcc from complaining */
 }

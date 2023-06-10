@@ -2502,23 +2502,23 @@ RcppExport SEXP _RcppCWB_cwb_encode(SEXP regfileSEXP, SEXP data_dirSEXP, SEXP vr
     return rcpp_result_gen;
 }
 // cwb_decode
-int cwb_decode(SEXP x, SEXP regfile, int first_token, int last_token);
-static SEXP _RcppCWB_cwb_decode_try(SEXP xSEXP, SEXP regfileSEXP, SEXP first_tokenSEXP, SEXP last_tokenSEXP) {
+int cwb_decode(SEXP x, SEXP regdir, int first_token, int last_token);
+static SEXP _RcppCWB_cwb_decode_try(SEXP xSEXP, SEXP regdirSEXP, SEXP first_tokenSEXP, SEXP last_tokenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type regfile(regfileSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type regdir(regdirSEXP);
     Rcpp::traits::input_parameter< int >::type first_token(first_tokenSEXP);
     Rcpp::traits::input_parameter< int >::type last_token(last_tokenSEXP);
-    rcpp_result_gen = Rcpp::wrap(cwb_decode(x, regfile, first_token, last_token));
+    rcpp_result_gen = Rcpp::wrap(cwb_decode(x, regdir, first_token, last_token));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB_cwb_decode(SEXP xSEXP, SEXP regfileSEXP, SEXP first_tokenSEXP, SEXP last_tokenSEXP) {
+RcppExport SEXP _RcppCWB_cwb_decode(SEXP xSEXP, SEXP regdirSEXP, SEXP first_tokenSEXP, SEXP last_tokenSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB_cwb_decode_try(xSEXP, regfileSEXP, first_tokenSEXP, last_tokenSEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_cwb_decode_try(xSEXP, regdirSEXP, first_tokenSEXP, last_tokenSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
