@@ -240,6 +240,8 @@ cpos_to_lbound <- function(s_attr, cpos) {
 }
 
 #' @rdname s_attributes
+#' @details `cl_cpos2rbound()` and `cl_cpos2lbound()` return `NA` for values of
+#'   cpos that are outside a struc for the structural attribute given.
 cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = NULL) {
     .Call(`_RcppCWB_cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }

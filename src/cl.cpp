@@ -515,6 +515,8 @@ Rcpp::IntegerVector _cl_cpos2rbound(Attribute* att, Rcpp::IntegerVector cpos){
 
 
 //' @rdname s_attributes
+//' @details `cl_cpos2rbound()` and `cl_cpos2lbound()` return `NA` for values of
+//'   cpos that are outside a struc for the structural attribute given.
 // [[Rcpp::export]]
 Rcpp::IntegerVector cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry = R_NilValue){
   if (registry == R_NilValue) registry = mkString(getenv("CORPUS_REGISTRY"));

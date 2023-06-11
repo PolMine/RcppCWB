@@ -54,6 +54,10 @@ a right corpus position. The corpus library (CL) offers a set of functions
 to make the translations between corpus positions (cpos) and strucs
 (struc).
 }
+\details{
+\code{cl_cpos2rbound()} and \code{cl_cpos2lbound()} return \code{NA} for values of
+cpos that are outside a struc for the structural attribute given.
+}
 \examples{
 # get metadata for matches of token
 # scenario: id of the texts with occurrence of 'oil'
