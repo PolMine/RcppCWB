@@ -14,6 +14,12 @@ extern "C" {
 
 #include <Rcpp.h>
 
+
+/* avoid complications with including Rinternals.h */
+#define mkString		Rf_mkString
+SEXP	 Rf_mkString(const char *);
+
+
 /* short quasi-header */
 Attribute* make_s_attribute(SEXP corpus, SEXP s_attribute, SEXP registry);
 Attribute* make_p_attribute(SEXP corpus, SEXP p_attribute, SEXP registry);
@@ -422,4 +428,51 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
   }
 
   return cpos_matrix;
+}
+
+//' Get vector with min and max struc of s-attribute within a region
+//' 
+//' Look up the minimum and maximum struc of a s-attribute within a region.
+//' Works for nested s-attributes. If there are no regions of the s-attribute
+//' within the region, a vector with (two) `NA` values is returned.
+//' @param corpus ID of a CWB corpus.
+//' @param registry Path of the registry directory. If `NULL` (default), value
+//'   of environment variable 'CORPUS_REGISTRY' will be used.
+//' @param s_attribute Name of nested structural attribute.
+//' @param region Vector with left and right corpus position of region.
+//' @return A length-two integer vector.
+// [[Rcpp::export]]
+Rcpp::IntegerVector region_to_strucs(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector region, SEXP registry = R_NilValue){
+  
+  if (region(0) > region(1))
+    return Rcpp::IntegerVector::create(NA_INTEGER, NA_INTEGER);
+  
+  if (region.length() != 2)
+    return Rcpp::IntegerVector::create(NA_INTEGER, NA_INTEGER);
+  
+  if (registry == R_NilValue) registry = mkString(getenv("CORPUS_REGISTRY"));
+
+  Attribute* att = make_s_attribute(corpus, s_attribute, registry);
+  Rcpp::IntegerVector strucs(2);
+  
+  bool more = true;
+  while (more){
+    strucs(0) = cl_cpos2struc(att, region(0));
+    if (strucs(0) >= 0) more = false;
+    if (region(0) > region(1)) more = false;
+    region(0)++;
+  };
+  
+  more = true;
+  while (more){
+    strucs(1) = cl_cpos2struc(att, region(1));
+    if (strucs(1) >= 0) more = false;
+    if (region(1) < region(0)) more = false;
+    region(1)--;
+  };
+  
+  if (region(0) < 0) region(0) = NA_INTEGER;
+  if (region(1) < 0) region(1) = NA_INTEGER;
+  
+  return strucs;
 }

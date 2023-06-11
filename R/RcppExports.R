@@ -37,6 +37,21 @@
     .Call(`_RcppCWB_region_matrix_context`, corpus, registry, region_matrix, p_attribute, s_attribute, boundary, left, right)
 }
 
+#' Get vector with min and max struc of s-attribute within a region
+#' 
+#' Look up the minimum and maximum struc of a s-attribute within a region.
+#' Works for nested s-attributes. If there are no regions of the s-attribute
+#' within the region, a vector with (two) `NA` values is returned.
+#' @param corpus ID of a CWB corpus.
+#' @param registry Path of the registry directory. If `NULL` (default), value
+#'   of environment variable 'CORPUS_REGISTRY' will be used.
+#' @param s_attribute Name of nested structural attribute.
+#' @param region Vector with left and right corpus position of region.
+#' @return A length-two integer vector.
+region_to_strucs <- function(corpus, s_attribute, region, registry = NULL) {
+    .Call(`_RcppCWB_region_to_strucs`, corpus, s_attribute, region, registry)
+}
+
 .cwb_version <- function() {
     .Call(`_RcppCWB_cwb_version`)
 }
