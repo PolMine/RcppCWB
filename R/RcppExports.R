@@ -228,8 +228,9 @@ id_to_cpos <- function(p_attr, id) {
     .Call(`_RcppCWB_id_to_cpos`, p_attr, id)
 }
 
-.cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB__cl_cpos2lbound`, corpus, s_attribute, cpos, registry)
+#' @rdname s_attributes
+cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = NULL) {
+    .Call(`_RcppCWB_cl_cpos2lbound`, corpus, s_attribute, cpos, registry)
 }
 
 #' @rdname cl_rework
@@ -238,8 +239,9 @@ cpos_to_lbound <- function(s_attr, cpos) {
     .Call(`_RcppCWB_cpos_to_lbound`, s_attr, cpos)
 }
 
-.cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB__cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
+#' @rdname s_attributes
+cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = NULL) {
+    .Call(`_RcppCWB_cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 
 #' @rdname cl_rework

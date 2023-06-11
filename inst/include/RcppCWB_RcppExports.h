@@ -612,17 +612,17 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::IntegerVector >(rcpp_result_gen);
     }
 
-    inline Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry) {
-        typedef SEXP(*Ptr__cl_cpos2lbound)(SEXP,SEXP,SEXP,SEXP);
-        static Ptr__cl_cpos2lbound p__cl_cpos2lbound = NULL;
-        if (p__cl_cpos2lbound == NULL) {
-            validateSignature("Rcpp::IntegerVector(*_cl_cpos2lbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
-            p__cl_cpos2lbound = (Ptr__cl_cpos2lbound)R_GetCCallable("RcppCWB", "_RcppCWB__cl_cpos2lbound");
+    inline Rcpp::IntegerVector cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry = R_NilValue) {
+        typedef SEXP(*Ptr_cl_cpos2lbound)(SEXP,SEXP,SEXP,SEXP);
+        static Ptr_cl_cpos2lbound p_cl_cpos2lbound = NULL;
+        if (p_cl_cpos2lbound == NULL) {
+            validateSignature("Rcpp::IntegerVector(*cl_cpos2lbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
+            p_cl_cpos2lbound = (Ptr_cl_cpos2lbound)R_GetCCallable("RcppCWB", "_RcppCWB_cl_cpos2lbound");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p__cl_cpos2lbound(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(s_attribute)), Shield<SEXP>(Rcpp::wrap(cpos)), Shield<SEXP>(Rcpp::wrap(registry)));
+            rcpp_result_gen = p_cl_cpos2lbound(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(s_attribute)), Shield<SEXP>(Rcpp::wrap(cpos)), Shield<SEXP>(Rcpp::wrap(registry)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -654,17 +654,17 @@ namespace RcppCWB {
         return Rcpp::as<Rcpp::IntegerVector >(rcpp_result_gen);
     }
 
-    inline Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry) {
-        typedef SEXP(*Ptr__cl_cpos2rbound)(SEXP,SEXP,SEXP,SEXP);
-        static Ptr__cl_cpos2rbound p__cl_cpos2rbound = NULL;
-        if (p__cl_cpos2rbound == NULL) {
-            validateSignature("Rcpp::IntegerVector(*_cl_cpos2rbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
-            p__cl_cpos2rbound = (Ptr__cl_cpos2rbound)R_GetCCallable("RcppCWB", "_RcppCWB__cl_cpos2rbound");
+    inline Rcpp::IntegerVector cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry = R_NilValue) {
+        typedef SEXP(*Ptr_cl_cpos2rbound)(SEXP,SEXP,SEXP,SEXP);
+        static Ptr_cl_cpos2rbound p_cl_cpos2rbound = NULL;
+        if (p_cl_cpos2rbound == NULL) {
+            validateSignature("Rcpp::IntegerVector(*cl_cpos2rbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
+            p_cl_cpos2rbound = (Ptr_cl_cpos2rbound)R_GetCCallable("RcppCWB", "_RcppCWB_cl_cpos2rbound");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p__cl_cpos2rbound(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(s_attribute)), Shield<SEXP>(Rcpp::wrap(cpos)), Shield<SEXP>(Rcpp::wrap(registry)));
+            rcpp_result_gen = p_cl_cpos2rbound(Shield<SEXP>(Rcpp::wrap(corpus)), Shield<SEXP>(Rcpp::wrap(s_attribute)), Shield<SEXP>(Rcpp::wrap(cpos)), Shield<SEXP>(Rcpp::wrap(registry)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

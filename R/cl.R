@@ -171,34 +171,6 @@ cl_struc2str <- function(corpus, s_attribute, struc, registry = Sys.getenv("CORP
   .cl_struc2str(corpus = corpus, s_attribute = s_attribute, struc = struc, registry = registry)
 }
 
-#' @rdname s_attributes
-cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_registry(registry)
-  check_corpus(corpus, registry, cqp = FALSE)
-  check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
-  
-  if (length(cpos) == 0L) return(integer())
-  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
-  
-  .cl_cpos2lbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
-}
-
-#' @rdname s_attributes
-cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_registry(registry)
-  check_corpus(corpus, registry, cqp = FALSE)
-  check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
-  
-  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
-  if (length(cpos) == 0L) return(integer())
-  
-  .cl_cpos2rbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
-}
-
-
-
-
-
 
 #' @title Using Positional Attributes.
 #' 
