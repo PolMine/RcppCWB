@@ -649,8 +649,7 @@ Rcpp::StringVector _cl_charset_name(SEXP corpus, SEXP registry){
 // [[Rcpp::export(name=".cl_struc_values")]]
 int _cl_struc_values(SEXP corpus, SEXP s_attribute, SEXP registry){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
-  int y = cl_struc_values(att);
-  return y;
+  return cl_struc_values(att);
 }
   
 

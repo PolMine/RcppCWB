@@ -373,8 +373,7 @@ cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- normalizePath(path.expand(registry))
-  i <- .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
-  if (i == 1L) TRUE else if (i == 0L) FALSE else if (i < 0L) as.integer(NA)
+  .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
 }
 
 #' Get information from registry file
