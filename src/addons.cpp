@@ -455,35 +455,33 @@ Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute,
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   
   Rcpp::IntegerMatrix struc_matrix(region_matrix.nrow(), 2);
-  bool more;
+  Rcpp::IntegerMatrix regions = clone(region_matrix);
   int i;    
   
-  for (i = 0; i < region_matrix.nrow(); i++){
+  for (i = 0; i < regions.nrow(); i++){
     
-    if (region_matrix(i,0) > region_matrix(i,1)){
+    if (regions(i,0) > regions(i,1)){
       struc_matrix(i,0) = NA_INTEGER;
       struc_matrix(i,1) = NA_INTEGER;
       continue;
     }
 
-    more = true;
-    while (more){
-      struc_matrix(i,0) = cl_cpos2struc(att, region_matrix(i,0));
-      if (struc_matrix(i,0) >= 0) more = false;
-      if (region_matrix(i,0) > region_matrix(i,1)) more = false;
-      region_matrix(i,0)++;
+    while (true){
+      struc_matrix(i,0) = cl_cpos2struc(att, regions(i,0));
+      if (struc_matrix(i,0) >= 0) break;
+      if (regions(i,0) >= regions(i,1)) break;
+      regions(i,0)++;
     };
     
-    more = true;
-    while (more){
-      struc_matrix(i,1) = cl_cpos2struc(att, region_matrix(i,1));
-      if (struc_matrix(i,1) >= 0) more = false;
-      if (region_matrix(i,1) < region_matrix(i,0)) more = false;
-      region_matrix(i,1)--;
+    while (true){
+      struc_matrix(i,1) = cl_cpos2struc(att, regions(i,1));
+      if (struc_matrix(i,1) >= 0) break;
+      if (regions(i,1) < regions(i,0)) break;
+      regions(i,1)--;
     };
     
-    if (region_matrix(i,0) < 0) region_matrix(i,0) = NA_INTEGER;
-    if (region_matrix(i,1) < 0) region_matrix(i,1) = NA_INTEGER;
+    if (regions(i,0) < 0) regions(i,0) = NA_INTEGER;
+    if (regions(i,1) < 0) regions(i,1) = NA_INTEGER;
   }
   
   return struc_matrix;
