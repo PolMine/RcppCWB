@@ -48,8 +48,16 @@
 #' @param s_attribute Name of nested structural attribute.
 #' @param region Vector with left and right corpus position of region.
 #' @return A length-two integer vector.
+#' @rdname regions_to_strucs
 region_to_strucs <- function(corpus, s_attribute, region, registry = NULL) {
     .Call(`_RcppCWB_region_to_strucs`, corpus, s_attribute, region, registry)
+}
+
+#' @param region_matrix A two-column `matrix` with regions, left corpus
+#'   positions in column 1, right corpus positions in column 2.
+#' @rdname regions_to_strucs
+region_matrix_to_struc_matrix <- function(corpus, s_attribute, region_matrix, registry = NULL) {
+    .Call(`_RcppCWB_region_matrix_to_struc_matrix`, corpus, s_attribute, region_matrix, registry)
 }
 
 .cwb_version <- function() {

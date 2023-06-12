@@ -150,6 +150,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// region_matrix_to_struc_matrix
+Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute, Rcpp::IntegerMatrix region_matrix, SEXP registry);
+RcppExport SEXP _RcppCWB_region_matrix_to_struc_matrix(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP region_matrixSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type region_matrix(region_matrixSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(region_matrix_to_struc_matrix(corpus, s_attribute, region_matrix, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cwb_version
 Rcpp::StringVector cwb_version();
 static SEXP _RcppCWB_cwb_version_try() {
@@ -2675,6 +2689,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {"_RcppCWB_region_matrix_context", (DL_FUNC) &_RcppCWB_region_matrix_context, 8},
     {"_RcppCWB_region_to_strucs", (DL_FUNC) &_RcppCWB_region_to_strucs, 4},
+    {"_RcppCWB_region_matrix_to_struc_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_struc_matrix, 4},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
     {"_RcppCWB_p_attr_default", (DL_FUNC) &_RcppCWB_p_attr_default, 0},
     {"_RcppCWB_s_attr", (DL_FUNC) &_RcppCWB_s_attr, 3},

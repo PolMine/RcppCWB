@@ -441,6 +441,7 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
 //' @param s_attribute Name of nested structural attribute.
 //' @param region Vector with left and right corpus position of region.
 //' @return A length-two integer vector.
+//' @rdname regions_to_strucs
 // [[Rcpp::export]]
 Rcpp::IntegerVector region_to_strucs(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector region, SEXP registry = R_NilValue){
   
@@ -475,4 +476,42 @@ Rcpp::IntegerVector region_to_strucs(SEXP corpus, SEXP s_attribute, Rcpp::Intege
   if (region(1) < 0) region(1) = NA_INTEGER;
   
   return strucs;
+}
+
+
+//' @param region_matrix A two-column `matrix` with regions, left corpus
+//'   positions in column 1, right corpus positions in column 2.
+//' @rdname regions_to_strucs
+// [[Rcpp::export]]
+Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute, Rcpp::IntegerMatrix region_matrix, SEXP registry = R_NilValue){
+  
+  if (registry == R_NilValue) registry = mkString(getenv("CORPUS_REGISTRY"));
+  Attribute* att = make_s_attribute(corpus, s_attribute, registry);
+  
+  Rcpp::IntegerMatrix struc_matrix(region_matrix.nrow(), 2);
+  bool more;
+  int i;    
+  
+  for (i = 0; i < region_matrix.nrow(); i++){
+    more = true;
+    while (more){
+      struc_matrix(i,0) = cl_cpos2struc(att, region_matrix(i,0));
+      if (struc_matrix(i,0) >= 0) more = false;
+      if (region_matrix(i,0) > region_matrix(i,1)) more = false;
+      region_matrix(i,0)++;
+    };
+    
+    more = true;
+    while (more){
+      struc_matrix(i,1) = cl_cpos2struc(att, region_matrix(i,1));
+      if (struc_matrix(i,1) >= 0) more = false;
+      if (region_matrix(i,1) < region_matrix(i,0)) more = false;
+      region_matrix(i,1)--;
+    };
+    
+    if (region_matrix(i,0) < 0) region_matrix(i,0) = NA_INTEGER;
+    if (region_matrix(i,1) < 0) region_matrix(i,1) = NA_INTEGER;
+  }
+  
+  return struc_matrix;
 }

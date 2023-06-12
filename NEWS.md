@@ -2,6 +2,7 @@
 
 * New function `region_to_strucs()` to get minimumum and maximum struc of 
 s-attribute within region provided. Works also for nested s-attributes.
+* New function `region_matrix_to_struc_matrix()`.
 * Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` return NA if corpus
 position is outside stru for given s-attribute. #78.
 * Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` are exposed directly from

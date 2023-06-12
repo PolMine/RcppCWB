@@ -2,9 +2,17 @@
 % Please edit documentation in R/RcppExports.R
 \name{region_to_strucs}
 \alias{region_to_strucs}
+\alias{region_matrix_to_struc_matrix}
 \title{Get vector with min and max struc of s-attribute within a region}
 \usage{
 region_to_strucs(corpus, s_attribute, region, registry = NULL)
+
+region_matrix_to_struc_matrix(
+  corpus,
+  s_attribute,
+  region_matrix,
+  registry = NULL
+)
 }
 \arguments{
 \item{corpus}{ID of a CWB corpus.}
@@ -15,6 +23,9 @@ region_to_strucs(corpus, s_attribute, region, registry = NULL)
 
 \item{registry}{Path of the registry directory. If \code{NULL} (default), value
 of environment variable 'CORPUS_REGISTRY' will be used.}
+
+\item{region_matrix}{A two-column \code{matrix} with regions, left corpus
+positions in column 1, right corpus positions in column 2.}
 }
 \value{
 A length-two integer vector.
