@@ -430,55 +430,21 @@ Rcpp::IntegerMatrix region_matrix_context(SEXP corpus, SEXP registry, Rcpp::Inte
   return cpos_matrix;
 }
 
-//' Get vector with min and max struc of s-attribute within a region
+//' Get min and max strucs of s-attribute present in region
 //' 
-//' Look up the minimum and maximum struc of a s-attribute within a region.
-//' Works for nested s-attributes. If there are no regions of the s-attribute
-//' within the region, a vector with (two) `NA` values is returned.
+//' Look up the minimum and maximum struc of a s-attribute within a region,
+//' including scenario of nested s-attributes. If there are no regions of the
+//' s-attribute within the region, `NA` values are returned.
+//' 
+//' 
 //' @param corpus ID of a CWB corpus.
 //' @param registry Path of the registry directory. If `NULL` (default), value
 //'   of environment variable 'CORPUS_REGISTRY' will be used.
-//' @param s_attribute Name of nested structural attribute.
+//' @param s_attribute Name of structural attribute. The attribute may be
+//'   nested.
 //' @param region Vector with left and right corpus position of region.
-//' @return A length-two integer vector.
-//' @rdname regions_to_strucs
-// [[Rcpp::export]]
-Rcpp::IntegerVector region_to_strucs(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector region, SEXP registry = R_NilValue){
-  
-  if (region(0) > region(1))
-    return Rcpp::IntegerVector::create(NA_INTEGER, NA_INTEGER);
-  
-  if (region.length() != 2)
-    return Rcpp::IntegerVector::create(NA_INTEGER, NA_INTEGER);
-  
-  if (registry == R_NilValue) registry = mkString(getenv("CORPUS_REGISTRY"));
-
-  Attribute* att = make_s_attribute(corpus, s_attribute, registry);
-  Rcpp::IntegerVector strucs(2);
-  
-  bool more = true;
-  while (more){
-    strucs(0) = cl_cpos2struc(att, region(0));
-    if (strucs(0) >= 0) more = false;
-    if (region(0) > region(1)) more = false;
-    region(0)++;
-  };
-  
-  more = true;
-  while (more){
-    strucs(1) = cl_cpos2struc(att, region(1));
-    if (strucs(1) >= 0) more = false;
-    if (region(1) < region(0)) more = false;
-    region(1)--;
-  };
-  
-  if (region(0) < 0) region(0) = NA_INTEGER;
-  if (region(1) < 0) region(1) = NA_INTEGER;
-  
-  return strucs;
-}
-
-
+//' @return Depending whether input is a vector (argument `region`) or a matrix
+//' (argument `region_matrix`), a vector or a matrix.
 //' @param region_matrix A two-column `matrix` with regions, left corpus
 //'   positions in column 1, right corpus positions in column 2.
 //' @rdname regions_to_strucs
@@ -493,6 +459,13 @@ Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute,
   int i;    
   
   for (i = 0; i < region_matrix.nrow(); i++){
+    
+    if (region_matrix(i,0) > region_matrix(i,1)){
+      struc_matrix(i,0) = NA_INTEGER;
+      struc_matrix(i,1) = NA_INTEGER;
+      continue;
+    }
+
     more = true;
     while (more){
       struc_matrix(i,0) = cl_cpos2struc(att, region_matrix(i,0));
@@ -514,4 +487,33 @@ Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute,
   }
   
   return struc_matrix;
+}
+
+
+//' @rdname regions_to_strucs
+// [[Rcpp::export]]
+Rcpp::IntegerVector region_to_strucs(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector region, SEXP registry = R_NilValue){
+  
+  /* The default case is you want to get a struc matrix for a region matrix,
+   * so to keep the times the attribute is instantiated to a minimum, 
+   * this simple case maps arguments on the more complex case */
+  
+  Rcpp::IntegerMatrix region_matrix(1,2);
+  Rcpp::IntegerMatrix struc_matrix;
+  Rcpp::IntegerVector strucs(2);
+  
+  region_matrix(0,0) = region(0);
+  region_matrix(0,1) = region(1);
+  
+  struc_matrix = region_matrix_to_struc_matrix(
+    corpus,
+    s_attribute,
+    region_matrix,
+    registry
+  );
+  
+  strucs(0) = struc_matrix(0,0);
+  strucs(1) = struc_matrix(0,1);
+  
+  return strucs;
 }

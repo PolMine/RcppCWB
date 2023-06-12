@@ -37,27 +37,31 @@
     .Call(`_RcppCWB_region_matrix_context`, corpus, registry, region_matrix, p_attribute, s_attribute, boundary, left, right)
 }
 
-#' Get vector with min and max struc of s-attribute within a region
+#' Get min and max strucs of s-attribute present in region
 #' 
-#' Look up the minimum and maximum struc of a s-attribute within a region.
-#' Works for nested s-attributes. If there are no regions of the s-attribute
-#' within the region, a vector with (two) `NA` values is returned.
+#' Look up the minimum and maximum struc of a s-attribute within a region,
+#' including scenario of nested s-attributes. If there are no regions of the
+#' s-attribute within the region, `NA` values are returned.
+#' 
+#' 
 #' @param corpus ID of a CWB corpus.
 #' @param registry Path of the registry directory. If `NULL` (default), value
 #'   of environment variable 'CORPUS_REGISTRY' will be used.
-#' @param s_attribute Name of nested structural attribute.
+#' @param s_attribute Name of structural attribute. The attribute may be
+#'   nested.
 #' @param region Vector with left and right corpus position of region.
-#' @return A length-two integer vector.
-#' @rdname regions_to_strucs
-region_to_strucs <- function(corpus, s_attribute, region, registry = NULL) {
-    .Call(`_RcppCWB_region_to_strucs`, corpus, s_attribute, region, registry)
-}
-
+#' @return Depending whether input is a vector (argument `region`) or a matrix
+#' (argument `region_matrix`), a vector or a matrix.
 #' @param region_matrix A two-column `matrix` with regions, left corpus
 #'   positions in column 1, right corpus positions in column 2.
 #' @rdname regions_to_strucs
 region_matrix_to_struc_matrix <- function(corpus, s_attribute, region_matrix, registry = NULL) {
     .Call(`_RcppCWB_region_matrix_to_struc_matrix`, corpus, s_attribute, region_matrix, registry)
+}
+
+#' @rdname regions_to_strucs
+region_to_strucs <- function(corpus, s_attribute, region, registry = NULL) {
+    .Call(`_RcppCWB_region_to_strucs`, corpus, s_attribute, region, registry)
 }
 
 .cwb_version <- function() {
