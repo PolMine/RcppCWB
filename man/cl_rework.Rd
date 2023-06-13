@@ -90,6 +90,7 @@ functions with a C++ implementation that are compiled and linked using
 \code{Rcpp::cppFunction()} or \code{Rcpp::sourceCpp()}
 }
 \examples{
+\donttest{
 library(Rcpp)
 
 cppFunction(
@@ -109,4 +110,5 @@ cppFunction(
 )
 
 result <- get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
+}
 }

@@ -542,6 +542,7 @@ cl_list_corpora <- function(){
 #' @name cl_rework
 #' @rdname cl_rework
 #' @examples
+#' \donttest{
 #' library(Rcpp)
 #' 
 #' cppFunction(
@@ -561,6 +562,7 @@ cl_list_corpora <- function(){
 #' )
 #'
 #' result <- get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
+#' }
 NULL
 
 
