@@ -21,7 +21,7 @@ change.
 ## Test environments
 
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* R winbuilder (R 4.2 release, devel, oldrel)
+* R winbuilder (R 4.3.0 release, devel, oldrel)
 * local macOS, R 4.3.0 (arm64)
 
 
