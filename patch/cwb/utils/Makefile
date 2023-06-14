@@ -49,6 +49,7 @@ libcwb.a: $(OBJS)
 	@$(ECHO) "--------------------------------- CREATING ARCHIVE"
 	$(RM) $@
 	$(AR) cq $@ $^
+	ranlib $@
 
 cwb-encode.o: cwb-encode.c
 	${CC} -c $(CFLAGS_ALL) -o cwb-encode.o cwb-encode.c

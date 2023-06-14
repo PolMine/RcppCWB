@@ -103,6 +103,7 @@ parser.tab.c parser.tab.h: parser.y
 libcqp.a: $(OBJS) $(CQI_OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
+	ranlib $@
 
 cqp$(EXEC_SUFFIX): $(OBJS) $(CQP_OBJS) llquery.o $(LIBCL_PATH)
 	@$(ECHO) "    .... link executable" $@
@@ -156,9 +157,3 @@ size: $(SRCS) $(HDRS)
 
 # -------- dependencies --------
 include depend.mk
-
-
-
-
-
-

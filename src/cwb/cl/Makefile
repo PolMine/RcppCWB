@@ -106,6 +106,7 @@ all: libcl.a $(EXTRA_OBJS)
 libcl.a: $(OBJS)
 	$(RM) $@
 	$(AR) cq $@ $^
+	ranlib $@
 
 install: libcl.a
 ifndef __MINGW__
