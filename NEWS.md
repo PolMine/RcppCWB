@@ -1,4 +1,4 @@
-# RcppCWB 0.6.0.9001ff
+# RcppCWB 0.6.1
 
 * New function `region_to_strucs()` to get minimumum and maximum struc of 
 s-attribute within region provided. Works also for nested s-attributes.
