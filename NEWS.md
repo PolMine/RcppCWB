@@ -1,3 +1,8 @@
+# RcppCWB 0.6.1.9001
+
+* The configure script adds flag '-fno-objc-msgsend-selector-stubs' to linker
+call if clang compiler is used to avoid 'Symbol not found'-error on CRAN.
+
 # RcppCWB 0.6.1
 
 * New function `region_to_strucs()` to get minimumum and maximum struc of 
