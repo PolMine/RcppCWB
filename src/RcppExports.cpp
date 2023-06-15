@@ -136,6 +136,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// region_matrix_to_struc_matrix
+Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute, Rcpp::IntegerMatrix region_matrix, SEXP registry);
+RcppExport SEXP _RcppCWB_region_matrix_to_struc_matrix(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP region_matrixSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type region_matrix(region_matrixSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(region_matrix_to_struc_matrix(corpus, s_attribute, region_matrix, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
+// region_to_strucs
+Rcpp::IntegerVector region_to_strucs(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector region, SEXP registry);
+RcppExport SEXP _RcppCWB_region_to_strucs(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP regionSEXP, SEXP registrySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type region(regionSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
+    rcpp_result_gen = Rcpp::wrap(region_to_strucs(corpus, s_attribute, region, registry));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cwb_version
 Rcpp::StringVector cwb_version();
 static SEXP _RcppCWB_cwb_version_try() {
@@ -1134,24 +1162,24 @@ RcppExport SEXP _RcppCWB_id_to_cpos(SEXP p_attrSEXP, SEXP idSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_cpos2lbound
-Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
-static SEXP _RcppCWB__cl_cpos2lbound_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
+// cl_cpos2lbound
+Rcpp::IntegerVector cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
+static SEXP _RcppCWB_cl_cpos2lbound_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_cpos2lbound(corpus, s_attribute, cpos, registry));
+    rcpp_result_gen = Rcpp::wrap(cl_cpos2lbound(corpus, s_attribute, cpos, registry));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_cpos2lbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
+RcppExport SEXP _RcppCWB_cl_cpos2lbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_cpos2lbound_try(corpusSEXP, s_attributeSEXP, cposSEXP, registrySEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_cl_cpos2lbound_try(corpusSEXP, s_attributeSEXP, cposSEXP, registrySEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1206,24 +1234,24 @@ RcppExport SEXP _RcppCWB_cpos_to_lbound(SEXP s_attrSEXP, SEXP cposSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// _cl_cpos2rbound
-Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
-static SEXP _RcppCWB__cl_cpos2rbound_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
+// cl_cpos2rbound
+Rcpp::IntegerVector cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry);
+static SEXP _RcppCWB_cl_cpos2rbound_try(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type corpus(corpusSEXP);
     Rcpp::traits::input_parameter< SEXP >::type s_attribute(s_attributeSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type cpos(cposSEXP);
     Rcpp::traits::input_parameter< SEXP >::type registry(registrySEXP);
-    rcpp_result_gen = Rcpp::wrap(_cl_cpos2rbound(corpus, s_attribute, cpos, registry));
+    rcpp_result_gen = Rcpp::wrap(cl_cpos2rbound(corpus, s_attribute, cpos, registry));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RcppCWB__cl_cpos2rbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
+RcppExport SEXP _RcppCWB_cl_cpos2rbound(SEXP corpusSEXP, SEXP s_attributeSEXP, SEXP cposSEXP, SEXP registrySEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RcppCWB__cl_cpos2rbound_try(corpusSEXP, s_attributeSEXP, cposSEXP, registrySEXP));
+        rcpp_result_gen = PROTECT(_RcppCWB_cl_cpos2rbound_try(corpusSEXP, s_attributeSEXP, cposSEXP, registrySEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -2534,9 +2562,9 @@ static int _RcppCWB_RcppExport_validate(const char* sig) {
         signatures.insert("Rcpp::IntegerVector(*id_to_freq)(SEXP,Rcpp::IntegerVector)");
         signatures.insert("Rcpp::IntegerVector(*.cl_id2cpos)(SEXP,SEXP,SEXP,SEXP)");
         signatures.insert("Rcpp::IntegerVector(*id_to_cpos)(SEXP,Rcpp::IntegerVector)");
-        signatures.insert("Rcpp::IntegerVector(*.cl_cpos2lbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
+        signatures.insert("Rcpp::IntegerVector(*cl_cpos2lbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
         signatures.insert("Rcpp::IntegerVector(*cpos_to_lbound)(SEXP,Rcpp::IntegerVector)");
-        signatures.insert("Rcpp::IntegerVector(*.cl_cpos2rbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
+        signatures.insert("Rcpp::IntegerVector(*cl_cpos2rbound)(SEXP,SEXP,Rcpp::IntegerVector,SEXP)");
         signatures.insert("Rcpp::IntegerVector(*cpos_to_rbound)(SEXP,Rcpp::IntegerVector)");
         signatures.insert("SEXP(*.cl_find_corpus)(SEXP,SEXP)");
         signatures.insert("SEXP(*.cl_new_attribute)(SEXP,SEXP,int)");
@@ -2607,9 +2635,9 @@ RcppExport SEXP _RcppCWB_RcppExport_registerCCallable() {
     R_RegisterCCallable("RcppCWB", "_RcppCWB_id_to_freq", (DL_FUNC)_RcppCWB_id_to_freq_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_id2cpos", (DL_FUNC)_RcppCWB__cl_id2cpos_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_id_to_cpos", (DL_FUNC)_RcppCWB_id_to_cpos_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_cpos2lbound", (DL_FUNC)_RcppCWB__cl_cpos2lbound_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_cl_cpos2lbound", (DL_FUNC)_RcppCWB_cl_cpos2lbound_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_cpos_to_lbound", (DL_FUNC)_RcppCWB_cpos_to_lbound_try);
-    R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_cpos2rbound", (DL_FUNC)_RcppCWB__cl_cpos2rbound_try);
+    R_RegisterCCallable("RcppCWB", "_RcppCWB_cl_cpos2rbound", (DL_FUNC)_RcppCWB_cl_cpos2rbound_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_cpos_to_rbound", (DL_FUNC)_RcppCWB_cpos_to_rbound_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_find_corpus", (DL_FUNC)_RcppCWB__cl_find_corpus_try);
     R_RegisterCCallable("RcppCWB", "_RcppCWB_.cl_new_attribute", (DL_FUNC)_RcppCWB__cl_new_attribute_try);
@@ -2660,6 +2688,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_ids_to_count_matrix", (DL_FUNC) &_RcppCWB_ids_to_count_matrix, 1},
     {"_RcppCWB_region_matrix_to_count_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_count_matrix, 4},
     {"_RcppCWB_region_matrix_context", (DL_FUNC) &_RcppCWB_region_matrix_context, 8},
+    {"_RcppCWB_region_matrix_to_struc_matrix", (DL_FUNC) &_RcppCWB_region_matrix_to_struc_matrix, 4},
+    {"_RcppCWB_region_to_strucs", (DL_FUNC) &_RcppCWB_region_to_strucs, 4},
     {"_RcppCWB_cwb_version", (DL_FUNC) &_RcppCWB_cwb_version, 0},
     {"_RcppCWB_p_attr_default", (DL_FUNC) &_RcppCWB_p_attr_default, 0},
     {"_RcppCWB_s_attr", (DL_FUNC) &_RcppCWB_s_attr, 3},
@@ -2688,9 +2718,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RcppCWB_id_to_freq", (DL_FUNC) &_RcppCWB_id_to_freq, 2},
     {"_RcppCWB__cl_id2cpos", (DL_FUNC) &_RcppCWB__cl_id2cpos, 4},
     {"_RcppCWB_id_to_cpos", (DL_FUNC) &_RcppCWB_id_to_cpos, 2},
-    {"_RcppCWB__cl_cpos2lbound", (DL_FUNC) &_RcppCWB__cl_cpos2lbound, 4},
+    {"_RcppCWB_cl_cpos2lbound", (DL_FUNC) &_RcppCWB_cl_cpos2lbound, 4},
     {"_RcppCWB_cpos_to_lbound", (DL_FUNC) &_RcppCWB_cpos_to_lbound, 2},
-    {"_RcppCWB__cl_cpos2rbound", (DL_FUNC) &_RcppCWB__cl_cpos2rbound, 4},
+    {"_RcppCWB_cl_cpos2rbound", (DL_FUNC) &_RcppCWB_cl_cpos2rbound, 4},
     {"_RcppCWB_cpos_to_rbound", (DL_FUNC) &_RcppCWB_cpos_to_rbound, 2},
     {"_RcppCWB__cl_find_corpus", (DL_FUNC) &_RcppCWB__cl_find_corpus, 2},
     {"_RcppCWB__cl_new_attribute", (DL_FUNC) &_RcppCWB__cl_new_attribute, 3},

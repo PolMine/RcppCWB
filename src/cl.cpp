@@ -28,6 +28,13 @@ extern "C" {
 using namespace Rcpp;
 // [[Rcpp::interfaces(r, cpp)]]
 
+/* avoid complications with including Rinternals.h */
+#define mkString		Rf_mkString
+SEXP	 Rf_mkString(const char *);
+/* end of quasi-header */
+
+
+
 char* cl_get_version();
 char* cl_get_p_attr_default();
 
@@ -456,16 +463,22 @@ Rcpp::IntegerVector _cl_cpos2lbound(Attribute * att, Rcpp::IntegerVector cpos){
   
   for (i = 0; i < len; i++){
     struc = cl_cpos2struc(att, cpos(i));
-    cl_struc2cpos(att, struc, &lb, &rb);
-    result(i) = lb;
+    if (struc >= 0){
+      cl_struc2cpos(att, struc, &lb, &rb);
+      result(i) = lb;
+    } else {
+      result(i) = NA_INTEGER;
+    }
   }
   
   return( result );
 }
 
 
-// [[Rcpp::export(name=".cl_cpos2lbound")]]
-Rcpp::IntegerVector _cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry){
+//' @rdname s_attributes
+// [[Rcpp::export]]
+Rcpp::IntegerVector cl_cpos2lbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry = R_NilValue){
+  if (registry == R_NilValue) registry = mkString(getenv("CORPUS_REGISTRY"));
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   return(_cl_cpos2lbound(att, cpos));
 }
@@ -489,16 +502,24 @@ Rcpp::IntegerVector _cl_cpos2rbound(Attribute* att, Rcpp::IntegerVector cpos){
   
   for (i = 0; i < len; i++){
     struc = cl_cpos2struc(att, cpos(i));
-    cl_struc2cpos(att, struc, &lb, &rb);
-    result(i) = rb;
+    if (struc >= 0){
+      cl_struc2cpos(att, struc, &lb, &rb);
+      result(i) = rb;
+    } else {
+      result(i) = NA_INTEGER;
+    }
   }
   
   return( result );
 }
 
 
-// [[Rcpp::export(name=".cl_cpos2rbound")]]
-Rcpp::IntegerVector _cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry){
+//' @rdname s_attributes
+//' @details `cl_cpos2rbound()` and `cl_cpos2lbound()` return `NA` for values of
+//'   cpos that are outside a struc for the structural attribute given.
+// [[Rcpp::export]]
+Rcpp::IntegerVector cl_cpos2rbound(SEXP corpus, SEXP s_attribute, Rcpp::IntegerVector cpos, SEXP registry = R_NilValue){
+  if (registry == R_NilValue) registry = mkString(getenv("CORPUS_REGISTRY"));
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
   return(_cl_cpos2rbound(att, cpos));
 }
@@ -628,8 +649,7 @@ Rcpp::StringVector _cl_charset_name(SEXP corpus, SEXP registry){
 // [[Rcpp::export(name=".cl_struc_values")]]
 int _cl_struc_values(SEXP corpus, SEXP s_attribute, SEXP registry){
   Attribute* att = make_s_attribute(corpus, s_attribute, registry);
-  int y = cl_struc_values(att);
-  return y;
+  return cl_struc_values(att);
 }
   
 

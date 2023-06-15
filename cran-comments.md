@@ -1,21 +1,10 @@
 ## General remarks
 
-- This release replaces dependency PCRE with PCRE2 in the CWB source code 
-included in this package. I hereby anticipate that build machines will 
-successively not have PCRE installed. Fedora will presumably be first.
+- This release extends auxiliary Rcpp functionality and fixes minor bugs. No 
+changes of fundamentals.
 
-- Rcpp wrappers for CWB functionality is now exported such that it is possible 
-to write Rcpp inline C++ functions using this functionality.
-
-- This is the first package version that includes a vignette (explaining how to
-write inline C++ functions). 
-
-- The cleanup script is extended and reverts modifications that had previously
-gone unnoticed. 
-
-- A failure to build Windows binaries for R-oldrel is addressed: Repository 
-https://github.com/PolMine/libcl that is used to get static libraries has been 
-updated.
+- An example using `cppFunction()` ran 10 secs on winbuilder, so I wrapped this
+into \donttest{}.
 
 Previous aspects I repeat:
 
@@ -32,8 +21,8 @@ change.
 ## Test environments
 
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* R winbuilder (R 4.2 release, devel, oldrel)
-* local macOS, R 4.2.2 (arm64)
+* R winbuilder (R 4.3.0 release, devel, oldrel)
+* local macOS, R 4.3.0 (arm64)
 
 
 ## R CMD check results

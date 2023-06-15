@@ -37,6 +37,33 @@
     .Call(`_RcppCWB_region_matrix_context`, corpus, registry, region_matrix, p_attribute, s_attribute, boundary, left, right)
 }
 
+#' Get min and max strucs of s-attribute present in region
+#' 
+#' Look up the minimum and maximum struc of a s-attribute within a region,
+#' including scenario of nested s-attributes. If there are no regions of the
+#' s-attribute within the region, `NA` values are returned.
+#' 
+#' 
+#' @param corpus ID of a CWB corpus.
+#' @param registry Path of the registry directory. If `NULL` (default), value
+#'   of environment variable 'CORPUS_REGISTRY' will be used.
+#' @param s_attribute Name of structural attribute. The attribute may be
+#'   nested.
+#' @param region Vector with left and right corpus position of region.
+#' @return Depending whether input is a vector (argument `region`) or a matrix
+#' (argument `region_matrix`), a vector or a matrix.
+#' @param region_matrix A two-column `matrix` with regions, left corpus
+#'   positions in column 1, right corpus positions in column 2.
+#' @rdname regions_to_strucs
+region_matrix_to_struc_matrix <- function(corpus, s_attribute, region_matrix, registry = NULL) {
+    .Call(`_RcppCWB_region_matrix_to_struc_matrix`, corpus, s_attribute, region_matrix, registry)
+}
+
+#' @rdname regions_to_strucs
+region_to_strucs <- function(corpus, s_attribute, region, registry = NULL) {
+    .Call(`_RcppCWB_region_to_strucs`, corpus, s_attribute, region, registry)
+}
+
 .cwb_version <- function() {
     .Call(`_RcppCWB_cwb_version`)
 }
@@ -213,8 +240,9 @@ id_to_cpos <- function(p_attr, id) {
     .Call(`_RcppCWB_id_to_cpos`, p_attr, id)
 }
 
-.cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB__cl_cpos2lbound`, corpus, s_attribute, cpos, registry)
+#' @rdname s_attributes
+cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = NULL) {
+    .Call(`_RcppCWB_cl_cpos2lbound`, corpus, s_attribute, cpos, registry)
 }
 
 #' @rdname cl_rework
@@ -223,8 +251,11 @@ cpos_to_lbound <- function(s_attr, cpos) {
     .Call(`_RcppCWB_cpos_to_lbound`, s_attr, cpos)
 }
 
-.cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry) {
-    .Call(`_RcppCWB__cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
+#' @rdname s_attributes
+#' @details `cl_cpos2rbound()` and `cl_cpos2lbound()` return `NA` for values of
+#'   cpos that are outside a struc for the structural attribute given.
+cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = NULL) {
+    .Call(`_RcppCWB_cl_cpos2rbound`, corpus, s_attribute, cpos, registry)
 }
 
 #' @rdname cl_rework

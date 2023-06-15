@@ -171,34 +171,6 @@ cl_struc2str <- function(corpus, s_attribute, struc, registry = Sys.getenv("CORP
   .cl_struc2str(corpus = corpus, s_attribute = s_attribute, struc = struc, registry = registry)
 }
 
-#' @rdname s_attributes
-cl_cpos2lbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_registry(registry)
-  check_corpus(corpus, registry, cqp = FALSE)
-  check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
-  
-  if (length(cpos) == 0L) return(integer())
-  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
-  
-  .cl_cpos2lbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
-}
-
-#' @rdname s_attributes
-cl_cpos2rbound <- function(corpus, s_attribute, cpos, registry = Sys.getenv("CORPUS_REGISTRY")){
-  check_registry(registry)
-  check_corpus(corpus, registry, cqp = FALSE)
-  check_s_attribute(corpus = corpus, registry = registry, s_attribute = s_attribute)
-  
-  check_cpos(corpus = corpus, p_attribute = "word", cpos = cpos, registry = registry)
-  if (length(cpos) == 0L) return(integer())
-  
-  .cl_cpos2rbound(corpus = corpus, s_attribute = s_attribute, cpos = cpos, registry = registry)
-}
-
-
-
-
-
 
 #' @title Using Positional Attributes.
 #' 
@@ -401,8 +373,7 @@ cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
   registry <- normalizePath(path.expand(registry))
-  i <- .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
-  if (i == 1L) TRUE else if (i == 0L) FALSE else if (i < 0L) as.integer(NA)
+  .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
 }
 
 #' Get information from registry file
@@ -571,6 +542,7 @@ cl_list_corpora <- function(){
 #' @name cl_rework
 #' @rdname cl_rework
 #' @examples
+#' \donttest{
 #' library(Rcpp)
 #' 
 #' cppFunction(
@@ -590,6 +562,7 @@ cl_list_corpora <- function(){
 #' )
 #'
 #' result <- get_str("REUTERS", "word", RcppCWB::get_tmp_registry(), 0:50)
+#' }
 NULL
 
 

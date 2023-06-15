@@ -1,4 +1,16 @@
-# RcppCWB 0.5.5.9001-.9003
+# RcppCWB 0.6.0.9001ff
+
+* New function `region_to_strucs()` to get minimumum and maximum struc of 
+s-attribute within region provided. Works also for nested s-attributes.
+* New function `region_matrix_to_struc_matrix()`.
+* Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` return NA if corpus
+position is outside stru for given s-attribute. #78.
+* Functions `cl_cpos2lbound()` and `cl_cpos2rbound()` are exposed directly from
+C++ without R wrappers, improving performance. Using the environment variable
+'CORPUS_REGISTRY' if argument `registry` is handled implicitly now.
+
+
+# RcppCWB 0.6.0
 
 * Rcpp wrappers for Corpus Library (CL) functions are exposed directly and  
 can be used in C++ functions imported using `Rcpp::sourceCpp()` or
