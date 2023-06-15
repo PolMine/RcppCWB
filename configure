@@ -14,11 +14,10 @@ CARBON=""
 SOCKETLIB=""
 
 # see https://github.com/PolMine/RcppCWB/issues/82
-if [[ $CC_R = clang* ]]; then
-  NOSTUBS="-fno-objc-msgsend-selector-stubs"
-else
-  NOSTUBS=""
-fi
+case $CC_R in
+  clang*) NOSTUBS="-fno-objc-msgsend-selector-stubs";;
+  *) NOSTUBS=""
+esac
 
 OS=`uname -s`
 echo "* operating system detected for CWB configuration: $OS"
