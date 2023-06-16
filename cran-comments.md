@@ -1,10 +1,20 @@
 ## General remarks
 
-- This release extends auxiliary Rcpp functionality and fixes minor bugs. No 
-changes of fundamentals.
+This is a quick follow up to v0.6.1. Check results report ERRORs on macOS build
+machines. At the linker stage, you see:
+"Symbol not found: _objc_msgSend$UTF8String"
+for r-release-macos-arm64 and r-oldrel-macos-arm64.
 
-- An example using `cppFunction()` ran 10 secs on winbuilder, so I wrapped this
-into \donttest{}.
+The errors most likely result from a scenario when clang and Xcode are not 
+aligned, see: https://github.com/xamarin/xamarin-macios/issues/16223
+
+My (temporary) solution is to add flag -fno-objc-msgsend-selector-stubs to clang 
+to PKG_LIBS. I hope that macOS errors on CRAN build machines will not occurr
+any more.
+
+A further modification of the configure script is that it now deals with the 
+scenario of Power PCs.
+
 
 Previous aspects I repeat:
 
