@@ -1,4 +1,4 @@
-# RcppCWB 0.6.1.9001-9002
+# RcppCWB 0.6.2
 
 * The configure script adds flag '-fno-objc-msgsend-selector-stubs' to linker
 call if clang compiler is used to avoid 'Symbol not found'-error on CRAN.
