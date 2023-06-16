@@ -30,13 +30,15 @@
 #           linux-64            - configuration for 64-bit CPUs
 #           linux-opteron       - with optimimzation for AMD Opteron processor
 #       darwin              MacOS / Darwin [use one of the more specific entries below]
-#           darwin-brew         - Intel 64-bit, natively tuned, prerequisites installed with HomeBrew (recommended)
+#           darwin-brew             - Intel 64-bit, natively tuned, prerequisites installed with HomeBrew (recommended)
 #           darwin-brew-m1          - same for ARM 64-bit (M1 and other Apple Silicon)
-#           darwin-brew-release - Intel 64-bit (Core2 and newer), statically linked for binary release
+#           darwin-brew-release     - Intel 64-bit (Core2 and newer), statically linked for binary release
 #           darwin-brew-release-m1  - same for ARM 64-bit (M1 and other Apple Silicon)
-#           darwin-64           - Intel 64-bit, natively tunes, prerequisites installed by user
-#           darwin-universal    - universal 64-bit/32-bit build on Mac OS X 10.6 - 10.13 (deprecated)
-#           darwin-port         - generic build, prerequisites installed with MacPorts (deprecated)
+#           darwin-x86_64           - Intel 64-bit, natively tunes, prerequisites installed by user
+#           darwin-ppc              - PowerPC 32-bit, natively tunes, prerequisites installed by user
+#           darwin-ppc64            - PowerPC 64-bit, natively tunes, prerequisites installed by user
+#           darwin-universal        - universal 64-bit/32-bit build on Mac OS X 10.7–10.13 (deprecated)
+#           darwin-port             - generic build, prerequisites installed with MacPorts (deprecated)
 #       solaris             SUN Solaris 8 for SPARC CPU (unsupported)
 #       cygwin              Win32 build using Cygwin emulation layer (experimental)
 #       mingw-cross         Cross-compile for Win32-on-i586 from a *nix system with MinGW installed (experimental)

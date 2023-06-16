@@ -35,8 +35,9 @@ case "$uname_output" in
         ;;
     Darwin*)
         case "$uname_output" in
-            *ppc)
-                echo "*** MacOS is no longer supported on PowerPC processors ***"
+            # `uname -a` will just show 'Power Macintosh' among other info.
+            *Power*)
+                echo "*** Please use darwin-ppc or darwin-ppc64, depending on desired arch ***"
                 exit
                 ;;
             *i386)
@@ -52,7 +53,7 @@ case "$uname_output" in
                 then
                   platform="darwin-port-core2" # GLib seems to be provided by MacPorts
                 else
-                  platform="darwin-64" # assume user has installed the prerequisite manually
+                  platform="darwin-x86_64" # assume user has installed the prerequisite manually
                 fi
                 ;;
               *)

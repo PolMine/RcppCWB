@@ -31,10 +31,15 @@ case $OS in
         echo "* compiling for darwin-arm64"
         CWB_PLATFORM_CONFIG_FILE="darwin-arm64"
         CWB_PLATFORM_CONFIG_FILE_CC="unix";;
-
+      # uname -m is a poor choice, as it shows machine arch family and has nothing to do with desired arch
+      # of the build; for PowerPC it reports 'Power Macintosh', which is not an arch at all.
+      'Power Macintosh')
+        echo "* compiling for darwin-ppc; if you wish to build for ppc64, please change the value manually"
+        CWB_PLATFORM_CONFIG_FILE="darwin-ppc"
+        CWB_PLATFORM_CONFIG_FILE_CC="unix";;
       *)
-        echo "* compiling for darwin-64"
-        CWB_PLATFORM_CONFIG_FILE="darwin-64"
+        echo "* compiling for darwin-x86_64"
+        CWB_PLATFORM_CONFIG_FILE="darwin-x86_64"
         CWB_PLATFORM_CONFIG_FILE_CC="unix";;
     esac
     ;;

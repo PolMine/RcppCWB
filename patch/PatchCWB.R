@@ -1986,7 +1986,7 @@ PatchCWB <- R6Class(
           
         ),
         
-        "src/cwb/config/platform/darwin-64" = list(
+        "src/cwb/config/platform/darwin-x86_64" = list(
           # stable r1069-r1690
           replace = list("^(CFLAGS\\s*=.*?)\\s+-march=native\\s+(.*?)$", "\\1 \\2", 1L)
         ),
