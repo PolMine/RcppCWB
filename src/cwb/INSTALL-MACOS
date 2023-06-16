@@ -128,7 +128,7 @@ If you've used the MacPorts package manager, specify
 Otherwise, make sure that the prerequisite libraries have been installed into 
 the /usr/local tree and then specify either
 
-        PLATFORM=darwin-64
+        PLATFORM=darwin-x86_64
 
 for an Intel 64-bit build or
 
