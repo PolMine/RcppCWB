@@ -105,7 +105,7 @@ all: libcl.a $(EXTRA_OBJS)
 
 libcl.a: $(OBJS)
 	$(RM) $@
-	$(AR) cq $@ $^
+	$(AR) cqs $@ $^
 
 install: libcl.a
 ifndef __MINGW__
