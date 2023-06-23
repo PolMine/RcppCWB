@@ -1,10 +1,12 @@
 # RcppCWB 0.6.2
 
-* The configure script adds flag '-fno-objc-msgsend-selector-stubs' to linker
-call if clang compiler is used to avoid 'Symbol not found'-error on CRAN.
 * The configure script now covers the case of Power PCs. Files for the power pc 
 scenario have been added to src/cwb/config/platform; darwin-64 has been renamed
 to darwin-x86_64 as a matter of consistency #79.
+* Warning "variable 'nr_targets' set but not used" for files newly reported by
+Apple clang version 14.0.3 (clang-1403.0.22.14.1) is addressed by commenting out
+respective lines #83.
+
 
 
 # RcppCWB 0.6.1
