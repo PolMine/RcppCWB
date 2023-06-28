@@ -457,7 +457,7 @@ latex_print_group(Group *group, FILE *dest)
 
     Rprintf(" & %s & %d \\\\\n", latex_convert_string(target_s), count);
 
-    nr_targets++;
+    nr_targets = nr_targets + 1; /* replaces nr_targets++; #83 */ 
   }
 
   Rprintf("\\end{tabular}\n");

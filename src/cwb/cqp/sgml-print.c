@@ -425,7 +425,7 @@ sgml_print_group(Group *group, FILE *dest)
 
     Rprintf("<TD>%d</TR>\n", count);
 
-    nr_targets++;
+    nr_targets = nr_targets + 1; /* replaces nr_targets++; #83 */ 
   }
 
   Rprintf("</TABLE>\n");
