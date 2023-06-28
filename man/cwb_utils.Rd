@@ -46,12 +46,12 @@ cwb_encode(
 )
 }
 \arguments{
-\item{corpus}{name of a CWB corpus (upper case)}
+\item{corpus}{Name of a CWB corpus (upper case).}
 
-\item{p_attribute}{name p-attribute}
+\item{p_attribute}{Name of p-attribute.}
 
-\item{registry}{path to the registry directory, defaults to the value of the
-environment variable CORPUS_REGISTRY}
+\item{registry}{Path to the registry directory, defaults to the value of the
+environment variable CORPUS_REGISTRY.}
 
 \item{quietly}{A \code{logical} value, whether to turn off messages (including
 warnings).}
@@ -93,9 +93,9 @@ tokens}
 }
 \description{
 Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
-\code{cwb-compress-rdx}). Unlike the 'original' command line tools, these
-wrappers will always perform a specific indexing/compression step on one
-positional attribute, and produce all components.
+\code{cwb-compress-rdx}). Unlike the 'original' command line tools, these wrappers
+will always perform a specific indexing/compression step on one positional
+attribute, and produce all components.
 }
 \examples{
 # The package includes and 'unfinished' corpus of debates in the UN General 

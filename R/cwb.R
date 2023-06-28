@@ -1,14 +1,14 @@
 #' CWB Tools for Creating Corpora
 #' 
-#' Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
-#' \code{cwb-compress-rdx}). Unlike the 'original' command line tools, these
-#' wrappers will always perform a specific indexing/compression step on one
-#' positional attribute, and produce all components.
+#' Wrappers for the CWB tools (`cwb-makeall`, `cwb-huffcode`,
+#' `cwb-compress-rdx`). Unlike the 'original' command line tools, these wrappers
+#' will always perform a specific indexing/compression step on one positional
+#' attribute, and produce all components.
 #' 
-#' @param corpus name of a CWB corpus (upper case)
-#' @param p_attribute name p-attribute
-#' @param registry path to the registry directory, defaults to the value of the
-#'   environment variable CORPUS_REGISTRY
+#' @param corpus Name of a CWB corpus (upper case).
+#' @param p_attribute Name of p-attribute.
+#' @param registry Path to the registry directory, defaults to the value of the
+#'   environment variable CORPUS_REGISTRY.
 #' @param quietly A `logical` value, whether to turn off messages (including
 #'   warnings).
 #' @param verbose A `logical` value, whether to show progress information
@@ -67,21 +67,32 @@
 #' @rdname cwb_utils
 #' @export cwb_makeall
 #' @importFrom utils capture.output
+#' @importFrom fs path path_expand
 cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+  
+  registry <- path_expand(path(registry))
   check_registry(registry)
-  regfile <- file.path(normalizePath(registry, winslash = "/"), tolower(corpus), fsep = "/")
+  regfile <- path(registry, tolower(corpus))
   if (!file.exists(regfile)){
-    stop(sprintf("No registry file for corpus '%s' in registry directory '%s'.", corpus, registry))
+    stop(
+      sprintf(
+        "No registry file for corpus '%s' in registry directory '%s'.",
+        corpus, registry
+        )
+      )
   }
   
-  # The registry directory provided is ignored if the corpus has already been loaded, resulting 
-  # in unexpected behavior. Therefore, we unload the corpus and force reloading corpora.
+  # The registry directory provided is ignored if the corpus has already been
+  # loaded, resulting in unexpected behavior. Therefore, we unload the corpus
+  # and force reloading corpora.
   if (toupper(corpus) %in% cqp_list_corpora()){
     cl_delete_corpus(corpus, registry = registry)
     cqp_reset_registry(registry = registry)
   }
   
-  makeall <- function() .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  makeall <- function()
+    .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+  
   if (quietly){
     capture.output({success <- makeall()}, type = "output")
   } else {
@@ -96,6 +107,17 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 #' @param delete A `logical` value, whether to remove redundant files after
 #'   compression.
 cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
+  
+  registry <- path_expand(path(registry))
+  check_registry(registry)
+  regfile <- path(registry, tolower(corpus))
+  if (!file.exists(regfile)){
+    stop(sprintf(
+      "No registry file for corpus '%s' in registry directory '%s'.",
+      corpus, registry
+    ))
+  }
+  
   huffcode <- function()
     .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
@@ -126,6 +148,14 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 #'   registry = get_tmp_registry()
 #' )
 cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
+  
+  registry <- path_expand(path(registry))
+  check_registry(registry)
+  regfile <- path(registry, tolower(corpus))
+  if (!file.exists(regfile)){
+    stop(sprintf("No registry file for corpus '%s' in registry directory '%s'.", corpus, registry))
+  }
+  
   compress_rdx <-function()
     .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
