@@ -245,8 +245,9 @@ cwb_encode <- function(
     )
   )
   
-  data_dir <- path.expand(data_dir)
-  vrt_dir <- path.expand(vrt_dir)
+  registry <- fs::path_expand(vrt_dir)
+  data_dir <- fs::path_expand(data_dir)
+  vrt_dir <- fs::path_expand(vrt_dir)
   
   stopifnot(
     is.character(corpus), length(corpus) == 1L,
