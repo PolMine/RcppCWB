@@ -49,10 +49,12 @@ test_that(
     
     tmp_data_dir <- file.path(tempdir(), "bt")
     dir.create(tmp_data_dir)
+    
+    regdir <- get_tmp_registry()
 
     cwb_encode(
       corpus = "BT",
-      registry = get_tmp_registry(),
+      registry = regdir,
       vrt_dir = system.file(package = "RcppCWB", "extdata", "vrt"),
       data_dir = tmp_data_dir,
       encoding = "utf8",

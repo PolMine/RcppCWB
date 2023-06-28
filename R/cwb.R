@@ -245,10 +245,6 @@ cwb_encode <- function(
     )
   )
   
-  registry <- fs::path_expand(vrt_dir)
-  data_dir <- fs::path_expand(data_dir)
-  vrt_dir <- fs::path_expand(vrt_dir)
-  
   stopifnot(
     is.character(corpus), length(corpus) == 1L,
     is.character(registry), length(registry) == 1L, dir.exists(registry),
@@ -278,9 +274,9 @@ cwb_encode <- function(
   )
   
   # Ensure that paths are standardized
-  regfile <- as.character(fs::path(file.path(registry, tolower(corpus))))
-  data_dir <- as.character(fs::path(data_dir))
-  vrt_dir <- as.character(fs::path(vrt_dir))
+  regfile <- as.character(fs::path(fs::path_expand(registry), tolower(corpus)))
+  data_dir <- as.character(fs::path(fs::path_expand(data_dir)))
+  vrt_dir <- as.character(fs::path(fs::path_expand(vrt_dir)))
   
   .cwb_encode(
     regfile = regfile,
