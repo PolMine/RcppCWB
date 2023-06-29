@@ -2,7 +2,7 @@ Package: RcppCWB
 Type: Package
 Title: 'Rcpp' Bindings for the 'Corpus Workbench' ('CWB')
 Version: 0.6.2
-Date: 2023-06-16
+Date: 2023-06-29
 Author: Andreas Blaette [aut, cre],
   Bernard Desgraupes [aut],
   Sylvain Loiseau [aut],
