@@ -1,3 +1,8 @@
+# RcppCWB 0.6.3
+
+* `cl_struc_values()` does not duplicate registry directories any more #77. 
+
+
 # RcppCWB 0.6.2
 
 * The configure script now covers the case of Power PCs. Files for the power pc 
