@@ -1,16 +1,6 @@
 ## General remarks
 
-This is a quick follow up to v0.6.1. I address robustness issues and warnings
-that are newly reported by clang (starting with clang 14).
-
-Considerung check results, there are ERRORs on macOS build machines: At the 
-linker stage, you see: "Symbol not found: _objc_msgSend$UTF8String"
-(r-release-macos-arm64 and r-oldrel-macos-arm64).
-
-I sent a message to the R-package-devel list and Simon Urbanek explained that 
-an update of macOS would be required to solve this issue. If this update has
-been implemented, I hope that this release will trigger new macOS tests that 
-succeed.
+Fixes -Wformat-security issue under r-devel caused by Rcpp.
 
 Previous aspects I repeat:
 
