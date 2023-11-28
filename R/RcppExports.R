@@ -406,5 +406,5 @@ cpos_to_rbound <- function(s_attr, cpos) {
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_RcppCWB_RcppExport_registerCCallable', PACKAGE = 'RcppCWB')
+    .Call(`_RcppCWB_RcppExport_registerCCallable`)
 })

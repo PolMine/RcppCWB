@@ -1,3 +1,6 @@
+# RcppCWB 0.6.2.9001
+* Fix format-security issue under r-devel #86. 
+
 # RcppCWB 0.6.2
 
 * The configure script now covers the case of Power PCs. Files for the power pc 
