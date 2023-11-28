@@ -1,10 +1,10 @@
 #' Get Attribute Size (of Positional/Structural Attribute).
 #' 
-#' Use \code{cl_attribute_size} to get the total number of values of a
-#' positional attribute (param \code{attribute_type} = "p"), or structural
-#' attribute (param \code{attribute_type} = "s"). Note that indices are
-#' zero-based, i.e. the maximum position of a positional / structural
-#' attribute is attribute size minus 1 (see examples).
+#' Use `cl_attribute_size()` to get the total number of values of a positional
+#' attribute (param `attribute_type` = "p"), or structural attribute (param
+#' `attribute_type` = "s"). Note that indices are zero-based, i.e. the maximum
+#' position of a positional / structural attribute is attribute size minus 1
+#' (see examples).
 #' @rdname cl_attribute_size
 #' @param corpus name of a CWB corpus (upper case)
 #' @param attribute name of a p- or s-attribute
@@ -372,7 +372,7 @@ cl_charset_name <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY")){
 #' cl_struc_values("REUTERS", "date") # NA - attribute does not exist
 cl_struc_values <- function(corpus, s_attribute, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_corpus(corpus = corpus, registry = registry, cqp = FALSE)
-  registry <- normalizePath(path.expand(registry))
+  registry <- path(path_expand(registry))
   .cl_struc_values(corpus = corpus, s_attribute = s_attribute, registry = registry)
 }
 

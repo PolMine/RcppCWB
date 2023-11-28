@@ -1,5 +1,8 @@
-# RcppCWB 0.6.2.9001
+# RcppCWB 0.6.2.9002
+
 * Fix format-security issue under r-devel #86. 
+* `cl_struc_values()` does not duplicate registry directories any more #77. 
+
 
 # RcppCWB 0.6.2
 
