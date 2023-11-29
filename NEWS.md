@@ -5,7 +5,7 @@
 * `get_region_matrix()` reports NA values for negative strucs #87.
 * `region_matrix_to_struc_matrix()` returns NA values for regions without 
 nested region as declared in the documentation #88.
-* `check_strucs()` issues warning if negative values are passed and if lenght of
+* `check_strucs()` issues warning if negative values are passed and if length of
 input vector is 0.
 * `ranges_to_cpos()` drops rows from input matrix with NA values and issues 
 a respective warning.
