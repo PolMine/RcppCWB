@@ -1,7 +1,14 @@
-# RcppCWB 0.6.2.9002
+# RcppCWB 0.6.3
 
-* Fix format-security issue under r-devel #86. 
 * `cl_struc_values()` does not duplicate registry directories any more #77. 
+* Fix format-security issue under r-devel #86.
+* `get_region_matrix()` reports NA values for negative strucs #87.
+* `region_matrix_to_struc_matrix()` returns NA values for regions without 
+nested region as declared in the documentation #88.
+* `check_strucs()` issues warning if negative values are passed and if lenght of
+input vector is 0.
+* `ranges_to_cpos()` drops rows from input matrix with NA values and issues 
+a respective warning.
 
 
 # RcppCWB 0.6.2

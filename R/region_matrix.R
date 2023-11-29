@@ -122,12 +122,22 @@ region_matrix_context <- function(corpus, registry = Sys.getenv("CORPUS_REGISTRY
 #'   positions in first and second column, respectively).
 #' @export
 ranges_to_cpos <- function(ranges){
-  stopifnot(
-    is.integer(ranges),
-    is.matrix(ranges),
-    all(ranges[,2] >= ranges[,1])
-  )
+  stopifnot(is.integer(ranges), is.matrix(ranges))
+  
+  if (any(is.na(ranges))){
+    drop <- unique(c(which(is.na(ranges[,1])), which(is.na(ranges[,2]))))
+    warning(
+      sprintf("matrix includes NA values, dropping %d rows", length(drop))
+    )
+    ranges <- ranges[-drop,]
+    # if only one row left, we have a vector to be turned into matrix again
+    if (length(ranges) == 2L) ranges <- matrix(ranges, nrow = 1L)
+  }
+  
   if (nrow(ranges) == 0L) return(integer())
+  
+  stopifnot(all(ranges[,2] >= ranges[,1]))
+  
   if (ncol(ranges) != 2L){
     warning(
       "ranges_to_cpos() requires two-column integer matrix as input ",

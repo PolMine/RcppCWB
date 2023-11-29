@@ -485,8 +485,8 @@ Rcpp::IntegerMatrix region_matrix_to_struc_matrix(SEXP corpus, SEXP s_attribute,
       regions(i,1)--;
     };
     
-    if (regions(i,0) < 0) regions(i,0) = NA_INTEGER;
-    if (regions(i,1) < 0) regions(i,1) = NA_INTEGER;
+    if (struc_matrix(i,0) < 0) struc_matrix(i,0) = NA_INTEGER;
+    if (struc_matrix(i,1) < 0) struc_matrix(i,1) = NA_INTEGER;
   }
   
   return struc_matrix;

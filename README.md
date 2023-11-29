@@ -80,8 +80,8 @@ On macOS, the [pcre2](http://www.pcre.org/) and
 [Glib](https://docs.gtk.org/glib) libraries need to be present. We
 recommend to use ‘Homebrew’ as a package manager for macOS. To install
 Homebrew, follow the instructions on the [Homebrew
-Website](https://brew.sh/index_de.html). It may also be necessary to
-also install [Xcode](https://developer.apple.com/xcode/) and
+Website](https://brew.sh). It may also be necessary to also install
+[Xcode](https://developer.apple.com/xcode/) and
 [XQuartz](https://www.xquartz.org).
 
 The following commands then need to be executed from a terminal window.
@@ -185,7 +185,7 @@ cqp_initialize(registry = registry)
 cqp_query(corpus = "REUTERS", query = '"crude" "oil"')
 ```
 
-    ## <pointer: 0x1192aa230>
+    ## <pointer: 0x103757ca0>
 
 ``` r
 cpos <- cqp_dump_subcorpus(corpus = "REUTERS")
