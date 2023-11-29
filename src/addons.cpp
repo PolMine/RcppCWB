@@ -80,9 +80,14 @@ Rcpp::IntegerMatrix get_region_matrix(SEXP corpus, SEXP s_attribute, SEXP strucs
   
   Rcpp::IntegerMatrix cpos_matrix(strucs_length,2);
   for (n = 0; n < strucs_length; n++){
-    cl_struc2cpos(att, strucs_int[n], &start, &end);
-    cpos_matrix(n,0) = start;
-    cpos_matrix(n,1) = end;
+    if (strucs_int[n] >= 0){
+      cl_struc2cpos(att, strucs_int[n], &start, &end);
+      cpos_matrix(n,0) = start;
+      cpos_matrix(n,1) = end;
+    } else {
+      cpos_matrix(n,0) = NA_INTEGER;
+      cpos_matrix(n,1) = NA_INTEGER;
+    }
   }
   return cpos_matrix;
 }

@@ -15,3 +15,18 @@ test_that(
   }
 )
 
+test_that(
+  "NA for negative values",
+  {
+    regions <- get_region_matrix(
+      corpus = "REUTERS",
+      registry = RcppCWB::corpus_registry_dir("REUTERS")[[1]],
+      s_attribute = "id",
+      strucs = c(-1, 0:2)
+    )
+    
+    expect_identical(regions[1,1], NA_integer_)
+    expect_identical(regions[1,2], NA_integer_)
+    
+  }
+)

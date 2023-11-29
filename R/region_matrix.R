@@ -1,21 +1,24 @@
 #' Get Matrix with Regions for Strucs.
 #' 
-#' The return value is an integer matrix with the left and right corpus positions
-#' of the strucs in columns one and two, respectively.
+#' The return value is an `integer` matrix with the left and right corpus
+#' positions of the strucs in columns one and two, respectively. For negative
+#' struc values in the input vector, the matrix reports `NA` values.
 #' 
-#' @param corpus a CWB corpus
-#' @param s_attribute a structural attribute
-#' @param strucs strucs
-#' @param registry the registry directory
+#' @param corpus A CWB corpus (length-one `character` vector).
+#' @param s_attribute A structural attribute (length-one `character` vector).
+#' @param strucs Integer vector with strucs.
+#' @param registry Registry directory with registry file.
 #' @rdname get_region_matrix
 #' @export get_region_matrix
-#' @return A matrix with integer values indicating left and right corpus positions
-#' (columns 1 and 2, respectively).
+#' @return A matrix with integer values indicating left and right corpus
+#'   positions (columns 1 and 2, respectively).
 #' @examples 
 #' y <- get_region_matrix(
-#'   corpus = "REUTERS", s_attribute = "id",
-#'   strucs = 0L:5L, registry = get_tmp_registry()
-#'   )
+#'   corpus = "REUTERS",
+#'   s_attribute = "id",
+#'   strucs = 0L:5L,
+#'   registry = get_tmp_registry()
+#' )
 get_region_matrix <- function(corpus, s_attribute, strucs, registry = Sys.getenv("CORPUS_REGISTRY")){
   check_registry(registry)
   check_corpus(corpus, registry)
