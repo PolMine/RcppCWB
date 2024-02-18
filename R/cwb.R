@@ -132,15 +132,17 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
     fname <- path(data_dir, sprintf("%s.corpus", p_attribute))
     if (!file.exists(fname)) warning("cwb_huffcode: file to delete missing")
     print(file.access(fname, mode = 2))
-    removed <- file.remove(fname)
-    if (removed){
-      if (!quietly) message("redundant file deleted: ", fname)
-    } else {
-      message("could not delete redundant file: ", fname)
-      print(list.files(data_dir))
-      print(file.info(fname))
-      print(file.access(fname, mode = 2))
-    }
+    # removed <- file.remove(fname)
+    removed <- file_delete(fname)
+    print(removed)
+    # if (removed){
+    #   if (!quietly) message("redundant file deleted: ", fname)
+    # } else {
+    #   message("could not delete redundant file: ", fname)
+    #   print(list.files(data_dir))
+    #   print(file.info(fname))
+    #   print(file.access(fname, mode = 2))
+    # }
   }
   
   success
