@@ -137,6 +137,7 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
     } else {
       message("could not delete redundant file: ", fname)
       print(list.files(data_dir))
+      print(file.info(fname))
     }
   }
   
@@ -181,6 +182,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
     } else {
       message("could not delete redundant file: ", rev_file)
       print(list.files(data_dir))
+      print(file.info(rev_file))
     }
     
     rdx_file <- path(data_dir, sprintf("%s.corpus.rdx", p_attribute))
@@ -191,6 +193,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
     } else {
       message("could not delete redundant file: ", rdx_file)
       print(list.files(data_dir))
+      print(file.info(rdx_file))
     }
   }
 
