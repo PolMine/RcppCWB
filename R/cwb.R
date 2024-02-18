@@ -131,6 +131,7 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
     data_dir <- corpus_data_dir(corpus = corpus, registry = registry)
     fname <- path(data_dir, sprintf("%s.corpus", p_attribute))
     if (!file.exists(fname)) warning("cwb_huffcode: file to delete missing")
+    print(file.mode(fname, mode = 2))
     removed <- file.remove(fname)
     if (removed){
       if (!quietly) message("redundant file deleted: ", fname)
@@ -138,6 +139,7 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
       message("could not delete redundant file: ", fname)
       print(list.files(data_dir))
       print(file.info(fname))
+      print(file.mode(fname, mode = 2))
     }
   }
   
@@ -176,6 +178,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
     
     rev_file <- path(data_dir, sprintf("%s.corpus.rev", p_attribute))
     if (!file.exists(rev_file)) warning("cwb_huffcode: file to delete missing")
+    print(file.mode(rev_file))
     removed <- file.remove(rev_file)
     if (removed){
       if (!quietly) message("redundant file deleted: ", rev_file)
@@ -183,10 +186,12 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
       message("could not delete redundant file: ", rev_file)
       print(list.files(data_dir))
       print(file.info(rev_file))
+      print(file.mode(rev_file))
     }
     
     rdx_file <- path(data_dir, sprintf("%s.corpus.rdx", p_attribute))
     if (!file.exists(rdx_file)) warning("cwb_huffcode: file to delete missing")
+    print(file.mode(rdx_file))
     removed <- file.remove(rdx_file)
     if (removed){
       if (!quietly) message("redundant file deleted: ", rdx_file)
@@ -194,6 +199,7 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
       message("could not delete redundant file: ", rdx_file)
       print(list.files(data_dir))
       print(file.info(rdx_file))
+      print(file.mode(rdx_file))
     }
   }
 
