@@ -1,7 +1,7 @@
 #' CWB Tools for Creating Corpora
 #' 
-#' Wrappers for the CWB tools (`cwb-makeall`, `cwb-huffcode`,
-#' `cwb-compress-rdx`). Unlike the 'original' command line tools, these wrappers
+#' Wrappers for the CWB tools `cwb-makeall`, `cwb-huffcode` and
+#' `cwb-compress-rdx`. Unlike the 'original' command line tools, these wrappers
 #' will always perform a specific indexing/compression step on one positional
 #' attribute, and produce all components.
 #' 
@@ -15,13 +15,16 @@
 #'   (counter of tokens processed).
 #' @examples
 #' # The package includes and 'unfinished' corpus of debates in the UN General 
-#' # Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is
-#' # not compressed.
+#' # Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it 
+#' # is not compressed.
 #' #
 #' # The first step in the following example is to copy the raw
 #' # corpus to a temporary place.
 #' 
-#' home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
+#' home_dir <- system.file(
+#'   package = "RcppCWB",
+#'   "extdata", "cwb", "indexed_corpora", "unga"
+#' )
 #' 
 #' tmp_data_dir <- file.path(tempdir(), "indexed_corpora")
 #' tmp_unga_dir <- file.path(tmp_data_dir, "unga2")
@@ -104,9 +107,15 @@ cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGIS
 
 #' @rdname cwb_utils
 #' @export cwb_huffcode
-#' @param delete A `logical` value, whether to remove redundant files after
-#'   compression.
-cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
+#' @param delete A `logical` value, whether to remove redundant file
+#'   (p_attribute).corpus after compression.
+cwb_huffcode <- function(
+    corpus,
+    p_attribute,
+    registry = Sys.getenv("CORPUS_REGISTRY"),
+    quietly = FALSE,
+    delete = TRUE
+  ){
   
   registry <- path_expand(path(registry))
   check_registry(registry)
@@ -118,9 +127,14 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
     ))
   }
   
-  huffcode <- function()
-    .cwb_huffcode(x = corpus, p_attribute = p_attribute, registry_dir = registry)
-  
+  huffcode <- function(){
+    .cwb_huffcode(
+      x = corpus,
+      p_attribute = p_attribute,
+      registry_dir = registry
+    )
+  }
+
   if (quietly){
     capture.output({success <- huffcode()}, type = "output")
   } else {
@@ -131,18 +145,16 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
     data_dir <- corpus_data_dir(corpus = corpus, registry = registry)
     fname <- path(data_dir, sprintf("%s.corpus", p_attribute))
     if (!file.exists(fname)) warning("cwb_huffcode: file to delete missing")
-    print(file.access(fname, mode = 2))
-    # removed <- file.remove(fname)
-    removed <- file_delete(fname)
-    print(removed)
-    # if (removed){
-    #   if (!quietly) message("redundant file deleted: ", fname)
-    # } else {
-    #   message("could not delete redundant file: ", fname)
-    #   print(list.files(data_dir))
-    #   print(file.info(fname))
-    #   print(file.access(fname, mode = 2))
-    # }
+    # removing the file will fail on Windows unless corpus is unloaded #89
+    cl_delete_corpus(corpus = corpus, registry = registry)
+    removed <- file.remove(fname)
+    if (removed){
+      if (!quietly) message("redundant file deleted: ", fname)
+    } else {
+      message("could not delete redundant file: ", fname)
+    }
+    # reload corpus so that it is available again
+    cl_load_corpus(corpus = corpus, registry = registry)
   }
   
   success
@@ -157,17 +169,33 @@ cwb_huffcode <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGI
 #'   p_attribute = "word",
 #'   registry = get_tmp_registry()
 #' )
-cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE, delete = TRUE){
+cwb_compress_rdx <- function(
+    corpus,
+    p_attribute,
+    registry = Sys.getenv("CORPUS_REGISTRY"),
+    quietly = FALSE,
+    delete = TRUE
+  ){
   
   registry <- path_expand(path(registry))
   check_registry(registry)
   regfile <- path(registry, tolower(corpus))
   if (!file.exists(regfile)){
-    stop(sprintf("No registry file for corpus '%s' in registry directory '%s'.", corpus, registry))
+    stop(
+      sprintf(
+        "No registry file for corpus '%s' in registry directory '%s'.",
+        corpus,
+        registry
+      )
+    )
   }
   
   compress_rdx <-function()
-    .cwb_compress_rdx(x = corpus, p_attribute = p_attribute, registry_dir = registry)
+    .cwb_compress_rdx(
+      x = corpus,
+      p_attribute = p_attribute,
+      registry_dir = registry
+    )
   
   if (quietly){
     capture.output({success <- compress_rdx()}, type = "output")
@@ -180,29 +208,24 @@ cwb_compress_rdx <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_
     
     rev_file <- path(data_dir, sprintf("%s.corpus.rev", p_attribute))
     if (!file.exists(rev_file)) warning("cwb_huffcode: file to delete missing")
-    print(file.access(rev_file, mode = 2))
+    # deleting *.rev file fails on Windows unless corpus is unloaded #89
+    cl_delete_corpus(corpus = corpus, registry = registry)
     removed <- file.remove(rev_file)
     if (removed){
       if (!quietly) message("redundant file deleted: ", rev_file)
     } else {
       message("could not delete redundant file: ", rev_file)
-      print(list.files(data_dir))
-      print(file.info(rev_file))
-      print(file.access(rev_file, mode = 2))
     }
-    
+
     rdx_file <- path(data_dir, sprintf("%s.corpus.rdx", p_attribute))
     if (!file.exists(rdx_file)) warning("cwb_huffcode: file to delete missing")
-    print(file.access(rdx_file, mode = 2))
     removed <- file.remove(rdx_file)
     if (removed){
       if (!quietly) message("redundant file deleted: ", rdx_file)
     } else {
       message("could not delete redundant file: ", rdx_file)
-      print(list.files(data_dir))
-      print(file.info(rdx_file))
-      print(file.access(rdx_file, mode = 2))
     }
+    cl_load_corpus(corpus = corpus, registry = registry)
   }
 
   success
