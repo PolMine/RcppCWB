@@ -12,25 +12,28 @@ get_region_matrix(
 )
 }
 \arguments{
-\item{corpus}{a CWB corpus}
+\item{corpus}{A CWB corpus (length-one \code{character} vector).}
 
-\item{s_attribute}{a structural attribute}
+\item{s_attribute}{A structural attribute (length-one \code{character} vector).}
 
-\item{strucs}{strucs}
+\item{strucs}{Integer vector with strucs.}
 
-\item{registry}{the registry directory}
+\item{registry}{Registry directory with registry file.}
 }
 \value{
-A matrix with integer values indicating left and right corpus positions
-(columns 1 and 2, respectively).
+A matrix with integer values indicating left and right corpus
+positions (columns 1 and 2, respectively).
 }
 \description{
-The return value is an integer matrix with the left and right corpus positions
-of the strucs in columns one and two, respectively.
+The return value is an \code{integer} matrix with the left and right corpus
+positions of the strucs in columns one and two, respectively. For negative
+struc values in the input vector, the matrix reports \code{NA} values.
 }
 \examples{
 y <- get_region_matrix(
-  corpus = "REUTERS", s_attribute = "id",
-  strucs = 0L:5L, registry = get_tmp_registry()
-  )
+  corpus = "REUTERS",
+  s_attribute = "id",
+  strucs = 0L:5L,
+  registry = get_tmp_registry()
+)
 }

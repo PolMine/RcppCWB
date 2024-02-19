@@ -56,8 +56,8 @@ environment variable CORPUS_REGISTRY.}
 \item{quietly}{A \code{logical} value, whether to turn off messages (including
 warnings).}
 
-\item{delete}{A \code{logical} value, whether to remove redundant files after
-compression.}
+\item{delete}{A \code{logical} value, whether to remove redundant file
+(p_attribute).corpus after compression.}
 
 \item{data_dir}{The data directory where \code{cwb_encode} will save the binary
 files of the indexed corpus.  Tilde expansion is performed on \code{data_dir}
@@ -92,20 +92,23 @@ tokens}
 (counter of tokens processed).}
 }
 \description{
-Wrappers for the CWB tools (\code{cwb-makeall}, \code{cwb-huffcode},
-\code{cwb-compress-rdx}). Unlike the 'original' command line tools, these wrappers
+Wrappers for the CWB tools \code{cwb-makeall}, \code{cwb-huffcode} and
+\code{cwb-compress-rdx}. Unlike the 'original' command line tools, these wrappers
 will always perform a specific indexing/compression step on one positional
 attribute, and produce all components.
 }
 \examples{
 # The package includes and 'unfinished' corpus of debates in the UN General 
-# Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it is
-# not compressed.
+# Assembly ("UNGA"), i.e. it does not yet include the reverse index, and it 
+# is not compressed.
 #
 # The first step in the following example is to copy the raw
 # corpus to a temporary place.
 
-home_dir <- system.file(package = "RcppCWB", "extdata", "cwb", "indexed_corpora", "unga")
+home_dir <- system.file(
+  package = "RcppCWB",
+  "extdata", "cwb", "indexed_corpora", "unga"
+)
 
 tmp_data_dir <- file.path(tempdir(), "indexed_corpora")
 tmp_unga_dir <- file.path(tmp_data_dir, "unga2")
