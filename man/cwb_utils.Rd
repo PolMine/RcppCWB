@@ -26,7 +26,8 @@ cwb_makeall(
   corpus,
   p_attribute,
   registry = Sys.getenv("CORPUS_REGISTRY"),
-  quietly = FALSE
+  quietly = FALSE,
+  logfile
 )
 
 cwb_huffcode(
@@ -34,6 +35,7 @@ cwb_huffcode(
   p_attribute,
   registry = Sys.getenv("CORPUS_REGISTRY"),
   quietly = FALSE,
+  logfile,
   delete = TRUE
 )
 
@@ -42,6 +44,7 @@ cwb_compress_rdx(
   p_attribute,
   registry = Sys.getenv("CORPUS_REGISTRY"),
   quietly = FALSE,
+  logfile,
   delete = TRUE
 )
 }
@@ -87,6 +90,9 @@ warnings).}
 (counter of tokens processed).}
 
 \item{p_attribute}{Name of p-attribute.}
+
+\item{logfile}{Redirect messages of \code{cwb_makeall()}, \code{cwb_huffcode()} or
+\code{cwb_compress_rdx()} to this file. Requires that quietly is \code{TRUE}.}
 
 \item{delete}{A \code{logical} value, whether to remove redundant file
 (p_attribute).corpus after compression.}
