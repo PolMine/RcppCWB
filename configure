@@ -61,16 +61,18 @@ case $OS in
     ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
     case "$ARCH" in 
       x86_64)
+        echo "* architecture: $ARCH ... using config 'linux-64'"
         CWB_PLATFORM_CONFIG_FILE="linux-64";;
       i386) 
+        echo "* architecture: $ARCH ... using config 'linux'"
         CWB_PLATFORM_CONFIG_FILE="linux";;
       aarch64)
         # aarch64/arm64 (= Apple Silicon): E.g. when you run docker container 
         # on MacBook
-        echo "* architecture $ARCH - using default Linux config"
+        echo "* architecture: $ARCH ... using config 'linux'"
         CWB_PLATFORM_CONFIG_FILE="linux";;
       *)
-        echo "* unknown architecture ($ARCH), using Linux config as default"
+        echo "* unknown architecture ($ARCH) ... using default config 'linux'"
         CWB_PLATFORM_CONFIG_FILE="linux"
         ;;
     esac
