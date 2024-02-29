@@ -12,9 +12,9 @@ supported by the Corpus Workbench (CWB). The vector is derived from the the
 \code{CorpusCharset} object defined in the header file of the corpus library (CL).
 }
 \details{
-Early versions of the CWB were developed for "latin1", "utf8" support has been
-introduced with CWB v3.2. Note that RcppCWB is tested only for "latin1" and
-"utf8" and that R uses "UTF-8" rather than utf8" (CWB) by convention.
+Early versions of the CWB were developed for "latin1", "utf8" support has
+been introduced with CWB v3.2. Note that RcppCWB is tested only for "latin1"
+and "utf8" and that R uses "UTF-8" rather than utf8" (CWB) by convention.
 }
 \examples{
 cwb_charsets()
