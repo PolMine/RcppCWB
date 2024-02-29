@@ -46,7 +46,11 @@
 #' }
 #' 
 #' # perform cwb_makeall (equivalent to cwb-makeall command line utility)
-#' cwb_makeall(corpus = "UNGA2", p_attribute = "word", registry = get_tmp_registry())
+#' cwb_makeall(
+#'   corpus = "UNGA2",
+#'   p_attribute = "word",
+#'   registry = get_tmp_registry()
+#' )
 #' cl_load_corpus("UNGA2", registry = get_tmp_registry())
 #' cqp_load_corpus("UNGA2", registry = get_tmp_registry())
 #' 
@@ -59,7 +63,11 @@
 #'   corpus = "UNGA2", p_attribute = "word",
 #'   registry = get_tmp_registry(), id = ids_sentence_1
 #'   )
-#' sentence <- gsub("\\s+([\\.,])", "\\1", paste(tokens_sentence_1, collapse = " "))
+#' sentence <- gsub(
+#'   "\\s+([\\.,])",
+#'   "\\1",
+#'   paste(tokens_sentence_1, collapse = " ")
+#' )
 #' 
 #' # perform cwb_huffcode (equivalent to cwb-makeall command line utility)
 #' cwb_huffcode(
@@ -71,7 +79,12 @@
 #' @export cwb_makeall
 #' @importFrom utils capture.output
 #' @importFrom fs path path_expand
-cwb_makeall <- function(corpus, p_attribute, registry = Sys.getenv("CORPUS_REGISTRY"), quietly = FALSE){
+cwb_makeall <- function(
+    corpus,
+    p_attribute,
+    registry = Sys.getenv("CORPUS_REGISTRY"),
+    quietly = FALSE
+  ){
   
   registry <- path_expand(path(registry))
   check_registry(registry)
@@ -281,9 +294,18 @@ cwb_compress_rdx <- function(
 #' unlink(data_dir)
 #' unlink(file.path(Sys.getenv("CORPUS_REGISTRY"), "btmin"))
 cwb_encode <- function(
-  corpus, registry = Sys.getenv("CORPUS_REGISTRY"), data_dir, vrt_dir,
-  encoding = "utf8", p_attributes = c("word", "pos", "lemma"), s_attributes,
-  skip_blank_lines = TRUE, strip_whitespace = TRUE, xml = TRUE, quietly = FALSE, verbose = FALSE
+  corpus,
+  registry = Sys.getenv("CORPUS_REGISTRY"),
+  data_dir,
+  vrt_dir,
+  encoding = "utf8",
+  p_attributes = c("word", "pos", "lemma"),
+  s_attributes = list(),
+  skip_blank_lines = TRUE,
+  strip_whitespace = TRUE,
+  xml = TRUE,
+  quietly = FALSE, 
+  verbose = FALSE
 ){
   
   if (encoding == "UTF-8") encoding <- "utf8"
@@ -300,7 +322,6 @@ cwb_encode <- function(
     is.character(data_dir), length(data_dir) == 1L,
     dir.exists(data_dir), length(list.files(data_dir)) == 0L,
     is.character(vrt_dir), length(vrt_dir) == 1L, dir.exists(vrt_dir),
-    length(list.files(vrt_dir)) > 0L,
     is.character(encoding), length(encoding) == 1L,
     is.character(p_attributes),
     is.logical(skip_blank_lines), length(skip_blank_lines) == 1L,
@@ -308,19 +329,33 @@ cwb_encode <- function(
     is.logical(xml), length(xml) == 1L
   )
   
+  if (length(list.files(vrt_dir)) < 1L)
+    stop("No files in directory 'vrt_dir'")
+  
   s_attributes_noanno <- unlist(lapply(
     names(s_attributes),
-    function(s_attr) if (length(s_attributes[[s_attr]]) == 0L) s_attr else character()
+    function(s_attr)
+      if (length(s_attributes[[s_attr]]) == 0L) s_attr else character()
   ))
+  # zero-length scenario results in NULL
+  if (is.null(s_attributes_noanno)) s_attributes_noanno <- character()
   
   for (s_attr in s_attributes_noanno) s_attributes[[s_attr]] <- NULL
   
   s_attributes_anno <- unname(
-    sapply(
-      names(s_attributes),
-      function(s_attr) paste(s_attr, ":", 0L, "+", paste(s_attributes[[s_attr]], collapse = "+"), sep = "")
+    unlist(
+      lapply(
+        names(s_attributes),
+        function(s_attr)
+          paste(
+            s_attr, ":", 0L, "+",
+            paste(s_attributes[[s_attr]], collapse = "+"),
+            sep = ""
+          )
+      )
     )
   )
+  if (is.null(s_attributes_anno)) s_attributes_anno <- character()
   
   # Ensure that paths are standardized
   regfile <- as.character(fs::path(fs::path_expand(registry), tolower(corpus)))
@@ -362,9 +397,9 @@ cwb_version <- function() as.numeric_version(.cwb_version())
 #' supported by the Corpus Workbench (CWB). The vector is derived from the the
 #' `CorpusCharset` object defined in the header file of the corpus library (CL).
 #' 
-#' Early versions of the CWB were developed for "latin1", "utf8" support has been
-#' introduced with CWB v3.2. Note that RcppCWB is tested only for "latin1" and
-#' "utf8" and that R uses "UTF-8" rather than utf8" (CWB) by convention.
+#' Early versions of the CWB were developed for "latin1", "utf8" support has
+#' been introduced with CWB v3.2. Note that RcppCWB is tested only for "latin1"
+#' and "utf8" and that R uses "UTF-8" rather than utf8" (CWB) by convention.
 #' @export
 #' @examples
 #' cwb_charsets()
