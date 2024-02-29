@@ -1,7 +1,12 @@
-# RcppCWB 0.6.3.9001
+# RcppCWB 0.6.3.9001-9003
 
 * `cwb_huffcode()` and `cwb_compress_rdx()` did not delete redundant files on 
 Windows. Fixed by temporarily unloading the corpus #89.
+* `cwb_encode()` failed if argument `s_attributes` was empty list. Fixed, the
+default value of `s_attributes` is now `list()` #90.
+* `cwb_makeall()` will not reset CORPUS_REGISTY environment variable implicitly
+if corpus to process has already been loaded #92.
+
 
 # RcppCWB 0.6.3
 

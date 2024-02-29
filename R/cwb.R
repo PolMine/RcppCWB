@@ -235,12 +235,10 @@ cwb_makeall <- function(
   
   # The registry directory provided is ignored if the corpus has already been
   # loaded, resulting in unexpected behavior. Therefore, we unload the corpus
-  # and force reloading corpora.
-  if (toupper(corpus) %in% cqp_list_corpora()){
+  # and trigger reloading corpora.
+  if (tolower(corpus) %in% cl_list_corpora())
     cl_delete_corpus(corpus, registry = registry)
-    cqp_reset_registry(registry = registry)
-  }
-  
+
   makeall <- function()
     .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
