@@ -55,13 +55,17 @@ case $OS in
     echo "* Linux distribution ID: $DISTRO ($SUPPORT)";
 
     # For Debian, Fedora and Ubuntu, the generic Linux configuration works, 
-    # there are no known required adaptions so far. If another distribution is used,
-    # the previous message informs users that adaptions may be necessary.
+    # there are no known required adaptions so far. If another distribution is
+    # used, the previous message informs users that adaptions may be necessary.
+    # 
     ARCH=`lscpu | head -n 1 | grep -oP '\w+$'`
     case "$ARCH" in 
       x86_64)
         CWB_PLATFORM_CONFIG_FILE="linux-64";;
       i386) 
+        CWB_PLATFORM_CONFIG_FILE="linux";;
+      aarch64)
+        echo "* architecture ($ARCH), using Linux config as default"
         CWB_PLATFORM_CONFIG_FILE="linux";;
       *)
         echo "* unknown architecture ($ARCH), using Linux config as default"
