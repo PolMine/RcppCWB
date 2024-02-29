@@ -6,6 +6,8 @@ Windows. Fixed by temporarily unloading the corpus #89.
 default value of `s_attributes` is now `list()` #90.
 * `cwb_makeall()` will not reset CORPUS_REGISTY environment variable implicitly
 if corpus to process has already been loaded #92.
+* Architecture "aarch64"" (equivalent to "amd64" / Apple Silicon) as known 
+Linux architecture (= scenario when running a Docker container on MacBook) #91.
 
 
 # RcppCWB 0.6.3

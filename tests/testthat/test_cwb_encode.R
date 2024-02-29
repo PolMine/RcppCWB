@@ -2,46 +2,6 @@ library(RcppCWB)
 use_tmp_registry()
 testthat::context("cwb_encode")
 
-# utils_zipfile <- tempfile()
-# utils_dir <- file.path(tempdir(), "cwb_win-0.0.1", "utils")
-# download.file("https://github.com/PolMine/cwb_win/archive/refs/tags/v0.0.1.zip", destfile = utils_zipfile)
-# unzip(utils_zipfile, exdir = tempdir())
-# file.rename(
-#   from = file.path(utils_dir, "libintl-9.dll"),
-#   to = file.path(utils_dir, "libintl-8.dll")
-# )
-# utils <- Sys.glob(sprintf("%s/*.exe", utils_dir))
-# names(utils) <- gsub("\\.exe$", "", basename(utils))
-# 
-#     args <- sprintf(
-#       '%s -d "%s" -c utf8 -xsB -v -D -F "%s" -R "%s" -P pos -S plenary_protocol:0+lp+protocol_no+date+year+birthday+version+url+filetype -S speaker:0+id+type+lp+protocol_no+date+year+ai_no+ai_id+ai_type+who+name+parliamentary_group+party+role -S p:0+',
-#       fs::path(utils[["cwb-encode"]]),
-#       fs::path(tmp_data_dir),
-#       system.file(package = "RcppCWB", "extdata", "vrt"),
-#       fs::path(tmp_registry_file)
-#     )
-# foo <- system(shQuote(args))
-# 
-# for (p_attr in c("word", "pos", "lemma")){
-#   cmd_makeall <- sprintf(
-#     "%s -r %s -P word BT",
-#     fs::path(utils[["cwb-makeall"]]), fs::path(tmp_registry)
-#   )
-#   system(command = cmd_makeall)
-#   
-#   cmd_huffcode <- sprintf(
-#     "%s -r %s -P word BT",
-#     fs::path(utils[["cwb-huffcode"]]), fs::path(tmp_registry)
-#   )
-#   system(command = cmd_huffcode)
-#   
-#   cmd_compress_rdx <- sprintf(
-#     "%s -r %s -P word BT",
-#     fs::path(utils[["cwb-compress-rdx"]]), fs::path(tmp_registry)
-#   )
-#   system(command = cmd_compress_rdx)
-# }
-
 
 test_that(
   "identity of RcppCWB and CWB encoding result",
