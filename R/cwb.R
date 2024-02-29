@@ -5,6 +5,13 @@
 #' will always perform a specific indexing/compression step on one positional
 #' attribute, and produce all components.
 #' 
+#' @details
+#' Running `cwb_huffcode()` and `cwb_compress_rdx()` is optional. Corpora can be
+#' fully used without compression. It is recommended when reducing the size of
+#' corpus data has relevant benefits, e.g. for sharing data. On Windows, 
+#' compression is not stable and not recommended. A respective warning
+#' is issued when running `cwb_huffcode()` and `cwb_compress_rdx()` on Windows.
+#' 
 #' @param p_attributes Positional attributes (p-attributes) to be declared.
 #' @param data_dir The data directory where `cwb_encode` will save the binary
 #'   files of the indexed corpus.  Tilde expansion is performed on `data_dir`
@@ -268,6 +275,12 @@ cwb_huffcode <- function(
     delete = TRUE
   ){
   
+  if (.Platform$OS.type == "windows")
+    message(
+      "`cwb_huffcode()` is not stable on Windows. ",
+      "Corpus compression is optional and not recommended on Windows."
+    )
+  
   registry <- path_expand(path(registry))
   check_registry(registry)
   regfile <- path(registry, tolower(corpus))
@@ -329,6 +342,12 @@ cwb_compress_rdx <- function(
     logfile,
     delete = TRUE
   ){
+  
+  if (.Platform$OS.type == "windows")
+    message(
+      "`cwb_compress_rdx()` is not stable on Windows. ",
+      "Corpus compression is optional and not recommended on Windows."
+    )
   
   registry <- path_expand(path(registry))
   check_registry(registry)

@@ -103,6 +103,13 @@ Wrappers for the CWB tools \code{cwb-makeall}, \code{cwb-huffcode} and
 will always perform a specific indexing/compression step on one positional
 attribute, and produce all components.
 }
+\details{
+Running \code{cwb_huffcode()} and \code{cwb_compress_rdx()} is optional. Corpora can be
+fully used without compression. It is recommended when reducing the size of
+corpus data has relevant benefits, e.g. for sharing data. On Windows,
+compression is not stable and not recommended. A respective warning
+is issued when running \code{cwb_huffcode()} and \code{cwb_compress_rdx()} on Windows.
+}
 \examples{
 data_dir <- file.path(tempdir(), "bt_data_dir")
 dir.create(data_dir)
