@@ -1,6 +1,6 @@
 ## General remarks
 
-Fixes -Wformat-security issue under r-devel caused by Rcpp.
+A set of minor bug fixes and small enhancements to improve usability.
 
 Previous aspects I repeat:
 
@@ -17,9 +17,8 @@ change.
 ## Test environments
 
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* R winbuilder (R 4.3.0 release, devel, oldrel)
+* R winbuilder (R 4.3.2 release, devel, oldrel)
 * local macOS, R 4.3.1 (arm64)
-* Debian with R-devel and clang (14.0.6 and 15.0.6)
 
 
 ## R CMD check results
