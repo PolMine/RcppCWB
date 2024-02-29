@@ -65,7 +65,9 @@ case $OS in
       i386) 
         CWB_PLATFORM_CONFIG_FILE="linux";;
       aarch64)
-        echo "* architecture ($ARCH), using Linux config as default"
+        # aarch64/arm64 (= Apple Silicon): E.g. when you run docker container 
+        # on MacBook
+        echo "* architecture $ARCH - using default Linux config"
         CWB_PLATFORM_CONFIG_FILE="linux";;
       *)
         echo "* unknown architecture ($ARCH), using Linux config as default"
