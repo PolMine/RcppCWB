@@ -8,6 +8,9 @@ default value of `s_attributes` is now `list()` #90.
 if corpus to process has already been loaded #92.
 * Architecture "aarch64"" (equivalent to "amd64" / Apple Silicon) as known 
 Linux architecture (= scenario when running a Docker container on MacBook) #91.
+* Functions `cwb_makeall()`, `cwb_huffcode()` and `cwb_compress_rdx()` have
+new argument `logfile` to redirect output to this file. Requires argument
+`quietly`  to be `TRUE` #65.
 
 
 # RcppCWB 0.6.3

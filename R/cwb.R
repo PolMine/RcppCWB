@@ -32,6 +32,8 @@
 #'   environment variable CORPUS_REGISTRY.
 #' @param quietly A `logical` value, whether to turn off messages (including
 #'   warnings).
+#' @param logfile Redirect messages of `cwb_makeall()`, `cwb_huffcode()` or
+#'   `cwb_compress_rdx()` to this file. Requires that quietly is `TRUE`.
 #' @param verbose A `logical` value, whether to show progress information
 #'   (counter of tokens processed).
 #' @rdname cwb_utils
@@ -218,7 +220,8 @@ cwb_makeall <- function(
     corpus,
     p_attribute,
     registry = Sys.getenv("CORPUS_REGISTRY"),
-    quietly = FALSE
+    quietly = FALSE,
+    logfile
   ){
   
   registry <- path_expand(path(registry))
@@ -243,7 +246,8 @@ cwb_makeall <- function(
     .cwb_makeall(x = corpus, p_attribute = p_attribute, registry_dir = registry)
   
   if (quietly){
-    capture.output({success <- makeall()}, type = "output")
+    log <- capture.output({success <- makeall()}, type = "output")
+    if (!missing(logfile)) writeLines(log, con = logfile)
   } else {
     success <- makeall()
   }
@@ -260,6 +264,7 @@ cwb_huffcode <- function(
     p_attribute,
     registry = Sys.getenv("CORPUS_REGISTRY"),
     quietly = FALSE,
+    logfile,
     delete = TRUE
   ){
   
@@ -282,7 +287,8 @@ cwb_huffcode <- function(
   }
 
   if (quietly){
-    capture.output({success <- huffcode()}, type = "output")
+    log <- capture.output({success <- huffcode()}, type = "output")
+    if (!missing(logfile)) writeLines(log, con = logfile)
   } else {
     success <- huffcode()
   }
@@ -320,6 +326,7 @@ cwb_compress_rdx <- function(
     p_attribute,
     registry = Sys.getenv("CORPUS_REGISTRY"),
     quietly = FALSE,
+    logfile,
     delete = TRUE
   ){
   
@@ -344,7 +351,8 @@ cwb_compress_rdx <- function(
     )
   
   if (quietly){
-    capture.output({success <- compress_rdx()}, type = "output")
+    log <- capture.output({success <- compress_rdx()}, type = "output")
+    if (!missing(logfile)) writeLines(log, con = logfile)
   } else {
     success <- compress_rdx()
   }
