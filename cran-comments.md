@@ -1,6 +1,8 @@
 ## General remarks
 
-A set of minor bug fixes and small enhancements to improve usability.
+This release fixes a compiler warning 'argument 1 value '18446744073709551615' exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]'. I have been notified that the fix is expected by September 28.
+
+The (significant) compiler warning is newly thrown by GCC 14. I have used a Docker image with Fedora 40, R-devel (r87186) and GCC 14 to reproduce and fix the issue.
 
 Previous aspects I repeat:
 
@@ -16,18 +18,17 @@ change.
 
 ## Test environments
 
+* Docker image with Fedora 40, R-devel r87186 and GCC 14
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* R winbuilder (R 4.3.2 release, devel, oldrel)
+* R winbuilder (R 4.3.3, R 4.4.1, R-devel r87186 ucrt)
 * local macOS, R 4.3.1 (arm64)
 
 
 ## R CMD check results
 
-Check status is OK on all test environments, with one exception. On
-Windows-oldrel, I see SSL issues with URLs in README.md:
+Check status is OK on all test environments. A warning I have seen but that I cannot reproduce results from this website:
 
-- https://developer.apple.com/xcode/ (self signed certificate in certificate chain)
-- https://txm.gitpages.huma-num.fr/textometrie/ (unable to get local issuer certificate)
+https://txm.gitpages.huma-num.fr/textometrie/ (unable to get local issuer certificate)
 
 I do not see these on the  R winbuilder for R release of R devel. My browsers do
 not show a problem with these certificates either. 

@@ -1,4 +1,9 @@
-# RcppCWB 0.6.3.9001-9003
+# RcppCWB 0.6.5
+
+* Fixes a 'exceeds maximum object size'-compiler warning #93.
+
+
+# RcppCWB 0.6.4
 
 * `cwb_huffcode()` and `cwb_compress_rdx()` did not delete redundant files on 
 Windows. Fixed by temporarily unloading the corpus #89.
