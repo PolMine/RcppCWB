@@ -326,26 +326,26 @@ cl_open_stream(const char *filename, int mode, int type)
   case CL_STREAM_GZIP:
     point = g_shell_quote(filename);
     if (mode == CL_STREAM_APPEND) {
-      sprintf(command, "gzip >> %s", point);
+      snprintf(command, 2 * CL_MAX_FILENAME_LENGTH, "gzip >> %s", point);
       mode_spec = (mode_spec[1] == 'b' ? "wb" : "w");
     }
     else if (mode == CL_STREAM_WRITE)
-      sprintf(command, "gzip > %s", point);
+      snprintf(command, 2 * CL_MAX_FILENAME_LENGTH, "gzip > %s", point);
     else
-      sprintf(command, "gzip -cd %s", point);
+      snprintf(command, 2 * CL_MAX_FILENAME_LENGTH, "gzip -cd %s", point);
     handle = popen(command, mode_spec);
     g_free(point);
     break;
   case CL_STREAM_BZIP2:
     point = g_shell_quote(filename);
     if (mode == CL_STREAM_APPEND) {
-      sprintf(command, "bzip2 >> %s", point);
+      snprintf(command, 2 * CL_MAX_FILENAME_LENGTH, "bzip2 >> %s", point);
       mode_spec = (mode_spec[1] == 'b' ? "wb" : "w");
     }
     else if (mode == CL_STREAM_WRITE)
-      sprintf(command, "bzip2 > %s", point);
+      snprintf(command, 2 * CL_MAX_FILENAME_LENGTH, "bzip2 > %s", point);
     else
-      sprintf(command, "bzip2 -cd %s", point);
+      snprintf(command, 2 * CL_MAX_FILENAME_LENGTH, "bzip2 -cd %s", point);
     handle = popen(command, mode_spec);
     g_free(point);
     break;

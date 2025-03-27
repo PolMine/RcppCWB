@@ -510,20 +510,20 @@ sencode_open_files(void)
 {
   char buf[CL_MAX_LINE_LENGTH];
 
-  sprintf(buf, RNG_RNG, new_satt.dir, new_satt.name);
+  snprintf(buf, CL_MAX_LINE_LENGTH, RNG_RNG, new_satt.dir, new_satt.name);
   if ((new_satt.fd = fopen(buf, "wb")) == NULL) {
     perror(buf);
     exit(1);
   }
 
   if (new_satt.store_values) {
-    sprintf(buf, RNG_AVS, new_satt.dir, new_satt.name);
+    snprintf(buf, CL_MAX_LINE_LENGTH, RNG_AVS, new_satt.dir, new_satt.name);
     if ((new_satt.avs = fopen(buf, "w")) == NULL) {
       perror(buf);
       exit(1);
     }
 
-    sprintf(buf, RNG_AVX, new_satt.dir, new_satt.name);
+    snprintf(buf, CL_MAX_LINE_LENGTH, RNG_AVX, new_satt.dir, new_satt.name);
     if ((new_satt.avx = fopen(buf, "wb")) == NULL) {
       perror(buf);
       exit(1);

@@ -132,7 +132,7 @@ progress_bar_percentage(int pass, int total, int percentage)
 {
   /* [pass <pass> of <total>: <percentage>% complete]  (uses progress_bar_message) */
   char message[20];
-  sprintf(message, "%3d%c complete", percentage, '%');
+  snprintf(message, 20, "%3d%c complete", percentage, '%');
   progress_bar_message(pass, total, message);
 }
 

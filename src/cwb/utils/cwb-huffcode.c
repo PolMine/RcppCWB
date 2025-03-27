@@ -622,9 +622,9 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
 
       if (fname) {
         path = fname;
-        sprintf(hcd_path, "%s.hcd", path);
-        sprintf(huf_path, "%s.huf", path);
-        sprintf(sync_path, "%s.huf.syn", path);
+        snprintf(hcd_path, CL_MAX_LINE_LENGTH, "%s.hcd", path);
+        snprintf(huf_path, CL_MAX_LINE_LENGTH, "%s.huf", path);
+        snprintf(sync_path, CL_MAX_LINE_LENGTH, "%s.huf.syn", path);
       }
       else {
         path = component_full_name(attr, CompHuffSeq, NULL);
@@ -749,9 +749,9 @@ decode_check_huff(Attribute *attr, char *corpus_id, char *fname)
   Rprintf("VALIDATING %s.%s\n", corpus_id, attr->any.name);
 
   if (fname) {
-    sprintf(hcd_path, "%s.hcd", fname);
-    sprintf(huf_path, "%s.huf", fname);
-    sprintf(sync_path, "%s.huf.syn", fname);
+    snprintf(hcd_path, CL_MAX_LINE_LENGTH, "%s.hcd", fname);
+    snprintf(huf_path, CL_MAX_LINE_LENGTH, "%s.huf", fname);
+    snprintf(sync_path, CL_MAX_LINE_LENGTH, "%s.huf.syn", fname);
   }
   else {
     char *path;

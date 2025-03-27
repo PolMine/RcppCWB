@@ -86,7 +86,7 @@ compose_kwic_print_structures(ContextDescriptor *cd,
 {
   if (show_cpos && pdr->CPOSPrintFormat) {
     static char rendered_cpos[CL_MAX_LINE_LENGTH];  /* another 'Oli': this was num[16], definitely not enough for HTML output */
-    sprintf(rendered_cpos, pdr->CPOSPrintFormat, position);
+    snprintf(rendered_cpos, CL_MAX_LINE_LENGTH, pdr->CPOSPrintFormat, position);
     cl_autostring_concat(s, rendered_cpos);
   }
 
@@ -230,7 +230,7 @@ compose_kwic_token(ContextDescriptor *cd, int position, ClAutoString dest, Print
         static char body[CL_MAX_LINE_LENGTH]; /* 'body' of the start tag, may include annotation  */
 
         if (show_tag_attributes && region->annot)
-          sprintf(body, "%s %s", region->name, region->annot);
+          snprintf(body, CL_MAX_LINE_LENGTH, "%s %s", region->name, region->annot);
         else
           cl_strcpy(body, region->name);
 

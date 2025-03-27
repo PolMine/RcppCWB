@@ -210,7 +210,7 @@ accept_connection(int port)
 
   if (err != 0) {
     char buffer[50];
-    sprintf(buffer,"ERROR WSAStartup failed with error: %d\n",err);
+    snprintf(buffer, 50, "ERROR WSAStartup failed with error: %d\n",err);
     perror(buffer);
     return -1;
   }
@@ -1070,7 +1070,7 @@ combine_subcorpus_spec(char *corpus, char *subcorpus)
   if (!subcorpus)
     return cl_strdup(corpus);
   spec = (char *) cl_malloc(strlen(corpus) + strlen(subcorpus) + 2);
-  sprintf(spec, "%s:%s", corpus, subcorpus);
+  snprintf(spec, strlen(corpus) + strlen(subcorpus) + 2, "%s:%s", corpus, subcorpus);
   return spec;
 }
 

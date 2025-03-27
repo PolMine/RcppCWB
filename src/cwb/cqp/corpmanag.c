@@ -281,7 +281,7 @@ ensure_corpus_size(CorpusList *cl)
       if (cl->mother_name == NULL)
         strcpy(filename, cl->name);
       else
-        sprintf(filename, "%s:%s", cl->mother_name, cl->name);
+        snprintf(filename, CL_MAX_FILENAME_LENGTH, "%s:%s", cl->mother_name, cl->name);
       return attach_subcorpus(cl, cl->local_dir, filename);
     }
 
@@ -927,14 +927,14 @@ get_fulllocalpath(CorpusList *cl, int qualify)
     upname = cl->mother_name ? cl_strdup(cl->mother_name) : cl_strdup("NONE");
     cl_id_toupper(upname);
 
-    sprintf(fullname, "%s%s%s:%s", data_directory,
+    snprintf(fullname, CL_MAX_FILENAME_LENGTH, "%s%s%s:%s", data_directory,
             data_directory[strlen(data_directory)-1] == SUBDIR_SEPARATOR ? "" : SUBDIR_SEP_STRING,
             cl->mother_name ? cl->mother_name : "NONE",
             cl->name);
     cl_free(upname);
   }
   else
-    sprintf(fullname, "%s%s%s", data_directory,
+    snprintf(fullname, CL_MAX_FILENAME_LENGTH, "%s%s%s", data_directory,
             data_directory[strlen(data_directory)-1] == SUBDIR_SEPARATOR ? "" : SUBDIR_SEP_STRING,
             cl->name);
 
@@ -990,7 +990,7 @@ check_stamp(char *directory, char *fname)
   char full_name[CL_MAX_FILENAME_LENGTH];
   int magic, ok;
 
-  sprintf(full_name, "%s" SUBDIR_SEP_STRING "%s", directory, fname);
+  snprintf(full_name, CL_MAX_FILENAME_LENGTH, "%s" SUBDIR_SEP_STRING "%s", directory, fname);
 
   if (((fd = cl_open_stream(full_name, "rb")) == NULL) ||
       (fread(&magic, sizeof(int), 1, fd) == 0) ||
@@ -1450,7 +1450,7 @@ save_subcorpus(CorpusList *cl, char *fname)
           cqpmessage(Warning, "Directory for private subcorpora isn't set, can't save %s", cl->name);
           return False;
         }
-        sprintf(fname, "%s%c%s:%s",
+        snprintf(fname, CL_MAX_FILENAME_LENGTH, "%s%c%s:%s",
                 data_directory,
                 SUBDIR_SEPARATOR,
                 cl->mother_name ? cl->mother_name : "NONE",
@@ -1837,7 +1837,7 @@ show_corpora_backend(CorpusType ct, int only_active_corpus)
       if (pretty_print) {
         if (list[i][0] != initial) {
           initial = list[i][0];
-          sprintf(label, " %c:", initial);
+          snprintf(label, 4, " %c:", initial);
           ilist_print_break(label);
         }
         ilist_print_item(list[i]);

@@ -1406,10 +1406,10 @@ do_XMLTag(char *s_name, int is_closing, int op, char *regex, int flags)
           pattern = cl_malloc(strlen(conv_regex) + 42); /* leave some room for the regexp wrapper */
 
           if (OP_CONTAINS == op_type)
-            sprintf(pattern, ".*\\|(%s)\\|.*", conv_regex);
+            snprintf(pattern, strlen(conv_regex) + 42, ".*\\|(%s)\\|.*", conv_regex);
           else      /* op_type == OP_MATCHES */
             /* if inner regexp is 'safe', we can omit the parentheses and thus enable optimisation */
-            sprintf(pattern, safe_regex ? "\\|(%s\\|)+" : "\\|((%s)\\|)+", conv_regex);
+            snprintf(pattern, strlen(conv_regex) + 42, safe_regex ? "\\|(%s\\|)+" : "\\|((%s)\\|)+", conv_regex);
 
           cl_free(conv_regex);
           break;
@@ -1508,7 +1508,7 @@ Evaltree do_RegionElement(char *name,
   /* try to find a named query result for the query_corpus */
   corpus_name = (query_corpus->type == SUB || query_corpus->type == TEMP) ? query_corpus->mother_name : query_corpus->name; /* type TEMP is a temporary subcorpus, which seems to be used for all subqueries */
   nqr_name = cl_malloc(strlen(corpus_name) + strlen(name) + 2);
-  sprintf(nqr_name, "%s:%s", corpus_name, name); /* construct qualified NQR name for lookup with findcorpus() */
+  snprintf(nqr_name, strlen(corpus_name) + strlen(name) + 2, "%s:%s", corpus_name, name); /* construct qualified NQR name for lookup with findcorpus() */
   nqr = findcorpus(nqr_name, SUB, 0); /* also ensures that NQR is loaded from disk if necessary */
   cl_free(nqr_name);
   if (!nqr) {
@@ -2476,10 +2476,10 @@ do_flagged_re_variable(char *varname, int flags)
       for (i = 0; i < N_strings; i++)
         length += strlen(items[i]) + 1;
       s = cl_malloc(length);
-      l = sprintf(s, "%s", items[0]);
+      l = snprintf(s, length, "%s", items[0]);
       mark = s + l;        /* <mark> points to the trailing null byte */
       for (i = 1; i < N_strings; i++) {
-        l = sprintf(mark, "|%s", items[i]);
+        l = snprintf(mark, strlen(mark), "|%s", items[i]);
         mark += l;
       }
       cl_free(items);
@@ -2643,13 +2643,13 @@ do_feature_set_string(char *s, int op, int flags)
 
     switch (op & OP_NOT_MASK) {
     case OP_CONTAINS:
-      sprintf(pattern, ".*\\|(%s)\\|.*", converted_s);
+      snprintf(pattern, strlen(converted_s) + 42, ".*\\|(%s)\\|.*", converted_s);
       break;
     case OP_MATCHES:
       if (safe_regexp)                /* inner regexp is 'safe' so we can omit the parentheses and thus enable optimisation */
-        sprintf(pattern, "\\|(%s\\|)+", converted_s);
+        snprintf(pattern, strlen(converted_s) + 42, "\\|(%s\\|)+", converted_s);
       else
-        sprintf(pattern, "\\|((%s)\\|)+", converted_s);
+        snprintf(pattern, strlen(converted_s) + 42, "\\|((%s)\\|)+", converted_s);
       break;
     default:
       /* undefined operator */

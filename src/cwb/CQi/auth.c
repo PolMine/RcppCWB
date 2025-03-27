@@ -144,7 +144,7 @@ add_hosts_in_subnet_to_list(char *ipsubnet)
   int i;
 
   for (i = 1; i <= 255; i++) {
-    sprintf(ipaddr, "%s%d", ipsubnet, i);
+    snprintf(ipaddr, strlen(ipsubnet) + 4, "%s%d", ipsubnet, i);
     add_host_to_list(ipaddr);
   }
   cl_free(ipaddr);

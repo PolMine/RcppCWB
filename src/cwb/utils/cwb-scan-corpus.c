@@ -645,7 +645,7 @@ main (int argc, char *argv[])
      * but still avoid unnecessary computation if current cpos is outside <att> region
      */
     char *within_key = cl_malloc(strlen(within_att) + 4);
-    sprintf(within_key, "?%s+0", within_att);
+    snprintf(within_key, strlen(within_att) + 4, "?%s+0", within_att);
     scancorpus_add_key(within_key);
     cl_free(within_key);
   }

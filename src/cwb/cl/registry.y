@@ -44,7 +44,7 @@ char cregestring[1024];
 #define cregSetAttrComponentPath(attr, cid, path) \
 { \
   if (!declare_component(attr, cid, path)) { \
-    sprintf(cregestring, "Component %s with path %s declared twice" \
+    snprintf(cregestring, 1024, "Component %s with path %s declared twice" \
             " (or internal error)", cid_name(cid), path); \
     cl_free(path); \
     cregerror(cregestring); \
@@ -259,7 +259,7 @@ Attributes      : Attribute         {
 Attribute       : ATTRIBUTE_SYM 
                   id                { 
                                       if ((cregattrib = setup_attribute(cregcorpus, $2, ATT_POS, NULL)) == NULL) {
-                                        sprintf(cregestring, 
+                                        snprintf(cregestring, 1024,
                                                 "Positional attribute %s declared twice -- "
                                                 "semantic error", $2);
                                         cl_free($2);
@@ -270,7 +270,7 @@ Attribute       : ATTRIBUTE_SYM
 
                 | ALIGNED_SYM id StorageSpec
                                     { if (($$ = setup_attribute(cregcorpus, $2, ATT_ALIGN, NULL)) == NULL) {
-                                        sprintf(cregestring, "Alignment attribute %s declared twice -- "
+                                        snprintf(cregestring, 1024, "Alignment attribute %s declared twice -- "
                                                 "semantic error", $2);
                                         cl_free($2);
                                         cl_free($3.path);
@@ -281,7 +281,7 @@ Attribute       : ATTRIBUTE_SYM
                                     }
                 | STRUCTURE_SYM id StorageSpec
                                     { if (($$ = setup_attribute(cregcorpus, $2, ATT_STRUC, NULL)) == NULL) {
-                                        sprintf(cregestring, "Structure attribute %s declared twice -- "
+                                        snprintf(cregestring, 1024, "Structure attribute %s declared twice -- "
                                                 "semantic error", $2);
                                         cl_free($2);
                                         cl_free($3.path);
@@ -297,7 +297,7 @@ Attribute       : ATTRIBUTE_SYM
 
                                         DynArg *a;
 
-                                        sprintf(cregestring, "Dynamic attribute %s declared twice -- "
+                                        snprintf(cregestring, 1024, "Dynamic attribute %s declared twice -- "
                                                 "semantic error", $2);
                                         cl_free($2);
                                         cl_free($7);
@@ -352,7 +352,7 @@ ArgList         : SingleArg         { $$ = $1; }
 
 SingleArg       : id                { $$ = (DynArg *)makearg($1); 
                                       if ($$ == NULL) {
-                                        sprintf(cregestring, "Illegal argument type %s or "
+                                        snprintf(cregestring, 1024, "Illegal argument type %s or "
                                                 "not enough memory -- FATAL ERROR", $1);
                                         cregerror(cregestring);
                                       }
@@ -389,7 +389,7 @@ path            : id                { $$ = $1; }
 id              : IDENTIFIER        { $$ = $1; }
                 | NUMBER            { char *nr;
                                       nr = (char *)cl_malloc(16);
-                                      sprintf(nr, "%d", $1);
+                                      snprintf(nr, 16, "%d", $1);
                                       $$ = nr;
                                     }
                 ;

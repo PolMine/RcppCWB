@@ -241,23 +241,23 @@ decode_string_escape(const char *s)
   if (mode == XMLMode || xml_compatible) {
     for (i = 0; s[i]; i++) {
       if (s[i] == '"') {
-        sprintf(coded_s+t, "&quot;");
+        snprintf(coded_s+t, CL_MAX_LINE_LENGTH, "&quot;");
         t += strlen(coded_s+t);
       }
       else if (s[i] == '\'') {
-        sprintf(coded_s+t, "&apos;");
+        snprintf(coded_s+t, CL_MAX_LINE_LENGTH, "&apos;");
         t += strlen(coded_s+t);
       }
       else if (s[i] == '<') {
-        sprintf(coded_s+t, "&lt;");
+        snprintf(coded_s+t, CL_MAX_LINE_LENGTH, "&lt;");
         t += strlen(coded_s+t);
       }
       else if (s[i] == '>') {
-        sprintf(coded_s+t, "&gt;");
+        snprintf(coded_s+t, CL_MAX_LINE_LENGTH, "&gt;");
         t += strlen(coded_s+t);
       }
       else if (s[i] == '&') {
-        sprintf(coded_s+t, "&amp;");
+        snprintf(coded_s+t, CL_MAX_LINE_LENGTH, "&amp;");
         t += strlen(coded_s+t);
       }
       else if ((s[i] > 0) && (s[i] < 32)) {
@@ -482,7 +482,7 @@ decode_add_attribute(const char *name, int type, const char *display_name, const
     return 0;
   }
   if (recursion > 0)
-    sprintf(temp, "%s%d", name, recursion);
+    snprintf(temp, CL_MAX_LINE_LENGTH, "%s%d", name, recursion);
   else
     cl_strcpy(temp, name);
   handle = get_attribute_handle(temp, type); /* aborts with error message if not found */
@@ -507,9 +507,9 @@ decode_add_attribute(const char *name, int type, const char *display_name, const
     av = cl_strdup(avspec);
     for (item = strtok(av, "+"); item; item = strtok(NULL, "+")) {
       if (recursion > 0)
-        sprintf(temp, "%s_%s%d", name, item, recursion);
+        snprintf(temp, CL_MAX_LINE_LENGTH, "%s_%s%d", name, item, recursion);
       else
-        sprintf(temp, "%s_%s", name, item);
+        snprintf(temp, CL_MAX_LINE_LENGTH, "%s_%s", name, item);
       av_handle = get_attribute_handle(temp, ATT_STRUC);
       if (!cl_struc_values(av_handle)) {
         fprintf(stderr, "Error: S-attribute %s selected by -S %s+%s has no annotated values (aborted).\n",

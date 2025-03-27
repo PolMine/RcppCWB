@@ -355,7 +355,7 @@ ComputeGroupExternally(Group *group)
     Rprintf("%d %d\n", get_group_id(group, i, 0, NULL), get_group_id(group, i, 1, NULL)); /* (source ID, target ID) */
 
   /* construct sort call */
-  sprintf(sort_call, ExternalGroupCommand, temporary_name);
+  snprintf(sort_call, CL_MAX_LINE_LENGTH, ExternalGroupCommand, temporary_name);
 #if GROUP_DEBUG
   Rprintf("Running grouping sort: \n\t%s\n", sort_call);
 #endif

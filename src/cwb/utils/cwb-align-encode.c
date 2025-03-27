@@ -280,9 +280,9 @@ main(int argc, char *argv[])
     }
   }
   else {
-    sprintf(alx_name, "%s" SUBDIR_SEP_STRING "%s.alx", data_dir, attribute_name);
+    snprintf(alx_name, CL_MAX_LINE_LENGTH, "%s" SUBDIR_SEP_STRING "%s.alx", data_dir, attribute_name);
     if (compatibility)
-      sprintf(alg_name, "%s" SUBDIR_SEP_STRING "%s.alg", data_dir, attribute_name);
+      snprintf(alg_name, CL_MAX_LINE_LENGTH, "%s" SUBDIR_SEP_STRING "%s.alg", data_dir, attribute_name);
   }
 
   /* now open output file(s) */

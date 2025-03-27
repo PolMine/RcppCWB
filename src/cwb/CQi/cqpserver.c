@@ -871,7 +871,7 @@ do_cqi_cqp_query(void)
       query_lock = floor(1e9 * cl_random_fraction()) + 1; /* activate query lock mode with random key */
       cqiserver_log(Info, "query_lock = %d\n", query_lock);
 
-      sprintf(cqp_query, "%s = %s;", child, query);
+      snprintf(cqp_query, len, "%s = %s;", child, query);
       if (!cqp_parse_string(cqp_query))
         cqi_command(CQI_CQP_ERROR_GENERAL); /* should be changed to detailed error messages */
       else {

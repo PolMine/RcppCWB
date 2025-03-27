@@ -360,7 +360,7 @@ encode_scan_directory(char *dir)
           || (len_name >= 9 && (0 == strcasecmp(name + len_name - 8, DEFAULT_INFILE_EXTENSION ".bz2"))) )
       {
         char *full_name = (char *) cl_malloc(len_dir + len_name + 2);
-        sprintf(full_name, "%s%c%s", dir, SUBDIR_SEPARATOR, name);
+        snprintf(full_name, len_dir + len_name + 2, "%s%c%s", dir, SUBDIR_SEPARATOR, name);
         if (stat(full_name, &statbuf) != 0) {
           perror("Can't stat file:");
           encode_error("Failed to access input file %s -- aborted.\n", full_name);
@@ -575,20 +575,20 @@ s_att_declare(char *name, char *directory, int store_values, int null_attribute)
   /* open data files for this s-attribute (children will be added later) */
 
   /* create .rng component */
-  sprintf(buf, PATH_STRUC_RNG, directory, sbuilder->name);
+  snprintf(buf, CL_MAX_LINE_LENGTH, PATH_STRUC_RNG, directory, sbuilder->name);
   if ((sbuilder->rng_fh = fopen(buf, "wb")) == NULL) {
     perror(buf);
     encode_error("Can't write .rng file for s-attribute <%s>.", name);
   }
   if (sbuilder->store_values) {
     /* create .avx and .avs components and initialise lexicon hash */
-    sprintf(buf, PATH_STRUC_AVS, sbuilder->dir, sbuilder->name);
+    snprintf(buf, CL_MAX_LINE_LENGTH, PATH_STRUC_AVS, sbuilder->dir, sbuilder->name);
     if ((sbuilder->avs_fh = fopen(buf, "wb")) == NULL) {
       perror(buf);
       encode_error("Can't write .avs file for s-attribute <%s>.", name);
     }
 
-    sprintf(buf, PATH_STRUC_AVX, sbuilder->dir, sbuilder->name);
+    snprintf(buf, CL_MAX_LINE_LENGTH, PATH_STRUC_AVX, sbuilder->dir, sbuilder->name);
     if ((sbuilder->avx_fh = fopen(buf, "wb")) == NULL) {
       perror(buf);
       encode_error("Can't write .avx file for s-attribute <%s>.", name);
@@ -613,7 +613,7 @@ s_att_declare(char *name, char *directory, int store_values, int null_attribute)
     sbuilder->recursion_children[0] = sbuilder; /* zeroeth recursion level is stored in the att. itself */
     for (i = 1; i <= sbuilder->max_recursion; i++) {
       /* recursion children have 'flat' structure, because recursion is handled explicitly */
-      sprintf(buf, "%s%d%s", sbuilder->name, i, is_feature_set ? "/" : "");
+      snprintf(buf, CL_MAX_LINE_LENGTH, "%s%d%s", sbuilder->name, i, is_feature_set ? "/" : "");
       sbuilder->recursion_children[i] = s_att_declare(buf, sbuilder->dir, sbuilder->store_values, /*null*/ 0);
       sbuilder->recursion_children[i]->automatic = 1; /* mark as automatically handled attribute */
     }
@@ -638,9 +638,9 @@ s_att_declare(char *name, char *directory, int store_values, int null_attribute)
         *p = '\0';              /* ea now points to NUL-terminated "<ea_i>" */
 
       if (sbuilder->max_recursion >= 0)
-        sprintf(buf, "%s_%s:%d", sbuilder->name, ea, sbuilder->max_recursion);
+        snprintf(buf, CL_MAX_LINE_LENGTH, "%s_%s:%d", sbuilder->name, ea, sbuilder->max_recursion);
       else
-        sprintf(buf, "%s_%s", sbuilder->name, ea);
+        snprintf(buf, CL_MAX_LINE_LENGTH, "%s_%s", sbuilder->name, ea);
       /* potential feature set marker (/) is passed on to the respective child attribute and handled there */
 
       if (ea[strlen(ea)-1] == '/')
@@ -1102,9 +1102,9 @@ p_att_declare(char *name, char *directory, int nr_buckets)
 
   /* We now create paths for each of the three files that this encoder generates.
    * The paths aren't stored in the p_attr - only the file handles from opening them. */
-  sprintf(corname, PATH_POS_CORPUS, directory, p_encoder[p_encoder_ix].name);
-  sprintf(lexname, PATH_POS_LEX,    directory, p_encoder[p_encoder_ix].name);
-  sprintf(idxname, PATH_POS_LEXIDX, directory, p_encoder[p_encoder_ix].name);
+  snprintf(corname, CL_MAX_LINE_LENGTH, PATH_POS_CORPUS, directory, p_encoder[p_encoder_ix].name);
+  snprintf(lexname, CL_MAX_LINE_LENGTH, PATH_POS_LEX,    directory, p_encoder[p_encoder_ix].name);
+  snprintf(idxname, CL_MAX_LINE_LENGTH, PATH_POS_LEXIDX, directory, p_encoder[p_encoder_ix].name);
 
   /* Note: corpus_fh is a binary file, lex_fh is kinda mixed(*), and lexidx_fh is a binary file.
    *
@@ -1400,7 +1400,7 @@ encode_generate_registry_file(char *registry_file)
   cl_id_toupper(corpus_name);
 
   info_file = (char *)cl_malloc(strlen(directory) + 1 + strlen(CWB_INFOFILE_DEFAULT_NAME) + 4); /* extra bytes as safety margin */
-  sprintf(info_file, "%s%c%s", directory, SUBDIR_SEPARATOR, CWB_INFOFILE_DEFAULT_NAME);
+  snprintf(info_file, strlen(directory) + 1 + strlen(CWB_INFOFILE_DEFAULT_NAME) + 4, "%s%c%s", directory, SUBDIR_SEPARATOR, CWB_INFOFILE_DEFAULT_NAME);
 
   /* write header part for registry file */
   fprintf(registry_fh, "##\n## registry entry for corpus %s\n##\n\n", corpus_name);

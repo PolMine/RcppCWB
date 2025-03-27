@@ -1106,7 +1106,7 @@ SortExternally(void)
       fclose(tmp);
 
       /* now, execute the external sort command on the temporary file */
-      sprintf(sort_call, "%s %s %s | gawk '{print $1}'", ExternalSortCommand, (srt_ascending ? "" : "-r"), temporary_name);
+      snprintf(sort_call, CL_MAX_LINE_LENGTH, "%s %s %s | gawk '{print $1}'", ExternalSortCommand, (srt_ascending ? "" : "-r"), temporary_name);
       if (SORT_DEBUG)
         Rprintf("Running sort: \n\t%s\n", sort_call);
 

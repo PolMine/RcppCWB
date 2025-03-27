@@ -2424,13 +2424,13 @@ cl_dynamic_call(Attribute *attribute,
 
                 case ATTAT_INT:
                 case ATTAT_POS:
-                  sprintf(istr, "%d", args[ap].value.intres);
+                  snprintf(istr, 32, "%d", args[ap].value.intres);
                   for (k = 0; istr[k]; k++)
                     call[ins++] = istr[k];
                   break;
 
                 case ATTAT_FLOAT:
-                  sprintf(istr, "%f", args[ap].value.floatres);
+                  snprintf(istr, 32, "%f", args[ap].value.floatres);
                   for (k = 0; istr[k]; k++)
                     call[ins++] = istr[k];
                   break;
@@ -2453,13 +2453,13 @@ cl_dynamic_call(Attribute *attribute,
 
               case ATTAT_INT:
               case ATTAT_POS:
-                sprintf(istr, "%d", args[ap].value.intres);
+                snprintf(istr, 32, "%d", args[ap].value.intres);
                 for (k = 0; istr[k]; k++)
                   call[ins++] = istr[k];
                 break;
 
               case ATTAT_FLOAT:
-                sprintf(istr, "%f", args[ap].value.floatres);
+                snprintf(istr, 32, "%f", args[ap].value.floatres);
                 for (k = 0; istr[k]; k++)
                   call[ins++] = istr[k];
                 break;

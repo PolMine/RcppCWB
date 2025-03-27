@@ -667,7 +667,7 @@ evaltree2searchstr(Evaltree etptr, int *length)
       right = evaltree2searchstr(etptr->node.right, &len_r);
       *length = len_l + len_r + 1;
       result = (char *)cl_malloc(*length);
-      sprintf(result, "%s %s", left, right);
+      snprintf(result, *length, "%s %s", left, right);
       cl_free(left);
       cl_free(right);
       break;
@@ -680,7 +680,7 @@ evaltree2searchstr(Evaltree etptr, int *length)
       right = evaltree2searchstr(etptr->node.right, &len_r);
       *length = len_l + len_r + 7;
       result = (char *)cl_malloc(*length);
-      sprintf(result, "( %s | %s )", left, right);
+      snprintf(result, *length, "( %s | %s )", left, right);
       cl_free(left);
       cl_free(right);
       break;
@@ -697,21 +697,21 @@ evaltree2searchstr(Evaltree etptr, int *length)
       if (min == 0 && max == repeat_inf) {
         *length = len_l + 5;
         result = (char *)cl_malloc(*length);
-        sprintf(result, "( %s )*", left);
+        snprintf(result, *length, "( %s )*", left);
         cl_free(left);
       }
 
       else if ((min == 1) && (max == repeat_inf)) {
         *length = len_l + 5;
         result = (char *)cl_malloc(*length);
-        sprintf(result, "( %s )+", left);
+        snprintf(result, *length, "( %s )+", left);
         cl_free(left);
       }
 
       else if ((min == 0) && (max == 1)) {
         *length = len_l + 4;
         result = (char *)cl_malloc(*length);
-        sprintf(result, "[ %s ]", left);
+        snprintf(result, *length, "[ %s ]", left);
         cl_free(left);
       }
 
@@ -781,7 +781,7 @@ evaltree2searchstr(Evaltree etptr, int *length)
     /* etptr->node.type is something other than node */
     char numstr[16];
     assert(etptr->leaf.type == leaf);
-    sprintf(numstr, " \"%d\" ",etptr->leaf.patindex);
+    snprintf(numstr, 16, " \"%d\" ",etptr->leaf.patindex);
     result = cl_strdup(numstr);
     *length = strlen(result) + 1;
   }

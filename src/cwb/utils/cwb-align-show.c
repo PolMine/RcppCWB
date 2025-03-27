@@ -251,11 +251,11 @@ alignshow_print_next_region(FILE *f)
 
   /* print separator bar */
   if (args == 6)
-    sprintf(line, "%s-alignment bead [%d, %d] x [%d, %d] (%d)", type, f1, l1, f2, l2, quality);
+    snprintf(line, CL_MAX_LINE_LENGTH, "%s-alignment bead [%d, %d] x [%d, %d] (%d)", type, f1, l1, f2, l2, quality);
   else if (args == 5)
-    sprintf(line, "%s-alignment bead [%d, %d] x [%d, %d] ", type, f1, l1, f2, l2);
+    snprintf(line, CL_MAX_LINE_LENGTH, "%s-alignment bead [%d, %d] x [%d, %d] ", type, f1, l1, f2, l2);
   else
-    sprintf(line, "alignment bead [%d, %d] x [%d, %d] ", f1, l1, f2, l2);
+    snprintf(line, CL_MAX_LINE_LENGTH, "alignment bead [%d, %d] x [%d, %d] ", f1, l1, f2, l2);
 
   n = (2 * COL_WIDTH + COL_SEP) - strlen(line);
   printf("%s", line);
@@ -275,10 +275,10 @@ alignshow_print_next_region(FILE *f)
         n = strlen(word);
       }
       if ((w + n) > COL_WIDTH) break; /* column full */
-      sprintf(col + w, "%s", word); w += n;
+      snprintf(col + w, MAX_COL_WIDTH + 1, "%s", word); w += n;
       i1++;                           /* next token */
       if (w < COL_WIDTH) {
-        sprintf(col + w, " ");        /* add token separator, if there's room */
+        snprintf(col + w, MAX_COL_WIDTH + 1, " ");        /* add token separator, if there's room */
         w++;
       }
     }
@@ -302,10 +302,10 @@ alignshow_print_next_region(FILE *f)
       }
       if ((w + n) > COL_WIDTH)
         break; /* column full */
-      sprintf(col + w, "%s", word); w += n;
+      snprintf(col + w, MAX_COL_WIDTH + 1, "%s", word); w += n;
       i2++;                           /* next token */
       if (w < COL_WIDTH) {
-        sprintf(col + w, " ");        /* add token separator, if there's room */
+        snprintf(col + w, MAX_COL_WIDTH + 1, " ");        /* add token separator, if there's room */
         w++;
       }
     }

@@ -210,7 +210,7 @@ initialize_cqp(int argc, char **argv)
   /* under Windows it is %HOMEDRIVE%%HOMEPATH% */
   if (NULL != (homepath = (char *)getenv("HOMEPATH")) && NULL != (homedrive = (char *)getenv("HOMEDRIVE")))  {
     home = (char *)cl_malloc(256);
-    sprintf(home, "%s%s", homedrive, homepath);
+    snprintf(home, 256, "%s%s", homedrive, homepath);
   }
 #endif
   /* note that either way above, home is NULL if the needed env var(s) were not found. */
@@ -237,9 +237,9 @@ initialize_cqp(int argc, char **argv)
 
     /* read init file specified with -I , otherwise look for $HOME/.cqprc */
     if (cqp_init_file)
-      sprintf(init_file_fullname, "%s", cqp_init_file);
+      snprintf(init_file_fullname, CL_MAX_FILENAME_LENGTH, "%s", cqp_init_file);
     else if (home)
-      sprintf(init_file_fullname, "%s%c%s", home, SUBDIR_SEPARATOR, CQPRC_NAME);
+      snprintf(init_file_fullname, CL_MAX_FILENAME_LENGTH, "%s%c%s", home, SUBDIR_SEPARATOR, CQPRC_NAME);
 
     if (init_file_fullname[0] != '\0') {
       if (NULL != (cqprc = fopen(init_file_fullname, "r"))) {
@@ -274,9 +274,9 @@ initialize_cqp(int argc, char **argv)
 
       /* read macro init file specified with -M ; otherwise look for ~/.cqpmacros */
       if (macro_init_file)
-        sprintf(init_file_fullname, "%s", macro_init_file);
+        snprintf(init_file_fullname, CL_MAX_FILENAME_LENGTH, "%s", macro_init_file);
       else if (home)
-        sprintf(init_file_fullname, "%s%c%s", home, SUBDIR_SEPARATOR, CQPMACROS_NAME);
+        snprintf(init_file_fullname, CL_MAX_FILENAME_LENGTH, "%s%c%s", home, SUBDIR_SEPARATOR, CQPMACROS_NAME);
 
       if (init_file_fullname[0] != '\0') {
         if (NULL != (cqprc = fopen(init_file_fullname, "r"))) {

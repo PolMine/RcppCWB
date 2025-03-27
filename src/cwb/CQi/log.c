@@ -143,10 +143,10 @@ cqiserver_debug_arglist(const char *arg_list, int n_args, int int_args)
   if (server_debug) {
     for (i = 0, mark = buf ; i < n_args ; i += incr)
       if (int_args)
-        sprintf(mark += strlen(mark), "%d ", (int)arg_list[i]);
+        snprintf(mark += strlen(mark), CL_MAX_LINE_LENGTH, "%d ", (int)arg_list[i]);
       else
         /* super creaky typecasting needed to get the compiler to not complain here */
-        sprintf(mark += strlen(mark), "'%s' ", arg_list);
+        snprintf(mark += strlen(mark), CL_MAX_LINE_LENGTH, "'%s' ", arg_list);
   }
   return buf;
 }

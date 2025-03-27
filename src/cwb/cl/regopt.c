@@ -242,8 +242,9 @@ cl_new_regex(char *regex, int flags, CorpusCharset charset)
   cl_free(delatexed_regex);
 
   /* add start and end anchors to improve performance of regex matcher for expressions such as ".*ung" */
-  anchored_regex = (char *) cl_malloc(strlen(preprocessed_regex) + 7);
-  sprintf(anchored_regex, "^(?:%s)$", preprocessed_regex);
+  int regex_len = strlen(preprocessed_regex) + 7;
+  anchored_regex = (char *) cl_malloc(regex_len);
+  snprintf(anchored_regex, regex_len, "^(?:%s)$", preprocessed_regex);
   length_regex = (PCRE2_SIZE)strlen(anchored_regex);
 
   /* compile regular expression with PCRE library function */

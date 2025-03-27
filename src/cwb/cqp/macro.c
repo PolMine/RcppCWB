@@ -522,7 +522,7 @@ expand_macro(const char *name)
     cl_free(macro_arg[i]);
 
   /* set pseudo argument */
-  sprintf(pseudo_arg, "_pseudo_%u", pseudo_arg_counter++);
+  snprintf(pseudo_arg, 20, "_pseudo_%u", pseudo_arg_counter++);
 
   /* some rather daring circular usage of the lexical analyzer ... but it _should_ work */
   /* the '(' is part of the macro token recognised by the lexical analyzer now */
@@ -1149,7 +1149,7 @@ macro_iterator_next_prototype(const char *prefix)
   prototype = (char *)cl_malloc(len);
 
   /* assemble formatted prototype: /NAME[ARG, ARG, ARG] */
-  sprintf(prototype, "/%s[", macro->name);
+  snprintf(prototype, len, "/%s[", macro->name);
   for (i = 0; i < macro->args; i++) {
     strcat(prototype, macro->argnames[i] ? macro->argnames[i] : "_");
     /* append ',' unless this is the last argument */
@@ -1209,7 +1209,7 @@ list_macros(const char *prefix)
       if (!prefix || !strncasecmp(p->name, prefix, len)) {
         l = strlen(p->name) + 8;
         macro_name = (char *) cl_malloc(l);
-        sprintf(macro_name, "/%s(%d)", p->name, p->args);
+        snprintf(macro_name, l, "/%s(%d)", p->name, p->args);
         list[k++] = macro_name;
       }
 
@@ -1223,7 +1223,7 @@ list_macros(const char *prefix)
     if (pretty_print) {
       if (list[i][1] != initial) {
         initial = list[i][1];
-        sprintf(label, " %c:", initial);
+        snprintf(label, 4, " %c:", initial);
         ilist_print_break(label);
       }
       ilist_print_item(list[i]);

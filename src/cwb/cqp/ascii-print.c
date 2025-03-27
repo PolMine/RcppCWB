@@ -259,7 +259,7 @@ get_screen_escapes(void)
 
   /* in highlighted mode, switch off display attributes at end of line (to be on the safe side) */
   ASCIIHighlightedPrintDescriptionRecord.AfterLine = cl_malloc(strlen(sc_all_out) + 2);
-  sprintf(ASCIIHighlightedPrintDescriptionRecord.AfterLine,
+  snprintf(ASCIIHighlightedPrintDescriptionRecord.AfterLine, strlen(sc_all_out) + 2,
           "%s\n", sc_all_out);
 
   /* print cpos in blue, "print structures" in pink if we're in coloured mode */
@@ -270,13 +270,13 @@ get_screen_escapes(void)
     char *bold = get_typeface_escape('b');
 
     ASCIIHighlightedPrintDescriptionRecord.CPOSPrintFormat = cl_malloc(strlen(blue) + strlen(normal) + 8);
-    sprintf(ASCIIHighlightedPrintDescriptionRecord.CPOSPrintFormat,
+    snprintf(ASCIIHighlightedPrintDescriptionRecord.CPOSPrintFormat, strlen(blue) + strlen(normal) + 8,
             "%s%c9d:%s ", blue, '%', normal);
     ASCIIHighlightedPrintDescriptionRecord.BeforePrintStructures = cl_malloc(strlen(pink) + strlen(bold) + 4);
-    sprintf(ASCIIHighlightedPrintDescriptionRecord.BeforePrintStructures,
+    snprintf(ASCIIHighlightedPrintDescriptionRecord.BeforePrintStructures, strlen(pink) + strlen(bold) + 4,
             "%s%s", pink, bold);
     ASCIIHighlightedPrintDescriptionRecord.AfterPrintStructures = cl_malloc(strlen(normal) + 6);
-    sprintf(ASCIIHighlightedPrintDescriptionRecord.AfterPrintStructures,
+    snprintf(ASCIIHighlightedPrintDescriptionRecord.AfterPrintStructures, strlen(normal) + 6,
             ":%s ", normal);
   }
 }
@@ -384,7 +384,7 @@ ascii_print_field(FieldType field, int at_end)
     /* if colours are activated & seem to work, print target number in red, otherwise print in parens */
     if (*red) {
       /* must set colour first, then all other current attributes */
-      sprintf(sc_before_token + strlen(sc_before_token),
+      snprintf(sc_before_token + strlen(sc_before_token), 0 + strlen(sc_before_token),
               "%s%s%s%s%s%d",
               sc_all_out,
               red,
@@ -394,7 +394,7 @@ ascii_print_field(FieldType field, int at_end)
               field - TargetField);       /* should yield 0 .. 9  */
     }
     else
-      sprintf(sc_before_token + strlen(sc_before_token), "(%d)", field - TargetField ); /* should yield 0 .. 9 */
+      snprintf(sc_before_token + strlen(sc_before_token), strlen(sc_before_token), "(%d)", field - TargetField ); /* should yield 0 .. 9 */
   }
 
   /* set the display attribute flags */
@@ -427,7 +427,7 @@ ascii_print_field(FieldType field, int at_end)
   }
 
   /* now compose escape sequence which has to be sent to the terminal (setting _all_ attributes to their current values) */
-  sprintf(sc_before_token + strlen(sc_before_token),
+  snprintf(sc_before_token + strlen(sc_before_token), strlen(sc_before_token),
           "%s%s%s%s",
           sc_all_out,                /* first switch off all attributes, then set the active ones in order standout, underline, bold */
           (sc_s_mode) ? sc_s_in : "",

@@ -228,8 +228,8 @@ compress_reversed_index(Attribute *attr, char *output_fn, char *corpus_id, int d
   }
 
   if (output_fn) {
-    sprintf(data_fname, "%s.crc", output_fn);
-    sprintf(index_fname, "%s.crx", output_fn);
+    snprintf(data_fname, CL_MAX_FILENAME_LENGTH, "%s.crc", output_fn);
+    snprintf(index_fname, CL_MAX_FILENAME_LENGTH, "%s.crx", output_fn);
   }
   else {
     s = component_full_name(attr, CompCompRF, NULL);
@@ -358,8 +358,8 @@ decompress_check_reversed_index(Attribute *attr, char *output_fn, char *corpus_i
   }
 
   if (output_fn) {
-    sprintf(data_fname, "%s.crc", output_fn);
-    sprintf(index_fname, "%s.crx", output_fn);
+    snprintf(data_fname, CL_MAX_FILENAME_LENGTH, "%s.crc", output_fn);
+    snprintf(index_fname, CL_MAX_FILENAME_LENGTH, "%s.crx", output_fn);
   }
   else {
     s = component_full_name(attr, CompCompRF, NULL);

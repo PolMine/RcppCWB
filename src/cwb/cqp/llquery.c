@@ -201,7 +201,7 @@ cqp_custom_completion(const char *text, int start, int end)
 #endif
       if (strncmp(prefix, var->my_name, prefix_len) == 0) { /* found variable matching prefix -> format and add */
         completion = cl_malloc(strlen(var->my_name) + 2);
-        sprintf(completion, "$%s", var->my_name);
+        snprintf(completion, strlen(var->my_name) + 2, "$%s", var->my_name);
         cc_compl_list_add(completion);
       }
       var = variables_iterator_next();
@@ -308,7 +308,7 @@ cqp_custom_completion(const char *text, int start, int end)
             if (mother_len) {
               /* we must allocate a string of sufficient length and build a full subcorpus specifier */
               completion = (char *) cl_malloc(mother_len + 1 + strlen(cl->name) + 1);
-              sprintf(completion, "%s:%s", mother, cl->name);
+              snprintf(completion, mother_len + 1 + strlen(cl->name) + 1, "%s:%s", mother, cl->name);
               cc_compl_list_add(completion);
             }
             else {
@@ -329,7 +329,7 @@ cqp_custom_completion(const char *text, int start, int end)
           /* requires special handling: return ''<mother>:'' */
           char *completion = (char *) cl_malloc(strlen(cl->mother_name) + 2);
           /* just show there are subcorpora as well; user must type ':' to see subcorpora completions */
-          sprintf(completion, "%s:", cl->mother_name);
+          snprintf(completion, strlen(cl->mother_name) + 2, "%s:", cl->mother_name);
           /* note that this will return the same string over and over again if there are multiple subcorpora;
              fortunately, readline sorts and uniqs the list of completions, so we don't have to worry */
           cc_compl_list_add(completion);
@@ -405,15 +405,15 @@ readline_main(void)
       if (current_corpus != NULL) {
         /* don't use terminal colours for the prompt because they mess up readline's formatting */
         if (cl_streq(current_corpus->name, current_corpus->mother_name))
-          sprintf(prompt, "%s> ", current_corpus->name);
+          snprintf(prompt, CL_MAX_LINE_LENGTH, "%s> ", current_corpus->name);
         else
-          sprintf(prompt, "%s:%s[%d]> ",
+          snprintf(prompt, CL_MAX_LINE_LENGTH, "%s:%s[%d]> ",
                   current_corpus->mother_name,
                   current_corpus->name,
                   current_corpus->size);
       }
       else
-        sprintf(prompt, "[no corpus]> ");
+        snprintf(prompt, CL_MAX_LINE_LENGTH, "[no corpus]> ");
       input = readline(prompt);
     }
 
@@ -491,7 +491,7 @@ main(int argc, char *argv[])
     for (i = 3; i <= 4; i++) {
       Rprintf("[");
       for (j = 0; j < 8; j++) {
-        sprintf(sc_colour, "\x1B[0;%d%dm", i,j);
+        snprintf(sc_colour, 256, "\x1B[0;%d%dm", i,j);
         Rprintf("%d%d: %sN%s%sB%s%sU%s%sS%s  ",
                i, j,
                sc_colour,

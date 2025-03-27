@@ -58,7 +58,7 @@ char emulate_setenv_buffer[CL_MAX_LINE_LENGTH]; /* should be big enough for "var
 int
 setenv(const char *name, const char *value, int overwrite) {
   assert(name != NULL && value != NULL && "Invalid call of setenv() emulation function.");
-  sprintf(emulate_setenv_buffer, "%s=%s", name, value);
+  snprintf(emulate_setenv_buffer, CL_MAX_LINE_LENGTH, "%s=%s", name, value);
   return putenv(emulate_setenv_buffer);
 }
 

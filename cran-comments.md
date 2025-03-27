@@ -1,8 +1,7 @@
 ## General remarks
 
-This release fixes a compiler warning 'argument 1 value '18446744073709551615' exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]'. I have been notified that the fix is expected by September 28.
+- Usage of `sprintf()` has been replaced by `snprintf()` 
 
-The (significant) compiler warning is newly thrown by GCC 14. I have used a Docker image with Fedora 40, R-devel (r87186) and GCC 14 to reproduce and fix the issue.
 
 Previous aspects I repeat:
 
