@@ -430,7 +430,12 @@ int was_pipe;
     break;
   default:
     Rprintf("CL: internal error, managed I/O stream has invalid type = %d\n", stream->type);
+#ifndef R_PACKAGE
     exit(1);
+#else 
+    /* we return -1 to indicate that closing the stream was not successful */
+    return -1;
+#endif
   }
 
   /* remove stream from list */

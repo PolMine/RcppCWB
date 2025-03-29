@@ -20,6 +20,7 @@
 # * Edit this file to configure CWB for your system *
 # **********************************************************
 
+
 # 
 # PLATFORM-SPECIFIC CONFIGURATION (OS and CPU type)
 #

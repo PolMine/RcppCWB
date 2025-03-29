@@ -16,7 +16,11 @@
  */
 
 
+#ifdef R_PACKAGE
 void Rprintf(const char *, ...);
+void Rf_error(const char *, ...);
+#endif
+
 #ifndef _cl_globals_h_
 #define _cl_globals_h_
 

@@ -2088,8 +2088,12 @@ YY_BUFFER_STATE yy_scan_bytes  (const char * yybytes, yy_size_t  _yybytes_len )
 
 static void yynoreturn yy_fatal_error (const char* msg )
 {
-			Rprintf("%s\n", msg );
+#ifndef R_PACKAGE
+  Rprintf("%s\n", msg );
 	exit( YY_EXIT_FAILURE );
+#else
+	Rf_error(msg);
+#endif
 }
 
 /* Redefine yyless() so it works in section 3 code. */

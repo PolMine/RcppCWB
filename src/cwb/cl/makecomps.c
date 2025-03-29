@@ -278,7 +278,12 @@ creat_rev_corpus(Component *revcorp)
   /* open REVCORP data file for writing */
   if ((revcorp_fd = fopen(revcorp->path, "wb")) == NULL) {
     perror(revcorp->path);
+#ifndef R_PACKAGE
     exit(1);
+#else 
+    Rf_error("Could not create reverse component\n");
+    return -1;
+#endif
   }
 
   /*

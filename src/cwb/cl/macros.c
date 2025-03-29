@@ -58,7 +58,11 @@ cl_malloc(size_t bytes)
     Rprintf("CL: Out of memory. (killed)\n");
     Rprintf("CL: [cl_malloc(%ld)]\n", bytes);
     Rprintf("\n");		/* for CQP's child mode */
+    #ifdef R_PACKAGE
+    return NULL;
+    #else
     exit(1);
+    #endif
   }
   return block;
 }
@@ -80,7 +84,11 @@ cl_calloc(size_t nr_of_elements, size_t element_size)
     Rprintf("CL: Out of memory. (killed)\n");
     Rprintf("CL: [cl_calloc(%ld*%ld bytes)]\n", nr_of_elements, element_size);
     Rprintf("\n");		/* for CQP's child mode */
+    #ifdef R_PACKAGE
+    return NULL;
+    #else
     exit(1);
+    #endif
   }
   return block;
 }
@@ -109,7 +117,11 @@ cl_realloc(void *block, size_t bytes)
       Rprintf("CL: Out of memory. (killed)\n");
       Rprintf("CL: [cl_realloc(block at %p to %ld bytes)]\n", block, bytes);
       Rprintf("\n");		/* for CQP's child mode */
+      #ifdef R_PACKAGE
+      return NULL;
+      #else
       exit(1);
+      #endif
     }
   }
   return new_block;
@@ -131,7 +143,11 @@ cl_strdup(const char *string)
     Rprintf("CL: Out of memory. (killed)\n");
     Rprintf("CL: [cl_strdup(addr=%p, len=%ld)]\n", string, strlen(string));
     Rprintf("\n");		/* for CQP's child mode */
+    #ifdef R_PACKAGE
+    return NULL;
+    #else
     exit(1);
+    #endif
   }
   return new_string;
 }
