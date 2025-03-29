@@ -1059,8 +1059,10 @@ YY_DECL
 		if ( ! yyin )
 			yyin = stdin;
 
+#ifndef R_PACKAGE
 		if ( ! yyout )
 			yyout = stdout;
+#endif
 
 		if ( ! YY_CURRENT_BUFFER ) {
 			yyensure_buffer_stack ();

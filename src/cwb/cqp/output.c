@@ -241,6 +241,7 @@ open_rd_output_stream(struct Redir *rd, CorpusCharset charset)
     rd->stream = cl_open_stream(rd->name, mode, (insecure) ? CL_STREAM_MAGIC_NOPIPE : CL_STREAM_MAGIC);
     rd->is_paging = False;
   }
+#ifndef R_PACKAGE
   else {
     if (pager && paging && isatty(fileno(stdout))) {
       if (insecure)
@@ -269,6 +270,11 @@ open_rd_output_stream(struct Redir *rd, CorpusCharset charset)
       rd->is_paging = False;
     }
   }
+#else
+  else {
+    Rf_error("Paging not allowed in the R context\n");
+  }
+#endif
 
   if (!rd->stream) {
     cqpmessage(Error, "Can't write to %s: %s", (rd->name) ? rd->name : "STDOUT", cl_error_string(cl_errno));
@@ -607,7 +613,14 @@ corpus_info(CorpusList *cl)
   if (cl->type == SYSTEM) {
     /* use pager, or simply print to stdout if it fails */
     stream_ok = open_rd_output_stream(&to_less, ascii);
+#ifndef R_PACKAGE
     outfh = stream_ok ? to_less.stream : stdout;
+#else 
+    if (!stream_ok)
+      Rf_error("pager not available, aborting\n");
+    else
+      outfh = to_less.stream;
+#endif
 
     /* print name for child mode (added v3.4.15)  */
     if (child_process)

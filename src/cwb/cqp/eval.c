@@ -3616,7 +3616,9 @@ show_environment(int thisenv)
     }
 
     Rprintf("\n ================= END ENVIRONMENT #%d =============\n", thisenv);
+#ifndef R_PACKAGE
     fflush(stdout);
+#endif
   }
 }
 

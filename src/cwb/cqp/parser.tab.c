@@ -2450,7 +2450,9 @@ yyreduce:
     {
                                           /* print special code ``-::-EOL-::-'' marking end-of-command in child mode */
                                           Rprintf("-::-EOL-::-\n"); 
+#ifndef R_PACKAGE
                                           fflush(stdout); 
+#endif
                                         ;}
     break;
 

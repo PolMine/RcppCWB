@@ -201,8 +201,10 @@ initialize_cqp(int argc, char **argv)
 
   /* let's always run stdout unbuffered */
   /*  if (batchmode || rangeoutput || insecure || !isatty(fileno(stdout))) */
+#ifndef R_PACKAGE
   if (setvbuf(stdout, NULL, _IONBF, 0) != 0)
     perror("unbuffer stdout");
+#endif
 
   yydebug = parser_debug;
 
