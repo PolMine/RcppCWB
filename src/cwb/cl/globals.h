@@ -19,6 +19,7 @@
 #ifdef R_PACKAGE
 void Rprintf(const char *, ...);
 void Rf_error(const char *, ...);
+void	Rf_warning(const char *, ...);
 #endif
 
 #ifndef _cl_globals_h_

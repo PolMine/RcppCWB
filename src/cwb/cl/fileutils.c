@@ -281,7 +281,11 @@ cl_open_stream(const char *filename, int mode, int type)
 
     /* "-" = STDIN or STDOUT */
     if (cl_str_is(filename, "-"))
+#ifndef R_PACKAGE
       type = CL_STREAM_STDIO;
+#else
+    Rf_warning("Reading/writing from stdout/stdin disabled in R context\n");
+#endif 
     else {
       point = (char *) filename + strspn(filename, " \t");
 
@@ -355,7 +359,11 @@ cl_open_stream(const char *filename, int mode, int type)
     handle = popen(filename, mode_spec);
     break;
   case CL_STREAM_STDIO:
+#ifndef R_PACKAGE
     handle = (mode == CL_STREAM_READ) ? stdin : stdout;
+#else
+    Rf_error("CL: invalid I/O stream type in R context = %d\n", type);
+#endif
     break;
   default:
     Rprintf("CL: invalid I/O stream type = %d\n", type);

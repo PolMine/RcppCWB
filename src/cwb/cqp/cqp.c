@@ -443,11 +443,12 @@ cqp_parse_file(FILE *src, int exit_on_parse_errors)
       }
 
       /* in child mode, flush output streams after every parse pass. */
+#ifndef R_PACKAGE
       if (child_process && !reading_cqprc) {
         fflush(stdout);
         fflush(stderr);
       }
-
+#endif
     }
     /* end of loop over yyparse() calls. "ok" is now set to what we want to return. */
 

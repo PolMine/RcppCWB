@@ -316,7 +316,11 @@ REGEX2DFA_ERROR(char *Format, ...)
   va_start(AP, Format);
   Rprintf(Format, AP);
   va_end(AP);
+#ifndef R_PACKAGE
   fputc('\n', stderr);
+#else
+  Rprintf("\n");
+#endif
   if (++ERRORS == MAX_ERRORS) {
 #ifndef R_PACKAGE
     Rprintf("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
