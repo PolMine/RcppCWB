@@ -318,8 +318,12 @@ REGEX2DFA_ERROR(char *Format, ...)
   va_end(AP);
   fputc('\n', stderr);
   if (++ERRORS == MAX_ERRORS) {
+#ifndef R_PACKAGE
     Rprintf("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("regex2dfa: Reached the %d error limit.\n", MAX_ERRORS);
+#endif
   }
 }
 
@@ -363,8 +367,12 @@ LEX(void)
   if (isalpha(Ch) || Ch == '_' || Ch == '$') {
     for (LastW = ChP; isalnum(Ch) || Ch == '_' || Ch == '$'; ChP++) {
       if (ChP - ChArr == MAX_CHAR) {
+#ifndef R_PACKAGE
         Rprintf("Out of character space.\n");
         exit(cqp_error_status ? cqp_error_status : 1);
+#else
+        Rf_error("Out of character space.\n");
+#endif
       }
       *ChP = Ch;
       Ch = GET();
@@ -372,8 +380,12 @@ LEX(void)
     if (Ch != EOF)
       UNGET(Ch);
     if (ChP - ChArr == MAX_CHAR) {
+#ifndef R_PACKAGE
       Rprintf("Out of character space.\n");
       exit(cqp_error_status ? cqp_error_status : 1);
+#else
+      Rf_error("Out of character space.\n");
+#endif
     }
     *ChP++ = '\0';
     return IdenT;
@@ -382,19 +394,31 @@ LEX(void)
     Ch = GET();
     for (LastW = ChP; Ch != '"' && Ch != EOF; ChP++) {
       if (ChP - ChArr == MAX_CHAR) {
+#ifndef R_PACKAGE
         Rprintf("Out of character space.\n");
         exit(cqp_error_status ? cqp_error_status : 1);
+#else
+        Rf_error("Out of character space.\n");
+#endif
       }
       *ChP = Ch;
       Ch = GET();
     }
     if (Ch == EOF) {
+#ifndef R_PACKAGE
       Rprintf("Missing closing \".\n");
       exit(cqp_error_status ? cqp_error_status : 1);
+#else
+      Rf_error("Missing closing \".\n");
+#endif
     }
     if (ChP - ChArr == MAX_CHAR) {
+#ifndef R_PACKAGE
       Rprintf("Out of character space.\n");
       exit(cqp_error_status ? cqp_error_status : 1);
+#else
+      Rf_error("Out of character space.\n");
+#endif
     }
     *ChP++ = '\0';
     return IdenT;
@@ -604,8 +628,12 @@ static void
 PUSH(StackTag Tag, int Q)
 {
   if (SP >= Stack + STACK_MAX) {
+#ifndef R_PACKAGE
     REGEX2DFA_ERROR("Expression too complex ... aborting.");
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Expression too complex ... aborting.");
+#endif
   }
   SP->Tag = Tag;
   SP->Q = Q;
@@ -683,8 +711,12 @@ END:
   /* finish off parsing by checking for anything left over indicating errors etc. */
   switch (Action[TOP][L])  {
   case 'A':
+#ifndef R_PACKAGE
     REGEX2DFA_ERROR("Extra ','");
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Extra ','");
+#endif
   case 'B':
     REGEX2DFA_ERROR("Unmatched ).");
     L = LEX();
@@ -710,11 +742,19 @@ END:
     L = LEX();
     goto MakeOpt;
   case 'H':
+#ifndef R_PACKAGE
     REGEX2DFA_ERROR("Left-hand side of '=' must be symbol.");
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Left-hand side of '=' must be symbol.");
+#endif
   case 'I':
+#ifndef R_PACKAGE
     REGEX2DFA_ERROR("Missing evaluation.");
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Missing evaluation.\n");
+#endif
   case '.':
     POP();
     return RHS;
@@ -1178,7 +1218,11 @@ regex2dfa(char *rxs, DFA *automaton)
   if (ERRORS > 0)
     Rprintf("%d error(s)\n", ERRORS);
   if (Q == -1)
+#ifndef R_PACKAGE
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Aborting ...\n");
+#endif
   FormState(Q);
   MergeStates();
 

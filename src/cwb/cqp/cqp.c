@@ -115,7 +115,11 @@ static void
 sigINT_signal_handler(int signum)
 {
   if (!signal_handler_is_installed)
+#ifndef R_PACKAGE
     exit(cqp_error_status ? cqp_error_status : 1); /* make sure we abort if Ctrl-C is pressed a second time (even on platforms where signal handlers don't need to be reinstalled) */
+#else
+    Rf_error("** Aborting evaluation ...");
+#endif
 
   if (EvaluationIsRunning) {
     Rprintf("** Aborting evaluation ... (press Ctrl-C again to exit CQP)\n");
@@ -245,14 +249,22 @@ initialize_cqp(int argc, char **argv)
       if (NULL != (cqprc = fopen(init_file_fullname, "r"))) {
         reading_cqprc = 1;        /* not good for very much, really */
         if (!cqp_parse_file(cqprc, 1)) {
+#ifndef R_PACKAGE
           Rprintf("Parse errors while reading %s, exiting.\n",  init_file_fullname);
           exit(cqp_error_status ? cqp_error_status : 1);
+#else
+          Rf_error("Parse errors while reading %s, exiting.\n",  init_file_fullname);
+#endif
         }
         reading_cqprc = 0; /* no need to close the file - cqp_parse_file() does so once it's chewed it up */
       }
       else if (cqp_init_file) {
+#ifndef R_PACKAGE
         Rprintf("Can't read initialization file %s\n", init_file_fullname);
         exit(cqp_error_status ? cqp_error_status : 1);
+#else
+        Rf_error("Can't read initialization file %s\n", init_file_fullname);
+#endif
       }
     }
   }
@@ -282,14 +294,22 @@ initialize_cqp(int argc, char **argv)
         if (NULL != (cqprc = fopen(init_file_fullname, "r"))) {
           reading_cqprc = 1;
           if (!cqp_parse_file(cqprc, 1)) {
+#ifndef R_PACKAGE
             Rprintf("Parse errors while reading %s, exiting.\n", init_file_fullname);
             exit(cqp_error_status ? cqp_error_status : 1);
+#else
+            Rf_error("Parse errors while reading %s, exiting.\n", init_file_fullname);
+#endif
           }
           reading_cqprc = 0;
         }
         else if (macro_init_file) {
+#ifndef R_PACKAGE
           Rprintf("Can't read macro initialization file %s\n", init_file_fullname);
           exit(cqp_error_status ? cqp_error_status : 1);
+#else
+          Rf_error("Can't read macro initialization file %s\n", init_file_fullname);
+#endif
         }
       }
     } /* end of (if we have a macro init file, OR we are in interactive mode & able to seek for ~/.cqpmacros ...) */
@@ -299,8 +319,12 @@ initialize_cqp(int argc, char **argv)
 
   /* load the default corpus. */
   if ((default_corpus) && !set_current_corpus_name(default_corpus, 0)) {
+#ifndef R_PACKAGE
     Rprintf("Can't set current corpus to default corpus %s, exiting.\n", default_corpus);
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Can't set current corpus to default corpus %s, exiting.\n", default_corpus);
+#endif
   }
 
 #ifndef __MINGW__

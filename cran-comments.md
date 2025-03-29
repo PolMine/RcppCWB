@@ -1,6 +1,8 @@
 ## General remarks
 
-- Usage of `sprintf()` has been replaced by `snprintf()` 
+- Usage of `sprintf()` has been replaced by `snprintf()`
+- Calls of `exit()` have been replaced by `Rf_error()` (using preprocessor
+directives and a newly used macro R_PACKAGE)
 
 
 Previous aspects I repeat:

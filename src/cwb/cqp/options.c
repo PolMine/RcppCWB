@@ -377,8 +377,12 @@ cqp_usage(void)
     Rprintf("Usage: %s [options]\n", progname);
     break;
   default:
+#ifndef R_PACKAGE
     Rprintf("??? Unknown application ???\n");
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("??? Unknown application ???\n");
+#endif
   }
   Rprintf("Options:\n");
   Rprintf("    -h           help\n");
@@ -426,7 +430,11 @@ cqp_usage(void)
     Rprintf("       [ ServerLog [on], ServerDebug, Snoop (log all network traffic)   ]\n");
   Rprintf("       [ ALL (activate all modes except ParseOnly)                      ]\n");
   Rprintf("\n");
+#ifndef R_PACKAGE
   exit(cqp_error_status ? cqp_error_status : 1);
+#else
+  Rf_error("Aborting ...\n");
+#endif
 }
 
 /**
@@ -779,8 +787,12 @@ execute_side_effects(int opt)
     break;
 
   default:
+#ifndef R_PACKAGE
     Rprintf("Unknown side-effect #%d invoked by option %s.\n", cqpoptions[opt].side_effect, cqpoptions[opt].opt_name);
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("Unknown side-effect #%d invoked by option %s.\n", cqpoptions[opt].side_effect, cqpoptions[opt].opt_name);
+#endif
   }
 }
 
@@ -1070,8 +1082,12 @@ parse_options(int ac, char *av[])
 
     case 'E':
       if (!(query_string = getenv(optarg))) {
+#ifndef R_PACKAGE
         Rprintf("Environment variable %s has no value, exiting\n", optarg);
         exit(cqp_error_status ? cqp_error_status : 1);
+#else
+        Rf_error("Environment variable %s has no value, exiting\n", optarg);
+#endif
       }
       break;
 
@@ -1127,8 +1143,12 @@ parse_options(int ac, char *av[])
           cl_set_debug_level(activate_cl_debug);
         }
         else {
+#ifndef R_PACKAGE
           Rprintf("Invalid debug mode: -d %s\nType '%s -h' for more information.\n", optarg, progname);
           exit(cqp_error_status ? cqp_error_status : 1);
+#else
+          Rf_error("Invalid debug mode: -d %s\nType '%s -h' for more information.\n", optarg, progname);
+#endif
         }
       }
       break;
@@ -1138,8 +1158,12 @@ parse_options(int ac, char *av[])
       break;
 
     case 'v':
+#ifndef R_PACKAGE
       Rprintf("%s\n", licensee);
       exit(cqp_error_status);
+#else
+      Rf_error("%s\n", licensee);
+#endif
 
     case 's':
       auto_subquery = 1;
@@ -1197,13 +1221,21 @@ parse_options(int ac, char *av[])
       /* note that cl_open_stream() handles the case where the filename is "-" for stdin */
       if (!(batchfh = cl_open_stream(optarg, CL_STREAM_READ, CL_STREAM_MAGIC))) {
         perror(optarg);
+#ifndef R_PACKAGE
         exit(cqp_error_status ? cqp_error_status : 1);
+#else
+        Rf_error("Aborting ...\n");
+#endif
       }
       break;
 
     default:
+#ifndef R_PACKAGE
       Rprintf("Invalid option. Type '%s -h' for more information.\n", progname);
       exit(cqp_error_status ? cqp_error_status : 1);
+#else
+      Rf_error("Invalid option. Type '%s -h' for more information.\n", progname);
+#endif
       break;
     }
 }

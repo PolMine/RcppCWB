@@ -346,8 +346,12 @@ ActivateCorpus(CorpusList *cl)
   cqpmessage(Message, "ActivateCorpus: %s", cl);
 
   if (inhibit_activation) {
+#ifndef R_PACKAGE
     Rprintf("Activation prohibited\n");
     exit(cqp_error_status ? cqp_error_status : 1); /* hard way! */
+#else
+    Rf_error("Activation prohibited\n");
+#endif
   }
   else {
     query_corpus = cl;

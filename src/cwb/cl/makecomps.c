@@ -192,7 +192,11 @@ creat_freqs(Component *freqs)
   if ((fd = fopen(corpus_fn, "rb")) == NULL) {
     Rprintf("CL makecomps:creat_freqs(): Couldn't open corpus %s\n", corpus_fn);
     perror(corpus_fn);
+#ifndef R_PACKAGE
     exit(2);
+#else
+    Rf_error("Abort\n");
+#endif
   }
 
   /* do the counts */

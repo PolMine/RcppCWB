@@ -275,8 +275,12 @@ calculate_ranges(CorpusList *cl, int cpos, Context spc, int *left, int *right)
     break;
 
   default:
+#ifndef R_PACKAGE
     Rprintf("calculate_ranges: undefined space type %d detected\n", spc.space_type);
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("calculate_ranges: undefined space type %d detected\n", spc.space_type);
+#endif
     break;
   }
   return 1;

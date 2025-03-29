@@ -278,8 +278,12 @@ MacroHashDelete(MacroEntry macro)
       if (p->next == macro)
         break;
     if (!p) {                /* this REALLY shouldn't happen */
+#ifndef R_PACKAGE
       cqpmessage(Error, "MacroHashDelete: MacroEntry not found in hash ???");
       exit(cqp_error_status ? cqp_error_status : 1);
+#else
+      Rf_error("MacroHashDelete: MacroEntry not found in hash ???");
+#endif
     }
     p->next = macro->next;        /* cut macro from list */
   }

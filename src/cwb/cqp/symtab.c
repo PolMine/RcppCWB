@@ -254,8 +254,12 @@ dup_reftab(RefTab rt1, RefTab rt2)
 {
   assert(rt1 && rt2);
   if (rt1->size != rt2->size) {
+#ifndef R_PACKAGE
     Rprintf("dup_reftab()<symtab.c>: Tried to dup() RefTab (%d entries) to RefTab of different size (%d entries)\n", rt1->size, rt2->size);
     exit(cqp_error_status ? cqp_error_status : 1);
+#else
+    Rf_error("dup_reftab()<symtab.c>: Tried to dup() RefTab (%d entries) to RefTab of different size (%d entries)\n", rt1->size, rt2->size);
+#endif
   }
   memcpy(rt2->data, rt1->data, rt1->size * sizeof(int));
 }
@@ -276,8 +280,12 @@ set_reftab(RefTab rt, int index, int value)
 {
   if (rt) {
     if (index < 0 || index >= rt->size) {
+#ifndef R_PACKAGE
       cqpmessage(Error, "RefTab index #%d not in range 0 .. %d", index, rt->size - 1);
       exit(cqp_error_status ? cqp_error_status : 1);
+#else
+      Rf_error("RefTab index #%d not in range 0 .. %d", index, rt->size - 1);
+#endif
     }
     else
       rt->data[index] = value;
