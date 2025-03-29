@@ -345,8 +345,12 @@ creat_rev_corpus(Component *revcorp)
     for (id = primus + 1; id <= secundus; id++) {
       ptr += cl_id2freq(attr, id);
       if (ptr != ptab[id]) {
+#ifndef R_PACKAGE
         Rprintf("CL makecomps: Pointer inconsistency for id=%d. Aborting.\n", id);
         exit(1);
+#else
+        Rf_error("CL makecomps: Pointer inconsistency for id=%d. Aborting.\n", id);
+#endif
       }
     }
 
@@ -364,8 +368,12 @@ creat_rev_corpus(Component *revcorp)
 
   /* finally, check amount of data read/written vs. expected */
   if ((ints_written != cpos) || (ints_written != datasize)) {
+#ifndef R_PACKAGE
     Rprintf("CL makecomps: Data size inconsistency: expected=%d, read=%d, written=%d.\n", datasize, cpos, ints_written);
     exit(1);
+#else
+    Rf_error("CL makecomps: Data size inconsistency: expected=%d, read=%d, written=%d.\n", datasize, cpos, ints_written);
+#endif
   }
 
   /* free allocated memory */
@@ -433,9 +441,13 @@ creat_rev_corpus_idx(Component *revcidx)
   /* WE DO NOT CONVERT the table from host to network order while
    * writing it, since it's already been created in network order!!! */
   if (write_file_from_blob(revcidx->path, &(revcidx->data), 0) == 0) {
+#ifndef R_PACKAGE
     Rprintf("CL makecomps: Can't open %s for writing", revcidx->path);
     perror(revcidx->path);
     exit(2);
+#else
+    Rf_error("CL makecomps: Can't open %s for writing", revcidx->path);
+#endif
   }
 
   return 1;

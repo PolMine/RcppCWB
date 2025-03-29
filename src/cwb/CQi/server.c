@@ -98,8 +98,12 @@ char cqi_error_string[GENERAL_ERROR_SIZE] = "No error.";
 void
 cqi_send_error(char *function)
 {
+#ifndef R_PACKAGE
   cqiserver_log(Error, "ERROR CQi data send failure in function\n\t%s() <server.c>", function);
   exit(1);
+#else
+  Rf_error("ERROR CQi data send failure in function\n\t%s() <server.c>", function);
+#endif
 }
 
 /**
@@ -112,8 +116,12 @@ cqi_send_error(char *function)
 void
 cqi_recv_error(char *function)
 {
+#ifndef R_PACKAGE
   cqiserver_log(Error, "ERROR CQi data recv failure in function\n\t%s() <server.c>\n", function);
   exit(1);
+#else
+  Rf_error("ERROR CQi data recv failure in function\n\t%s() <server.c>\n", function);
+#endif
 }
 
 /**
@@ -127,8 +135,12 @@ cqi_recv_error(char *function)
 void
 cqi_internal_error(char *function, char *cause)
 {
+#ifndef R_PACKAGE
   cqiserver_log(Error, "ERROR Internal error in function\n\t%s() <server.c>\n\t''%s''", function, cause);
   exit(1);
+#else
+  Rf_error("ERROR Internal error in function\n\t%s() <server.c>\n\t''%s''", function, cause);
+#endif
 }
 
 
@@ -190,8 +202,12 @@ accept_connection(int port)
 
 #ifndef __MINGW__
   if (SIG_ERR == signal(SIGCHLD, SIG_IGN)) {
+#ifndef R_PACKAGE
     perror("ERROR Can't ignore SIGCHLD");
     exit(1);
+#else
+    Rf_error("ERROR Can't ignore SIGCHLD");
+#endif
   }
 #endif
 
@@ -254,7 +270,11 @@ accept_connection(int port)
     if (pid != 0) {
       /* parent returns to caller */
       close(sockfd);
+#ifndef R_PACKAGE
       exit(cqiserver_log(Info, "[child is running in background now, parent server quits]") || cqp_error_status);
+#else
+      Rf_error("[child is running in background now, parent server quits]");
+#endif
     }
   }
 #else
@@ -273,7 +293,12 @@ accept_connection(int port)
       FD_SET(sockfd, &read_fd);
 
       if (0 >= select(sockfd+1, &read_fd, NULL, NULL, &tv) || !FD_ISSET(sockfd, &read_fd))
+#ifndef R_PACKAGE
         exit(cqiserver_log(Error, "Port #%d timed out in private server mode. Aborting.", port) || cqp_error_status);
+#else
+      Rf_error("Port #%d timed out in private server mode. Aborting.", port);
+#endif      
+      
     }
 
     connfd = accept(sockfd, (struct sockaddr *)&client_addr, &sin_size);
@@ -304,7 +329,11 @@ accept_connection(int port)
 
     if (private_server) {
       close(sockfd);
+#ifndef R_PACKAGE
       exit(cqiserver_log(Info, "Accepting no more connections (private server).") || cqp_error_status);
+#else
+      Rf_error("Accepting no more connections (private server).");
+#endif
       /* SIGCHLD should be reaped by calling process */
     }
 #else
@@ -329,10 +358,16 @@ accept_connection(int port)
 
   /* check if remote host is in validation list */
   if (!check_host(client_addr.sin_addr)) {
+#ifndef R_PACKAGE
     cqiserver_log(Info, "WARNING %s not in list, connection refused!\n", remote_address);
     cqiserver_log(Info, "Exit. (pid = %d)\n", (int)getpid());
     close(connfd);
     exit(1);
+#else 
+    close(connfd);
+    Rprintf("WARNING %s not in list, connection refused!\n", remote_address);
+    Rf_error("Exit. (pid = %d)\n", (int)getpid());
+#endif
   }
 
 #ifndef __MINGW__
