@@ -595,11 +595,15 @@ cqpmessage(MessageType type, const char *format, ...)
 void
 corpus_info(CorpusList *cl)
 {
+#ifndef R_PACKAGE
   FILE *fh;
   FILE *outfh;
 
   char buf[CL_MAX_LINE_LENGTH];
   int i, ok, stream_ok;
+#else
+  int stream_ok;
+#endif
 
   struct Redir to_less = { NULL, NULL, NULL, 0 }; /* for paging (with open_stream()) */
 
@@ -618,8 +622,6 @@ corpus_info(CorpusList *cl)
 #else 
     if (!stream_ok)
       Rf_error("pager not available, aborting\n");
-    else
-      outfh = to_less.stream;
 #endif
 
     /* print name for child mode (added v3.4.15)  */
@@ -645,6 +647,7 @@ corpus_info(CorpusList *cl)
     Rprintf("\n");
 
     /* do we have further info in a .INFO file? */
+#ifndef R_PACKAGE
     if (
         !cl->corpus->info_file
         ||
@@ -668,7 +671,10 @@ corpus_info(CorpusList *cl)
 
       cl_close_stream(fh);
     }
-
+#else
+    Rprintf("Printing information from info file not available from R.\n");
+#endif
+    
     if (stream_ok)
       close_rd_output_stream(&to_less);        /* close pipe to pager if we were using it */
 
