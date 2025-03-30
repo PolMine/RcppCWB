@@ -1508,7 +1508,9 @@ int cwb_encode_worker(cl_string_list input_files){
   while ( encode_get_input_line(linebuf, MAX_INPUT_LINE_LENGTH) ) {
     if (verbose && (line % 15000 == 0)) {
       Rprintf("%" COMMA_SEP_THOUSANDS_CONVSPEC "9dk tokens processed\r", line >> 10);
+#ifndef R_PACKAGE      
       fflush(stdout);
+#endif
     }
 
     input_line++;
