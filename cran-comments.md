@@ -1,8 +1,13 @@
 ## General remarks
 
-- Usage of `sprintf()` has been replaced by `snprintf()`
+This maintanence release shall meet expanded checks of symbols in linked static
+libraries:
+
+- Usage of `sprintf()` has been replaced by `snprintf()`;
 - Calls of `exit()` have been replaced by `Rf_error()` (using preprocessor
-directives and a newly used macro R_PACKAGE)
+directives and a newly used macro R_PACKAGE);
+- Calls of `putchar()` and `vprintf()` have been replaced;
+- `stderr` and `stdout` not used any more.
 
 
 Previous aspects I repeat:

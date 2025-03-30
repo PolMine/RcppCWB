@@ -140,6 +140,14 @@ Open Corpus Workbench (\url{https://cwb.sourceforge.io})
 Witten, I.H.; Moffat, A.; Bell, T.C. (1999). Managing Gigabytes. Morgan
 Kaufmann Publishing, San Francisco, 2nd edition.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/PolMine/RcppCWB}
+  \item Report bugs at \url{https://github.com/PolMine/RcppCWB/issues}
+}
+
+}
 \author{
 Andreas Blaette (andreas.blaette@uni-due.de)
 }
