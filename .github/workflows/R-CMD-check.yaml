@@ -99,7 +99,7 @@ jobs:
           
       - name: Upload Windows binary
         if: matrix.config.os == 'windows-latest'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: RcppCWB-Windows-binary
           path: ./*.zip
