@@ -76,7 +76,7 @@ devtools::install_github("PolMine/RcppCWB", ref = "dev")
 
 ## Installation on macOS
 
-On macOS, the [pcre2](http://www.pcre.org/) and
+On macOS, the [pcre2](https://www.pcre.org/) and
 [Glib](https://docs.gtk.org/glib) libraries need to be present. We
 recommend to use ‘Homebrew’ as a package manager for macOS. To install
 Homebrew, follow the instructions on the [Homebrew
@@ -185,7 +185,7 @@ cqp_initialize(registry = registry)
 cqp_query(corpus = "REUTERS", query = '"crude" "oil"')
 ```
 
-    ## <pointer: 0x103757ca0>
+    ## <pointer: 0x12e036020>
 
 ``` r
 cpos <- cqp_dump_subcorpus(corpus = "REUTERS")

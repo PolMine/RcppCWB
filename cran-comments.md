@@ -9,6 +9,10 @@ directives and a newly used macro R_PACKAGE);
 - Calls of `putchar()` and `vprintf()` have been replaced;
 - `stderr` and `stdout` not used any more.
 
+Further fixes:
+
+- The page for the BSD licence for https://www.pcre.org/licence.txt is not
+available, in the DESCRIPTION file I now refer to https://github.com/PCRE2Project/pcre2/blob/master/LICENCE.md
 
 Previous aspects I repeat:
 
