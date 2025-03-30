@@ -35,7 +35,11 @@
 
 #ifdef __MINGW__
 
+#ifdef R_PACKAGE
 void Rprintf(const char *, ...);
+void Rf_error(const char *, ...);
+#endif
+
 #include "windows-mmap.h"
 
 /**
@@ -61,16 +65,24 @@ mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset)
   if (!fstat(fd, &st))
     len = (size_t) st.st_size;
   else {
+#ifndef R_PACKAGE
     Rprintf("mmap: could not determine filesize");
     exit(1);
+#else
+    Rf_error("mmap: could not determine filesize");
+#endif
   }
 
   if ((length + offset) > len)
     length = len - offset;
 
   if (!(flags & MAP_PRIVATE)) {
+#ifndef R_PACKAGE
     Rprintf("Invalid usage of mmap when built with USE_WIN32_MMAP");
     exit(1);
+#else
+    Rf_error("Invalid usage of mmap when built with USE_WIN32_MMAP");
+#endif
   }
 
   hmap = CreateFileMapping((HANDLE)_get_osfhandle(fd), 0, PAGE_WRITECOPY, 0, 0, 0);
