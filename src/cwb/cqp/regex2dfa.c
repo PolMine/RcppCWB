@@ -1113,7 +1113,7 @@ WriteStates(void)
         Rprintf(" |");
       Rprintf(" %s s%d", SP->ShList[Sh].LHS->Name, STab[C].Class);
     }
-    putchar('\n');
+    Rprintf('\n');
   }
 }
 
@@ -1156,7 +1156,7 @@ show_complete_dfa(DFA dfa)
     if (dfa.Final[i])
       Rprintf("(final)");
     else
-      putchar('\t');
+      Rprintf('\t');
     for (j = 0; j < dfa.Max_Input; j++)   {
       Rprintf("\t%d -> ", j);
       if (dfa.TransTable[i][j] == dfa.E_State)
@@ -1164,7 +1164,7 @@ show_complete_dfa(DFA dfa)
       else
         Rprintf("s%d,",dfa.TransTable[i][j]);
     }
-    putchar('\n');
+    Rprintf('\n');
   }
 }
 

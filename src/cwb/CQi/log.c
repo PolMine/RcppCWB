@@ -68,7 +68,7 @@ cqiserver_log(MessageType msg_type, const char *msg, ...)
   if (server_log || Error == msg_type) {
     va_start(vector, msg);
     Rprintf("CQPserver: ");
-    vprintf(msg, vector);
+    Rprintf(msg, vector);
     Rprintf("\n");
     va_end(vector);
   }
