@@ -202,7 +202,7 @@ endif
 # Set up compiler and linker flags
 #
 
-CFLAGS += -DR_PACKAGE
+CFLAGS += -DR_PACKAGE -DNDEBUG
 CFLAGS += $(DEBUG_FLAGS) $(SITE_CFLAGS)
 LDFLAGS += $(DEBUG_FLAGS) $(SITE_LDFLAGS)
 
