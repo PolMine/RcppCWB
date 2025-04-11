@@ -241,7 +241,10 @@ creat_freqs(Component *freqs)
 int
 creat_rev_corpus(Component *revcorp)
 {
+/* freqs is only used in assert, causes unused variable warning when macro NDEBUG is set */
+#ifndef NDEBUG
   Component *freqs;
+#endif
   int cpos = 0, f, id, ints_written, pass;
 
   int datasize;
@@ -261,11 +264,15 @@ creat_rev_corpus(Component *revcorp)
   attr = revcorp->attribute;          /* need the attribute handle to use CL functions */
 
   /* get the frequency table to compute offsets and fill buffer */
+#ifndef NDEBUG
   freqs = ensure_component(attr, CompCorpusFreqs, 1);
 
   assert(freqs != NULL);
   assert(freqs->corpus == revcorp->corpus); /* gotta be kidding ... */
-
+#else
+  ensure_component(attr, CompCorpusFreqs, 1);
+#endif
+  
   lexsize = cl_max_id(attr);        /* this is the number of lexicon entries for this attribute */
   ptab = (int **) cl_malloc(sizeof(int *) * ((size_t) lexsize)); /* table of pointers into <buffer> */
 

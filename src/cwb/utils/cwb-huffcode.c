@@ -610,15 +610,22 @@ compute_code_lengths(Attribute *attr, HCD *hc, char *fname)
       char huf_path[CL_MAX_LINE_LENGTH];
       char sync_path[CL_MAX_LINE_LENGTH];
 
+/* corp is only used by assert, if macro NDEBUG is set, defining the variable causes compiler warning */
+#ifndef NDEBUG
       Component *corp;
+#endif
 
       BFile bfd;
       FILE *sync;
 
       int cl, code, pos;
 
+#ifndef NDEBUG
       corp = ensure_component(attr, CompCorpus, 0);
       assert(corp);
+#else
+      ensure_component(attr, CompCorpus, 0);
+#endif
 
       if (fname) {
         path = fname;
