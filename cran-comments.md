@@ -1,18 +1,13 @@
 ## General remarks
 
-This maintanence release shall meet expanded checks of symbols in linked static
-libraries:
+This is a quick follow up to the previous release to meet expanded checks of
+symbols in linked static libraries. A WARNING issued on macOS check machines 
+is addressed:
 
-- Usage of `sprintf()` has been replaced by `snprintf()`;
-- Calls of `exit()` have been replaced by `Rf_error()` (using preprocessor
-directives and a newly used macro R_PACKAGE);
-- Calls of `putchar()` and `vprintf()` have been replaced;
-- `stderr` and `stdout` not used any more.
-
-Further fixes:
-
-- The page for the BSD licence for https://www.pcre.org/licence.txt is not
-available. In the DESCRIPTION file I now refer to https://github.com/PCRE2Project/pcre2/blob/master/LICENCE.md
+- (Non-)Usage of `assert()` is now controlled by explicitly setting the flag
+NDEBUG when compiling static libraries;
+- 'unused variable' warnings that are issued as a side effect are handled by
+using macros.
 
 Previous aspects I repeat:
 
@@ -28,10 +23,9 @@ change.
 
 ## Test environments
 
-* Docker image with Fedora 40, R-devel r87186 and GCC 14
+* Docker image with Fedora 42, R-devel r87186 and GCC 20
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* R winbuilder (R 4.3.3, R 4.4.1, R-devel r87186 ucrt)
-* local macOS, R 4.3.1 (arm64)
+* local macOS, R 4.4.1 (arm64)
 
 
 ## R CMD check results
