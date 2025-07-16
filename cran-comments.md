@@ -1,13 +1,6 @@
 ## General remarks
 
-This is a quick follow up to the previous release to meet expanded checks of
-symbols in linked static libraries. A WARNING issued on macOS check machines 
-is addressed:
-
-- (Non-)Usage of `assert()` is now controlled by explicitly setting the flag
-NDEBUG when compiling static libraries;
-- 'unused variable' warnings that are issued as a side effect are handled by
-using macros.
+This release fixes an error thrown by gcc-ASAN checks (null destination pointer warning)
 
 Previous aspects I repeat:
 
@@ -23,19 +16,14 @@ change.
 
 ## Test environments
 
-* Docker image with Fedora 42, R-devel r87186 and GCC 20
+* Docker image with Fedora 42
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
 * local macOS, R 4.4.1 (arm64)
 
 
 ## R CMD check results
 
-Check status is OK on all test environments. A warning I have seen but that I cannot reproduce results from this website:
-
-https://txm.gitpages.huma-num.fr/textometrie/ (unable to get local issuer certificate)
-
-I do not see these on the  R winbuilder for R release of R devel. My browsers do
-not show a problem with these certificates either. 
+Check status is OK on all test environments.
 
 
 ## Downstream dependencies
