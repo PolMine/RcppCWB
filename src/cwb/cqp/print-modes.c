@@ -91,7 +91,7 @@ ComputePrintStructures(CorpusList *cl)
   for ( ai = al ? al->list : NULL ; ai ; ai = ai->next ) {
     if (p != printStructure)
       *p++ = ' ';                /* insert blank between attributes */
-    snprintf(p, strlen(p), "%s", ai->attribute->any.name);
+    snprintf(p, printStructure + sizeof(printStructure) - p, "%s", ai->attribute->any.name);
     p += strlen(p);
   }
 
