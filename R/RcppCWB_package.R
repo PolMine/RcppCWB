@@ -135,5 +135,5 @@
 #'     paste(tokens, collapse = " ")
 #'   }
 #'  )
-NULL
+"_PACKAGE"
 
