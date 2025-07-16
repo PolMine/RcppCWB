@@ -1,3 +1,7 @@
+# RcppCWB 0.6.8
+
+* Fixes null destination pointer warning issued by gcc-ASAN #99.
+
 # RcppCWB 0.6.5
 
 * Fixes a 'exceeds maximum object size'-compiler warning #93.
