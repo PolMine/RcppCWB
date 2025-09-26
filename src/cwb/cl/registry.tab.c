@@ -822,9 +822,9 @@ do {						\
 } while (YYID (0))
 
 # define YY_SYMBOL_PRINT(Title, Type, Value, Location)			  \
-do {									  \
-  if (yydebug)								  \
-    {									  \
+do {                                               
+  if (yydebug)
+    {
       YYFPRINTF ("%s ", Title);
     
 /*
