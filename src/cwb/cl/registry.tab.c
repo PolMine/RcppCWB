@@ -827,8 +827,7 @@ do {									  \
     {									  \
       YYFPRINTF ("%s ", Title);
 #ifndef R_PACKAGE
-      yy_symbol_print (stderr,						  \
-		  Type, Value); \
+      yy_symbol_print (stderr, Type, Value);
 #endif;
       YYFPRINTF ("\n");						  \
     }									  \
@@ -947,9 +946,7 @@ yy_reduce_print (yyvsp, yyrule)
     {
       Rprintf("   $%d = ", yyi + 1);
 #ifndef R_PACKAGE
-      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
-		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi], &(yyvsp[(yyi + 1) - (yynrhs)]));
 #endif;
       Rprintf("\n");
     }
