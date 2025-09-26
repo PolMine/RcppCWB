@@ -825,14 +825,14 @@ do {						\
 do {									  \
   if (yydebug)								  \
     {									  \
-      YYFPRINTF ("%s ", Title);                                \
+      YYFPRINTF ("%s ", Title);
     
 /*
       yy_symbol_print (stderr, Type, Value);
 */
 
-      YYFPRINTF ("\n");						  \
-    }									  \
+      YYFPRINTF ("\n");
+    }
 } while (YYID (0))
 
 
