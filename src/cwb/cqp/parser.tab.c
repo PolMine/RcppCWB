@@ -1600,9 +1600,11 @@ do {						\
 do {									  \
   if (yydebug)								  \
     {									  \
-      YYFPRINTF ("%s ", Title);					  \
+      YYFPRINTF ("%s ", Title);					  \                        
+#ifndef R_PACKAGE
       yy_symbol_print (stderr,						  \
 		  Type, Value); \
+#endif      
       YYFPRINTF ("\n");						  \
     }									  \
 } while (YYID (0))
@@ -1719,10 +1721,12 @@ yy_reduce_print (yyvsp, yyrule)
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       Rprintf("   $%d = ", yyi + 1);
+#ifndef R_PACKAGE
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      Rprintf("\n");
+#endif
+            Rprintf("\n");
     }
 }
 
