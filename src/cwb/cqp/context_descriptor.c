@@ -356,7 +356,7 @@ print_context_descriptor(ContextDescriptor *cdp)
     fh = (stream_ok) ? dst.stream : stdout; /* use pager, or simply print to stdout if it fails */
 #else
     if (stream_ok) fh = dst.stream; else return;
-#endif;
+#endif
 
     if (pretty_print) {
       Rprintf("===Context Descriptor=======================================\n");
