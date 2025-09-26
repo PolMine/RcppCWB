@@ -826,8 +826,8 @@ do {									  \
   if (yydebug)								  \
     {									  \
       YYFPRINTF ("%s ", Title);					  \
-      /* yy_symbol_print (stderr,						  \
-		  Type, Value); */ \
+      yy_symbol_print (stderr,						  \
+		  Type, Value); \
       YYFPRINTF ("\n");						  \
     }									  \
 } while (YYID (0))
@@ -944,9 +944,9 @@ yy_reduce_print (yyvsp, yyrule)
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       Rprintf("   $%d = ", yyi + 1);
-      /* yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
+      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-      ); */
+		       		       );
       Rprintf("\n");
     }
 }
