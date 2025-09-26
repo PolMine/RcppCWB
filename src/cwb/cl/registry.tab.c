@@ -826,11 +826,6 @@ do {
   if (yydebug)
     {
       YYFPRINTF("%s ", Title);
-    
-/*
-      yy_symbol_print (stderr, Type, Value);
-*/
-
       YYFPRINTF("\n");
     }
 } while (YYID (0))
