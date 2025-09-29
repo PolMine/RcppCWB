@@ -1,6 +1,7 @@
 ## General remarks
 
-This release fixes an error thrown by gcc-ASAN checks (null destination pointer warning)
+This release fixes a warning thrown by Fedora/R-devel(clang: potential
+stderr/stdout usage removed from C code.
 
 Previous aspects I repeat:
 
@@ -18,7 +19,7 @@ change.
 
 * Docker image with Fedora 42
 * CI checks with GitHub Actions (Windows/macOS/Ubuntu)
-* local macOS, R 4.4.1 (arm64)
+* local macOS, R 4.5.1 (arm64)
 
 
 ## R CMD check results

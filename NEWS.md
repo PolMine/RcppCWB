@@ -1,3 +1,7 @@
+# RcppCWB 0.6.9
+
+* Fixes stderr/stout usage in C code.
+
 # RcppCWB 0.6.8
 
 * Fixes null destination pointer warning issued by gcc-ASAN #99.
