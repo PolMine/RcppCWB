@@ -1,7 +1,17 @@
 ## General remarks
 
-This release fixes a warning thrown by Fedora/R-devel(clang: potential
-stderr/stdout usage removed from C code.
+To explain the quick follow-up:_ RcppCWB v0.6.9 fixed a warning thrown by
+Fedora/R-devel/clang: stderr/stdout symbols in RcppCWB.so. CRAN checks show,
+that this issue re-occurrs:
+https://www.r-project.org/nosvn/R.check/r-devel-linux-x86_64-fedora-clang/RcppCWB-00check.html
+
+There is a side effect of clang version 21.1.2, the NOTE did not show last
+week with clang version 21.1.1.
+
+I want to solve/address this issue, before you send out a message. On this 
+occasion: v0.6.9 had solved the known issue. LLVM development seems to be 
+fairly dynamic, newest dev versions of the clang linker apparently pull in
+symbols into the dynamic library that previously remained outside. 
 
 Previous aspects I repeat:
 

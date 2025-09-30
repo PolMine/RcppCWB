@@ -1,6 +1,11 @@
+# RcppCWB 0.6.10
+
+* Fixes stderr/stout usage in C code of the Corpus Workbench that is issued by
+the latest dev version of LLVM #102.
+
 # RcppCWB 0.6.9
 
-* Fixes stderr/stout usage in C code.
+* Fixes stderr/stout usage in C code #100.
 
 # RcppCWB 0.6.8
 
