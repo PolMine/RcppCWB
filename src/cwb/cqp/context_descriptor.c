@@ -352,7 +352,15 @@ print_context_descriptor(ContextDescriptor *cdp)
 
   if (cdp) {
     stream_ok = open_rd_output_stream(&dst, ascii);
+#ifndef R_PACKAGE
     fh = (stream_ok) ? dst.stream : stdout; /* use pager, or simply print to stdout if it fails */
+#else
+    /* we need to avoid using stdout */
+    if (stream_ok)
+      fh = dst.stream;
+    else
+      return;
+#endif
 
     if (pretty_print) {
       Rprintf("===Context Descriptor=======================================\n");

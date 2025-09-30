@@ -821,6 +821,7 @@ do {						\
     YYFPRINTF Args;				\
 } while (YYID (0))
 
+# ifndef R_PACKAGE
 # define YY_SYMBOL_PRINT(Title, Type, Value, Location)			  \
 do {									  \
   if (yydebug)								  \
@@ -831,7 +832,16 @@ do {									  \
       YYFPRINTF ("\n");						  \
     }									  \
 } while (YYID (0))
-
+# else 
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)			  \
+do {									                                              \
+  if (yydebug)								                                     \
+  {									                                               \
+    YYFPRINTF ("%s ", Title);					                         \
+    YYFPRINTF ("\n");						                                \
+  }									                                               \
+} while (YYID (0))
+# endif
 
 /*--------------------------------.
 | Print this symbol on YYOUTPUT.  |
@@ -944,9 +954,11 @@ yy_reduce_print (yyvsp, yyrule)
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       Rprintf("   $%d = ", yyi + 1);
+#ifndef R_PACKAGE
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
+#endif
       Rprintf("\n");
     }
 }
