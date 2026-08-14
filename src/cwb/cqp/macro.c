@@ -1089,7 +1089,7 @@ static MacroEntry
 macro_iterator_seek(const char *prefix)
 {
   int prefix_length;
-  char *first_paren;
+  const char *first_paren;
 
   if (enable_macros && MacroHash) {
     prefix_length = (NULL != prefix) ? strlen(prefix) : 0;

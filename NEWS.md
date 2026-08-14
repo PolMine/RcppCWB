@@ -1,3 +1,8 @@
+# RcppCWB 0.6.11
+
+* Fixes a 'discarded-qualifiers' warning reported by CRAN check machines #104.
+* Fixes a 'unused-const-variable' warning.
+
 # RcppCWB 0.6.10
 
 * Fixes stderr/stout usage in C code of the Corpus Workbench that is issued by

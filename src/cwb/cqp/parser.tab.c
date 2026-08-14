@@ -790,7 +790,7 @@ static const yytype_uint8 yytranslate[] =
 #if YYDEBUG
 /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
    YYRHS.  */
-static const yytype_uint16 yyprhs[] =
+/* static const yytype_uint16 yyprhs[] =
 {
        0,     0,     3,     4,     7,     9,    10,    11,    15,    16,
       21,    24,    25,    29,    30,    35,    36,    39,    41,    43,
@@ -828,10 +828,10 @@ static const yytype_uint16 yyprhs[] =
      931,   935,   936,   939,   940,   948,   956,   961,   963,   964,
      967,   971,   978,   981,   983,   985,   988,   989,   991,   992,
      994,   995,   997,   998,  1000,  1001,  1003,  1004,  1006
-};
+}; */
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
-static const yytype_int16 yyrhs[] =
+/* static const yytype_int16 yyrhs[] =
 {
      123,     0,    -1,    -1,   124,   125,    -1,   104,    -1,    -1,
       -1,   126,   131,   104,    -1,    -1,    89,    14,   127,   104,
@@ -935,7 +935,7 @@ static const yytype_int16 yyrhs[] =
       -1,    -1,    55,    -1,    -1,    95,    -1,    -1,    36,    -1,
       -1,    81,    -1,    -1,    16,    -1,    16,   112,    14,   113,
       -1
-};
+}; */
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
